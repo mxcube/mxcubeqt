@@ -1,3 +1,3 @@
 [submodule "./Bricks/MotorBricks"]
-	path = ./Bricks/MotorBricks
+	path = Bricks/MotorBricks
 	url = git://forge.epn-campus.eu/repositories/MotorBricks2.git
