@@ -33,9 +33,9 @@ class SpecCmd(qt.QObject):
   def __call__(self, *args):
     spec_cmd = self.ho.getCommandObject(self.spec_cmd_name)
     if not self._initialized:
-      qt.QObject.connect(spec_cmd, qt.PYSIGNAL("commandReplyArrived"), self._emitReplyArrived)
-      qt.QObject.connect(spec_cmd, qt.PYSIGNAL("commandAborted"), self._emitAborted)
-      qt.QObject.connect(spec_cmd, qt.PYSIGNAL("commandFailed"), self._emitFailed)  
+      spec_cmd.connectSignal('commandReplyArrived', self._emitReplyArrived)
+      spec_cmd.connectSignal("commandAborted", self._emitAborted)
+      spec_cmd.connectSignal("commandFailed", self._emitFailed)
     self._initialized = True
     spec_cmd(*args)
 
