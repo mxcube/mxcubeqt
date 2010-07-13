@@ -557,6 +557,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
             logging.getLogger().exception("Could not stop %s", self.name())
 
         #self.setAcceptDrops(True)
+        self.__enabledState = self.isEnabled()
         QWidget.setEnabled(self, True)
        
 
@@ -623,23 +624,8 @@ class BlissWidget(QWidget, Connectable.Connectable):
             QObject.disconnect(sender, pysignal and PYSIGNAL(signal) or SIGNAL(signal), signalSlotFilter)
 
 
-    def setEnabled(self, enabled):
-        #print 'set enabled called', enabled, type(enabled)
-        #import sys; f=sys._getframe(1); print f.f_code.co_name + " " + str(f.f_lineno) + " " + f.f_code.co_filename
-        if type(enabled) == types.IntType:
-            #event comes from Qt
-            if self.isRunning():
-                QWidget.setEnabled(self, enabled)
-            return
-
-        self.__enabledState = enabled
-
-        if self.isRunning():
-            QWidget.setEnabled(self, enabled)
-	   
-
     def reparent(self, *args, **kwargs):
-        savedEnabledState = self.__enabledState
+        savedEnabledState = self.isEnabled()
 
         QWidget.reparent(self, *args, **kwargs)
 
