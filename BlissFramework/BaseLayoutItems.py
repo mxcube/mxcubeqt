@@ -124,7 +124,7 @@ class WindowCfg(ContainerCfg):
         self.properties.addProperty("expertPwd", "string", "tonic")
 
         self.signals.update({ "isShown": (), "isHidden": (), "enableExpertMode": (), "quit":() })
-        self.slots.update({ "show": (), "hide": (), "setCaption": () })
+        self.slots.update({ "show": (), "hide": (), "setCaption": (), "exitExpertMode": () })
 
     """
     def addChild(self, item):

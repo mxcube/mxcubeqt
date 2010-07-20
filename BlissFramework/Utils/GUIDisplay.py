@@ -487,6 +487,12 @@ class WindowDisplayWidget(qt.QScrollView):
 
         return ret
 
+    def exitExpertMode(self, *args):
+        if len(args) > 0:
+          if args[0]:
+            return
+        BlissWidget._menuBar.setExpertMode(False)
+        BlissWidget._menuBar.expertMode.setChecked(False)
 
     def addItem(self, item_cfg, parent):
         type = item_cfg["type"]
