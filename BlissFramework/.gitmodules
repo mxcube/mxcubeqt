@@ -1,0 +1,24 @@
+[submodule "Bricks/Instrument"]
+	path = Bricks/Instrument
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/Instrument
+[submodule "Bricks/Scans"]
+	path = Bricks/Scans
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/Scans
+[submodule "Bricks/Camera"]
+	path = Bricks/Camera
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/Camera
+[submodule "Bricks/Motor"]
+	path = Bricks/Motor
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/Motor
+[submodule "Bricks/Spec"]
+	path = Bricks/Spec
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/Spec
+[submodule "Bricks/GuiUtils"]
+	path = Bricks/GuiUtils
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/GuiUtils
+[submodule "Bricks/BeamlineComponent"]
+	path = Bricks/BeamlineComponent
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/BeamlineComponent
+[submodule "Bricks/mxCuBE"]
+	path = Bricks/mxCuBE
+	url = git://git.epn-campus.eu/repositories/fwk2_bricks/mxCuBE
