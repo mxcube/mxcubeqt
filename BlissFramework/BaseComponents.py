@@ -426,7 +426,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
 
 
     @staticmethod
-    def widgetComboBoxActivated(brick_name, widget_name,masterSync,widget,index):
+    def widgetComboBoxActivated(brick_name, widget_name,widget,masterSync,index):
         lines=[]
         if widget.editable():
             for i in range(widget.count()):
