@@ -401,7 +401,8 @@ class GUISupervisor(qt.QWidget):
             try:
                 main_widget=self.loadGUI(event.data())
             finally:
-                self.splashScreen.finish(main_widget)
+                if main_widget:
+                  self.splashScreen.finish(main_widget)
                 del self.splashScreen
         except:
             logging.getLogger().exception("exception while loading GUI file")
