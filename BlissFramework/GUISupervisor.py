@@ -114,11 +114,20 @@ class GUISupervisor(qt.QWidget):
                                     logging.getLogger().exception("could not load properties for %s", item["name"])
                                 else:
                                     item["properties"]=props
-
+                                    """
                                     try:
                                         mne_list.append(props["mnemonic"])
                                     except:
                                         pass
+                                    """
+                                    try:
+                                      for prop in props:
+                                        prop_value = prop.getValue()
+                                        if type(prop_value)==type('') and prop_value.startswith("/"):
+                                          mne_list.append(prop_value)
+                                    except:
+                                      logging.exception("could not build list of required hardware objects")
+
                                 continue
 
                             mne_list += getMnemonics(item["children"])
