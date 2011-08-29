@@ -93,7 +93,8 @@ def setLogFile(filename):
 
     _logger.removeHandler(_hdlr)
         
-    _hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 5 files max.           
+    _hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 5 files max.
+    os.chmod(filename, 666)
     _hdlr.setFormatter(_formatter)
     _logger.addHandler(_hdlr)
 
