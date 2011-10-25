@@ -407,6 +407,7 @@ class GUISupervisor(qt.QWidget):
                 break
 
         try:
+            main_widget = None
             try:
                 main_widget=self.loadGUI(event.data())
             finally:
