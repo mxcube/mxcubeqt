@@ -351,7 +351,6 @@ class GUISupervisor(qt.QWidget):
     def finalize(self):
         BlissWidget.setRunMode(False) # call .stop() for each brick
 
-        self.hardwareRepository.timer.stop()
         self.hardwareRepository.close()
 
         qt.qApp.sendPostedEvents()

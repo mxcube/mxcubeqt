@@ -1,5 +1,5 @@
 #!/usr/bin/env python 
-
+import gevent
 import fcntl
 import tempfile
 import socket
@@ -195,7 +195,17 @@ if __name__ == '__main__':
     # redirect errors to logger
     #
     ErrorHandler.enableStdErrRedirection()
-    
+   
+    #
+    # install a Qt timer for gevent loop 
+    # (this is not the best solution, but is good enough for now)
+    #
+    gevent_loop_qtimer = QTimer()
+    def run_gevent_loop():
+      gevent.sleep(0.01)
+    QObject.connect(gevent_loop_qtimer, SIGNAL("timeout()"), run_gevent_loop)
+    gevent_loop_qtimer.start(0)
+ 
     app.exec_loop()
     
     if lockfile is not None:
