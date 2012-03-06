@@ -183,8 +183,8 @@ if __name__ == '__main__':
    
     supervisor = GUISupervisor.GUISupervisor(executionOnly = opts.executionOnly, designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
 
-    QObject.connect(app, SIGNAL("aboutToQuit()"), supervisor.finalize)
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    #QObject.connect(app, SIGNAL("aboutToQuit()"), supervisor.finalize)
+    #QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
 
     #BlissFramework.setDebugMode(True)
     #
@@ -199,15 +199,20 @@ if __name__ == '__main__':
   
     def process_qt_events():
       while True:
+        time.sleep(0.01)
         while app.hasPendingEvents():
           app.processEvents()
+
           time.sleep(0.01)
-        if app.mainWidget() and app.mainWidget().isShown():
-          app.exec_loop()
-          break
+
+          if not app.mainWidget() or not app.mainWidget().isVisible():
+            return
  
     qt_events = gevent.spawn(process_qt_events)
     qt_events.join() 
+
+    supervisor.finalize()
+    app.quit() 
 
     if lockfile is not None:
         filename = lockfile.name
