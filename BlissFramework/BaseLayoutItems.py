@@ -200,6 +200,8 @@ class TabCfg(ContainerCfg):
             if "label" in child["properties"].properties:
                 slot_name="showPage_%s" % child["properties"]["label"]
                 self.slots[slot_name.replace(" ", "_")]=()
+                slot_name="hidePage_%s" % child["properties"]["label"]
+                self.slots[slot_name.replace(" ", "_")]=()
                 slot_name="enablePage_%s" % child["properties"]["label"]
                 self.slots[slot_name.replace(" ", "_")]=()
                 slot_name="enableTab_%s" % child["properties"]["label"]
