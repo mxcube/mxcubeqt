@@ -321,17 +321,18 @@ class WindowDisplayWidget(qt.QScrollView):
 
             # add 'hide page' slot
             slotName = "hidePage_%s" % label
-            def tab_slot(self, hide=True, page_index=self.indexOf(scrollview), page={"widget":None, "label": ""}):
+            def tab_slot(self, hide=True, page_index=self.indexOf(scrollview), page={"widget":None, "label": "", "hidden":False}):
                 if hide:
-                  page['widget'] = self.page(page_index)
-                  page["label"] = self.tabLabel(page["widget"])
-                  self.removePage(page["widget"])
+                  if not page["hidden"]:
+                    page['widget'] = self.page(page_index)
+                    page["label"] = self.tabLabel(page["widget"])
+                    self.removePage(page["widget"])
+                    page["hidden"] = True
                 else:
-                  if page["widget"] is None:
-                    return
-                  else:
+                  if page["hidden"]:
                     self.insertTab(page["widget"], page["label"], page_index)
                     self.showPage(page["widget"])
+                    page["hidden"] = False
             try:
               self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
             except: 
