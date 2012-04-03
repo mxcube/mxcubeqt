@@ -82,6 +82,8 @@ class ContainerCfg(_CfgItem):
     def childPropertyChanged(self, child_name, property, old_value, new_value):
         pass
 
+    def updateSlots(self):
+        pass
 
     def removeChild(self, child_index):
         del self.children[child_index]

@@ -440,8 +440,8 @@ class GUIEditorWindow(qt.QWidget):
                 if self.configuration.isContainer(child):
                     #print 'is container'
                     new_list_item = self.appendItem(parentItem, child["name"], child["type"], icon=child["type"])
-
                     addChildren(child["children"], new_list_item)
+                    self.configuration.items[child["name"]].updateSlots()
                 elif self.configuration.isSpacer(child):
                     #print 'is spacer'
                     new_list_item = self.appendItem(parentItem, child["name"], "spacer", icon=child["type"])
