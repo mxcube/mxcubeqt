@@ -321,18 +321,24 @@ class WindowDisplayWidget(qt.QScrollView):
 
             # add 'hide page' slot
             slotName = "hidePage_%s" % label
-            def tab_slot(self, hide=True, page_index=self.indexOf(scrollview), page={"widget":None, "label": "", "hidden":False}):
+            def tab_slot(self, hide=True, page={"widget":scrollview, "label":self.tabLabel(scrollview) , "index":self.indexOf(scrollview), "icon": icon,"hidden":False}):
                 if hide:
                   if not page["hidden"]:
-                    page['widget'] = self.page(page_index)
-                    page["label"] = self.tabLabel(page["widget"])
                     self.removePage(page["widget"])
                     page["hidden"] = True
                 else:
                   if page["hidden"]:
-                    self.insertTab(page["widget"], page["label"], page_index)
+                    if icon:
+                      pixmap = Icons.load(icon)
+                      self.insertTab(page["widget"], qt.QIconSet(pixmap,pixmap), label, page["index"])
+                    else:
+                      self.insertTab(page["widget"], page["label"], page["index"])
                     self.showPage(page["widget"])
                     page["hidden"] = False
+                #page_info =""
+                #for i in range(self.count()):
+                #  page_info+="PAGE %d: %s, %s "% (i, self.tabLabel(self.page(i)), self.page(i))
+                #logging.info(page_info)
             try:
               self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
             except: 
