@@ -241,7 +241,7 @@ class GUISupervisor(qt.QWidget):
             # make connections
             #        
             widgets_dict = dict([(callable(w.name) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
-               
+
             def make_connections(items_list):
                 for item in items_list:
                     try:
@@ -388,7 +388,7 @@ class GUISupervisor(qt.QWidget):
                     self.configuration.save(self.GUIConfigFile)
 
 
-    def customEvent(self, event):
+    def finishInit(self, GUIConfigFile):
         while True:
             try:
                 self.hardwareRepository.connect()
@@ -407,8 +407,9 @@ class GUISupervisor(qt.QWidget):
 
         try:
             main_widget = None
+            
             try:
-                main_widget=self.loadGUI(event.data())
+                main_widget=self.loadGUI(GUIConfigFile)
             finally:
                 if main_widget:
                   self.splashScreen.finish(main_widget)
@@ -416,3 +417,7 @@ class GUISupervisor(qt.QWidget):
         except:
             logging.getLogger().exception("exception while loading GUI file")
             qt.qApp.exit()
+
+    def customEvent(self, event):
+        self.finishInit(event.data())
+        

@@ -8,7 +8,7 @@ import sys
 import os
 import logging
 from optparse import OptionParser
-
+import traceback
 from qt import *
 
 import BlissFramework
@@ -17,6 +17,15 @@ from BlissFramework.Utils import ErrorHandler
 
 from HardwareRepository import HardwareRepository
 
+def do_gevent():
+    # can't call gevent.run inside inner event loops (message boxes...)
+    if qApp.loopLevel() == 1:
+        gevent.run(0.01)
+    else:
+        # all that I tried with gevent here fails! => seg fault
+        pass
+    
+ 
 if __name__ == '__main__':    
     defaultHwrServer = socket.gethostname() + ':hwr'
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
@@ -180,11 +189,9 @@ if __name__ == '__main__':
     logging.getLogger().info(logInfo)
 
     QApplication.setDesktopSettingsAware(False) #use default settings
+    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
    
     supervisor = GUISupervisor.GUISupervisor(executionOnly = opts.executionOnly, designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
-
-    #QObject.connect(app, SIGNAL("aboutToQuit()"), supervisor.finalize)
-    #QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
 
     #BlissFramework.setDebugMode(True)
     #
@@ -196,23 +203,27 @@ if __name__ == '__main__':
     # redirect errors to logger
     #
     ErrorHandler.enableStdErrRedirection()
-  
+
+    timer = QTimer()
+    timer.connect(timer, SIGNAL("timeout()"), do_gevent)
+    timer.start(0)
+
+    
+    app.exec_loop()
+    """
     def process_qt_events():
       while True:
         time.sleep(0.01)
         while app.hasPendingEvents():
-          app.processEvents()
-
+          app.processEvents() 
           time.sleep(0.01)
-
           if not app.mainWidget() or not app.mainWidget().isVisible():
             return
- 
-    qt_events = gevent.spawn(process_qt_events)
-    qt_events.join() 
+    qt_events = gevent.spawn(process_qt_events) 
+    qt_events.join()   
+    """
 
     supervisor.finalize()
-    app.quit() 
 
     if lockfile is not None:
         filename = lockfile.name
