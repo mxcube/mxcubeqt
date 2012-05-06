@@ -20,7 +20,10 @@ from HardwareRepository import HardwareRepository
 def do_gevent():
     # can't call gevent.run inside inner event loops (message boxes...)
     if qApp.loopLevel() == 1:
-        gevent.run(0.01)
+        try:
+          gevent.run(0.01)
+        except AssertionError:
+          pass
     else:
         # all that I tried with gevent here fails! => seg fault
         pass
