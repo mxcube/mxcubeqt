@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
           sys.exit(1)
       else:
-          os.chmod(lock_filename,666)
+          os.chmod(lock_filename,0666)
           try:
              fcntl.lockf(lockfile.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
           except:
@@ -138,7 +138,7 @@ if __name__ == '__main__':
           log_ok=False
       else:
           try:
-            os.chmod(log_lock_filename,666)
+            os.chmod(log_lock_filename,0666)
           except:
             pass
           try:
@@ -163,7 +163,7 @@ if __name__ == '__main__':
             pass
           else:
             try:
-              os.chmod(log_lock_filename2,666)
+              os.chmod(log_lock_filename2,0666)
             except:
               pass
             try:
