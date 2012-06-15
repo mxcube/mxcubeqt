@@ -28,8 +28,7 @@ def do_gevent():
         # all that I tried with gevent here fails! => seg fault
         pass
     
- 
-if __name__ == '__main__':    
+def run(GUIConfigFile=None):    
     defaultHwrServer = socket.gethostname() + ':hwr'
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
 
@@ -46,7 +45,6 @@ if __name__ == '__main__':
     #parser.add_option('', '--widgetcount', action='store_true', dest='widgetCount', default=False, help="prints debug message at the end about number of widgets left undestroyed")
 
     (opts, args) = parser.parse_args()
-    GUIConfigFile = None
     
     if len(args) >= 1:
         if len(args) == 1:
@@ -243,3 +241,7 @@ if __name__ == '__main__':
             os.unlink(filename)
         except:
             logging.getLogger().exception("Problem removing the log lock file")
+
+
+if __name__ == '__main__':
+    run()
