@@ -29,7 +29,7 @@ def do_gevent():
         pass
     
 def run(GUIConfigFile=None):    
-    defaultHwrServer = socket.gethostname() + ':hwr'
+    defaultHwrServer = 'localhost:hwr'
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
 
     parser = OptionParser(usage = 'usage: %prog <GUI definition file> [options]')
