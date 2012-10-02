@@ -22,7 +22,9 @@ try:
     from HardwareRepository import HardwareRepository
 except ImportError:
     logging.getLogger().warning("no Hardware Repository client module could be found")
-    
+else:
+    from HardwareRepository import HardwareRepositoryBrowser   
+ 
 
 class HorizontalSpacer(qt.QWidget):
     """Helper class to have a horizontal spacer widget"""
@@ -1002,7 +1004,7 @@ class HWRWindow(qt.QWidget):
 
     def add_hwr_browser(self):
         try:
-            _hwr_widget = HardwareRepository.HardwareRepositoryBrowser
+            _hwr_widget = HardwareRepositoryBrowser.HardwareRepositoryBrowser
         except AttributeError:
             logging.getLogger().error("No Hardware Repository client found")
         else:
