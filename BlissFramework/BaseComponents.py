@@ -17,6 +17,50 @@ from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
 from BlissFramework.Utils import ProcedureWidgets
 
+try:
+  from louie import dispatcher
+  from louie import saferef
+except ImportError:
+  from pydispatch import dispatcher
+  from pydispatch import saferef
+  saferef.safe_ref = saferef.safeRef
+
+_emitterCache = weakref.WeakKeyDictionary()
+
+class _QObject(QObject):
+    def __init__(self, *args, **kwargs):
+        QObject.__init__(self, *args)
+
+        try:
+            self.__ho = weakref.ref(kwargs.get("ho"))
+        except:
+            self.__ho = None
+
+
+def emitter(ob):
+    """Returns a QObject surrogate for *ob*, to use in Qt signaling.
+
+    This function enables you to connect to and emit signals from (almost)
+    any python object with having to subclass QObject.
+
+      >>> class A(object):
+      ...   def notify(self, *args):
+      ...       QObject.emit(emitter(self), PYSIGNAL('test'), args)
+      ...
+      >>> ob = A()
+      >>> def myhandler(*args): print 'got', args
+      ...
+      >>> QObject.connect(emitter(ob), PYSIGNAL('test'), myhandler)
+      ... True
+      >>> ob.notify('hello')
+      got ('hello',)
+
+      >>> QObject.emit(emitter(ob), PYSIGNAL('test'), (42, 'abc',))
+      got (42, 'abc')
+    """
+    if ob not in _emitterCache:
+        _emitterCache[ob] = _QObject(ho=ob)
+    return _emitterCache[ob]
 
 class InstanceEventFilter(QObject):
     def eventFilter(self, w, e):
@@ -525,7 +569,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
         #
         # connect signals / slots
         #
-        QObject.connect(HardwareRepository.HardwareRepository(), PYSIGNAL('hardwareObjectDiscarded'), self.__hardwareObjectDiscarded)
+        dispatcher.connect(self.__hardwareObjectDiscarded, 'hardwareObjectDiscarded', HardwareRepository.HardwareRepository())
  
         
     def __run(self):
@@ -583,7 +627,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
           pysignal=True
 
         if not isinstance(sender, QObject):
-            _sender = HardwareRepository.emitter(sender)
+            _sender = emitter(sender)
         else:
 	    _sender = sender
 
@@ -610,7 +654,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
             sender.disconnectNotify(signal)
 
         if not isinstance(sender, QObject):
-            sender = HardwareRepository.emitter(sender)
+            sender = emitter(sender)
            
             try:
                 uid=(sender, pysignal and PYSIGNAL(signal) or SIGNAL(signal), hash(slot))
