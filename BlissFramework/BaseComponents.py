@@ -13,6 +13,7 @@ import weakref
 import gc
 
 from HardwareRepository import HardwareRepository
+from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
 from BlissFramework.Utils import ProcedureWidgets
@@ -627,6 +628,11 @@ class BlissWidget(QWidget, Connectable.Connectable):
           pysignal=True
 
         if not isinstance(sender, QObject):
+          if isinstance(sender, HardwareObject):
+            logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
+            sender.connect(signal, slot) 
+            return
+          else:
             _sender = emitter(sender)
         else:
 	    _sender = sender
@@ -648,6 +654,11 @@ class BlissWidget(QWidget, Connectable.Connectable):
           signal=signal[1:]
         else:
           pysignal=True
+
+        if isinstance(sender, HardwareObject):
+          logging.warning("You should use %s.disconnect instead of using %s.connect", sender,self)
+          sender.disconnect(signal, slot)
+          return
 
         # workaround for PyQt lapse
         if hasattr(sender, "disconnectNotify"):
