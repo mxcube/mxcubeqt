@@ -78,9 +78,12 @@ class BaseGraphicScan(BlissWidget) :
         showgButton = self._widgetTree.child('__showGrab')
         showgButton.hide()
         
-        mvButton = self._widgetTree.child('__movetoStart')
-        qt.QObject.connect(mvButton,qt.SIGNAL('clicked()'),self._movetoStart)
-        mvButton.hide()
+        try:
+          mvButton = self._widgetTree.child('__movetoStart')
+          qt.QObject.connect(mvButton,qt.SIGNAL('clicked()'),self._movetoStart)
+          mvButton.hide()
+        except:
+          pass
 
         startButton = self._widgetTree.child('__startScan')
         qt.QObject.connect(startButton,qt.SIGNAL('clicked()'),self._startScan)
@@ -165,7 +168,8 @@ class BaseGraphicScan(BlissWidget) :
             qt.QObject.connect(showgButton,qt.SIGNAL('toggled(bool)'),self._showGrabScan)
 
             mvButton = self._widgetTree.child('__movetoStart')
-            mvButton.show()
+            if mvButton is not None:
+              mvButton.show()
 
             self.connect(self._view, qt.PYSIGNAL("ForegroundColorChanged"),
                          self._setColor)
