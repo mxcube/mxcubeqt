@@ -161,7 +161,6 @@ class TabCfg(ContainerCfg):
     def setProperties(self, properties):
         for property in properties:
             prop_name = property.getName()
-            print prop_name, property.getUserValue()
             if prop_name in self.properties.properties:
                 #print prop_name, property.getUserValue()
                 self.properties.getProperty(prop_name).setValue(property.getUserValue())

@@ -553,9 +553,9 @@ class WindowDisplayWidget(qt.QScrollView):
 
                 frame_style=qt.QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"]!="default":
-                    exec("frame_style=qt.QFrame.%s" % item_cfg["properties"]["frameshape"].capitalize())
+                    frame_style = getattr(qt.QFrame, item_cfg["properties"]["frameshape"].capitalize())
                 if item_cfg["properties"]["shadowstyle"]!="default":
-                    exec("frame_style=frame_style | qt.QFrame.%s" % item_cfg["properties"]["shadowstyle"].capitalize())
+                    frame_style = frame_style | getattr(qt.QFrame, item_cfg["properties"]["shadowstyle"].capitalize())
                 if frame_style!=qt.QFrame.NoFrame:
                     try:
                         newItem.setFrameStyle(frame_style)
@@ -574,7 +574,9 @@ class WindowDisplayWidget(qt.QScrollView):
                 newItem.setCornerWidget(newItem.cmdCloseTab)
                 newItem.cmdCloseTab.hide()
                 def close_current_page(tab=newItem):
-                  tab.removePage(tab.currentPage())
+                  slotName = "hidePage_%s" % str(tab.tabLabel(tab.currentPage()))
+                  slotName = slotName.replace(" ", "_")
+                  getattr(tab, slotName)()
                 newItem._close_current_page_cb = close_current_page
                 qt.QObject.connect(newItem, qt.SIGNAL('currentChanged( QWidget * )'), item_cfg.notebookPageChanged)
                 qt.QObject.connect(newItem.cmdCloseTab, qt.SIGNAL("clicked()"), close_current_page)
