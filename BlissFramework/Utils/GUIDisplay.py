@@ -566,6 +566,15 @@ class WindowDisplayWidget(qt.QScrollView):
                 newItem.setText(item_cfg["properties"]["text"])
             elif type == "tab":
                 item_cfg.widget = newItem
+                newItem.cmdCloseTab = qt.QToolButton(newItem)
+                newItem.cmdCloseTab.setIconSet(qt.QIconSet(Icons.load('delete_small')))
+                newItem.setCornerWidget(newItem.cmdCloseTab)
+                newItem.cmdCloseTab.hide()
+                def close_current_page(tab=newItem):
+                  tab.removePage(tab.currentPage())
+                newItem._close_current_page_cb = close_current_page
+                qt.QObject.connect(newItem, qt.SIGNAL('currentChanged( QWidget * )'), item_cfg.notebookPageChanged)
+                qt.QObject.connect(newItem.cmdCloseTab, qt.SIGNAL("clicked()"), close_current_page)
             elif type == "vsplitter" or type == "hsplitter":
                 pass
                 
@@ -573,7 +582,7 @@ class WindowDisplayWidget(qt.QScrollView):
                                                                              
         return newItem
 
-
+    
     def makeItem(self, item_cfg, parent, containerIds):
         if isinstance(item_cfg, ContainerCfg):
             self.containerNum += 1
@@ -600,6 +609,7 @@ class WindowDisplayWidget(qt.QScrollView):
                 # adding to tab widget
                 parent.hide()
                 newTab = parent.addTab(newItem, child["properties"]["label"], child["properties"]["icon"])
+                newTab.item_cfg = child
                 previewItemsList.append(newTab)
                 parent.show()
             else:

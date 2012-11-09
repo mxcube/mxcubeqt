@@ -158,6 +158,17 @@ class TabCfg(ContainerCfg):
         self.signals.update({ "notebookPageChanged": ("pageName", ) })
 
 
+    def setProperties(self, properties):
+        for property in properties:
+            prop_name = property.getName()
+            print prop_name, property.getUserValue()
+            if prop_name in self.properties.properties:
+                #print prop_name, property.getUserValue()
+                self.properties.getProperty(prop_name).setValue(property.getUserValue())
+            elif property.hidden or prop_name.startswith("closable_"):
+                self.properties[prop_name] = property
+
+
     def __repr__(self):
         try:
             widget = self.widget
@@ -190,26 +201,43 @@ class TabCfg(ContainerCfg):
 
     def removeChild(self, child_index):
         ContainerCfg.removeChild(self, child_index)
-        
         self.updateSlots()
 
 
     def updateSlots(self):
+        closable_props = {}
+        for prop in self.properties:
+          if prop.name.startswith("closable_"):
+            closable_props[prop.name]=prop.getValue()
+            
+        for prop_name in closable_props.iterkeys():
+          self.properties.delProperty(prop_name)
+
         self.slots = {}
-        for child in self.children:
+        for child in self.children:  
             if "label" in child["properties"].properties:
-                slot_name="showPage_%s" % child["properties"]["label"]
+                child_lbl = child["properties"]["label"]
+                self.properties.addProperty("closable_%s" % child_lbl, "boolean", closable_props.get("closable_%s"%child_lbl,False))
+                #self.properties.getProperty("closable_%s" % child_lbl).child_item=id(child)
+ 
+                slot_name="showPage_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="hidePage_%s" % child["properties"]["label"]
+                slot_name="hidePage_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="enablePage_%s" % child["properties"]["label"]
+                slot_name="enablePage_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="enableTab_%s" % child["properties"]["label"]
+                slot_name="enableTab_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="incTabCount_%s" % child["properties"]["label"]
+                slot_name="incTabCount_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="resetTabCount_%s" % child["properties"]["label"]
+                slot_name="resetTabCount_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")]=()
+
+    def notebookPageChanged(self, new_page): 
+        if self.properties.getProperty("closable_%s" % new_page.item_cfg["properties"]["label"]).getValue():
+            self.widget.cmdCloseTab.show()
+        else:
+            self.widget.cmdCloseTab.hide()
 
 
 class SplitterCfg(ContainerCfg):
