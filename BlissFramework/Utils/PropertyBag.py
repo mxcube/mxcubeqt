@@ -309,9 +309,12 @@ class PropertyBag:
         except KeyError:
             pass
         else:
-            editor = ed()
-            if editor is not None:
-                editor.setPropertyBag(self)
+            try:
+                editor = ed()
+                if editor is not None:
+                    editor.setPropertyBag(self)
+            except TypeError:
+                pass
             
         
     def getProperty(self, propertyName):
