@@ -21,7 +21,7 @@ def do_gevent():
     # can't call gevent.run inside inner event loops (message boxes...)
     if qApp.loopLevel() == 1:
         try:
-          gevent.run(0.01)
+          gevent.wait(timeout=0.01)
         except AssertionError:
           pass
     else:
