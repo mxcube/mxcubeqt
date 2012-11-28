@@ -1,7 +1,8 @@
 import gevent.monkey; gevent.monkey.patch_all(thread=False, subprocess=False)
-def mywait(timeout=None):
-  return gevent.run(timeout)
-gevent.wait=mywait
+if not hasattr(gevent, "wait"):
+  def mywait(timeout=None):
+    return gevent.run(timeout)
+  gevent.wait=mywait
 import sys
 import os
 import string
