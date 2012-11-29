@@ -629,7 +629,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
 
         if not isinstance(sender, QObject):
           if isinstance(sender, HardwareObject):
-            logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
+            #logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
             sender.connect(signal, slot) 
             return
           else:
@@ -656,7 +656,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
           pysignal=True
 
         if isinstance(sender, HardwareObject):
-          logging.warning("You should use %s.disconnect instead of using %s.connect", sender,self)
+          #logging.warning("You should use %s.disconnect instead of using %s.connect", sender,self)
           sender.disconnect(signal, slot)
           return
 
