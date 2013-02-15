@@ -87,6 +87,9 @@ def run(GUIConfigFile=None):
     bricksDirs = filter(None, bricksDirs)
     hoDirs = filter(None, hoDirs)
     
+    queue_model.model = queue_model.QueueModelFactory()
+    queue_model.collect_context = queue_model.CollectContext()
+
     app = QApplication([])
     lockfile = None
 
