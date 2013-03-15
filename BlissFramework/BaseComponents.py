@@ -707,7 +707,6 @@ class BlissWidget(QWidget, Connectable.Connectable):
               
 
     def loadUIFile(self, filename):
-        import pdb;pdb.set_trace()
         for path in [BlissFramework.getStdBricksPath()]+BlissFramework.getCustomBricksDirs():
           #modulePath = sys.modules[self.__class__.__module__].__file__
           #path = os.path.dirname(modulePath)
