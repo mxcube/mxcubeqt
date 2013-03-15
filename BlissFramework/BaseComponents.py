@@ -17,6 +17,7 @@ from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
 from BlissFramework.Utils import ProcedureWidgets
+import BlissFramework
 
 try:
   from louie import dispatcher
@@ -706,10 +707,12 @@ class BlissWidget(QWidget, Connectable.Connectable):
               
 
     def loadUIFile(self, filename):
-        modulePath = sys.modules[self.__class__.__module__].__file__
-        path = os.path.dirname(modulePath)
-
-        return qtui.QWidgetFactory.create(os.path.join(path, filename))
+        import pdb;pdb.set_trace()
+        for path in [BlissFramework.getStdBricksPath()]+BlissFramework.getCustomBricksDirs():
+          #modulePath = sys.modules[self.__class__.__module__].__file__
+          #path = os.path.dirname(modulePath)
+          if os.path.exists(os.path.join(path, filename)):
+            return qtui.QWidgetFactory.create(os.path.join(path, filename))
 
 
     def createGUIFromUI(self, UIFile):
