@@ -19,6 +19,3 @@
 [submodule "Bricks/BeamlineComponent"]
 	path = Bricks/BeamlineComponent
 	url = git://git.epn-campus.eu/repositories/fwk2_bricks/BeamlineComponent
-[submodule "Bricks/mxCuBE"]
-	path = Bricks/mxCuBE
-	url = git://git.epn-campus.eu/repositories/fwk2_bricks/mxCuBE
