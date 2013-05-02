@@ -32,7 +32,7 @@ class ValueDisplayBrick(SynopticBrick.SynopticBrick):
         self.lblUnit.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                  
 
-    def setValue(self, value=None):
+    def setValue(self, value=None, *args):
         if value is None:
             value = self.value
         else:

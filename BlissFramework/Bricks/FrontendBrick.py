@@ -38,6 +38,7 @@ class FrontendBrick(SynopticBrick.SynopticBrick):
         'opened':    '#00ff00',
         'moving':    '#663300',
         'automatic': '#009900',
+        'running'  : '#009900',
         'fault':     '#990000',
         'disabled':  '#ec3cdd',
         'error':     '#990000'
@@ -86,7 +87,8 @@ class FrontendBrick(SynopticBrick.SynopticBrick):
     def shutterStateChanged(self, state, automaticModeTimeLeft):
         self.lblShutter.setText('<b>%s</b>' % state)
         self.lblShutter.setPaletteBackgroundColor(QColor(FrontendBrick.shutterState[state]))
-
+        if state == 'running':
+            state = 'automatic'
         if state == 'opened' or state == 'automatic':
             if state == 'automatic':
                 try:

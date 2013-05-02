@@ -550,14 +550,14 @@ class WrapperHO(QObject):
                 pass
             return state
         return "unknown"
-    def procedureSetInEnded(self):
+    def procedureSetInEnded(self, *args):
         self.emit(PYSIGNAL('duoStateChanged'), ('in', ))
         
-    def procedureSetOutEnded(self):
+    def procedureSetOutEnded(self, *args):
         self.emit(PYSIGNAL('duoStateChanged'), ('out', ))
         
-    def procedureStarted(self):
+    def procedureStarted(self, *args):
         self.emit(PYSIGNAL('duoStateChanged'), ('moving', ))
         
-    def procedureAborted(self):
+    def procedureAborted(self, *args):
         self.emit(PYSIGNAL('duoStateChanged'), ('error', ))

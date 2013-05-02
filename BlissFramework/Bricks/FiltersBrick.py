@@ -101,8 +101,8 @@ class FilterMotor:
         self.motor  = motor
         self.axisno = axisno
         if self.motor is not None:
-             self.motor.connect( self.motor, PYSIGNAL("positionChanged"), self.positionChanged)
-             self.motor.connect( self.motor, PYSIGNAL("stateChanged"), self.stateChanged)
+             self.motor.connect("positionChanged", self.positionChanged)
+             self.motor.connect("stateChanged", self.stateChanged)
                      
 
     def move(self, posto):

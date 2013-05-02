@@ -165,12 +165,12 @@ class CommandButton(QVBox):
         self.connect(self.cmdExecute, SIGNAL('clicked()'), self.launchCommand)
 
 
-    def commandLaunched(self):
+    def commandLaunched(self,*args):
         self.cmdExecute.setTextLabel("abort")
         self.cmdExecute.setIconSet(QIconSet(Icons.load("stop")))
 
 
-    def commandReplyArrived(self):
+    def commandReplyArrived(self, *args):
         pass
 
     def enableCommand(self):
@@ -184,7 +184,7 @@ class CommandButton(QVBox):
           self.cmdExecute.setEnabled(False)
 
 
-    def launchCommand(self):
+    def launchCommand(self, *args):
         if str(self.cmdExecute.textLabel()) == 'abort':
             self.cmdObject.abort()
         else:
@@ -215,7 +215,6 @@ class CommandButton(QVBox):
                     return
                 else:
                     args.append(value)
-
             self.cmdObject(*tuple(args))
 
 

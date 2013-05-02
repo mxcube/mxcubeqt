@@ -355,7 +355,7 @@ class MenuButton(QToolButton):
         if not self.executing:
             self.disconnected()
 
-    def macroStarted(self):
+    def macroStarted(self,*args):
         #print "STARTED"
         self.executing=True
         if self.standardColor is None:
@@ -367,7 +367,7 @@ class MenuButton(QToolButton):
         self.setEnabled(True)
         self.emit(PYSIGNAL("macroStarted"), (self.cmd,))
 
-    def macroDone(self):
+    def macroDone(self,*args):
         #print "DONE"
         self.executing=False
         if self.standardColor is not None:
@@ -376,7 +376,7 @@ class MenuButton(QToolButton):
             self.setPixmap(self.runIcon)
         self.emit(PYSIGNAL("macroDone"), (self.cmd,))
 
-    def macroFailed(self):
+    def macroFailed(self,*args):
         #print "FAILED"
         self.executing=False
         if self.standardColor is not None:
@@ -385,7 +385,7 @@ class MenuButton(QToolButton):
             self.setPixmap(self.runIcon)
         self.emit(PYSIGNAL("macroFailed"), (self.cmd,))
 
-    def macroAborted(self):
+    def macroAborted(self,*args):
         #print "ABORTED"
         pass
 

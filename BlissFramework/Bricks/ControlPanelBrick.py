@@ -132,11 +132,11 @@ class ControlPanelCommandWidget(ControlPanelWidget):
     def __init__(self, *args, **kwargs):
         ControlPanelWidget.__init__(self, *args, **kwargs)
 
-    def _commandLaunched(self):
+    def _commandLaunched(self, *args):
         pass
 
 
-    def _commandReplyArrived(self):
+    def _commandReplyArrived(self, *args):
         pass
 
 

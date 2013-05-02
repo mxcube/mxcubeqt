@@ -127,12 +127,13 @@ class ShutterBrick(SynopticBrick.SynopticBrick):
 
 
     def shutterStateChanged(self, state):
-        logging.getLogger("ShutterBrick").info("shutterStateChanged(%s) color : %s",state ,self.shutterState[state])
+        #logging.getLogger("ShutterBrick").info("shutterStateChanged(%s) color : %s",state ,self.shutterState[state])
+        if self.ds_type == "TANGO":
+           state = state.upper() 
 
         # shutterState used only here:
         self.lblShutter.setPaletteBackgroundColor(QColor(self.shutterState[state]))
         self.lblShutter.setText('<b>%s</b>' % state)
-
         if self.ds_type == "TANGO":
             if state == 'OPEN':
                 self.cmdOpenCloseShutter.setText('Open')
