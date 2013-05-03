@@ -1,19 +1,19 @@
+
 import qt
 import logging
 import sys
 
 from BlissFramework.BaseComponents import BlissWidget
 from MultiAxisAlignmentBrick import MultiAxisAlignmentBrick
-from BlissFramework.Utils import widget_colors
 
 __category__ = "Motor"
 
 class MultiplePositionsBrick(BlissWidget):
     colorState = {
-        'NOTINITIALIZED': widget_colors.DARK_GRAY, 
-        'UNUSABLE': widget_colors.LIGHT_RED,
-        'READY': widget_colors.LIGHT_GREEN,
-        'MOVING': widget_colors.LIGHT_YELLOW,
+        'NOTINITIALIZED': 'gray', 
+        'UNUSABLE': 'red',
+        'READY': '#00ee00',
+        'MOVING': 'yellow',
         }
     nameState = ['READY', 'MOVING', 'UNUSABLE', 'NOTINITIALIZED']
     
@@ -49,7 +49,7 @@ class MultiplePositionsBrick(BlissWidget):
         self.buildInterface()
             
     def buildInterface(self):        
-        self.layout = qt.QHBoxLayout(self)
+        self.layout = qt.QVBoxLayout(self)
         
         self.titleLabel = QubLabel("<B>Title<B>", self)
         self.titleLabel.setAlignment(qt.Qt.AlignCenter)
@@ -60,7 +60,7 @@ class MultiplePositionsBrick(BlissWidget):
         """
         move and configure appearence
         """
-        self.radioGroup = QubRadioGroup(QubRadioGroup.Horizontal, self)
+        self.radioGroup = QubRadioGroup(QubRadioGroup.Vertical, self)
         self.radioGroup.hide()
         self.connect(self.radioGroup, qt.PYSIGNAL("PositionClicked"),
                      self.positionClicked)
@@ -86,8 +86,8 @@ class MultiplePositionsBrick(BlissWidget):
         """
         self.frame = qt.QFrame(self)
         self.frame.hide()
-        self.frame.setFrameShape(qt.QFrame.NoFrame)
-        self.frame.setFrameShadow(qt.QFrame.Plain)
+        self.frame.setFrameShape(qt.QFrame.Box)
+        self.frame.setFrameShadow(qt.QFrame.Raised)
         self.layout.addWidget(self.frame)
         
         vlayout = qt.QVBoxLayout(self.frame)
@@ -410,8 +410,8 @@ class MultiplePositionConfigurator(qt.QDialog):
         value change window
         """
         self.frame = qt.QFrame(self)
-        self.frame.setFrameShape(qt.QFrame.NoFrame)
-        self.frame.setFrameShadow(qt.QFrame.Plain)
+        self.frame.setFrameShape(qt.QFrame.Box)
+        self.frame.setFrameShadow(qt.QFrame.Sunken)
         hlayout.addWidget(self.frame)
 
         vlayout3 = qt.QVBoxLayout(self.frame)
@@ -531,8 +531,8 @@ class QubRadioGroup(qt.QFrame):
     def __init__(self, orientation=Vertical, *args):
         qt.QFrame.__init__(self, *args)
 
-        self.setFrameShape(qt.QFrame.NoFrame)
-        self.setFrameShadow(qt.QFrame.Plain)
+        self.setFrameShape(qt.QFrame.GroupBoxPanel)
+        self.setFrameShadow(qt.QFrame.Raised)
         
         if orientation == QubRadioGroup.Horizontal:
             self.layout = qt.QHBoxLayout(self)
@@ -686,7 +686,7 @@ class QubValue(qt.QWidget):
                          self.__returnPressed)
         else:
             self.valueWidget = qt.QLabel(self)            
-            self.valueWidget.setFrameShape(qt.QFrame.NoFrame)
+            self.valueWidget.setFrameShape(qt.QFrame.Box)
             self.valueWidget.setFrameShadow(qt.QFrame.Plain)
         self.layout.addWidget(self.valueWidget)
             

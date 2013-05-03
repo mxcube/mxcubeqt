@@ -3,7 +3,6 @@ from BlissFramework import Icons
 from qt import *
 import logging
 import HardwareRepository.HardwareObjects.SpecMotor
-from BlissFramework.Utils import widget_colors
 
 '''
 Motor control brick using a spin box (as an input field, and for the steps)
@@ -14,12 +13,10 @@ __category__ = 'Motor'
 
 class MotorSpinBoxBrick(BaseComponents.BlissWidget):
 
-    STATE_COLORS = (widget_colors.LIGHT_RED, 
-                    widget_colors.DARK_GRAY,
-                    widget_colors.LIGHT_GREEN,
-                    widget_colors.LIGHT_YELLOW,  
-                    widget_colors.LIGHT_YELLOW,
-                    widget_colors.LIGHT_YELLOW)
+    STATE_COLORS = (QWidget.red, QWidget.darkGray,\
+        QWidget.green,\
+        QWidget.yellow, QWidget.yellow,\
+        QWidget.darkYellow)
 
     MAX_HISTORY = 20
 
@@ -73,8 +70,6 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         self.spinBox.setDecimalPlaces(4)
         self.spinBox.setMinValue(-1E4)
         self.spinBox.setMaxValue(1E4)
-        self.spinBox.setMinimumSize(QSize(75,25))
-        self.spinBox.setMaximumSize(QSize(75,25))
         self.spinBox.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
         QToolTip.add(self.spinBox,"Moves the motor to a specific position or step by step; right-click for motor history")
 
@@ -426,7 +421,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
             self.containerBox.setTitle(label)
         else:
             if label!="":
-                label+=": "
+                label+=":"
             self.containerBox.setTitle("")
             self.label.setText(label)
             self.labelBox.show()

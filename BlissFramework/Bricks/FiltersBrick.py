@@ -140,7 +140,6 @@ class FilterMotor:
 
 
 class FilterTable_form( QTable ):
-
     def __init__(self,parent,*pars):
 
         QTable.__init__(self,parent,*pars)
@@ -150,7 +149,6 @@ class FilterTable_form( QTable ):
         self.setLeftMargin ( 0 )
 
     def setNumAxes(self,naxes):
-
         self.naxes   = naxes
         self.current = [0,]    * self.naxes
         self.states  = [None,] * self.naxes
@@ -203,7 +201,6 @@ class FilterTable( FilterTable_form ):
         pass
 
     def selectFilter(self,axisno,filtno):
-
         curfilt = self.current[axisno]
         self.current[axisno] = filtno
 
@@ -227,7 +224,6 @@ class FilterTable( FilterTable_form ):
 
 
 class MotorizedFilterTable( FilterTable ):
-
    def setNumAxes( self, naxes ):
       FilterTable.setNumAxes( self, naxes )
       self.motors  = [None,] * naxes

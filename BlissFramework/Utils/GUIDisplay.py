@@ -3,7 +3,6 @@ import logging
 import weakref
 import new
 
-from BlissFramework.Utils import widget_colors
 from BlissFramework.BaseLayoutItems import BrickCfg, SpacerCfg, LabelCfg, WindowCfg, ContainerCfg, TabCfg
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
@@ -539,9 +538,7 @@ class WindowDisplayWidget(qt.QScrollView):
                 if item_cfg["properties"]["color"] is not None:
                     try:
                         qtcolor = qt.QColor(item_cfg["properties"]["color"])
-                        newItem.setPaletteBackgroundColor(qt.QColor(qtcolor.red(),
-                                                                    qtcolor.green(),
-                                                                    qtcolor.blue()))
+                        newItem.setPaletteBackgroundColor(qt.QColor(qtcolor.red(), qtcolor.green(), qtcolor.blue()))
                     except:
                         logging.getLogger().exception("Could not set color on item %s", item_cfg["name"])
 

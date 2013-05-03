@@ -225,7 +225,7 @@ class CameraBrick(BlissWidget):
         self.__zoomPlug.zoom().setZoom(2,2)
         self.__cbk = _rectangleZoom(self.__zoomAction,self.__zoomPlug)
 
-        layout = qt.QHBoxLayout(self,0,0,"layout")
+        layout = qt.QHBoxLayout(self,11,6,"layout")
         layout.addWidget(self.__splitter)
 
         self.__image2Pixmap = QubImage2Pixmap()

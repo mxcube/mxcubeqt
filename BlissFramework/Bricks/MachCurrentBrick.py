@@ -64,8 +64,7 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
         self.containerBox=QVGroupBox("Machine current",self)
         self.containerBox.setInsideMargin(4)
         self.containerBox.setInsideSpacing(0)
-        self.containerBox.setAlignment(QLabel.AlignLeft)
-        #self.containerBox.setFixedWidth(350)
+        self.containerBox.setAlignment(QLabel.AlignCenter)
 
         self.current=QLabel(self.containerBox)
         self.current.setAlignment(QLabel.AlignCenter)
@@ -132,7 +131,7 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
     def fontChange(self,oldFont):
         font=self.font()
         size=font.pointSize()
-        font.setPointSize(5+size)
+        font.setPointSize(2*size)
         self.current.setFont(font)
     
     def propertyChanged(self,propertyName,oldValue,newValue):

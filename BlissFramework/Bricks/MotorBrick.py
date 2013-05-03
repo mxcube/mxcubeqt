@@ -12,7 +12,6 @@ import Qwt5 as qwt
 from BlissFramework import BaseComponents
 from BlissFramework import Icons
 from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
-from BlissFramework.Utils import widget_colors
 
 class MotorControlDialog(QDialog):
     def __init__(self, parent, caption):
@@ -422,8 +421,7 @@ class MotorBrick(BaseComponents.BlissWidget):
 
     def slotStatus(self, state):
         state = state - 1
-        color = [self.colorGroup().background(), widget_colors.LIGHT_GREEN,
-                 Qt.yellow, Qt.yellow, widget_colors.LIGHT_RED, self.colorGroup().background()]
+        color = [self.colorGroup().background(), Qt.green, Qt.yellow, Qt.yellow, Qt.red, self.colorGroup().background()]
         self.lblMotorName.setPaletteBackgroundColor(color[state])
         self.lblPosition.setPaletteBackgroundColor(color[state])
         self.lblMotorPosition.setPaletteBackgroundColor(color[state])

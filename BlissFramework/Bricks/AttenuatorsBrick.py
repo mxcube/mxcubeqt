@@ -91,8 +91,6 @@ from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
-from BlissFramework.Utils import widget_colors
-
 
 class AtteFilter(QCheckBox):
     def __init__(self,label,parent,idx):
@@ -109,9 +107,9 @@ class AtteFilter(QCheckBox):
         self.blockSignals(False)
 
 class AttenuatorsBrick(BlissWidget):
-    CONNECTED_COLOR = widget_colors.LIGHT_GREEN
+    CONNECTED_COLOR = QWidget.green
     CHANGED_COLOR = QColor(255,165,0)
-    OUTLIMITS_COLOR = widget_colors.LIGHT_RED
+    OUTLIMITS_COLOR = QWidget.red
 
     MAX_HISTORY = 20
 
@@ -144,7 +142,6 @@ class AttenuatorsBrick(BlissWidget):
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
         self.currentTransmission=myLineEdit(self.paramsBox)
-        self.currentTransmission.setFixedWidth(75)
         f=self.currentTransmission.font()
         f.setBold(True)
         self.currentTransmission.setFont(f)
@@ -159,9 +156,8 @@ class AttenuatorsBrick(BlissWidget):
         pol=self.newTransmission.sizePolicy()
         pol.setVerData(QSizePolicy.MinimumExpanding)
         self.newTransmission.setSizePolicy(pol)
-        self.newTransmission.setFixedWidth(75)
-        #self.applyButton=QPushButton("+",box1)
-        #QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentTransmission)
+        self.applyButton=QPushButton("+",box1)
+        QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentTransmission)
         self.paramsBox.layout().addWidget(box1, 1, 1)
         self.newTransmission.setValidator(QDoubleValidator(self))
         self.newTransmission.setPaletteBackgroundColor(AttenuatorsBrick.CONNECTED_COLOR)
@@ -179,7 +175,7 @@ class AttenuatorsBrick(BlissWidget):
 
         QVBoxLayout(self)
         self.layout().addWidget(self.topBox)
-        self.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Fixed)
         
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
@@ -216,10 +212,10 @@ class AttenuatorsBrick(BlissWidget):
         elif property == 'icons':
             icons_list=newValue.split()
 
-            #try:
-            #    self.applyButton.setPixmap(Icons.load(icons_list[0]))
-            #except IndexError:
-            #    pass
+            try:
+                self.applyButton.setPixmap(Icons.load(icons_list[0]))
+            except IndexError:
+                pass
 
             try:
                 self.filtersButton.setPixmap(Icons.load(icons_list[1]))

@@ -37,9 +37,9 @@ class CommandMenuBrick(BlissWidget):
 
         self.commands2Hide=[]
 
-        self.containerBox = QVBox(self)
-        #self.containerBox.setInsideMargin(4)
-        #self.containerBox.setInsideSpacing(2)
+        self.containerBox = QHGroupBox(self)
+        self.containerBox.setInsideMargin(4)
+        self.containerBox.setInsideSpacing(2)
 
         QVBoxLayout(self)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -100,7 +100,6 @@ class CommandMenuBrick(BlissWidget):
                     self.commands2Hide.index(cmd.name())
                 except ValueError:
                     but=MenuButton(self.containerBox,cmd,self.isSearchDone)
-                    but.setMinimumSize(QSize(75,50))
                     QObject.connect(but,PYSIGNAL("macroStarted"),self.macroStarted)
                     QObject.connect(but,PYSIGNAL("macroDone"),self.macroDone)
                     QObject.connect(but,PYSIGNAL("macroFailed"),self.macroFailed)
@@ -123,15 +122,15 @@ class CommandMenuBrick(BlissWidget):
             if self.commandHO is not None:
                 if self['showBorder']:
                     self.containerBox.setTitle(newValue)
-                #else:
-                #    self.containerBox.setTitle("")
+                else:
+                    self.containerBox.setTitle("")
         elif property == 'showBorder':
             if newValue:
                 self.containerBox.setFrameShape(self.containerBox.GroupBoxPanel)
                 self.containerBox.setInsideMargin(4)
             else:
                 self.containerBox.setFrameShape(self.containerBox.NoFrame)
-                #self.containerBox.setInsideMargin(0)
+                self.containerBox.setInsideMargin(0)
             self['label']=self['label']            
         elif property == 'confirmationMessages':
             self.setConfirmationMessages(newValue)
