@@ -21,17 +21,16 @@ class SlitsBrick(BlissWidget):
         self.addProperty('minidiff', 'string', '')
         self.addProperty('icons', 'string', '')
         self.addProperty('motorIcons', 'string', '')
-        #self.addProperty('title', 'string', 'Beam size')
+        self.addProperty('title', 'string', 'Beam size')
         self.addProperty('formatString','formatString','##.####')
         self.addProperty('decimalPlaces', 'string', '4')
         self.addProperty('expertOnly', 'boolean', False)
 
-        self.topBox = QHBoxLayout(self)
-        self.topBox.setMargin(5)
-        self.topBox.setSpacing(20)
+        self.topBox = QHGroupBox('Beam size',self)
+        self.topBox.setInsideMargin(4)
+        self.topBox.setInsideSpacing(2)
 
-        self.beamHorSize=MotorSpinBoxBrick.MotorSpinBoxBrick(self)
-        self.topBox.addWidget(self.beamHorSize)
+        self.beamHorSize=MotorSpinBoxBrick.MotorSpinBoxBrick(self.topBox)
         self.beamHorSize['showMoveButtons']=False
         self.beamHorSize['showBox']=False
         self.beamHorSize['showLabel']=True
@@ -39,8 +38,7 @@ class SlitsBrick(BlissWidget):
         self.beamHorSize['showStep']=False
         self.beamHorSize['showStepList']=True
         
-        self.beamVerSize=MotorSpinBoxBrick.MotorSpinBoxBrick(self)
-        self.topBox.addWidget(self.beamVerSize)
+        self.beamVerSize=MotorSpinBoxBrick.MotorSpinBoxBrick(self.topBox)
         self.beamVerSize['showMoveButtons']=False
         self.beamVerSize['showBox']=False
         self.beamVerSize['showLabel']=True
@@ -48,19 +46,16 @@ class SlitsBrick(BlissWidget):
         self.beamVerSize['showStep']=False
         self.beamVerSize['showStepList']=True
 
-        #self.topBox.addSpace(10)
-        self.offset_layout = QHBoxLayout(self.topBox, 5)
-        self.offsetsLabel=QLabel("Move:",self)
-        self.offset_layout.addWidget(self.offsetsLabel)
-        self.offsetsButton=QToolButton(self)
-        self.offset_layout.addWidget(self.offsetsButton)
+        self.topBox.addSpace(10)
+        self.offsetsLabel=QLabel("Move:",self.topBox)
+        self.offsetsButton=QToolButton(self.topBox)
         self.offsetsButton.setTextLabel("Offsets")
         self.offsetsButton.setUsesTextLabel(True)
         self.offsetsButton.setTextPosition(QToolButton.BesideIcon)
         QObject.connect(self.offsetsButton, SIGNAL('clicked()'), self.openOffsetsDialog)
 
-        #QVBoxLayout(self)
-        #self.layout().addLayout(self.topBox)
+        QVBoxLayout(self)
+        self.layout().addWidget(self.topBox)
         self.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Fixed)
 
     def instanceModeChanged(self,mode):
@@ -79,14 +74,12 @@ class SlitsBrick(BlissWidget):
 
     def run(self):
         if self.slitbox is None:
-            pass
-            #self.hide()
+            self.topBox.hide()
         elif self.inExpert is not None:
             self.setExpertMode(self.inExpert)
 
     def stop(self):
-        pass
-        #self.topBox.show()
+        self.topBox.show()
 
     def setIcons(self,icons):
         icons_list=icons.split()
@@ -127,8 +120,8 @@ class SlitsBrick(BlissWidget):
                 pass
         elif property == 'icons':
             self.setIcons(newValue)
-        #elif property == 'title':
-        #    self.topBox.setTitle(newValue)
+        elif property == 'title':
+            self.topBox.setTitle(newValue)
         elif property == 'motorIcons':
             self.beamHorSize['icons']=newValue
             self.beamVerSize['icons']=newValue

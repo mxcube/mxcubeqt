@@ -1,6 +1,5 @@
 import logging
 import math
-from BlissFramework.Utils import widget_colors
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 from qt import *
@@ -8,12 +7,12 @@ import SampleChanger
 
 __category__ = "mxCuBE"
 
-SC_STATE_COLOR = { "FAULT": widget_colors.LIGHT_RED,
-                   "STANDBY": widget_colors.LIGHT_GREEN,
-                   "MOVING": widget_colors.LIGHT_GREEN,
-                   "ALARM": widget_colors.LIGHT_RED,
+SC_STATE_COLOR = { "FAULT": "red",
+                   "STANDBY": "green",
+                   "MOVING": "yellow",
+                   "ALARM": "purple",
                    "DISABLE": None,
-                   "RUNNING": widget_colors.LIGHT_YELLOW,
+                   "RUNNING": "yellow",
                    "UNKNOWN": None}
 
 SC_STATE_GENERAL = { "FAULT": False,
@@ -24,10 +23,10 @@ SC_STATE_GENERAL = { "FAULT": False,
                      "RUNNING": False,
                      "UNKNOWN": False}
 
-SC_SAMPLE_COLOR = { "LOADED": widget_colors.LIGHT_GREEN,
-                    "UNLOADED": widget_colors.DARK_GRAY,
-                    "LOADING": widget_colors.LIGHT_YELLOW,
-                    "UNLOADING": widget_colors.LIGHT_YELLOW,
+SC_SAMPLE_COLOR = { "LOADED": "green",
+                    "UNLOADED": "darkGrey",
+                    "LOADING": "yellow",
+                    "UNLOADING": "yellow",
                     "UNKNOWN": None }
 
 SC_LOADED_COLOR = { -1: None,
@@ -464,14 +463,14 @@ class CurrentSampleView(CurrentView):
         if msg is None:
             msg=""
         self.stateLabel.setText(msg)
-        self.emit(PYSIGNAL("sample_changer_state"), (msg,))
 
     def setStateColor(self,state):
-        color = SC_SAMPLE_COLOR[state]
-        if color  is None:
-            color = QWidget.paletteBackgroundColor(self)
+        color_name=SC_SAMPLE_COLOR[state]
+        if color_name is None:
+            color=QWidget.paletteBackgroundColor(self)
         else:
-            self.stateLabel.setPaletteBackgroundColor(color)
+            color=QColor(color_name)
+        self.stateLabel.setPaletteBackgroundColor(color)
 
     def setIcons(self,load_icon,unload_icon):
         self.loadIcon=Icons.load(load_icon)
@@ -508,14 +507,14 @@ class CurrentSampleView(CurrentView):
 
 class StatusView(QWidget):
     def __init__(self,parent):
-        QWidget.__init__(self, parent)
+        QWidget.__init__(self,parent)
 
         self.contentsBox=QVGroupBox("Unknown",self)
         self.contentsBox.setInsideMargin(4)
         self.contentsBox.setInsideSpacing(2)
         self.contentsBox.setAlignment(Qt.AlignHCenter)
 
-        self.box1=QHBox(self.contentsBox, 'content_box')
+        self.box1=QHBox(self.contentsBox)
 
         self.lblStatus = QLabel("",self.box1)
         self.lblStatus.setAlignment(Qt.AlignCenter)
@@ -545,13 +544,11 @@ class StatusView(QWidget):
     def setIcons(self,reset_icon):
         self.buttonReset.setPixmap(Icons.load(reset_icon))
 
-    def setStatusMsg(self, status):
+    def setStatusMsg(self,status):
         #print "SAMPLE CHANGER MSG IS",status
         QToolTip.add(self.lblStatus,status)
         status = status.strip()
         self.lblStatus.setText(status)
-        color = self.lblStatus.paletteBackgroundColor()
-        self.emit(PYSIGNAL("status_msg_changed"), (status, color))
 
     def setState(self,state):
         #logging.getLogger().debug('SampleChangerBrick2: state changed (%s)' % state)
@@ -559,12 +556,12 @@ class StatusView(QWidget):
         if state is None:
             state="UNKNOWN"
 
-        color = SC_STATE_COLOR.get(state, None) #SC_STATE_COLOR[state]
-        if color is None:
-            color = QWidget.paletteBackgroundColor(self)
+        color_name=SC_STATE_COLOR.get(state, None) #SC_STATE_COLOR[state]
+        if color_name is None:
+            color=QWidget.paletteBackgroundColor(self)
         else:
-            self.lblStatus.setPaletteBackgroundColor(color)
-
+            color=QColor(color_name)
+        self.lblStatus.setPaletteBackgroundColor(color)
         self.contentsBox.setTitle("%s" % state.capitalize())
 
         try:
@@ -707,10 +704,6 @@ class SampleChangerBrick3(BlissWidget):
 
         self.defineSignal("scanBasketUpdate", ())
         self.defineSignal("sampleGotLoaded", ())
-
-        # Emitted when the status of the hwobj changes,
-        # original intended receiver is TreeBrick.
-        self.defineSignal("status_msg_changed", ())
         self.defineSlot('setSession',())
         self.defineSlot('setCollecting',())
 
@@ -719,29 +712,23 @@ class SampleChangerBrick3(BlissWidget):
         self.inExpert=None
         self.lastBasketChecked=()
 
-        self.contentsBox=QVBox(self)
-        self.contentsBox.setSpacing(10)
-        
-        #self.contentsBox.setInsideMargin(4)
-        #self.contentsBox.setInsideSpacing(2)
+        self.contentsBox=QVGroupBox("Sample changer",self)
+        self.contentsBox.setInsideMargin(4)
+        self.contentsBox.setInsideSpacing(2)
 
         self.status=StatusView(self.contentsBox)
         self.cmdSwitchToSampleTransfer = QPushButton("Switch to Sample Transfer mode", self.contentsBox)
         self.currentBasket=CurrentBasketView(self.contentsBox)
         self.currentSample=CurrentSampleView(self.contentsBox)
-        #VerticalSpacer(self.contentsBox)
-        self.scContents = QVGroupBox("Contents", self.contentsBox)
-        self.scContents.setInsideMargin(4)
-        self.scContents.setInsideSpacing(2)
-        self.scContents.setAlignment(Qt.AlignHCenter)
-        self.cmdResetBasketsSamples = QPushButton("Reset sample changer contents", self.scContents)
+        VerticalSpacer(self.contentsBox)
+        self.cmdResetBasketsSamples = QPushButton("Reset sample changer contents", self.contentsBox)
         QObject.connect(self.cmdResetBasketsSamples, SIGNAL("clicked()"), self.resetBasketsSamplesInfo)
 
-        self.basket1=BasketView(self.scContents,1)
-        self.basket2=BasketView(self.scContents,2)
-        self.basket3=BasketView(self.scContents,3)
-        self.basket4=BasketView(self.scContents,4)
-        self.basket5=BasketView(self.scContents,5)
+        self.basket1=BasketView(self.contentsBox,1)
+        self.basket2=BasketView(self.contentsBox,2)
+        self.basket3=BasketView(self.contentsBox,3)
+        self.basket4=BasketView(self.contentsBox,4)
+        self.basket5=BasketView(self.contentsBox,5)
         self.baskets=(self.basket1,self.basket2,self.basket3,self.basket4,self.basket5)
  
         for i in range(5):
@@ -750,9 +737,9 @@ class SampleChangerBrick3(BlissWidget):
           self.baskets[i].setChecked(False)
           self.baskets[i].setEnabled(False)
 
-        self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.scContents)
+        self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.contentsBox)
 
-        self.scanBaskets=ScanBasketsView(self.scContents)
+        self.scanBaskets=ScanBasketsView(self.contentsBox)
 
         self.currentSample.setStateMsg("Unknown smart magnet state")
         self.currentSample.setStateColor("UNKNOWN")
@@ -761,7 +748,6 @@ class SampleChangerBrick3(BlissWidget):
 
         self.basketsSamplesSelectionDialog = BasketsSamplesSelection(self)
 
-        VerticalSpacer(self.contentsBox)
         QVBoxLayout(self)
         self.layout().addWidget(self.contentsBox)
 
@@ -779,8 +765,7 @@ class SampleChangerBrick3(BlissWidget):
 
         QObject.connect(self.scanBaskets,PYSIGNAL("scanAllBaskets"),self.scanAllBaskets)
         QObject.connect(self.scanBaskets,PYSIGNAL("selectBasketsSamples"),self.selectBasketsSamples)
-        QObject.connect(self.status, PYSIGNAL("status_msg_changed"), self.status_msg_changed)
-        
+
         self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         self.contentsBox.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
 
@@ -842,7 +827,6 @@ class SampleChangerBrick3(BlissWidget):
                 self.status.hideOperationalControl(self.sampleChanger.isMicrodiff())
                 self.sampleChangerStatusChanged(self.sampleChanger.getStatus())
                 self.sampleChangerStateChanged(self.sampleChanger.getState())
-                self.matrixCodesChanged(self.sampleChanger.getMatrixCodes())
                 self.sampleChangerInUse(self.sampleChanger.sampleChangerInUse())
                 self.sampleChangerCanLoad(self.sampleChanger.sampleChangerCanLoad())
                 self.minidiffCanMove(self.sampleChanger.minidiffCanMove())
@@ -867,9 +851,6 @@ class SampleChangerBrick3(BlissWidget):
 
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
-
-    def status_msg_changed(self, msg, color):
-        self.emit(PYSIGNAL("status_msg_changed"), (msg, color))
 
     def instanceModeChanged(self,mode):
         if mode==BlissWidget.INSTANCE_MODE_SLAVE:
@@ -952,7 +933,6 @@ class SampleChangerBrick3(BlissWidget):
         except:
             pass
 
-        
     def sampleLoadSuccess(self,already_loaded):
         pass
 
@@ -1088,7 +1068,7 @@ class SampleChangerBrick3(BlissWidget):
              
         self.sampleChanger.scanBaskets(baskets_to_scan, self.scanAllBasketsDone,self.scanAllBasketsDone)
 
-    def matrixCodesChanged(self,matrix_codes):
+    def matrixCodesChanged(self,matrix_codes,old={"matrices":None}):
         try:
             basket_presence=self.sampleChanger.getBasketPresence()
         except:
@@ -1108,6 +1088,7 @@ class SampleChangerBrick3(BlissWidget):
             presences.append(flags)
 
         cleared_matrix_codes=[]
+        cmp_matrices = []
         for code in matrix_codes:
             matrix=code[0]
             basket=code[1]
@@ -1119,6 +1100,7 @@ class SampleChangerBrick3(BlissWidget):
 
             flag=int(code[4])
             cleared_matrix_codes.append(code)
+            cmp_matrices.append([matrix,basket,vial])
             if flag & 8:
                 presences[basket-1][vial-1]=[VialView.VIAL_AXIS,matrix]
             else:
@@ -1142,7 +1124,9 @@ class SampleChangerBrick3(BlissWidget):
             i+=1
             basket.setMatrices(presence)
         
-        self.emit(PYSIGNAL("scanBasketUpdate"),(cleared_matrix_codes,))
+        if cmp_matrices != old["matrices"]:
+          old["matrices"]=cmp_matrices
+          self.emit(PYSIGNAL("scanBasketUpdate"),(cleared_matrix_codes,))
 
     def selectBasketsSamples(self):
         retval=self.basketsSamplesSelectionDialog.exec_loop()
@@ -1179,7 +1163,7 @@ class BasketsSamplesSelection(QDialog):
 
         self.setCaption("Basket and Sample selection")
         self.cmdResetContents = QPushButton("Reset basket and sample data", self)
-        baskets_box = QHBox(self, 'basket_box')
+        baskets_box = QHBox(self)
         baskets_box.setSpacing(5)
         baskets_box.setMargin(5)
         QLabel("Select baskets :", baskets_box)
@@ -1196,7 +1180,7 @@ class BasketsSamplesSelection(QDialog):
         buttons_box.layout().addWidget(self.cmdCancel, 1, 1)
 
         for i in range(5):
-            self.samplesBoxes.append(QHBox(samples_group, 'sample_group'))
+            self.samplesBoxes.append(QHBox(samples_group))
             QLabel("Basket %s :" % str(i+1), self.samplesBoxes[-1])
             self.txtPresentSamples.append(QLineEdit(self.samplesBoxes[-1]))
             self.txtPresentSamples[-1].setText("1-10")

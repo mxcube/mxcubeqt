@@ -65,8 +65,6 @@ class ResolutionBrick(BlissWidget):
         box1=QHBox(self.paramsBox)
         self.currentResolution=myLineEdit(box1)
         self.currentDetectorDistance=myLineEdit(box1)
-        self.currentResolution.setFixedWidth(55)
-        self.currentDetectorDistance.setFixedWidth(75)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)
@@ -76,7 +74,6 @@ class ResolutionBrick(BlissWidget):
         self.paramsBox.layout().addWidget(self.newValue, 1, 1)
         self.newValue.setValidator(QDoubleValidator(self))
         self.newValue.setAlignment(QWidget.AlignRight)
-        self.newValue.setFixedWidth(50)
         pol=self.newValue.sizePolicy()
         pol.setVerData(QSizePolicy.MinimumExpanding)
         self.newValue.setSizePolicy(pol)
@@ -92,14 +89,14 @@ class ResolutionBrick(BlissWidget):
 
         box2=QHBox(self.paramsBox)
         box2.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
-        #self.applyButton=QPushButton("+",box2)
-        #QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentValue)
+        self.applyButton=QPushButton("+",box2)
+        QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentValue)
         self.stopButton=QPushButton("*",box2)
         self.stopButton.setEnabled(False)
         QObject.connect(self.stopButton,SIGNAL('clicked()'),self.stopClicked)
         self.paramsBox.layout().addWidget(box2, 1, 3)
 
-        #self.applyButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
+        self.applyButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
         self.stopButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
 
         QVBoxLayout(self)
@@ -218,10 +215,10 @@ class ResolutionBrick(BlissWidget):
         elif property == 'icons':
             icons_list=newValue.split()
 
-            #try:
-            #    self.applyButton.setPixmap(Icons.load(icons_list[0]))
-            #except IndexError:
-            #    pass
+            try:
+                self.applyButton.setPixmap(Icons.load(icons_list[0]))
+            except IndexError:
+                pass
 
             try:
                 self.stopButton.setPixmap(Icons.load(icons_list[1]))
@@ -487,10 +484,10 @@ class ResolutionBrick(BlissWidget):
                 self.newValue.setText("")
                 self.newValue.blockSignals(False)
                 self.newValue.setEnabled(True)
-                #self.applyButton.setEnabled(True)
+                self.applyButton.setEnabled(True)
             else:
                 self.newValue.setEnabled(False)
-                #self.applyButton.setEnabled(False)
+                self.applyButton.setEnabled(False)
             if state==self.detectorMotor.MOVING or state==self.detectorMotor.MOVESTARTED:
                 self.stopButton.setEnabled(True)
             else:
@@ -524,10 +521,10 @@ class ResolutionBrick(BlissWidget):
                 self.newValue.setText("")
                 self.newValue.blockSignals(False)
                 self.newValue.setEnabled(True)
-                #self.applyButton.setEnabled(True)
+                self.applyButton.setEnabled(True)
             else:
                 self.newValue.setEnabled(False)
-                #self.applyButton.setEnabled(False)
+                self.applyButton.setEnabled(False)
             if state==self.detectorMotor.MOVING or state==self.detectorMotor.MOVESTARTED:
                 self.stopButton.setEnabled(True)
             else:

@@ -134,21 +134,21 @@ class HutchTriggerBrick2(DuoStateBrick):
     def msgChanged(self,msg):
         logging.getLogger().info(msg)
 
-    def hutchTriggerStarted(self):
+    def hutchTriggerStarted(self,*args):
         self.stateLabel.setButtonStopEnabled(True)
 
-    def hutchTriggerDone(self):
+    def hutchTriggerDone(self,*args):
         self.stateLabel.setButtonStopEnabled(False)
         if self['mode']=='automatic':
             self.stateChanged('automatic')
         else:
             self.stateChanged('ready')
 
-    def hutchTriggerFailed(self):
+    def hutchTriggerFailed(self,*args):
         self.stateLabel.setButtonStopEnabled(False)
         self.stateChanged('error')
 
-    def hutchTriggerChanged(self,state):
+    def hutchTriggerChanged(self,state,*args):
         if self['mode']=='automatic':
             if state:
                 self.setIn(True)

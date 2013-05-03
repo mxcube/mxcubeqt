@@ -7,8 +7,6 @@ from datetime import datetime
 import os
 import sys
 
-from BlissFramework.Utils import widget_colors
-
 __category__ = 'mxCuBE'
 
 ENV_BEAMLINE_NAME = 'SMIS_BEAMLINE_NAME'
@@ -67,24 +65,22 @@ class ProposalBrick2(BlissWidget):
         self.contentsBox.setInsideMargin(4)
         self.contentsBox.setInsideSpacing(0)
 
-        self.loginBox=QHBox(self.contentsBox, 'login_box')
+        self.loginBox=QHBox(self.contentsBox)
         code_label=QLabel("Code:",self.loginBox)
         self.propType=QComboBox(self.loginBox)
         self.propType.setEditable(True)
         self.propType.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        self.propType.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+        self.propType.setPaletteBackgroundColor(QWidget.yellow)
         dash_label=QLabel(" - ",self.loginBox)
         self.propNumber=QLineEdit(self.loginBox)
         self.propNumber.setValidator(QIntValidator(0,99999,self.propNumber))
         self.propNumber.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        self.propNumber.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-        self.propNumber.setFixedWidth(50)
+        self.propNumber.setPaletteBackgroundColor(QWidget.yellow)
         password_label=QLabel("Password:",self.loginBox)
         self.propPassword=QLineEdit(self.loginBox)
         self.propPassword.setEchoMode(QLineEdit.Password)
         self.propPassword.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        self.propPassword.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-        self.propPassword.setFixedWidth(75)
+        self.propPassword.setPaletteBackgroundColor(QWidget.yellow)
         self.connect(self.propPassword, SIGNAL('returnPressed()'), self.login)
 
         self.loginButton=QToolButton(self.loginBox)
@@ -102,13 +98,13 @@ class ProposalBrick2(BlissWidget):
         self.connect(self.logoutButton,SIGNAL('clicked()'),self.openLogoutDialog)
         self.logoutButton.hide()
 
-        labels_box=QHBox(self.contentsBox, 'contents_box')
+        labels_box=QHBox(self.contentsBox)
         labels_box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         self.titleLabel=QLabel(labels_box)
         self.titleLabel.setAlignment(Qt.AlignCenter)
         self.titleLabel.hide()
-        #self.proposalLabel=QLabel(ProposalBrick2.NOBODY_STR,labels_box)
-        #self.proposalLabel.setAlignment(Qt.AlignCenter)
+        self.proposalLabel=QLabel(ProposalBrick2.NOBODY_STR,labels_box)
+        self.proposalLabel.setAlignment(Qt.AlignCenter)
 
         # Initialize layout
         QHBoxLayout(self)
@@ -185,8 +181,8 @@ class ProposalBrick2(BlissWidget):
         self.loginBox.show()
         self.logoutButton.hide()
         self.titleLabel.hide()
-        #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
-        #QToolTip.add(self.proposalLabel,"")
+        self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
+        QToolTip.add(self.proposalLabel,"")
        
         # Emit signals clearing the proposal and session
         self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
@@ -209,7 +205,7 @@ class ProposalBrick2(BlissWidget):
 
         code=proposal["code"].lower()
         if code=="":
-            #self.proposalLabel.setText("<nobr><i>%s</i>" % personFullName(person))
+            self.proposalLabel.setText("<nobr><i>%s</i>" % personFullName(person))
             session_id=""
             logging.getLogger().warning("Using local login: the data collected won't be stored in the database")
             self.dbConnection.disable()
@@ -241,11 +237,11 @@ class ProposalBrick2(BlissWidget):
                 header="%s Dates: %s to %s" % (person_name,start_date,end_date)
 
             # Set interface info and signal the new session
-            #self.proposalLabel.setText("<nobr><i>(%s)</i>" % header)
+            self.proposalLabel.setText("<nobr><i>(%s)</i>" % header)
             self.titleLabel.setText("<nobr><b>%s</b>" % title)
             self.titleLabel.show()
             if comments:
-                #QToolTip.add(self.proposalLabel,"Comments: "+comments)
+                QToolTip.add(self.proposalLabel,"Comments: "+comments)
                 QToolTip.add(self.titleLabel,"Comments: "+comments)
 
             try:

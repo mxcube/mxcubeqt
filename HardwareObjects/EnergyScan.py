@@ -9,6 +9,7 @@ import time
 import types
 import math
 import gevent
+import gevent.event
 
 class EnergyScan(Equipment):
     def init(self):
@@ -20,6 +21,8 @@ class EnergyScan(Equipment):
         self.storeScanThread = None
         self.energy2WavelengthConstant=None
         self.defaultWavelength=None
+        self.ready_event = gevent.event.Event()
+
         try:
             self.defaultWavelengthChannel=self.getChannelObject('default_wavelength')
         except KeyError:
@@ -175,6 +178,7 @@ class EnergyScan(Equipment):
             return False
         return self.doEnergyScan is not None
     def startEnergyScan(self,element,edge,directory,prefix,session_id=None,blsample_id=None):
+        self.ready_event.clear()
         self.scanInfo={"sessionId":session_id,"blSampleId":blsample_id,"element":element,"edgeEnergy":edge}
         if self.fluodetectorHO is not None:
             self.scanInfo['fluorescenceDetector']=self.fluodetectorHO.userName()
@@ -233,6 +237,7 @@ class EnergyScan(Equipment):
         self.scanning = False
         self.storeEnergyScan()
         self.emit('energyScanFailed', ())
+        self.ready_event.set()
     def scanCommandAborted(self, *args):
         pass
     def scanCommandFinished(self,result, *args):
@@ -289,6 +294,7 @@ class EnergyScan(Equipment):
             pass
 
         self.emit('energyScanFinished', (self.scanInfo,))
+        self.ready_event.set()
 
 
     def doChooch(self, scanObject, elt, edge, scanArchiveFilePrefix, scanFilePrefix):
@@ -333,7 +339,7 @@ class EnergyScan(Equipment):
           rm = self.thEdge + 0.03
           comm = 'Calculated peak (%f) is more that 10eV away from the theoretical value (%f). Please check your scan' % (savpk, self.thEdge)
    
-          logging.getLogger("HWR").warning('EnergyScan: calculated peak (%f) is more that 20eV %s the theoretical value (%f). Please check your scan and choose the energies manually' % (savpk, (self.thEdge - ip) > 0.02 and "below" or "above", self.thEdge))
+          logging.getLogger("HWR").warning('EnergyScan: calculated peak (%f) is more that 10eV %s the theoretical value (%f). Please check your scan and choose the energies manually' % (savpk, (self.thEdge - ip) > 0.01 and "below" or "above", self.thEdge))
 
         archiveEfsFile=os.path.extsep.join((scanArchiveFilePrefix, "efs"))
         try:

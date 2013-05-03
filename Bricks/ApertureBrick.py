@@ -1,6 +1,5 @@
 from BlissFramework import BaseComponents
 from BlissFramework import Icons
-from BlissFramework.Utils import widget_colors
 from qt import *
 import new
 import re
@@ -14,10 +13,10 @@ class ApertureBrick(BaseComponents.BlissWidget):
     STATES = {
         'unknown': (None, True, True, False, False),
         'disabled': (None, False, False, False, False),
-        'error': (widget_colors.LIGHT_RED, True, True, False, False),
+        'error': (QWidget.red, True, True, False, False),
         'out': (QWidget.darkGray, True, True, False, True),
         'moving': (QWidget.yellow, False, False, None, None),
-        'in': (widget_colors.LIGHT_GREEN, True, True, True, False),
+        'in': (QWidget.green, True, True, True, False),
         'automatic': (QWidget.white, True, True, False, False)
     }
 
@@ -547,14 +546,14 @@ class WrapperHO(QObject):
                 pass
             return state
         return "unknown"
-    def procedureSetInEnded(self):
+    def procedureSetInEnded(self, *args):
         if self.stateChannel is None:
             self.emit(PYSIGNAL('duoStateChanged'), ('in', ))
-    def procedureSetOutEnded(self):
+    def procedureSetOutEnded(self, *args):
         if self.stateChannel is None:
             self.emit(PYSIGNAL('duoStateChanged'), ('out', ))
-    def procedureStarted(self):
+    def procedureStarted(self, *args):
         if self.stateChannel is None:
             self.emit(PYSIGNAL('duoStateChanged'), ('moving', ))
-    def procedureAborted(self):
+    def procedureAborted(self, *args):
         self.emit(PYSIGNAL('duoStateChanged'), ('error', ))

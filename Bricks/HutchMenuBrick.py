@@ -5,7 +5,6 @@ import logging
 import MiniDiff
 import CommandMenuBrick
 import os
-import tempfile
 
 from Qub.Objects.QubDrawingManager import QubPointDrawingMgr, Qub2PointSurfaceDrawingMgr, QubAddDrawing
 from Qub.Objects.QubDrawingManager import QubContainerDrawingMgr
@@ -18,8 +17,6 @@ from Qub.Objects.QubDrawingCanvasTools import QubCanvasRectangle
 from Qub.Objects.QubDrawingCanvasTools import QubCanvasScale
 from Qub.Objects.QubDrawingEvent import QubMoveNPressed1Point
 from Qub.Tools import QubImageSave
-from BlissFramework.Utils import widget_colors
-
 
 __category__ = 'mxCuBE'
 
@@ -63,7 +60,6 @@ class HutchMenuBrick(BlissWidget):
         self.defineSignal('getView',())
         self.defineSignal('beamPositionChanged', ())
         self.defineSignal('calibrationChanged', ())
-        self.defineSignal('newCentredPos', ())
         #self.defineSignal('setMoveToBeamState', ())
         self.defineSlot('setDirectory',())
         self.defineSlot('setPrefix',())
@@ -72,33 +68,29 @@ class HutchMenuBrick(BlissWidget):
         self.defineSlot('rejectCentring', ())
         self.defineSlot('setSample',())
         #self.defineSlot('enableAutoStartLoopCentring', ())
-        self.defineSlot('getSnapshot',())
-        
-        self.sampleCentreBox=QVBox(self)
-        #self.sampleCentreBox.setInsideMargin(11)
-        #self.sampleCentreBox.setInsideSpacing(0)
+
+        self.sampleCentreBox=QHGroupBox(self)
+        self.sampleCentreBox.setInsideMargin(4)
+        self.sampleCentreBox.setInsideSpacing(0)
 
         #self.modeBox=QVButtonGroup(self.sampleCentreBox)
         #self.modeBox.setFrameShape(self.modeBox.NoFrame)
         #self.modeBox.setInsideMargin(0)
         #self.modeBox.setInsideSpacing(0)            
         #QObject.connect(self.modeBox,SIGNAL('clicked(int)'),self.centringModeChanged)
-        #self.userConfirmsButton=QCheckBox("User confirms", self.sampleCentreBox)
-        #self.userConfirmsButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
-        #self.userConfirmsButton.setChecked(True)
+        self.userConfirmsButton=QCheckBox("User confirms", self.sampleCentreBox)
+        self.userConfirmsButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
+        self.userConfirmsButton.setChecked(True)
 
-        self.buttonsBox=QVBox(self.sampleCentreBox)
-        self.buttonsBox.setSpacing(0)
+        self.buttonsBox=QHBox(self.sampleCentreBox)
 
         self.buttonCentre=MenuButton(self.buttonsBox,"Centre")
-        self.buttonCentre.setMinimumSize(QSize(75,50))
         self.connect(self.buttonCentre,PYSIGNAL('executeCommand'),self.centreSampleClicked)
         self.connect(self.buttonCentre,PYSIGNAL('cancelCommand'),self.cancelCentringClicked)
 
         self.buttonAccept = QToolButton(self.buttonsBox)
         self.buttonAccept.setUsesTextLabel(True)
-        self.buttonAccept.setTextLabel("Save")
-        self.buttonAccept.setMinimumSize(QSize(75,50))
+        self.buttonAccept.setTextLabel("Accept")
         self.buttonAccept.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.buttonAccept.setEnabled(False)
         QObject.connect(self.buttonAccept,SIGNAL('clicked()'),self.acceptClicked)
@@ -107,13 +99,11 @@ class HutchMenuBrick(BlissWidget):
         self.buttonReject = QToolButton(self.buttonsBox)
         self.buttonReject.setUsesTextLabel(True)
         self.buttonReject.setTextLabel("Reject")
-        self.buttonReject.setMinimumSize(QSize(75,50))
         self.buttonReject.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.buttonReject.setEnabled(False)
-        self.buttonReject.hide()
         QObject.connect(self.buttonReject,SIGNAL('clicked()'),self.rejectClicked)
 
-        #HorizontalSpacer4(self.sampleCentreBox)
+        HorizontalSpacer3(self.sampleCentreBox)
 
         self.extraCommands=CommandMenuBrick.CommandMenuBrick(self.sampleCentreBox)
         self.extraCommands['showBorder']=False
@@ -121,11 +111,8 @@ class HutchMenuBrick(BlissWidget):
         self.buttonSnapshot = QToolButton(self.sampleCentreBox)
         self.buttonSnapshot.setUsesTextLabel(True)
         self.buttonSnapshot.setTextLabel("Snapshot")
-        self.buttonSnapshot.setMinimumSize(QSize(75,50))
         self.buttonSnapshot.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         QObject.connect(self.buttonSnapshot,SIGNAL('clicked()'),self.saveSnapshot)
-
-        #HorizontalSpacer3(self.sampleCentreBox)
 
         self.centringButtons=[]
         self.defaultBackgroundColor=None
@@ -142,7 +129,7 @@ class HutchMenuBrick(BlissWidget):
         self.selectedSamples=None
 
         # Layout
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
         QHBoxLayout(self)        
         self.layout().addWidget(self.sampleCentreBox)
 
@@ -216,7 +203,7 @@ class HutchMenuBrick(BlissWidget):
         elif propertyName == 'icons':
             self.setIcons(newValue)
         elif propertyName=='label':
-          pass #self.sampleCentreBox.setTitle(newValue)
+            self.sampleCentreBox.setTitle(newValue)
         elif propertyName=='extraCommands':
             self.extraCommands['mnemonic']=newValue
         elif propertyName=='extraCommandsIcons':
@@ -323,33 +310,6 @@ class HutchMenuBrick(BlissWidget):
                 self.formatType=image_type.lower()
                 self.fileIndex+=1
 
-
-    def centredPositionSnapshot(self):
-        matrix = self.__drawing.matrix()
-
-        zoom = 1
-        if matrix is not None:
-            zoom = matrix.m11()
-
-        img = self.__drawing.getPPP()
-        fd, name = tempfile.mkstemp()
-        os.close(fd)
-
-        QubImageSave.save(name, img, self.__drawing.canvas(), zoom, "JPEG")
-
-        f = open(name, "r")
-        imgcopy = f.read()
-        f.close()
-        os.unlink(name)
-
-        return imgcopy
-
-
-    def getSnapshot(self, img):
-        logging.getLogger().debug("Taking snapshot for centred position")
-        img['data'] = self.centredPositionSnapshot()
-    
-
     def cancelCentringClicked(self,reject=False):
         #print "CANCELCENTRINGCLICKED",reject
         self.minidiff.cancelCentringMethod(reject=reject)
@@ -389,8 +349,6 @@ class HutchMenuBrick(BlissWidget):
           self.insideDataCollection = False
           self.emit(PYSIGNAL("centringAccepted"), (state,centring_status))
 
-        self.emit(PYSIGNAL("newCentredPos"), (state, centring_status))
-
     def centringSnapshots(self,state):
         if state is None:
             self.isShooting=True
@@ -427,13 +385,10 @@ class HutchMenuBrick(BlissWidget):
             self.__pointer.startDrawing()
 
     def drawAutoCentringPoint(self, x,y):
-      if x<0 or y<0:
-        self.__autoCentringPoint.hide()
-      else:
-        self.__autoCentringPoint.startDrawing()
-        self.__autoCentringPoint.setPoint(x,y)
-        self.__autoCentringPoint.stopDrawing()
-        self.__autoCentringPoint.show()
+      self.__autoCentringPoint.startDrawing()
+      self.__autoCentringPoint.setPoint(x,y)
+      self.__autoCentringPoint.stopDrawing()
+      self.__autoCentringPoint.show()
       
     def centringSuccessful(self,method,centring_status):
         self.__point.stopDrawing()
@@ -456,8 +411,8 @@ class HutchMenuBrick(BlissWidget):
         if self.insideDataCollection:
             if self.standardColor is None:
                 self.standardColor=self.buttonAccept.paletteBackgroundColor()
-            self.buttonAccept.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
-            self.buttonReject.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            self.buttonAccept.setPaletteBackgroundColor(QWidget.green)
+            self.buttonReject.setPaletteBackgroundColor(QWidget.red)
 
         if self.collectObj is not None:
             self.collectObj.setCentringStatus(centring_status)
@@ -808,18 +763,9 @@ class MenuButton(QToolButton):
     def commandFailed(self):
         self.commandDone()
 
-
 class HorizontalSpacer3(QWidget):
     def __init__(self,*args):
         QWidget.__init__(self,*args)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-    def sizeHint(self):
-        return QSize(5,0)
-
-
-class HorizontalSpacer4(QWidget):
-    def __init__(self,*args):
-        QWidget.__init__(self,*args)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
     def sizeHint(self):
         return QSize(5,0)

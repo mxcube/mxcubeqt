@@ -1284,7 +1284,6 @@ class ISPyBValueFactory():
 #             det_mode = 1
 #             group.detectorMode = modes[det_mode]
 
-
             try:
                 try:
                     helical_used = mx_collect_dict['helical']

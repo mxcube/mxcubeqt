@@ -108,12 +108,18 @@ EDNA_DEFAULT_INPUT = """<?xml version="1.0" ?>
         <complexity>
             <value>min</value>
         </complexity>
+        <forcedSpaceGroup>
+            <value>P1</value>
+        </forcedSpaceGroup>
         <maxExposureTimePerDataCollection>
             <value>6.000000e+03</value>
         </maxExposureTimePerDataCollection>
     </diffractionPlan>
     <experimentalCondition>
         <beam>
+            <flux>
+                <value>2.700000e+12</value>
+            </flux>
             <minExposureTimePerImage>
                 <value>1.000000e-01</value>
             </minExposureTimePerImage>

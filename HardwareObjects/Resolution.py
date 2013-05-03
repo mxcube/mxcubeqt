@@ -20,10 +20,11 @@ class Resolution(BaseHardwareObjects.Equipment):
         self.dtox = self.getDeviceByRole("dtox")
         self.wavelength = self.getDeviceByRole("wavelength")
 	self.getradius = self.getCommandObject("detector_radius")
-   	self.detector_diameter_chan = self.addChannel({"type":"spec", "version": self.getradius.specVersion, "name":"detector_radius"}, "MXBCM_PARS/detector_radius")
-        self.detector_diameter = 0
         self.beam_centre_channel = self.addChannel({"type":"spec", "version": self.getradius.specVersion, "name":"beam_centre"}, "MXBCM_PARS/beam")   
+   	self.detector_diameter = float(self.addChannel({"type":"spec", "version": self.getradius.specVersion, "name":"detector_radius"}, "MXBCM_PARS/detector_radius").getValue()) * 2 
         self.beam_centre_channel.connectSignal("update", self.beam_centre_updated)
+
+        self.beam_centre_updated(self.beam_centre_channel.getValue())
 
         if self.wavelength is None:
           self.energy = self.getDeviceByRole("energy")
@@ -47,8 +48,6 @@ class Resolution(BaseHardwareObjects.Equipment):
             self.connect(self.energy, "positionChanged", self.energyChanged)
 
     def beam_centre_updated(self, beam_pos_dict):
-        if self.detector_diameter == 0:
-            self.detector_diameter = float(self.detector_diameter_chan.getValue()) * 2
         x = float(beam_pos_dict["x"])
         y = float(beam_pos_dict["y"])
         self.det_radius =  min(self.detector_diameter - x, self.detector_diameter - y, x, y)

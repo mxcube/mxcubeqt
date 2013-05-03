@@ -505,6 +505,13 @@ class AbstractMultiCollect(object):
         self.sample_centring_result = AsyncResult()
         
         if sample_was_loaded:
+          #try:
+          #    automatic_centring = str(data_collect_parameters["start_auto_centring"]).upper()=='TRUE'
+          #except:
+          #    automatic_centring = False
+        
+          # TODO: handle automatic centring case
+          # here it is just normal centring :
           self.emit("collectValidateCentring", (True, file_parameters))
 
           logging.getLogger("HWR").info("Waiting for sample to be centred")
@@ -724,7 +731,7 @@ class AbstractMultiCollect(object):
                                      data_collect_parameters["comment"])
             data_collect_parameters["dark"] = 0
 
-            # at this point input files should have been written           
+            # at this point input files should have been written
             if data_collect_parameters.get("processing", False)=="True":
                 self.trigger_auto_processing("before",
                                        self.xds_directory,

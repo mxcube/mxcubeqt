@@ -14,8 +14,6 @@ Example XML config. file:
 import logging
 import gevent.event
 import time
-import queue_model
-
 from AbstractDataAnalysis import *
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 
@@ -47,6 +45,15 @@ from edna_test_data import EDNA_DEFAULT_INPUT
 from edna_test_data import EDNA_TEST_DATA
 
 from collections import namedtuple
+
+
+StrategyComplexity = namedtuple('StrategyComplexity', ['NOT_USED',
+                                                       'SINGLE','FEW','MANY'])
+STRATEGY_COMPLEXITY = StrategyComplexity('none', 'none', 'few', 'full')
+
+ExperimentType = namedtuple('ExperimentType', ['SAD','SAD_INV',
+                                               'MAD', 'MAD_INV', 'NATIVE'])
+EXPERIMENT_TYPE = ExperimentType(0,1,2,3,4)
 
 
 class DataAnalysis(AbstractDataAnalysis, HardwareObject):
@@ -87,7 +94,8 @@ class DataAnalysis(AbstractDataAnalysis, HardwareObject):
             self.job_success_event.set()
 
 
-    def get_html_report(self, edna_result):
+    def get_html_report(self, edna_output):
+        edna_result = XSDataResultMXCuBE.parseString(edna_output)
         html_report = None
 
         try:
@@ -141,15 +149,15 @@ class DataAnalysis(AbstractDataAnalysis, HardwareObject):
 
 
         diff_plan.setComplexity(XSDataString(\
-                queue_model.STRATEGY_COMPLEXITY[char_params.strategy_complexity]))
+                STRATEGY_COMPLEXITY[char_params.strategy_complexity]))
 
 
         if char_params.use_permitted_rotation:
-            diff_plan.setUserDefinedRotationStart(XSDataAngle(char_params.\
+            diff_plan.setUserDefinedRotationStart(XSDataAnlge(char_params.\
                                                               permitted_phi_start))
 
-            diff_plan.setUserDefinedRotationRange(XSDataAngle(char_params.permitted_phi_end -\
-                                                              char_params.permitted_phi_start))
+            diff_plan.setUserDefinedRotationEnd(XSDataAnlge(char_params.\
+                                                              permitted_phi_end))
 
 
         #Vertical crystal dimension
@@ -161,8 +169,8 @@ class DataAnalysis(AbstractDataAnalysis, HardwareObject):
         #Radiation damage model
         sample.setSusceptibility(XSDataDouble(char_params.rad_suscept))
         sample.setChemicalComposition(None)
-        sample.setRadiationDamageModelBeta(XSDataDouble(char_params.beta/1e6))
-        sample.setRadiationDamageModelGamma(XSDataDouble(char_params.gamma/1e6))
+        sample.setRadiationDamageModelBeta(XSDataDouble(char_params.beta))
+        sample.setRadiationDamageModelGamma(XSDataDouble(char_params.gamma))
             
 
         diff_plan.setForcedSpaceGroup(XSDataString(char_params.\
@@ -187,7 +195,7 @@ class DataAnalysis(AbstractDataAnalysis, HardwareObject):
 
         # Characterisation type - SAD
 
-        if queue_model.EXPERIMENT_TYPE[char_params.experiment_type] is queue_model.EXPERIMENT_TYPE.SAD:
+        if EXPERIMENT_TYPE[char_params.experiment_type] is EXPERIMENT_TYPE.SAD:
             diff_plan.setAnomalousData(XSDataBoolean(True))
         else:
             diff_plan.setAnomalousData(XSDataBoolean(False))
@@ -212,27 +220,17 @@ class DataAnalysis(AbstractDataAnalysis, HardwareObject):
     def characterise(self, edna_input):
         #edna_plugin = "EDPluginControlInterfaceToMXCuBEv1_3"
         edna_plugin = "EDPluginControlMXCuBEWrapperv1_3"
-        edna_result = None
-
 
         self.job_success_event.clear()
         self.job_id = self.startJob([edna_plugin, 
                                      edna_input.marshal()])
         logging.info("Running %s" % edna_plugin)
 
-        self.job_success_event.wait(timeout = 180)
+        self.job_success_event.wait(timeout = 60)
 
         if self.result is not None:
             if self.result.find("CharacterisationResult.xml") != -1:
-
-                logging.getLogger('queue_exec').\
-                    info('EDNA-Characterisation completed successfully')
-                logging.getLogger('queue_exec').\
-                    info('with result ' + self.result)
-                
-                edna_result = XSDataResultMXCuBE.parseString(self.result)
-                
-        return edna_result
+                return self.result
 
 
     def is_running(self):

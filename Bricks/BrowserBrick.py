@@ -30,6 +30,8 @@ class BrowserBrick(BaseComponents.BlissWidget):
 
         self.defineSlot('load_file', ())
         self.defineSlot('login_changed', ())
+        # New slot created for displaying html pages from the queue (Olof 2013/04/25)
+        self.defineSlot('new_html', ())
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('history', 'string', '', hidden=True)
         self.addProperty('sessions ttl (in days)', 'integer', '30')
@@ -211,7 +213,7 @@ class BrowserBrick(BaseComponents.BlissWidget):
             self.edna = self.getHardwareObject(newval)
             logging.getLogger().debug('edna object is now: %s', self.edna)
             self.connect(self.edna, PYSIGNAL('newEDNAHTML'), self.new_html)
-    
+ 
     def run(self):
         pass
 

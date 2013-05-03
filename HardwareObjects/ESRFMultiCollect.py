@@ -520,24 +520,16 @@ class ESRFMultiCollect(AbstractMultiCollect, HardwareObject):
 
 
     def get_machine_current(self):
-        if self.bl_control.machine_current:
-            return self.bl_control.machine_current.getCurrent()
-        else:
-            return 0
+      return self.bl_control.machine_current.getCurrent()
 
 
     def get_machine_message(self):
-        if  self.bl_control.machine_current:
-            return self.bl_control.machine_current.getMessage()
-        else:
-            return ''
+      return self.bl_control.machine_current.getMessage()
 
 
     def get_machine_fill_mode(self):
-        if self.bl_control.machine_current:
-            return self.bl_control.machine_current.getFillMode()
-        else:
-            ''
+      return self.bl_control.machine_current.getFillMode()
+
 
     def get_cryo_temperature(self):
       return self.bl_control.cryo_stream.getTemperature()

@@ -6,6 +6,8 @@ from HardwareRepository.BaseHardwareObjects import Equipment
 import tempfile
 import logging
 import numpy
+import base64
+import xmlrpclib
 import math
 import os
 import time
@@ -592,52 +594,196 @@ class MiniDiff(Equipment):
 
 
     def autoCentringDone(self, auto_centring_procedure):
-        try:
-          motor_pos = auto_centring_procedure.get()
-          if isinstance(motor_pos, gevent.GreenletExit):
-            # BUG IN GEVENT?
-            raise motor_pos
-        except:
-          try:
-            self._abort_cmd()
-          except:
-            pass
-          logging.exception("Could not complete automatic centring")
-          self.emitCentringFailed()
+        self.emitProgressMessage("")
+        if auto_centring_procedure.get():
+            self.emitCentringSuccessful()
         else:
-          self.emitProgressMessage("Moving sample to centred position...")
-          self.emitCentringMoving()
-         
-          self.emitCentringSuccessful()
-          self.emitProgressMessage("")
+            logging.error("Could not complete automatic centring")
+            self.emitCentringFailed()
+      
 
+    def do_auto_centring(self, phi, phiy, phiz, sampx, sampy, zoom, camera, phiy_direction):
+        imgWidth = camera.getWidth()
+        imgHeight = camera.getHeight()
+        server = xmlrpclib.Server(self["autoCentering"].centring_server)
+
+        def find_loop(zoom=0,show_point=True):
+          img_array = numpy.fromstring(camera.getChannelObject("image").getValue
+(), numpy.uint8)
+          img_array.shape = (imgHeight, imgWidth)
+          info, x, y = server.find_loop(base64.b64encode(img_array.tostring()),
+img_array.shape,zoom)
+          self.emitProgressMessage("Loop found: %s (%d, %d)" % (info, x, y))
+          logging.debug("Loop found: %s (%d, %d)" % (info, x, y))
+          if show_point:
+              self.emit("newAutomaticCentringPoint", (x,y))
+          return x,y
+        
+        def face_finder(zoom=0):
+          img_array = numpy.fromstring(camera.getChannelObject("image").getValue
+(), numpy.uint8)
+          img_array.shape = (imgHeight, imgWidth)
+          num = server.face_finder(base64.b64encode(img_array.tostring()),
+img_array.shape,zoom)
+          logging.info("loop size: %d", num)
+          return num
+
+        def centre_loop(pixelsPerMmY, pixelsPerMmZ,zoom=0):
+          X = []
+          Y = []
+          phiSavedDialPosition = phi.getDialPosition()
+         
+          logging.debug("in centre_loop: pixelsPerMmY=%f, pixelsPerMmZ=%f", pixelsPerMmY, pixelsPerMmZ)
+          self.emitProgressMessage("Doing automatic centring")
+          for angle in (0, 90, 90):
+            phi.syncMoveRelative(angle)
+            x, y = find_loop(zoom) 
+            if x < 0 or y < 0:
+              for i in range(1,5):
+                logging.debug("loop not found - moving back") 
+                phi.syncMoveRelative(-20)
+                x, y = find_loop(zoom)
+                if x >=0:
+                  if y < imgHeight/2:
+                    y = 0
+                    self.emit("newAutomaticCentringPoint", (x,y))
+                    X.append(x); Y.append(y)
+                    break
+                  else:
+                    y = imgHeight
+                    self.emit("newAutomaticCentringPoint", (x,y))
+                    X.append(x); Y.append(y)
+                    break
+                if i == 4:
+                  if X and Y:
+                    logging.debug("loop not found - trying with last coordinates")
+                    self.emit("newAutomaticCentringPoint", (X[-1],Y[-1]))
+                    X.append(X[-1]); Y.append(Y[-1])
+                  else:
+                    # should never happen in normal conditions!
+                    return
+              phi.syncMoveRelative(i*20)
+            else:
+              X.append(x); Y.append(y)
+              
+          beam_xc = imgWidth / 2
+          beam_yc = imgHeight / 2
+          yc = (Y[0]+Y[2]) / 2
+          y =  Y[0] - yc
+          x =  yc - Y[1]
+          b1 = -math.radians(phiSavedDialPosition)
+          rotMatrix = numpy.matrix([math.cos(b1), -math.sin(b1), math.sin(b1), math.cos(b1)])
+          rotMatrix.shape = (2,2)
+          dx, dy = numpy.dot(numpy.array([x,y]), numpy.array(rotMatrix))/pixelsPerMmY
+
+          beam_xc_real = beam_xc / float(pixelsPerMmY)
+          beam_yc_real = beam_yc / float(pixelsPerMmZ)
+          y = yc / float(pixelsPerMmZ)
+          x = sum(X) / 3.0 / float(pixelsPerMmY)
+          centredPos = { sampx: sampx.getPosition() + float(dx),
+                         sampy: sampy.getPosition() + float(dy),
+                         phiy: phiy.getPosition() + phiy_direction * (x - beam_xc_real),
+                         phiz: phiz.getPosition() + (y - beam_yc_real) }
+          return centredPos
+
+        def check_centring(zoom=0):
+          centring_results = []
+     
+          for angle in (0,-90,-90):
+            phi.syncMoveRelative(angle)
+            logging.debug("checking centring at angle %d", phi.getPosition())
+            x, y = find_loop(zoom, False)
+            centring_results.append(x > imgWidth*0.35 and x < imgWidth*0.65 and y > imgHeight*0.35 and y < imgHeight*0.65)
+            logging.debug("  centring is %s", "ok" if centring_results[-1] else "bad")
+                
+          return all(centring_results)
+         
+        def find_face(zoom=0):
+            angles_results = []
+            
+            for angle in [0]+[10]*18:
+                phi.syncMoveRelative(angle)
+                angles_results.append(face_finder(zoom))
+            
+            m=max(angles_results)
+            index = angles_results.index(m)
+            
+            phi.syncMoveRelative((index-18)*10)
+                
+ 
+        #check if loop is there at the beginning
+        i = 0
+        #phiz.syncMoveRelative(-2.0)
+        #phiz.syncMoveRelative(2.0)
+        logging.info("begin autocentering")
+        while -1 in find_loop():
+          phi.syncMoveRelative(90)
+          i+=1
+          if i>4:
+            return
+
+        centred = False
+        for i in range(6):
+          motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ)
+          try:
+            gevent.spawn(move_to_centred_position, motor_pos).get()
+          except:
+            #ERROR
+            pass
+          else:
+            if not check_centring():
+              continue
+            else:
+              centred = True
+              break
+
+        if centred:
+          # move zoom
+          positions = zoom.getPredefinedPositionsList()
+          i = len(positions) / 2
+          zoom.moveToPosition(positions[i-1])
+          while zoom.motorIsMoving():
+            time.sleep(0.1)
+          self.pixelsPerMmY, self.pixelsPerMmZ = self.getCalibrationData(zoom.getPosition())
+
+          # last centring
+          logging.info("ok_for_centering")
+          motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
+          try:
+            gevent.spawn(move_to_centred_position, motor_pos).get()
+          except:
+            #ERROR
+            pass
+          else:
+            if check_centring(1):
+                #find_face(1)
+                logging.info("endofcentering")
+                return motor_pos
+            else:
+                motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
+                try:
+                    gevent.spawn(move_to_centred_position, motor_pos).get()
+                except:
+                    #ERROR
+                    pass
+                else:
+                    if check_centring(1):
+                        #find_face(1)
+                        logging.info("endofcentering")
+                        return motor_pos
 
     def startAutoCentring(self,sample_info=None, loop_only=False):
-        # sample info is the BL sample ID for the moment (None or an integer) 
-        # in the future, this could be a dictionary
-        try:
-            centring_server = self["autoCentering"].centring_server
-        except:
-            logging.getLogger("HWR").error("%s: no automatic centring script", self.name())
-            self.cancelCentringMethod()
-        else:        
-            if not hasattr(self, "_search_cmd"): 
-                self._search_cmd=self.addCommand({"type":"tango", "tangoname":centring_server, "name":"search" }, "Search")
-                self._abort_cmd=self.addCommand({"type":"tango", "tangoname":centring_server, "name":"abort" }, "Abort")
-                self._message_chan=self.addChannel({"type":"tango", "tangoname":centring_server,"name":"message", "polling":"events"}, "Message")
-                self._error_chan=self.addChannel({"type":"tango", "tangoname":centring_server,"name":"error", "polling":"events"}, "Error")
-
-        try:
-            centring_server = self["autoCentering"].centring_server
-            self.currentCentringProcedure = gevent.spawn(auto_centring, self._search_cmd, self._abort_cmd, self._message_chan, self._error_chan, self, sample_info,
-                                                                  progressMessage=self.emitProgressMessage,
-                                                                  loopCentringOnly=loop_only)
-            self.currentCentringProcedure.link(self.autoCentringDone)
-            self.emitProgressMessage("Starting automatic centring procedure...")
-        except:
-            logging.getLogger("HWR").error("Autocentring will not start because the server is not responding")
-            self.cancelCentringMethod()
-
+        self.currentCentringProcedure = gevent.spawn(self.do_auto_centring, self.phiMotor,
+                                                     self.phiyMotor,
+                                                     self.phizMotor,
+                                                     self.sampleXMotor,
+                                                     self.sampleYMotor,
+                                                     self.zoomMotor,
+                                                     self.camera,
+                                                     self.phiy_direction)
+        self.currentCentringProcedure.link(self.autoCentringDone)
+	self.emitProgressMessage("Starting automatic centring procedure...")
+        
 
     def imageClicked(self, x, y, xi, yi):
         USER_CLICKED_EVENT.set((x,y))

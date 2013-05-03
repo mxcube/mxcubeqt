@@ -14,8 +14,7 @@ class DataCollectTree(QWidget):
     def __init__(self, parent = None, name = "data_collect", 
                  selection_changed=None):
         QWidget.__init__(self, parent, name)
-
-        self.queue_hwobj = None
+        
         self.data_model = SCDataModel()
         self.selection_changed_cb = None
 
@@ -186,7 +185,6 @@ class DataCollectTree(QWidget):
 
     def get_selected_item(self):
         return self.sample_list_view.selectedItem()
-
     
     def __run(self):
         #perform_on_children(self.sample_list_view, print_text, do_if_checked)
@@ -304,6 +302,7 @@ class DataCollectTree(QWidget):
         self.sample_list_view.clear()
         
         for sample_info in data:
+
             self.data_model.add_sample(str(sample_info[1]), sample_info)
 
             item = QDataListItem(self.sample_list_view, 
