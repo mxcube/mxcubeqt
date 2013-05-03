@@ -1,0 +1,389 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>VerticalCrystalDimensionWidgetLayout</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>VerticalCrystalDimensionWidgetLayout</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>307</width>
+            <height>163</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>3</hsizetype>
+            <vsizetype>3</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>VerticalCrystalDimensionWidget</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>gbox</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>3</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="title">
+                <string>Crystal</string>
+            </property>
+            <property name="checked">
+                <bool>false</bool>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>main_layout</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="spacing">
+                            <number>15</number>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>space_group_layout</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>space_group_ledit_layout</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>space_group_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Space group:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>space_group_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>100</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>100</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer2</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>1</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>vdim_layout</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="spacing">
+                                    <number>2</number>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>vdim_heading_layout</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>dimension_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Vertical crystal dimension (mm):</string>
+                                            </property>
+                                        </widget>
+                                        <spacer>
+                                            <property name="name">
+                                                <cstring>vdim_heading_spacer</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>1</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </hbox>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>vdim_control_layout</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="margin">
+                                            <number>0</number>
+                                        </property>
+                                        <property name="spacing">
+                                            <number>0</number>
+                                        </property>
+                                        <widget class="QLayoutWidget">
+                                            <property name="name">
+                                                <cstring>vdim_ledit_hlayout</cstring>
+                                            </property>
+                                            <hbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>20</number>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>col_one_vdim_ledit_hlayout</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLayoutWidget">
+                                                            <property name="name">
+                                                                <cstring>vlayout_min_vdim_label</cstring>
+                                                            </property>
+                                                            <vbox>
+                                                                <property name="name">
+                                                                    <cstring>unnamed</cstring>
+                                                                </property>
+                                                                <widget class="QLabel">
+                                                                    <property name="name">
+                                                                        <cstring>min_vdim_label</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>Min:</string>
+                                                                    </property>
+                                                                </widget>
+                                                                <widget class="QLabel">
+                                                                    <property name="name">
+                                                                        <cstring>vdim_min_phi_label</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>ω at min:</string>
+                                                                    </property>
+                                                                </widget>
+                                                            </vbox>
+                                                        </widget>
+                                                        <widget class="QLayoutWidget">
+                                                            <property name="name">
+                                                                <cstring>vlayout_min_vdim_ledit</cstring>
+                                                            </property>
+                                                            <vbox>
+                                                                <property name="name">
+                                                                    <cstring>unnamed</cstring>
+                                                                </property>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>min_vdim_ledit</cstring>
+                                                                    </property>
+                                                                    <property name="minimumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>0</height>
+                                                                        </size>
+                                                                    </property>
+                                                                    <property name="maximumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>32767</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </widget>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>min_vphi_ledit</cstring>
+                                                                    </property>
+                                                                    <property name="minimumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>0</height>
+                                                                        </size>
+                                                                    </property>
+                                                                    <property name="maximumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>32767</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </widget>
+                                                            </vbox>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>col_two_vdim_ledit_hlayout</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLayoutWidget">
+                                                            <property name="name">
+                                                                <cstring>vlayout_two_vdim_hlayout</cstring>
+                                                            </property>
+                                                            <vbox>
+                                                                <property name="name">
+                                                                    <cstring>unnamed</cstring>
+                                                                </property>
+                                                                <widget class="QLabel">
+                                                                    <property name="name">
+                                                                        <cstring>max_vdim_label</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>Max:</string>
+                                                                    </property>
+                                                                </widget>
+                                                                <widget class="QLabel">
+                                                                    <property name="name">
+                                                                        <cstring>max_vphi_label</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>ω at max:</string>
+                                                                    </property>
+                                                                </widget>
+                                                            </vbox>
+                                                        </widget>
+                                                        <widget class="QLayoutWidget">
+                                                            <property name="name">
+                                                                <cstring>vlayout_max_vdim_ledit</cstring>
+                                                            </property>
+                                                            <vbox>
+                                                                <property name="name">
+                                                                    <cstring>unnamed</cstring>
+                                                                </property>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>max_vdim_ledit</cstring>
+                                                                    </property>
+                                                                    <property name="minimumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>0</height>
+                                                                        </size>
+                                                                    </property>
+                                                                    <property name="maximumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>32767</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </widget>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>max_vphi_ledit</cstring>
+                                                                    </property>
+                                                                    <property name="minimumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>0</height>
+                                                                        </size>
+                                                                    </property>
+                                                                    <property name="maximumSize">
+                                                                        <size>
+                                                                            <width>50</width>
+                                                                            <height>32767</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </widget>
+                                                            </vbox>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </hbox>
+                                        </widget>
+                                        <spacer>
+                                            <property name="name">
+                                                <cstring>vspacer</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>1</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </hbox>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </vbox>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
