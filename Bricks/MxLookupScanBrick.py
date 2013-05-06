@@ -19,7 +19,6 @@ class MxLookupScanBrick(BaseGraphicScan) :
         BaseGraphicScan.__init__(self, parent, name, uifile=uifile, **kwargs)
         self._graphicSelection = None
         self.__gridPoints = None
-        self.__angle = None
         self._matchPoints = None
         self.__offsetMeasure = 1e3
         self.old_mot1_pos = None
@@ -247,8 +246,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
         mot1 = self._horizontalMotors[0]
         mot2 = self._verticalMotors[0]
         x,y = self.__gridPoints[firstPoint,0],self.__gridPoints[firstPoint,1]
-        self.emit(qt.PYSIGNAL("addToQueue"), ({ "angle": float(self.__angle),
-                                                "dx_mm": float(dist1),
+        self.emit(qt.PYSIGNAL("addToQueue"), ({ "dx_mm": float(dist1),
                                                 "dy_mm": float(dist2),
                                                 "steps_x": int(inter1)+1,
                                                 "steps_y": int(inter2)+1,
@@ -388,7 +386,6 @@ class MxLookupScanBrick(BaseGraphicScan) :
     def __createGridPoints(self) :
         # del old grid point
         self.__gridPoints = None
-        self.__angle = None
 
         table = self._widgetTree.child('__gridTable')
         stringVal = table.text(0,0)
@@ -401,7 +398,6 @@ class MxLookupScanBrick(BaseGraphicScan) :
 
         if self._graphicSelection.points() :
             points = numpy.array([[x,y] for x,y in self._graphicSelection.points()])
-            self.__angle = self._graphicSelection.angle()[0]
             angle = self._graphicSelection.angle()[0] * math.pi / 180
             rotation = numpy.matrix([[numpy.cos(angle),-numpy.sin(angle)],
                                      [numpy.sin(angle),numpy.cos(angle)]])
