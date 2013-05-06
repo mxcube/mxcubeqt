@@ -33,14 +33,13 @@ __category__ = 'Synoptic'
 
 class FrontendBrick(SynopticBrick.SynopticBrick):
     shutterState = {
-        'unknown': 'gray', 
-        'closed':    '#ff00ff',
+        'unknown': 'gray',
+        'closed':    '#ffffef',
         'opened':    '#00ff00',
         'moving':    '#663300',
         'automatic': '#009900',
-        'running'  : '#009900',
         'fault':     '#990000',
-        'disabled':  '#ec3cdd',
+        'disabled':  '#ff00ff',
         'error':     '#990000'
         }
     
@@ -85,19 +84,21 @@ class FrontendBrick(SynopticBrick.SynopticBrick):
 
 
     def shutterStateChanged(self, state, automaticModeTimeLeft):
-        self.lblShutter.setText('<b>%s</b>' % state)
-        self.lblShutter.setPaletteBackgroundColor(QColor(FrontendBrick.shutterState[state]))
         if state == 'running':
             state = 'automatic'
+        self.lblShutter.setText('<b>%s</b>' % state)
+        self.lblShutter.setPaletteBackgroundColor(QColor(FrontendBrick.shutterState[state]))
+
         if state == 'opened' or state == 'automatic':
+            self.cmdCloseShutter.setEnabled(True)
+            self.cmdOpenShutter.setText('Start Auto')
+            self.cmdOpenShutter.setEnabled(True)
             if state == 'automatic':
                 try:
-                    self.lblShutter.setText(str(self.lblShutter.text()) + '<br><nobr>%dh%dm left</nobr>' % (int(automaticModeTimeLeft), int(automaticModeTimeLeft * 60) % 60))
+                    self.lblShutter.setText(str(self.lblShutter.text()) + '<br><nobr>%dh%dm left</nobr>' % (int(automaticModeTimeLeft/3600), int(automaticModeTimeLeft % 3600 / 60)))
+                    self.cmdOpenShutter.setText('Stop Auto')
                 except:
                     pass
-            self.cmdOpenShutter.setText('Auto')
-            self.cmdOpenShutter.setEnabled(True)
-            self.cmdCloseShutter.setEnabled(True)
         elif state == 'closed':
             self.cmdOpenShutter.setText('Open')
             self.cmdCloseShutter.setEnabled(False)
@@ -108,7 +109,11 @@ class FrontendBrick(SynopticBrick.SynopticBrick):
 
             
     def cmdOpenShutterClicked(self):
-        self.shutter.openShutter()
+        state = self.shutter.getShutterState()
+        if state == "running" :
+            self.shutter.manualShutter()
+        else:
+            self.shutter.openShutter()
 
         
     def cmdCloseShutterClicked(self):
@@ -125,17 +130,3 @@ class FrontendBrick(SynopticBrick.SynopticBrick):
             self.updateGUI()
         else:
             SynopticBrick.SynopticBrick.propertyChanged.im_func(self, propertyName, oldValue, newValue)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
