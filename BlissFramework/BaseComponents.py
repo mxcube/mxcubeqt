@@ -17,8 +17,6 @@ from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
 from BlissFramework.Utils import ProcedureWidgets
-from BlissFramework.Utils import widget_colors
-import BlissFramework
 
 try:
   from louie import dispatcher
@@ -188,16 +186,16 @@ class BlissWidget(QWidget, Connectable.Connectable):
         if BlissWidget._menuBar is not None:
             if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
                 if BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_IMPERSONATE:
-                    color=widget_colors.LIGHT_BLUE
+                    color=Qt.blue
                 else:
-                    color=widget_colors.LIGHT_GREEN
+                    color=Qt.green
             elif BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_SLAVE:
                 if BlissWidget._instanceRole==BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
-                    color=widget_colors.LIGHT_RED
+                    color=Qt.red
                 elif BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_UNKNOWN:
                     color=QColor(255,165,0)
                 else:
-                    color=widget_colors.LIGHT_YELLOW
+                    color=Qt.yellow
         if color is not None:
             BlissWidget._menuBar.setPaletteBackgroundColor(color)
             children = BlissWidget._menuBar.children() or []
@@ -708,11 +706,10 @@ class BlissWidget(QWidget, Connectable.Connectable):
               
 
     def loadUIFile(self, filename):
-        for path in [BlissFramework.getStdBricksPath()]+BlissFramework.getCustomBricksDirs():
-          #modulePath = sys.modules[self.__class__.__module__].__file__
-          #path = os.path.dirname(modulePath)
-          if os.path.exists(os.path.join(path, filename)):
-            return qtui.QWidgetFactory.create(os.path.join(path, filename))
+        modulePath = sys.modules[self.__class__.__module__].__file__
+        path = os.path.dirname(modulePath)
+
+        return qtui.QWidgetFactory.create(os.path.join(path, filename))
 
 
     def createGUIFromUI(self, UIFile):
