@@ -20,27 +20,51 @@ queue_external_feeding_list = list()
 external_event = gevent.event.Event()
 server = None
 
-def load_queue(data_collect_list):
-    queue_external_feeding_list.append(("load", data_collect_list))
-    external_event.set()
-    return True
+# Simple XMPRPC server for handling exiernal requests for the workflow
+# Added by Olof (2013/04/24)
+class MxCuBEXMLRPCServer(SimpleXMLRPCServer):
 
-def queue_status():
-    result = gevent.event.AsyncResult()
-    queue_external_feeding_list.append(("status", result))
-    external_event.set()
-    return result.get()
+    def __init__(self, parent, addr, **params):
+        SimpleXMLRPCServer.__init__(self, addr, **params)
+        self.parent = parent 
+        self.register_introspection_functions()
+        self.register_function(self.load_queue)
+        self.register_function(self.start_queue)
+        self.register_function(self.queue_status)
+        self.register_function(self.grid_info)
+        # Added new xmlrpc methods for workflow logging and html page (Olof 2013/04/24)
+        self.register_function(self.log_message)
+        self.register_function(self.new_html_page)
+
+    def load_queue(self, data_collect_list):
+        queue_external_feeding_list.append(("load", data_collect_list))
+        external_event.set()
+        return True
+
+    def queue_status(self):
+        result = gevent.event.AsyncResult()
+        queue_external_feeding_list.append(("status", result))
+        external_event.set()
+        return result.get()
  
-def start_queue():
-    queue_external_feeding_list.append(("start", None))
-    external_event.set()
-    return True
+    def start_queue(self):
+        queue_external_feeding_list.append(("start", None))
+        external_event.set()
+        return True
 
-def grid_info():
-    result = gevent.event.AsyncResult()
-    queue_external_feeding_list.append(("grid_info", result))
-    external_event.set()
-    return result.get()
+    def grid_info(self):
+        result = gevent.event.AsyncResult()
+        queue_external_feeding_list.append(("grid_info", result))
+        external_event.set()
+        return result.get()
+
+    def log_message(self, message, log_level=logging.INFO):
+        logging.getLogger().log(log_level, message)
+        return True
+
+    def new_html_page(self, html_path, imagePrefix, lRunN):
+        self.parent.emit(PYSIGNAL('new_html'), (html_path, imagePrefix, int(lRunN)))
+        return True
 
 
 __category__ = 'mxCuBE'
@@ -337,6 +361,8 @@ class DataCollectQueueBrick(BlissWidget):
         self.defineSignal('collectOscillations',())
         self.defineSignal('resetQueueCount',())
         self.defineSignal('incQueueCount',())
+        # New signal created for displaying html pages from the XML RPC server (Olof 2013/04/25)
+        self.defineSignal('new_html',())
 
         self.lastReady = False
         self.collectObj = None
@@ -498,19 +524,13 @@ class DataCollectQueueBrick(BlissWidget):
         elif propertyName == 'XML-RPC server port':
             global server
             try:
-                server = SimpleXMLRPCServer(("", newValue),logRequests=False)
+                server = MxCuBEXMLRPCServer(self, (socket.gethostname(), newValue), logRequests=False)
+                if server is not None:
+                    self.xmlrpcServerGreenlet = gevent.spawn(server.serve_forever)
             except:
                 # port already in use? can be remote version of mxCuBE...
                 # let's ignore this error
                 pass
-            else:
-                server.register_introspection_functions()
-                server.register_function(load_queue)
-                server.register_function(start_queue)
-                server.register_function(queue_status)
-                server.register_function(grid_info)
-
-                self.xmlrpcServerGreenlet = gevent.spawn(server.serve_forever)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
