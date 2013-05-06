@@ -324,10 +324,14 @@ class DataCollectBrick2(BlissWidget):
           collect_list[0]['helical'] = 0
 
         try:
-          collect_list[0]['scan4d'] = int(self.scan4d.getValue())
+          if collect_list[0]['scan4d'] != 1 :
+              try:
+                  collect_list[0]['scan4d'] = int(self.scan4d.getValue())
+              except:
+                  pass
         except:
           collect_list[0]['scan4d'] = 0
-
+        
         # Cleanup the data collection and release resources
         def cleanup(stat,msg,show=True):
             return self.showCollectResult(stat,msg,show)
@@ -610,6 +614,22 @@ class DataCollectBrick2(BlissWidget):
             collect_dict['EDNA_files_dir']=params_dict.get('EDNA_files_dir','')
             collect_dict['do_inducedraddam']=params_dict.get('do_inducedraddam', False)
             collect_dict['motors']=params_dict.get("motors", {})
+
+            try:
+                collect_dict['scan4d'] = int(params_dict['scan4d'])
+            except:
+                pass
+            try:
+                collect_dict['phiy_s'] = params_dict['phiy_s']
+                collect_dict['phiz_s'] = params_dict['phiz_s']
+                collect_dict['sampx_s'] = params_dict['sampx_s']
+                collect_dict['sapmy_s'] = params_dict['sampy_s']
+                collect_dict['phiy_e'] = params_dict['phiy_e']
+                collect_dict['phiz_e'] = params_dict['phiz_e']
+                collect_dict['sampx_e'] = params_dict['sampx_e']
+                collect_dict['sampy_e'] = params_dict['sampy_e']
+            except:
+                pass
 
             if mapFromGUIParameters is True:
                 fileinfo_dict['directory']          =       params_dict['directory']
