@@ -17,6 +17,7 @@ from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
 from BlissFramework.Utils import ProcedureWidgets
+import BlissFramework
 
 try:
   from louie import dispatcher
