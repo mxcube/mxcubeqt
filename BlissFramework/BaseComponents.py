@@ -706,10 +706,11 @@ class BlissWidget(QWidget, Connectable.Connectable):
               
 
     def loadUIFile(self, filename):
-        modulePath = sys.modules[self.__class__.__module__].__file__
-        path = os.path.dirname(modulePath)
-
-        return qtui.QWidgetFactory.create(os.path.join(path, filename))
+        for path in [BlissFramework.getStdBricksPath()]+BlissFramework.getCustomBricksDirs():
+          #modulePath = sys.modules[self.__class__.__module__].__file__
+          #path = os.path.dirname(modulePath)
+          if os.path.exists(os.path.join(path, filename)):
+            return qtui.QWidgetFactory.create(os.path.join(path, filename))
 
 
     def createGUIFromUI(self, UIFile):
