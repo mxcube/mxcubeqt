@@ -6,8 +6,7 @@ from HardwareRepository.BaseHardwareObjects import Equipment
 import tempfile
 import logging
 import numpy
-import base64
-import xmlrpclib
+import lucid
 import math
 import os
 import time
@@ -224,6 +223,8 @@ class MiniDiff(Equipment):
         self.sampleXMotor = self.getDeviceByRole('sampx')
         self.sampleYMotor = self.getDeviceByRole('sampy')
         self.camera = self.getDeviceByRole('camera')
+
+        self.camera.addChannel({ 'type': 'tango', 'name': 'jpegImage' }, "JpegImage")
 
         sc_prop=self.getProperty("samplechanger")
         if sc_prop is not None:
@@ -595,6 +596,8 @@ class MiniDiff(Equipment):
 
     def autoCentringDone(self, auto_centring_procedure):
         self.emitProgressMessage("")
+        self.emit("newAutomaticCentringPoint", (-1,-1))
+
         if auto_centring_procedure.get():
             self.emitCentringSuccessful()
         else:
@@ -605,14 +608,16 @@ class MiniDiff(Equipment):
     def do_auto_centring(self, phi, phiy, phiz, sampx, sampy, zoom, camera, phiy_direction):
         imgWidth = camera.getWidth()
         imgHeight = camera.getHeight()
-        server = xmlrpclib.Server(self["autoCentering"].centring_server)
 
         def find_loop(zoom=0,show_point=True):
-          img_array = numpy.fromstring(camera.getChannelObject("image").getValue
-(), numpy.uint8)
-          img_array.shape = (imgHeight, imgWidth)
-          info, x, y = server.find_loop(base64.b64encode(img_array.tostring()),
-img_array.shape,zoom)
+          jpeg_data = camera.getChannelObject("jpegImage").getValue().tostring()
+          jpeg_file = open("/tmp/mxCuBE_snapshot.jpg", "w")
+          jpeg_file.write(jpeg_data)
+          jpeg_file.close()
+          #img_array = numpy.fromstring(camera.getChannelObject("image").getValue().tostring(), numpy.uint8)
+          #img_array.shape = (imgHeight, imgWidth)
+          #info, x, y = lucid.find_loop(img_array,zoom=zoom)
+          info, x, y = lucid.find_loop_byimg("/tmp/mxCuBE_snapshot.jpg", showVisuals=0, zoom=zoom)
           self.emitProgressMessage("Loop found: %s (%d, %d)" % (info, x, y))
           logging.debug("Loop found: %s (%d, %d)" % (info, x, y))
           if show_point:
@@ -620,11 +625,9 @@ img_array.shape,zoom)
           return x,y
         
         def face_finder(zoom=0):
-          img_array = numpy.fromstring(camera.getChannelObject("image").getValue
-(), numpy.uint8)
+          img_array = numpy.fromstring(camera.getChannelObject("image").getValue(), numpy.uint8)
           img_array.shape = (imgHeight, imgWidth)
-          num = server.face_finder(base64.b64encode(img_array.tostring()),
-img_array.shape,zoom)
+          num = lucid.face_finder(img_array, zoom)
           logging.info("loop size: %d", num)
           return num
 
@@ -635,7 +638,10 @@ img_array.shape,zoom)
          
           logging.debug("in centre_loop: pixelsPerMmY=%f, pixelsPerMmZ=%f", pixelsPerMmY, pixelsPerMmZ)
           self.emitProgressMessage("Doing automatic centring")
+          a = 0
           for angle in (0, 90, 90):
+            a+=1
+            self.emitProgressMessage("%d: moving at angle %f" % (a, phi.getPosition()+angle))
             phi.syncMoveRelative(angle)
             x, y = find_loop(zoom) 
             if x < 0 or y < 0:
@@ -691,11 +697,12 @@ img_array.shape,zoom)
      
           for angle in (0,-90,-90):
             phi.syncMoveRelative(angle)
+            self.emit("newAutomaticCentringPoint", (-1,-1))
             logging.debug("checking centring at angle %d", phi.getPosition())
             x, y = find_loop(zoom, False)
             centring_results.append(x > imgWidth*0.35 and x < imgWidth*0.65 and y > imgHeight*0.35 and y < imgHeight*0.65)
             logging.debug("  centring is %s", "ok" if centring_results[-1] else "bad")
-                
+          
           return all(centring_results)
          
         def find_face(zoom=0):
@@ -710,12 +717,10 @@ img_array.shape,zoom)
             
             phi.syncMoveRelative((index-18)*10)
                 
+        self.getDeviceByRole("flight").move(0)
  
         #check if loop is there at the beginning
         i = 0
-        #phiz.syncMoveRelative(-2.0)
-        #phiz.syncMoveRelative(2.0)
-        logging.info("begin autocentering")
         while -1 in find_loop():
           phi.syncMoveRelative(90)
           i+=1
@@ -725,52 +730,46 @@ img_array.shape,zoom)
         centred = False
         for i in range(6):
           motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ)
-          try:
-            gevent.spawn(move_to_centred_position, motor_pos).get()
-          except:
-            #ERROR
-            pass
+          gevent.spawn(move_to_centred_position, motor_pos).get()
+          if not check_centring():
+            continue
           else:
-            if not check_centring():
-              continue
-            else:
-              centred = True
-              break
+            centred = True
+            break
 
         if centred:
           # move zoom
+          self.emit("newAutomaticCentringPoint", (-1,-1))
           positions = zoom.getPredefinedPositionsList()
           i = len(positions) / 2
           zoom.moveToPosition(positions[i-1])
           while zoom.motorIsMoving():
-            time.sleep(0.1)
-          self.pixelsPerMmY, self.pixelsPerMmZ = self.getCalibrationData(zoom.getPosition())
+              time.sleep(0.1)
 
-          # last centring
-          logging.info("ok_for_centering")
-          motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
+          # adjust light
+          old_flight = self.getDeviceByRole("flight").getPosition()
           try:
-            gevent.spawn(move_to_centred_position, motor_pos).get()
-          except:
-            #ERROR
-            pass
-          else:
-            if check_centring(1):
-                #find_face(1)
-                logging.info("endofcentering")
-                return motor_pos
-            else:
-                motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
-                try:
-                    gevent.spawn(move_to_centred_position, motor_pos).get()
-                except:
-                    #ERROR
-                    pass
-                else:
-                    if check_centring(1):
-                        #find_face(1)
-                        logging.info("endofcentering")
-                        return motor_pos
+              self.getDeviceByRole("flight").move(5)
+              self.lightWago.wagoOut()
+              while self.lightWago.getWagoState() == "in":
+                 time.sleep(0.1)
+    
+              self.pixelsPerMmY, self.pixelsPerMmZ = self.getCalibrationData(zoom.getPosition())
+              # last centring
+              motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
+              gevent.spawn(move_to_centred_position, motor_pos).get()
+              if check_centring(1):
+                 #find_face(1)
+                 return motor_pos
+              else:
+                 motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
+                 gevent.spawn(move_to_centred_position, motor_pos).get()
+                 if check_centring(1):
+                    #find_face(1)
+                    return motor_pos
+          finally:
+              self.getDeviceByRole("flight").move(old_flight)
+              self.lightWago.wagoIn()
 
     def startAutoCentring(self,sample_info=None, loop_only=False):
         self.currentCentringProcedure = gevent.spawn(self.do_auto_centring, self.phiMotor,
