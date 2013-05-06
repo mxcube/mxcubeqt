@@ -12,6 +12,7 @@ import pprint
 import gevent
 import gevent.event
 import time
+import socket
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
@@ -524,9 +525,7 @@ class DataCollectQueueBrick(BlissWidget):
         elif propertyName == 'XML-RPC server port':
             global server
             try:
-                # Replaced vanilla simple XMLRPC server with the one dedicated to MxCuBE (Olof 2013/04/24)
-                #server = SimpleXMLRPCServer(("", newValue),logRequests=False)
-                server = MxCuBEXMLRPCServer(self, ("", newValue), logRequests=False)
+                server = MxCuBEXMLRPCServer(self, (socket.gethostname(), newValue), logRequests=False)
                 if server is not None:
                     self.xmlrpcServerGreenlet = gevent.spawn(server.serve_forever)
             except:
