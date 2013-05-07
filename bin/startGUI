@@ -2,7 +2,7 @@
 import sys
 import os
 
-MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 sys.path.insert(0, MXCUBE_ROOT)
 
 os.environ["CUSTOM_BRICKS_PATH"]=os.path.join(MXCUBE_ROOT, "Bricks")
