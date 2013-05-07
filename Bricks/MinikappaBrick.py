@@ -196,16 +196,16 @@ class MinikappaBrick(BlissWidget):
                 self.kappaOnCmd=None
                 self.kappaOffCmd=None
 
-    def kappaOnStarted(self):
+    def kappaOnStarted(self, *args):
         self.kappaOnOngoing=True
 
-    def kappaOnFinished(self):
+    def kappaOnFinished(self,*args):
         self.kappaOnOngoing=False
 
-    def kappaOffStarted(self):
+    def kappaOffStarted(self, *args):
         self.kappaOffOngoing=True
 
-    def kappaOffFinished(self):
+    def kappaOffFinished(self,*args):
         self.kappaOffOngoing=False
 
     def stateChanged(self,username,state):
