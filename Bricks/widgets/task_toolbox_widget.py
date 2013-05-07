@@ -18,7 +18,7 @@ class TaskToolBoxWidget(qt.QWidget):
         qt.QWidget.__init__(self, parent, name)
 
         # Data atributes
-        self.qub_helper = None
+        self.shape_history = None
         self.tree_brick = None
 
         #Layout
@@ -82,15 +82,15 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page.set_tree_brick(brick)
 
 
-    def set_qub_helper(self, qub_helper):
+    def set_shape_history(self, shape_history):
         """
-        Sets the qub_helper of each page in the toolbox.
+        Sets the shape_history of each page in the toolbox.
         """
-        self.qub_helper = qub_helper
-        self.helical_page.set_qub_helper(qub_helper)
-        self.discrete_page.set_qub_helper(qub_helper)
-        self.char_page.set_qub_helper(qub_helper)
-        self.energy_scan_page.set_qub_helper(qub_helper)
+        self.shape_history = shape_history
+        self.helical_page.set_shape_history(shape_history)
+        self.discrete_page.set_shape_history(shape_history)
+        self.char_page.set_shape_history(shape_history)
+        self.energy_scan_page.set_shape_history(shape_history)
 
 
     def ispyb_logged_in(self, logged_in):
