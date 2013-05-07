@@ -9,7 +9,7 @@ class CreateTaskBase(qt.QWidget):
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
          qt.QWidget.__init__(self, parent, name, fl)
          
-         self._qub_helper = None
+         self._shape_history = None
          self._tree_brick = None
          self._task_node_name = task_node_name
 
@@ -29,8 +29,8 @@ class CreateTaskBase(qt.QWidget):
         self._tree_brick = brick
 
 
-    def set_qub_helper(self, qub_helper):
-        self._qub_helper = qub_helper
+    def set_shape_history(self, shape_history):
+        self._shape_history = shape_history
 
 
     @abc.abstractmethod
