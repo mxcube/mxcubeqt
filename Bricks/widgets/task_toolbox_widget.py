@@ -18,7 +18,7 @@ class TaskToolBoxWidget(qt.QWidget):
         qt.QWidget.__init__(self, parent, name)
 
         # Data atributes
-        self.qub_helper = None
+        self.shape_history = None
         self.tree_brick = None
 
         #Layout
@@ -82,15 +82,15 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page.set_tree_brick(brick)
 
 
-    def set_qub_helper(self, qub_helper):
+    def set_shape_history(self, shape_history):
         """
-        Sets the qub_helper of each page in the toolbox.
+        Sets the shape_history of each page in the toolbox.
         """
-        self.qub_helper = qub_helper
-        self.helical_page.set_qub_helper(qub_helper)
-        self.discrete_page.set_qub_helper(qub_helper)
-        self.char_page.set_qub_helper(qub_helper)
-        self.energy_scan_page.set_qub_helper(qub_helper)
+        self.shape_history = shape_history
+        self.helical_page.set_shape_history(shape_history)
+        self.discrete_page.set_shape_history(shape_history)
+        self.char_page.set_shape_history(shape_history)
+        self.energy_scan_page.set_shape_history(shape_history)
 
 
     def ispyb_logged_in(self, logged_in):
@@ -139,17 +139,17 @@ class TaskToolBoxWidget(qt.QWidget):
     def create_task(self, items = None):
         if self.tool_box.currentItem().approve_creation():
             for item in items:
-                if isinstance(item.get_model(), queue_model.TaskNode):
+                if isinstance(item.get_model(), queue_model.Sample):
+                    parent_task_node = self.tool_box.currentItem().\
+                                       create_parent_task_node(item)    
+                    self.tree_brick.add_to_queue(parent_task_node,
+                                                  item)
+                elif isinstance(item.get_model(), queue_model.TaskNode):
                     parent_task_node = item.get_model() 
                     sample = item.parent().get_model()
                     task_list = self.tool_box.currentItem().\
                                 create_task(parent_task_node, sample)
-                    self.tree_brick.add_task_node(task_list, item)
-                elif isinstance(item.get_model(), queue_model.Sample):
-                    parent_task_node = self.tool_box.currentItem().\
-                                       create_parent_task_node(item)    
-                    self.tree_brick.add_task_node(parent_task_node,
-                                                  item)
+                    self.tree_brick.add_to_queue(task_list, item)
                 else:
                     self.create_task([item.parent()])
 

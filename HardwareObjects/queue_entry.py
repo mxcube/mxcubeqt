@@ -22,6 +22,7 @@ logger.setLevel(logging.INFO)
 logger = logging.getLogger('queue_exec').\
          info("Module load, probably application start")
 
+
 from queue_model import COLLECTION_ORIGIN
 from queue_model import STRATEGY_COMPLEXITY
 from queue_model import EXPERIMENT_TYPE
@@ -52,7 +53,8 @@ class QueueEntryContainer(object):
         logging.getLogger('queue_exec').info('Enqueue called with: ' + \
                                              str(queue_entry))
         logging.getLogger('queue_exec').info('Queue is :' + \
-                                             str(queue_entry.get_queue_controller()))
+                                             str(queue_entry.\
+                                                 get_queue_controller()))
 
 
     def dequeue(self, queue_entry):
@@ -123,6 +125,8 @@ class QueueEntryContainer(object):
 class BaseQueueEntry(QueueEntryContainer):
     def __init__(self, view = None, data_model = None):
         QueueEntryContainer.__init__(self)
+        self._data_model = None
+        self._view = None
         self.set_data_model(data_model)
         self.set_view(view)
         self._checked_for_exec = False
@@ -173,11 +177,11 @@ class BaseQueueEntry(QueueEntryContainer):
         logging.getLogger('queue_exec').\
             info('Calling post_execute on: ' + str(self))
 
+
     def stop(self):
         self.get_view().setText(1, 'Stopped')
         logging.getLogger('queue_exec').\
             info('Calling stop on: ' + str(self))
-        
 
 
     def __str__(self):
@@ -417,7 +421,6 @@ class DataCollectionQueueEntry(BaseQueueEntry):
 
     def execute(self):
         BaseQueueEntry.execute(self)
-        
         data_collection = self.get_data_model()
         
         if data_collection:

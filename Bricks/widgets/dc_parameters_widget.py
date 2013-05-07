@@ -24,21 +24,16 @@ from BlissFramework.Utils import widget_colors
 class DCParametersWidget(QWidget):
     def __init__(self, parent = None, name = "parameter_widget"):
         QWidget.__init__(self, parent, name)
-
-        self._data_collection = queue_model.DataCollection()
-        self._acquisition_mib = DataModelInputBinder(self._data_collection.\
-            acquisitions[0].acquisition_parameters)
-        
-
+        self._data_collection = None
         self.add_dc_cb = None
 
         self.path_widget = DataPathWidget(self, None)
         self.acq_gbox = QVGroupBox("Acquisition", self)
         self.acq_gbox.setInsideMargin(2)
         self.acq_widget = AcquisitionWidget(self.acq_gbox, 
-                                            layout = AcquisitionWidgetHorizontalLayout)
-        self.position_widget = SnapshotWidgetLayout(self)
+                          layout = AcquisitionWidgetHorizontalLayout)
 
+        self.position_widget = SnapshotWidgetLayout(self)
         self._processing_gbox = QVGroupBox('Processing', self, 
                                            'processing_gbox')
 
@@ -69,8 +64,11 @@ class DCParametersWidget(QWidget):
 
     def populate_parameter_widget(self, data_collection):
         self._data_collection = data_collection
+        self._acquisition_mib = DataModelInputBinder(self._data_collection.\
+                                acquisitions[0].acquisition_parameters)
+        
         self.path_widget.update_data_model(data_collection.\
-                                               acquisitions[0].path_template)
+                                           acquisitions[0].path_template)
         self.acq_widget.update_data_model(data_collection.acquisitions[0].\
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\

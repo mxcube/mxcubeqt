@@ -18,7 +18,6 @@ from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
 from acquisition_widget_simple import AcquisitionWidgetSimple
 
-
 class CreateCharWidget(CreateTaskBase):
     def __init__(self,parent = None,name = None, fl = 0):
         CreateTaskBase.__init__(self, parent, name, fl, 'Characterisation')
@@ -28,12 +27,12 @@ class CreateCharWidget(CreateTaskBase):
 
         #
         # Data attributes
-        #
-        self._char = queue_model.Characterisation()
+        #        
+        self._char = queue_model.Characterisation(None)
         self._data_collection = self._char.reference_image_collection
-
         self._path_template = self._data_collection.\
-            acquisitions[0].path_template
+                              acquisitions[0].path_template
+        
         self._char_params = self._char.characterisation_parameters
         self._char_params.experiment_type = queue_model.EXPERIMENT_TYPE.OSC
         self._char_params_mib = DataModelInputBinder(self._char_params)
@@ -180,7 +179,7 @@ class CreateCharWidget(CreateTaskBase):
 
             selected_shapes = [shape_history.Point(None, cpos, None)]
         else:
-            selected_shapes = self._qub_helper.selected_shapes
+            selected_shapes = self._shape_history.selected_shapes
 
         for shape in selected_shapes:
             snapshot = None
@@ -189,11 +188,8 @@ class CreateCharWidget(CreateTaskBase):
                 sc = None
                  
                 if not shape.get_drawing():
-                    sc = queue_model.QueueModelFactory.\
-                         create(queue_model.SampleCentring, parent_task_node)
-
+                    sc = queue_model.SampleCentring(parent_task_node)
                     sc.set_name('sample-centring')
-                    
                     tasks.append(sc)
 
                 data_collection = copy.deepcopy(self._data_collection)
@@ -203,9 +199,9 @@ class CreateCharWidget(CreateTaskBase):
                 char_params = copy.deepcopy(self._char_params)
 
                 if shape.qub_point is not None:
-                    snapshot = self._qub_helper.get_snapshot([shape.qub_point])
+                    snapshot = self._shape_history.get_snapshot([shape.qub_point])
                 else:
-                    snapshot = self._qub_helper.get_snapshot([])
+                    snapshot = self._shape_history.get_snapshot([])
 
                 data_collection.acquisitions[0].acquisition_parameters.\
                     centred_position.snapshot_image = snapshot
@@ -216,22 +212,21 @@ class CreateCharWidget(CreateTaskBase):
                     acquisition_parameters.overlap = 89
 
                 data_collection.experiment_type = queue_model.EXPERIMENT_TYPE.EDNA_REF
+                data_collection.crystal = sample.crystals[0]
 
                 if sc:
                     sc.set_task(data_collection)
-
                     
                 char_name = data_collection.acquisitions[0].path_template.prefix + '_' + \
                     str(data_collection.acquisitions[0].path_template.run_number)
 
-                char = queue_model.QueueModelFactory.\
-                    create(queue_model.Characterisation, parent_task_node, data_collection, 
-                           char_params, sample.crystals[0], char_name)
+                char = queue_model.Characterisation(parent_task_node,
+                                                    data_collection, 
+                                                    char_params, char_name)
 
                 # Increase run number for next collection
                 self.set_run_number(self._path_template.run_number + 1)
 
-  
                 tasks.append(char)
 
         return tasks

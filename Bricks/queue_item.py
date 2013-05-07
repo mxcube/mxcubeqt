@@ -137,7 +137,7 @@ class QueueItem(QCheckListItem):
         self.listView().triggerUpdate()
 
     
-    def getLastItem(self):
+    def lastItem(self):
         """
         :returns: The last item of this child.
         :rtype: QueueItem
@@ -185,7 +185,8 @@ class QueueItem(QCheckListItem):
 
 
 class SampleQueueItem(QueueItem):
-    def __init__(self, parent, after, text, controller):
+    def __init__(self, parent, after, text,
+                 controller = QCheckListItem.CheckBoxController):
         QueueItem.__init__(self, parent, after, text, controller,
                            deletable = False)
 
