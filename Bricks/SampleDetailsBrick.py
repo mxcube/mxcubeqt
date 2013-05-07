@@ -15,7 +15,7 @@ class SampleDetailsBrick(BaseComponents.BlissWidget):
         #
         # Data attributes
         #
-        self.sample = queue_model.Sample()
+        self.sample = queue_model.Sample(None)
         self.crystal = self.sample.crystals[0]
         self.sample_mib = DataModelInputBinder(self.sample)
         self.crystal_mib = DataModelInputBinder(self.crystal)

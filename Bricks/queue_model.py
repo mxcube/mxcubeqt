@@ -1,12 +1,4 @@
 """
-This module contains classes related to the data model.
-The data model is a tree of different types of Node objects,
-of wich all inherits the Node class.
-
-The QueueModelFactory owns the data model and handles all creation of 
-Nodes in the model. A object derevied from the Node object should 
-never be created from its constructor (this module apart), but through 
-this Factory object.
 """
 
 import pprint
@@ -65,20 +57,16 @@ model = None
 collect_context = None
 
 class TaskNode(object):
-    """
-    TaskNode base class, all nodes present in the data model should 
-    inherit this object.
-    """
-
-    def __init__(self, parent = None, children = None, name = str()):
+    def __init__(self, parent = None):
         object.__init__(self)
-        self._parent = parent
+        
         self._children = []
         self._name = str()
         self._executed = False
-        
-        if isinstance(children, list):
-            self._children.extend(children)
+        self._parent = None
+
+        if parent:
+            parent.add_child(self)
 
 
     def add_child(self, child):
@@ -95,22 +83,17 @@ class TaskNode(object):
         :rtype: None
 
         """
-
-        logging.getLogger('queue_model').info("Insert child")
-        logging.getLogger('queue_model').info(child)
-        
-        
         if isinstance(child, TaskNode):
             child._parent = self
             self._children.append(child)
         else:
             raise TypeError("Expected type TaskNode, got %s " % str(type(child)))
 
-        logging.getLogger('queue_model').info("Model after insert")
-        logging.getLogger('queue_model').info(self.get_root().pprint())
-        
 
     def _remove(self):
+        """
+        Code to be called before the node is removed from parent.
+        """
         pass
 
 
@@ -121,10 +104,6 @@ class TaskNode(object):
         :param child: Child to remove.
         :type child: TaskNode
         """
-        
-        logging.getLogger('queue_model').info("Removed child")
-        logging.getLogger('queue_model').info(child)
-        
         if child in self._children:
             for grand_child in child.get_children():
                 grand_child._remove()
@@ -132,17 +111,29 @@ class TaskNode(object):
             child._remove()
 
             self._children.remove(child)
-                                 
-        logging.getLogger('queue_model').info("Model after remove")
-        logging.getLogger('queue_model').info('\n'  + self.get_root().pprint())
 
 
     def get_children(self):
         return self._children
+
+
+    def _detach_child(self, child):
+        """
+        Detaches the child <child>
         
+        :param child: Child to detach.
+        :type child: TaskNode
+        """
+        child = self._children.pop(child)
+        return child
+
 
     def set_parent(self, parent):
-        self._parent = parent
+        if self._parent:
+            child = self._parent._detach_child(self)
+            child.set_parent(parent)
+        else:
+            self._parent = parent
 
         
     def get_parent(self):
@@ -177,13 +168,7 @@ class TaskNode(object):
         self._executed = executed
 
 
-    def reparent(self, new_parent):
-        if isinstance(new_parent, TaskNode):
-            self._parent = new_parent
-
-
     def pprint(self, indent = 0):
-
         s = indent * "\t" + str(self).replace('\n', '\n' + indent * "\t")  + "\n"
 
         for child in self._children:
@@ -212,9 +197,20 @@ class TaskNode(object):
 
         return s
 
-class Sample(object):
+
+class RootNode(TaskNode):
     def __init__(self):
-        object.__init__(self)
+        TaskNode.__init__(self, None)
+
+
+class TaskGroup(TaskNode):
+    def __init__(self, parent):
+        TaskNode.__init__(self, parent)
+
+
+class Sample(TaskNode):
+    def __init__(self, parent):
+        TaskNode.__init__(self, parent)
         self.code = str()
         self.lims_code = str()
         self.holder_length = 22.0
@@ -236,10 +232,9 @@ class Sample(object):
 
 
     def __str__(self):
-        s = '<%s object at %s, with sample changer location: %s>' % (
+        s = '<%s object at %s>' % (
             self.__class__.__name__,
-            hex(id(self)),
-            self.loc_str
+            hex(id(self))
             )
 
         return s
@@ -264,10 +259,15 @@ class Sample(object):
             return acronym + '-' + name
         else:
             return ''
+
+
+    def init_from_sc_sample(self, sc_sample):
+         self.loc_str = str(sc_sample[1]) + ':' + str(sc_sample[2])
+         self.location = (sc_sample[1], sc_sample[2])
+         self.set_name(self.loc_str)
             
 
     def init_from_lims_object(self, lims_sample):
-
         if hasattr(lims_sample, 'cellA'):
             self.crystals[0].cell_a = lims_sample.cellA
 
@@ -325,15 +325,49 @@ class Sample(object):
 
 
 class DataCollection(TaskNode):
-    def __init__(self, parent = None):
+    """
+    Adds the child node <child>. Raises the exception TypeError 
+    if child is not of type TaskNode.
+
+    Moves the child (reparents it) if it already has a parent. 
+    
+    :param parent: Parent TaskNode object.
+    :type parent: TaskNode
+
+    :param acquisition_list: List of Acquisition objects.
+    :type acquisition_list: list
+
+    :crystal: Crystal object
+    :type crystal: Crystal
+
+    :param processing_paremeters: Parameters used by autoproessing software.
+    :type processing_parameters: ProcessingParameters
+    
+    :returns: None
+    :rtype: None
+    """
+    def __init__(self, parent, acquisition_list = None, crystal = None,
+                 processing_parameters = None, name = ''):
         TaskNode.__init__(self, parent)
-        self.acquisitions = [Acquisition()]
+    
+        if not acquisition_list:
+            acquisition_list = [Acquisition()]
+
+        if not crystal:
+            crystal = Crystal()
+
+        if not processing_parameters:
+            processing_parameters = ProcessingParameters()        
+        
+        self.acquisitions = acquisition_list
+        self.crystal = crystal
+        self.processing_parameters = processing_parameters
+        self.set_name(name)
+        
         self.previous_acquisition = None
-        self.crystal = Crystal()
         self.experiment_type = EXPERIMENT_TYPE.NATIVE
         self.html_report = str()
         self.id = int()
-        self.processing_parameters = ProcessingParameters()
 
 
     def as_dict(self):
@@ -401,39 +435,14 @@ class DataCollection(TaskNode):
         return file_locations
 
 
-    # def next_available_run_number(self):
-    #     parent_node = self.get_parent()
-    #     largest = 1
-
-    #     for task_node in parent_node.get_children():
-    #         if task_node.get_prefix() == self.get_prefix():
-    #             if task_node.get_run_number() > largest:
-    #                 largest = task_node.get_run_number()
-
-    #     return int(largest)
-    
-
-    def __repr__(self):
+    def __str__(self):
         s = '<%s object at %s>' % (
-             self.__class__.__name__,
-             hex(id(self))
-         )
-
-        s += "\n Collection parameters: \n"
-        s += pprint.pformat(self.as_dict()) + '\n'
-         
+            self.__class__.__name__,
+            hex(id(self))
+        )
+        
         return s
 
-
-    # @property
-    # def parameters(self):
-    #     return self._parameters
-
-
-    # @parameters.setter
-    # def parameters(self, parameters):
-    #     self._parameters = parameters
-    
 
     def __str__(self):
         return super(DataCollection, self).__str__()
@@ -465,12 +474,22 @@ class ProcessingParameters():
                                   self.cell_c, self.cell_alpha,
                                   self.cell_beta, self.cell_gamma)))
 
-    
+
 class Characterisation(TaskNode):
-   def __init__(self, parent = None):
+   def __init__(self, parent, ref_data_collection = None,
+                characterisation_parameters = None, name = ''):
         TaskNode.__init__(self, parent)
-        self.characterisation_parameters = CharacterisationParameters()
-        self.reference_image_collection = DataCollection()
+
+        if not characterisation_parameters:
+            characterisation_parameters = CharacterisationParameters()
+
+        if not ref_data_collection:
+            ref_data_collection = DataCollection(parent)
+
+        self.reference_image_collection = ref_data_collection
+        self.characterisation_parameters = characterisation_parameters
+        self.set_name(name)
+        
         self.html_report = None
         self.characterisation_software = None
 
@@ -488,10 +507,6 @@ class Characterisation(TaskNode):
        return self.reference_image_collection.get_prefix()
 
 
-   #def get_children(self):    
-       #return [self.reference_image_collection]
-
-
    def get_files_to_be_written(self):
         file_locations = []
         
@@ -506,18 +521,6 @@ class Characterisation(TaskNode):
                                                file_name_template % i))
 
         return file_locations
-
-
-   # def next_available_run_number(self):
-   #      parent_node = self.get_parent()
-   #      largest = 1
-
-   #      for task_node in parent_node.get_children():
-   #          if task_node.get_prefix() == self.get_prefix():
-   #              if task_node.get_run_number() > largest:
-   #                  largest = task_node.get_run_number()
-
-   #      return int(largest)
 
 
 class CharacterisationParameters(object):
@@ -623,9 +626,9 @@ class EnergyScanResult(object):
 
 
 class SampleCentring(TaskNode):
-    def __init__(self):
-        TaskNode.__init__(self)
-        self._task = TaskNode()
+    def __init__(self, parent):
+        TaskNode.__init__(self, parent)
+        self._task = None
 
 
     def set_task(self, task_node):
@@ -1165,7 +1168,7 @@ class QueueModelFactory(object):
     @staticmethod
     def _create_dc(parent_task_node, acquisitions, crystal, 
                    processing_parameters, name = ''):
-
+    
         dc = DataCollection()
         dc.acquisitions = acquisitions
         dc.crystal = crystal
