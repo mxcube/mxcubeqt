@@ -139,17 +139,17 @@ class TaskToolBoxWidget(qt.QWidget):
     def create_task(self, items = None):
         if self.tool_box.currentItem().approve_creation():
             for item in items:
-                if isinstance(item.get_model(), queue_model.TaskNode):
+                if isinstance(item.get_model(), queue_model.Sample):
+                    parent_task_node = self.tool_box.currentItem().\
+                                       create_parent_task_node(item)    
+                    self.tree_brick.add_to_queue(parent_task_node,
+                                                  item)
+                elif isinstance(item.get_model(), queue_model.TaskNode):
                     parent_task_node = item.get_model() 
                     sample = item.parent().get_model()
                     task_list = self.tool_box.currentItem().\
                                 create_task(parent_task_node, sample)
-                    self.tree_brick.add_task_node(task_list, item)
-                elif isinstance(item.get_model(), queue_model.Sample):
-                    parent_task_node = self.tool_box.currentItem().\
-                                       create_parent_task_node(item)    
-                    self.tree_brick.add_task_node(parent_task_node,
-                                                  item)
+                    self.tree_brick.add_to_queue(task_list, item)
                 else:
                     self.create_task([item.parent()])
 
