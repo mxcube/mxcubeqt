@@ -137,7 +137,7 @@ class QueueItem(QCheckListItem):
         self.listView().triggerUpdate()
 
     
-    def getLastItem(self):
+    def lastItem(self):
         """
         :returns: The last item of this child.
         :rtype: QueueItem
