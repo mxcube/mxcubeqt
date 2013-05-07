@@ -110,7 +110,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             selected_shapes = [shape_history.Point(None, cpos, None)]
         else:
-            selected_shapes = self._qub_helper.selected_shapes
+            selected_shapes = self._shape_history.selected_shapes
 
         invalid = False
                 
@@ -128,16 +128,15 @@ class CreateDiscreteWidget(CreateTaskBase):
                 sc = None
                 
                 if not shape.get_drawing():
-                    sc = queue_model.QueueModelFactory.\
-                         create(queue_model.SampleCentring, parent_task_node)
+                    sc = queue_model.SampleCentring(parent_task_node)
                     sc.set_name('sample-centring')
                     
                     tasks.append(sc)
 
                 if shape.qub_point is not None:
-                    snapshot = self._qub_helper.get_snapshot([shape.qub_point])
+                    snapshot = self._shape_history.get_snapshot([shape.qub_point])
                 else:
-                    snapshot = self._qub_helper.get_snapshot([])
+                    snapshot = self._shape_history.get_snapshot([])
 
                 # Acquisition for start position
                 acq = queue_model.Acquisition()
@@ -156,10 +155,10 @@ class CreateDiscreteWidget(CreateTaskBase):
                 dc_name = acq.path_template.prefix + '_' + \
                     str(acq.path_template.run_number)
 
-                dc = queue_model.QueueModelFactory.\
-                    create(queue_model.DataCollection, parent_task_node, 
-                           [acq], sample.crystals[0], processing_parameters, 
-                           name = dc_name)
+                dc = queue_model.DataCollection(parent_task_node, [acq],
+                                                sample.crystals[0],
+                                                processing_parameters, 
+                                                name = dc_name)
 
                 dc.experiment_type = queue_model.EXPERIMENT_TYPE.NATIVE
 
@@ -167,7 +166,6 @@ class CreateDiscreteWidget(CreateTaskBase):
                     sc.set_task(dc)
 
                 # Increase run number for next collection
-                
                 self.set_run_number(self._path_template.run_number + 1)
 
                 tasks.append(dc)
