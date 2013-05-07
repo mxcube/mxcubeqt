@@ -185,7 +185,8 @@ class QueueItem(QCheckListItem):
 
 
 class SampleQueueItem(QueueItem):
-    def __init__(self, parent, after, text, controller):
+    def __init__(self, parent, after, text,
+                 controller = QCheckListItem.CheckBoxController):
         QueueItem.__init__(self, parent, after, text, controller,
                            deletable = False)
 
