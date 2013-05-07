@@ -29,7 +29,7 @@ class CharParametersWidget(QWidget):
         #
         # Private members
         #
-        self._data_collection = queue_model.DataCollection()
+        self._data_collection = None
         self._char_params = queue_model.CharacterisationParameters()
         self._char_params_mib = DataModelInputBinder(self._char_params)
         self.previous_energy = None
