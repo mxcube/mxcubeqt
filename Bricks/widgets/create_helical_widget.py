@@ -112,18 +112,18 @@ class CreateHelicalWidget(CreateTaskBase):
 
         
     def add_clicked(self):
-        selected_shapes = self._qub_helper.selected_shapes.values()
+        selected_shapes = self._shape_history.selected_shapes.values()
 
         if len(selected_shapes) == 2:
 
             p1 = selected_shapes[1]
             p2 = selected_shapes[0]
             
-            line = shape_history.Line(self._qub_helper.get_drawing(), p1.qub_point, p2.qub_point,
+            line = shape_history.Line(self._shape_history.get_drawing(), p1.qub_point, p2.qub_point,
                                      p1.centred_position, p2.centred_position)
 
             line.show()
-            self._qub_helper.add_shape(line)
+            self._shape_history.add_shape(line)
             list_box_item = qt.QListBoxText(self._list_box, 'Line')
             self._list_item_map[list_box_item] = line
 
@@ -136,11 +136,11 @@ class CreateHelicalWidget(CreateTaskBase):
             for item in selected_items:
                 self._list_box.removeItem(self._list_box.index(item))
                 line = self._list_item_map[item]
-                self._qub_helper.delete_shape(line)
+                self._shape_history.delete_shape(line)
                 del self._list_item_map[item]
 
 
-    # Calback from qub_helper, called when a shape is deleted
+    # Calback from shape_history, called when a shape is deleted
     def shape_deleted(self, shape):
         if isinstance(shape, shape_history.Point):
             items_to_remove = []
@@ -153,7 +153,7 @@ class CreateHelicalWidget(CreateTaskBase):
             for (list_item, line) in items_to_remove:
                 self._list_box.removeItem(self._list_box.index(list_item))
                 del self._list_item_map[list_item]
-                self._qub_helper.delete_shape(line)
+                self._shape_history.delete_shape(line)
 
 
     def centred_position_selection(self, positions):
@@ -214,9 +214,9 @@ class CreateHelicalWidget(CreateTaskBase):
 
             if isinstance(shape, shape_history.Line ):
                 if shape.get_qub_objects() is not None:
-                    snapshot = self._qub_helper.get_snapshot(shape.get_qub_objects())
+                    snapshot = self._shape_history.get_snapshot(shape.get_qub_objects())
                 else:
-                    snapshot = self._qub_helper.get_snapshot([])
+                    snapshot = self._shape_history.get_snapshot([])
 
                 # Acquisition for start position
                 start_acq = queue_model.Acquisition()
