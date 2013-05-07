@@ -21,7 +21,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("shape-history", "string", "/shape-history")
 
         #Data atributes
-        self.qub_helper = None
+        self.shape_history = None
         self.tree_brick = None
         self.ispyb_logged_in = False
         self.diffractometer_hwobj = None
@@ -29,7 +29,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         #Signals
         self.defineSignal("getView", ())
         self.defineSignal("getTreeBrick",())
-        self.defineSignal("getQubHelper",())
 
         #Slots
         self.defineSlot("logged_in", ())
@@ -59,13 +58,13 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         # helper classes for handling centred positions.
         d = {}
         self.emit(qt.PYSIGNAL("getView"), (d, ))
-        self.qub_helper.set_drawing(d.get('drawing', None))
-        #self.drawing_event = qub_helper.DrawingEvent(self.qub_helper)
-        #self.qub_helper.drawing_event = self.drawing_event
-        #self.qub_helper.drawing.addDrawingEvent(self.drawing_event)
-        self.qub_helper.get_drawing_event_handler().\
+        self.shape_history.set_drawing(d.get('drawing', None))
+        #self.drawing_event = shape_history.DrawingEvent(self.shape_history)
+        #self.shape_history.drawing_event = self.drawing_event
+        #self.shape_history.drawing.addDrawingEvent(self.drawing_event)
+        self.shape_history.get_drawing_event_handler().\
             selection_cb = self.shape_selected
-        self.qub_helper.get_drawing_event_handler().\
+        self.shape_history.get_drawing_event_handler().\
             deletion_cb = self.shape_deleted
         
         try:
@@ -76,7 +75,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             traceback.print_exc()
             
 
-        self.task_tool_box_widget.set_qub_helper(self.qub_helper)
+        self.task_tool_box_widget.set_shape_history(self.shape_history)
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
@@ -167,7 +166,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
 
 
         if property_name == 'shape-history':
-            self.qub_helper = self.getHardwareObject(new_value)
+            self.shape_history = self.getHardwareObject(new_value)
 
         #if property_name =='tunable-energy':
         #    self.task_tool_box_widget.set_tunable_energy(new_value)
@@ -229,13 +228,13 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 screen_pos = self.diffractometer_hwobj.\
                              motor_positions_to_screen(cpos.as_dict())
 
-                point = shape_history.Point(self.qub_helper.get_drawing(), 
+                point = shape_history.Point(self.shape_history.get_drawing(), 
                                          cpos, screen_pos)
-                #qub_point = self.qub_helper.draw_position(screen_pos)
+                #qub_point = self.shape_history.draw_position(screen_pos)
 
                 if point:
-                    #self.qub_helper.add_point(cpos, qub_point)
-                    self.qub_helper.add_shape(point)
+                    #self.shape_history.add_point(cpos, qub_point)
+                    self.shape_history.add_shape(point)
             except:
                 logging.getLogger('HWR').\
                     exception('Could not get screen positons for %s' % cpos)
@@ -248,7 +247,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         minidiffStateChanged of the diffractometer hardware object.
         """
         if self.diffractometer_hwobj.isReady():
-            for shape in self.qub_helper.get_shapes():
+            for shape in self.shape_history.get_shapes():
 
                 new_positions = []
                 for cpos in shape.get_centred_positions():
@@ -259,9 +258,9 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
 
                 shape.move(new_positions)
 
-            for shape in self.qub_helper.get_shapes():
+            for shape in self.shape_history.get_shapes():
                 shape.show()
 
         else:
-            for shape in self.qub_helper.get_shapes():
+            for shape in self.shape_history.get_shapes():
                 shape.hide()
