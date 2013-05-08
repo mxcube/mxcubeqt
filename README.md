@@ -1,5 +1,4 @@
 # mxCuBE
-========
 
 mxCuBE stands for macromolecular xtallography customized beamline environment;
 the project started in 2005 at [ESRF](http://www.esrf.eu), since then it has
@@ -34,7 +33,6 @@ for mxCuBE. Then, implementation differs at each site depending on hardware and
 beamline specificities.
 
 ## Installing mxCuBE
-====================
 
 ### git repository organization
 
@@ -66,7 +64,6 @@ it is possible to specify a directory containing the Hardware Objects XML files 
 of a "host:port" string for the --hardwareRepository command line argument.
 
 ## Running mxCuBE
-=================
 
 Once dependencies are satisfied, and the mxcube.gui is present, just run the mxcube
 script:
