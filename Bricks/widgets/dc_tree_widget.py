@@ -607,7 +607,7 @@ class DataCollectTree(QWidget):
             self.stop_collection()
 
 
-    def collect_items(self, items):
+    def collect_items(self, items = None):
         self.user_stopped = False
         self.delete_button.setEnabled(False)
         self.parent().sample_changer_widget.setEnabled(False)
@@ -779,14 +779,6 @@ class DataCollectTree(QWidget):
             sample.set_name(sample.loc_str)
 
             self.add_to_queue([sample], self.sample_list_view, False)
-
-            #if sample.location == self.loaded_sample:
-            #    view_item.setPixmap(0, self.pin_pixmap)
-            #    view_item.setSelected(True)
-            #    self.sample_list_view_selection()
-            #    self._loaded_sample_item = view_item
-            #else:
-            #    view_item.setPixmap(0, QPixmap())
             
 
     def get_mounted_sample_item(self):
@@ -795,7 +787,7 @@ class DataCollectTree(QWidget):
                                                    queue_item.get_item)
         
         for item in sample_items:
-            if item.data.location == self.sample_changer_hwobj.\
+            if item.get_model().location == self.sample_changer_hwobj.\
                     getLoadedSampleLocation():
                 return item
 
