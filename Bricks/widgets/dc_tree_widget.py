@@ -451,7 +451,7 @@ class DataCollectTree(QWidget):
                                                        task.get_name())
             
                 qe = queue_entry.SampleQueueEntry(view_item, task)
-            elif isinstance(task, queue_model.TaskNode):
+            elif isinstance(task, queue_model.TaskGroup):
                 view_item = queue_item.\
                             DataCollectionGroupQueueItem(parent_tree_item,
                                                          parent_tree_item.lastItem(),
