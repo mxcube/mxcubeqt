@@ -460,18 +460,18 @@ class TreeBrick(BaseComponents.BlissWidget):
         return self.dc_tree_widget.get_selected_dcgs()
 
             
-    def get_mounted_sample_item(self, s):
-        sample_item = self.dc_tree_widget.get_mounted_sample()
-        s['sample'] = sample_item.get_model()
+    # def get_mounted_sample_item(self, s):
+    #     sample_item = self.dc_tree_widget.get_mounted_sample()
+    #     s['sample'] = sample_item.get_model()
     
 
-    def is_sample_selected(self, selected_sample_dict):
-        selected_sample = self.dc_tree_widget.is_sample_selected()
+    # def is_sample_selected(self, selected_sample_dict):
+    #     selected_sample = self.dc_tree_widget.is_sample_selected()
 
-        if selected_sample:        
-            selected_sample_dict["sample_selected"] = True
-        else:
-            selected_sample_dict["sample_selected"] = False
+    #     if selected_sample:        
+    #         selected_sample_dict["sample_selected"] = True
+    #     else:
+    #         selected_sample_dict["sample_selected"] = False
 
 
     def add_to_queue(self, task_list, parent_tree_item = None, set_on = True):
