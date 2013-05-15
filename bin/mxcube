@@ -2,7 +2,7 @@
 import sys
 import os
 
-MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "mxcube.gui")
 
 sys.path.insert(0, MXCUBE_ROOT)
