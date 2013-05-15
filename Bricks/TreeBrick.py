@@ -444,13 +444,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.current_cpos = cpos
 
 
-    def centring_completed(self):
-        #cpos = self.current_cpos
-        print "Centring ... "
-        time.sleep(3)
-        cpos = object
-        self.current_cpos = None
-        return cpos
         
 
     def get_selected_items(self):
