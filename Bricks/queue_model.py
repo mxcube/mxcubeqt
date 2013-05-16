@@ -17,10 +17,6 @@ ExperimentType = namedtuple('ExperimentType', ['SAD','SAD_INV', 'MAD',
                                                'MAD_INV', 'NATIVE','HELICAL', 'EDNA_REF', 'OSC'])
 EXPERIMENT_TYPE = ExperimentType(0,1,2,3,4,5,6,7)
 
-
-ExperimentType = namedtuple('ExperimentType', ['SAD','SAD_INV', 'MAD', 
-                                               'MAD_INV', 'NATIVE','HELICAL', 'EDNA_REF', 'OSC'])
-
 EXPERIMENT_TYPE_STR = ExperimentType('SAD','SAD - Inverse Beam','MAD','MAD - Inverse Beam',
                                      'OSC','Helical','Characterization', 'OSC')
 
