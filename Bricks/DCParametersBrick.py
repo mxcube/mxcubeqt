@@ -1,7 +1,6 @@
 import logging
 import sys
 import pprint
-import queue_model
 import html_template
 import decimal; decimal.getcontext().prec = 3; decimal.getcontext().rounding = decimal.ROUND_DOWN
 
