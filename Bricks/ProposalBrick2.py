@@ -11,8 +11,6 @@ from BlissFramework.Utils import widget_colors
 
 __category__ = 'mxCuBE'
 
-ENV_BEAMLINE_NAME = 'SMIS_BEAMLINE_NAME'
-
 PROPOSAL_GUI_EVENT = QEvent.User
 class ProposalGUIEvent(QCustomEvent):
     def __init__(self, method, arguments):
@@ -150,12 +148,7 @@ class ProposalBrick2(BlissWidget):
 
     def impersonateProposal(self,proposal_code,proposal_number):
         if BlissWidget.isInstanceUserIdInhouse():
-            try:
-                beamline_name=os.environ[ENV_BEAMLINE_NAME]
-            except KeyError:
-                pass
-            else:
-                self._do_login(proposal_code,proposal_number,None,beamline_name, impersonate=True)
+            self._do_login(proposal_code, proposal_number, None, self.dbConnection.beamline_name, impersonate=True)
         else:
             logging.getLogger().debug('ProposalBrick2: cannot impersonate unless logged as the inhouse user!')
 
@@ -282,20 +275,7 @@ class ProposalBrick2(BlissWidget):
             self.propType.insertItem(cd)
 
     def run(self):
-        try:
-            beamline=os.environ[ENV_BEAMLINE_NAME]
-        except KeyError:
-            beamline=""
-        if beamline=="":
-            logging.getLogger().warning("ProposalBrick: unknown beamline (unable to validate sessions)")
-        else:
-            logging.getLogger().info("Beamline is %s" % beamline)
-
-        state=False
-        if self.localLogin is not None:
-            state=True
-        elif self.ldapConnection is not None and beamline!="":
-            state=True
+        state=all([self.localLogin, self.ldapConnection])
         self.setEnabled(state)
 
         self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
@@ -406,26 +386,16 @@ class ProposalBrick2(BlissWidget):
             return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
         try:
-            beamline_name=os.environ[ENV_BEAMLINE_NAME]
-        except KeyError:
-            beamline_name=""
-        if beamline_name=="":
-            return self.refuseLogin(False,"Unknown beamline (environment variable %s is missing)." % ENV_BEAMLINE_NAME)
-
-        try:
             prop_number=int(prop_number)
         except (ValueError,TypeError):
             return self.refuseLogin(None,"Invalid proposal number.")
 
-        if self.ldapConnection is None and str(beamline_name) != "My_office":
+        if self.ldapConnection is None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
         if self.dbConnection is None:
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
 
-        if str(beamline_name) == "My_office":
-            self._do_login(prop_type,prop_number,prop_password,beamline_name, impersonate=True)
-        else:
-            self._do_login(prop_type,prop_number,prop_password,beamline_name)
+        self._do_login(prop_type,prop_number,prop_password, self.dbConnection.beamline_name)
 
     def passControl(self,has_control_id):
         pass
