@@ -42,6 +42,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self._lims_hwobj = None
         self.sample_changer = None
         self.queue_hwobj = None
+        self.xml_rpc_server_hwobj = None
 
         # Properties
         self.addProperty("lims_client", "string", "")
@@ -53,6 +54,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("energy_scan_hwobj", "string", "")
         self.addProperty("queue", "string", "/queue-controller")
+        self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
 
         # Qt - Slots
         self.defineSlot("logged_in", ())
@@ -267,6 +269,15 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
 
 
+        if property_name == 'xml_rpc_server':
+            self.xml_rpc_server_hwobj = self.getHardwareObject(new_value)
+            self.connect(self.xml_rpc_server_hwobj, 'add_to_queue',
+                         self.add_to_queue)
+
+            self.connect(self.xml_rpc_server_hwobj, 'start_queue',
+                         self.dc_tree_widget.collect_items)
+
+
     def get_sc_content(self):
         sc_content = []
         
@@ -433,13 +444,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.current_cpos = cpos
 
 
-    def centring_completed(self):
-        #cpos = self.current_cpos
-        print "Centring ... "
-        time.sleep(3)
-        cpos = object
-        self.current_cpos = None
-        return cpos
         
 
     def get_selected_items(self):
@@ -456,22 +460,25 @@ class TreeBrick(BaseComponents.BlissWidget):
         return self.dc_tree_widget.get_selected_dcgs()
 
             
-    def get_mounted_sample_item(self, s):
-        sample_item = self.dc_tree_widget.get_mounted_sample()
-        s['sample'] = sample_item.get_model()
+    # def get_mounted_sample_item(self, s):
+    #     sample_item = self.dc_tree_widget.get_mounted_sample()
+    #     s['sample'] = sample_item.get_model()
     
 
-    def is_sample_selected(self, selected_sample_dict):
-        selected_sample = self.dc_tree_widget.is_sample_selected()
+    # def is_sample_selected(self, selected_sample_dict):
+    #     selected_sample = self.dc_tree_widget.is_sample_selected()
 
-        if selected_sample:        
-            selected_sample_dict["sample_selected"] = True
-        else:
-            selected_sample_dict["sample_selected"] = False
+    #     if selected_sample:        
+    #         selected_sample_dict["sample_selected"] = True
+    #     else:
+    #         selected_sample_dict["sample_selected"] = False
 
 
-    def add_task_node(self, task_list, parent_tree_item, set_on = True):
-        self.dc_tree_widget.add_task_node(task_list, parent_tree_item, set_on)
+    def add_to_queue(self, task_list, parent_tree_item = None, set_on = True):
+        if not parent_tree_item :
+            parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
+        
+        self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
 
 
     def run(self):

@@ -53,8 +53,6 @@ except:
 logger.setLevel(logging.INFO)
 logger = logging.getLogger('queue_model').info("Module load, probably application start")
 
-model = None
-collect_context = None
 
 class TaskNode(object):
     def __init__(self, parent = None):
