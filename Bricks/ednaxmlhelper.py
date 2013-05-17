@@ -33,7 +33,7 @@ def get_fields(field_container):
 
         #try to get the properties according to the type
         if fieldtype.endswith('SpinnerWrapper'):
-            field_dict['type'] = 'spinbox'
+            field_dict['type'] = 'text'
         if fieldtype.endswith('StandardBox'):
             field_dict['type'] = 'text'
         if fieldtype.endswith('FileBox'):
