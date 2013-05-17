@@ -271,7 +271,7 @@ class ProposalBrick2(BlissWidget):
             self.propType.insertItem(cd)
 
     def run(self):
-        state=all([self.localLogin, self.ldapConnection])
+        state = (self.localLogin and self.ldapConnection) is not None
         self.setEnabled(state)
 
         self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
