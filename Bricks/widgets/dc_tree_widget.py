@@ -798,7 +798,7 @@ class DataCollectTree(QWidget):
                                                    queue_item.get_item)
 
         for item in sample_items:
-            if item.data.location == self.sample_changer_hwobj.\
+            if item.get_model().location == self.sample_changer_hwobj.\
                     getLoadedSampleLocation():
                 item.setPixmap(0, self.pin_pixmap)
             else:
