@@ -193,7 +193,10 @@ class SampleQueueItem(QueueItem):
 
     def update_pin_icon(self):
         dc_tree_widget = self.listView().parent()
-        dc_tree_widget._loaded_sample_item.setPixmap(0, QPixmap())
+
+        if  dc_tree_widget._loaded_sample_item:
+            dc_tree_widget._loaded_sample_item.setPixmap(0, QPixmap())
+            
         dc_tree_widget._loaded_sample_item = self
         self.setPixmap(0, dc_tree_widget.pin_pixmap)
         
