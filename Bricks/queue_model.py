@@ -917,18 +917,31 @@ class PathTemplate(object):
     def __init__(self):
         object.__init__(self)
 
-        self.base_directory = str()
         self.directory = str()
-        
+        self.process_directory = str()
+
         self.prefix = str()
+        self.base_prefix = str()
+        self.mad_prefix = str()
+        self.reference_image_prefix = str()
         self.run_number = 1
 
         self.template = str()
         self.suffix = str()
         self.start_num = 1
         self.num_files = 1
+
         
-        self.process_directory = str()
+    def get_prefix(self):
+        prefix = self.base_prefix
+
+        if self.mad_prefix:
+            prefix = self.mad_prefix + '-' + self.base_prefix
+
+        if self.reference_image_prefix:
+            prefix = self.reference_image_prefix + '-' + prefix
+
+        return prefix
 
 
 class AcquisitionParameters(object):
