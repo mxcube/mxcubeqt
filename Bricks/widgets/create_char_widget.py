@@ -46,6 +46,8 @@ class CreateCharWidget(CreateTaskBase):
             queue_model.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
 
+        self._path_template.reference_image_prefix = 'ref'
+        
         #
         # Layout
         #
@@ -119,8 +121,6 @@ class CreateCharWidget(CreateTaskBase):
                                                 str,
                                                 None)
 
-    def get_prefix_type(self):
-        return 'ref'
 
 #     def set_energy(self, pos, wav):
 #         self._data_collection.acquisitions[0].acquisition_parameters.energy = \
@@ -217,7 +217,7 @@ class CreateCharWidget(CreateTaskBase):
                 if sc:
                     sc.set_task(data_collection)
                     
-                char_name = data_collection.acquisitions[0].path_template.prefix + '_' + \
+                char_name = data_collection.acquisitions[0].path_template.get_prefix() + '_' + \
                     str(data_collection.acquisitions[0].path_template.run_number)
 
                 char = queue_model.Characterisation(parent_task_node,

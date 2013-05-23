@@ -47,6 +47,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                                             acq_params =  self._acquisition_parameters,
                                             path_template = self._path_template)
 
+
         self._data_path_gbox = QVGroupBox('Data location', self, 'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
                                                data_model = self._path_template,
@@ -64,8 +65,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         v_layout.addStretch()
 
 
-    def get_prefix_type(self):
-        return ''
+        self.connect(self._acq_widget, PYSIGNAL('mad_energy_selected'),
+                     self.mad_energy_selected)
 
 
     def set_tunable_energy(self, state):
@@ -152,7 +153,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 processing_parameters = copy.deepcopy(self._processing_parameters)
 
-                dc_name = acq.path_template.prefix + '_' + \
+                dc_name = acq.path_template.get_prefix() + '_' + \
                     str(acq.path_template.run_number)
 
                 dc = queue_model.DataCollection(parent_task_node, [acq],

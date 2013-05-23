@@ -164,8 +164,9 @@ class DataPathWidget(qt.QWidget):
             setText(str(run_number))
 
 
-    def set_prefix(self, prefix):
-        self._data_model.prefix = prefix
+    def set_prefix(self, base_prefix):
+        self._data_model.base_prefix = base_prefix
+        prefix = self._data_model.get_prefix()
         self.data_path_widget_layout.prefix_ledit.setText(prefix)
 
 

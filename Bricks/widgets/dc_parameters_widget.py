@@ -57,9 +57,25 @@ class DCParametersWidget(QWidget):
         rtwo_hlayout.addStretch(10)
         v_layout.addStretch()
 
+
+        self.connect(self.acq_widget, PYSIGNAL('mad_energy_selected'),
+                     self.mad_energy_selected)
+
          
     def __add_data_collection(self):
         return self.add_dc_cb(self._data_collection, self.collection_type)
+
+    
+    def mad_energy_selected(self, name, energy, state):
+        path_template = self._data_collection.\
+            acquisitions[0].path_template
+
+        if state:
+            path_template.mad_prefix = name
+        else:
+            path_template.mad_prefix = ''
+            
+        self.path_widget.set_prefix(path_template.base_prefix)
 
 
     def populate_parameter_widget(self, data_collection):
@@ -80,7 +96,7 @@ class DCParametersWidget(QWidget):
         #    get_context().build_image_path(data_collection.\
         #                                       acquisitions[0].path_template)
                 
-        #self.path_widget.set_data_path(new_path)    
+        #self.path_widget.set_data_path(new_path)
         self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
 
         if data_collection.acquisitions[0].acquisition_parameters.\

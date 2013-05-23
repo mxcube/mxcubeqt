@@ -37,6 +37,18 @@ class CreateTaskBase(qt.QWidget):
     def set_energies(self):
         pass
 
+ 
+    def mad_energy_selected(self, name, energy, state):
+        data_path_widget = self.get_data_path_widget()
+
+        if data_path_widget:
+            if state:
+                self._path_template.mad_prefix = name
+            else:
+                self._path_template.mad_prefix = ''
+
+            data_path_widget.set_prefix(self._path_template.base_prefix)
+
 
     def get_sample_item(self):
         if isinstance(self._current_selected_item, queue_item.SampleQueueItem):
@@ -92,11 +104,6 @@ class CreateTaskBase(qt.QWidget):
         if data_path_widget:
             data_path_widget.set_run_number(run_number)
 
-
-    @abc.abstractmethod
-    def get_prefix_type(self):
-        pass
-
     
     def _selection_changed(self, tree_item):
         pass
@@ -104,8 +111,8 @@ class CreateTaskBase(qt.QWidget):
 
     def get_default_prefix(self, sample_data_node):
         prefix = queue_model.QueueModelFactory.\
-            get_context().get_default_prefix(self.get_prefix_type(),
-                                             sample_data_node)            
+            get_context().get_default_prefix(sample_data_node)
+
         return prefix
 
         
@@ -156,7 +163,7 @@ class CreateTaskBase(qt.QWidget):
         acq_widget = self.get_acquisition_widget()
 
         if acq_widget:
-            acq_widget.set_energies(sample_data_node.energy_scan_result)
+            acq_widget.set_energies(sample_data_node.crystals[0].energy_scan_result)
 
 
         data_path_widget = self.get_data_path_widget()
