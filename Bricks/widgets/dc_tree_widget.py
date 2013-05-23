@@ -430,7 +430,7 @@ class DataCollectTree(QWidget):
                                                       parent_tree_item.lastItem(),
                                                       task.get_name())
 
-                qe = queue_entry.CharacterisationQueueEntry(view_item, task)
+                qe = queue_entry.CharacterisationGroupQueueEntry(view_item, task)
             elif isinstance(task, queue_model.EnergyScan):
                 view_item = queue_item.\
                             EnergyScanQueueItem(parent_tree_item,
