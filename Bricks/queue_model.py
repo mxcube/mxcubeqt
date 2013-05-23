@@ -752,7 +752,7 @@ class CollectContext(object):
         return path
 
 
-    def get_default_prefix(self, type_str, sample_data_node):
+    def get_default_prefix(self, sample_data_node):
         proposal = self.get_proposal()
 
         if not proposal:
@@ -767,13 +767,9 @@ class CollectContext(object):
                     crystals[0].protein_acronym + '-' + sample_data_node.name
 
         else:
-            if type_str is  '':
-                prefix = proposal
-            else:
-                prefix = type_str + '-' + proposal
+            prefix = proposal
             
         return prefix
-
 
     def get_image_paths(self, acquisition):
         paths = []
