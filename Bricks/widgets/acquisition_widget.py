@@ -9,6 +9,9 @@ from widgets.acquisition_widget_horizontal_layout \
 from widgets.widget_utils import DataModelInputBinder
 
 
+MAD_ENERGY_COMBO_NAMES = {'ip':0, 'pk':1, 'rm1':2, 'rm2':3}
+
+
 class AcquisitionWidget(qt.QWidget):
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
                  path_template = None, layout = None):
@@ -145,9 +148,12 @@ class AcquisitionWidget(qt.QWidget):
     def use_mad(self, state):
         if state:    
             self.previous_energy = self._acquisition_parameters.energy
-            self.set_energy(self.get_mad_energy()[1], 0)
+            (name, energy) = self.get_mad_energy()
+            self.set_energy(energy, 0)
+            self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, state))
         else:
             self.set_energy(self.previous_energy, 0)
+            self.emit(qt.PYSIGNAL('mad_energy_selected'), ('', self.previous_energy, state))
 
 
     def get_mad_energy(self):
@@ -167,11 +173,17 @@ class AcquisitionWidget(qt.QWidget):
                            'rm1 - %.4f' % energy_scan_result.first_remote, 
                            'rm2 - %.4f' % energy_scan_result.second_remote])
 
+        if self._path_template.mad_prefix:
+            self.acq_widget_layout.mad_cbox.setOn(True)
+            self.acq_widget_layout.energies_combo.\
+                setCurrentItem(MAD_ENERGY_COMBO_NAMES[self._path_template.mad_prefix])
+
 
     def energy_selected(self, index):
         if self.acq_widget_layout.mad_cbox.isChecked():
-            self.set_energy(self.get_mad_energy()[1], 0)
-
+            (name, energy) = self.get_mad_energy()
+            self.set_energy(energy, 0)
+            self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
 
     def set_energy(self, energy, wav):
         energy = round(float(energy), 4)
