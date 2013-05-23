@@ -1351,8 +1351,8 @@ class QueueModelFactory(object):
                 # dc.parametets.path = enda_result.directory
                 # dc.parameters.centred_positions = enda_result.centred_positions
 
-                dc = QueueModelFactory._create_dc(dcg_model, [acq], crystal,
-                                                  processing_parameters, name = name)
+                dc = DataCollection(dcg_model, [acq], crystal,
+                                    processing_parameters, name = name)
                 data_collections.append(dc)
             
         return data_collections
