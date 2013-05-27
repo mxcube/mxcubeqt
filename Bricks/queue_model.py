@@ -388,11 +388,6 @@ class DataCollection(TaskNode):
                 'snapshot': self.acquisitions[0].acquisition_parameters.centred_position.snapshot_image}
 
 
-    def _remove(self):
-        QueueModelFactory.get_context().\
-            remove_path_template(self.acquisitions[0].path_template)
-
-
     def rename(self, name):
         self._name = name
 
@@ -417,8 +412,7 @@ class DataCollection(TaskNode):
         file_locations = []
         
         path_template = self.acquisitions[0].path_template
-        file_name_template = QueueModelFactory.get_context()\
-                             .get_image_file_name(path_template)
+        file_name_template = path_template.get_image_file_name()
 
         for i in range(path_template.start_num, 
                        path_template.start_num + path_template.num_files):
@@ -488,11 +482,6 @@ class Characterisation(TaskNode):
         self.characterisation_software = None
 
 
-   def _remove(self):
-       QueueModelFactory.get_context().remove_path_template(self.\
-           reference_image_collection.acquisitions[0].path_template)
-
-
    def get_run_number(self):
        return  self.reference_image_collection.get_run_number()
 
@@ -504,9 +493,9 @@ class Characterisation(TaskNode):
    def get_files_to_be_written(self):
         file_locations = []
         
-        path_template = self.reference_image_collection.acquisitions[0].path_template
-        file_name_template = QueueModelFactory.get_context()\
-                             .get_image_file_name(path_template)
+        path_template = self.reference_image_collection.acquisitions[0].\
+                        path_template
+        file_name_template = path_template.get_image_file_name()
 
         for i in range(path_template.start_num, 
                        path_template.start_num + path_template.num_files):
@@ -581,11 +570,21 @@ class CharacterisationParameters(object):
 
 
 class EnergyScan(TaskNode):
-    def __init__(self, parent = None):
+    def __init__(self, parent = None, sample = None, path_template = None):
         TaskNode.__init__(self, parent)
         self.element_symbol = None
         self.edge = None
-        self.path_template = PathTemplate()
+
+        if not sample:
+            self.sample = sample
+        else:
+            self.sampel = Sample()
+            
+        if not path_template:
+            self.path_template = path_template
+        else:
+            self.path_template = PathTemplate()
+        
         self.result = EnergyScanResult()
 
 
@@ -633,284 +632,38 @@ class SampleCentring(TaskNode):
         return self._task
     
 
-class CollectContext(object):
-    def __init__(self):
-        self.session_id = None
-        self.prop_code = None
-        self.prop_number = None
-        self.prop_id = None
-        self._is_inhouse = None
-        self.default_suffix = 'img'
-        self.default_precision = '04'
-        self.suffix = None
-        self._path_template_dict = {}
-        self._exp_hutch = str()
-
-        #self.exp_hutch = 'id23eh1'
-        #self.exp_hutch = "id14eh4"
-        #self.exp_hutch = "id14eh1"
-        #self.exp_hutch = "id23eh2"
-        self.in_house = []
-
-        self.beamline_config_hwobj = None
-
-
-    def set_exp_hutch(self, exp_hutch):
-        if isinstance(exp_hutch, str):
-            self._exp_hutch = exp_hutch
-        else:
-            self._exp_hutch = 'unknown-exp-hutch'
-            logging.error("Could not read hutch value from config file")
-
-
-    def get_exp_hutch(self):
-        return self._exp_hutch
-
-
-    def get_base_data_directory(self):
-        user_category = ''
-        directory = ''
-        
-        if self.is_inhouse():
-            user_category = 'inhouse'
-            directory = os.path.join('/data',
-                                     self.get_exp_hutch(),
-                                     user_category, self.get_proposal(),
-                                     time.strftime("%Y%m%d"))
-        else:
-            user_category = 'visitor' 
-            directory = os.path.join('/data',
-                                     user_category, self.get_proposal(),
-                                     self.get_exp_hutch(),
-                                     time.strftime("%Y%m%d"))
-
-        return directory
-
-
-    def get_base_image_directory(self):
-        return os.path.join(self.get_base_data_directory(),
-                            'RAW_DATA')
-
-
-    def get_base_process_directory(self):
-        return os.path.join(self.get_base_data_directory(),
-                            'PROCESSED_DATA')
-
-
-    def get_image_directory(self, sample_data_node, sub_dir = None):
-        directory = None
-        user_category = 'visitor'
-        sample_name = sample_data_node.loc_str.replace(':', '-')
-
-        if sample_data_node.has_lims_data():
-            sample_name = os.path.join(sample_data_node.crystals[0].protein_acronym,
-                                       sample_data_node.name)
-
-        directory = os.path.join(self.get_base_image_directory(), 
-                                 sample_name)
-        
-        if sub_dir:
-            directory = os.path.join(directory,
-                                     sub_dir)
-
-        return directory
-
-
-    def get_process_directory(self, sample_data_node, sub_dir = None):
-        directory = None
-        user_category = 'visitor'
-        sample_name = sample_data_node.loc_str.replace(':', '-')
-
-        if sample_data_node.has_lims_data():
-            sample_name = os.path.join(sample_data_node.crystals[0].protein_acronym,
-                                       sample_data_node.name)
-            
-        directory = os.path.join(self.get_base_process_directory(), 
-                                 sample_name)
-
-        if sub_dir:
-            directory = os.path.join(directory,
-                                     sub_dir)
-
-        return directory
-
-
-    def get_image_file_name(self, path_template, suffix = None):
-        if not suffix:
-            suffix = self.suffix if self.suffix else self.default_suffix
-
-        template = "%s_%s_%%" + self.default_precision + "d.%s" 
-        file_name = template % (path_template.prefix, 
-                                path_template.run_number, suffix)
-
-        return file_name
-
-
-    def build_image_path(self, path_template):
-        path = os.path.join(path_template.directory, 
-            self.get_image_file_name(path_template))
-        return path
-
-
-    def get_default_prefix(self, sample_data_node):
-        proposal = self.get_proposal()
-
-        if not proposal:
-            proposal = "local-user"
-        
-        if sample_data_node.has_lims_data():
-            if type_str is  '':
-                prefix = sample_data_node.crystals[0].protein_acronym + \
-                    '-' + sample_data_node.name     
-            else:
-                prefix = type_str + '-' + sample_data_node.\
-                    crystals[0].protein_acronym + '-' + sample_data_node.name
-
-        else:
-            prefix = proposal
-            
-        return prefix
-
-    def get_image_paths(self, acquisition):
-        paths = []
-                            
-        for i in range(acquisition.first_image, 
-                       acquisition.num_images + acquisition.first_image):
-            
-            paths.append(self.build_image_path(parameters) % i)
-
-        return paths
-
-
-    def get_proposal(self):
-        proposal = 'local-user'
-        
-        if self.prop_code and self.prop_number:
-            if self.prop_code == 'ifx':
-                self.prop_code = 'fx'
-
-            proposal = "%s%s" % (self.prop_code, self.prop_number)
-
-        return proposal
-
-
-    def get_archive_directory(self, path_template):
-        folders = path_template.directory.split('/')
-        folders[2] = 'pyarch'
-        folders[3] = self.get_exp_hutch()
-        archive_directory = '/' +os.path.join(*folders[1:])
-
-        return archive_directory
-
-
-    def get_preview_image_paths(self, acquisition):
-        paths = []
-  
-        for i in range(acquisition.acquisition_parameters.first_image, 
-                       acquisition.acquisition_parameters.num_images + \
-                       acquisition.acquisition_parameters.first_image):
-
-            path = os.path.join(self.get_archive_directory(acquisition.path_template),
-                                self.get_image_file_name(acquisition.path_template,
-                                                         suffix = 'thumb.jpeg') % i)
-
-            paths.append(path)
-
-        return paths
-
-
-    def is_inhouse(self, proposal_code = None, proposal_number = None):
-        if not proposal_code:
-            proposal_code = self.prop_code
-
-        if not proposal_number:
-            proposal_number = self.prop_number
-
-        if (proposal_code, proposal_number) in self.in_house:
-            return True
-        else:
-            return False
-
-
-    def get_inhouse_user(self):
-        return self.in_house[0]
-
-
-    def set_inhouse(self, state):
-        if state:
-            self.is_inhouse = True
-        else:
-            self.is_inhouse = False
-
-    
-    def add_path_template(self, path_template):
-        if path_template.prefix in self._path_template_dict:
-            self._path_template_dict[path_template.prefix].\
-                append(path_template)
-        else:
-            self._path_template_dict[path_template.prefix] = []
-            self._path_template_dict[path_template.prefix].\
-                append(path_template)
-
-
-    def remove_path_template(self, path_template):
-        if path_template.prefix in self._path_template_dict:
-            pt_list = self._path_template_dict[path_template.prefix]
-            del pt_list[pt_list.index(path_template)]
-            
-
-    def get_free_run_number(self, prefix, directory):
-        path_template_list = self._path_template_dict.get(prefix,
-                                                          [])
-        largest = 0
-        for path_template in path_template_list:
-            if path_template.directory == directory:
-                if path_template.run_number > largest:
-                    largest = path_template.run_number
-
-        return largest + 1
-
-
-    def detector_has_shutterless(self):
-        shutter_less = False
-        
-        try:
-            shutter_less = self.beamline_config_hwobj["BCM_PARS"]['detector'].\
-                           getProperty('has_shutterless')
-
-            if shutter_less is None:
-                shutter_less = False
-
-        except:
-            shutter_less = False
-            #traceback.print_exc()
-            
-        return shutter_less
-
-
-    def tunable_wavelength(self):
-        tw = False
-        
-        try:
-            tw = self.beamline_config_hwobj["BCM_PARS"].\
-                 getProperty('tunable_wavelength')
-            
-            if tw is None:
-                tw = False
-                
-        except:
-            shutter_less = False
-            #traceback.print_exc()
-        
-        return tw
-        
-
 class Acquisition(object):
     def __init__(self, parent = None):
         object.__init__(self)
 
         self.path_template = PathTemplate()
         self.acquisition_parameters = AcquisitionParameters()
+
+
+    def get_preview_image_paths(self, acquisition):
+        """
+        Returns the full paths, including the filename, to preview/thumbnail
+        images stored in the archive directory.
+
+        :param acquisition: The acqusition object to generate paths for.
+        :type acquisition: Acquisition
+
+        :returns: The full paths.
+        :rtype: str
+        """
+        paths = []
+  
+        for i in range(self.acquisition_parameters.first_image, 
+                       self.acquisition_parameters.num_images + \
+                       self.acquisition_parameters.first_image):
+
+            path = os.path.join(selfpath_template.get_archive_directory(),
+                                acquisition.path_template.get_image_file_name(\
+                                    suffix = 'thumb.jpeg') % i)
+
+            paths.append(path)
+
+        return paths
 
 
 class PathTemplate(object):
@@ -924,10 +677,10 @@ class PathTemplate(object):
         self.base_prefix = str()
         self.mad_prefix = str()
         self.reference_image_prefix = str()
-        self.run_number = 1
-
         self.template = str()
-        self.suffix = str()
+        self.run_number = 1
+        self.suffix = 'img'
+        self.precision = '04'
         self.start_num = 1
         self.num_files = 1
 
@@ -942,6 +695,38 @@ class PathTemplate(object):
             prefix = self.reference_image_prefix + '-' + prefix
 
         return prefix
+
+
+    def get_image_file_name(self, suffix = None):
+        template = "%s_%s_%%" + self.precision + "d.%s"
+
+        if suffix:
+            file_name = template % (self.prefix, self.run_number, suffix)
+        else:
+            file_name = template % (self.prefix, self.run_number, self.suffix)
+
+        return file_name
+
+
+    def get_image_path(self):
+        path = os.path.join(self.directory,
+                            self.get_image_file_name())
+        return path
+
+
+     def get_archive_directory(self):
+        """
+        Returns the archive directory, for longer term storage.
+
+        :returns: Archive directory.
+        :rtype: str
+        """
+        folders = self.directory.split('/')
+        folders[2] = 'pyarch'
+        folders[3] = self.endstation_name
+        archive_directory = '/' +os.path.join(*folders[1:])
+
+        return archive_directory
 
 
 class AcquisitionParameters(object):
@@ -1053,180 +838,102 @@ class CentredPosition(object):
                     'zoom': str(self.zoom)})
 
 
-class QueueModelFactory(object):
+#
+# Collect hardware object utility function.
+#
+def to_collect_dict(data_collection, session):
+    """ return [{'comment': '',
+          'helical': 0,
+          'motors': {},
+          'take_snapshots': False,
+          'fileinfo': {'directory': '/data/id14eh4/inhouse/opid144/20120808/RAW_DATA',
+                       'prefix': 'opid144', 'run_number': 1,
+                       'process_directory': '/data/id14eh4/inhouse/opid144/20120808/PROCESSED_DATA'},
+          'in_queue': 0,
+          'detector_mode': 2,
+          'shutterless': 0,
+          'sessionId': 32368,
+          'do_inducedraddam': False,
+          'sample_reference': {},
+          'processing': 'False',
+          'residues': '',
+          'dark': True,
+          'scan4d': 0,
+          'input_files': 1,
+          'oscillation_sequence': [{'exposure_time': 1.0,
+                                    'kappaStart': 0.0,
+                                    'phiStart': 0.0,
+                                    'start_image_number': 1,
+                                    'number_of_images': 1,
+                                    'overlap': 0.0,
+                                    'start': 0.0,
+                                    'range': 1.0,
+                                    'number_of_passes': 1}],
+          'nb_sum_images': 0,
+          'EDNA_files_dir': '',
+          'anomalous': 'False',
+          'file_exists': 0,
+          'experiment_type': 'SAD',
+          'skip_images': 0}]"""
 
-    __qmodel_root = None
-    __collect_context = CollectContext()
-
-    def __init__(self):
-        """
-        Creates the model if its not already
-        created. (In a singleton like manner)
-        """
-
-        if QueueModelFactory.__qmodel_root is None:
-            QueueModelFactory.__qmodel_root = TaskNode()
-            global model
-            global collect_context 
-            
-            collect_context = QueueModelFactory.__collect_context
-            model = self
-
-
-    @staticmethod
-    def get_root():
-        """
-        Returns the root TaskNode object of the model.
-        """
-        return QueueModelFactory.__qmodel_root
-
-
-    @staticmethod
-    def set_context(context):
-        QueueModelFactory.__collect_context = context  
-
-
-    @staticmethod
-    def get_context():
-        return QueueModelFactory.__collect_context  
-            
-
-    @staticmethod
-    def copy(_type, *args, **kwargs):
-        if _type is DataCollection:
-            return QueueModelFactory._copy_data_collection(*args, **kwargs)
-        elif _type is Characterisation:
-            pass #return QueueModelFactory._copy_characterisation(*args, **kwargs)
-
-
-    @staticmethod 
-    def _copy_data_collection(data_collection):
-        params_copy = copy.deepcopy(data_collection.parameters)
-        dc = QueueModelFactory.create(DataCollection,
-                                      data_collection.get_parent(), 
-                                      params_copy, 
-                                      data_collection.sample, 
-                                      name = data_collection.get_name())
-
-        dc.parameters.collected = False
-        dc.parameters.run_number += 1
-
-        return dc
-
-
-    @staticmethod 
-    def _copy_characterisation(characterisation):
-        data_collection = characterisation.reference_image_collection
-        dc_params = data_collection.parameters
-        params_copy = copy.deepcopy(dc_params)
-        params_copy.collected = False
-        params_copy.run_number += 1
-
-        char = QueueModelFactory.\
-            create(Characterisation, characterisation.get_parent(), params_copy,
-                   data_collection.sample, characterisation.get_name())
-
-        
-        char.characterisation_parameters.collected = False
-        
-
-        return char
-
-
-    @staticmethod
-    def create(_type, *args, **kwargs):
-        if _type is DataCollection:
-            return QueueModelFactory._create_dc(*args, **kwargs)
-        #elif _type is DataCollectionGroup:
-        elif _type is TaskNode:
-            return QueueModelFactory._create_task_node(*args, **kwargs) 
-        elif _type is Sample:
-            return QueueModelFactory._create_sample()
-        elif _type is Characterisation:
-            return QueueModelFactory._create_characterisation(*args, **kwargs)
-        elif _type is EnergyScan:
-            return QueueModelFactory._create_energy_scan(*args, **kwargs)
-        elif _type is SampleCentring:
-            return QueueModelFactory._create_sample_centring(*args, **kwargs)
-
-
-    @staticmethod
-    def _create_sample():
-        sample = Sample()
-        return sample
-
-
-    @staticmethod
-    def _create_task_node(task_list = None):
-        task_node = TaskNode()
-
-        if task_list:
-            for task in task_list:
-                task_node.add_child(task)
-
-        QueueModelFactory.get_root().add_child(task_node)        
-        return task_node
-    
-
-    @staticmethod
-    def _create_dc(parent_task_node, acquisitions, crystal, 
-                   processing_parameters, name = ''):
-    
-        dc = DataCollection()
-        dc.acquisitions = acquisitions
-        dc.crystal = crystal
-        dc.processing_parameters = processing_parameters
-        dc.set_name(name)
+    acquisition = data_collection.acquisitions[0]
+    acq_params = acquisition.acquisition_parameters
+    proc_params = data_collection.processing_parameters
            
-        QueueModelFactory.__collect_context.\
-            add_path_template(dc.acquisitions[0].path_template)
+    return [{'comment': '',
+             'helical': 0,
+             'motors': {},
+             'take_snapshots': acq_params.take_snapshots,
+             'fileinfo': {'directory': acquisition.path_template.directory,
+                          'prefix': acquisition.path_template.prefix,
+                          'run_number': acquisition.path_template.run_number,
+                          'process_directory': acquisition.path_template.process_directory},
+             'in_queue': 0,
+             'detector_mode': 0,
+             'shutterless': acq_params.shutterless,
+             'sessionId': session.session_id,
+             'do_inducedraddam': False,
+             'sample_reference': {'spacegroup': proc_params.space_group,
+                                  'cell': proc_params.get_cell_str()},
+             'processing': str(proc_params.process_data and True),
+             'residues':  proc_params.num_residues,
+             'dark': 'True', #acq_params.take_dark_current,
+             'scan4d': 0,
+             'resolution': {'upper': acq_params.resolution},
+             'transmission': acq_params.transmission,
+             'energy': acq_params.energy,
+             'input_files': 1,
+             'oscillation_sequence': [{'exposure_time': acq_params.exp_time,
+                                       'kappaStart': 0.0,
+                                       'phiStart': 0.0,
+                                       'start_image_number': acq_params.first_image,
+                                       'number_of_images': acq_params.num_images,
+                                       'overlap': acq_params.overlap,
+                                       'start': acq_params.osc_start,
+                                       'range': acq_params.osc_range,
+                                       'number_of_passes': acq_params.num_passes}],
+             'nb_sum_images': 0,
+             'EDNA_files_dir': '',
+             'anomalous': proc_params.anomalous,
+             'file_exists': 0,
+             'experiment_type': EXPERIMENT_TYPE_STR[data_collection.experiment_type],
+             'skip_images': acq_params.skip_existing_images}]
 
-        parent_task_node.add_child(dc)
 
-        return dc
+def next_available_run_number(parent_node, prefix):
+    largest = 0
 
-    
-    @staticmethod
-    def _create_characterisation(parent_task_node, reference_image_collection, 
-                                 char_params, crystal, name):
-        char = Characterisation()
-        char.characterisation_parameters = char_params
-        char.reference_image_collection = reference_image_collection
-        char.set_name(name)
+    for task_node in parent_node.get_children():
+        if task_node.get_prefix() == prefix:
+            if task_node.get_run_number() > largest:
+                largest = task_node.get_run_number()
 
-        char.reference_image_collection.crystal = crystal 
-
-        QueueModelFactory.__collect_context.\
-            add_path_template(reference_image_collection.\
-                                  acquisitions[0].path_template)
-
-        parent_task_node.add_child(char)
-        return char
+    return int(largest)
 
 
-    @staticmethod
-    def _create_energy_scan(parent_task_node, params, sample, path_template):
-        energy_scan = EnergyScan()
-        energy_scan.sample = sample
-
-        energy_scan.path_template = path_template
-        
-        parent_task_node.add_child(energy_scan)
-
-        return energy_scan
-
-
-    @staticmethod
-    def _create_sample_centring(parent_task_node):
-        sc = SampleCentring()
-        parent_task_node.add_child(sc)
-
-        return sc
-    
-
-    @staticmethod
-    def dc_from_edna_output(edna_result, reference_image_collection,
-                            dcg_model, sample_data_model, char_params = None):
+def dc_from_edna_output(edna_result, reference_image_collection,
+                        dcg_model, sample_data_model, session,
+                        char_params = None):
         data_collections = []
 
         crystal = copy.deepcopy(reference_image_collection.crystal)
@@ -1277,13 +984,11 @@ class QueueModelFactory(object):
 
                 sub_dir = dcg_model.get_name().lower().replace(' ','')
 
-                data_directory = QueueModelFactory.get_context().\
-                                 get_image_directory(sample_data_model, 
-                                                     sub_dir = sub_dir)
+                data_directory = session.get_image_directory(sample_data_model,
+                                                             sub_dir = sub_dir)
                 
-                proc_directory = QueueModelFactory.get_context().\
-                                 get_process_directory(sample_data_model,
-                                                       sub_dir = sub_dir)
+                proc_directory = session.get_process_directory(sample_data_model,
+                                                               sub_dir = sub_dir)
                 
                 acq.path_template.directory = data_directory
                 acq.path_template.process_directory = proc_directory
@@ -1356,116 +1061,3 @@ class QueueModelFactory(object):
                 data_collections.append(dc)
             
         return data_collections
-
-
-    @staticmethod
-    def rename(node, new_name):
-        node.set_name(new_name)
-
-        #if isinstance(node, DataCollectionGroup):
-        if isinstance(node, TaskNode):
-            for child in node._children:
-                if isinstance(child, DataCollection):
-                    child.parameters.directory = QueueModelFactory.get_context().\
-                        get_image_directory(sub_dir = new_name)
-                    
-                elif isinstance(child, Characterisation):
-                    child.reference_image_parameters.directory = \
-                        QueueModelFactory.get_context().get_image_directory(sub_dir = new_name)
-
-    @staticmethod
-    def remove(node):
-        parent = node.get_parent()
-        parent.del_child(node)
-
-#
-# Collect hardware object utility function.
-#
-def to_collect_dict(data_collection, collect_context):
-    """ return [{'comment': '',
-          'helical': 0,
-          'motors': {},
-          'take_snapshots': False,
-          'fileinfo': {'directory': '/data/id14eh4/inhouse/opid144/20120808/RAW_DATA',
-                       'prefix': 'opid144', 'run_number': 1,
-                       'process_directory': '/data/id14eh4/inhouse/opid144/20120808/PROCESSED_DATA'},
-          'in_queue': 0,
-          'detector_mode': 2,
-          'shutterless': 0,
-          'sessionId': 32368,
-          'do_inducedraddam': False,
-          'sample_reference': {},
-          'processing': 'False',
-          'residues': '',
-          'dark': True,
-          'scan4d': 0,
-          'input_files': 1,
-          'oscillation_sequence': [{'exposure_time': 1.0,
-                                    'kappaStart': 0.0,
-                                    'phiStart': 0.0,
-                                    'start_image_number': 1,
-                                    'number_of_images': 1,
-                                    'overlap': 0.0,
-                                    'start': 0.0,
-                                    'range': 1.0,
-                                    'number_of_passes': 1}],
-          'nb_sum_images': 0,
-          'EDNA_files_dir': '',
-          'anomalous': 'False',
-          'file_exists': 0,
-          'experiment_type': 'SAD',
-          'skip_images': 0}]"""
-
-    acquisition = data_collection.acquisitions[0]
-    acq_params = acquisition.acquisition_parameters
-    proc_params = data_collection.processing_parameters
-           
-    return [{'comment': '',
-             'helical': 0,
-             'motors': {},
-             'take_snapshots': acq_params.take_snapshots,
-             'fileinfo': {'directory': acquisition.path_template.directory,
-                          'prefix': acquisition.path_template.prefix,
-                          'run_number': acquisition.path_template.run_number,
-                          'process_directory': acquisition.path_template.process_directory},
-             'in_queue': 0,
-             'detector_mode': 0,
-             'shutterless': acq_params.shutterless,
-             'sessionId': collect_context.session_id,
-             'do_inducedraddam': False,
-             'sample_reference': {'spacegroup': proc_params.space_group,
-                                  'cell': proc_params.get_cell_str()},
-             'processing': str(proc_params.process_data and True),
-             'residues':  proc_params.num_residues,
-             'dark': 'True', #acq_params.take_dark_current,
-             'scan4d': 0,
-             'resolution': {'upper': acq_params.resolution},
-             'transmission': acq_params.transmission,
-             'energy': acq_params.energy,
-             'input_files': 1,
-             'oscillation_sequence': [{'exposure_time': acq_params.exp_time,
-                                       'kappaStart': 0.0,
-                                       'phiStart': 0.0,
-                                       'start_image_number': acq_params.first_image,
-                                       'number_of_images': acq_params.num_images,
-                                       'overlap': acq_params.overlap,
-                                       'start': acq_params.osc_start,
-                                       'range': acq_params.osc_range,
-                                       'number_of_passes': acq_params.num_passes}],
-             'nb_sum_images': 0,
-             'EDNA_files_dir': '',
-             'anomalous': proc_params.anomalous,
-             'file_exists': 0,
-             'experiment_type': EXPERIMENT_TYPE_STR[data_collection.experiment_type],
-             'skip_images': acq_params.skip_existing_images}]
-
-
-def next_available_run_number(parent_node, prefix):
-    largest = 0
-
-    for task_node in parent_node.get_children():
-        if task_node.get_prefix() == prefix:
-            if task_node.get_run_number() > largest:
-                largest = task_node.get_run_number()
-
-    return int(largest)

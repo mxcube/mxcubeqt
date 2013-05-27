@@ -8,7 +8,6 @@ from SpecScanPlotBrick import SpecScanPlotBrick
 
 
 class EnergyScanParametersWidget(qt.QWidget):
-
     def __init__(self, parent = None, name = "energy_scan_tab_widget"):
         qt.QWidget.__init__(self, parent, name)
 
@@ -46,15 +45,9 @@ class EnergyScanParametersWidget(qt.QWidget):
         self.energy_scan = energy_scan
         self.data_path_widget.update_data_model(energy_scan.path_template)
         
-        new_path = queue_model.QueueModelFactory().\
-            get_context().build_image_path(energy_scan.path_template)
-
         self.periodic_table.periodicTable.\
             tableElementChanged(energy_scan.symbol)
-                
-        self.data_path_widget.set_data_path(new_path)
-
-
+        
     def element_clicked(self, symbol, energy):
         self.energy_scan.symbol = symbol
         self.energy_scan.edge = energy

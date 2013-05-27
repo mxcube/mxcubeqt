@@ -92,11 +92,6 @@ class DCParametersWidget(QWidget):
         self.processing_widget.update_data_model(data_collection.\
                                                      processing_parameters)
 
-        #new_path = queue_model.QueueModelFactory().\
-        #    get_context().build_image_path(data_collection.\
-        #                                       acquisitions[0].path_template)
-                
-        #self.path_widget.set_data_path(new_path)
         self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
 
         if data_collection.acquisitions[0].acquisition_parameters.\

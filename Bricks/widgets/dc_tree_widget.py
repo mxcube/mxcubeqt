@@ -202,24 +202,10 @@ class DataCollectTree(QWidget):
                 menu.insertItem(QString("Details"), self.show_details)
             
             menu.insertItem(QString("Collect"), self.context_collect_item)
-
-
-    # def copy_generic_dc_list_item(self):
-    #     dcs = self.get_selected_items()
-
-    #     if len(dcs) == 1:
-    #         task_node_item = dcs[0].parent()
-
-    #         # Copy the model node
-    #         dc = dcs[0].data
-    #         dc_copy = queue_model.QueueModelFactory.copy(type(dc), dc)
             
-    #         self._add_dc(task_node_item, dc_copy)
-
 
     def item_double_click(self):
         self.show_details()
-
 
 
     def context_collect_item(self):
@@ -277,23 +263,7 @@ class DataCollectTree(QWidget):
                 warning("The image name is not unique, " + \
                 " change the run number to not overwrite your data.")
         
-        queue_model.QueueModelFactory().\
-            rename(item.data, str(text))
-
-        # if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-            
-        #     item.data.name = str(text)
-
-        #     child_item = item.firstChild()
-        #     while child_item:
-        #         context = queue_model.QueueModelFactory().get_context()
-
-             
-        #         child_item.data.parameters.directory = \
-        #             context.construct_dir_name(postfix = item.data.name)
-                
-        #         child_item = child_item.nextSibling()
-
+        item.set_name(str(text))
             
         if isinstance(item, queue_item.DataCollectionQueueItem) or \
                 isinstance(item, queue_item.CharacterisationQueueItem):
@@ -400,7 +370,7 @@ class DataCollectTree(QWidget):
 
     def add_empty_task_node(self):
         samples = self.get_selected_samples()
-        task_node = queue_model.QueueModelFactory.create(queue_model.TaskNode)
+        task_node = queue_model.TaskGroup()
         task_node.set_name('Collection group')
 
         task_node_tree_item = \
@@ -661,8 +631,8 @@ class DataCollectTree(QWidget):
                     if isinstance(item, queue_item.DataCollectionQueueItem):
                         self.tree_brick.show_sample_centring_tab()
 
-                    queue_model.QueueModelFactory().remove(item.get_model())
                     parent = item.parent()
+                    parent.del_child(item)
                     qe = item.get_queue_entry()
                     parent.get_queue_entry().dequeue(qe)
                     parent.takeItem(item)
