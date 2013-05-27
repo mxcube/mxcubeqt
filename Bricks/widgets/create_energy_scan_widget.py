@@ -71,10 +71,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if self.periodic_table.current_edge:
             path_template = copy.deepcopy(self._path_template)
             
-            energy_scan = queue_model.QueueModelFactory.\
-                create(queue_model.EnergyScan, dcg, None, sample,
-                       path_template)
-
+            energy_scan = qeue_model.EnergyScan(dcg, sample, path_template)
             energy_scan.set_name(path_template.prefix + '_' \
                                  + str(path_template.run_number))
             energy_scan.symbol = self.periodic_table.current_element

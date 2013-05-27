@@ -24,6 +24,9 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         # Qt-Slots
         self.defineSlot("populate_parameter_widget",({}))
 
+        # Properties
+        self.addProperty("session", "string", "/session")
+        
         # Layout
         self.stack = QWidgetStack(self, 'stack')
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
@@ -79,6 +82,8 @@ class DCParametersBrick(BaseComponents.BlissWidget):
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-        
-
-        
+      
+    def propertyChanged(self, property_name, old_value, new_value):
+        if property_name == 'session':
+            session_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.path_widget.set_session(session_hwobj)

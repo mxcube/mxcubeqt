@@ -206,6 +206,9 @@ class CreateCharWidget(CreateTaskBase):
                 data_collection.acquisitions[0].acquisition_parameters.\
                     centred_position.snapshot_image = snapshot
 
+                data_collection.acquisitions[0].path_template.suffix = \
+                    self._session_hwobj.suffix
+
                 # Referance images for characterisations should be taken 90 deg apart
                 # this is achived by setting overap to 89
                 data_collection.acquisitions[0].\

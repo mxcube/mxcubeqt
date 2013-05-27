@@ -88,6 +88,10 @@ class AcquisitionWidgetSimple(qt.QWidget):
         pass
 
 
+    def set_bl_config(self, bl_config):
+        pass
+
+
     def set_energy(self, energy, wav):
         energy = round(float(energy), 4)
         self._acquisition_parameters.energy = energy

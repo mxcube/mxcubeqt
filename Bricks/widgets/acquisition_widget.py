@@ -14,13 +14,14 @@ MAD_ENERGY_COMBO_NAMES = {'ip':0, 'pk':1, 'rm1':2, 'rm2':3}
 
 class AcquisitionWidget(qt.QWidget):
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
-                 path_template = None, layout = None):
-        
+                 path_template = None, layout = None):      
         qt.QWidget.__init__(self, parent, name, fl)
 
         #
         # Attributes
         #
+        self._bl_config = None
+
         if acq_params is None:
             self._acquisition_parameters = queue_model.AcquisitionParameters()
         else:
@@ -127,16 +128,16 @@ class AcquisitionWidget(qt.QWidget):
                            self.num_images_ledit_change)
 
 
-        has_shutter_less = queue_model.QueueModelFactory().get_context().\
-                           detector_has_shutterless()
+    def set_bl_config(self, bl_config):
+        self._bl_config = bl_config
+
+        te = bl_config.tunable_wavelength()
+        self.set_tunable_energy(te)
+
+        has_shutter_less = self._bl_config.detector_has_shutterless()
         self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
 
 
-        te = queue_model.QueueModelFactory().get_context().\
-                 tunable_wavelength()
-        self.set_tunable_energy(te)
-        
-            
     def first_image_ledit_change(self, new_value):
         self._path_template.start_num = int(new_value)
 
@@ -150,10 +151,12 @@ class AcquisitionWidget(qt.QWidget):
             self.previous_energy = self._acquisition_parameters.energy
             (name, energy) = self.get_mad_energy()
             self.set_energy(energy, 0)
-            self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, state))
+            self.emit(qt.PYSIGNAL('mad_energy_selected'),
+                      (name, energy, state))
         else:
             self.set_energy(self.previous_energy, 0)
-            self.emit(qt.PYSIGNAL('mad_energy_selected'), ('', self.previous_energy, state))
+            self.emit(qt.PYSIGNAL('mad_energy_selected'),
+                      ('', self.previous_energy, state))
 
 
     def get_mad_energy(self):
@@ -184,6 +187,7 @@ class AcquisitionWidget(qt.QWidget):
             (name, energy) = self.get_mad_energy()
             self.set_energy(energy, 0)
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
+
 
     def set_energy(self, energy, wav):
         energy = round(float(energy), 4)

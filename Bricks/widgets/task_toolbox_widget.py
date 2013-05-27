@@ -93,6 +93,20 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page.set_shape_history(shape_history)
 
 
+    def set_session(self, session_hwobj):
+        self.helical_page.set_session(session_hwobj)
+        self.discrete_page.set_session(session_hwobj)
+        self.char_page.set_session(session_hwobj)
+        self.energy_scan_page.set_session(session_hwobj)
+
+
+    def set_bl_config(self, bl_config):
+        self.helical_page.set_bl_config(bl_config)
+        self.discrete_page.set_bl_config(bl_config)
+        self.char_page.set_bl_config(bl_config)
+        self.energy_scan_page.set_bl_config(bl_config)
+
+
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)
@@ -144,7 +158,7 @@ class TaskToolBoxWidget(qt.QWidget):
                                        create_parent_task_node(item)    
                     self.tree_brick.add_to_queue(parent_task_node,
                                                   item)
-                elif isinstance(item.get_model(), queue_model.TaskNode):
+                elif isinstance(item.get_model(), queue_model.TaskGroup):
                     parent_task_node = item.get_model() 
                     sample = item.parent().get_model()
                     task_list = self.tool_box.currentItem().\

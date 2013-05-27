@@ -230,6 +230,8 @@ class CreateHelicalWidget(CreateTaskBase):
                 start_acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
 
+                start_acq.acquisitions[0].path_template.suffix = \
+                    self.session_hwobj.suffix
 
                 # Add another acquisition for the end position
                 end_acq = queue_model.Acquisition()
@@ -243,9 +245,11 @@ class CreateHelicalWidget(CreateTaskBase):
                 end_acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
 
+                end_acq.acquisitions[0].path_template.suffix = \
+                    self.session_hwobj.suffix
+
                 processing_parameters = copy.deepcopy(self._processing_parameters)
                 
-
                 # Get a list of names in the current collection
                 # group, to check for duplicates and so on.
                 dc_names = []
@@ -255,10 +259,11 @@ class CreateHelicalWidget(CreateTaskBase):
                 dc_name = start_acq.path_template.prefix  + '_'+ \
                     str(start_acq.path_template.run_number)
 
-                dc = queue_model.QueueModelFactory.\
-                    create(queue_model.DataCollection, parent_task_node, 
-                           [start_acq, end_acq], sample.crystals[0], processing_parameters,
-                           name = dc_name)
+                dc = queue_model.DataCollection(parent_task_node,
+                                                [start_acq, end_acq],
+                                                sample.crystals[0],
+                                                processing_parameters,
+                                                name = dc_name)
                 
                 dc.experiment_type = queue_model.EXPERIMENT_TYPE.HELICAL
 

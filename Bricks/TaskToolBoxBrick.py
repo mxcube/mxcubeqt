@@ -19,6 +19,8 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("resolution", "string", "")
         self.addProperty("diffractometer", "string", "")
         self.addProperty("shape-history", "string", "/shape-history")
+        self.addProperty("session", "string", "/session")
+        self.addProperty("bl-config", "string", "/mxlocal")
 
         #Data atributes
         self.shape_history = None
@@ -34,7 +36,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.defineSlot("logged_in", ())
         self.defineSlot("set_session", ())
         self.defineSlot("selection_changed",())
-        #self.defineSlot("position_selected", ())
         self.defineSlot("new_centred_position", ())
 
         # Layout
@@ -59,9 +60,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         d = {}
         self.emit(qt.PYSIGNAL("getView"), (d, ))
         self.shape_history.set_drawing(d.get('drawing', None))
-        #self.drawing_event = shape_history.DrawingEvent(self.shape_history)
-        #self.shape_history.drawing_event = self.drawing_event
-        #self.shape_history.drawing.addDrawingEvent(self.drawing_event)
         self.shape_history.get_drawing_event_handler().\
             selection_cb = self.shape_selected
         self.shape_history.get_drawing_event_handler().\
@@ -124,8 +122,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 
             self.task_tool_box_widget.set_energy_scan_hw_obj(new_value)
 
-
-        if property_name == 'transmission':
+        elif property_name == 'transmission':
             transmission_hwobj = self.getHardwareObject(new_value)
 
             if transmission_hwobj is not None:                
@@ -142,7 +139,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 self.task_tool_box_widget.char_page.\
                     set_transmission(transmission)
             
-        if property_name == 'resolution':
+        elif property_name == 'resolution':
             resolution_hwobj = self.getHardwareObject(new_value)
 
             if resolution_hwobj is not None:
@@ -157,16 +154,24 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                     set_resolution(resolution)
                 self.task_tool_box_widget.char_page.set_resolution(resolution)
 
-        if property_name == "diffractometer":
+        elif property_name == "diffractometer":
             self.diffractometer_hwobj = self.getHardwareObject(new_value)
 
             if self.diffractometer_hwobj:
                 self.diffractometer_hwobj.connect("minidiffStateChanged", \
                                                   self.diffractometer_changed)
 
-
-        if property_name == 'shape-history':
+        elif property_name == 'shape-history':
             self.shape_history = self.getHardwareObject(new_value)
+
+        elif property_name == 'session':
+            self.session_hwobj = self.getHardwareObject(new_value)
+            self.task_tool_box_widget.set_session(self.session_hwobj)
+
+        elif property_name == 'bl-config':            
+            self.bl_config_hwobj = self.getHardwareObject(new_value)
+            self.task_tool_box_widget.set_bl_config(\
+                self.bl_config_hwobj)
 
         #if property_name =='tunable-energy':
         #    self.task_tool_box_widget.set_tunable_energy(new_value)

@@ -19,6 +19,8 @@ class DataPathWidget(qt.QWidget):
         #
         # Attributes
         #
+        self._session_hwobj = None
+        
         if data_model is None:
             self._data_model = queue_model.PathTemplate()
         else:
@@ -77,6 +79,10 @@ class DataPathWidget(qt.QWidget):
                            self._folder_ledit_change)
 
 
+    def set_session(self, session_hwobj):
+        self._session_hwobj = session_hwobj
+
+
     def _browse_clicked(self):
         get_dir = qt.QFileDialog(self)
         given_dir = self._data_model.directory
@@ -92,26 +98,19 @@ class DataPathWidget(qt.QWidget):
 
     def _prefix_ledit_change(self, new_value):
         self._data_model.prefix = str(new_value)
-
-        file_name = queue_model.QueueModelFactory().\
-            get_context().get_image_file_name(self._data_model)
-
+        file_name = self._data_model.get_image_file_name()
         self.data_path_widget_layout.file_name_value_label.setText(file_name)
 
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self._data_model.run_number = int(new_value)
-
-            file_name = queue_model.QueueModelFactory().\
-                get_context().get_image_file_name(self._data_model)
-
+            file_name = self._data_model.get_image_file_name()
             self.data_path_widget_layout.file_name_value_label.setText(file_name)
 
 
     def _folder_ledit_change(self, new_value):        
-        base_image_dir = queue_model.QueueModelFactory().\
-                         get_context().get_base_image_directory()
+        base_image_dir = self._session_hwobj.get_base_image_directory()
 
         new_sub_dir = str(new_value)
 
@@ -135,8 +134,7 @@ class DataPathWidget(qt.QWidget):
 
     
     def set_directory(self, directory):
-        base_image_dir = queue_model.QueueModelFactory().\
-                         get_context().get_base_image_directory()
+        base_image_dir = self._session_hwobj.get_base_image_directory()
 
         dir_parts = directory.split(base_image_dir)
 
@@ -172,7 +170,7 @@ class DataPathWidget(qt.QWidget):
 
     def update_data_model(self, data_model):
         self._data_model = data_model
-        self.set_directory(self._data_model.directory)
+        self.set_data_path(data_model.get_image_path())
         self._data_model_pm.set_model(data_model)
 
 

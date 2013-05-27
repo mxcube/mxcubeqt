@@ -286,12 +286,6 @@ class CharParametersWidget(QWidget):
         self.path_widget.update_data_model(char.reference_image_collection.\
                                            acquisitions[0].path_template)
         
-        new_path = queue_model.QueueModelFactory().\
-            get_context().build_image_path(char.reference_image_collection.\
-                                               acquisitions[0].path_template)
-
-        self.path_widget.set_data_path(new_path)  
-
         if self._data_collection.acquisitions[0].acquisition_parameters.\
                 centred_position.snapshot_image:
             image = self._data_collection.acquisitions[0].\

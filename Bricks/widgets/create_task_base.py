@@ -23,6 +23,9 @@ class CreateTaskBase(qt.QWidget):
          self._current_selected_item = None
          self._path_template = None
          self._energy_scan_result = None
+         self._session_hwobj = None
+         self._bl_config_hwobj = None
+         
 
 
     def set_tree_brick(self, brick):
@@ -31,6 +34,20 @@ class CreateTaskBase(qt.QWidget):
 
     def set_shape_history(self, shape_history):
         self._shape_history = shape_history
+
+
+    def set_session(self, session_hwobj):
+        self._session_hwobj = session_hwobj
+
+        if self._data_path_widget:
+            self._data_path_widget.set_session(session_hwobj)
+
+
+    def set_bl_config(self, bl_config):
+        self._bl_config = bl_config
+
+        if self._acq_widget:
+            self._acq_widget.set_bl_config(bl_config)
 
 
     @abc.abstractmethod
@@ -110,8 +127,7 @@ class CreateTaskBase(qt.QWidget):
 
 
     def get_default_prefix(self, sample_data_node):
-        prefix = queue_model.QueueModelFactory.\
-            get_context().get_default_prefix(sample_data_node)
+        prefix = self._session_hwobj.get_default_prefix(sample_data_node)
 
         return prefix
 
@@ -127,13 +143,13 @@ class CreateTaskBase(qt.QWidget):
             sub_dir = self.get_next_group_name(sample_item).\
                 lower().replace(' ','')
             
-        data_directory = queue_model.QueueModelFactory.\
-                         get_context().get_image_directory(sample_data_node, 
-                                                           sub_dir = sub_dir)
+        data_directory = self._session_hwobj.\
+                         get_image_directory(sample_data_node,
+                                             sub_dir = sub_dir)
 
-        proc_directory = queue_model.QueueModelFactory.\
-                         get_context().get_process_directory(sample_data_node, 
-                                                             sub_dir = sub_dir)
+        proc_directory = self._session_hwobj.\
+                         get_process_directory(sample_data_node,
+                                               sub_dir = sub_dir)
         
 
         return (data_directory,
@@ -173,8 +189,8 @@ class CreateTaskBase(qt.QWidget):
 
             prefix = self.get_default_prefix(sample_data_node)
 
-            run_number = queue_model.QueueModelFactory.\
-                get_context().get_free_run_number(prefix, data_directory)
+            run_number = self._session_hwobj.\
+                         get_free_run_number(prefix, data_directory)
 
             data_path_widget.set_run_number(run_number)
             data_path_widget.set_prefix(prefix)
@@ -197,7 +213,7 @@ class CreateTaskBase(qt.QWidget):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
-    def create_task(self, task_node, sample):
+    def create_task(self, task_node, sample):        
         tasks = self._create_task(task_node, sample)
         
         # Increase run number for next collection

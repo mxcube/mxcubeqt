@@ -54,7 +54,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("energy_scan_hwobj", "string", "")
         self.addProperty("queue", "string", "/queue-controller")
-        self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
+        self.addProperty("session", "string", "/session")
+        #self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
 
         # Qt - Slots
         self.defineSlot("logged_in", ())
@@ -127,30 +128,18 @@ class TreeBrick(BaseComponents.BlissWidget):
 
 
     def refresh_sample_list(self):
-        collect_context = queue_model.QueueModelFactory.get_context()
         lims_client = self._lims_hwobj
-        samples = lims_client.get_samples(collect_context.prop_id,
-                                          collect_context.session_id)
+        
+        samples = lims_client.get_samples(self.session.proposal_id,
+                                          self.session.session_id)
             
         if samples:
             self.dc_tree_widget.init_with_ispyb_data(samples)
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
-                    prop_id = None, start_date = None, prop_code = None, is_inhouse = None):
-
-        collect_context = queue_model.QueueModelFactory.get_context()  
-        collect_context.session_id = session_id
-        collect_context.prop_code = prop_code
-        collect_context.prop_id = prop_id
-        collect_context.start_date = start_date
-
-        try:
-            collect_context.prop_number = int(prop_number)
-        except (TypeError, ValueError):
-            collect_context.prop_number = 0
-        
-
+                    prop_id = None, start_date = None, prop_code = None,
+                    is_inhouse = None):
         # Tried to log into ISPyB but it didnt work for some reason,
         # no valid session.
         if session_id is '':
@@ -159,13 +148,13 @@ class TreeBrick(BaseComponents.BlissWidget):
             logging.getLogger("user_level_log").\
                 warning('Could not log into ISPyB, using inhouse user to collect data.')
             
-            try:
-                self._lims_hwobj.disable()
-            except:
-                logging.warning('Could not disable lims.')
-                traceback.print_exc()
+        #    try:
+        #        self._lims_hwobj.disable()
+        #    except:
+        #        logging.warning('Could not disable lims.')
+        #        traceback.print_exc()
 
-            #collect_context.set_inhouse(True)
+            self.session_hwobj.set_inhouse(True)
         else:
             lims_client = self._lims_hwobj
             samples = lims_client.get_samples(prop_id, session_id)
@@ -208,30 +197,6 @@ class TreeBrick(BaseComponents.BlissWidget):
             
         if property_name == 'dataAnalysis':
             self.data_analysis_hwobj = self.getHardwareObject(new_value)
-
-        if property_name == 'beamlineConfig':
-            self.beamline_config_hwobj = self.getHardwareObject(new_value)
-            try:
-                collect_context = queue_model.QueueModelFactory.get_context()
-                collect_context.beamline_config_hwobj = self.beamline_config_hwobj
-
-                if collect_context.beamline_config_hwobj:
-                    collect_context.suffix = self.beamline_config_hwobj["BCM_PARS"].\
-                                             getProperty("FileSuffix")
-
-                    collect_context.set_exp_hutch(self.beamline_config_hwobj["BCM_PARS"].\
-                                                  getProperty("hutch"))
-
-                    inhouse_proposals = self.beamline_config_hwobj\
-                                        ["INHOUSE_USERS"]["proposal"]
-
-                    for prop in inhouse_proposals:
-                        collect_context.in_house.append((prop.getProperty('code'),
-                                                         prop.getProperty('number')))
-            except:
-                pass
-                
-
 
         if property_name == 'sampleChanger':
             self.sample_changer_hwobj = self.getHardwareObject(new_value)
@@ -276,6 +241,9 @@ class TreeBrick(BaseComponents.BlissWidget):
 
             self.connect(self.xml_rpc_server_hwobj, 'start_queue',
                          self.dc_tree_widget.collect_items)
+
+        if property_name == 'session':
+            self.session_hwobj = self.getHardwareObject(new_value)
 
 
     def get_sc_content(self):

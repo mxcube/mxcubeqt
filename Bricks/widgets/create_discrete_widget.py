@@ -156,6 +156,9 @@ class CreateDiscreteWidget(CreateTaskBase):
                 dc_name = acq.path_template.get_prefix() + '_' + \
                     str(acq.path_template.run_number)
 
+                acq.path_template.suffix = self._session_hwobj.suffix
+                
+
                 dc = queue_model.DataCollection(parent_task_node, [acq],
                                                 sample.crystals[0],
                                                 processing_parameters, 
