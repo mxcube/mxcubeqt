@@ -714,7 +714,7 @@ class PathTemplate(object):
         return path
 
 
-     def get_archive_directory(self):
+    def get_archive_directory(self):
         """
         Returns the archive directory, for longer term storage.
 
