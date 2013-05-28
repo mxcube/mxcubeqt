@@ -2,7 +2,7 @@ from qt import *
 import logging
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
-from BlissFramework.Bricks import SampleChangerBrick3
+import SampleChangerBrick3
 
 __category__ = "mxCuBE"
 
