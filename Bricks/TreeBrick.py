@@ -56,6 +56,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("queue", "string", "/queue-controller")
         self.addProperty("session", "string", "/session")
         #self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
+        self.addProperty("queue_model", "string", "/queue-model")
 
         # Qt - Slots
         self.defineSlot("logged_in", ())
@@ -195,10 +196,10 @@ class TreeBrick(BaseComponents.BlissWidget):
         if property_name == 'dataCollect':
             self.collect_hwobj = self.getHardwareObject(new_value)
             
-        if property_name == 'dataAnalysis':
+        elif property_name == 'dataAnalysis':
             self.data_analysis_hwobj = self.getHardwareObject(new_value)
-
-        if property_name == 'sampleChanger':
+            
+        elif property_name == 'sampleChanger':
             self.sample_changer_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
 
@@ -210,31 +211,26 @@ class TreeBrick(BaseComponents.BlissWidget):
                              self.sample_load_state_changed)
 
 
-        if property_name == 'diffractometer':
+        elif property_name == 'diffractometer':
             self.diffractometer_hwobj = self.getHardwareObject(new_value)
 
             if self.diffractometer_hwobj:
                 self.dc_tree_widget.diffractometer_hwobj = self.getHardwareObject(new_value)
-
         
-        if property_name == 'holder_length_motor':
+        elif property_name == 'holder_length_motor':
             self.dc_tree_widget.hl_motor_hwobj = self.getHardwareObject(new_value)
 
-
-        if property_name == 'lims_client':
+        elif property_name == 'lims_client':
             self._lims_hwobj = self.getHardwareObject(new_value)
 
-
-        if property_name == 'energy_scan_hwobj':
+        elif property_name == 'energy_scan_hwobj':
             self.energy_scan_hwobj = self.getHardwareObject(new_value)
 
-
-        if property_name == 'queue':
+        elif property_name == 'queue':
             self.queue_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
 
-
-        if property_name == 'xml_rpc_server':
+        elif property_name == 'xml_rpc_server':
             self.xml_rpc_server_hwobj = self.getHardwareObject(new_value)
             self.connect(self.xml_rpc_server_hwobj, 'add_to_queue',
                          self.add_to_queue)
@@ -242,8 +238,16 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.connect(self.xml_rpc_server_hwobj, 'start_queue',
                          self.dc_tree_widget.collect_items)
 
-        if property_name == 'session':
+        elif property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)
+
+        elif property_name == 'queue_model':
+            self.queue_model_hwobj = self.getHardwareObject(new_value)
+            self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
+            self.connect(self.queue_model_hwobj, 'child_added',
+                         self.dc_tree_widget.add_to_view)
+
+            self.dc_tree_widget.populate_free_pin()
 
 
     def get_sc_content(self):
@@ -411,8 +415,6 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         self.current_cpos = cpos
 
-
-        
 
     def get_selected_items(self):
         items = self.dc_tree_widget.get_selected_items()
