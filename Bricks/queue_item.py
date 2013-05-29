@@ -2,7 +2,7 @@ import time
 import random
 import copy
 import functools
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import gevent
 import gevent.event
 import collections
@@ -14,11 +14,12 @@ import widgets.widget_utils
 
 from qt import *
 from widgets.position_history_widget import COLLECTION_METHOD_NAME
-from queue_model import COLLECTION_ORIGIN
-from queue_model import STRATEGY_COMPLEXITY
-from queue_model import EXPERIMENT_TYPE
-from queue_model import STRATEGY_OPTION
-from queue_model import COLLECTION_ORIGIN_STR
+from queue_model_objects_v1 import COLLECTION_ORIGIN
+from queue_model_objects_v1 import STRATEGY_COMPLEXITY
+from queue_model_objects_v1 import EXPERIMENT_TYPE
+from queue_model_objects_v1 import STRATEGY_OPTION
+from queue_model_objects_v1 import COLLECTION_ORIGIN_STR
+
 
 class QueueItem(QCheckListItem):
     """
@@ -39,6 +40,7 @@ class QueueItem(QCheckListItem):
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
         self._queue_entry = None
+        self._data_model = None
 
         # All subclasses should have the following
         # data attributes.
@@ -168,7 +170,7 @@ class QueueItem(QCheckListItem):
 
 
     def get_model(self):
-        return self._queue_entry.get_data_model()
+        return self._data_model
 
 
     def get_next_free_name(self, name):
@@ -308,3 +310,13 @@ def is_checked(node):
 
 def print_text(node):
     print "Executing node: " + node.text()
+
+
+MODEL_VIEW_MAPPINGS = \
+    {queue_model_objects.DataCollection: DataCollectionQueueItem,
+     queue_model_objects.Characterisation: CharacterisationQueueItem,
+     queue_model_objects.EnergyScan: EnergyScanQueueItem,
+     queue_model_objects.SampleCentring: SampleCentringQueueItem,
+     queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
+

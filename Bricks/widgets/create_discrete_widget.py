@@ -4,7 +4,7 @@ import queue_item
 import copy
 import widget_utils
 import math
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 
 from qt import *
 from widgets.data_path_widget import DataPathWidget
@@ -29,10 +29,10 @@ class CreateDiscreteWidget(CreateTaskBase):
         #
         # Data attributes
         #
-        self._path_template = queue_model.PathTemplate()
-        self._acquisition_parameters = queue_model.AcquisitionParameters()
-        self._energy_scan_result = queue_model.EnergyScanResult()
-        self._processing_parameters = queue_model.ProcessingParameters()
+        self._path_template = queue_model_objects.PathTemplate()
+        self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+        self._energy_scan_result = queue_model_objects.EnergyScanResult()
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
         self.previous_energy = None
         
 
@@ -103,7 +103,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             if self._tree_brick.diffractometer_hwobj:
                 pos_dict = self._tree_brick.diffractometer_hwobj.getPositions()
-                cpos = queue_model.CentredPosition(pos_dict)
+                cpos = queue_model_objects.CentredPosition(pos_dict)
 
             logging.getLogger("user_level_log").\
                 info("No centred position(s) was selected " + str(cpos) + \
@@ -129,7 +129,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 sc = None
                 
                 if not shape.get_drawing():
-                    sc = queue_model.SampleCentring(parent_task_node)
+                    sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     
                     tasks.append(sc)
@@ -140,11 +140,11 @@ class CreateDiscreteWidget(CreateTaskBase):
                     snapshot = self._shape_history.get_snapshot([])
 
                 # Acquisition for start position
-                acq = queue_model.Acquisition()
+                acq = queue_model_objects.Acquisition()
                 acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 acq.acquisition_parameters.collect_agent = \
-                    queue_model.COLLECTION_ORIGIN.MXCUBE
+                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
                 acq.acquisition_parameters.\
                     centred_position = copy.deepcopy(shape.get_centred_positions()[0])                
                 acq.path_template = copy.deepcopy(self._path_template)
@@ -159,12 +159,12 @@ class CreateDiscreteWidget(CreateTaskBase):
                 acq.path_template.suffix = self._session_hwobj.suffix
                 
 
-                dc = queue_model.DataCollection(parent_task_node, [acq],
+                dc = queue_model_objects.DataCollection([acq],
                                                 sample.crystals[0],
                                                 processing_parameters, 
                                                 name = dc_name)
 
-                dc.experiment_type = queue_model.EXPERIMENT_TYPE.NATIVE
+                dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
 
                 if sc:
                     sc.set_task(dc)

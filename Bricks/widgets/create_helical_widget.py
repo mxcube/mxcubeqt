@@ -1,4 +1,4 @@
-import queue_model
+import queue_model_objects_v1 as queue_model
 import queue_item
 import logging
 import qt

@@ -1,7 +1,7 @@
 import logging
 import queue_item
 import queue_entry
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import qt
 
 from BlissFramework import Icons
@@ -147,24 +147,26 @@ class TaskToolBoxWidget(qt.QWidget):
 
     def create_task_button_click(self):
         items = self.tree_brick.get_selected_items()
-        self.create_task(items)
+
+        for item in items:
+            self.create_task(item.get_model())
+            self.tool_box.currentItem().selection_changed(item)
 
 
-    def create_task(self, items = None):
-        if self.tool_box.currentItem().approve_creation():
-            for item in items:
-                if isinstance(item.get_model(), queue_model.Sample):
-                    parent_task_node = self.tool_box.currentItem().\
-                                       create_parent_task_node(item)    
-                    self.tree_brick.add_to_queue(parent_task_node,
-                                                  item)
-                elif isinstance(item.get_model(), queue_model.TaskGroup):
-                    parent_task_node = item.get_model() 
-                    sample = item.parent().get_model()
-                    task_list = self.tool_box.currentItem().\
-                                create_task(parent_task_node, sample)
-                    self.tree_brick.add_to_queue(task_list, item)
-                else:
-                    self.create_task([item.parent()])
+    def create_task(self, task_node):
+        if self.tool_box.currentItem().approve_creation(): 
+            if isinstance(task_node, queue_model_objects.Sample):
+                group_task_node = self.tool_box.currentItem().\
+                                  create_parent_task_node()
+                self.tree_brick.queue_model_hwobj.add_child(task_node,
+                                                            group_task_node)
+                self.create_task(group_task_node)
+                    
+            elif isinstance(task_node, queue_model_objects.TaskGroup):
+                sample = task_node.get_parent()
+                task_list = self.tool_box.currentItem().\
+                            create_task(task_node, sample)
 
-                self.tool_box.currentItem().selection_changed(item)
+                for child_task_node in task_list:
+                    self.tree_brick.queue_model_hwobj.\
+                        add_child(task_node, child_task_node)

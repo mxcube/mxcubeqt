@@ -1,7 +1,7 @@
 import qt
 import logging
 import queue_item
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import widget_utils
 import abc
 
@@ -244,11 +244,8 @@ class CreateTaskBase(qt.QWidget):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a sample is selected.
-    def create_parent_task_node(self, sample_item):
-        sample_node = sample_item.get_model()
-        task_node = queue_model.TaskGroup(sample_node)
-        task_node.set_name(sample_item.get_next_free_name(self._task_node_name))
-
-        self.create_task(task_node, sample_node)
+    def create_parent_task_node(self):
+        group_task_node = queue_model_objects.TaskGroup()
+        group_task_node.set_name(self._task_node_name)
                                 
-        return [task_node]
+        return group_task_node
