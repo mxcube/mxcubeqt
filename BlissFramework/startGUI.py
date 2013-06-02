@@ -33,12 +33,10 @@ def run(GUIConfigFile=None):
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
 
     parser = OptionParser(usage = 'usage: %prog <GUI definition file> [options]')
-    parser.add_option('', '--no-opengl', action="store_true", dest="disableOpenGL", default=False, help="Disable OpenGL support")
     parser.add_option('', '--logFile', action = 'store', type = 'string', help = 'Log file', dest = 'logFile', metavar = 'FILE', default = '')
     parser.add_option('', '--bricksDirs', action = 'store', type = 'string', help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
     parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
     parser.add_option('', '--hardwareObjectsDirs', action = 'store', type = 'string', help = 'Additional directories for Hardware Objects search path (you can also use the CUSTOM_HARDWARE_OBJECTS_PATH environment variable)', dest = 'hardwareObjectsDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
-    parser.add_option('-x', '', action='store_true', dest="executionOnly", default=False, help="start GUI for execution only (no switch to design mode, no reload available)")
     parser.add_option('-d', '', action='store_true', dest="designMode", default=False, help="start GUI in Design mode")
     parser.add_option('-m', '', action='store_true', dest="showMaximized", default=False, help="maximize main window")	
     parser.add_option('', '--no-border', action='store_true', dest='noBorder', default=False, help="does not show borders on main window")
@@ -115,11 +113,6 @@ def run(GUIConfigFile=None):
     BlissFramework.addCustomBricksDirs(bricksDirs)
     
     #
-    # set OpenGL support
-    #
-    BlissFramework.setOpenGLEnabled(not opts.disableOpenGL)
-
-    #
     # set log name and log file
     #
     if GUIConfigFile:
@@ -192,7 +185,7 @@ def run(GUIConfigFile=None):
     QApplication.setDesktopSettingsAware(False) #use default settings
     QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
    
-    supervisor = GUISupervisor.GUISupervisor(executionOnly = opts.executionOnly, designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
+    supervisor = GUISupervisor.GUISupervisor(designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
 
     #BlissFramework.setDebugMode(True)
     #
