@@ -1,5 +1,5 @@
 import qt
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import logging
 import traceback
 import ShapeHistory as shape_history
@@ -226,7 +226,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
 
 
         if p_dict:
-            cpos = queue_model.CentredPosition(p_dict)
+            cpos = queue_model_objects.CentredPosition(p_dict)
             #self.position_history.add_centred_position(state, cpos)
             
             try:

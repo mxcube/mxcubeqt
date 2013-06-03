@@ -1,10 +1,11 @@
 import traceback
-import queue_item
-import queue_model
 import logging
 import sys
 import time
 import os
+
+import queue_item
+import queue_model_objects_v1 as queue_model_objects
 
 from BlissFramework import Icons
 from BlissFramework.Utils import widget_colors
@@ -411,7 +412,7 @@ class TreeBrick(BaseComponents.BlissWidget):
             p_dict = dict(centring_status['motors']) 
 
         if p_dict:
-            cpos = queue_model.CentredPosition(p_dict)
+            cpos = queue_model_objects.CentredPosition(p_dict)
 
         self.current_cpos = cpos
 

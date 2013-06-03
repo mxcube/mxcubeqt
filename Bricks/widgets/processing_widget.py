@@ -1,4 +1,4 @@
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import qt
 
 from widgets.widget_utils import DataModelInputBinder
@@ -12,7 +12,7 @@ class ProcessingWidget(qt.QWidget):
         qt.QWidget.__init__(self, parent, name, fl)
 
         if data_model is None:
-            self._model = queue_model.ProcessingParameters()
+            self._model = queue_model_objects.ProcessingParameters()
         else:
             self._model = data_model
 

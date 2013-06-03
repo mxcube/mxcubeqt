@@ -1,5 +1,5 @@
 import qt
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 
 #from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
@@ -12,7 +12,7 @@ class EnergyScanParametersWidget(qt.QWidget):
         qt.QWidget.__init__(self, parent, name)
 
         # Data Attributes
-        self.energy_scan = queue_model.EnergyScan()
+        self.energy_scan = queue_model_objects.EnergyScan()
 
         # Layout
         h_layout = qt.QHBoxLayout(self, 0, 0, "main_v_layout")

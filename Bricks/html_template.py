@@ -1,5 +1,4 @@
 import math
-import queue_model
 
 
 HEADER = "<p><h1> Data Collection - Result Summary </h1></br></p>"

@@ -1,4 +1,4 @@
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import queue_item
 import copy
 import widget_utils
@@ -28,13 +28,13 @@ class CreateCharWidget(CreateTaskBase):
         #
         # Data attributes
         #        
-        self._char = queue_model.Characterisation(None)
+        self._char = queue_model_objects.Characterisation(None)
         self._data_collection = self._char.reference_image_collection
         self._path_template = self._data_collection.\
                               acquisitions[0].path_template
         
         self._char_params = self._char.characterisation_parameters
-        self._char_params.experiment_type = queue_model.EXPERIMENT_TYPE.OSC
+        self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
         self._char_params_mib = DataModelInputBinder(self._char_params)
 
         self._current_selected_item = None
@@ -43,7 +43,7 @@ class CreateCharWidget(CreateTaskBase):
         self._data_collection.acquisitions[0].\
             acquisition_parameters.num_images = 2
         self._char.characterisation_software =\
-            queue_model.COLLECTION_ORIGIN.EDNA
+            queue_model_objects.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
 
         self._path_template.reference_image_prefix = 'ref'
@@ -151,7 +151,7 @@ class CreateCharWidget(CreateTaskBase):
 #         if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
 #                isinstance(tree_item, queue_item.DataCollectionQueueItem):
             
-#             run_number = queue_model.\
+#             run_number = queue_model_objects.\
 #                          get_largest_prefix_with_name(tree_item, 
 #                              self._data_collection.acquisitions[0].path_template.prefix) + 1 
 #             self.set_run_number(run_number)
@@ -171,7 +171,7 @@ class CreateCharWidget(CreateTaskBase):
             
             if self._tree_brick.diffractometer_hwobj:
                 pos_dict = self._tree_brick.diffractometer_hwobj.getPositions()
-                cpos = queue_model.CentredPosition(pos_dict)
+                cpos = queue_model_objects.CentredPosition(pos_dict)
 
             logging.getLogger("user_level_log").\
                 info("No centred position(s) was selected " + str(cpos) + \
@@ -188,7 +188,7 @@ class CreateCharWidget(CreateTaskBase):
                 sc = None
                  
                 if not shape.get_drawing():
-                    sc = queue_model.SampleCentring(parent_task_node)
+                    sc = queue_model_objects.SampleCentring(parent_task_node)
                     sc.set_name('sample-centring')
                     tasks.append(sc)
 
@@ -214,7 +214,7 @@ class CreateCharWidget(CreateTaskBase):
                 data_collection.acquisitions[0].\
                     acquisition_parameters.overlap = 89
 
-                data_collection.experiment_type = queue_model.EXPERIMENT_TYPE.EDNA_REF
+                data_collection.experiment_type = queue_model_objects.EXPERIMENT_TYPE.EDNA_REF
                 data_collection.crystal = sample.crystals[0]
 
                 if sc:
@@ -223,7 +223,7 @@ class CreateCharWidget(CreateTaskBase):
                 char_name = data_collection.acquisitions[0].path_template.get_prefix() + '_' + \
                     str(data_collection.acquisitions[0].path_template.run_number)
 
-                char = queue_model.Characterisation(parent_task_node,
+                char = queue_model_objects.Characterisation(parent_task_node,
                                                     data_collection, 
                                                     char_params, char_name)
 

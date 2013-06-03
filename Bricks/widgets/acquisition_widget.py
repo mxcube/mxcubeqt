@@ -1,5 +1,5 @@
-import queue_model
 import qt
+import queue_model_objects_v1 as queue_model_objects
 
 
 from widgets.acquisition_widget_vertical_layout \
@@ -23,12 +23,12 @@ class AcquisitionWidget(qt.QWidget):
         self._bl_config = None
 
         if acq_params is None:
-            self._acquisition_parameters = queue_model.AcquisitionParameters()
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         else:
             self._acquisition_parameters = acq_params
 
         if path_template is None:
-            self._path_template = queue_model.PathTemplate()
+            self._path_template = queue_model_objects.PathTemplate()
         else:
             self._path_template = path_template
 

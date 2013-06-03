@@ -1,5 +1,5 @@
 import os
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import logging
 import copy
 
@@ -17,7 +17,7 @@ from widgets.snapshot_widget_layout import\
 from widgets.processing_widget \
     import ProcessingWidget
 
-from queue_model import COLLECTION_ORIGIN
+from queue_model_objects_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
 
 

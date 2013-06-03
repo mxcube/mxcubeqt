@@ -1,7 +1,7 @@
 import qt
 import os
-import queue_model
 import logging
+import queue_model_objects_v1 as queue_model_objects
 
 from widgets.data_path_widget_horizontal_layout \
     import DataPathWidgetHorizontalLayout
@@ -22,7 +22,7 @@ class DataPathWidget(qt.QWidget):
         self._session_hwobj = None
         
         if data_model is None:
-            self._data_model = queue_model.PathTemplate()
+            self._data_model = queue_model_objects.PathTemplate()
         else:
             self._data_model = data_model
         

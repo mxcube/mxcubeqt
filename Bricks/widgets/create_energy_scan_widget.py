@@ -2,7 +2,7 @@ import qt
 import logging
 import copy
 import queue_item
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import sys
 
 #from PyMca import QPeriodicTable
@@ -17,8 +17,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, fl, 'Energy-scan')
 
         # Data attributes
-        self.enery_scan = queue_model.EnergyScan()
-        self._path_template = queue_model.PathTemplate()
+        self.enery_scan = queue_model_objects.EnergyScan()
+        self._path_template = queue_model_objects.PathTemplate()
 
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 5, "main_v_layout")

@@ -1,8 +1,7 @@
+import os
 import qt
 import queue_item
-import queue_model
-import os
-
+import queue_model_objects_v1 as queue_model_objects
 
 from widgets.confirm_dialog_widget_vertical_layout \
      import ConfirmDialogWidgetVerticalLayout
@@ -74,8 +73,8 @@ class ConfirmDialog(qt.QDialog):
             if isinstance(item, queue_item.SampleQueueItem):
                 self.sample_items.append(item)
                 current_sample_item = item                
-            if isinstance(item.get_model(), queue_model.DataCollection) or\
-                   isinstance(item.get_model(), queue_model.Characterisation):
+            if isinstance(item.get_model(), queue_model_objects.DataCollection) or\
+                   isinstance(item.get_model(), queue_model_objects.Characterisation):
                 collection_items.append(item)
                 file_paths = item.get_model().get_files_to_be_written()
                 num_images += len(file_paths)

@@ -1,6 +1,6 @@
 import os
 import array
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 
 from qt import *
 from qttable import QTable, QTableItem
@@ -19,7 +19,7 @@ from widgets.widget_utils import DataModelInputBinder
 from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
 
-from queue_model import COLLECTION_ORIGIN
+from queue_model_objects_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
 
 class CharParametersWidget(QWidget):
@@ -30,7 +30,7 @@ class CharParametersWidget(QWidget):
         # Private members
         #
         self._data_collection = None
-        self._char_params = queue_model.CharacterisationParameters()
+        self._char_params = queue_model_objects.CharacterisationParameters()
         self._char_params_mib = DataModelInputBinder(self._char_params)
         self.previous_energy = None
         

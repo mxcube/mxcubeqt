@@ -1,5 +1,6 @@
 import qt
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
+
 
 from BlissFramework import BaseComponents
 from widgets.crystal_widget_layout import CrystalWidgetLayout
@@ -15,7 +16,7 @@ class SampleDetailsBrick(BaseComponents.BlissWidget):
         #
         # Data attributes
         #
-        self.sample = queue_model.Sample(None)
+        self.sample = queue_model_objects.Sample()
         self.crystal = self.sample.crystals[0]
         self.sample_mib = DataModelInputBinder(self.sample)
         self.crystal_mib = DataModelInputBinder(self.crystal)

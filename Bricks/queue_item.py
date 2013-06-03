@@ -9,7 +9,6 @@ import collections
 import logging
 import os
 import pprint
-import qub_helper
 import widgets.widget_utils
 
 from qt import *
