@@ -579,9 +579,9 @@ class MiniDiff(Equipment):
           #img_array.shape = (imgHeight, imgWidth)
           #info, x, y = lucid.find_loop(img_array,zoom=zoom)
           if zoom ==0:
-              info, x, y = lucid.find_loop_byimg("/tmp/mxCuBE_snapshot.jpg", showVisuals=0, zoom=zoom)
+              info, x, y = lucid.find_loop("/tmp/mxCuBE_snapshot.jpg", showVisuals=0, zoom=zoom)
           else:
-              info, x, y = lucid.loop_center_mm("/tmp/mxCuBE_snapshot.jpg", showVisuals=0,virtCenter=virtCenter)
+              info, x, y = lucid.find_loop_mesh("/tmp/mxCuBE_snapshot.jpg", showVisuals=False,zoom=zoom,virtCenter=virtCenter)
           self.emitProgressMessage("Loop found: %s (%d, %d)" % (info, x, y))
           logging.debug("Loop found: %s (%d, %d)" % (info, x, y))
           if show_point:
@@ -591,7 +591,7 @@ class MiniDiff(Equipment):
         def face_finder(zoom=0):
           img_array = numpy.fromstring(camera.getChannelObject("image").getValue(), numpy.uint8)
           img_array.shape = (imgHeight, imgWidth)
-          num = lucid.face_finder(img_array, zoom)
+          num = lucid.find_face(img_array, zoom=zoom)
           logging.info("loop size: %d", num)
           return num
 
@@ -739,14 +739,14 @@ class MiniDiff(Equipment):
               co-=1
           
           # last centring
-          motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1,lastCoord)
+          motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,2,lastCoord)
           gevent.spawn(move_to_centred_position, motor_pos).get()
-          checked,lastCoord = check_centring(1)
+          checked,lastCoord = check_centring(2)
           if checked:
              #find_face(1)
              return motor_pos
           else:
-             motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,1)
+             motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,2)
              gevent.spawn(move_to_centred_position, motor_pos).get()
              if (check_centring(1))[0]:
                 #find_face(1)
