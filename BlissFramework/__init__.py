@@ -106,18 +106,7 @@ def setLogFile(filename):
 #
 # general framework settings
 #
-_OpenGLEnabled = True
 _useDumbDbm = False
-
-
-def setOpenGLEnabled(o):
-    global _OpenGLEnabled
-
-    _OpenGLEnabled = o
-
-
-def isOpenGLEnabled():
-    return _OpenGLEnabled
 
 
 def setUseDumbDbm(d):

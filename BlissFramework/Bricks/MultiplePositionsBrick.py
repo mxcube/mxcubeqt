@@ -539,6 +539,7 @@ class QubRadioGroup(qt.QFrame):
         else:
             self.layout = qt.QVBoxLayout(self)
         self.layout.setMargin(5)
+        self.layout.setSpacing(20)
         
         self.buttonList = {}
         
