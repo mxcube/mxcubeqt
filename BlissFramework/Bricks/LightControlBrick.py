@@ -15,7 +15,7 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
 
         self.addProperty('wagolight', 'string', '')
         self.addProperty('wagoicons', 'string', '')
-        self.addProperty('out_delta', 'string', '')
+        self.addProperty('changeIntensity', 'boolean', True)
 
         self.lightOffButton=QPushButton("0",self.extraButtonsBox)
         self.lightOffButton.setPixmap(Icons.load('far_left'))
@@ -43,17 +43,15 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
         if self.wagoLight is not None:
             if self.wagoLight.getWagoState()!="out":
                 if self.motor is not None:
-                    try:
+                  if self['changeIntensity']:
+                      try:
                         self.lightSavedPosition=self.motor.getPosition()
-                    except:
+                      except:
                         logging.exception("could not get light actuator position")
                         self.lightSavedPosition=None
-                    if self['out_delta']!="":
-                        delta=float(self['out_delta'])
-                    else:
-                        delta=0.0
-                    light_limits=self.motor.getLimits()
-                    self.motor.move(light_limits[0]+delta)
+                      delta=0.0
+                      light_limits=self.motor.getLimits()
+                      self.motor.move(light_limits[0]+delta)
                 self.wagoLightStateChanged('unknown')
                 self.wagoLight.wagoOut()
             else:
