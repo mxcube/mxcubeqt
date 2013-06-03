@@ -136,6 +136,7 @@ class AcquisitionWidget(qt.QWidget):
 
         has_shutter_less = self._bl_config.detector_has_shutterless()
         self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
+        self.acq_widget_layout.shutterless_cbx.setOn(has_shutter_less)
 
 
     def first_image_ledit_change(self, new_value):
