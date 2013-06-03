@@ -247,9 +247,11 @@ class MiniDiff(Equipment):
             self.connect(self.lightWago, 'wagoStateChanged', self.wagoLightStateChanged)
         else:
             logging.getLogger("HWR").warning('MiniDiff: wago light is not defined in minidiff equipment %s', str(self.name()))
+        self.last_aperture_position = None
         if self.aperture is not None:
             self.connect(self.aperture, 'predefinedPositionChanged', self.apertureChanged)
             self.connect(self.aperture, 'positionReached', self.apertureChanged)
+            self.last_aperture_position = self.aperture.getPosition()
  
         try:
           self.auto_loop_centring = self.getChannelObject("auto_centring_flag")
@@ -318,9 +320,12 @@ class MiniDiff(Equipment):
             self.camera is not None
 
 
-    def apertureChanged(self, *args):
+    def apertureChanged(self, aperture_pos_name, *args):
         # will trigger minidiffReady signal for update of beam size in video
         self.equipmentReady()
+        if aperture_pos_name:
+          # save last known aperture pos.
+          self.last_aperture_position = aperture_pos_name
          
 
     def equipmentReady(self):
@@ -550,6 +555,8 @@ class MiniDiff(Equipment):
     def autoCentringDone(self, auto_centring_procedure):
         self.emitProgressMessage("")
         self.emit("newAutomaticCentringPoint", (-1,-1))
+        if self.last_aperture_position:
+          gevent.spawn(self.aperture.moveToPosition, self.last_aperture_position)
 
         if auto_centring_procedure.get():
             self.emitCentringSuccessful()
@@ -704,6 +711,10 @@ class MiniDiff(Equipment):
           positions = zoom.getPredefinedPositionsList()
           i = len(positions) / 2
           zoom.moveToPosition(positions[i-1])
+
+          #move back aperture
+          if self.last_aperture_position: 
+              gevent.spawn(self.aperture.moveToPosition, self.last_aperture_position)
 
           #be sure zoom stop moving
           while zoom.motorIsMoving():
