@@ -2,11 +2,16 @@ import logging
 from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
+from BlissFramework.Utils import widget_colors
 
 __category__ = 'mxCuBE'
 
 class EnergyBrick(BlissWidget):
-    STATE_COLORS = {'error':QWidget.red, 'moving':QWidget.yellow, 'ready':QWidget.green, 'changed':QColor(255,165,0), 'outlimits':QWidget.red}
+    STATE_COLORS = {'error': widget_colors.LIGHT_RED, 
+                    'moving':widget_colors.LIGHT_YELLOW, 
+                    'ready': widget_colors.LIGHT_GREEN, 
+                    'changed':QColor(255,165,0), 
+                    'outlimits': widget_colors.LIGHT_RED}
 
     MAX_HISTORY = 20
 
@@ -49,13 +54,16 @@ class EnergyBrick(BlissWidget):
 
         box1=QHBox(self.paramsBox)
         self.currentEnergy=myLineEdit(box1)
+        self.currentEnergy.setFixedWidth(90)
         self.currentWavelength=myLineEdit(box1)
+        self.currentWavelength.setFixedWidth(60)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)
         self.paramsBox.layout().addWidget(label2, 1, 0)
 
         self.newValue=QLineEdit(self.paramsBox)
+        self.newValue.setFixedWidth(50)
         self.paramsBox.layout().addWidget(self.newValue, 1, 1)
         self.newValue.setValidator(QDoubleValidator(self))
         self.newValue.setAlignment(QWidget.AlignRight)
@@ -75,15 +83,15 @@ class EnergyBrick(BlissWidget):
 
         box2=QHBox(self.paramsBox)
         box2.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
-        self.applyButton=QPushButton("+",box2)
-        QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentValue)
+        #self.applyButton=QPushButton("+",box2)
+        #QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentValue)
         self.stopButton=QPushButton("*",box2)
         self.stopButton.setEnabled(False)
         QObject.connect(self.stopButton,SIGNAL('clicked()'),self.stopClicked)
         #HorizontalSpacer(box2)
         self.paramsBox.layout().addWidget(box2, 1, 3)
 
-        self.applyButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
+        #self.applyButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
         self.stopButton.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.MinimumExpanding)
 
         self.staticBox = QWidget(self.topBox)
@@ -93,7 +101,7 @@ class EnergyBrick(BlissWidget):
         
         self.staticEnergy=myLineEdit(self.staticBox)
         f=self.staticEnergy.font()
-        f.setBold(True)
+        #f.setBold(True)
         self.staticEnergy.setFont(f)
         self.staticBox.layout().addWidget(self.staticEnergy, 0, 1)
 
@@ -153,10 +161,10 @@ class EnergyBrick(BlissWidget):
         elif propertyName == 'icons':
             icons_list=newValue.split()
 
-            try:
-                self.applyButton.setPixmap(Icons.load(icons_list[0]))
-            except IndexError:
-                pass
+            #try:
+            #    self.applyButton.setPixmap(Icons.load(icons_list[0]))
+            #except IndexError:
+            #    pass
 
             try:
                 self.stopButton.setPixmap(Icons.load(icons_list[1]))
@@ -332,12 +340,12 @@ class EnergyBrick(BlissWidget):
         f_kev=self.currentEnergy.font()
         f_ang=self.currentWavelength.font()
         if unit==chr(197):
-            f_kev.setBold(False)
-            f_ang.setBold(True)
+            #f_kev.setBold(False)
+            #f_ang.setBold(True)
             self.topBox.setTitle('Wavelength')
         elif unit=="keV":
-            f_kev.setBold(True)
-            f_ang.setBold(False)
+            #f_kev.setBold(True)
+            #f_ang.setBold(False)
             self.topBox.setTitle('Energy')
         self.currentEnergy.setFont(f_kev)
         self.currentWavelength.setFont(f_ang)
@@ -351,7 +359,7 @@ class EnergyBrick(BlissWidget):
             if kev<self.energyLimits[0] or kev>self.energyLimits[1]:
                 return
         self.energy.startMoveEnergy(kev, wait=False)
-        self.applyButton.setEnabled(False)
+        #self.applyButton.setEnabled(False)
         self.newValue.setEnabled(False)
         self.units.setEnabled(False)            
 
@@ -360,7 +368,7 @@ class EnergyBrick(BlissWidget):
             if ang<self.wavelengthLimits[0] or ang>self.wavelengthLimits[1]:
                 return
         self.energy.startMoveWavelength(ang, wait=False)
-        self.applyButton.setEnabled(False)
+        #self.applyButton.setEnabled(False)
         self.newValue.setEnabled(False)
         self.units.setEnabled(False)
 
@@ -377,7 +385,7 @@ class EnergyBrick(BlissWidget):
 
     def changeEnergyReady(self,state):
         self.newValue.setEnabled(state)
-        self.applyButton.setEnabled(state)
+        #self.applyButton.setEnabled(state)
 
     def changeEnergyStarted(self):
         self.stopButton.setEnabled(True)
@@ -390,7 +398,7 @@ class EnergyBrick(BlissWidget):
         #self.newValue.blockSignals(False)
         self.newValue.setEnabled(True)
         self.units.setEnabled(True)
-        self.applyButton.setEnabled(True)
+        #self.applyButton.setEnabled(True)
         self.setWidgetColor('ready')
 
         """
@@ -417,7 +425,7 @@ class EnergyBrick(BlissWidget):
         #self.newValue.blockSignals(False)
         self.newValue.setEnabled(True)
         self.units.setEnabled(True)
-        self.applyButton.setEnabled(True)
+        #self.applyButton.setEnabled(True)
         self.setWidgetColor('error')
 
     def stopClicked(self):

@@ -1,8 +1,11 @@
 import logging
+import types
+
 from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
-import types
+from BlissFramework.Utils import widget_colors
+
 
 __category__ = 'mxCuBE'
 
@@ -15,12 +18,14 @@ class ResolutionGUIEvent(QCustomEvent):
 """
 
 class ResolutionBrick(BlissWidget):
-    STATE_COLORS = (QWidget.red, QWidget.red,\
-        QWidget.green,\
-        QWidget.yellow, QWidget.yellow,\
-        QWidget.darkYellow,\
-        QColor(255,165,0),\
-        QWidget.red)
+    STATE_COLORS = (widget_colors.LIGHT_RED, 
+                    widget_colors.LIGHT_RED,
+                    widget_colors.LIGHT_GREEN,
+                    widget_colors.LIGHT_YELLOW, 
+                    widget_colors.LIGHT_YELLOW,
+                    QWidget.darkYellow,
+                    QColor(255,165,0),
+                    widget_colors.LIGHT_RED)
 
     MAX_HISTORY = 20
 
@@ -65,8 +70,8 @@ class ResolutionBrick(BlissWidget):
         box1=QHBox(self.paramsBox)
         self.currentResolution=myLineEdit(box1)
         self.currentDetectorDistance=myLineEdit(box1)
-        self.currentResolution.setFixedWidth(55)
-        self.currentDetectorDistance.setFixedWidth(75)
+        self.currentResolution.setFixedWidth(60)
+        self.currentDetectorDistance.setFixedWidth(80)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)
@@ -311,13 +316,13 @@ class ResolutionBrick(BlissWidget):
         f_mm=self.currentDetectorDistance.font()
         f_ang=self.currentResolution.font()
         if unit==chr(197):
-            f_mm.setBold(False)
-            f_ang.setBold(True)
+            #f_mm.setBold(False)
+            #f_ang.setBold(True)
             self.topBox.setTitle('Resolution')
             self.resolutionStateChanged(self.resolutionMotor.getState())
         elif unit=="mm":
-            f_mm.setBold(True)
-            f_ang.setBold(False)
+            #f_mm.setBold(True)
+            #f_ang.setBold(False)
             self.topBox.setTitle('Detector distance')
             self.detectorStateChanged(self.detectorMotor.getState())
         self.currentDetectorDistance.setFont(f_mm)
