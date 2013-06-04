@@ -742,7 +742,7 @@ class DataCollectTree(QWidget):
 
     def populate_free_pin(self):
         self.queue_model_hwobj.select_model('free-pin')
-        sample = queue_model.Sample()
+        sample = queue_model_objects.Sample()
         sample.set_name('-:-')
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
