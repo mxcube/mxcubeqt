@@ -1,6 +1,7 @@
 from BlissFramework import BaseComponents
 from BlissFramework.Bricks import MotorWPredefinedPositionsBrick
 from qt import *
+from BlissFramework.Utils import widget_colors
 
 '''
 '''
@@ -9,8 +10,8 @@ __category__ = 'Motor'
 
 class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositionsBrick):
 
-    STATE_COLORS = (QWidget.red, QWidget.red,\
-        QWidget.green,\
+    STATE_COLORS = (widget_colors.LIGHT_RED, widget_colors.LIGHT_RED,\
+        widget_colors.LIGHT_GREEN,\
         QWidget.yellow, QWidget.yellow,\
         QWidget.darkYellow)
 

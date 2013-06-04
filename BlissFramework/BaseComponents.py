@@ -17,6 +17,7 @@ from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
 from BlissFramework.Utils import ProcedureWidgets
+from BlissFramework.Utils import widget_colors
 import BlissFramework
 
 try:
@@ -187,16 +188,16 @@ class BlissWidget(QWidget, Connectable.Connectable):
         if BlissWidget._menuBar is not None:
             if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
                 if BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_IMPERSONATE:
-                    color=Qt.blue
+                    color=widget_colors.LIGHT_BLUE
                 else:
-                    color=Qt.green
+                    color=widget_colors.LIGHT_GREEN
             elif BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_SLAVE:
                 if BlissWidget._instanceRole==BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
-                    color=Qt.red
+                    color=widget_colors.LIGHT_RED
                 elif BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_UNKNOWN:
                     color=QColor(255,165,0)
                 else:
-                    color=Qt.yellow
+                    color=widget_colors.LIGHT_YELLOW
         if color is not None:
             BlissWidget._menuBar.setPaletteBackgroundColor(color)
             children = BlissWidget._menuBar.children() or []

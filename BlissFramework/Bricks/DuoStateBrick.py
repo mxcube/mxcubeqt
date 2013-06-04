@@ -1,5 +1,6 @@
 from BlissFramework import BaseComponents
 from BlissFramework import Icons
+from BlissFramework.Utils import widget_colors
 from qt import *
 import new
 import re
@@ -13,10 +14,10 @@ class DuoStateBrick(BaseComponents.BlissWidget):
     STATES = {
         'unknown': (None, True, True, False, False),
         'disabled': (QWidget.magenta, False, False, False, False),
-        'error': (QWidget.red, True, True, False, False),
+        'error': (widget_colors.LIGHT_RED, True, True, False, False),
         'out': (QWidget.darkGray, True, True, False, True),
         'moving': (QWidget.yellow, False, False, None, None),
-        'in': (QWidget.green, True, True, True, False),
+        'in': (widget_colors.LIGHT_GREEN, True, True, True, False),
         'automatic': (QWidget.white, True, True, False, False)
     }
 

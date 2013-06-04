@@ -134,8 +134,8 @@ class FeedbackBrick(BaseComponents.BlissWidget):
             info_dialog.exec_loop()
 
             if self["jira_server"]:
-              jira_customfield = [{"customfieldId" : "customfield_10794", "values" : ["No"]}]
               jira_server = xmlrpclib.Server(self["jira_server"]+"/rpc/xmlrpc")
-              auth = jira_server.jira1.login(self["jira_user"], self["jira_passwd"])
-              newissue = jira_server.jira1.createIssue(auth, {"project": self["jira_project"], "customFieldValues": jira_customfield, "type": 5, "summary": subj, "description": str(self.message.text())})
+              auth = jira_server.jira1.login(self["jira_user"], self["jira_passwd"]) 
+              newissue = jira_server.jira1.createIssue(auth, {"project": self["jira_project"], "type": 5, "summary": subj, "description": str(self.message.text())}) 
+            
             self.message.clear()

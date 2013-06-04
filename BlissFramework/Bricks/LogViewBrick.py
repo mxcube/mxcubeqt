@@ -59,20 +59,26 @@ from qt import *
 __category__ = 'gui_utils'
 
 class LogView(QTextEdit):
-    COLORS = { logging.NOTSET: 'lightgrey', logging.DEBUG: 'darkgreen', logging.INFO: 'darkblue', logging.WARNING: 'orange', logging.ERROR: 'red', logging.CRITICAL: 'black' }
+    COLORS = { logging.NOTSET: 'lightgrey', logging.DEBUG: 'darkgreen',
+               logging.INFO: 'darkblue', logging.WARNING: 'orange',
+               logging.ERROR: 'red', logging.CRITICAL: 'black'}
+
+    LEVELS = { logging.NOTSET: 'NOTSET', logging.DEBUG: 'DEBUG',
+               logging.INFO: 'INFO', logging.WARNING: 'WARNING',
+               logging.ERROR: 'ERROR', logging.CRITICAL: 'CRITICAL'}
 
     def __init__(self,parent,label):
         QTextEdit.__init__(self,parent)
 
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         
-        self.setTextFormat(QTextEdit.LogText)
+        self.setTextFormat(QTextEdit.PlainText)
         self.tabLabel=label
         self.unreadMessages=0
         
     def log(self,level,date,message):
         color=LogView.COLORS[level]
-        self.append("<font color=%s>%s %s" % (color,date,message))
+        self.append("[%s][%s] %s" % (LogView.LEVELS[level], date, message))
         self.scrollToBottom()
 
 ###

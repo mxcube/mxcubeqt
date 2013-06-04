@@ -4,7 +4,7 @@ from BlissFramework import Icons
 import BlissFramework
 from qt import *
 import logging
-import DataCollectBrick2
+#import DataCollectBrick2
 import InstanceServer
 from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
 import email.Utils
@@ -768,23 +768,126 @@ class InstanceListBrick(BlissWidget):
             custom_event=WantsControlEvent(client_id)
             qApp.postEvent(self,custom_event)
 
-class NickEditInput(DataCollectBrick2.LineEditInput):
+
+"""
+LineEditInput
+    Description: Single-line input field. Changes color depending on the validity of the input:
+                 red for invalid (or whatever DataCollectBrick2.PARAMETER_STATE["INVALID"] has)
+                 and white for valid (or whatever DataCollectBrick2.PARAMETER_STATE["OK"]).
+    Type       : class (qt.QLineEdit)
+    API        : setReadOnly(readonly<bool>)
+                 <string> text()
+    Signals    : returnPressed(), inputValid(valid<bool>), textChanged(txt<string>)
+    Notes      : Returns 1/3 of the width in the sizeHint from QLineEdit
+"""
+class LineEditInput(QLineEdit):
+
+    PARAMETER_STATE={"INVALID":QWidget.red,\
+                     "OK":QWidget.white,\
+                     "WARNING":QWidget.yellow}
+    
+    def __init__(self, parent):
+        QLineEdit.__init__(self, parent)
+        QObject.connect(self, SIGNAL('textChanged(const QString &)'), self.txtChanged)
+        QObject.connect(self, SIGNAL('returnPressed()'), self.retPressed)
+        self.colorDefault=None
+        self.origPalette=QPalette(self.palette())
+        self.palette2=QPalette(self.origPalette)
+        self.palette2.setColor(QPalette.Active,QColorGroup.Base,self.origPalette.disabled().background())
+        self.palette2.setColor(QPalette.Inactive,QColorGroup.Base,self.origPalette.disabled().background())
+        self.palette2.setColor(QPalette.Disabled,QColorGroup.Base,self.origPalette.disabled().background())
+
+    def retPressed(self):
+        if self.validator() is not None:
+            if self.hasAcceptableInput():
+                self.emit(PYSIGNAL("returnPressed"),())
+        else:
+            self.emit(PYSIGNAL("returnPressed"),())
+
+    def text(self):
+        return str(QLineEdit.text(self))
+
     def txtChanged(self,txt):
         txt=str(txt)
         valid=None
         if self.validator() is not None:
             if self.hasAcceptableInput():
                 valid=True
-                self.setPaletteBackgroundColor(DataCollectBrick2.DataCollectBrick2.PARAMETER_STATE["WARNING"])
+                if txt=="":
+                    if self.colorDefault is None:
+                        color=LineEditInput.PARAMETER_STATE["OK"]
+                    else:
+                        color=self.colorDefault
+                else:
+                    color=LineEditInput.PARAMETER_STATE["OK"]
+            else:
+                if txt=="":
+                    if self.colorDefault is None:
+                        valid=False
+                        color=LineEditInput.PARAMETER_STATE["INVALID"]
+                    else:
+                        color=self.colorDefault
+                else:
+                    valid=False
+                    color=LineEditInput.PARAMETER_STATE["INVALID"]
+            self.setPaletteBackgroundColor(color)
+        else:
+            if txt=="":
+                if self.colorDefault is None:
+                    if self.isReadOnly():
+                        color=self.origBackgroundColor()
+                    else:
+                        color=LineEditInput.PARAMETER_STATE["OK"]
+                else:
+                    color=self.colorDefault
+            else:
+                #color=DataCollectBrick2.PARAMETER_STATE["OK"]
+                if self.isReadOnly():
+                    color=self.origBackgroundColor()
+                else:
+                    color=LineEditInput.PARAMETER_STATE["OK"]
+            self.setPaletteBackgroundColor(color)
+        self.emit(PYSIGNAL("textChanged"),(txt,))
+        if valid is not None:
+            self.emit(PYSIGNAL("inputValid"),(self,valid,))
+
+    def sizeHint(self):
+        size_hint=QLineEdit.sizeHint(self)
+        size_hint.setWidth(size_hint.width()/3)
+        return size_hint
+                
+    def setReadOnly(self,readonly):
+        if readonly:
+            self.setPalette(self.palette2)
+        else:
+            self.setPalette(self.origPalette)
+        QLineEdit.setReadOnly(self,readonly)
+        
+    def origBackgroundColor(self):
+        return self.origPalette.disabled().background()
+
+    def setDefaultColor(self,color=None):
+        self.colorDefault=color
+        self.txtChanged(self.text())
+
+
+class NickEditInput(LineEditInput):
+    def txtChanged(self,txt):
+        txt=str(txt)
+        valid=None
+        if self.validator() is not None:
+            if self.hasAcceptableInput():
+                valid=True
+                self.setPaletteBackgroundColor(LineEditInput.PARAMETER_STATE["WARNING"])
             else:
                 valid=False
-                self.setPaletteBackgroundColor(DataCollectBrick2.DataCollectBrick2.PARAMETER_STATE["INVALID"])
+                self.setPaletteBackgroundColor(LineEditInput.PARAMETER_STATE["INVALID"])
         self.emit(PYSIGNAL("textChanged"),(txt,))
         if valid is not None:
             self.emit(PYSIGNAL("inputValid"),(self,valid,))
 
     def acceptInput(self):
-        self.setPaletteBackgroundColor(DataCollectBrick2.DataCollectBrick2.PARAMETER_STATE["OK"])
+        self.setPaletteBackgroundColor(LineEditInput.PARAMETER_STATE["OK"])
 
 
 class ExternalUserInfoDialog(QDialog):

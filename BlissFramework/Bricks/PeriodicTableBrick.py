@@ -10,6 +10,9 @@ class PeriodicTableBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
+        self.current_element = None
+        self.current_edge = None
+
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('title', 'string', '')
         self.addProperty('kevFormatString','formatString','##.####')
@@ -20,9 +23,9 @@ class PeriodicTableBrick(BlissWidget):
         self.defineSlot('setEnabled',())
         self.defineSlot('setSession',())
 
-        self.topBox = QHGroupBox(self)
-        self.topBox.setInsideMargin(4)
-        self.topBox.setInsideSpacing(2)
+        self.topBox = QHBox(self)
+        #self.topBox.setInsideMargin(4)
+        #self.topBox.setInsideSpacing(2)
 
         self.periodicTable=myPeriodicTable(self.topBox)
         self.connect(self.periodicTable,PYSIGNAL('edgeSelected'),self.edgeSelected)
@@ -50,8 +53,10 @@ class PeriodicTableBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,property,oldValue,newValue)
 
-    def edgeSelected(self,symbol,energy):
-        self.emit(PYSIGNAL('edgeSelected'), (symbol,energy))
+    def edgeSelected(self, symbol, energy):
+        self.emit(PYSIGNAL('edgeSelected'), (symbol, energy))
+        self.current_element = symbol
+        self.current_edge = energy
 
     def setSession(self,session_id):
         if session_id is None:
@@ -101,7 +106,7 @@ class myPeriodicTable(QPeriodicTable.QPeriodicTable):
             self.eltLabel.setText(txt)
             self.emit(PYSIGNAL('edgeSelected'), (symbol,energy))
             self.emit(PYSIGNAL("widgetSynchronize"),((symbol,),))
-
+            
     def setElements(self,elements):
         self.energiesDict={}
         for b in self.eltButton:

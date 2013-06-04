@@ -2,7 +2,6 @@ from BlissFramework import BaseComponents
 from BlissFramework import Icons
 from qt import *
 import logging
-import HardwareRepository.HardwareObjects.SpecMotor
 from BlissFramework.Utils import widget_colors
 
 '''
@@ -124,7 +123,6 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         
         self.defineSlot('setEnabled',())
         self.defineSlot('setDisabled',())
-        self.defineSlot('setSpecMotor',())
 
     def setExpertMode(self,mode):
         #print "MotorSpinBoxBrick.setExpertMode",mode,self['hideInUser']
@@ -430,11 +428,6 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
             self.containerBox.setTitle("")
             self.label.setText(label)
             self.labelBox.show()
-
-    def setSpecMotor(self,specversion,specmotor,username):
-        if all((specversion,specmotor)):
-            motor = HardwareRepository.HardwareObjects.SpecMotor.SpecVersionMotor(specversion,specmotor,username)
-            self.setMotor(motor)
 
     def setMotor(self,motor,motor_ho_name=None):
         if self.motor is not None:

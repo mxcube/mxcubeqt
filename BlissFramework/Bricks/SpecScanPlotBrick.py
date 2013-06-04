@@ -14,21 +14,20 @@ try:
 except ImportError:
   from SpecClient import SpecScan
 
-
 __category__ = 'Scans'
 
-class QSpecScan(QObject, SpecScan.SpecScanA):
-    def __init__(self, specVersion):
-        QObject.__init__(self)
-        SpecScan.SpecScanA.__init__(self, specVersion)
+## class QSpecScan(QObject, SpecScan.SpecScanA):
+##     def __init__(self, specVersion):
+##         QObject.__init__(self)
+##         SpecScan.SpecScanA.__init__(self, specVersion)
     
 
-    def newScan(self, scanParameters):
-        self.emit(PYSIGNAL('newScan'), (scanParameters, ))
+##     def newScan(self, scanParameters):
+##         self.emit(PYSIGNAL('newScan'), (scanParameters, ))
 
 
-    def newScanPoint(self, i, x, y):
-        self.emit(PYSIGNAL('newPoint'), (x, y, ))
+##     def newScanPoint(self, i, x, y):
+##         self.emit(PYSIGNAL('newPoint'), (x, y, ))
 
 
 class SpecScanPlotBrick(BlissWidget):
@@ -91,12 +90,8 @@ class SpecScanPlotBrick(BlissWidget):
         if property == 'specVersion':
             if self.scanObject is not None:
                 self.safeDisconnect()
-                
-            self.scanObject = QSpecScan(newValue)
 
-            if self.scanObject is not None:
-                self.safeConnect()
-
+            self.scanObject = SpecScan.SpecScanA(newValue, callbacks={"newScan":self.newScan, "newPoint":self.newScanPoint})
         elif property == 'backgroundColor':
             if newValue == 'white':
                 self.setPaletteBackgroundColor(Qt.white)
@@ -128,7 +123,7 @@ class SpecScanPlotBrick(BlissWidget):
         self.graph.newcurve('scan', self.xdata, self.ydata)
         self.graph.replot() 
 
-    def newScanPoint(self, x, y):
+    def newScanPoint(self, i, x, y):
         #if not self.canAddPoint:
         #    return
         self.xdata.append(x)
@@ -139,22 +134,7 @@ class SpecScanPlotBrick(BlissWidget):
 
     def handleBlissGraphSignal(self, signalDict):
         if signalDict['event'] == 'MouseAt':
-            self.lblPosition.setText("(X: %f, Y: %f)" % (signalDict['x'], signalDict['y']))
-
-
-    def safeConnect(self):
-        if not self.isConnected:
-            self.connect(self.scanObject, PYSIGNAL('newScan'), self.newScan)
-            self.connect(self.scanObject, PYSIGNAL('newPoint'), self.newScanPoint)
-            self.isConnected=True
-
-
-    def safeDisconnect(self):
-        if self.isConnected:
-            self.disconnect(self.scanObject, PYSIGNAL('newScan'), self.newScan)
-            self.disconnect(self.scanObject, PYSIGNAL('newScanPoint'), self.newScanPoint)
-            #self.canAddPoint = False
-            self.isConnected = False
+            self.lblPosition.setText("(X: %3.3f, Y: %3.3f)" % (signalDict['x'], signalDict['y']))
 
 
     #def instanceMirrorChanged(self,mirror):
