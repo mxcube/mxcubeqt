@@ -323,14 +323,19 @@ class DataCollectBrick2(BlissWidget):
         except:
           collect_list[0]['helical'] = 0
 
+        val = 0
         try:
-          if collect_list[0]['scan4d'] != 1 :
-              try:
-                  collect_list[0]['scan4d'] = int(self.scan4d.getValue())
-              except:
-                  pass
+            val = int(self.scan4d.getValue())
         except:
-          collect_list[0]['scan4d'] = 0
+            collect_list[0]['scan4d'] = 0
+        try:
+            if collect_list[0]['scan4d'] == 1 :
+                self.scan4dm.setValue(0)
+            else:
+                collect_list[0]['scan4d'] = int(self.scan4d.getValue())
+        except:
+            collect_list[0]['scan4d'] = val
+            self.scan4dm.setValue(1)
         
         # Cleanup the data collection and release resources
         def cleanup(stat,msg,show=True):
@@ -1056,6 +1061,7 @@ class DataCollectBrick2(BlissWidget):
                 
                 try:
                     self.scan4d = self.collectObj.getChannelObject('scan4d')
+                    self.scan4dm = self.collectObj.getChannelObject('scan4dm')
                 except:
                     pass
                 

@@ -330,7 +330,16 @@ class DataCollectQueueBrick(BlissWidget):
         "gshg":             (29, "GSHG",        None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
         "gsvg":             (30, "GSVG",        None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
         "axis":             (31, "Axis", SCAN_AXIS_FIXED, [axisComboItem,None],  None ),\
-        "do_inducedraddam": (32, "Radiation Damage", True, [boolEditItem,QString("")],(optionalIntValidator,1),              50),\
+        "do_inducedraddam": (32, "Radiation Damage", True, [boolEditItem,QString("")],(optionalIntValidator,1),         50),\
+        "scan4d":           (33, "4D Scan",     None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "phiy_s":           (34, "Phiy Start",  None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "phiz_s":           (35, "Phiz Start",  None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "sampx_s":          (36, "Sampx Start", None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "sampy_s":          (37, "Sampy Start", None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "phiy_e":           (38, "Phiy End",    None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "phiz_e":           (39, "Phiz End",    None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "sampx_e":          (40, "Sampx End",   None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
+        "sampy_e":          (41, "Sampy End",   None, [editItem,qttable.QTableItem.Always], (QDoubleValidator,0.0),     30),\
         }
 
     """
@@ -593,6 +602,17 @@ class DataCollectQueueBrick(BlissWidget):
                     DataCollectQueueBrick.PARAMETERS["detector_mode"][3][1].append(s)
             else:
                 self.table.setColumnReadOnly(DataCollectQueueBrick.PARAMETERS["detector_mode"][0],True)
+                
+            if detector_type != 'pilatus' :
+                 for index in [33,34,35,36,37,38,39,40,41]:
+                    self.table.hideColumn(index)
+            else:
+                if hasattr(self.collectObj.diffractometer(), 'username') == True:
+                    if self.collectObj.diffractometer().__getattr__('username') != 'Microdiff' :
+                        for index in [33,34,35,36,37,38,39,40,41]:
+                            self.table.hideColumn(index)
+                            
+
 
     """
     contextMenuEvent
