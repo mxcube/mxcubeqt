@@ -454,7 +454,7 @@ class DataCollectTree(QWidget):
         return self.sample_list_view
 
 
-    def add_to_view(self, parent, task, set_on = True):
+    def add_to_view(self, parent, task):
         view_item = None
         qe = None
         
@@ -466,7 +466,7 @@ class DataCollectTree(QWidget):
                         task.get_name())
                 
         view_item.setOpen(True)
-        self.queue_model_hwobj.view_created(view_item, task, set_on)
+        self.queue_model_hwobj.view_created(view_item, task)
 
 
     def get_selected_items(self):
@@ -766,9 +766,10 @@ class DataCollectTree(QWidget):
             sample.loc_str = str(sample_info[1]) + ':' + str(sample_info[2])
             sample.location = (sample_info[1], sample_info[2])
             sample.set_name(sample.loc_str)
+            sample.set_enabled(False)
 
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-                                             get_model_root(), sample, set_on = False)
+                                             get_model_root(), sample)
             
             #self.add_to_queue([sample], self.sample_list_view, False)
             

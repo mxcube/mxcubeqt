@@ -56,23 +56,30 @@ class QueueItem(QCheckListItem):
 
     def stateChange(self, state):
         QCheckListItem.stateChange(self, state)
+        # The QCheckListItem is somewhat tricky:
+        # state = 0     The item is unchecked.
+        #
+        # state = 1     The item is checked but
+        #               not all of the children
+        #
+        # state = 2     The item and all its children are
+        #               checked.
+        #
+        # However the state passed by stateChanged are a boolean
+        # we have to use the state() member to get the actual state.
+        # Great !
+
         if self._queue_entry:
-            # The QCheckListItem is somewhat tricky:
-            # state = 0     The item is unchecked.
-            #
-            # state = 1     The item is checked but
-            #               not all of the children
-            #
-            # state = 2     The item and all its children are
-            #               checked.
-            #
-            # However the state passed by stateChanged are a boolean
-            # we have to use the state() member to get the actual state.
-            # Great !
             if self.state() > 0:
-                self._queue_entry.set_enabled(True)
+                self._queue_entry.set_enabled(True)                
             else:
                 self._queue_entry.set_enabled(False)
+
+        if self._data_model:
+            if self.state() > 0:
+                self._data_model.set_enabled(True)                
+            else:
+                self._data_model.set_enabled(False)
 
 
     def paintCell(self, painter, color_group, column, width, align):
@@ -158,6 +165,9 @@ class QueueItem(QCheckListItem):
 
         if self._queue_entry:
             self._queue_entry.set_enabled(state)
+
+        if self._data_model:
+            self._data_model.set_enabled(state)
 
 
     def set_queue_entry(self, queue_entry):
