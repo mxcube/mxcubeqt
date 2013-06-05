@@ -333,10 +333,10 @@ class DataCollectBrick2(BlissWidget):
                 self.scan4dm.setValue(0)
             else:
                 collect_list[0]['scan4d'] = int(self.scan4d.getValue())
+                self.scan4dm.setValue(1)
         except:
             collect_list[0]['scan4d'] = val
-            self.scan4dm.setValue(1)
-        
+            
         # Cleanup the data collection and release resources
         def cleanup(stat,msg,show=True):
             return self.showCollectResult(stat,msg,show)
