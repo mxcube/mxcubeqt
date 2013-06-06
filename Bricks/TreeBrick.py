@@ -164,8 +164,8 @@ class TreeBrick(BaseComponents.BlissWidget):
 
             #smp = self.dc_tree_widget.crosscheck_sample_lists(sc_content, samples)
             
-            if samples:
-                self.dc_tree_widget.init_with_ispyb_data(samples)
+            #if samples:
+                #self.dc_tree_widget.init_with_ispyb_data(samples)
 
             
     def logged_in(self, logged_in):
