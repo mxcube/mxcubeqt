@@ -128,20 +128,19 @@ class CreateTaskBase(qt.QWidget):
 
     def get_default_prefix(self, sample_data_node):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node)
-
         return prefix
 
         
     def get_default_directory(self, sample_data_node):
-        group_item = self.get_group_item()
-        sample_item = self.get_sample_item()
         sub_dir = str()
+        item = self.get_group_item()
+        
+        if not item:
+            item = self.get_sample_item()
 
-        if group_item:
-            sub_dir = group_item.get_model().get_name().lower().replace(' ','')
-        else:
-            sub_dir = self.get_next_group_name(sample_item).\
-                lower().replace(' ','')
+        
+
+        sub_dir = item.get_model().get_name().lower().replace(' ','')
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sample_data_node,
@@ -150,8 +149,7 @@ class CreateTaskBase(qt.QWidget):
         proc_directory = self._session_hwobj.\
                          get_process_directory(sample_data_node,
                                                sub_dir = sub_dir)
-        
-
+    
         return (data_directory,
                 proc_directory)
 
