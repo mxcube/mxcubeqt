@@ -188,7 +188,7 @@ class CreateCharWidget(CreateTaskBase):
                 sc = None
                  
                 if not shape.get_drawing():
-                    sc = queue_model_objects.SampleCentring(parent_task_node)
+                    sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     tasks.append(sc)
 
@@ -220,12 +220,12 @@ class CreateCharWidget(CreateTaskBase):
                 if sc:
                     sc.set_task(data_collection)
                     
-                char_name = data_collection.acquisitions[0].path_template.get_prefix() + '_' + \
-                    str(data_collection.acquisitions[0].path_template.run_number)
-
-                char = queue_model_objects.Characterisation(parent_task_node,
-                                                    data_collection, 
-                                                    char_params, char_name)
+                char = queue_model_objects.Characterisation(data_collection, 
+                                                            char_params)
+                char.set_name(data_collection.acquisitions[0].\
+                              path_template.get_prefix())
+                char.set_number(data_collection.acquisitions[0].\
+                                path_template.run_number)
 
                 # Increase run number for next collection
                 self.set_run_number(self._path_template.run_number + 1)

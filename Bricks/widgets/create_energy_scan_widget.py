@@ -50,10 +50,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self.periodic_table.propertyChanged('mnemonic', '', mnemonic)
 
 
-    def get_prefix_type(self):
-        return 'escan'
-
-
     def approve_creation(self):
         if self.periodic_table.current_edge:
             return True
@@ -71,9 +67,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if self.periodic_table.current_edge:
             path_template = copy.deepcopy(self._path_template)
             
-            energy_scan = qeue_model.EnergyScan(dcg, sample, path_template)
-            energy_scan.set_name(path_template.prefix + '_' \
-                                 + str(path_template.run_number))
+            energy_scan = queue_model_objects.EnergyScan(sample,
+                                                         path_template)
+            energy_scan.set_name(path_template.get_prefix())
+            energy_scan.set_number(path_template.run_number)
             energy_scan.symbol = self.periodic_table.current_element
             energy_scan.edge = self.periodic_table.current_edge
 

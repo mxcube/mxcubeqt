@@ -49,7 +49,8 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         self.toggle_page_button.setDisabled(True)
 
 
-    def populate_edna_parameter_widget(self, char):
+    def populate_edna_parameter_widget(self, item):
+        char = item.get_model()
         parameters = char.reference_image_collection
         char_params = char.characterisation_parameters
         
@@ -71,7 +72,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
             self.toggle_page_button.setText("View Results")
 
         self.parameters_widget.\
-            populate_parameter_widget(char)
+            populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(char.is_executed())
 
 

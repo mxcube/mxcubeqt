@@ -131,7 +131,6 @@ class CreateDiscreteWidget(CreateTaskBase):
                 if not shape.get_drawing():
                     sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
-                    
                     tasks.append(sc)
 
                 if shape.qub_point is not None:
@@ -153,16 +152,15 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 processing_parameters = copy.deepcopy(self._processing_parameters)
 
-                dc_name = acq.path_template.get_prefix() + '_' + \
-                    str(acq.path_template.run_number)
 
                 acq.path_template.suffix = self._session_hwobj.suffix
                 
-
                 dc = queue_model_objects.DataCollection([acq],
-                                                sample.crystals[0],
-                                                processing_parameters, 
-                                                name = dc_name)
+                                                        sample.crystals[0],
+                                                        processing_parameters)
+
+                dc.set_name(acq.path_template.get_prefix())
+                dc.set_number(acq.path_template.run_number)
 
                 dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
 
@@ -171,7 +169,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 # Increase run number for next collection
                 self.set_run_number(self._path_template.run_number + 1)
-
                 tasks.append(dc)
 
         return tasks

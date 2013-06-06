@@ -55,7 +55,9 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         self.toggle_page_button.setDisabled(True)
 
     
-    def populate_parameter_widget(self, data_collection):
+    def populate_parameter_widget(self, item):
+        data_collection = item.get_model()
+        
         if data_collection.is_collected():
             self.populate_results(data_collection)
             self.stack.raiseWidget(self.results_view)
@@ -64,8 +66,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-        self.parameters_widget.\
-            populate_parameter_widget(data_collection)
+        self.parameters_widget.populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(data_collection.is_collected())
 
 

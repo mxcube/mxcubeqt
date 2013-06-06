@@ -359,7 +359,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def populate_parameters_tab(self, item = None):
         self.emit(PYSIGNAL("populate_parameter_widget"),
-                  (item.get_model(),))
+                  (item,))
         
 
     def show_datacollection_tab(self, item):
@@ -388,7 +388,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def populate_edna_parameters_tab(self, item):
         self.emit(PYSIGNAL("populate_edna_parameter_widget"),
-                  (item.get_model(),))
+                  (item,))
 
 
     def show_energy_scan_tab(self, item):
@@ -403,7 +403,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
 
     def populate_energy_scan_tab(self, item):
-        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item.get_model(),))
+        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item,))
         
 
     def toggle_sample_changer_tab(self): 
