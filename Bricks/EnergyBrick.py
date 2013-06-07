@@ -53,10 +53,13 @@ class EnergyBrick(BlissWidget):
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
         box1=QHBox(self.paramsBox)
-        self.currentEnergy=myLineEdit(box1)
+        self.currentEnergy=QLineEdit(box1)
         self.currentEnergy.setReadOnly(True)
+        self.currentEnergy.setAlignment(QWidget.AlignRight)
         self.currentEnergy.setFixedWidth(90)
-        self.currentWavelength=myLineEdit(box1)
+        self.currentWavelength=QLineEdit(box1)
+        self.currentWavelength.setReadOnly(True)
+        self.currentWavelength.setAlignment(QWidget.AlignRight)
         self.currentWavelength.setFixedWidth(60)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
@@ -100,7 +103,7 @@ class EnergyBrick(BlissWidget):
         label3=QLabel("Energy:",self.staticBox)
         self.staticBox.layout().addWidget(label3, 0, 0)
         
-        self.staticEnergy=myLineEdit(self.staticBox)
+        self.staticEnergy=QLineEdit(self.staticBox)
         f=self.staticEnergy.font()
         #f.setBold(True)
         self.staticEnergy.setFont(f)
@@ -109,7 +112,7 @@ class EnergyBrick(BlissWidget):
         label4=QLabel("Wavelength:",self.staticBox)
         self.staticBox.layout().addWidget(label4, 1, 0)
 
-        self.staticWavelength=myLineEdit(self.staticBox)
+        self.staticWavelength=QLineEdit(self.staticBox)
         self.staticBox.layout().addWidget(self.staticWavelength, 1, 1)
 
         QVBoxLayout(self)
@@ -240,8 +243,8 @@ class EnergyBrick(BlissWidget):
                 self.topBox.setCheckable(False)
                 self.staticEnergy.setText(str(curr_energy))
                 self.staticWavelength.setText(str(curr_wavelength))
-                self.staticEnergy.setDisabledLook(False)
-                self.staticWavelength.setDisabledLook(False)
+                #self.staticEnergy.setDisabledLook(False)
+                #self.staticWavelength.setDisabledLook(False)
             self.energyChanged(curr_energy,curr_wavelength)
         else:
             self.topBox.setEnabled(False)
@@ -250,8 +253,8 @@ class EnergyBrick(BlissWidget):
             self.staticBox.show()
             self.topBox.setTitle('Energy')
             self.topBox.setCheckable(False)
-            self.staticEnergy.setDisabledLook(True)
-            self.staticWavelength.setDisabledLook(True)
+            #self.staticEnergy.setDisabledLook(True)
+            #self.staticWavelength.setDisabledLook(True)
 
     def connected(self):
         #print "EnergyBrick.connected"
@@ -565,17 +568,16 @@ class myLineEdit(QLineEdit):
     def __init__(self,parent):
         QLineEdit.__init__(self,parent)
         palette=self.palette()
-        self.originalCG=QColorGroup(palette.disabled())
-        self.disabledCG=QColorGroup(palette.disabled())
-        self.disabledCG.setColor(QColorGroup.Text,QWidget.black)
-        self.setEnabled(False)
-        self.setAlignment(QWidget.AlignRight)
-        palette.setDisabled(self.disabledCG)
-        self.originalCG.setColor(QColorGroup.Background,QWidget.red)
+        #self.originalCG=QColorGroup(palette.disabled())
+        #self.disabledCG=QColorGroup(palette.disabled())
+        #self.disabledCG.setColor(QColorGroup.Text,QWidget.black)
+     
+        #palette.setDisabled(self.disabledCG)
+        #self.originalCG.setColor(QColorGroup.Background,QWidget.red)
 
-    def setDisabledLook(self,state):
-        palette=self.palette()
-        if state:
-            palette.setDisabled(self.originalCG)
-        else:
-            palette.setDisabled(self.disabledCG)
+#    def setDisabledLook(self,state):
+#        palette=self.palette()
+#        if state:
+#            palette.setDisabled(self.originalCG)
+#        else:
+#            palette.setDisabled(self.disabledCG)
