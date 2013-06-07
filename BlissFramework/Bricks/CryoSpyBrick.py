@@ -65,8 +65,8 @@ class CryoSpyBrick(BlissWidget):
 
         self.temperature=QLabel(self.containerBox)
         self.temperature.setAlignment(QLabel.AlignCenter)
-        self.temperature.setPaletteForegroundColor(QColor(QWidget.white))
-        #self.temperature.setPaletteBackgroundColor(QColor(QWidget.cyan))
+        self.temperature.setPaletteForegroundColor(widget_colors.WHITE)
+        #self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
         font=self.temperature.font()
         font.setStyleHint(QFont.OldEnglish)
         self.temperature.setFont(font)
@@ -112,7 +112,7 @@ class CryoSpyBrick(BlissWidget):
         try:
             t = float(temp)
         except TypeError:
-            self.temperature.setPaletteBackgroundColor(QColor(QWidget.darkGray))
+            self.temperature.setPaletteBackgroundColor(widget_colors.DARK_GRAY)
             #self.temperature.setText("?%s" % chr(176))
             self.temperature.setText("? K")
         else:
@@ -120,13 +120,13 @@ class CryoSpyBrick(BlissWidget):
             self.temperature.setText(svalue)
 
             if temp > self["warningTemp"]:
-              self.temperature.setPaletteBackgroundColor(QColor(QWidget.red))
+              self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
               if not old["warning"]:
                 old["warning"]=True
                 QMessageBox.critical(self, "Warning: risk for sample", "Cryo temperature is too high - sample is in danger!\nPlease fix the problem with cryo cooler") 
             else:
               old["warning"]=False 
-              self.temperature.setPaletteBackgroundColor(QColor(QWidget.cyan))
+              self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
               
 
     def setDrier(self, status):
