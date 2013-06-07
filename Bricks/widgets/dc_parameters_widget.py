@@ -29,7 +29,7 @@ class DCParametersWidget(QWidget):
         self._tree_view_item = None
 
 
-        self.path_widget = DataPathWidget(self, None)
+        self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
         self.acq_gbox = QVGroupBox("Acquisition", self)
         self.acq_gbox.setInsideMargin(2)
         self.acq_widget = AcquisitionWidget(self.acq_gbox, 
@@ -64,14 +64,14 @@ class DCParametersWidget(QWidget):
                      self.mad_energy_selected)
 
         
-        QObject.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
-                        SIGNAL("textChanged(const QString &)"), 
-                        self._prefix_ledit_change)
+        self.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
 
 
-        QObject.connect(self.path_widget.data_path_widget_layout.run_number_ledit, 
-                        SIGNAL("textChanged(const QString &)"), 
-                        self._run_number_ledit_change)
+        self.connect(self.path_widget.data_path_widget_layout.run_number_ledit,
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
 
 
     def _prefix_ledit_change(self, new_value):
@@ -79,7 +79,7 @@ class DCParametersWidget(QWidget):
                  path_template.get_prefix()
         self._data_collection.set_name(prefix)
         self._tree_view_item.setText(0, self._data_collection.get_name())
-
+        
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():

@@ -164,32 +164,34 @@ class CreateTaskBase(qt.QWidget):
 
     def selection_changed(self, tree_item):
         self._current_selected_item = tree_item
-        sample_item = self.get_sample_item()
-        sample_data_node = sample_item.get_model() if sample_item else None
-        group_item = self.get_group_item()
-        
-        acq_widget = self.get_acquisition_widget()
-
-        if acq_widget:
-            acq_widget.set_energies(sample_data_node.crystals[0].energy_scan_result)
-
-
-        data_path_widget = self.get_data_path_widget()
-        if data_path_widget and sample_data_node:
-            (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
-            data_path_widget.set_directory(data_directory)
-
-            prefix = self.get_default_prefix(sample_data_node)
-
-            run_number = self._session_hwobj.\
-                         get_free_run_number(prefix, data_directory)
-
-            data_path_widget.set_run_number(run_number)
-            data_path_widget.set_prefix(prefix)
-            self._path_template.process_directory = proc_directory
-
         self._selection_changed(tree_item)
-            
+
+        if isinstance(tree_item, queue_item.TaskQueueItem):
+            pass
+        else:
+            sample_item = self.get_sample_item()
+            sample_data_node = sample_item.get_model() if sample_item else None
+            group_item = self.get_group_item()
+
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.set_energies(sample_data_node.crystals[0].energy_scan_result)
+
+            data_path_widget = self.get_data_path_widget()
+            if data_path_widget and sample_data_node:
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
+                data_path_widget.set_directory(data_directory)
+
+                prefix = self.get_default_prefix(sample_data_node)
+
+                run_number = self._session_hwobj.\
+                             get_free_run_number(prefix, data_directory)
+
+                data_path_widget.set_run_number(run_number)
+                data_path_widget.set_prefix(prefix)
+                self._path_template.process_directory = proc_directory
+
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.

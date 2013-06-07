@@ -12,7 +12,7 @@ from BlissFramework.Utils import widget_colors
 
 
 class DataPathWidget(qt.QWidget):
-    def __init__(self, parent = None, name = None, fl = 0, data_model = None, 
+    def __init__(self, parent = None, name = '', fl = 0, data_model = None, 
                  layout = None):
         qt.QWidget.__init__(self, parent, name, fl)
 
@@ -35,9 +35,9 @@ class DataPathWidget(qt.QWidget):
         h_layout = qt.QHBoxLayout(self)
 
         if layout is DataPathWidgetHorizontalLayout:
-            self.data_path_widget_layout = layout(self)
+            self.data_path_widget_layout = layout(self, name)
         elif layout is DataPathWidgetVerticalLayout:
-            self.data_path_widget_layout = layout(self)
+            self.data_path_widget_layout = layout(self, name)
         else:
             self.data_path_widget_layout = DataPathWidgetHorizontalLayout(self)
 
@@ -97,16 +97,12 @@ class DataPathWidget(qt.QWidget):
 
 
     def _prefix_ledit_change(self, new_value):
-        self._data_model.base_prefix = str(new_value)
-        file_name = self._data_model.get_image_file_name()
-        self.data_path_widget_layout.file_name_value_label.setText(file_name)
+        self.set_prefix(new_value)
 
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
-            self._data_model.run_number = int(new_value)
-            file_name = self._data_model.get_image_file_name()
-            self.data_path_widget_layout.file_name_value_label.setText(file_name)
+            self.set_run_number(new_value)
 
 
     def _folder_ledit_change(self, new_value):        
@@ -135,7 +131,6 @@ class DataPathWidget(qt.QWidget):
     
     def set_directory(self, directory):
         base_image_dir = self._session_hwobj.get_base_image_directory()
-
         dir_parts = directory.split(base_image_dir)
 
         if len(dir_parts) > 1:
@@ -157,14 +152,14 @@ class DataPathWidget(qt.QWidget):
 
 
     def set_run_number(self, run_number):
-        self._data_model.run_number = run_number
+        self._data_model.run_number = int(run_number)
         self.data_path_widget_layout.run_number_ledit.\
             setText(str(run_number))
 
 
     def set_prefix(self, base_prefix):
-        self._data_model.base_prefix = base_prefix
-        self.data_path_widget_layout.prefix_ledit.setText(base_prefix)
+        self._data_model.base_prefix = str(base_prefix)
+        self.data_path_widget_layout.prefix_ledit.setText(str(base_prefix))
         file_name = self._data_model.get_image_file_name()
         self.data_path_widget_layout.file_name_value_label.setText(file_name)
 

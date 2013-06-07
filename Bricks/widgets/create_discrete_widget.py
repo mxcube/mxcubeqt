@@ -49,9 +49,10 @@ class CreateDiscreteWidget(CreateTaskBase):
 
 
         self._data_path_gbox = QVGroupBox('Data location', self, 'data_path_gbox')
-        self._data_path_widget = DataPathWidget(self._data_path_gbox, 
-                                               data_model = self._path_template,
-                                               layout = DataPathWidgetVerticalLayout)
+        self._data_path_widget = DataPathWidget(self._data_path_gbox,
+                                                'create_dc_path_widget',
+                                                data_model = self._path_template,
+                                                layout = DataPathWidgetVerticalLayout)
 
         self._processing_gbox = QVGroupBox('Processing', self, 
                                            'processing_gbox')
@@ -87,9 +88,30 @@ class CreateDiscreteWidget(CreateTaskBase):
     def _selection_changed(self, tree_item):
         sample_view_item = self.get_sample_item()
         
-        if sample_view_item:
-            sample_data_model = sample_view_item.get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
+        if isinstance(tree_item, queue_item.TaskQueueItem):
+            data_collection = tree_item.get_model()
+            self._path_template = data_collection.acquisitions[0].path_template
+            self._acquisition_parameters = data_collection.acquisitions[0].\
+                                           acquisition_parameters
+            self._energy_scan_result = queue_model_objects.EnergyScanResult()
+            self._processing_parameters = data_collection.processing_parameters
+            self._energy_scan_result = data_collection.crystal.energy_scan_result
+        else:
+            self._path_template = queue_model_objects.PathTemplate()
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            self._energy_scan_result = queue_model_objects.EnergyScanResult()
+            self._processing_parameters = queue_model_objects.ProcessingParameters()
+             
+            if sample_view_item:
+                sample_data_model = sample_view_item.get_model()
+                self.update_processing_parameters(sample_data_model.crystals[0])
+       
+        self._data_path_widget.update_data_model(self._path_template)
+        self._acq_widget.update_data_model(self._acquisition_parameters,
+                                           self._path_template)
+        self._processing_widget.update_data_model(self._processing_parameters)
+        self._acq_widget.set_energies(self._energy_scan_result)
+
         
 
     # Called by the owning widget (task_toolbox_widget) to create
