@@ -54,6 +54,7 @@ class EnergyBrick(BlissWidget):
 
         box1=QHBox(self.paramsBox)
         self.currentEnergy=myLineEdit(box1)
+        self.currentEnergy.setReadOnly(True)
         self.currentEnergy.setFixedWidth(90)
         self.currentWavelength=myLineEdit(box1)
         self.currentWavelength.setFixedWidth(60)
