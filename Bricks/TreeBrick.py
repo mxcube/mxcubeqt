@@ -128,15 +128,52 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.layout().addWidget(self.dc_tree_widget)
         self.enable_collect(self.ispyb_logged_in)
 
-
+ 
     def refresh_sample_list(self):
         lims_client = self._lims_hwobj
-        
-        samples = lims_client.get_samples(self.session.proposal_id,
-                                          self.session.session_id)
-            
+        samples = lims_client.get_samples(self.session_hwobj.proposal_id,
+                                          self.session_hwobj.session_id)
+
         if samples:
-            self.dc_tree_widget.init_with_ispyb_data(samples)
+            (barcode_samples, location_samples) = \
+                self.dc_tree_widget.samples_from_lims(samples)
+
+            sc_content = self.get_sc_content()
+            sc_sample_list = self.dc_tree_widget.\
+                             samples_from_sc_content(sc_content)
+            
+            for sc_sample in sc_sample_list:
+
+                # Get the sample in lims with the barcode
+                # sc_sample.code
+                lims_sample = barcode_samples.get(sc_sample.code)
+
+                # There was a sample with that barcode
+                if lims_sample:
+                    if lims_sample.lims_location == sc_sample.location:
+                        pass # do the match
+                    else:
+                        logging.getLogger("user_level_log").\
+                            warning("The sample with the barcode (%s) exists"+\
+                                    " in lims but the location does not mat" +\
+                                    "ch. Sample changer location: %s, lims " +\
+                                    "location %s" % (sc_sample.code,
+                                                     sc_sample.location,
+                                                     lims_sample.lims_location))
+                else: # No sample with that barcode, continue with location
+                    lims_sample = location_samples.get(sc_sample.lims_location)
+                    if lims_sample.lims_code is not '':
+                        logging.getLogger("user_level_log").\
+                            warning("The sample has a barcode in lims, but t"+\
+                                    "he SC were not able to read barcode on "+\
+                                    "the current sample. You can rescan the "+\
+                                    "barcode by rescaning the basket.")
+                    else:
+                        logging.getLogger("user_level_log").\
+                            warning("No barcode was provided in ISPyB "+\
+                                    "which makes it impossible to verify if"+\
+                                    "the locations are correct, assuming "+\
+                                    "that the positions are correct.")
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
@@ -322,7 +359,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def populate_parameters_tab(self, item = None):
         self.emit(PYSIGNAL("populate_parameter_widget"),
-                  (item.get_model(),))
+                  (item,))
         
 
     def show_datacollection_tab(self, item):
@@ -351,7 +388,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def populate_edna_parameters_tab(self, item):
         self.emit(PYSIGNAL("populate_edna_parameter_widget"),
-                  (item.get_model(),))
+                  (item,))
 
 
     def show_energy_scan_tab(self, item):
@@ -366,7 +403,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
 
     def populate_energy_scan_tab(self, item):
-        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item.get_model(),))
+        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item,))
         
 
     def toggle_sample_changer_tab(self): 

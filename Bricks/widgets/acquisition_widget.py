@@ -177,10 +177,10 @@ class AcquisitionWidget(qt.QWidget):
                            'rm1 - %.4f' % energy_scan_result.first_remote, 
                            'rm2 - %.4f' % energy_scan_result.second_remote])
 
-        if self._path_template.mad_prefix:
-            self.acq_widget_layout.mad_cbox.setOn(True)
-            self.acq_widget_layout.energies_combo.\
-                setCurrentItem(MAD_ENERGY_COMBO_NAMES[self._path_template.mad_prefix])
+        #if self._path_template.mad_prefix:
+        #    self.acq_widget_layout.mad_cbox.setOn(True)
+        #    self.acq_widget_layout.energies_combo.\
+        #        setCurrentItem(MAD_ENERGY_COMBO_NAMES[self._path_template.mad_prefix])
 
 
     def energy_selected(self, index):

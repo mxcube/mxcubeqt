@@ -32,6 +32,7 @@ class CharParametersWidget(QWidget):
         self._data_collection = None
         self._char_params = queue_model_objects.CharacterisationParameters()
         self._char_params_mib = DataModelInputBinder(self._char_params)
+        self._tree_view_item = None
         self.previous_energy = None
         
         self.add_dc_cb = None
@@ -252,6 +253,29 @@ class CharParametersWidget(QWidget):
                         self.enable_aimed_mult_ledit)
 
 
+        QObject.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
+                        SIGNAL("textChanged(const QString &)"), 
+                        self._prefix_ledit_change)
+
+        
+        QObject.connect(self.path_widget.data_path_widget_layout.run_number_ledit, 
+                        SIGNAL("textChanged(const QString &)"), 
+                        self._run_number_ledit_change)
+
+
+    def _prefix_ledit_change(self, new_value):
+        prefix = self._data_collection.acquisitions[0].\
+                 path_template.get_prefix()
+        self._data_collection.set_name(prefix)
+        self._tree_view_item.setText(0, self._data_collection.get_name())
+
+
+    def _run_number_ledit_change(self, new_value):
+        if str(new_value).isdigit():
+            self._data_collection.set_number(int(new_value))
+            self._tree_view_item.setText(0, self._data_collection.get_name())
+
+
     def enable_aimed_mult_ledit(self, state):
         self.opt_parameters_widget.aimed_mult_ledit.setEnabled(state)
 
@@ -273,7 +297,9 @@ class CharParametersWidget(QWidget):
         self.opt_parameters_widget.setEnabled(not state)
 
 
-    def populate_parameter_widget(self, char):
+    def populate_parameter_widget(self, tree_view_item):
+        self._tree_view_item = tree_view_item
+        char = tree_view_item.get_model()
         self._data_collection = char.reference_image_collection
         self._char_params = char.characterisation_parameters
         self._char_params_mib.set_model(char.characterisation_parameters)
@@ -299,7 +325,7 @@ class CharParametersWidget(QWidget):
         self.enable_aimed_mult_ledit(self._char_params.use_aimed_multiplicity)
         
         item = self.char_type_widget.charact_type_tbox.\
-            item(self._char_params.experiment_type)
+               item(self._char_params.experiment_type)
         
         self.char_type_widget.charact_type_tbox.setCurrentItem(item)
         self.char_type_widget.toggle_time_dose()

@@ -25,8 +25,8 @@ class EnergyScanParametersBrick(BaseComponents.BlissWidget):
         self.defineSlot("populate_parameter_widget", ({}))
 
 
-    def populate_parameter_widget(self, energy_scan):
-        self.energy_scan_widget.populate_widget(energy_scan)
+    def populate_parameter_widget(self, item):
+        self.energy_scan_widget.populate_widget(item)
 
 
     def propertyChanged(self, property_name, old_value, new_value):

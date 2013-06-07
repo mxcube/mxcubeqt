@@ -4,6 +4,7 @@ import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import widget_utils
 import abc
+import os
 
 class CreateTaskBase(qt.QWidget):
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
@@ -137,18 +138,11 @@ class CreateTaskBase(qt.QWidget):
         
         if not item:
             item = self.get_sample_item()
-
-        
-
-        sub_dir = item.get_model().get_name().lower().replace(' ','')
             
         data_directory = self._session_hwobj.\
-                         get_image_directory(sample_data_node,
-                                             sub_dir = sub_dir)
-
+                         get_image_directory(item.get_model())
         proc_directory = self._session_hwobj.\
-                         get_process_directory(sample_data_node,
-                                               sub_dir = sub_dir)
+                         get_process_directory(item.get_model())
     
         return (data_directory,
                 proc_directory)
@@ -220,6 +214,7 @@ class CreateTaskBase(qt.QWidget):
         #    self.set_run_number(self._path_template.run_number + 1)
 
         return tasks
+
 
     @abc.abstractmethod
     def _create_task(self, task_node, sample):

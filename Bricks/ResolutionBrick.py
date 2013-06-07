@@ -68,8 +68,10 @@ class ResolutionBrick(BlissWidget):
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
         box1=QHBox(self.paramsBox)
-        self.currentResolution=myLineEdit(box1)
-        self.currentDetectorDistance=myLineEdit(box1)
+        self.currentResolution=QLineEdit(box1)
+        self.currentResolution.setReadOnly(True)
+        self.currentDetectorDistance=QLineEdit(box1)
+        self.currentDetectorDistance.setReadOnly(True)
         self.currentResolution.setFixedWidth(60)
         self.currentDetectorDistance.setFixedWidth(80)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
@@ -611,24 +613,6 @@ class HorizontalSpacer(QWidget):
     def __init__(self,*args):
         QWidget.__init__(self,*args)
         self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
-
-class myLineEdit(QLineEdit):
-    def __init__(self,parent):
-        QLineEdit.__init__(self,parent)
-        palette=self.palette()
-        self.originalCG=QColorGroup(palette.disabled())
-        self.disabledCG=QColorGroup(palette.disabled())
-        self.disabledCG.setColor(QColorGroup.Text,QWidget.black)
-        self.setEnabled(False)
-        self.setAlignment(QWidget.AlignRight)
-        palette.setDisabled(self.disabledCG)
-
-    def setDisabledLook(self,state):
-        palette=self.palette()
-        if state:
-            palette.setDisabled(self.originalCG)
-        else:
-            palette.setDisabled(self.disabledCG)
 
 """
 class ResolutionLimitsThread(QThread):

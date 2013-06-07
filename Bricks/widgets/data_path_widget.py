@@ -47,7 +47,7 @@ class DataPathWidget(qt.QWidget):
         #
         # Logic
         #
-        self._data_model_pm.bind_value_update('prefix', 
+        self._data_model_pm.bind_value_update('base_prefix', 
                                               self.data_path_widget_layout.prefix_ledit,
                                               str,
                                               None)
@@ -97,7 +97,7 @@ class DataPathWidget(qt.QWidget):
 
 
     def _prefix_ledit_change(self, new_value):
-        self._data_model.prefix = str(new_value)
+        self._data_model.base_prefix = str(new_value)
         file_name = self._data_model.get_image_file_name()
         self.data_path_widget_layout.file_name_value_label.setText(file_name)
 
@@ -164,8 +164,9 @@ class DataPathWidget(qt.QWidget):
 
     def set_prefix(self, base_prefix):
         self._data_model.base_prefix = base_prefix
-        prefix = self._data_model.get_prefix()
-        self.data_path_widget_layout.prefix_ledit.setText(prefix)
+        self.data_path_widget_layout.prefix_ledit.setText(base_prefix)
+        file_name = self._data_model.get_image_file_name()
+        self.data_path_widget_layout.file_name_value_label.setText(file_name)
 
 
     def update_data_model(self, data_model):
