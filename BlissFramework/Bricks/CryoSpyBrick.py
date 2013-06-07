@@ -35,16 +35,17 @@ Example of valid Hardware Object XML :
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 from qt import *
+from BlissFramework.Utils import widget_colors
 
 __category__ = "Synoptic"
 __author__ = "Vicente Rey, Matias Guijarro, Jose Gabadinho"
 __version__ = 1.0
 
-CRYO_COLORS = { "OFF": QWidget.gray,
-                "SATURATED": QWidget.red,
-                "READY": QWidget.green,
-                "WARNING": QWidget.yellow,
-                "FROZEN": QWidget.magenta,
+CRYO_COLORS = { "OFF": widget_colors.GRAY,
+                "SATURATED": widget_colors.LIGHT_RED,
+                "READY": widget_colors.LIGHT_GREEN,
+                "WARNING": widget_colors.LIGHT_YELLOW,
+                "FROZEN": widget_colors.LIGHT_BLUE,
                 "UNKNOWN": None }
 
 class CryoSpyBrick(BlissWidget):

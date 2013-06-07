@@ -41,14 +41,16 @@ from qt import *
 import logging
 import time
 
+from BlissFramework.Utils import widget_colors
+
 __category__ = 'Synoptic'
 
 class MachCurrentBrick(BaseComponents.BlissWidget):
     STATES = {
-        'unknown': QWidget.darkGray,
-        'ready': QWidget.blue,
-        'error': QWidget.red
-    }
+        'unknown':  widget_colors.DARK_GRAY,
+        'ready': widget_colors.LIGHT_BLUE,
+        'error':  widget_colors.LIGHT_RED
+        }
 
     def __init__(self, *args):
         BaseComponents.BlissWidget.__init__(self, *args)
@@ -69,13 +71,13 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
 
         self.current=QLabel(self.containerBox)
         self.current.setAlignment(QLabel.AlignCenter)
-        self.current.setPaletteForegroundColor(QColor(QWidget.white))
+        self.current.setPaletteForegroundColor(widget_colors.WHITE)
         font=self.current.font()
         font.setStyleHint(QFont.OldEnglish)
         self.current.setFont(font)
         self.mode=QLabel(self.containerBox)
         self.mode.setAlignment(QLabel.AlignCenter)
-        self.mode.setPaletteBackgroundColor(QColor(QWidget.cyan))
+        self.mode.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
 
         self.refillCountdown=QLCDNumber(self.containerBox)
         self.refillCountdown.setSegmentStyle(QLCDNumber.Flat)

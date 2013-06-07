@@ -143,7 +143,8 @@ class AttenuatorsBrick(BlissWidget):
         label1=QLabel("Current:",self.paramsBox)
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
-        self.currentTransmission=myLineEdit(self.paramsBox)
+        self.currentTransmission=QLineEdit(self.paramsBox)
+        self.currentTransmission.setReadOnly(True)
         self.currentTransmission.setFixedWidth(75)
         #f=self.currentTransmission.font()
         #f.setBold(True)
@@ -398,25 +399,6 @@ class FiltersDialog(QDialog):
         except ValueError:
            logging.getLogger().warning('AttenuatorsBrick: error reading filter status (%d)' % value)
 
-class myLineEdit(QLineEdit):
-    def __init__(self,parent):
-        QLineEdit.__init__(self,parent)
-        palette=self.palette()
-        self.originalCG=QColorGroup(palette.disabled())
-        self.disabledCG=QColorGroup(palette.disabled())
-        self.disabledCG.setColor(QColorGroup.Text,QWidget.black)
-        self.setEnabled(False)
-        self.setAlignment(QWidget.AlignRight)
-        palette.setDisabled(self.disabledCG)
-
-    def setDisabledLook(self,state):
-        palette=self.palette()
-        if state:
-            palette.setDisabled(self.originalCG)
-        else:
-            palette.setDisabled(self.disabledCG)
-        self.setPalette(palette)
-        self.setAlignment(QWidget.AlignRight)
 
 class HorizontalSpacer(QWidget):
     def __init__(self,*args):
