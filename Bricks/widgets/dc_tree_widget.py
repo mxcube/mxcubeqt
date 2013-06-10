@@ -232,6 +232,8 @@ class DataCollectTree(QWidget):
                 self.tree_brick.show_edna_tab(item)
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
+            elif isinstance(item, queue_item.GenericWorkflowQueueItem):
+                self.tree_brick.show_work_flow_tab(item)
         elif len(items) == 0:
             self.tree_brick.show_sample_tab()
 

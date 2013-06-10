@@ -247,6 +247,11 @@ class EnergyScanQueueItem(TaskQueueItem):
         TaskQueueItem.__init__(self, parent, after, text)
 
 
+class GenericWorkflowQueueItem(TaskQueueItem):
+    def __init__(self, parent, after, text):
+        TaskQueueItem.__init__(self, parent, after, text)
+
+
 class SampleCentringQueueItem(TaskQueueItem):
     def __init__(self, parent, after, text):
         TaskQueueItem.__init__(self, parent, after, text)
@@ -327,5 +332,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

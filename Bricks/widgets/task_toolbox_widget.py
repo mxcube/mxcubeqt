@@ -4,6 +4,7 @@ import queue_entry
 import queue_model_objects_v1 as queue_model_objects
 import qt
 
+
 from BlissFramework import Icons
 from collections import namedtuple
 from widgets.create_helical_widget import CreateHelicalWidget
@@ -11,6 +12,7 @@ from widgets.create_discrete_widget import CreateDiscreteWidget
 from widgets.create_mesh_widget import CreateMeshWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
+from widgets.create_workflow_widget import CreateWorkflowWidget
 
 
 class TaskToolBoxWidget(qt.QWidget):
@@ -42,6 +44,10 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, 
                                                        "energy_scan")
 
+        self.workflow_page = CreateWorkflowWidget(self.tool_box,
+                                                  'workflow')
+        
+
         #self.mesh_page = CreateMeshWidget(self.tool_box, "Mesh")
         #self.mesh_page.setBackgroundMode(qt.QWidget.PaletteBackground)
       
@@ -49,6 +55,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tool_box.addItem(self.char_page, "Characterise")
         self.tool_box.addItem(self.helical_page, "Helical")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
+        self.tool_box.addItem(self.workflow_page, "Workflow")
         #self.tool_box.addItem(self.mesh_page, "Mesh")
 
         self.add_pixmap = Icons.load("add_row.png")
@@ -80,6 +87,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.discrete_page.set_tree_brick(brick)
         self.char_page.set_tree_brick(brick)
         self.energy_scan_page.set_tree_brick(brick)
+        self.workflow_page.set_tree_brick(brick)
 
 
     def set_shape_history(self, shape_history):
@@ -91,6 +99,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.discrete_page.set_shape_history(shape_history)
         self.char_page.set_shape_history(shape_history)
         self.energy_scan_page.set_shape_history(shape_history)
+        self.workflow_page.set_shape_history(shape_history)
 
 
     def set_session(self, session_hwobj):
@@ -98,6 +107,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.discrete_page.set_session(session_hwobj)
         self.char_page.set_session(session_hwobj)
         self.energy_scan_page.set_session(session_hwobj)
+        self.workflow_page.set_session(session_hwobj)
 
 
     def set_bl_config(self, bl_config):
@@ -105,6 +115,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.discrete_page.set_bl_config(bl_config)
         self.char_page.set_bl_config(bl_config)
         self.energy_scan_page.set_bl_config(bl_config)
+        self.workflow_page.set_bl_config(bl_config)
 
 
     def ispyb_logged_in(self, logged_in):
@@ -117,6 +128,8 @@ class TaskToolBoxWidget(qt.QWidget):
         self.char_page.ispyb_logged_in(logged_in)
         self.helical_page.ispyb_logged_in(logged_in)
         self.energy_scan_page.ispyb_logged_in(logged_in)
+        self.energy_scan_page.ispyb_logged_in(logged_in)
+        self.workflow_page.ispyb_logged_in(logged_in)
 
 
     # def set_tunable_energy(self, state):
@@ -143,6 +156,7 @@ class TaskToolBoxWidget(qt.QWidget):
             self.char_page.selection_changed(item)
             self.helical_page.selection_changed(item)
             self.energy_scan_page.selection_changed(item)
+            self.workflow_page.selection_changed(item)
 
 
     def create_task_button_click(self):

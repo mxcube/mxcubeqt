@@ -85,12 +85,14 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("hide_sample_changer_tab", ())
         self.defineSignal("hide_edna_tab", ())
         self.defineSignal("hide_energy_scan_tab",())
+        self.defineSignal("hide_workflow_tab", ())
         self.defineSignal("populate_parameter_widget", ())
         self.defineSignal("clear_centred_positions", ())
         self.defineSignal("populate_edna_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("selection_changed",())
         self.defineSignal("populate_energy_scan_widget", ())
+        
 
         # Layout
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
@@ -332,6 +334,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
 
 
     def show_sample_tab(self, item):
@@ -344,7 +347,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_dcg_tab(self):
         self.sample_changer_widget.details_button.setText("Show details")
@@ -355,6 +358,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
 
 
     def populate_parameters_tab(self, item = None):
@@ -371,6 +375,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_parameters_tab(item)
 
 
@@ -382,7 +387,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(PYSIGNAL("hide_edna_tab"), (False,))
         self.emit(PYSIGNAL("hide_sample_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,)) 
+        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_edna_parameters_tab(item)
 
 
@@ -398,8 +404,20 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(PYSIGNAL("hide_sample_tab"), (True,)) 
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (False,)) 
+        self.emit(PYSIGNAL("hide_energy_scan_tab"), (False,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_energy_scan_tab(item)
+
+
+    def show_work_flow_tab(self, item):
+        self.sample_changer_widget.details_button.setText("Show details")
+        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(PYSIGNAL("hide_sample_tab"), (True,)) 
+        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (False,))
 
 
     def populate_energy_scan_tab(self, item):
@@ -497,6 +515,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
         self.dc_tree_widget.sample_list_view_selection()
 
         self.connect(self.queue_hwobj, 'queue_paused', 

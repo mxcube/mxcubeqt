@@ -190,6 +190,9 @@ class CreateDiscreteWidget(CreateTaskBase):
                     sc.set_task(dc)
 
                 # Increase run number for next collection
+                run_number = self._current_selected_item.get_model().\
+                             get_next_number_for_name(acq.path_template.\
+                                                      get_prefix())
                 self.set_run_number(self._path_template.run_number + 1)
                 tasks.append(dc)
 
