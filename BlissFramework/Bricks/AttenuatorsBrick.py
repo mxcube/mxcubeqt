@@ -283,13 +283,13 @@ class AttenuatorsBrick(BlissWidget):
 
     def connected(self):
         self.transmissionLimits=(0,100)
-        self.currentTransmission.setDisabledLook(False)
+        #self.currentTransmission.setDisabledLook(False)
         self.topBox.setEnabled(True)
 
     def disconnected(self):
         self.transmissionLimits=None
         self.filtersDialog.accept()
-        self.currentTransmission.setDisabledLook(True)
+        #self.currentTransmission.setDisabledLook(True)
         self.topBox.setEnabled(False)
 
     def setExpertMode(self,state):
@@ -313,12 +313,12 @@ class AttenuatorsBrick(BlissWidget):
         if value < 0:
             self.currentTransmissionValue=None
             self.currentTransmission.setText("")
-            self.currentTransmission.setDisabledLook(True)
+            #self.currentTransmission.setDisabledLook(True)
         else:
             att_str=self['formatString'] % value
             self.currentTransmissionValue=att_str
             self.currentTransmission.setText('%s%%' % att_str)
-            self.currentTransmission.setDisabledLook(False)
+            #self.currentTransmission.setDisabledLook(False)
             self.updateTransHistory(att_str)
 
     def updateTransHistory(self,trans):
