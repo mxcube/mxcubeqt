@@ -56,7 +56,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("energy_scan_hwobj", "string", "")
         self.addProperty("queue", "string", "/queue-controller")
         self.addProperty("session", "string", "/session")
-        #self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
+        self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
         self.addProperty("queue_model", "string", "/queue-model")
 
         # Qt - Slots
