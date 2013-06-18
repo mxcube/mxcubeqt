@@ -284,6 +284,7 @@ class WindowDisplayWidget(qt.QScrollView):
             else:
                 orig_label=" ".join(label_list)
             self.emit(qt.PYSIGNAL("notebookPageChanged"), (orig_label, ))
+            qt.qApp.emit(qt.PYSIGNAL('tab_changed'), (index, page))
 
             tab_name=self.name()
             BlissWidget.updateTabWidget(tab_name,index)
