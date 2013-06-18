@@ -27,6 +27,12 @@ class CreateTaskBase(qt.QWidget):
          self._session_hwobj = None
          self._bl_config_hwobj = None
          
+         qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_closed'),
+                            self.tab_closed)
+
+
+    def tab_closed(self, tab, slot_name):
+        self.selection_changed(self._current_selected_item)
 
 
     def set_tree_brick(self, brick):
