@@ -30,12 +30,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         #
         # Data attributes
         #
-        self._path_template = queue_model_objects.PathTemplate()
-        self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-        self._energy_scan_result = queue_model_objects.EnergyScanResult()
-        self._processing_parameters = queue_model_objects.ProcessingParameters()
         self.previous_energy = None
-        
+        self.init_models()
 
         #
         # Layout
@@ -71,6 +67,41 @@ class CreateDiscreteWidget(CreateTaskBase):
                      self.mad_energy_selected)
 
 
+        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
+
+
+        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+
+
+    def init_models(self):
+        self._path_template = queue_model_objects.PathTemplate()
+        self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+        self._energy_scan_result = queue_model_objects.EnergyScanResult()
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
+
+
+    def _prefix_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.DataCollectionQueueItem):
+            prefix = self._path_template.get_prefix()
+            item.get_model().set_name(prefix)
+            item.setText(0, item.get_model().get_name())
+        
+
+    def _run_number_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.DataCollectionQueueItem):
+            if str(new_value).isdigit():
+                item.get_model().set_number(int(new_value))
+                item.setText(0, item.get_model().get_name())
+
+
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
 
@@ -90,13 +121,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
 
-            self._path_template = queue_model_objects.PathTemplate()
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._energy_scan_result = queue_model_objects.EnergyScanResult()
-            self._processing_parameters = queue_model_objects.ProcessingParameters()
-
-            sample_view_item = self.get_sample_item()
-            sample_data_model = sample_view_item.get_model()
+            self.init_models()
+            sample_data_model = self.get_sample_item().get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
             self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
 
@@ -105,14 +131,12 @@ class CreateDiscreteWidget(CreateTaskBase):
                 sub_dir =  'discrete-%i' % tree_item.get_model().\
                           get_next_number_for_name('Discrete')       
                 proc_directory = os.path.join(proc_directory, sub_dir)
-                data_directory = os.path.join(data_directory, sub_dir)                
+                data_directory = os.path.join(data_directory, sub_dir)     
             else:
                 (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
                 
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
-            
-            
             self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
 
             self._path_template.\

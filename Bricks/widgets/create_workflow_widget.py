@@ -4,6 +4,7 @@ import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import sys
+import os
 
 
 from create_task_base import CreateTaskBase
@@ -17,7 +18,7 @@ class CreateWorkflowWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, fl, 'Workflow')
 
         # Data attributes
-        self._path_template = queue_model_objects.PathTemplate()
+        self.init_models()
 
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 5, "main_v_layout")
@@ -34,6 +35,68 @@ class CreateWorkflowWidget(CreateTaskBase):
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addStretch()
 
+        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+                     qt.SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
+
+
+        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+                     qt.SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+        
+
+    def _prefix_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.GenericWorkflowQueueItem):
+            prefix = self._path_template.get_prefix()
+            item.get_model().set_name(prefix)
+            item.setText(0, item.get_model().get_name())
+        
+
+    def _run_number_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.GenericWorkflowQueueItem):
+            if str(new_value).isdigit():
+                item.get_model().set_number(int(new_value))
+                item.setText(0, item.get_model().get_name())
+
+
+    def init_models(self):
+        self._path_template = queue_model_objects.PathTemplate()
+
+
+    def _selection_changed(self, tree_item):
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+
+            self.init_models()
+            sample_data_model = self.get_sample_item().get_model()
+
+            if isinstance(tree_item, queue_item.SampleQueueItem):
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+                sub_dir =  'workflow-%i' % tree_item.get_model().\
+                          get_next_number_for_name('Workflow')       
+                proc_directory = os.path.join(proc_directory, sub_dir)
+                data_directory = os.path.join(data_directory, sub_dir)     
+            else:
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+                
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+
+            self._path_template.\
+                run_number = self._session_hwobj.\
+                get_free_run_number(self._path_template.base_prefix,
+                                    data_directory)
+        elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
+            workflow_model = tree_item.get_model()
+            self._path_template = workflow_model.path_template
+
+        self._data_path_widget.update_data_model(self._path_template)
+
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
@@ -42,7 +105,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
         path_template = copy.deepcopy(self._path_template)
         wf = queue_model_objects.Workflow()
-        wf.path_tempalte = path_template
+        wf.path_template = path_template
         wf.set_name(path_template.get_prefix())
         
         tasks.append(wf)

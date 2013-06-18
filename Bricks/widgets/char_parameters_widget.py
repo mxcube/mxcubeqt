@@ -29,7 +29,7 @@ class CharParametersWidget(QWidget):
         #
         # Private members
         #
-        self._data_collection = None
+        self._char = None
         self._char_params = queue_model_objects.CharacterisationParameters()
         self._char_params_mib = DataModelInputBinder(self._char_params)
         self._tree_view_item = None
@@ -266,14 +266,14 @@ class CharParametersWidget(QWidget):
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].\
                  path_template.get_prefix()
-        self._data_collection.set_name(prefix)
-        self._tree_view_item.setText(0, self._data_collection.get_name())
+        self._char.set_name(prefix)
+        self._tree_view_item.setText(0, self._char.get_name())
 
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
-            self._data_collection.set_number(int(new_value))
-            self._tree_view_item.setText(0, self._data_collection.get_name())
+            self._char.set_number(int(new_value))
+            self._tree_view_item.setText(0, self._char.get_name())
 
 
     def enable_aimed_mult_ledit(self, state):
@@ -299,17 +299,17 @@ class CharParametersWidget(QWidget):
 
     def populate_parameter_widget(self, tree_view_item):
         self._tree_view_item = tree_view_item
-        char = tree_view_item.get_model()
-        self._data_collection = char.reference_image_collection
-        self._char_params = char.characterisation_parameters
-        self._char_params_mib.set_model(char.characterisation_parameters)
+        self._char = tree_view_item.get_model()
+        self._data_collection = self._char.reference_image_collection
+        self._char_params = self._char.characterisation_parameters
+        self._char_params_mib.set_model(self._char.characterisation_parameters)
        
-        self.acq_widget.update_data_model(char.reference_image_collection.\
+        self.acq_widget.update_data_model(self._char.reference_image_collection.\
                                           acquisitions[0].acquisition_parameters,
-                                          char.reference_image_collection.\
+                                          self._char.reference_image_collection.\
                                           acquisitions[0].path_template)
         
-        self.path_widget.update_data_model(char.reference_image_collection.\
+        self.path_widget.update_data_model(self._char.reference_image_collection.\
                                            acquisitions[0].path_template)
         
         if self._data_collection.acquisitions[0].acquisition_parameters.\

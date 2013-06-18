@@ -99,6 +99,33 @@ class CreateHelicalWidget(CreateTaskBase):
         qt.QObject.connect(self._list_box, qt.SIGNAL("selectionChanged()"),
                         self.list_box_selection_changed)
 
+        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+                     qt.SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
+
+
+        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+                     qt.SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+        
+
+    def _prefix_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.DataCollectionQueueItem):
+            prefix = self._path_template.get_prefix()
+            item.get_model().set_name(prefix)
+            item.setText(0, item.get_model().get_name())
+        
+
+    def _run_number_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.DataCollectionQueueItem):
+            if str(new_value).isdigit():
+                item.get_model().set_number(int(new_value))
+                item.setText(0, item.get_model().get_name())
+
 
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \

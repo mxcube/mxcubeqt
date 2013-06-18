@@ -60,7 +60,7 @@ class EnergyScanParametersWidget(qt.QWidget):
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.energy_scan.set_number(int(new_value))
-            self._tree_view_item.setText(0, self._data_collection.get_name())
+            self._tree_view_item.setText(0, self.energy_scan.get_name())
         
 
     def populate_widget(self, item):

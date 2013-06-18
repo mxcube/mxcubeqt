@@ -28,39 +28,20 @@ class CreateCharWidget(CreateTaskBase):
 
         #
         # Data attributes
-        #        
-        self._char = queue_model_objects.Characterisation(None)
-        self._data_collection = self._char.reference_image_collection
-        self._path_template = self._data_collection.\
-                              acquisitions[0].path_template
-        
-        self._char_params = self._char.characterisation_parameters
-        self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
-        self._char_params_mib = DataModelInputBinder(self._char_params)
-
+        #
         self._current_selected_item = None
-
-        # The num images drop down default value is 1 
-        self._data_collection.acquisitions[0].\
-            acquisition_parameters.num_images = 2
-        self._char.characterisation_software =\
-            queue_model_objects.COLLECTION_ORIGIN.EDNA
-        self._path_template.num_files = 2
-
-        self._path_template.reference_image_prefix = 'ref'
-        
+        self.init_models()
+        self._char_params_mib = DataModelInputBinder(self._char_params)
+   
         #
         # Layout
         #
         v_layout = QVBoxLayout(self, 2, 6, "v_layout")
-        self._acq_widget = \
-            AcquisitionWidgetSimple(self, acq_params = self._data_collection.\
-                                    acquisitions[0].acquisition_parameters,
-                                    path_template = self._path_template)
+        self._acq_widget = AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
+                                                   path_template = self._path_template)
                 
         self._vertical_dimension_widget = VerticalCrystalDimensionWidgetLayout(self)
-        self._char_widget = CharacteriseSimpleWidgetVerticalLayout(self, 
-                                                                 "characterise_widget")
+        self._char_widget = CharacteriseSimpleWidgetVerticalLayout(self, "characterise_widget")
 
 
         self._data_path_gbox = QVGroupBox('Data location', self, 'data_path_gbox')
@@ -123,14 +104,63 @@ class CreateCharWidget(CreateTaskBase):
                                                 None)
 
 
+        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
+
+
+        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+        
+
+    def _prefix_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.CharacterisationQueueItem):
+            prefix = self._path_template.get_prefix()
+            item.get_model().set_name(prefix)
+            item.setText(0, item.get_model().get_name())
+        
+
+    def _run_number_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.CharacterisationQueueItem):
+            if str(new_value).isdigit():
+                item.get_model().set_number(int(new_value))
+                item.setText(0, item.get_model().get_name())
+
+
+    def init_models(self):
+        self._char = queue_model_objects.Characterisation()
+        self._data_collection = self._char.reference_image_collection
+        self._path_template = self._data_collection.\
+                              acquisitions[0].path_template
+        self._acquisition_parameters = self._data_collection.\
+                                       acquisitions[0].acquisition_parameters
+        
+        self._char_params = self._char.characterisation_parameters
+        self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
+
+        self._path_template.reference_image_prefix = 'ref'
+
+
+        # The num images drop down default value is 1
+        # we would like it to be 2
+        self._data_collection.acquisitions[0].\
+            acquisition_parameters.num_images = 2
+        self._char.characterisation_software =\
+            queue_model_objects.COLLECTION_ORIGIN.EDNA
+        self._path_template.num_files = 2
+
+
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
 
-            self._path_template = queue_model_objects.PathTemplate()
-
-            sample_view_item = self.get_sample_item()
-            sample_data_model = sample_view_item.get_model()
+            self.init_models()
+            sample_data_model = self.get_sample_item().get_model()
             
             if isinstance(tree_item, queue_item.SampleQueueItem):
                 (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
@@ -150,7 +180,20 @@ class CreateCharWidget(CreateTaskBase):
                 get_free_run_number(self._path_template.base_prefix,
                                     data_directory)
 
+        elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+            self._char = tree_item.get_model()
+            self._data_collection = self._char.reference_image_collection
+            self._path_template = self._data_collection.acquisitions[0].\
+                                  path_template
+            
+            self._char_params = self._char.characterisation_parameters
+            self._acquisition_parameters = self._data_collection.acquisitions[0].\
+                                           acquisition_parameters
+
+        self._acq_widget.update_data_model(self._acquisition_parameters,
+                                           self._path_template)
         self._data_path_widget.update_data_model(self._path_template)
+        self._char_params_mib.set_model(self._char_params)
 
 
 #     def set_energy(self, pos, wav):

@@ -27,7 +27,6 @@ class AcquisitionWidgetSimple(qt.QWidget):
 
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
-
         #   
         # Layout
         #
@@ -60,16 +59,35 @@ class AcquisitionWidgetSimple(qt.QWidget):
                            self.update_num_images)
 
 
-    def update_num_images(self, index):
-        if index is 0:
-            self._acquisition_parameters.num_images = 1
-            self._path_template.num_files = 1
-        elif index is 1:
-            self._acquisition_parameters.num_images = 2
-            self._path_template.num_files = 2
-        elif index is 2:
-            self._acquisition_parameters.num_images = 4
-            self._path_template.num_files = 4
+    def update_num_images(self, index = None, num_images = None):
+        if index:
+            if index is 0:
+                self._acquisition_parameters.num_images = 1
+                self._path_template.num_files = 1
+            elif index is 1:
+                self._acquisition_parameters.num_images = 2
+                self._path_template.num_files = 2
+            elif index is 2:
+                self._acquisition_parameters.num_images = 4
+                self._path_template.num_files = 4
+
+        if num_images:
+            if self.acq_widget_layout.num_images_cbox.count() > 3:
+                self.acq_widget_layout.num_images_cbox.removeItem(4)
+        
+            if num_images is 1:
+                self.acq_widget_layout.num_images_cbox.setCurrentItem(0)    
+            elif num_images is 2:
+                self.acq_widget_layout.num_images_cbox.setCurrentItem(1)
+            elif num_images is 4:
+                self.acq_widget_layout.num_images_cbox.setCurrentItem(2)
+            else:
+                self.acq_widget_layout.\
+                    num_images_cbox.insertItem(str(num_images))
+                self.acq_widget_layout.\
+                    num_images_cbox.setCurrentItem(3)
+
+            self._path_template.num_files = num_images
 
 
     def use_mad(self, state):
@@ -115,4 +133,5 @@ class AcquisitionWidgetSimple(qt.QWidget):
         self._acquisition_parameters = acquisition_parameters
         self._acquisition_mib.set_model(acquisition_parameters)
         self._path_template = path_template
-        self._path_template_mib.set_model(path_template)
+        self.update_num_images(None, acquisition_parameters.num_images)
+        #self._path_template_mib.set_model(path_template)
