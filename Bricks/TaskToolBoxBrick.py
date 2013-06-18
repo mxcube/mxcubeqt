@@ -20,7 +20,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("diffractometer", "string", "")
         self.addProperty("shape-history", "string", "/shape-history")
         self.addProperty("session", "string", "/session")
-        self.addProperty("bl-config", "string", "/mxlocal")
+        self.addProperty("bl-config", "string", "/bl-config")
 
         #Data atributes
         self.shape_history = None
