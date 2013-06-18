@@ -4,6 +4,7 @@ import copy
 import widget_utils
 import logging
 import math
+import os
 import ShapeHistory as shape_history
 
 from qt import *
@@ -120,6 +121,40 @@ class CreateCharWidget(CreateTaskBase):
                                                 self._vertical_dimension_widget.space_group_ledit,
                                                 str,
                                                 None)
+
+
+    def _selection_changed(self, tree_item):
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+
+            self._path_template = queue_model_objects.PathTemplate()
+
+            sample_view_item = self.get_sample_item()
+            sample_data_model = sample_view_item.get_model()
+            
+            if isinstance(tree_item, queue_item.SampleQueueItem):
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+                sub_dir =  'characterisation-%i' % tree_item.get_model().\
+                          get_next_number_for_name('Characterisation')       
+                proc_directory = os.path.join(proc_directory, sub_dir)
+                data_directory = os.path.join(data_directory, sub_dir)                
+            else:
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+                
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+
+            import pdb
+            pdb.set_trace()
+            
+            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+
+            self._path_template.\
+                run_number = self._session_hwobj.\
+                get_free_run_number(self._path_template.base_prefix,
+                                    data_directory)
+
+        self._data_path_widget.update_data_model(self._path_template)
 
 
 #     def set_energy(self, pos, wav):

@@ -178,8 +178,8 @@ class DataCollectTree(QWidget):
 
         if item:
             if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                menu.insertItem(QString("Rename"), self.rename_list_view_item)
-                menu.insertSeparator(1)
+                #menu.insertItem(QString("Rename"), self.rename_list_view_item)
+                #menu.insertSeparator(1)
                 menu.insertItem(QString("Remove"), self.delete_click)
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):

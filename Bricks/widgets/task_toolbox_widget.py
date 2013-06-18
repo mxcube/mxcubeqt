@@ -152,6 +152,7 @@ class TaskToolBoxWidget(qt.QWidget):
             item = items[0]            
             # Set current selected item in the relevant
             # toolbox widgets.
+
             self.discrete_page.selection_changed(item)
             self.char_page.selection_changed(item)
             self.helical_page.selection_changed(item)
