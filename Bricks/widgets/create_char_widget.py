@@ -142,11 +142,7 @@ class CreateCharWidget(CreateTaskBase):
                 (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
                 
             self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-
-            import pdb
-            pdb.set_trace()
-            
+            self._path_template.process_directory = proc_directory            
             self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
 
             self._path_template.\
