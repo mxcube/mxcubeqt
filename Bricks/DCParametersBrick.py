@@ -26,6 +26,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
 
         # Properties
         self.addProperty("session", "string", "/session")
+        self.addProperty("bl-config", "string", "/bl-config")
         
         # Layout
         self.stack = QWidgetStack(self, 'stack')
@@ -52,9 +53,10 @@ class DCParametersBrick(BaseComponents.BlissWidget):
                         SIGNAL('clicked()'),
                         self.toggle_page)
 
+        
         self.toggle_page_button.setDisabled(True)
 
-    
+
     def populate_parameter_widget(self, item):
         data_collection = item.get_model()
         
@@ -88,3 +90,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         if property_name == 'session':
             session_hwobj = self.getHardwareObject(new_value)
             self.parameters_widget.path_widget.set_session(session_hwobj)
+        elif property_name == 'bl-config':            
+            self.bl_config_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.set_bl_config(\
+                self.bl_config_hwobj)

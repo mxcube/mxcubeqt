@@ -74,6 +74,10 @@ class DCParametersWidget(QWidget):
                      self._run_number_ledit_change)
 
 
+    def set_bl_config(self, bl_config):
+        self.acq_widget.set_bl_config(bl_config)
+
+
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].\
                  path_template.get_prefix()
