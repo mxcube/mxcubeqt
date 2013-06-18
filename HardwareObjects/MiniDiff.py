@@ -566,14 +566,17 @@ class MiniDiff(Equipment):
       
 
     def do_auto_centring(self, phi, phiy, phiz, sampx, sampy, zoom, camera, phiy_direction):
+        saveimg = []
         imgWidth = camera.getWidth()
         imgHeight = camera.getHeight()
 
         def find_loop(zoom=0,show_point=True,virtCenter=(-1,-1)):
+          time.sleep(0.5)
           jpeg_data = camera.getChannelObject("jpegImage").getValue().tostring()
           jpeg_file = open("/tmp/mxCuBE_snapshot.jpg", "w")
           jpeg_file.write(jpeg_data)
           jpeg_file.close()
+          saveimg.append(jpeg_data)
           logging.info("virtual center : (%d,%d)" % (virtCenter[0],virtCenter[1]))
           #img_array = numpy.fromstring(camera.getChannelObject("image").getValue().tostring(), numpy.uint8)
           #img_array.shape = (imgHeight, imgWidth)
@@ -693,7 +696,7 @@ class MiniDiff(Equipment):
             return
         lastCoord = []
         centred = False
-        for i in range(6):
+        for i in range(4):
           motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ)
           gevent.spawn(move_to_centred_position, motor_pos).get()
           checked,lastCoord = check_centring()
@@ -749,8 +752,16 @@ class MiniDiff(Equipment):
              motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,2)
              gevent.spawn(move_to_centred_position, motor_pos).get()
              if (check_centring(1))[0]:
-                #find_face(1)
-                return motor_pos
+                 #find_face(1)
+                 return motor_pos
+             else:
+                 tt=time.ctime()
+                 os.makedirs('/users/opid23/save_bci/'+tt)
+                 numpy.save('/users/opid23/save_bci/'+tt+'/nparrjpg',numpy.array(saveimg))
+        else:
+            tt=time.ctime()
+            os.makedirs('/users/opid23/save_bci/'+tt)
+            numpy.save('/users/opid23/save_bci/'+tt+'/nparrjpg',numpy.array(saveimg))
 
     def startAutoCentring(self,sample_info=None, loop_only=False):
         self.currentCentringProcedure = gevent.spawn(self.do_auto_centring, self.phiMotor,
