@@ -80,8 +80,10 @@ class EDNAParameters(BlissWidget):
         pass
 
     def setExpertMode(self, expert):
-        self.setEnabled(expert)
-        self.emit(PYSIGNAL('workflowAvailable'), (expert, ))
+        self.setEnabled(True)
+        self.emit(PYSIGNAL('workflowAvailable'), (True, ))
+        #self.setEnabled(expert)
+        #self.emit(PYSIGNAL('workflowAvailable'), (expert, ))
 
     def propertyChanged(self, prop, old_val, new_val):
         if prop == 'mnemonic':
