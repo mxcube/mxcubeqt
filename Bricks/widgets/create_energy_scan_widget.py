@@ -104,10 +104,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
 
-            self._path_template.\
-                run_number = self._session_hwobj.\
-                get_free_run_number(self._path_template.base_prefix,
-                                    data_directory)
+            self._path_template.run_number = self._current_selected_item.\
+                get_model().get_next_number_for_name(self._path_template.get_prefix())
+            
         elif isinstance(tree_item, queue_item.EnergyScanQueueItem):
             escan_model = tree_item.get_model()
             self._path_template = escan_model.path_template

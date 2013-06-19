@@ -155,12 +155,10 @@ class CreateHelicalWidget(CreateTaskBase):
             
             
             self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+            self._path_template.run_number = self._current_selected_item.\
+                get_model().get_next_number_for_name(self._path_template.get_prefix())
 
-            self._path_template.\
-                run_number = self._session_hwobj.\
-                get_free_run_number(self._path_template.base_prefix,
-                                    data_directory)
-        
+
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
             self._path_template = data_collection.acquisitions[0].path_template
