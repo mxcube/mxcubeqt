@@ -329,5 +329,5 @@ class CharParametersWidget(QWidget):
         
         self.char_type_widget.charact_type_tbox.setCurrentItem(item)
         self.char_type_widget.toggle_time_dose()
-        crystal = char.reference_image_collection.crystal
+        crystal = self._char.reference_image_collection.crystal
         self.acq_widget.set_energies(crystal.energy_scan_result)
