@@ -109,7 +109,10 @@ class EDNAParameters(BlissWidget):
 
     def prompt_parameters(self, xml):
         logging.debug('got back XML from server:\n%s', xml)
-        xml_root = etree.fromstring(xml)
+        # Edited by Olof 2013/04/16: Temporary fix for handling messages containing
+        # XML markup
+        #xml_root = etree.fromstring(xml)
+        xml_root = etree.fromstring(xml, parser=etree.XMLParser(recover=True))
 
         # Special case until Olof implements the saner XML format on the server side
         if xml_root.tag == 'message':
