@@ -457,7 +457,7 @@ class TreeBrick(BaseComponents.BlissWidget):
             elif isinstance(item, queue_item.CharacterisationQueueItem):
                 self.populate_edna_parameters_tab(item)
 
-        self.emit(PYSIGNAL("selection_changed"), (items,))
+            self.emit(PYSIGNAL("selection_changed"), (items,))
 
 
     def new_centred_positions(self, state, centring_status):
