@@ -92,6 +92,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("populate_sample_details",())
         self.defineSignal("selection_changed",())
         self.defineSignal("populate_energy_scan_widget", ())
+        self.defineSignal("populate_workflow_tab", ())
         
 
         # Layout
@@ -409,6 +410,10 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.populate_energy_scan_tab(item)
 
 
+    def populate_energy_scan_tab(self, item):
+        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item,))
+
+
     def show_work_flow_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show details")
         self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
@@ -418,10 +423,11 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(PYSIGNAL("hide_workflow_tab"), (False,))
+        self.populate_workflow_tab(item)
 
 
-    def populate_energy_scan_tab(self, item):
-        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item,))
+    def populate_workflow_tab(self, item):
+        self.emit(PYSIGNAL("populate_workflow_tab"), (item,))
         
 
     def toggle_sample_changer_tab(self): 
