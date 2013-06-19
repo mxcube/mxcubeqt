@@ -29,6 +29,7 @@ class EDNAParameters(BlissWidget):
         #when starting a workflow we emit this signal and expect
         #to get the beamline params through the slot
         self.defineSlot('updateBeamlineParameters', ())
+        self.defineSlot("populate_workflow_widget",({}))  
         self.defineSignal('beamlineParametersNeeded', ())
         self.defineSignal('workflowAvailable', ())
 
@@ -313,9 +314,14 @@ class EDNAParameters(BlissWidget):
         self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1)
         self.params_widget.show()
 
+
     def login_changed(self, *login_infos):
         logging.debug('user logged in, logins_info: %r', login_infos)
         if len(login_infos) == 1 and login_infos[0] == None:
             self.session_id = None
         else:
             self.session_id = int(login_infos[0])
+
+
+    def populate_workflow_widget(self, item):
+        print item.get_model().path_template.directory
