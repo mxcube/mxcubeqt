@@ -329,4 +329,6 @@ class EDNAParameters(BlissWidget):
 
 
     def populate_workflow_widget(self, item):
-        print item.get_model().path_template.directory
+         self.beamline_params['directory'] = item.get_model().path_template.directory
+         self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
+         self.beamline_params['run_number'] = item.get_model().path_template.run_number
