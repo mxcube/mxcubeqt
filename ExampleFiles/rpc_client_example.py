@@ -70,4 +70,7 @@ for energy in energies:
     server.log_message('Collection added for %s added' % energy[1], 'info')
 
 server.log_message('Executing queue.', 'info')
+
 server.start_queue()
+# Or if you just want to execute the group
+#server.queue_execute_entry_with_id(dcg_id)
