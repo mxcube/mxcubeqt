@@ -302,7 +302,6 @@ class EDNAParameters(BlissWidget):
             self.beamline_params[k] = value
 
 
-
     def workflow_selected(self, name):
         if type(name) != types.StringType:
             name = str(name)
@@ -332,3 +331,8 @@ class EDNAParameters(BlissWidget):
          self.beamline_params['directory'] = item.get_model().path_template.directory
          self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
          self.beamline_params['run_number'] = item.get_model().path_template.run_number
+         self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
+         self.beamline_params['sample_node_id'] = item.get_model().get_parent().\
+                                                  get_parent()._node_id
+         self.beamline_params['group_node_id'] = item.get_model().get_parent().\
+                                                 get_parent()._node_id
