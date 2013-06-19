@@ -32,7 +32,7 @@ class CreateTaskBase(qt.QWidget):
 
 
     def tab_changed(self, tab_index, tab):
-        if tab_index is 0:
+        if tab_index is 0 and self._session_hwobj.proposal_code:
             self.selection_changed(self._current_selected_item)
 
 
@@ -155,18 +155,19 @@ class CreateTaskBase(qt.QWidget):
                 proc_directory)
 
 
-    def ispyb_logged_in(self, logged_in):        
-        data_path_widget = self.get_data_path_widget()
-        sample_item = self.get_sample_item()
-        sample_data_node = sample_item.get_model() if sample_item else None
+    def ispyb_logged_in(self, logged_in):
+        if logged_in:
+            data_path_widget = self.get_data_path_widget()
+            sample_item = self.get_sample_item()
+            sample_data_node = sample_item.get_model() if sample_item else None
 
-        if data_path_widget and sample_data_node:
-            (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
-            prefix = self.get_default_prefix(sample_data_node)
+            if data_path_widget and sample_data_node:
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
+                prefix = self.get_default_prefix(sample_data_node)
 
-            data_path_widget.set_directory(data_directory)
-            data_path_widget.set_prefix(prefix)
-            self._path_template.process_directory = proc_directory
+                data_path_widget.set_directory(data_directory)
+                data_path_widget.set_prefix(prefix)
+                self._path_template.process_directory = proc_directory
             
 
     def selection_changed(self, tree_item):
