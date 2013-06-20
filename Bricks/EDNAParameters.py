@@ -250,7 +250,7 @@ class EDNAParameters(BlissWidget):
         self.emit(PYSIGNAL('beamlineParametersNeeded'), ())
         name = str(self.workflow_list.currentText())
         params = ['modelpath', self.workflows[name]['path']]
-        blparams = XSDataMXCuBEParameters()
+        #blparams = XSDataMXCuBEParameters()
         for k,v in self.beamline_params.iteritems():
             # we'll have to lookup how those are specified someday
             # it's a (bool, string, string) tuple
@@ -265,21 +265,23 @@ class EDNAParameters(BlissWidget):
                 param = v[0]
             else: param=v
             logging.debug('setting %s to %r', k, param)
-            setattr(blparams, k, param)
+            #setattr(blparams, k, param)
+            params.append(k)
+            params.append(str(param))
         # we also need the session id
-        blparams.sessionId = self.session_id
-        output_dir = self.beamline_params['directory'].replace('RAW_DATA', 'PROCESSED_DATA')
+        #blparams.sessionId = self.session_id
+        #output_dir = self.beamline_params['directory'].replace('RAW_DATA', 'PROCESSED_DATA')
         # we'll need that one later to pass to the edna characterise HO
-        self.process_dir = output_dir
-	if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        (handle, filename) = tempfile.mkstemp(suffix='.xml', prefix='edna_output_', dir=output_dir)
-        blparams.output_file = filename
+        #self.process_dir = output_dir
+	#if not os.path.exists(output_dir):
+        #    os.makedirs(output_dir)
+        #(handle, filename) = tempfile.mkstemp(suffix='.xml', prefix='edna_output_', dir=output_dir)
+        #blparams.output_file = filename
         
         # convert that stuff to xml
-        params.append('mxcube_parameters')
-        params.append(blparams.marshal())
-        self.workflow_output_file = filename
+        #params.append('mxcube_parameters')
+        #params.append(blparams.marshal())
+        #self.workflow_output_file = filename
         logging.debug('starting workflow %s with params %r', name, params)
         self.workflow.start(params)
 
