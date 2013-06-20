@@ -104,7 +104,6 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
         else:
             if value<self['currentThreshold']:
                 self.setStateColor('error')
-                QMessageBox.warning(self, 'mxCuBE', 'Warning: Check machine current') 
             else:
                 self.setStateColor('ready')
             svalue = '<b>%s</b> mA' % str(self['formatString'] % value)
@@ -131,6 +130,10 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
     def setStateColor(self,state):
         color=MachCurrentBrick.STATES[state]
         self.current.setPaletteBackgroundColor(QColor(color))
+
+        #if state == 'error':
+            #QMessageBox.warning(self, 'mxCuBE', 'Warning: Check machine current') 
+        
 
     def fontChange(self,oldFont):
         font=self.font()
