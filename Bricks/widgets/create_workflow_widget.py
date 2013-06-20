@@ -5,6 +5,7 @@ import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import sys
 import os
+import MxLookupScanBrick
 
 
 from create_task_base import CreateTaskBase
@@ -31,8 +32,22 @@ class CreateWorkflowWidget(CreateTaskBase):
         self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
         self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
 
+        self._grid_widget = MxLookupScanBrick.\
+                            MxLookupScanBrick(self, 'grid_widget')
 
+
+        self._grid_widget.command = '/eh1/scans'
+        self._grid_widget.horizontal = '/eh1/horizontal_motors'
+        self._grid_widget.vertical = '/eh1/vertical_motors'
+        self._grid_widget.offsetmeasure = 1000
+
+        self._grid_widget.propertyChanged('command', '' , '/eh1/scans')
+        self._grid_widget.propertyChanged('horizontal', '', '/eh1/horizontal_motors')
+        self._grid_widget.propertyChanged('vertical', '', '/eh1/vertical_motors')
+        self._grid_widget.propertyChanged('offsetmeasure', 0, 1000)
+        
         v_layout.addWidget(self._data_path_gbox)
+        v_layout.addWidget(self._grid_widget)
         v_layout.addStretch()
 
         self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
