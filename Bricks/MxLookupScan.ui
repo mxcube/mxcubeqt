@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>579</width>
-            <height>214</height>
+            <width>387</width>
+            <height>190</height>
         </rect>
     </property>
     <property name="caption">
@@ -18,6 +18,9 @@
     <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>2</number>
         </property>
         <widget class="QGroupBox">
             <property name="name">
@@ -31,12 +34,18 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
+            <property name="margin">
+                <number>5</number>
+            </property>
             <property name="title">
                 <string>Grid</string>
             </property>
             <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>10</number>
                 </property>
                 <widget class="QLayoutWidget" row="2" column="0">
                     <property name="name">
@@ -105,40 +114,25 @@
                         <property name="text">
                             <string>points per line</string>
                         </property>
-                        <property name="pixmap">
-                            <pixmap></pixmap>
-                        </property>
                     </column>
                     <column>
                         <property name="text">
                             <string>steps (mm)</string>
-                        </property>
-                        <property name="pixmap">
-                            <pixmap></pixmap>
                         </property>
                     </column>
                     <column>
                         <property name="text">
                             <string>distance</string>
                         </property>
-                        <property name="pixmap">
-                            <pixmap></pixmap>
-                        </property>
                     </column>
                     <row>
                         <property name="text">
                             <string>Axis 1</string>
                         </property>
-                        <property name="pixmap">
-                            <pixmap></pixmap>
-                        </property>
                     </row>
                     <row>
                         <property name="text">
                             <string>Axis 2</string>
-                        </property>
-                        <property name="pixmap">
-                            <pixmap></pixmap>
                         </property>
                     </row>
                     <property name="name">
