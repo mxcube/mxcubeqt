@@ -230,10 +230,14 @@ class CharParametersWidget(QWidget):
                                             QDoubleValidator(0.0, 1000, 2, self))
 
 
-        self._char_params_mib.bind_value_update('space_group',
-                                                self.vertical_dimension_widget.space_group_ledit,
-                                                str,
-                                                None)
+        #self._char_params_mib.bind_value_update('space_group',
+        #                                        self.vertical_dimension_widget.space_group_ledit,
+        #                                        str,
+        #                                        None)
+
+
+        self.vertical_dimension_widget.space_group_ledit.\
+            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
 
 
         QObject.connect(self.char_type_widget.charact_type_tbox,
@@ -261,6 +265,25 @@ class CharParametersWidget(QWidget):
         QObject.connect(self.path_widget.data_path_widget_layout.run_number_ledit, 
                         SIGNAL("textChanged(const QString &)"), 
                         self._run_number_ledit_change)
+
+
+        QObject.connect(self.vertical_dimension_widget.space_group_ledit,
+                        SIGNAL("activated(int)"),
+                        self._space_group_change)
+
+
+    def _space_group_change(self, index):
+        self._char_params.space_group = queue_model_objects.\
+                                        XTAL_SPACEGROUPS[index]
+
+    def _set_space_group(self, space_group):
+        index  = 0
+        
+        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
+            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+
+        self._space_group_change(index)
+        self.vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
 
 
     def _prefix_ledit_change(self, new_value):
@@ -303,6 +326,7 @@ class CharParametersWidget(QWidget):
         self._data_collection = self._char.reference_image_collection
         self._char_params = self._char.characterisation_parameters
         self._char_params_mib.set_model(self._char.characterisation_parameters)
+        self._set_space_group(self._char_params.space_group)
        
         self.acq_widget.update_data_model(self._char.reference_image_collection.\
                                           acquisitions[0].acquisition_parameters,

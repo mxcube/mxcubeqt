@@ -98,11 +98,14 @@ class CreateCharWidget(CreateTaskBase):
                                                 float,
                                                 QDoubleValidator(0.0, 1000, 2, self))
 
-        self._char_params_mib.bind_value_update('space_group',
-                                                self._vertical_dimension_widget.space_group_ledit,
-                                                str,
-                                                None)
+        # self._char_params_mib.bind_value_update('space_group',
+        #                                         self._vertical_dimension_widget.space_group_ledit,
+        #                                         str,
+        #                                         None)
 
+        
+        self._vertical_dimension_widget.space_group_ledit.\
+            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
 
         self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
                      SIGNAL("textChanged(const QString &)"), 
@@ -112,8 +115,27 @@ class CreateCharWidget(CreateTaskBase):
         self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
                      SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
-        
 
+
+        self.connect(self._vertical_dimension_widget.space_group_ledit,
+                     SIGNAL("activated(int)"),
+                     self._space_group_change)    
+
+
+    def _space_group_change(self, index):
+       self._char_params.space_group = queue_model_objects.\
+                                       XTAL_SPACEGROUPS[index]
+
+    def _set_space_group(self, space_group):
+        index  = 0
+        
+        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
+            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+
+        self._space_group_change(index)
+        self._vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
+
+        
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_item
         
@@ -189,6 +211,7 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters = self._data_collection.acquisitions[0].\
                                            acquisition_parameters
 
+        self._set_space_group(self._char_params.space_group)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                            self._path_template)
         self._data_path_widget.update_data_model(self._path_template)

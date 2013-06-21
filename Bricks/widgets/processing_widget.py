@@ -25,11 +25,14 @@ class ProcessingWidget(qt.QWidget):
         self.layout_widget.use_code_radio.setDisabled(True)
         self.layout_widget.path_ledit.setDisabled(True)
         self.layout_widget.browse_button.setDisabled(True)
+
+        self.layout_widget.space_group_ledit.\
+            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
         
-        self._model_mib.bind_value_update('space_group',
-                                          self.layout_widget.space_group_ledit,
-                                          str,
-                                          None)
+        #self._model_mib.bind_value_update('space_group',
+        #                                  self.layout_widget.space_group_ledit,
+        #                                  int,
+        #                                  None)
 
         self._model_mib.bind_value_update('cell_a',
                                           self.layout_widget.a_ledit,
@@ -76,6 +79,27 @@ class ProcessingWidget(qt.QWidget):
                                           bool,
                                           None)
 
+        self.connect(self.layout_widget.space_group_ledit,
+                     qt.SIGNAL("activated(int)"),
+                     self._space_group_change)    
+
+
+    def _space_group_change(self, index):
+        self._model.space_group = queue_model_objects.\
+                                 XTAL_SPACEGROUPS[index]
+
+
+    def _set_space_group(self, space_group):
+        index = 0
+
+        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
+            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+        
+        self._space_group_change(index)
+        self.layout_widget.space_group_ledit.setCurrentItem(index)
+        
+
     def update_data_model(self, model):
         self._model = model
         self._model_mib.set_model(model)
+        self._set_space_group(model.space_group)
