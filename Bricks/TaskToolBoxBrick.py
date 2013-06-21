@@ -59,6 +59,10 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         # helper classes for handling centred positions.
         d = {}
         self.emit(qt.PYSIGNAL("getView"), (d, ))
+        self.task_tool_box_widget.workflow_page._grid_widget.connectToView(d)
+        self.task_tool_box_widget.workflow_page.\
+            _grid_widget._shape_history = self.shape_history
+        
         self.shape_history.set_drawing(d.get('drawing', None))
         self.shape_history.get_drawing_event_handler().\
             selection_cb = self.shape_selected
