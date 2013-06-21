@@ -19,10 +19,18 @@ class CreateWorkflowWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, fl, 'Workflow')
 
         # Data attributes
+        self.workflow = None
+        
         self.init_models()
 
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 5, "main_v_layout")
+
+        self._workflow_type_gbox = qt.QVGroupBox('Workflow type', self,
+                                                 'workflow_rtype')
+
+        self._wokflow_cbox = qt.QComboBox(self._workflow_type_gbox)
+
         self._data_path_gbox = qt.QVGroupBox('Data location', self,
                                              'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
@@ -31,6 +39,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
         self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
         self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
+
 
         self._grid_widget = MxLookupScanBrick.\
                             MxLookupScanBrick(self, 'grid_widget')
@@ -45,7 +54,8 @@ class CreateWorkflowWidget(CreateTaskBase):
         self._grid_widget.propertyChanged('horizontal', '', '/eh1/horizontal_motors')
         self._grid_widget.propertyChanged('vertical', '', '/eh1/vertical_motors')
         self._grid_widget.propertyChanged('offsetmeasure', 0, 1000)
-        
+
+        v_layout.addWidget(self._workflow_type_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._grid_widget)
         v_layout.addStretch()
