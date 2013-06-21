@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui_files/processing_widget_vertical_layout.ui'
 #
-# Created: Mon Mar 25 09:56:13 2013
+# Created: Fri Jun 21 15:28:22 2013
 #      by: The PyQt User Interface Compiler (pyuic) 3.18.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -53,7 +53,7 @@ class ProcessingWidgetVerticalLayout(QWidget):
         self.num_residues_ledit.setMaximumSize(QSize(75,32767))
         space_group_layout_ledit.addWidget(self.num_residues_ledit)
 
-        self.space_group_ledit = QLineEdit(self,"space_group_ledit")
+        self.space_group_ledit = QComboBox(0,self,"space_group_ledit")
         self.space_group_ledit.setMinimumSize(QSize(75,0))
         self.space_group_ledit.setMaximumSize(QSize(75,32767))
         space_group_layout_ledit.addWidget(self.space_group_ledit)

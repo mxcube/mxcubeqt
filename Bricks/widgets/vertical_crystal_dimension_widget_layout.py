@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui_files/vertical_crystal_dimension_widget_layout.ui'
 #
-# Created: Mon Mar 25 09:56:13 2013
+# Created: Fri Jun 21 15:28:23 2013
 #      by: The PyQt User Interface Compiler (pyuic) 3.18.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,13 +41,13 @@ class VerticalCrystalDimensionWidgetLayout(QWidget):
         self.space_group_label = QLabel(self.gbox,"space_group_label")
         space_group_ledit_layout.addWidget(self.space_group_label)
 
-        self.space_group_ledit = QLineEdit(self.gbox,"space_group_ledit")
+        self.space_group_ledit = QComboBox(0,self.gbox,"space_group_ledit")
         self.space_group_ledit.setMinimumSize(QSize(100,0))
         self.space_group_ledit.setMaximumSize(QSize(100,32767))
         space_group_ledit_layout.addWidget(self.space_group_ledit)
         space_group_layout.addLayout(space_group_ledit_layout)
-        spacer2 = QSpacerItem(1,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
-        space_group_layout.addItem(spacer2)
+        space_group_hspacer = QSpacerItem(1,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        space_group_layout.addItem(space_group_hspacer)
         main_layout.addLayout(space_group_layout)
 
         vdim_layout = QVBoxLayout(None,0,2,"vdim_layout")
