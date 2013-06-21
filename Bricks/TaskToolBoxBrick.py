@@ -21,6 +21,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("shape-history", "string", "/shape-history")
         self.addProperty("session", "string", "/session")
         self.addProperty("bl-config", "string", "/bl-config")
+        self.addProperty("workflow", "string", "/ednaparams")   
 
         #Data atributes
         self.shape_history = None
@@ -176,6 +177,10 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             self.bl_config_hwobj = self.getHardwareObject(new_value)
             self.task_tool_box_widget.set_bl_config(\
                 self.bl_config_hwobj)
+
+        elif property_name == 'workflow':
+            self.task_tool_box_widget.workflow_page.\
+                set_workflow(self.getHardwareObject(new_value))
 
         #if property_name =='tunable-energy':
         #    self.task_tool_box_widget.set_tunable_energy(new_value)

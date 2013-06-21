@@ -338,3 +338,5 @@ class EDNAParameters(BlissWidget):
                                                   get_parent()._node_id
          self.beamline_params['group_node_id'] = item.get_model().get_parent().\
                                                  get_parent()._node_id
+
+         #self.workflow_selected(item.get_model().get_type())
