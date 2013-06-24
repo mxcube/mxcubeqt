@@ -21,12 +21,14 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("shape-history", "string", "/shape-history")
         self.addProperty("session", "string", "/session")
         self.addProperty("bl-config", "string", "/bl-config")
+        self.addProperty("beamline_setup", "string", "/beamline_setup")
 
         #Data atributes
         self.shape_history = None
         self.tree_brick = None
         self.ispyb_logged_in = False
         self.diffractometer_hwobj = None
+        self.beamline_setup = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -176,6 +178,12 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             self.bl_config_hwobj = self.getHardwareObject(new_value)
             self.task_tool_box_widget.set_bl_config(\
                 self.bl_config_hwobj)
+
+        elif property_name == 'beamline-setup':
+            self.beamline_setup_hwobj = self.getHardwareObject(new_value)
+            self.task_tool_box_widget.set_bl_config(\
+                self.bl_config_hwobj)
+            
 
         #if property_name =='tunable-energy':
         #    self.task_tool_box_widget.set_tunable_energy(new_value)
