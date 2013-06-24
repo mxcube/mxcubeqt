@@ -22,7 +22,8 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("session", "string", "/session")
         self.addProperty("bl-config", "string", "/bl-config")
         self.addProperty("workflow", "string", "/ednaparams")   
-		self.addProperty("beamline_setup", "string", "/beamline_setup")
+        self.addProperty("beamline_setup", "string", "/beamline_setup")
+
         #Data atributes
         self.shape_history = None
         self.tree_brick = None
