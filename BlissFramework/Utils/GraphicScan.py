@@ -96,7 +96,7 @@ class BaseGraphicScan(BlissWidget) :
     def propertyChanged(self,property,oldValue,newValue):
         if property == 'horizontal' or property == 'vertical' :
             try:
-                hardwareObject = self.getHardwareObject(self[property])
+                hardwareObject = self.getHardwareObject(newValue)
                 if hardwareObject is None:
                     return
             except:
@@ -150,14 +150,20 @@ class BaseGraphicScan(BlissWidget) :
         """
         get view
         """
+        
         view = {}
         self.emit(qt.PYSIGNAL("getView"), (view,))
         try:
-            self._view = view["drawing"]
+            self.connectToView(view)
         except:
             logging.getLogger().error('view is not connected to MeshScanBrick')
             return
-        
+      
+
+
+    def connectToView(self, view):
+        self._view = view["drawing"]
+
         if self._view is not None :
             gButton = self._widgetTree.child('__grabButton')
             gButton.show()
@@ -174,7 +180,6 @@ class BaseGraphicScan(BlissWidget) :
             self.connect(self._view, qt.PYSIGNAL("ForegroundColorChanged"),
                          self._setColor)
             self._viewConnect(self._view)
-
 
             
     def ChangeBeamPosition(self,x,y) :

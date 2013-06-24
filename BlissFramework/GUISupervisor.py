@@ -60,7 +60,7 @@ class BlissSplashScreen(qt.QSplashScreen):
 
 
 class GUISupervisor(qt.QWidget):
-    def __init__(self, executionOnly = False, designMode = False, showMaximized=False, noBorder=False):
+    def __init__(self, designMode = False, showMaximized=False, noBorder=False):
         qt.QWidget.__init__(self)
 
         self.launchInDesignMode = designMode

@@ -35,16 +35,17 @@ Example of valid Hardware Object XML :
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 from qt import *
+from BlissFramework.Utils import widget_colors
 
 __category__ = "Synoptic"
 __author__ = "Vicente Rey, Matias Guijarro, Jose Gabadinho"
 __version__ = 1.0
 
-CRYO_COLORS = { "OFF": QWidget.gray,
-                "SATURATED": QWidget.red,
-                "READY": QWidget.green,
-                "WARNING": QWidget.yellow,
-                "FROZEN": QWidget.magenta,
+CRYO_COLORS = { "OFF": widget_colors.GRAY,
+                "SATURATED": widget_colors.LIGHT_RED,
+                "READY": widget_colors.LIGHT_GREEN,
+                "WARNING": widget_colors.LIGHT_YELLOW,
+                "FROZEN": widget_colors.LIGHT_BLUE,
                 "UNKNOWN": None }
 
 class CryoSpyBrick(BlissWidget):
@@ -64,37 +65,37 @@ class CryoSpyBrick(BlissWidget):
 
         self.temperature=QLabel(self.containerBox)
         self.temperature.setAlignment(QLabel.AlignCenter)
-        self.temperature.setPaletteForegroundColor(QColor(QWidget.white))
-        #self.temperature.setPaletteBackgroundColor(QColor(QWidget.cyan))
+        self.temperature.setPaletteForegroundColor(widget_colors.WHITE)
+        #self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
         font=self.temperature.font()
         font.setStyleHint(QFont.OldEnglish)
         self.temperature.setFont(font)
 
         #self.level=QProgressBar(self.containerBox)
 
-        grid1=QWidget(self.containerBox)
-        QGridLayout(grid1, 3, 2, 2, 1)
+        # grid1=QWidget(self.containerBox)
+        # QGridLayout(grid1, 3, 2, 2, 1)
 
-        label1=QLabel("Dry:",grid1)
-        grid1.layout().addWidget(label1, 0, 0)
-        self.dryState=QLabel(grid1)
-        self.dryState.setAlignment(QLabel.AlignCenter)
-        self.dryState.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
-        grid1.layout().addWidget(self.dryState, 0, 1)
+        # label1=QLabel("Dry:",grid1)
+        # grid1.layout().addWidget(label1, 0, 0)
+        # self.dryState=QLabel(grid1)
+        # self.dryState.setAlignment(QLabel.AlignCenter)
+        # self.dryState.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        # grid1.layout().addWidget(self.dryState, 0, 1)
 
-        label2=QLabel("Superdry:",grid1)
-        grid1.layout().addWidget(label2, 1, 0)
-        self.superdryState=QLabel(grid1)
-        self.superdryState.setAlignment(QLabel.AlignCenter)
-        self.superdryState.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
-        grid1.layout().addWidget(self.superdryState, 1, 1)
+        # label2=QLabel("Superdry:",grid1)
+        # grid1.layout().addWidget(label2, 1, 0)
+        # self.superdryState=QLabel(grid1)
+        # self.superdryState.setAlignment(QLabel.AlignCenter)
+        # self.superdryState.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        # grid1.layout().addWidget(self.superdryState, 1, 1)
 
-        label3=QLabel("Icing:",grid1)
-        grid1.layout().addWidget(label3, 2, 0)
-        self.icingState=QLabel(grid1)
-        self.icingState.setAlignment(QLabel.AlignCenter)
-        self.icingState.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
-        grid1.layout().addWidget(self.icingState, 2, 1)
+        # label3=QLabel("Icing:",grid1)
+        # grid1.layout().addWidget(label3, 2, 0)
+        # self.icingState=QLabel(grid1)
+        # self.icingState.setAlignment(QLabel.AlignCenter)
+        # self.icingState.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        # grid1.layout().addWidget(self.icingState, 2, 1)
 
         self.containerBox.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
@@ -111,7 +112,7 @@ class CryoSpyBrick(BlissWidget):
         try:
             t = float(temp)
         except TypeError:
-            self.temperature.setPaletteBackgroundColor(QColor(QWidget.darkGray))
+            self.temperature.setPaletteBackgroundColor(widget_colors.DARK_GRAY)
             #self.temperature.setText("?%s" % chr(176))
             self.temperature.setText("? K")
         else:
@@ -119,13 +120,13 @@ class CryoSpyBrick(BlissWidget):
             self.temperature.setText(svalue)
 
             if temp > self["warningTemp"]:
-              self.temperature.setPaletteBackgroundColor(QColor(QWidget.red))
+              self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
               if not old["warning"]:
                 old["warning"]=True
                 QMessageBox.critical(self, "Warning: risk for sample", "Cryo temperature is too high - sample is in danger!\nPlease fix the problem with cryo cooler") 
             else:
               old["warning"]=False 
-              self.temperature.setPaletteBackgroundColor(QColor(QWidget.cyan))
+              self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
               
 
     def setDrier(self, status):
@@ -193,30 +194,30 @@ class CryoSpyBrick(BlissWidget):
             if self.cryodev is not None:
                 self.disconnect(self.cryodev, PYSIGNAL("levelChanged"), self.setLevel)
                 self.disconnect(self.cryodev, PYSIGNAL("temperatureChanged"), self.setTemperature)
-                self.disconnect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
-                self.disconnect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
-                self.disconnect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
+                #self.disconnect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
+                #self.disconnect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
+                #self.disconnect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
                 
             self.cryodev = self.getHardwareObject(newValue)
             if self.cryodev is not None:
                 self.containerBox.setEnabled(True)
                 self.connect(self.cryodev, PYSIGNAL("levelChanged"), self.setLevel)
                 self.connect(self.cryodev, PYSIGNAL("temperatureChanged"), self.setTemperature)
-                self.connect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
-                self.connect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
-                self.connect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
+                #self.connect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
+                #self.connect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
+                #self.connect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
 
                 self.setLevel(self.cryodev.n2level)
                 self.setTemperature(self.cryodev.temp)
-                self.setIcing(self.cryodev.cryo_status)
-                self.setDrier(self.cryodev.dry_status)
-                self.setSDrier(self.cryodev.sdry_status)
+                #self.setIcing(self.cryodev.cryo_status)
+                #self.setDrier(self.cryodev.dry_status)
+                #self.setSDrier(self.cryodev.sdry_status)
             else:
                 self.containerBox.setEnabled(False)
                 self.setTemperature(None)
-                self.setDrier("UNKNOWN")
-                self.setSDrier("UNKNOWN")
-                self.setIcing("UNKNOWN")
+                #self.setDrier("UNKNOWN")
+                #self.setSDrier("UNKNOWN")
+                #self.setIcing("UNKNOWN")
                 self.setLevel(None)
         else:
             BlissWidget.propertyChanged(self,property,oldValue,newValue)

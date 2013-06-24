@@ -143,26 +143,28 @@ class AttenuatorsBrick(BlissWidget):
         label1=QLabel("Current:",self.paramsBox)
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
-        self.currentTransmission=myLineEdit(self.paramsBox)
+        self.currentTransmission=QLineEdit(self.paramsBox)
+        self.currentTransmission.setReadOnly(True)
         self.currentTransmission.setFixedWidth(75)
-        f=self.currentTransmission.font()
-        f.setBold(True)
-        self.currentTransmission.setFont(f)
+        #f=self.currentTransmission.font()
+        #f.setBold(True)
+        #self.currentTransmission.setFont(f)
         self.paramsBox.layout().addWidget(self.currentTransmission, 0, 1)
 
         label2=QLabel("Set to:",self.paramsBox)
         self.paramsBox.layout().addWidget(label2, 1, 0)
 
-        box1=QHBox(self.paramsBox)
-        self.newTransmission=QLineEdit(box1)
+        #box1=QHBox(self.paramsBox)
+        self.newTransmission=QLineEdit(self.paramsBox)
         self.newTransmission.setAlignment(QWidget.AlignRight)
-        pol=self.newTransmission.sizePolicy()
-        pol.setVerData(QSizePolicy.MinimumExpanding)
-        self.newTransmission.setSizePolicy(pol)
+        self.paramsBox.layout().addWidget(self.newTransmission, 1, 1)
+        #pol=self.newTransmission.sizePolicy()
+        #pol.setVerData(QSizePolicy.MinimumExpanding)
+        #self.newTransmission.setSizePolicy(pol)
         self.newTransmission.setFixedWidth(75)
         #self.applyButton=QPushButton("+",box1)
         #QObject.connect(self.applyButton,SIGNAL('clicked()'),self.changeCurrentTransmission)
-        self.paramsBox.layout().addWidget(box1, 1, 1)
+        #self.paramsBox.layout().addWidget(box1, 1, 1)
         self.newTransmission.setValidator(QDoubleValidator(self))
         self.newTransmission.setPaletteBackgroundColor(AttenuatorsBrick.CONNECTED_COLOR)
         QObject.connect(self.newTransmission, SIGNAL('returnPressed()'),self.changeCurrentTransmission)
@@ -281,13 +283,13 @@ class AttenuatorsBrick(BlissWidget):
 
     def connected(self):
         self.transmissionLimits=(0,100)
-        self.currentTransmission.setDisabledLook(False)
+        #self.currentTransmission.setDisabledLook(False)
         self.topBox.setEnabled(True)
 
     def disconnected(self):
         self.transmissionLimits=None
         self.filtersDialog.accept()
-        self.currentTransmission.setDisabledLook(True)
+        #self.currentTransmission.setDisabledLook(True)
         self.topBox.setEnabled(False)
 
     def setExpertMode(self,state):
@@ -311,12 +313,12 @@ class AttenuatorsBrick(BlissWidget):
         if value < 0:
             self.currentTransmissionValue=None
             self.currentTransmission.setText("")
-            self.currentTransmission.setDisabledLook(True)
+            #self.currentTransmission.setDisabledLook(True)
         else:
             att_str=self['formatString'] % value
             self.currentTransmissionValue=att_str
             self.currentTransmission.setText('%s%%' % att_str)
-            self.currentTransmission.setDisabledLook(False)
+            #self.currentTransmission.setDisabledLook(False)
             self.updateTransHistory(att_str)
 
     def updateTransHistory(self,trans):
@@ -397,25 +399,6 @@ class FiltersDialog(QDialog):
         except ValueError:
            logging.getLogger().warning('AttenuatorsBrick: error reading filter status (%d)' % value)
 
-class myLineEdit(QLineEdit):
-    def __init__(self,parent):
-        QLineEdit.__init__(self,parent)
-        palette=self.palette()
-        self.originalCG=QColorGroup(palette.disabled())
-        self.disabledCG=QColorGroup(palette.disabled())
-        self.disabledCG.setColor(QColorGroup.Text,QWidget.black)
-        self.setEnabled(False)
-        self.setAlignment(QWidget.AlignRight)
-        palette.setDisabled(self.disabledCG)
-
-    def setDisabledLook(self,state):
-        palette=self.palette()
-        if state:
-            palette.setDisabled(self.originalCG)
-        else:
-            palette.setDisabled(self.disabledCG)
-        self.setPalette(palette)
-        self.setAlignment(QWidget.AlignRight)
 
 class HorizontalSpacer(QWidget):
     def __init__(self,*args):

@@ -284,6 +284,7 @@ class WindowDisplayWidget(qt.QScrollView):
             else:
                 orig_label=" ".join(label_list)
             self.emit(qt.PYSIGNAL("notebookPageChanged"), (orig_label, ))
+            qt.qApp.emit(qt.PYSIGNAL('tab_changed'), (index, page))
 
             tab_name=self.name()
             BlissWidget.updateTabWidget(tab_name,index)
@@ -577,6 +578,8 @@ class WindowDisplayWidget(qt.QScrollView):
                   slotName = "hidePage_%s" % str(tab.tabLabel(tab.currentPage()))
                   slotName = slotName.replace(" ", "_")
                   getattr(tab, slotName)()
+                  qt.qApp.emit(qt.PYSIGNAL('tab_closed'), (tab, slotName))
+                  
                 newItem._close_current_page_cb = close_current_page
                 qt.QObject.connect(newItem, qt.SIGNAL('currentChanged( QWidget * )'), item_cfg.notebookPageChanged)
                 qt.QObject.connect(newItem.cmdCloseTab, qt.SIGNAL("clicked()"), close_current_page)
