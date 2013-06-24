@@ -131,6 +131,10 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
         color=MachCurrentBrick.STATES[state]
         self.current.setPaletteBackgroundColor(QColor(color))
 
+        #if state == 'error':
+            #QMessageBox.warning(self, 'mxCuBE', 'Warning: Check machine current') 
+        
+
     def fontChange(self,oldFont):
         font=self.font()
         size=font.pointSize()
