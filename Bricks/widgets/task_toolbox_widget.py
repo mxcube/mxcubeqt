@@ -165,7 +165,6 @@ class TaskToolBoxWidget(qt.QWidget):
 
         for item in items:
             self.create_task(item.get_model())
-            self.tool_box.currentItem().selection_changed(item)
 
 
     def create_task(self, task_node):
@@ -176,6 +175,7 @@ class TaskToolBoxWidget(qt.QWidget):
                 self.tree_brick.queue_model_hwobj.add_child(task_node,
                                                             group_task_node)
                 self.create_task(group_task_node)
+                self.tool_box.currentItem().update_selection()
                     
             elif isinstance(task_node, queue_model_objects.TaskGroup):
                 sample = task_node.get_parent()
@@ -185,3 +185,4 @@ class TaskToolBoxWidget(qt.QWidget):
                 for child_task_node in task_list:
                     self.tree_brick.queue_model_hwobj.\
                         add_child(task_node, child_task_node)
+                    self.tool_box.currentItem().update_selection()

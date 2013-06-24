@@ -117,6 +117,15 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
 
+    def select_shape_with_cpos(self, cpos):
+        self._shape_history._drawing_event.de_select_all()
+
+        for shape in self._shape_history.get_shapes():
+            if len(shape.get_centred_positions()) == 1:
+                if shape.get_centred_positions()[0] is cpos:
+                    self._shape_history._drawing_event.set_selected(shape)
+
+
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
@@ -148,6 +157,10 @@ class CreateDiscreteWidget(CreateTaskBase):
             self._path_template = data_collection.acquisitions[0].path_template
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
+
+            if len(data_collection.acquisitions) == 1:
+                self.select_shape_with_cpos(self._acquisition_parameters.centred_position)
+            
             self._energy_scan_result = queue_model_objects.EnergyScanResult()
             self._processing_parameters = data_collection.processing_parameters
             self._energy_scan_result = data_collection.crystal.energy_scan_result
@@ -212,7 +225,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 acq.acquisition_parameters.collect_agent = \
                     queue_model_objects.COLLECTION_ORIGIN.MXCUBE
                 acq.acquisition_parameters.\
-                    centred_position = copy.deepcopy(shape.get_centred_positions()[0])                
+                    centred_position = shape.get_centred_positions()[0]
                 acq.path_template = copy.deepcopy(self._path_template)
                 acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
@@ -227,7 +240,8 @@ class CreateDiscreteWidget(CreateTaskBase):
                                                         processing_parameters)
 
                 dc.set_name(acq.path_template.get_prefix())
-                dc.set_number(acq.path_template.run_number)
+                dc.set_number(self._path_template.run_number)
+                self._path_template.run_number += 1
 
                 dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
 

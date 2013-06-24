@@ -29,10 +29,7 @@ class CreateHelicalWidget(CreateTaskBase):
         #
         # Data attributes
         #
-        self._path_template = queue_model_objects.PathTemplate()
-        self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-        self._energy_scan_result = queue_model_objects.EnergyScanResult()
-        self._processing_parameters = queue_model_objects.ProcessingParameters()
+        self.init_models()
         
         self._prev_pos = None
         self._current_pos = None
@@ -103,10 +100,16 @@ class CreateHelicalWidget(CreateTaskBase):
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-
         self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
+
+
+    def init_models(self):
+        self._path_template = queue_model_objects.PathTemplate()
+        self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+        self._energy_scan_result = queue_model_objects.EnergyScanResult()
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
         
 
     def _prefix_ledit_change(self, new_value):
@@ -291,6 +294,67 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
 
+    def select_shape_with_cpos(self, start_cpos, end_cpos):
+        self._shape_history._drawing_event.de_select_all()
+
+        for shape in self._shape_history.get_shapes():
+            if len(shape.get_centred_positions()) == 2:
+                if shape.get_centred_positions()[0] is start_cpos and\
+                       shape.get_centred_positions()[1] is end_cpos:
+                    self._shape_history._drawing_event.set_selected(shape)
+
+
+    def _selection_changed(self, tree_item):
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+
+            self.init_models()
+            sample_data_model = self.get_sample_item().get_model()
+            self.update_processing_parameters(sample_data_model.crystals[0])
+            self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
+
+            if isinstance(tree_item, queue_item.SampleQueueItem):
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+                sub_dir =  'helical-%i' % tree_item.get_model().\
+                          get_next_number_for_name('Helical')       
+                proc_directory = os.path.join(proc_directory, sub_dir)
+                data_directory = os.path.join(data_directory, sub_dir)     
+            else:
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+                
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+
+            self._path_template.run_number = self._current_selected_item.\
+                get_model().get_next_number_for_name(self._path_template.get_prefix())
+
+        
+        elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
+            data_collection = tree_item.get_model()
+            self._path_template = data_collection.acquisitions[0].path_template
+            self._acquisition_parameters = data_collection.acquisitions[0].\
+                                           acquisition_parameters
+
+            if len(data_collection.acquisitions) == 2:
+                start_cpos = data_collection.acquisitions[0].acquisition_parameters.\
+                             centred_position
+                end_cpos = data_collection.acquisitions[1].acquisition_parameters.\
+                           centred_position
+
+                self.select_shape_with_cpos(start_cpos, end_cpos)
+            
+            self._energy_scan_result = queue_model_objects.EnergyScanResult()
+            self._processing_parameters = data_collection.processing_parameters
+            self._energy_scan_result = data_collection.crystal.energy_scan_result
+            self._acq_widget.set_energies(self._energy_scan_result)
+            
+        self._processing_widget.update_data_model(self._processing_parameters)
+        self._acq_widget.update_data_model(self._acquisition_parameters,
+                                           self._path_template)
+        self._data_path_widget.update_data_model(self._path_template)
+        
+
     def _create_task(self, parent_task_node, sample):
         data_collections = []
         selected_items = self.selected_items()
@@ -312,13 +376,12 @@ class CreateHelicalWidget(CreateTaskBase):
                 start_acq.acquisition_parameters.collect_agent = \
                     queue_model_objects.COLLECTION_ORIGIN.MXCUBE
                 start_acq.acquisition_parameters.\
-                    centred_position = copy.deepcopy(shape.start_cpos)
+                    centred_position = shape.start_cpos
                 start_acq.path_template = copy.deepcopy(self._path_template)
                 start_acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
 
-                start_acq.acquisitions[0].path_template.suffix = \
-                    self.session_hwobj.suffix
+                start_acq.path_template.suffix = self._session_hwobj.suffix
 
                 # Add another acquisition for the end position
                 end_acq = queue_model_objects.Acquisition()
@@ -327,35 +390,24 @@ class CreateHelicalWidget(CreateTaskBase):
                 end_acq.acquisition_parameters.collect_agent = \
                     queue_model_objects.COLLECTION_ORIGIN.MXCUBE
                 end_acq.acquisition_parameters.\
-                    centred_position = copy.deepcopy(shape.end_cpos)
+                    centred_position = shape.end_cpos
                 end_acq.path_template = copy.deepcopy(self._path_template)
                 end_acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
 
-                end_acq.acquisitions[0].path_template.suffix = \
-                    self.session_hwobj.suffix
+                end_acq.path_template.suffix = self._session_hwobj.suffix
 
                 processing_parameters = copy.deepcopy(self._processing_parameters)
-                
-                # Get a list of names in the current collection
-                # group, to check for duplicates and so on.
-                dc_names = []
-                for _dc in parent_task_node.get_children():
-                    dc_names.append(_dc.get_name())
+              
+                dc = queue_model_objects.DataCollection([start_acq, end_acq],
+                                                        sample.crystals[0],
+                                                        processing_parameters)
 
-                dc_name = start_acq.path_template.prefix  + '_'+ \
-                    str(start_acq.path_template.run_number)
+                dc.set_name(start_acq.path_template.get_prefix())
+                dc.set_number(start_acq.path_template.run_number)
 
-                dc = queue_model_objects.DataCollection(parent_task_node,
-                                                [start_acq, end_acq],
-                                                sample.crystals[0],
-                                                processing_parameters,
-                                                name = dc_name)
                 
                 dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.HELICAL
-
-                # Increase run number for next collection
-                self.set_run_number(self._path_template.run_number + 1)
 
                 data_collections.append(dc)
 

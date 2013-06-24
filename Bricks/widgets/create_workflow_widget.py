@@ -19,7 +19,7 @@ class CreateWorkflowWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, fl, 'Workflow')
 
         # Data attributes
-        self.workflow = None
+        self.workflow_hwobj = None
         
         self.init_models()
 
@@ -29,7 +29,7 @@ class CreateWorkflowWidget(CreateTaskBase):
         self._workflow_type_gbox = qt.QVGroupBox('Workflow type', self,
                                                  'workflow_rtype')
 
-        self._wokflow_cbox = qt.QComboBox(self._workflow_type_gbox)
+        self._workflow_cbox = qt.QComboBox(self._workflow_type_gbox)
 
         self._data_path_gbox = qt.QVGroupBox('Data location', self,
                                              'data_path_gbox')
@@ -69,6 +69,18 @@ class CreateWorkflowWidget(CreateTaskBase):
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
         
+
+        #self.connect(self._workflow_cbox, qt.SIGNAL('activated ( const QString &)'),
+        #             self.workflow_selected)
+
+
+    def set_workflow(self, workflow_hwobj):
+        self._workflow_hwobj = workflow_hwobj
+
+        if self._workflow_hwobj is not None:
+            for workflow in self._workflow_hwobj.get_available_workflows():
+                self._workflow_cbox.insertItem(workflow['name'])
+
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_item
@@ -131,6 +143,7 @@ class CreateWorkflowWidget(CreateTaskBase):
         wf = queue_model_objects.Workflow()
         wf.path_template = path_template
         wf.set_name(path_template.get_prefix())
+        wf.set_type(self._workflow_cbox.currentText())
         
         tasks.append(wf)
 

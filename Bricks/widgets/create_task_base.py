@@ -33,8 +33,8 @@ class CreateTaskBase(qt.QWidget):
 
     def tab_changed(self, tab_index, tab):
         if tab_index is 0 and self._session_hwobj.proposal_code:
-            self.selection_changed(self._current_selected_item)
-
+            self.update_selection()
+            
 
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -175,6 +175,10 @@ class CreateTaskBase(qt.QWidget):
         self._selection_changed(tree_item)
 
 
+    def update_selection(self):
+        self.selection_changed(self._current_selected_item)
+
+
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
     def centred_position_selection(self, positions):
@@ -192,11 +196,6 @@ class CreateTaskBase(qt.QWidget):
     def create_task(self, task_node, sample):        
         tasks = self._create_task(task_node, sample)
         
-        # Increase run number for next collection
-        #if not isinstance(self._current_selected_item, 
-        #                  queue_item.SampleQueueItem):
-        #    self.set_run_number(self._path_template.run_number + 1)
-
         return tasks
 
 
