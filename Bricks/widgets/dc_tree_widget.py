@@ -41,7 +41,7 @@ class DataCollectTree(QWidget):
         self.sample_changer_hwobj = None
         self.diffractometer_hwobj = None
         self.hl_motor_hwobj = None
-        self.tree_brick = self.parent() # Maybe a bit ugly but Iam lazy :)
+        self.tree_brick = self.parent()
 
         self.sample_item_list = []
         self.collect_tree_task = None
