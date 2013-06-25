@@ -329,14 +329,14 @@ class EDNAParameters(BlissWidget):
             self.session_id = int(login_infos[0])
 
 
-    def populate_workflow_widget(self, item):
-         self.beamline_params['directory'] = item.get_model().path_template.directory
-         self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
-         self.beamline_params['run_number'] = item.get_model().path_template.run_number
-         self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
-         self.beamline_params['sample_node_id'] = item.get_model().get_parent().\
-                                                  get_parent()._node_id
-         self.beamline_params['group_node_id'] = item.get_model().get_parent().\
+    def populate_workflow_widget(self, item):        
+        self.beamline_params['directory'] = item.get_model().path_template.directory
+        self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
+        self.beamline_params['run_number'] = item.get_model().path_template.run_number
+ 
+        self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
+        self.beamline_params['sample_node_id'] = item.get_model().get_parent().\
                                                  get_parent()._node_id
+        self.beamline_params['group_node_id'] = item.get_model().get_parent()._node_id
 
-         #self.workflow_selected(item.get_model().get_type())
+        #self.workflow_selected(item.get_model().get_type())
