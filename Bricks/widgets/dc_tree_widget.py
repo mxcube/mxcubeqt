@@ -233,7 +233,7 @@ class DataCollectTree(QWidget):
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
             elif isinstance(item, queue_item.GenericWorkflowQueueItem):
-                self.tree_brick.show_work_flow_tab(item)
+                self.tree_brick.show_workflow_tab(item)
         elif len(items) == 0:
             self.tree_brick.show_sample_tab()
 
@@ -442,7 +442,7 @@ class DataCollectTree(QWidget):
                 self.add_to_queue(task.get_children(), view_item, set_on)
 
         
-    def get_item_by_reference(self, parent_node):
+    def get_item_by_model(self, parent_node):
         it = QListViewItemIterator(self.sample_list_view)
         item = it.current()
         
@@ -460,7 +460,7 @@ class DataCollectTree(QWidget):
         view_item = None
         qe = None
         
-        parent_tree_item = self.get_item_by_reference(parent)
+        parent_tree_item = self.get_item_by_model(parent)
         
         
         cls = queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
