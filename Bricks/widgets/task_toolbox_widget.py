@@ -90,7 +90,51 @@ class TaskToolBoxWidget(qt.QWidget):
         self.workflow_page.set_tree_brick(brick)
 
 
-    def set_shape_history(self, shape_history):
+    def set_beamline_setup(self, beamline_setup_hwobj):
+        self.helical_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.discrete_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.char_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.energy_scan_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.workflow_page._beamline_setup_hwobj = beamline_setup_hwobj
+
+        self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
+        self._set_session(beamline_setup_hwobj.session_hwobj)
+        self._set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
+        self._set_energy_scan_hw_obj(beamline_setup_hwobj.energy_hwobj)
+        
+        transmission = beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+        self.discrete_page.set_transmission(transmission)
+        self.char_page.set_transmission(transmission)
+
+        resolution = beamline_setup_hwobj.resolution_hwobj.getPosition()
+        self.discrete_page.set_resolution(resolution)
+        self.char_page.set_resolution(resolution)
+
+        beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
+                                                       self.discrete_page.set_energy)
+                    
+        beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
+                                                       self.char_page.set_energy)
+
+        beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
+                                                             self.discrete_page.set_transmission)
+        beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
+                                                             self.char_page.set_transmission)
+
+        beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
+                                                           self.discrete_page.set_resolution)
+        beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
+                                                           self.char_page.set_resolution)
+
+
+    def _set_energy_scan_hw_obj(self, energy_hwobj):
+        self.energy_scan_page.set_energy_scan_hw_obj(energy_hwobj)
+        energy =  energy_hwobj.getCurrentEnergy()
+        self.discrete_page.set_energy(energy, 0)
+        self.char_page.set_energy(energy, 0)
+
+
+    def _set_shape_history(self, shape_history):
         """
         Sets the shape_history of each page in the toolbox.
         """
@@ -102,7 +146,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.workflow_page.set_shape_history(shape_history)
 
 
-    def set_session(self, session_hwobj):
+    def _set_session(self, session_hwobj):
         self.helical_page.set_session(session_hwobj)
         self.discrete_page.set_session(session_hwobj)
         self.char_page.set_session(session_hwobj)
@@ -131,19 +175,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page.ispyb_logged_in(logged_in)
         self.workflow_page.ispyb_logged_in(logged_in)
 
-
-    # def set_tunable_energy(self, state):
-    #     self.tool_box.setItemEnabled(\
-    #         self.tool_box.indexOf(self.energy_scan_page), state)
-
-    #     self.helical_page.set_tunable_energy(state)
-    #     self.discrete_page.set_tunable_energy(state)
-
-
-    def set_energy_scan_hw_obj(self, mnemonic):
-        self.energy_scan_page.set_energy_scan_hw_obj(mnemonic)
-
-        
+     
     def selection_changed(self, items):
         """
         Called by the parent widget when selection in the tree changes.

@@ -78,10 +78,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template = queue_model_objects.PathTemplate()
 
 
-    def set_energy_scan_hw_obj(self, mnemonic):
-        self.periodic_table['mnemonic'] = mnemonic
-        self.periodic_table.propertyChanged('mnemonic', '', mnemonic)
-
+    def set_energy_scan_hw_obj(self, energy_hwobj):
+        self.periodic_table.periodicTable.\
+            setElements(energy_hwobj.getElements())
 
 
     def _selection_changed(self, tree_item):
