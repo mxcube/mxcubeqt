@@ -82,6 +82,14 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
+        
+        if self._beamline_setup_hwobj is not None:
+            transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+            self._acquisition_parameters.transmission = transmission
+            
+            resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+            resolution = round(float(resolution), 4)
+            self._acquisition_parameters.resolution = resolution
 
 
     def _prefix_ledit_change(self, new_value):

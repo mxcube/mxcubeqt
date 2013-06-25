@@ -167,7 +167,6 @@ class CreateCharWidget(CreateTaskBase):
 
         self._path_template.reference_image_prefix = 'ref'
 
-
         # The num images drop down default value is 1
         # we would like it to be 2
         self._data_collection.acquisitions[0].\
@@ -176,6 +175,14 @@ class CreateCharWidget(CreateTaskBase):
             queue_model_objects.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
 
+
+        if self._beamline_setup_hwobj is not None:
+            transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+            self.set_transmission(transmission)
+
+            resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+            self.set_resolution(resolution)
+        
 
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \

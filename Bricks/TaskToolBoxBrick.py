@@ -22,12 +22,14 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("session", "string", "/session")
         self.addProperty("bl-config", "string", "/bl-config")
         self.addProperty("workflow", "string", "/ednaparams")   
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         #Data atributes
         self.shape_history = None
         self.tree_brick = None
         self.ispyb_logged_in = False
         self.diffractometer_hwobj = None
+        self.beamline_setup = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -112,79 +114,22 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         Overriding BaseComponents.BlissWidget (propertyChanged object) 
         run method.
         """
-        if property_name == 'energy-scan':
-            energy_hwobj = self.getHardwareObject(new_value)
-            
-            if energy_hwobj is not None:
-                energy_hwobj.connect('energyChanged',
-                                     self.task_tool_box_widget.discrete_page.set_energy)
-                energy_hwobj.connect('energyChanged',
-                                     self.task_tool_box_widget.char_page.set_energy)
-            
-                energy = energy_hwobj.getCurrentEnergy()
-                self.task_tool_box_widget.discrete_page.set_energy(energy, 0)
-                self.task_tool_box_widget.char_page.set_energy(energy, 0)
-                
-            self.task_tool_box_widget.set_energy_scan_hw_obj(new_value)
-
-        elif property_name == 'transmission':
-            transmission_hwobj = self.getHardwareObject(new_value)
-
-            if transmission_hwobj is not None:                
-                transmission_hwobj.connect('attFactorChanged',
-                                           self.task_tool_box_widget.\
-                                           discrete_page.set_transmission)
-                transmission_hwobj.connect('attFactorChanged',
-                                           self.task_tool_box_widget.\
-                                           char_page.set_transmission)
-            
-                transmission = transmission_hwobj.getAttFactor()
-                self.task_tool_box_widget.discrete_page.\
-                    set_transmission(transmission)
-                self.task_tool_box_widget.char_page.\
-                    set_transmission(transmission)
-            
-        elif property_name == 'resolution':
-            resolution_hwobj = self.getHardwareObject(new_value)
-
-            if resolution_hwobj is not None:
-                resolution_hwobj.connect('positionChanged',
-                    self.task_tool_box_widget.discrete_page.set_resolution)
-                resolution_hwobj.connect('positionChanged',
-                    self.task_tool_box_widget.char_page.set_resolution)
-
-            
-                resolution = resolution_hwobj.getPosition()
-                self.task_tool_box_widget.discrete_page.\
-                    set_resolution(resolution)
-                self.task_tool_box_widget.char_page.set_resolution(resolution)
-
-        elif property_name == "diffractometer":
-            self.diffractometer_hwobj = self.getHardwareObject(new_value)
-
-            if self.diffractometer_hwobj:
-                self.diffractometer_hwobj.connect("minidiffStateChanged", \
-                                                  self.diffractometer_changed)
-
-        elif property_name == 'shape-history':
-            self.shape_history = self.getHardwareObject(new_value)
-
-        elif property_name == 'session':
-            self.session_hwobj = self.getHardwareObject(new_value)
-            self.task_tool_box_widget.set_session(self.session_hwobj)
-
-        elif property_name == 'bl-config':            
+        if property_name == 'bl-config':            
             self.bl_config_hwobj = self.getHardwareObject(new_value)
             self.task_tool_box_widget.set_bl_config(\
                 self.bl_config_hwobj)
 
-        elif property_name == 'workflow':
-            self.task_tool_box_widget.workflow_page.\
-                set_workflow(self.getHardwareObject(new_value))
+        elif property_name == 'beamline_setup':
+            self.beamline_setup_hwobj = self.getHardwareObject(new_value)
 
-        #if property_name =='tunable-energy':
-        #    self.task_tool_box_widget.set_tunable_energy(new_value)
-
+            if self.beamline_setup_hwobj:
+                self.diffractometer_hwobj = self.beamline_setup_hwobj.diffractometer_hwobj
+                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+                self.diffractometer_hwobj.connect("minidiffStateChanged", self.diffractometer_changed)
+                self.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
+            else:
+                logging.getLogger('user_level_log').error('Could not load beamline setup '+\
+                                                          'check configuration !.')
 
     def selection_changed(self, items):
         """
@@ -194,9 +139,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.task_tool_box_widget.selection_changed(items)
 
 
-    #
-    # Methods for handling centred positions.
-    #
     def shape_selected(self, selected_positions):
         """
         Callback for the DrawingEvent object called when a shape is 
