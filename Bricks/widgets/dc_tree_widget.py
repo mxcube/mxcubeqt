@@ -172,7 +172,6 @@ class DataCollectTree(QWidget):
             return False
 
 
-
     def show_context_menu(self, item, point, col):
         menu = QPopupMenu(self.sample_list_view, "popup_menu")
 
@@ -343,11 +342,6 @@ class DataCollectTree(QWidget):
                                                        sample_location = location)
 
 
-    def sample_load_state_changed(self, loaded):
-        if loaded:
-            self.set_sample_pin_icon()  
-
-
     def sample_list_view_selection(self):
         items = self.get_selected_items()
 
@@ -445,7 +439,7 @@ class DataCollectTree(QWidget):
     def get_item_by_model(self, parent_node):
         it = QListViewItemIterator(self.sample_list_view)
         item = it.current()
-        
+    
         while item:
             if item.get_model() is parent_node:
                 return item
@@ -522,6 +516,7 @@ class DataCollectTree(QWidget):
         if option == SC_FILTER_OPTIONS.ALL_SAMPLES:
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('ispyb')
+            self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample = self.sample_changer_hwobj.\
                             getLoadedSampleLocation()
@@ -773,9 +768,8 @@ class DataCollectTree(QWidget):
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
                                              get_model_root(), sample)
             
-            #self.add_to_queue([sample], self.sample_list_view, False)
+        self.set_sample_pin_icon()
             
-
     def get_mounted_sample_item(self):
         sample_items = queue_item.perform_on_children(self.sample_list_view,
                                                    queue_item.is_sample,
@@ -788,17 +782,22 @@ class DataCollectTree(QWidget):
 
 
     def set_sample_pin_icon(self):
-        sample_items = queue_item.perform_on_children(self.sample_list_view,
-                                                   queue_item.is_sample,
-                                                   queue_item.get_item)
+        it = QListViewItemIterator(self.sample_list_view)
+        item = it.current()
 
-        for item in sample_items:
-            if item.get_model().location == self.sample_changer_hwobj.\
-                    getLoadedSampleLocation():
-                item.setPixmap(0, self.pin_pixmap)
-            else:
-                item.setPixmap(0, QPixmap())
+        while item:
+            if isinstance(item, queue_item.SampleQueueItem):
+                if item.get_model().location == self.sample_changer_hwobj.\
+                        getLoadedSampleLocation():
+                    item.setPixmap(0, self.pin_pixmap)
+                else:
+                    item.setPixmap(0, QPixmap())
         
+
+            it += 1
+            item = it.current()
+
+ 
 
     def init_with_ispyb_data(self, lims_sample_list):
         samples = {}

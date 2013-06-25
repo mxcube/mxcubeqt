@@ -15,6 +15,7 @@ from widgets.sample_changer_widget_layout import SampleChangerWidgetLayout
 from collections import namedtuple
 from BlissFramework import BaseComponents
 from BlissFramework import Icons
+from SampleChangerBrick import SC_STATE_COLOR
 from qt import *
 
 
@@ -247,10 +248,12 @@ class TreeBrick(BaseComponents.BlissWidget):
             sc_content = self.get_sc_content()
             self.dc_tree_widget.init_with_sc_content(sc_content)
 
-            if self.sample_changer_hwobj:
-                self.connect(self.sample_changer_hwobj, 'sampleIsLoaded',
-                             self.sample_load_state_changed)
+            if self.sample_changer_hwobj is not None:
+                self.connect(self.sample_changer_hwobj, 'matrixCodesUpdate',
+                             self.set_sample_pin_icon)
 
+                self.connect(self.sample_changer_hwobj, 'stateChanged', 
+                             self.sample_load_state_changed)
 
         elif property_name == 'diffractometer':
             self.diffractometer_hwobj = self.getHardwareObject(new_value)
@@ -319,9 +322,15 @@ class TreeBrick(BaseComponents.BlissWidget):
     def status_msg_changed(self, msg, color):
         logging.getLogger("user_level_log").info(msg)
 
+    
+    def set_sample_pin_icon(self, matrices):
+        self.dc_tree_widget.set_sample_pin_icon()
+
 
     def sample_load_state_changed(self, state):
-        self.dc_tree_widget.sample_load_state_changed(state)
+        s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
+        self.sample_changer_widget.details_button.\
+            setPaletteBackgroundColor(QColor(s_color))
 
 
     def set_holder_length(self, position):
