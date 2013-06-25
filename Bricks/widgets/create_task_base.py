@@ -54,7 +54,7 @@ class CreateTaskBase(qt.QWidget):
 
 
     def set_bl_config(self, bl_config):
-        self._bl_config = bl_config
+        self._bl_config_hwobj = bl_config
 
         if self._acq_widget:
             self._acq_widget.set_bl_config(bl_config)
