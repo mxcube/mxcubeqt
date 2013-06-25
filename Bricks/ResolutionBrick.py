@@ -464,10 +464,10 @@ class ResolutionBrick(BlissWidget):
         if state is None:
             state=self.detectorMotor.NOTINITIALIZED
 
-        if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
-            self.currentResolution.setDisabledLook(True)
-        else:
-            self.currentResolution.setDisabledLook(False)
+        #if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
+        #    self.currentResolution.setDisabledLook(True)
+        #else:
+        #    self.currentResolution.setDisabledLook(False)
 
         self.resolutionStateChanged(state)
 
@@ -475,10 +475,10 @@ class ResolutionBrick(BlissWidget):
         if state is None:
             state=self.detectorMotor.NOTINITIALIZED
 
-        if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
-            self.currentDetectorDistance.setDisabledLook(True)
-        else:
-            self.currentDetectorDistance.setDisabledLook(False)
+        #if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
+        #    self.currentDetectorDistance.setDisabledLook(True)
+        #else:
+        #    self.currentDetectorDistance.setDisabledLook(False)
 
         #self.detectorStateChanged(state)
 
