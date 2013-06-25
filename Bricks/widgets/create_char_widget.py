@@ -182,7 +182,12 @@ class CreateCharWidget(CreateTaskBase):
             self.set_transmission(transmission)
 
             resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+            resolution = round(float(resolution), 4)
             self.set_resolution(resolution)
+
+            energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+            energy = round(float(energy), 2)
+            self._acquisition_parameters.energy = energy
         
 
     def _selection_changed(self, tree_item):

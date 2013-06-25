@@ -91,7 +91,14 @@ class CreateDiscreteWidget(CreateTaskBase):
             resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
             resolution = round(float(resolution), 4)
             self._acquisition_parameters.resolution = resolution
+            
+            energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+            energy = round(float(energy), 2)
+            self._acquisition_parameters.energy = energy
 
+        if self._bl_config_hwobj:
+            has_shutter_less = self._bl_config_hwobj.detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_item
