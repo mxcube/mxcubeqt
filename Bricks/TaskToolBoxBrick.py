@@ -80,8 +80,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
 
-        self.task_tool_box_widget.set_shape_history(self.shape_history)
-
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
