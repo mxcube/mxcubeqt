@@ -85,6 +85,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         
         if self._beamline_setup_hwobj is not None:
             transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+            transmission = round(float(transmission), 1)
             self._acquisition_parameters.transmission = transmission
             
             resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
