@@ -101,30 +101,41 @@ class TaskToolBoxWidget(qt.QWidget):
         self._set_session(beamline_setup_hwobj.session_hwobj)
         self._set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
         self._set_energy_scan_hw_obj(beamline_setup_hwobj.energy_hwobj)
-        
-        transmission = beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+
+        try:
+            transmission = beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+        except AttributeError:
+            transmission = 0
+
+        try:
+            resolution = beamline_setup_hwobj.resolution_hwobj.getPosition()
+        except AttributeError:
+            resolution = 0
+
         self.discrete_page.set_transmission(transmission)
         self.char_page.set_transmission(transmission)
-
-        resolution = beamline_setup_hwobj.resolution_hwobj.getPosition()
         self.discrete_page.set_resolution(resolution)
         self.char_page.set_resolution(resolution)
 
-        beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
-                                                       self.discrete_page.set_energy)
+        try:
+            beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
+                                                      self.discrete_page.set_energy)
                     
-        beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
-                                                       self.char_page.set_energy)
+            beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
+                                                      self.char_page.set_energy)
 
-        beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
-                                                             self.discrete_page.set_transmission)
-        beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
-                                                             self.char_page.set_transmission)
+            beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
+                                                            self.discrete_page.set_transmission)
+            beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
+                                                            self.char_page.set_transmission)
 
-        beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
-                                                           self.discrete_page.set_resolution)
-        beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
-                                                           self.char_page.set_resolution)
+            beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
+                                                          self.discrete_page.set_resolution)
+            beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
+                                                          self.char_page.set_resolution)
+        except AttributeError as ex:
+            logging.getLogger("HWR").exception('Could not connect to one or'+\
+                                               'more hardware objects' + str(ex))
 
 
     def _set_energy_scan_hw_obj(self, energy_hwobj):

@@ -84,17 +84,27 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_parameters = queue_model_objects.ProcessingParameters()
         
         if self._beamline_setup_hwobj is not None:
-            transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-            transmission = round(float(transmission), 1)
-            self._acquisition_parameters.transmission = transmission
-            
-            resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-            resolution = round(float(resolution), 4)
+            try:
+                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+                transmission = round(float(transmission), 1)
+            except AttributeError:
+                transmission = 0
+
+            try:
+                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+                resolution = round(float(resolution), 4)
+            except AttributeError:
+                resolution = 0
+
+            try:
+                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+                energy = round(float(energy), 2)
+            except AttributeError:
+                energy = 0
+
             self._acquisition_parameters.resolution = resolution
-            
-            energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-            energy = round(float(energy), 2)
             self._acquisition_parameters.energy = energy
+            self._acquisition_parameters.transmission = transmission
 
         if self._bl_config_hwobj:
             has_shutter_less = self._bl_config_hwobj.detector_has_shutterless()

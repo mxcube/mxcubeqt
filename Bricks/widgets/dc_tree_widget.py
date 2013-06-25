@@ -280,14 +280,14 @@ class DataCollectTree(QWidget):
         if len(items) == 1:
             if not items[0].get_queue_entry().free_pin_mode:
 
-                message = "All centred positions associated with this " + \
-                    "sample will be lost, do you want to continue ?."
-                ans = QMessageBox.question(self,
-                                           "Data collection",
-                                           message,
-                                           QMessageBox.Yes,
-                                           QMessageBox.No,
-                                           QMessageBox.NoButton)
+                #message = "All centred positions associated with this " + \
+                #    "sample will be lost, do you want to continue ?."
+                #ans = QMessageBox.question(self,
+                #                           "Data collection",
+                #                           message,
+                #                           QMessageBox.Yes,
+                #                           QMessageBox.No,
+                #                           QMessageBox.NoButton)
                 
                 if ans == QMessageBox.Yes:
                     self.clear_centred_positions_cb()
@@ -790,6 +790,7 @@ class DataCollectTree(QWidget):
                 if item.get_model().location == self.sample_changer_hwobj.\
                         getLoadedSampleLocation():
                     item.setPixmap(0, self.pin_pixmap)
+                    item.setSelected(True)
                 else:
                     item.setPixmap(0, QPixmap())
         
