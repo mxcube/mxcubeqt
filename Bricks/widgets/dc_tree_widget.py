@@ -583,10 +583,17 @@ class DataCollectTree(QWidget):
             self.stop_collection()
 
 
+    def enable_sample_changer_widget(self, state):
+        self.parent().sample_changer_widget.synch_button.setEnabled(state)
+        self.parent().sample_changer_widget.centring_cbox.setEnabled(state)
+        self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
+
+
     def collect_items(self, items = None):
         self.user_stopped = False
         self.delete_button.setEnabled(False)
-        self.parent().sample_changer_widget.setEnabled(False)
+        self.enable_sample_changer_widget(False)
+        
         self.collecting = True
         self.collect_button.setText("      Stop   ")
         self.collect_button.setIconSet(QIconSet(self.stop_pixmap))
@@ -613,7 +620,7 @@ class DataCollectTree(QWidget):
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIconSet(QIconSet(self.play_pixmap))
         self.delete_button.setEnabled(True)
-        self.parent().sample_changer_widget.setEnabled(True)
+        self.enable_sample_changer_widget(True)
 
 
     def get_checked_items(self):
