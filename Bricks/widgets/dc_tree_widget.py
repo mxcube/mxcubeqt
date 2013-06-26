@@ -63,6 +63,7 @@ class DataCollectTree(QWidget):
         self.up_pixmap = Icons.load("Up2.png")
         self.down_pixmap = Icons.load("Down2.png")
         self.delete_pixmap = Icons.load("Delete2.png")
+        self.ispyb_pixmap = Icons.load("SampleChanger2.png")
                         
         self.up_button = QPushButton(self, "up_button")
         self.up_button.setPixmap(self.up_pixmap)
@@ -720,7 +721,7 @@ class DataCollectTree(QWidget):
             sample = queue_model_objects.Sample()
             sample.init_from_lims_object(lims_sample)
 
-            if sample.lims_code is not '':
+            if sample.lims_code:
                 barcode_samples[sample.lims_code] = sample
             else:
                 location_samples[sample.lims_location] = sample
@@ -742,6 +743,19 @@ class DataCollectTree(QWidget):
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
 
+
+    def populate_list_view(self, sample_list):
+        self.queue_hwobj.clear()
+        self.queue_model_hwobj.clear_model('ispyb')
+        self.sample_list_view.clear()
+        self.queue_model_hwobj.select_model('ispyb')
+        
+        for sample in sample_list:
+            sample.set_enabled(False)
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+                                             get_model_root(), sample)
+        self.set_sample_pin_icon()
+    
 
     def init_with_sc_content(self, sc_content):
         try:
@@ -793,8 +807,10 @@ class DataCollectTree(QWidget):
                     item.setSelected(True)
                 else:
                     item.setPixmap(0, QPixmap())
-        
 
+                if item.get_model().lims_location != (None, None):
+                    item.setPixmap(0, self.ispyb_pixmap)
+        
             it += 1
             item = it.current()
 

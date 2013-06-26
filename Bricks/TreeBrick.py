@@ -137,7 +137,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         lims_client = self._lims_hwobj
         samples = lims_client.get_samples(self.session_hwobj.proposal_id,
                                           self.session_hwobj.session_id)
-
+        sample_list = []
+        
         if samples:
             (barcode_samples, location_samples) = \
                 self.dc_tree_widget.samples_from_lims(samples)
@@ -147,7 +148,6 @@ class TreeBrick(BaseComponents.BlissWidget):
                              samples_from_sc_content(sc_content)
             
             for sc_sample in sc_sample_list:
-
                 # Get the sample in lims with the barcode
                 # sc_sample.code
                 lims_sample = barcode_samples.get(sc_sample.code)
@@ -155,7 +155,9 @@ class TreeBrick(BaseComponents.BlissWidget):
                 # There was a sample with that barcode
                 if lims_sample:
                     if lims_sample.lims_location == sc_sample.location:
-                        pass # do the match
+                        logging.getLogger("user_level_log").\
+                            warning("Found sample in ISPyB for location %s" % str(sc_sample.location))
+                        sample_list.append(lims_sample)
                     else:
                         logging.getLogger("user_level_log").\
                             warning("The sample with the barcode (%s) exists"+\
@@ -164,20 +166,37 @@ class TreeBrick(BaseComponents.BlissWidget):
                                     "location %s" % (sc_sample.code,
                                                      sc_sample.location,
                                                      lims_sample.lims_location))
+                        sample_list.append(sc_sample)
                 else: # No sample with that barcode, continue with location
-                    lims_sample = location_samples.get(sc_sample.lims_location)
-                    if lims_sample.lims_code is not '':
-                        logging.getLogger("user_level_log").\
-                            warning("The sample has a barcode in lims, but t"+\
-                                    "he SC were not able to read barcode on "+\
-                                    "the current sample. You can rescan the "+\
-                                    "barcode by rescaning the basket.")
+                    lims_sample = location_samples.get(sc_sample.location)
+                    if lims_sample:
+                        if lims_sample.lims_code:
+                            logging.getLogger("user_level_log").\
+                                warning("The sample has a barcode in lims, but"+\
+                                        "the SC were not able to read barcode on "+\
+                                        "the current sample. You can rescan the "+\
+                                        "barcode by rescaning the basket.")
+                            sample_list.append(lims_sample)
+                        else:
+                            logging.getLogger("user_level_log").\
+                                warning("Found sample in ISPyB for location %s" % str(sc_sample.location))
+                            sample_list.append(lims_sample)
                     else:
-                        logging.getLogger("user_level_log").\
-                            warning("No barcode was provided in ISPyB "+\
-                                    "which makes it impossible to verify if"+\
-                                    "the locations are correct, assuming "+\
-                                    "that the positions are correct.")
+                        if lims_sample:
+                            if lims_sample.lims_location != (None, None):
+                                logging.getLogger("user_level_log").\
+                                    warning("No barcode was provided in ISPyB "+\
+                                            "which makes it impossible to verify if"+\
+                                            "the locations are correct, assuming "+\
+                                            "that the positions are correct.")
+                                sample_list.append(lims_sample)
+                        else:
+                            logging.getLogger("user_level_log").\
+                                warning("No sample in ISPyB for location %s" % str(sc_sample.location))
+                            sample_list.append(sc_sample)
+
+            self.dc_tree_widget.populate_list_view(sample_list)
+
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
