@@ -74,7 +74,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('num_images', 
                                                 self.acq_widget_layout.num_images_ledit,
                                                 int,
-                                                qt.QIntValidator(1, 1000, self))
+                                                qt.QIntValidator(1, 10000, self))
         
         self._acquisition_mib.bind_value_update('num_passes', 
                                                 self.acq_widget_layout.num_passes_ledit,
