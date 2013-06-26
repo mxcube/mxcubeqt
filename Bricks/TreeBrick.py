@@ -102,7 +102,10 @@ class TreeBrick(BaseComponents.BlissWidget):
                                        
         self.sample_changer_widget = SampleChangerWidgetLayout(self)
         self.refresh_pixmap = Icons.load("Refresh2.png")
-        self.sample_changer_widget.synch_button.setPixmap(self.refresh_pixmap)
+        self.sample_changer_widget.synch_button.\
+            setIconSet(QIconSet(self.refresh_pixmap))
+        self.sample_changer_widget.synch_button.setText("Synch ISPyB")
+        
 
         self.dc_tree_widget = DataCollectTree(self)
         self.dc_tree_widget.selection_changed_cb = self.selection_changed
