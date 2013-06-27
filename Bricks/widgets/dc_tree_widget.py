@@ -183,7 +183,7 @@ class DataCollectTree(QWidget):
                 menu.insertItem(QString("Remove"), self.delete_click)
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
-                if not item.get_queue_entry().free_pin_mode:
+                if not item.get_model().free_pin_mode:
                     menu.insertItem(QString("Mount"), self.mount_sample)
                     menu.insertItem(QString("Un-Mount"), self.unmount_sample)
                 menu.insertSeparator(3)
@@ -279,7 +279,7 @@ class DataCollectTree(QWidget):
         items = self.get_selected_items()
 
         if len(items) == 1:
-            if not items[0].get_queue_entry().free_pin_mode:
+            if not items[0].get_model().free_pin_mode:
 
                 #message = "All centred positions associated with this " + \
                 #    "sample will be lost, do you want to continue ?."
@@ -289,8 +289,9 @@ class DataCollectTree(QWidget):
                 #                           QMessageBox.Yes,
                 #                           QMessageBox.No,
                 #                           QMessageBox.NoButton)
-                
-                if ans == QMessageBox.Yes:
+
+                ans = True
+                if ans:
                     self.clear_centred_positions_cb()
                     location = items[0].get_model().location
 
@@ -746,7 +747,8 @@ class DataCollectTree(QWidget):
     def populate_free_pin(self):
         self.queue_model_hwobj.select_model('free-pin')
         sample = queue_model_objects.Sample()
-        sample.set_name('-:-')
+        sample.free_pin_mode = True
+        sample.set_name('free-pin')
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
 
