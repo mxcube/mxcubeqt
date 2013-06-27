@@ -59,7 +59,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('first_image', 
                                                 self.acq_widget_layout.first_image_ledit,
                                                 int,
-                                                qt.QIntValidator(1, 1000, self))
+                                                qt.QIntValidator(1, 10000, self))
 
         self._acquisition_mib.bind_value_update('exp_time', 
                                                 self.acq_widget_layout.exp_time_ledit,
