@@ -38,6 +38,40 @@ CENTRING_METHOD = CentringMethod(0, 1, 2)
 WorkflowType = namedtuple('WorkflowType', ['BURN', 'WF1', 'WF2'])
 WORKFLOW_TYPE = WorkflowType(0, 1, 2)
 
+XTAL_SPACEGROUPS = ['', 'P1', 'P2 ', 'P21', 'C2', 'P222 ', 'P2221 ', 'P21212',
+                    'P212121', 'C222 ', 'C2221', 'F222', 'I222', 'I212121',
+                    'P4', 'P41', 'P42', 'P43', 'P422', 'P4212', 'P4122',
+                    'P41212', 'P4222', 'P42212', 'P4322', 'P43212', 'I4',
+                    'I41', 'I422', 'I4122', 'P3', 'P31', 'P32', 'P312',
+                    'P321', 'P3112', 'P3121', 'P3212', 'P3221', 'P6', 'P61',
+                    'P65', 'P62', 'P64', 'P63', 'P622', 'P6122', 'P6522',
+                    'P6222', 'P6422', 'P6322', 'R3', 'R32', 'P23', 'P213',
+                    'P432', 'P4232', 'P4332', 'P4132', 'F23', 'F432',
+                    'F4132', 'I23', 'I213', 'I432', 'I4132']
+
+ORIG_EDNA_SPACEGROUPS = {'I4132': '214', 'P21212': '18', 'P432': '207',
+                         'P43212': '96', 'P6222': '180', 'P3': '143',
+                         'C2': '5', 'P6422': '181', 'P212121': '19',
+                         'F432': '209', 'P4132': '213', 'R32': '155',
+                         'P23' : '195', 'I23': '197', 'I212121': '24',
+                         'P3112': '151', 'P1': '1', 'P42212': '94',
+                         'P321': '150', 'P63': '173', 'I422': '97',
+                         'P41': '76', 'P6122': '178', 'P65 ': '170',
+                         'I41': '80', 'P32 ': '145', 'I432 ': '211',
+                         'C222': '21', 'F4132': '210', 'F23 ': '196',
+                         'I222': '23', 'P42 ': '77', 'I213 ': '199',
+                         'P2': '3', 'R3 ': '146', 'P213 ': '198',
+                         'I4122': '98', 'P61': '169', 'P312 ': '149',
+                         'I4': '79', 'P64': '172', 'P222 ': '16',
+                         'P41212': '92', 'P3212 ': '153', 'P21': '4',
+                         'P6': '168', 'P4322 ': '95', 'C2221': '20',
+                         'P422': '89', 'F222': '22', 'P62 ': '171',
+                         'P6322': '182', 'P4 ': '75', 'P31 ': '144',
+                         'P3221': '154', 'P4122 ': '91', 'P6522 ': '179',
+                         'P4212': '90', 'P2221 ': '17', 'P622': '177',
+                         'P43': '78', 'P4222 ': '93', 'P3121 ': '152',
+                         'P4232': '208', 'P4332': '212'}
+
 class TaskNode(object):
     def __init__(self):
         object.__init__(self)
@@ -274,7 +308,7 @@ class Sample(TaskNode):
             self.lims_id = lims_sample.sampleId
         
         if hasattr(lims_sample, 'sampleName'):
-            self.name = lims_sample.sampleName
+            self.name = str(lims_sample.sampleName)
             
         if hasattr(lims_sample, 'containerSampleChangerLocation') and\
                 hasattr(lims_sample, 'sampleLocation'):
@@ -294,6 +328,16 @@ class Sample(TaskNode):
         
                 self.loc_str = str(str(self.lims_location[0]) +\
                                    ':' + str(self.lims_location[1]))
+
+        name = ''
+
+        if self.crystals[0].protein_acronym:
+            name += self.crystals[0].protein_acronym
+
+        if self.name:
+            name += '-' + self.name
+            
+        self.set_name(name)
 
 
 class DataCollection(TaskNode):
@@ -390,10 +434,11 @@ class DataCollection(TaskNode):
         file_locations = []
         
         path_template = self.acquisitions[0].path_template
+        acq_params = self.acquisitions[0].acquisition_parameters
         file_name_template = path_template.get_image_file_name()
 
-        for i in range(path_template.start_num, 
-                       path_template.start_num + path_template.num_files):
+        for i in range(acq_params.first_image, 
+                       acq_params.first_image + acq_params.num_images):
                     
             file_locations.append(os.path.join(path_template.directory,
                                                file_name_template % i))
@@ -477,10 +522,15 @@ class Characterisation(TaskNode):
         
         path_template = self.reference_image_collection.acquisitions[0].\
                         path_template
+
+        # Quick fix beacuse of bug, remove ASAP
+        acq_params = self.reference_image_collection.acquisitions[0].\
+                     acquisition_parameters
+        
         file_name_template = path_template.get_image_file_name()
 
-        for i in range(path_template.start_num, 
-                       path_template.start_num + path_template.num_files):
+        for i in range(acq_params.first_image, 
+                       acq_params.first_image + acq_params.num_images):
                     
             file_locations.append(os.path.join(path_template.directory,
                                                file_name_template % i))
@@ -659,6 +709,7 @@ class PathTemplate(object):
         self.base_prefix = str()
         self.mad_prefix = str()
         self.reference_image_prefix = str()
+        self.wedge_prefix = str()
         self.template = str()
         self.run_number = 1
         self.suffix = 'img'
@@ -675,6 +726,9 @@ class PathTemplate(object):
 
         if self.reference_image_prefix:
             prefix = self.reference_image_prefix + '-' + prefix
+
+        if self.wedge_prefix:
+            prefix = prefix + '_' + self.wedge_prefix
 
         return prefix
 
@@ -729,8 +783,8 @@ class AcquisitionParameters(object):
         self.transmission = float()
         self.inverse_beam = False
         self.shutterless = False
-        self.take_snapshots = False
-        self.take_dark_current = False
+        self.take_snapshots = True
+        self.take_dark_current = True
         self.skip_existing_images = False
 
 
@@ -825,7 +879,7 @@ class Workflow(TaskNode):
     def __init__(self):
         TaskNode.__init__(self)
         self.path_template = PathTemplate()
-        self._type = int()
+        self._type = str()
 
 
     def set_type(self, workflow_type):
@@ -895,7 +949,7 @@ def to_collect_dict(data_collection, session):
                                   'cell': proc_params.get_cell_str()},
              'processing': str(proc_params.process_data and True),
              'residues':  proc_params.num_residues,
-             'dark': 'True', #acq_params.take_dark_current,
+             'dark': acq_params.take_dark_current,
              'scan4d': 0,
              'resolution': {'upper': acq_params.resolution},
              'transmission': acq_params.transmission,
@@ -930,132 +984,130 @@ def next_available_run_number(parent_node, prefix):
 
 
 def dc_from_edna_output(edna_result, reference_image_collection,
-                        dcg_model, sample_data_model, session,
-                        char_params = None):
-        data_collections = []
+                        dcg_model, sample_data_model, session_hwobj,
+                        char_params = None):    
+    data_collections = []
 
-        crystal = copy.deepcopy(reference_image_collection.crystal)
-        processing_parameters = copy.deepcopy(reference_image_collection.\
-                                              processing_parameters)
+    crystal = copy.deepcopy(reference_image_collection.crystal)
+    processing_parameters = copy.deepcopy(reference_image_collection.\
+                                          processing_parameters)
+
+    try:
+        char_results = edna_result.getCharacterisationResult()
+        edna_strategy = char_results.getStrategyResult()
+        collection_plan = edna_strategy.getCollectionPlan()[0]
+        wedges = collection_plan.getCollectionStrategy().getSubWedge()
+    except:
+        pass
+    else:
+        try:
+            run_number = collection_plan.getCollectionPlanNumber().getValue()
+        except AttributeError:
+            run_number = 1
 
         try:
-            char_results = edna_result.getCharacterisationResult()
-            edna_strategy = char_results.getStrategyResult()
-            collection_plan = edna_strategy.getCollectionPlan()[0]
-            wedges = collection_plan.getCollectionStrategy().getSubWedge()
-        except:
-            pass
-        else:
-            try:
-                run_number = collection_plan.getCollectionPlanNumber().getValue()
-            except AttributeError:
-                run_number = 1
+            resolution = collection_plan.getStrategySummary().\
+                getResolution().getValue()
+        except AttributeError:
+            resolution = None
+
+        try: 
+            transmission = collection_plan.getStrategySummary().\
+               getAttenuation().getValue()
+        except AttributeError:
+            transmission = None
+
+        try:
+            screening_id = edna_result.getScreeningId().getValue()
+        except AttributeError:
+            screening_id = None
+
+        for i in range(0, len(wedges)):
+            wedge = wedges[i]
+            exp_condition = wedge.getExperimentalCondition()
+            goniostat = exp_condition.getGoniostat()
+            beam = exp_condition.getBeam()
+
+            acq = Acquisition()
+            acquisition_parameters = acq.acquisition_parameters
+
+            acquisition_parameters.centred_position =\
+                reference_image_collection.previous_acquisition.\
+                acquisition_parameters.centred_position
+
+            data_directory = session_hwobj.get_image_directory(dcg_model)
+            proc_directory = session_hwobj.get_process_directory(dcg_model)
+
+            acq.path_template.directory = data_directory
+            acq.path_template.process_directory = proc_directory
+            acq.path_template.base_prefix = session_hwobj.\
+                                            get_default_prefix(dcg_model.get_parent())
+
+            acq.path_template.wedge_prefix = 'w' + str(i)
+
+            if run_number:
+                acquisition_parameters.run_number = run_number
+
+            if resolution:
+                acquisition_parameters.resolution = resolution
+
+            if transmission:
+                acquisition_parameters.transmission = transmission
+
+            if screening_id:
+                acquisition_parameters.screening_id = screening_id
 
             try:
-                resolution = collection_plan.getStrategySummary().\
-                    getResolution().getValue()
+                acquisition_parameters.osc_start = goniostat.\
+                    getRotationAxisStart().getValue()
             except AttributeError:
-                resolution = None
+                pass
+
+            try:
+                acquisition_parameters.osc_end = goniostat.\
+                    getRotationAxisEnd().getValue()
+            except AttributeError:
+                pass
+
+            try:
+                acquisition_parameters.osc_width = goniostat.\
+                    getOscillationWidth().getValue()
+            except AttributeError:
+                pass
+
+            try:
+                acquisition_parameters.num_images = int(abs(acquisition_parameters.osc_end - \
+                                                            acquisition_parameters.osc_start) / acquisition_parameters.osc_width)
+                acq.path_template.num_files = acquisition_parameters.num_images
+                
+            except AttributeError:
+                pass
+
+            try:
+                acquisition_parameters.transmission = beam.getTransmission().getValue()
+            except AttributeError:
+                pass
 
             try: 
-                transmission = collection_plan.getStrategySummary().\
-                   getAttenuation().getValue()
+                acquisition_parameters.energy = \
+                    int(123984.0/beam.getWavelength().getValue())/10000.0
             except AttributeError:
-                transmission = None
+                pass
 
             try:
-                screening_id = edna_result.getScreeningId().getValue()
+                acquisition_parameters.exp_time = beam.getExposureTime().getValue()
             except AttributeError:
-                screening_id = None
-
-            for wedge in wedges:
-                exp_condition = wedge.getExperimentalCondition()
-                goniostat = exp_condition.getGoniostat()
-                beam = exp_condition.getBeam()
-                
-                acq = Acquisition()
-                acquisition_parameters = acq.acquisition_parameters
-
-                acquisition_parameters.centred_position =\
-                    reference_image_collection.previous_acquisition.\
-                    acquisition_parameters.centred_position
-
-                sub_dir = dcg_model.get_name().lower().replace(' ','')
-
-                data_directory = session.get_image_directory(sample_data_model,
-                                                             sub_dir = sub_dir)
-                
-                proc_directory = session.get_process_directory(sample_data_model,
-                                                               sub_dir = sub_dir)
-                
-                acq.path_template.directory = data_directory
-                acq.path_template.process_directory = proc_directory
-                
-                acq.path_template.prefix = reference_image_collection.acquisitions[0].\
-                                           path_template.prefix[4:]
-                
-                if run_number:
-                    acquisition_parameters.run_number = run_number
-
-                name = acq.path_template.prefix + '_' + str(run_number)
-
-                if resolution:
-                    acquisition_parameters.resolution = resolution
-
-                if transmission:
-                    acquisition_parameters.transmission = transmission
-
-                if screening_id:
-                    acquisition_parameters.screening_id = screening_id
-
-                try:
-                    acquisition_parameters.osc_start = goniostat.\
-                        getRotationAxisStart().getValue()
-                except AttributeError:
-                    pass
-
-                try:
-                    acquisition_parameters.osc_end = goniostat.\
-                        getRotationAxisEnd().getValue()
-                except AttributeError:
-                    pass
-
-                try:
-                    acquisition_parameters.osc_width = goniostat.\
-                        getOscillationWidth().getValue()
-                except AttributeError:
-                    pass
-
-                try:
-                    acquisition_parameters.num_images = \
-                        int(abs(acquisition_parameters.osc_end - \
-                                acquisition_parameters.osc_start) / acquisition_parameters.osc_width)
-                except AttributeError:
-                    pass
-
-                try:
-                    acquisition_parameters.transmission = beam.getTransmission().getValue()
-                except AttributeError:
-                    pass
-
-                try: 
-                    acquisition_parameters.energy = \
-                        int(123984.0/beam.getWavelength().getValue())/10000.0
-                except AttributeError:
-                    pass
-
-                try:
-                    acquisition_parameters.exp_time = beam.getExposureTime().getValue()
-                except AttributeError:
-                    pass
+                pass
 
 
-                # dc.parameters.comments = enda_result.comments
-                # dc.parametets.path = enda_result.directory
-                # dc.parameters.centred_positions = enda_result.centred_positions
+            # dc.parameters.comments = enda_result.comments
+            # dc.parametets.path = enda_result.directory
+            # dc.parameters.centred_positions = enda_result.centred_positions
 
-                dc = DataCollection(dcg_model, [acq], crystal,
-                                    processing_parameters, name = name)
-                data_collections.append(dc)
+            dc = DataCollection([acq], crystal, processing_parameters)
+            dc.set_name(acq.path_template.get_prefix())
+            dc.set_number(run_number)
             
-        return data_collections
+            data_collections.append(dc)
+
+    return data_collections
