@@ -434,10 +434,11 @@ class DataCollection(TaskNode):
         file_locations = []
         
         path_template = self.acquisitions[0].path_template
+        acq_params = self.acquisitions[0].acquisition_parameters
         file_name_template = path_template.get_image_file_name()
 
-        for i in range(path_template.start_num, 
-                       path_template.start_num + path_template.num_files):
+        for i in range(acq_params.first_image, 
+                       acq_params.first_image + acq_params.num_images):
                     
             file_locations.append(os.path.join(path_template.directory,
                                                file_name_template % i))
@@ -521,10 +522,15 @@ class Characterisation(TaskNode):
         
         path_template = self.reference_image_collection.acquisitions[0].\
                         path_template
+
+        # Quick fix beacuse of bug, remove ASAP
+        acq_params = self.reference_image_collection.acquisitions[0].\
+                     acquisition_parameters
+        
         file_name_template = path_template.get_image_file_name()
 
-        for i in range(path_template.start_num, 
-                       path_template.start_num + path_template.num_files):
+        for i in range(acq_params.first_image, 
+                       acq_params.first_image + acq_params.num_images):
                     
             file_locations.append(os.path.join(path_template.directory,
                                                file_name_template % i))
@@ -777,8 +783,8 @@ class AcquisitionParameters(object):
         self.transmission = float()
         self.inverse_beam = False
         self.shutterless = False
-        self.take_snapshots = False
-        self.take_dark_current = False
+        self.take_snapshots = True
+        self.take_dark_current = True
         self.skip_existing_images = False
 
 
@@ -943,7 +949,7 @@ def to_collect_dict(data_collection, session):
                                   'cell': proc_params.get_cell_str()},
              'processing': str(proc_params.process_data and True),
              'residues':  proc_params.num_residues,
-             'dark': 'True', #acq_params.take_dark_current,
+             'dark': acq_params.take_dark_current,
              'scan4d': 0,
              'resolution': {'upper': acq_params.resolution},
              'transmission': acq_params.transmission,
@@ -1070,9 +1076,10 @@ def dc_from_edna_output(edna_result, reference_image_collection,
                 pass
 
             try:
-                acquisition_parameters.num_images = \
-                    int(abs(acquisition_parameters.osc_end - \
-                            acquisition_parameters.osc_start) / acquisition_parameters.osc_width)
+                acquisition_parameters.num_images = int(abs(acquisition_parameters.osc_end - \
+                                                            acquisition_parameters.osc_start) / acquisition_parameters.osc_width)
+                acq.path_template.num_files = acquisition_parameters.num_images
+                
             except AttributeError:
                 pass
 
