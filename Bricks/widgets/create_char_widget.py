@@ -156,39 +156,51 @@ class CreateCharWidget(CreateTaskBase):
 
     def init_models(self):
         self._char = queue_model_objects.Characterisation()
-        self._data_collection = self._char.reference_image_collection
-        self._path_template = self._data_collection.\
-                              acquisitions[0].path_template
-        self._acquisition_parameters = self._data_collection.\
-                                       acquisitions[0].acquisition_parameters
-        
         self._char_params = self._char.characterisation_parameters
         self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
+
+        if self._bl_config_hwobj is not None:
+            self._acquisition_parameters = self._bl_config_hwobj.\
+                                           get_default_acquisition_parameters()
+
+            self._path_template =  self._bl_config_hwobj.\
+                                  get_default_path_template()
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            self._path_template = queue_model_objects.PathTemplate()
 
         self._path_template.reference_image_prefix = 'ref'
 
         # The num images drop down default value is 1
         # we would like it to be 2
-        self._data_collection.acquisitions[0].\
-            acquisition_parameters.num_images = 2
+        self._acquisition_parameters.num_images = 2
         self._char.characterisation_software =\
             queue_model_objects.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
-
-
+   
         if self._beamline_setup_hwobj is not None:
-            transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-            transmission = round(float(transmission), 1)
-            self.set_transmission(transmission)
+            try:
+                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+                transmission = round(float(transmission), 1)
+            except AttributeError:
+                transmission = 0
 
-            resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-            resolution = round(float(resolution), 4)
-            self.set_resolution(resolution)
+            try:
+                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+                resolution = round(float(resolution), 4)
+            except AttributeError:
+                resolution = 0
 
-            energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-            energy = round(float(energy), 2)
+            try:
+                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+                energy = round(float(energy), 2)
+            except AttributeError:
+                energy = 0
+
+            self._acquisition_parameters.resolution = resolution
             self._acquisition_parameters.energy = energy
-        
+            self._acquisition_parameters.transmission = transmission
+
 
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
@@ -216,12 +228,11 @@ class CreateCharWidget(CreateTaskBase):
 
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             self._char = tree_item.get_model()
-            self._data_collection = self._char.reference_image_collection
-            self._path_template = self._data_collection.acquisitions[0].\
-                                  path_template
+            data_collection = self._char.reference_image_collection
+            self._path_template = data_collection.acquisitions[0].path_template
             
             self._char_params = self._char.characterisation_parameters
-            self._acquisition_parameters = self._data_collection.acquisitions[0].\
+            self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
 
         self._set_space_group(self._char_params.space_group)
@@ -229,44 +240,6 @@ class CreateCharWidget(CreateTaskBase):
                                            self._path_template)
         self._data_path_widget.update_data_model(self._path_template)
         self._char_params_mib.set_model(self._char_params)
-
-
-#     def set_energy(self, pos, wav):
-#         self._data_collection.acquisitions[0].acquisition_parameters.energy = \
-#             round(float(wav), 4)
-        
-        
-#     def set_transmission(self, trans):
-#         self._data_collection.acquisitions[0].acquisition_parameters.transmission = \
-#             round(float(trans), 1)
-        
-
-#     def set_resolution(self, res):
-#         self._data_collection.acquisitions[0].acquisition_parameters.\
-#             resolution = round(float(res), 4)
-
-
-#     def set_run_number(self, run_number):
-#         self._data_collection.acquisitions[0].\
-#             path_template.run_number = run_number
-#         self.acq_widget.run_number_ledit.\
-#             setText(str(run_number))
-
-
-#     def selection_changed(self, tree_item):
-#         self.current_selected_item = tree_item
-#         self.set_energies()
-
-#         if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-#                isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            
-#             run_number = queue_model_objects.\
-#                          get_largest_prefix_with_name(tree_item, 
-#                              self._data_collection.acquisitions[0].path_template.prefix) + 1 
-#             self.set_run_number(run_number)
-        
-#         elif isinstance(tree_item, queue_item.SampleQueueItem):
-#             self.set_run_number(1)
 
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -301,10 +274,6 @@ class CreateCharWidget(CreateTaskBase):
                     sc.set_name('sample-centring')
                     tasks.append(sc)
 
-                data_collection = copy.deepcopy(self._data_collection)
-                data_collection.acquisitions[0].\
-                    acquisition_parameters.centred_position = \
-                    copy.deepcopy(shape.centred_position)
                 char_params = copy.deepcopy(self._char_params)
 
                 if shape.qub_point is not None:
@@ -312,19 +281,27 @@ class CreateCharWidget(CreateTaskBase):
                 else:
                     snapshot = self._shape_history.get_snapshot([])
 
-                data_collection.acquisitions[0].acquisition_parameters.\
-                    centred_position.snapshot_image = snapshot
+                # Acquisition for start position
+                acq = queue_model_objects.Acquisition()
+                acq.acquisition_parameters = \
+                    copy.deepcopy(self._acquisition_parameters)
+                acq.acquisition_parameters.collect_agent = \
+                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
+                acq.acquisition_parameters.\
+                    centred_position = shape.get_centred_positions()[0]
+                acq.path_template = copy.deepcopy(self._path_template)
+                acq.acquisition_parameters.centred_position.\
+                    snapshot_image = snapshot
 
-                data_collection.acquisitions[0].path_template.suffix = \
-                    self._session_hwobj.suffix
+                data_collection = queue_model_objects.\
+                                  DataCollection([acq], sample.crystals[0],
+                                                 processing_parameters)
 
                 # Referance images for characterisations should be taken 90 deg apart
                 # this is achived by setting overap to 89
-                data_collection.acquisitions[0].\
-                    acquisition_parameters.overlap = 89
-
+                acq.acquisition_parameters.overlap = 89
+                data_collection.acquisitions[0] = acq               
                 data_collection.experiment_type = queue_model_objects.EXPERIMENT_TYPE.EDNA_REF
-                data_collection.crystal = sample.crystals[0]
 
                 if sc:
                     sc.set_task(data_collection)

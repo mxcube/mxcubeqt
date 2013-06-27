@@ -36,7 +36,7 @@ class DataModelInputBinder(object):
 
 
     def __validated(self, validator, widget, new_value):
-        if validator: 
+        if validator:
             if validator.validate(new_value, widget.cursorPosition())[0] \
                     == QValidator.Acceptable:
                 widget.setPaletteBackgroundColor(QWidget.white)
@@ -54,6 +54,7 @@ class DataModelInputBinder(object):
     def set_model(self, obj):
         self.__pobj = obj
         self.init_bindings()
+        self.validate_all()
 
    
     def init_bindings(self):
@@ -67,7 +68,7 @@ class DataModelInputBinder(object):
             elif isinstance(value[0], QCheckBox) or \
                     isinstance(value[0], QRadioButton):
                 value[0].setChecked(bool(getattr(self.__pobj, key)))
-        
+
 
     def bind_value_update(self, field_name, widget, type_fn, validator = None):
         self.bindings[field_name] = (widget, validator, type_fn)
@@ -118,11 +119,10 @@ class DataModelInputBinder(object):
             
             if validator:
                 if isinstance(widget, QLineEdit):
-                    if not validator.validate(widget.text(), 
-                                              widget.cursorPosition())[0] \
-                                              == QValidator.Acceptable:
-                                              result.append(key)
-
+                    if not self.__validated(validator,
+                                            widget, 
+                                            widget.text()):
+                        result.append(key)
                 elif isinstance(widget, QComboBox):
                     pass
                 elif isinstance(widget, QCheckBox) or \

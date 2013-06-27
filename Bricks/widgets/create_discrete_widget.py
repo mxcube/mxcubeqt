@@ -78,10 +78,18 @@ class CreateDiscreteWidget(CreateTaskBase):
 
 
     def init_models(self):
-        self._path_template = queue_model_objects.PathTemplate()
-        self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
+
+        if self._bl_config_hwobj is not None:
+            self._acquisition_parameters = self._bl_config_hwobj.\
+                                           get_default_acquisition_parameters()
+
+            self._path_template =  self._bl_config_hwobj.\
+                                  get_default_path_template()    
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            self._path_template = queue_model_objects.PathTemplate()
         
         if self._beamline_setup_hwobj is not None:
             try:
@@ -257,9 +265,6 @@ class CreateDiscreteWidget(CreateTaskBase):
                     snapshot_image = snapshot
 
                 processing_parameters = copy.deepcopy(self._processing_parameters)
-
-
-                acq.path_template.suffix = self._session_hwobj.suffix
                 
                 dc = queue_model_objects.DataCollection([acq],
                                                         sample.crystals[0],
