@@ -158,6 +158,7 @@ class CreateCharWidget(CreateTaskBase):
         self._char = queue_model_objects.Characterisation()
         self._char_params = self._char.characterisation_parameters
         self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._bl_config_hwobj is not None:
             self._acquisition_parameters = self._bl_config_hwobj.\
@@ -208,6 +209,7 @@ class CreateCharWidget(CreateTaskBase):
 
             self.init_models()
             sample_data_model = self.get_sample_item().get_model()
+            self.update_processing_parameters(sample_data_model.crystals[0])
             
             if isinstance(tree_item, queue_item.SampleQueueItem):
                 (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
@@ -234,12 +236,23 @@ class CreateCharWidget(CreateTaskBase):
             self._char_params = self._char.characterisation_parameters
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
+            self._processing_parameters = data_collection.processing_parameters
 
         self._set_space_group(self._char_params.space_group)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                            self._path_template)
         self._data_path_widget.update_data_model(self._path_template)
         self._char_params_mib.set_model(self._char_params)
+
+
+    def update_processing_parameters(self, crystal):
+        self._processing_parameters.space_group = crystal.space_group
+        self._processing_parameters.cell_a = crystal.cell_a
+        self._processing_parameters.cell_alpha = crystal.cell_alpha
+        self._processing_parameters.cell_b = crystal.cell_b
+        self._processing_parameters.cell_beta = crystal.cell_beta
+        self._processing_parameters.cell_c = crystal.cell_c
+        self._processing_parameters.cell_gamma = crystal.cell_gamma
 
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -292,6 +305,8 @@ class CreateCharWidget(CreateTaskBase):
                 acq.path_template = copy.deepcopy(self._path_template)
                 acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
+
+                processing_parameters = copy.deepcopy(self._processing_parameters)
 
                 data_collection = queue_model_objects.\
                                   DataCollection([acq], sample.crystals[0],
