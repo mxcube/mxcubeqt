@@ -13,12 +13,12 @@ class DuoStateBrick(BaseComponents.BlissWidget):
 
     STATES = {
         'unknown': (None, True, True, False, False),
-        'disabled': (QWidget.magenta, False, False, False, False),
+        'disabled': (widget_colors.LIGHT_RED, False, False, False, False),
         'error': (widget_colors.LIGHT_RED, True, True, False, False),
-        'out': (QWidget.darkGray, True, True, False, True),
-        'moving': (QWidget.yellow, False, False, None, None),
+        'out': (widget_colors.DARK_GRAY, True, True, False, True),
+        'moving': (widget_colors.LIGHT_YELLOW, False, False, None, None),
         'in': (widget_colors.LIGHT_GREEN, True, True, True, False),
-        'automatic': (QWidget.white, True, True, False, False)
+        'automatic': (widget_colors.WHITE, True, True, False, False)
     }
 
     LABEL_CLASS=QLabel
