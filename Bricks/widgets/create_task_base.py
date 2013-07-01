@@ -225,5 +225,7 @@ class CreateTaskBase(qt.QWidget):
     def create_parent_task_node(self):
         group_task_node = queue_model_objects.TaskGroup()
         group_task_node.set_name(self._task_node_name)
+        num = self._current_selected_item.get_model().get_next_number_for_name(self._task_node_name)
+        group_task_node.set_number(num)
                                 
         return group_task_node

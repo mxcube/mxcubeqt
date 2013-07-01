@@ -107,18 +107,21 @@ class DataPathWidget(qt.QWidget):
 
     def _folder_ledit_change(self, new_value):        
         base_image_dir = self._session_hwobj.get_base_image_directory()
+        base_proc_dir = self._session_hwobj.get_base_process_directory()
 
         new_sub_dir = str(new_value)
 
         if len(new_sub_dir) > 0:
             if new_sub_dir[0] == '/':
                 new_sub_dir = new_sub_dir[1:]
-                
-            new_directory = os.path.join(base_image_dir, str(new_sub_dir))
+            new_image_directory = os.path.join(base_image_dir, str(new_sub_dir))
+            new_proc_dir = os.path.join(base_proc_dir, str(new_sub_dir))
         else:
-            new_directory = base_image_dir
+            new_image_directory = base_image_dir
+            new_proc_dir = base_proc_dir
             
-        self._data_model.directory = new_directory
+        self._data_model.directory = new_image_directory
+        self._data_model.process_directory = new_proc_dir 
         self.data_path_widget_layout.folder_ledit.\
             setPaletteBackgroundColor(widget_colors.WHITE)
 
