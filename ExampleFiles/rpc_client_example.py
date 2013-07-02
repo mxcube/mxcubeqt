@@ -4,7 +4,7 @@ import time
 import sys
 import imp
 
-server = xmlrpclib.ServerProxy('http://lonsdale:8000')
+server = xmlrpclib.ServerProxy('http://localhost:8000')
 BASE_DATA_DIRECTORY = '/data/id14eh1/inhouse/opid141/20130515/RAW_DATA/'
 
 # Retrieve code of queue model from server and compile and import it
