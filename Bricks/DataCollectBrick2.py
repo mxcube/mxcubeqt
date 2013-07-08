@@ -372,7 +372,7 @@ class DataCollectBrick2(BlissWidget):
 
         if self['checkDarkCurrent'] == 0:
             self.confirmDialog.forceDarkImage.hide()
-
+            
         if hasattr(self.collectObj._detector, "shutterless"):
             self.confirmDialog.forceDarkImage.hide()
             self.confirmDialog.shutterlessDatacollection.show()
@@ -382,13 +382,18 @@ class DataCollectBrick2(BlissWidget):
               if abcd['overlap']==0:
                 self.confirmDialog.shutterlessDatacollection.setEnabled(True)
                 self.confirmDialog.shutterlessDatacollection.setChecked(True)
+                self.confirmDialog.useScan4dModeCheckbox.setChecked(True)
+                self.confirmDialog.useScan4dModeCheckbox.setEnabled(True)
 	      else:
                 self.confirmDialog.shutterlessDatacollection.hide()
                 self.confirmDialog.shutterlessDatacollection.setChecked(False)
                 self.confirmDialog.shutterlessDatacollection.setEnabled(False)
+                self.confirmDialog.useScan4dModeCheckbox.hide()
+                self.confirmDialog.useScan4dModeCheckbox.setChecked(False)
+                self.confirmDialog.useScan4dModeCheckbox.setEnabled(False)
+                collect_list[0]['scan4d'] = 0
         else:
             self.confirmDialog.useScan4dModeCheckbox.hide()
-        
         s=self.font().pointSize()
         f = self.confirmDialog.font()
         f.setPointSize(s)
@@ -618,7 +623,7 @@ class DataCollectBrick2(BlissWidget):
             sequence_dict={}
             collect_dict={}
             sample_ref={}
-
+            
             collect_dict['EDNA_files_dir']=params_dict.get('EDNA_files_dir','')
             collect_dict['do_inducedraddam']=params_dict.get('do_inducedraddam', False)
             collect_dict['motors']=params_dict.get("motors", {})
@@ -631,7 +636,7 @@ class DataCollectBrick2(BlissWidget):
                 collect_dict['phiy_s'] = params_dict['phiy_s']
                 collect_dict['phiz_s'] = params_dict['phiz_s']
                 collect_dict['sampx_s'] = params_dict['sampx_s']
-                collect_dict['sapmy_s'] = params_dict['sampy_s']
+                collect_dict['sampy_s'] = params_dict['sampy_s']
                 collect_dict['phiy_e'] = params_dict['phiy_e']
                 collect_dict['phiz_e'] = params_dict['phiz_e']
                 collect_dict['sampx_e'] = params_dict['sampx_e']
