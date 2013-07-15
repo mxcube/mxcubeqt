@@ -178,6 +178,7 @@ class CreateCharWidget(CreateTaskBase):
         self._char.characterisation_software =\
             queue_model_objects.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
+        self._acquisition_parameters.shuterless = False
    
         if self._beamline_setup_hwobj is not None:
             try:
