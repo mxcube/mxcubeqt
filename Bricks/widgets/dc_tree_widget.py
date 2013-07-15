@@ -731,7 +731,8 @@ class DataCollectTree(QWidget):
 
             if sample.lims_code:
                 barcode_samples[sample.lims_code] = sample
-            else:
+                
+            if sample.lims_location:
                 location_samples[sample.lims_location] = sample
             
         return (barcode_samples, location_samples)
