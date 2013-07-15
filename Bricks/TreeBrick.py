@@ -164,8 +164,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                     else:
                         logging.getLogger("user_level_log").\
                             warning("The sample with the barcode (%s) exists"+\
-                                    " in lims but the location does not mat" +\
-                                    "ch. Sample changer location: %s, lims " +\
+                                    " in LIMS but the location does not mat" +\
+                                    "ch. Sample changer location: %s, LIMS " +\
                                     "location %s" % (sc_sample.code,
                                                      sc_sample.location,
                                                      lims_sample.lims_location))
@@ -175,10 +175,9 @@ class TreeBrick(BaseComponents.BlissWidget):
                     if lims_sample:
                         if lims_sample.lims_code:
                             logging.getLogger("user_level_log").\
-                                warning("The sample has a barcode in lims, but"+\
-                                        "the SC were not able to read barcode on "+\
-                                        "the current sample. You can rescan the "+\
-                                        "barcode by rescaning the basket.")
+                                warning("The sample has a barcode in LIMS, but "+\
+                                        "the SC has no barcode information for "+\
+                                        "this sample. For location: %s" % str(sc_sample.location))
                             sample_list.append(lims_sample)
                         else:
                             logging.getLogger("user_level_log").\
