@@ -263,7 +263,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 dc.set_name(acq.path_template.get_prefix())
                 dc.set_number(self._path_template.run_number)
-                self._path_template.run_number += 1
+                #self._path_template.run_number += 1
 
                 dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
 

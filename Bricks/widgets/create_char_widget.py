@@ -321,7 +321,7 @@ class CreateCharWidget(CreateTaskBase):
                                 path_template.run_number)
 
                 # Increase run number for next collection
-                self.set_run_number(self._path_template.run_number + 1)
+                #self.set_run_number(self._path_template.run_number + 1)
 
                 tasks.append(char)
 
