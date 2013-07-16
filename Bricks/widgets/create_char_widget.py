@@ -211,15 +211,7 @@ class CreateCharWidget(CreateTaskBase):
             self.init_models()
             sample_data_model = self.get_sample_item().get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
-            
-            if isinstance(tree_item, queue_item.SampleQueueItem):
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
-                sub_dir =  'characterisation-%i' % tree_item.get_model().\
-                          get_next_number_for_name('Characterisation')       
-                proc_directory = os.path.join(proc_directory, sub_dir)
-                data_directory = os.path.join(data_directory, sub_dir)                
-            else:
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+            (data_directory, proc_directory) = self.get_default_directory()
                 
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory            

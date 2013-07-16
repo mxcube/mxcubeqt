@@ -90,14 +90,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
             self.init_models()
             sample_data_model = self.get_sample_item().get_model()
 
-            if isinstance(tree_item, queue_item.SampleQueueItem):
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
-                sub_dir =  'energy-scan-%i' % tree_item.get_model().\
-                          get_next_number_for_name('Energyscan')       
-                proc_directory = os.path.join(proc_directory, sub_dir)
-                data_directory = os.path.join(data_directory, sub_dir)     
-            else:
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+            (data_directory, proc_directory) = self.get_default_directory()
                 
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory

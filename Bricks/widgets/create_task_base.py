@@ -141,12 +141,8 @@ class CreateTaskBase(qt.QWidget):
         return prefix
 
         
-    def get_default_directory(self, sample_data_node):
-        sub_dir = str()
-        item = self.get_group_item()
-        
-        if not item:
-            item = self.get_sample_item()
+    def get_default_directory(self):
+        item = self.get_sample_item()
             
         data_directory = self._session_hwobj.\
                          get_image_directory(item.get_model())

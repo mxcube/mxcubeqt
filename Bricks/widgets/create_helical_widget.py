@@ -348,14 +348,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self.update_processing_parameters(sample_data_model.crystals[0])
             self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
 
-            if isinstance(tree_item, queue_item.SampleQueueItem):
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
-                sub_dir =  'helical-%i' % tree_item.get_model().\
-                          get_next_number_for_name('Helical')       
-                proc_directory = os.path.join(proc_directory, sub_dir)
-                data_directory = os.path.join(data_directory, sub_dir)     
-            else:
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
+            (data_directory, proc_directory) = self.get_default_directory()
                 
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
