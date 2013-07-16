@@ -165,54 +165,6 @@ class CreateHelicalWidget(CreateTaskBase):
                 item.setText(0, item.get_model().get_name())
 
 
-    def _selection_changed(self, tree_item):
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-
-            self._path_template = queue_model_objects.PathTemplate()
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._energy_scan_result = queue_model_objects.EnergyScanResult()
-            self._processing_parameters = queue_model_objects.ProcessingParameters()
-
-            sample_view_item = self.get_sample_item()
-            sample_data_model = sample_view_item.get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
-            self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
-
-            if isinstance(tree_item, queue_item.SampleQueueItem):
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
-                sub_dir =  'discrete-%i' % tree_item.get_model().\
-                          get_next_number_for_name('Discrete')       
-                proc_directory = os.path.join(proc_directory, sub_dir)
-                data_directory = os.path.join(data_directory, sub_dir)                
-            else:
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_model)
-                
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            
-            
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._current_selected_item.\
-                get_model().get_next_number_for_name(self._path_template.get_prefix())
-
-
-        elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            data_collection = tree_item.get_model()
-            self._path_template = data_collection.acquisitions[0].path_template
-            self._acquisition_parameters = data_collection.acquisitions[0].\
-                                           acquisition_parameters
-            self._energy_scan_result = queue_model_objects.EnergyScanResult()
-            self._processing_parameters = data_collection.processing_parameters
-            self._energy_scan_result = data_collection.crystal.energy_scan_result
-            self._acq_widget.set_energies(self._energy_scan_result)
-            
-        self._processing_widget.update_data_model(self._processing_parameters)
-        self._acq_widget.update_data_model(self._acquisition_parameters,
-                                           self._path_template)
-        self._data_path_widget.update_data_model(self._path_template)
-        
-
     def get_prefix_type(self):
         return 'hel'
 
