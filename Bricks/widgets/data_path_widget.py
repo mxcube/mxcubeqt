@@ -98,11 +98,17 @@ class DataPathWidget(qt.QWidget):
 
     def _prefix_ledit_change(self, new_value):
         self.set_prefix(new_value)
+        self.emit(qt.PYSIGNAL('path_template_changed'),
+                  (self.data_path_widget_layout.prefix_ledit,
+                   new_value))
 
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.set_run_number(new_value)
+            self.emit(qt.PYSIGNAL('path_template_changed'),
+                      (self.data_path_widget_layout.run_number_ledit,
+                       new_value))
 
 
     def _folder_ledit_change(self, new_value):        
@@ -124,6 +130,10 @@ class DataPathWidget(qt.QWidget):
         self._data_model.process_directory = new_proc_dir 
         self.data_path_widget_layout.folder_ledit.\
             setPaletteBackgroundColor(widget_colors.WHITE)
+
+        self.emit(qt.PYSIGNAL('path_template_changed'),
+                  (self.data_path_widget_layout.folder_ledit,
+                   new_value))
 
 
     def set_data_path(self, path):
