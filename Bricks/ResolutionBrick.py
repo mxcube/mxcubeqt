@@ -1,8 +1,11 @@
 import logging
+import types
+
 from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
-import types
+from BlissFramework.Utils import widget_colors
+
 
 __category__ = 'mxCuBE'
 
@@ -15,12 +18,14 @@ class ResolutionGUIEvent(QCustomEvent):
 """
 
 class ResolutionBrick(BlissWidget):
-    STATE_COLORS = (QWidget.red, QWidget.red,\
-        QWidget.green,\
-        QWidget.yellow, QWidget.yellow,\
-        QWidget.darkYellow,\
-        QColor(255,165,0),\
-        QWidget.red)
+    STATE_COLORS = (widget_colors.LIGHT_RED, 
+                    widget_colors.LIGHT_RED,
+                    widget_colors.LIGHT_GREEN,
+                    widget_colors.LIGHT_YELLOW, 
+                    widget_colors.LIGHT_YELLOW,
+                    QWidget.darkYellow,
+                    QColor(255,165,0),
+                    widget_colors.LIGHT_RED)
 
     MAX_HISTORY = 20
 
@@ -63,10 +68,12 @@ class ResolutionBrick(BlissWidget):
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
         box1=QHBox(self.paramsBox)
-        self.currentResolution=myLineEdit(box1)
-        self.currentDetectorDistance=myLineEdit(box1)
-        self.currentResolution.setFixedWidth(55)
-        self.currentDetectorDistance.setFixedWidth(75)
+        self.currentResolution=QLineEdit(box1)
+        self.currentResolution.setReadOnly(True)
+        self.currentDetectorDistance=QLineEdit(box1)
+        self.currentDetectorDistance.setReadOnly(True)
+        self.currentResolution.setFixedWidth(60)
+        self.currentDetectorDistance.setFixedWidth(80)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)
@@ -311,13 +318,13 @@ class ResolutionBrick(BlissWidget):
         f_mm=self.currentDetectorDistance.font()
         f_ang=self.currentResolution.font()
         if unit==chr(197):
-            f_mm.setBold(False)
-            f_ang.setBold(True)
+            #f_mm.setBold(False)
+            #f_ang.setBold(True)
             self.topBox.setTitle('Resolution')
             self.resolutionStateChanged(self.resolutionMotor.getState())
         elif unit=="mm":
-            f_mm.setBold(True)
-            f_ang.setBold(False)
+            #f_mm.setBold(True)
+            #f_ang.setBold(False)
             self.topBox.setTitle('Detector distance')
             self.detectorStateChanged(self.detectorMotor.getState())
         self.currentDetectorDistance.setFont(f_mm)
@@ -457,10 +464,10 @@ class ResolutionBrick(BlissWidget):
         if state is None:
             state=self.detectorMotor.NOTINITIALIZED
 
-        if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
-            self.currentResolution.setDisabledLook(True)
-        else:
-            self.currentResolution.setDisabledLook(False)
+        #if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
+        #    self.currentResolution.setDisabledLook(True)
+        #else:
+        #    self.currentResolution.setDisabledLook(False)
 
         self.resolutionStateChanged(state)
 
@@ -468,10 +475,10 @@ class ResolutionBrick(BlissWidget):
         if state is None:
             state=self.detectorMotor.NOTINITIALIZED
 
-        if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
-            self.currentDetectorDistance.setDisabledLook(True)
-        else:
-            self.currentDetectorDistance.setDisabledLook(False)
+        #if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
+        #    self.currentDetectorDistance.setDisabledLook(True)
+        #else:
+        #    self.currentDetectorDistance.setDisabledLook(False)
 
         #self.detectorStateChanged(state)
 
@@ -606,24 +613,6 @@ class HorizontalSpacer(QWidget):
     def __init__(self,*args):
         QWidget.__init__(self,*args)
         self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
-
-class myLineEdit(QLineEdit):
-    def __init__(self,parent):
-        QLineEdit.__init__(self,parent)
-        palette=self.palette()
-        self.originalCG=QColorGroup(palette.disabled())
-        self.disabledCG=QColorGroup(palette.disabled())
-        self.disabledCG.setColor(QColorGroup.Text,QWidget.black)
-        self.setEnabled(False)
-        self.setAlignment(QWidget.AlignRight)
-        palette.setDisabled(self.disabledCG)
-
-    def setDisabledLook(self,state):
-        palette=self.palette()
-        if state:
-            palette.setDisabled(self.originalCG)
-        else:
-            palette.setDisabled(self.disabledCG)
 
 """
 class ResolutionLimitsThread(QThread):

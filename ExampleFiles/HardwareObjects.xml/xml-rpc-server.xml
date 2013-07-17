@@ -1,8 +1,24 @@
 <object class = "XMLRPCServer" role = "XMLRPCServer">
+
+  <!-- Should XML-RPC server listen on all interfaces?
+       False (the default) means listen only on the interface given
+       by socket.gethostname()-->
+  <all_interfaces> 
+    True
+  </all_interfaces>
   <port>
     8000
   </port>
 
+  <apis>
+    <api>
+     <module>Native</module>
+     <recurse>True</recurse>
+   </api>
+  </apis>
+
+  <object href="/queue-controller" role="queue_controller"/>
+  <object href="/queue-model" role="queue_model"/>
   <object href="/minidiff" role="diffractometer"/>
   <object href="/mxlocal" role="beamline_configuration"/>
 </object>

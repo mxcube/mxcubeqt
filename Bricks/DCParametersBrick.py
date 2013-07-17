@@ -24,6 +24,10 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         # Qt-Slots
         self.defineSlot("populate_parameter_widget",({}))
 
+        # Properties
+        self.addProperty("session", "string", "/session")
+        self.addProperty("bl-config", "string", "/bl-config")
+        
         # Layout
         self.stack = QWidgetStack(self, 'stack')
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
@@ -49,10 +53,13 @@ class DCParametersBrick(BaseComponents.BlissWidget):
                         SIGNAL('clicked()'),
                         self.toggle_page)
 
+        
         self.toggle_page_button.setDisabled(True)
 
-    
-    def populate_parameter_widget(self, data_collection):
+
+    def populate_parameter_widget(self, item):
+        data_collection = item.get_model()
+        
         if data_collection.is_collected():
             self.populate_results(data_collection)
             self.stack.raiseWidget(self.results_view)
@@ -61,8 +68,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-        self.parameters_widget.\
-            populate_parameter_widget(data_collection)
+        self.parameters_widget.populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(data_collection.is_collected())
 
 
@@ -79,6 +85,12 @@ class DCParametersBrick(BaseComponents.BlissWidget):
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-        
-
-        
+      
+    def propertyChanged(self, property_name, old_value, new_value):
+        if property_name == 'session':
+            session_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.path_widget.set_session(session_hwobj)
+        elif property_name == 'bl-config':            
+            self.bl_config_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.set_bl_config(\
+                self.bl_config_hwobj)

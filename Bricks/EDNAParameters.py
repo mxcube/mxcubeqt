@@ -29,6 +29,7 @@ class EDNAParameters(BlissWidget):
         #when starting a workflow we emit this signal and expect
         #to get the beamline params through the slot
         self.defineSlot('updateBeamlineParameters', ())
+        self.defineSlot("populate_workflow_widget",({}))  
         self.defineSignal('beamlineParametersNeeded', ())
         self.defineSignal('workflowAvailable', ())
 
@@ -79,8 +80,10 @@ class EDNAParameters(BlissWidget):
         pass
 
     def setExpertMode(self, expert):
-        self.setEnabled(expert)
-        self.emit(PYSIGNAL('workflowAvailable'), (expert, ))
+        self.setEnabled(True)
+        self.emit(PYSIGNAL('workflowAvailable'), (True, ))
+        #self.setEnabled(expert)
+        #self.emit(PYSIGNAL('workflowAvailable'), (expert, ))
 
     def propertyChanged(self, prop, old_val, new_val):
         if prop == 'mnemonic':
@@ -106,7 +109,10 @@ class EDNAParameters(BlissWidget):
 
     def prompt_parameters(self, xml):
         logging.debug('got back XML from server:\n%s', xml)
-        xml_root = etree.fromstring(xml)
+        # Edited by Olof 2013/04/16: Temporary fix for handling messages containing
+        # XML markup
+        #xml_root = etree.fromstring(xml)
+        xml_root = etree.fromstring(xml, parser=etree.XMLParser(recover=True))
 
         # Special case until Olof implements the saner XML format on the server side
         if xml_root.tag == 'message':
@@ -244,7 +250,7 @@ class EDNAParameters(BlissWidget):
         self.emit(PYSIGNAL('beamlineParametersNeeded'), ())
         name = str(self.workflow_list.currentText())
         params = ['modelpath', self.workflows[name]['path']]
-        blparams = XSDataMXCuBEParameters()
+        #blparams = XSDataMXCuBEParameters()
         for k,v in self.beamline_params.iteritems():
             # we'll have to lookup how those are specified someday
             # it's a (bool, string, string) tuple
@@ -259,21 +265,23 @@ class EDNAParameters(BlissWidget):
                 param = v[0]
             else: param=v
             logging.debug('setting %s to %r', k, param)
-            setattr(blparams, k, param)
+            #setattr(blparams, k, param)
+            params.append(k)
+            params.append(str(param))
         # we also need the session id
-        blparams.sessionId = self.session_id
-        output_dir = self.beamline_params['directory'].replace('RAW_DATA', 'PROCESSED_DATA')
+        #blparams.sessionId = self.session_id
+        #output_dir = self.beamline_params['directory'].replace('RAW_DATA', 'PROCESSED_DATA')
         # we'll need that one later to pass to the edna characterise HO
-        self.process_dir = output_dir
-	if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        (handle, filename) = tempfile.mkstemp(suffix='.xml', prefix='edna_output_', dir=output_dir)
-        blparams.output_file = filename
+        #self.process_dir = output_dir
+	#if not os.path.exists(output_dir):
+        #    os.makedirs(output_dir)
+        #(handle, filename) = tempfile.mkstemp(suffix='.xml', prefix='edna_output_', dir=output_dir)
+        #blparams.output_file = filename
         
         # convert that stuff to xml
-        params.append('mxcube_parameters')
-        params.append(blparams.marshal())
-        self.workflow_output_file = filename
+        #params.append('mxcube_parameters')
+        #params.append(blparams.marshal())
+        #self.workflow_output_file = filename
         logging.debug('starting workflow %s with params %r', name, params)
         self.workflow.start(params)
 
@@ -296,7 +304,6 @@ class EDNAParameters(BlissWidget):
             self.beamline_params[k] = value
 
 
-
     def workflow_selected(self, name):
         if type(name) != types.StringType:
             name = str(name)
@@ -313,9 +320,23 @@ class EDNAParameters(BlissWidget):
         self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1)
         self.params_widget.show()
 
+
     def login_changed(self, *login_infos):
         logging.debug('user logged in, logins_info: %r', login_infos)
         if len(login_infos) == 1 and login_infos[0] == None:
             self.session_id = None
         else:
             self.session_id = int(login_infos[0])
+
+
+    def populate_workflow_widget(self, item):        
+        self.beamline_params['directory'] = item.get_model().path_template.directory
+        self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
+        self.beamline_params['run_number'] = item.get_model().path_template.run_number
+ 
+        self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
+        self.beamline_params['sample_node_id'] = item.get_model().get_parent().\
+                                                 get_parent()._node_id
+        self.beamline_params['group_node_id'] = item.get_model().get_parent()._node_id
+
+        #self.workflow_selected(item.get_model().get_type())

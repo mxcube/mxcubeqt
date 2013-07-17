@@ -1,8 +1,9 @@
 import logging
 import queue_item
 import queue_entry
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import qt
+
 
 from BlissFramework import Icons
 from collections import namedtuple
@@ -11,6 +12,7 @@ from widgets.create_discrete_widget import CreateDiscreteWidget
 from widgets.create_mesh_widget import CreateMeshWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
+from widgets.create_workflow_widget import CreateWorkflowWidget
 
 
 class TaskToolBoxWidget(qt.QWidget):
@@ -42,6 +44,10 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, 
                                                        "energy_scan")
 
+        self.workflow_page = CreateWorkflowWidget(self.tool_box,
+                                                  'workflow')
+        
+
         #self.mesh_page = CreateMeshWidget(self.tool_box, "Mesh")
         #self.mesh_page.setBackgroundMode(qt.QWidget.PaletteBackground)
       
@@ -49,6 +55,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tool_box.addItem(self.char_page, "Characterise")
         self.tool_box.addItem(self.helical_page, "Helical")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
+        self.tool_box.addItem(self.workflow_page, "Workflow")
         #self.tool_box.addItem(self.mesh_page, "Mesh")
 
         self.add_pixmap = Icons.load("add_row.png")
@@ -80,9 +87,65 @@ class TaskToolBoxWidget(qt.QWidget):
         self.discrete_page.set_tree_brick(brick)
         self.char_page.set_tree_brick(brick)
         self.energy_scan_page.set_tree_brick(brick)
+        self.workflow_page.set_tree_brick(brick)
 
 
-    def set_shape_history(self, shape_history):
+    def set_beamline_setup(self, beamline_setup_hwobj):
+        self.helical_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.discrete_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.char_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.energy_scan_page._beamline_setup_hwobj = beamline_setup_hwobj
+        self.workflow_page._beamline_setup_hwobj = beamline_setup_hwobj
+
+        self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
+        self._set_session(beamline_setup_hwobj.session_hwobj)
+        self._set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
+        self._set_energy_scan_hw_obj(beamline_setup_hwobj.energy_hwobj)
+
+        try:
+            transmission = beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+        except AttributeError:
+            transmission = 0
+
+        try:
+            resolution = beamline_setup_hwobj.resolution_hwobj.getPosition()
+        except AttributeError:
+            resolution = 0
+
+        self.discrete_page.set_transmission(transmission)
+        self.char_page.set_transmission(transmission)
+        self.discrete_page.set_resolution(resolution)
+        self.char_page.set_resolution(resolution)
+
+        try:
+            beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
+                                                      self.discrete_page.set_energy)
+                    
+            beamline_setup_hwobj.energy_hwobj.connect('energyChanged',
+                                                      self.char_page.set_energy)
+
+            beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
+                                                            self.discrete_page.set_transmission)
+            beamline_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
+                                                            self.char_page.set_transmission)
+
+            beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
+                                                          self.discrete_page.set_resolution)
+            beamline_setup_hwobj.resolution_hwobj.connect('positionChanged',
+                                                          self.char_page.set_resolution)
+        except AttributeError as ex:
+            logging.getLogger("HWR").exception('Could not connect to one or'+\
+                                               'more hardware objects' + str(ex))
+
+
+    def _set_energy_scan_hw_obj(self, energy_hwobj):
+        self.energy_scan_page.set_energy_scan_hw_obj(energy_hwobj)
+        energy =  energy_hwobj.getCurrentEnergy()
+        self.discrete_page.set_energy(energy, 0)
+        self.char_page.set_energy(energy, 0)
+
+
+    def _set_shape_history(self, shape_history):
         """
         Sets the shape_history of each page in the toolbox.
         """
@@ -91,6 +154,23 @@ class TaskToolBoxWidget(qt.QWidget):
         self.discrete_page.set_shape_history(shape_history)
         self.char_page.set_shape_history(shape_history)
         self.energy_scan_page.set_shape_history(shape_history)
+        self.workflow_page.set_shape_history(shape_history)
+
+
+    def _set_session(self, session_hwobj):
+        self.helical_page.set_session(session_hwobj)
+        self.discrete_page.set_session(session_hwobj)
+        self.char_page.set_session(session_hwobj)
+        self.energy_scan_page.set_session(session_hwobj)
+        self.workflow_page.set_session(session_hwobj)
+
+
+    def set_bl_config(self, bl_config):
+        self.helical_page.set_bl_config(bl_config)
+        self.discrete_page.set_bl_config(bl_config)
+        self.char_page.set_bl_config(bl_config)
+        self.energy_scan_page.set_bl_config(bl_config)
+        self.workflow_page.set_bl_config(bl_config)
 
 
     def ispyb_logged_in(self, logged_in):
@@ -103,20 +183,10 @@ class TaskToolBoxWidget(qt.QWidget):
         self.char_page.ispyb_logged_in(logged_in)
         self.helical_page.ispyb_logged_in(logged_in)
         self.energy_scan_page.ispyb_logged_in(logged_in)
+        self.energy_scan_page.ispyb_logged_in(logged_in)
+        self.workflow_page.ispyb_logged_in(logged_in)
 
-
-    # def set_tunable_energy(self, state):
-    #     self.tool_box.setItemEnabled(\
-    #         self.tool_box.indexOf(self.energy_scan_page), state)
-
-    #     self.helical_page.set_tunable_energy(state)
-    #     self.discrete_page.set_tunable_energy(state)
-
-
-    def set_energy_scan_hw_obj(self, mnemonic):
-        self.energy_scan_page.set_energy_scan_hw_obj(mnemonic)
-
-        
+     
     def selection_changed(self, items):
         """
         Called by the parent widget when selection in the tree changes.
@@ -125,32 +195,37 @@ class TaskToolBoxWidget(qt.QWidget):
             item = items[0]            
             # Set current selected item in the relevant
             # toolbox widgets.
+
             self.discrete_page.selection_changed(item)
             self.char_page.selection_changed(item)
             self.helical_page.selection_changed(item)
             self.energy_scan_page.selection_changed(item)
+            self.workflow_page.selection_changed(item)
 
 
     def create_task_button_click(self):
         items = self.tree_brick.get_selected_items()
-        self.create_task(items)
+
+        for item in items:
+            self.create_task(item.get_model())
 
 
-    def create_task(self, items = None):
-        if self.tool_box.currentItem().approve_creation():
-            for item in items:
-                if isinstance(item.get_model(), queue_model.Sample):
-                    parent_task_node = self.tool_box.currentItem().\
-                                       create_parent_task_node(item)    
-                    self.tree_brick.add_to_queue(parent_task_node,
-                                                  item)
-                elif isinstance(item.get_model(), queue_model.TaskNode):
-                    parent_task_node = item.get_model() 
-                    sample = item.parent().get_model()
-                    task_list = self.tool_box.currentItem().\
-                                create_task(parent_task_node, sample)
-                    self.tree_brick.add_to_queue(task_list, item)
-                else:
-                    self.create_task([item.parent()])
+    def create_task(self, task_node):
+        if self.tool_box.currentItem().approve_creation(): 
+            if isinstance(task_node, queue_model_objects.Sample):
+                group_task_node = self.tool_box.currentItem().\
+                                  create_parent_task_node()
+                self.tree_brick.queue_model_hwobj.add_child(task_node,
+                                                            group_task_node)
+                self.create_task(group_task_node)
+                self.tool_box.currentItem().update_selection()
+                    
+            elif isinstance(task_node, queue_model_objects.TaskGroup):
+                sample = task_node.get_parent()
+                task_list = self.tool_box.currentItem().\
+                            create_task(task_node, sample)
 
-                self.tool_box.currentItem().selection_changed(item)
+                for child_task_node in task_list:
+                    self.tree_brick.queue_model_hwobj.\
+                        add_child(task_node, child_task_node)
+                    self.tool_box.currentItem().update_selection()

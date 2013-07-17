@@ -1,5 +1,5 @@
 import qt
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 
 #from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
@@ -8,12 +8,12 @@ from SpecScanPlotBrick import SpecScanPlotBrick
 
 
 class EnergyScanParametersWidget(qt.QWidget):
-
     def __init__(self, parent = None, name = "energy_scan_tab_widget"):
         qt.QWidget.__init__(self, parent, name)
 
         # Data Attributes
-        self.energy_scan = queue_model.EnergyScan()
+        self.energy_scan = queue_model_objects.EnergyScan()
+        self._tree_view_item = None
 
         # Layout
         h_layout = qt.QHBoxLayout(self, 0, 0, "main_v_layout")
@@ -40,19 +40,37 @@ class EnergyScanParametersWidget(qt.QWidget):
 
         qt.QObject.connect(self.periodic_table, qt.PYSIGNAL('edgeSelected'), 
                            self.element_clicked)
+
+
+        qt.QObject.connect(self.data_path_widget.data_path_widget_layout.prefix_ledit, 
+                           qt.SIGNAL("textChanged(const QString &)"), 
+                           self._prefix_ledit_change)
+
+
+        qt.QObject.connect(self.data_path_widget.data_path_widget_layout.run_number_ledit, 
+                           qt.SIGNAL("textChanged(const QString &)"), 
+                           self._run_number_ledit_change)
+
+
+    def _prefix_ledit_change(self, new_value):
+        self.energy_scan.set_name(str(new_value))
+        self._tree_view_item.setText(0, self.energy_scan.get_name())
+
+
+    def _run_number_ledit_change(self, new_value):
+        if str(new_value).isdigit():
+            self.energy_scan.set_number(int(new_value))
+            self._tree_view_item.setText(0, self.energy_scan.get_name())
         
 
-    def populate_widget(self, energy_scan):
-        self.energy_scan = energy_scan
-        self.data_path_widget.update_data_model(energy_scan.path_template)
+    def populate_widget(self, item):
+        self._tree_view_item = item
         
-        new_path = queue_model.QueueModelFactory().\
-            get_context().build_image_path(energy_scan.path_template)
-
+        self.energy_scan = item.get_model()
+        self.data_path_widget.update_data_model(self.energy_scan.path_template)
+        
         self.periodic_table.periodicTable.\
-            tableElementChanged(energy_scan.symbol)
-                
-        self.data_path_widget.set_data_path(new_path)
+            tableElementChanged(self.energy_scan.symbol)
 
 
     def element_clicked(self, symbol, energy):

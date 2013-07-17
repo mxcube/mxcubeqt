@@ -1,5 +1,5 @@
 import os
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import logging
 import copy
 
@@ -17,7 +17,7 @@ from widgets.snapshot_widget_layout import\
 from widgets.processing_widget \
     import ProcessingWidget
 
-from queue_model import COLLECTION_ORIGIN
+from queue_model_objects_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
 
 
@@ -26,8 +26,10 @@ class DCParametersWidget(QWidget):
         QWidget.__init__(self, parent, name)
         self._data_collection = None
         self.add_dc_cb = None
+        self._tree_view_item = None
 
-        self.path_widget = DataPathWidget(self, None)
+
+        self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
         self.acq_gbox = QVGroupBox("Acquisition", self)
         self.acq_gbox.setInsideMargin(2)
         self.acq_widget = AcquisitionWidget(self.acq_gbox, 
@@ -61,7 +63,34 @@ class DCParametersWidget(QWidget):
         self.connect(self.acq_widget, PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
 
-         
+        
+        self.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
+
+
+        self.connect(self.path_widget.data_path_widget_layout.run_number_ledit,
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+
+
+    def set_bl_config(self, bl_config):
+        self.acq_widget.set_bl_config(bl_config)
+
+
+    def _prefix_ledit_change(self, new_value):
+        prefix = self._data_collection.acquisitions[0].\
+                 path_template.get_prefix()
+        self._data_collection.set_name(prefix)
+        self._tree_view_item.setText(0, self._data_collection.get_name())
+        
+
+    def _run_number_ledit_change(self, new_value):
+        if str(new_value).isdigit():
+            self._data_collection.set_number(int(new_value))
+            self._tree_view_item.setText(0, self._data_collection.get_name())
+
+
     def __add_data_collection(self):
         return self.add_dc_cb(self._data_collection, self.collection_type)
 
@@ -78,7 +107,9 @@ class DCParametersWidget(QWidget):
         self.path_widget.set_prefix(path_template.base_prefix)
 
 
-    def populate_parameter_widget(self, data_collection):
+    def populate_parameter_widget(self, item):
+        data_collection = item.get_model()
+        self._tree_view_item = item
         self._data_collection = data_collection
         self._acquisition_mib = DataModelInputBinder(self._data_collection.\
                                 acquisitions[0].acquisition_parameters)
@@ -92,11 +123,6 @@ class DCParametersWidget(QWidget):
         self.processing_widget.update_data_model(data_collection.\
                                                      processing_parameters)
 
-        #new_path = queue_model.QueueModelFactory().\
-        #    get_context().build_image_path(data_collection.\
-        #                                       acquisitions[0].path_template)
-                
-        #self.path_widget.set_data_path(new_path)
         self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
 
         if data_collection.acquisitions[0].acquisition_parameters.\

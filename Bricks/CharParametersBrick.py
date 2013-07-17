@@ -17,6 +17,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
 
         # Framwork-2 properties
         self.addProperty("tunable-energy", "boolean", "True")
+        self.addProperty("session", "string", "/session")
 
         # Qt-Slots
         self.defineSlot("populate_edna_parameter_widget",({}))
@@ -48,7 +49,8 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         self.toggle_page_button.setDisabled(True)
 
 
-    def populate_edna_parameter_widget(self, char):
+    def populate_edna_parameter_widget(self, item):
+        char = item.get_model()
         parameters = char.reference_image_collection
         char_params = char.characterisation_parameters
         
@@ -70,7 +72,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
             self.toggle_page_button.setText("View Results")
 
         self.parameters_widget.\
-            populate_parameter_widget(char)
+            populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(char.is_executed())
 
 
@@ -85,5 +87,8 @@ class CharParametersBrick(BaseComponents.BlissWidget):
 
     # Framework-2 callback
     def propertyChanged(self, property_name, old_value, new_value):
-        if property_name =='tunable-energy':
-            self.parameters_widget.acq_widget.set_tunable_energy(new_value)
+        if property_name == 'tunable-energy':
+            self.parameters_widget.acq_widget.set_tunable_energy(new_value)            
+        elif property_name == 'session':
+            session_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.path_widget.set_session(session_hwobj)

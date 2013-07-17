@@ -2,8 +2,9 @@ import qt
 import logging
 import copy
 import queue_item
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import sys
+import os
 
 #from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
@@ -17,8 +18,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, fl, 'Energy-scan')
 
         # Data attributes
-        self.enery_scan = queue_model.EnergyScan()
-        self._path_template = queue_model.PathTemplate()
+        self.init_models()
 
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 5, "main_v_layout")
@@ -45,13 +45,64 @@ class CreateEnergyScanWidget(CreateTaskBase):
         v_layout.addStretch()
 
 
-    def set_energy_scan_hw_obj(self, mnemonic):
-        self.periodic_table['mnemonic'] = mnemonic
-        self.periodic_table.propertyChanged('mnemonic', '', mnemonic)
+        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+                     qt.SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
 
 
-    def get_prefix_type(self):
-        return 'escan'
+        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+                     qt.SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+
+
+    def _prefix_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.EnergyScanQueueItem):
+            prefix = self._path_template.get_prefix()
+            item.get_model().set_name(prefix)
+            item.setText(0, item.get_model().get_name())
+        
+
+    def _run_number_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.EnergyScanQueueItem):
+            if str(new_value).isdigit():
+                item.get_model().set_number(int(new_value))
+                item.setText(0, item.get_model().get_name())
+
+
+    def init_models(self):
+        self.enery_scan = queue_model_objects.EnergyScan()
+        self._path_template = queue_model_objects.PathTemplate()
+
+
+    def set_energy_scan_hw_obj(self, energy_hwobj):
+        self.periodic_table.periodicTable.\
+            setElements(energy_hwobj.getElements())
+
+
+    def _selection_changed(self, tree_item):
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+
+            self.init_models()
+            sample_data_model = self.get_sample_item().get_model()
+
+            (data_directory, proc_directory) = self.get_default_directory()
+                
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+            self._path_template.run_number = self._tree_brick.queue_model_hwobj.\
+                                             get_run_number(self._path_template)
+            
+        elif isinstance(tree_item, queue_item.EnergyScanQueueItem):
+            escan_model = tree_item.get_model()
+            self._path_template = escan_model.path_template
+
+        self._data_path_widget.update_data_model(self._path_template)
 
 
     def approve_creation(self):
@@ -71,12 +122,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if self.periodic_table.current_edge:
             path_template = copy.deepcopy(self._path_template)
             
-            energy_scan = queue_model.QueueModelFactory.\
-                create(queue_model.EnergyScan, dcg, None, sample,
-                       path_template)
-
-            energy_scan.set_name(path_template.prefix + '_' \
-                                 + str(path_template.run_number))
+            energy_scan = queue_model_objects.EnergyScan(sample,
+                                                         path_template)
+            energy_scan.set_name(path_template.get_prefix())
+            energy_scan.set_number(path_template.run_number)
             energy_scan.symbol = self.periodic_table.current_element
             energy_scan.edge = self.periodic_table.current_edge
 

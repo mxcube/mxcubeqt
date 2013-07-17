@@ -23,6 +23,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
         self.__offsetMeasure = 1e3
         self.old_mot1_pos = None
         self.old_mot2_pos = None
+        self._shape_history = None
         
         self.addProperty('offsetmeasure','float',1e3)
         self.defineSignal("addToQueue", ())
@@ -37,7 +38,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
         timeWidget.setValidator(qt.QDoubleValidator(timeWidget))
         timeWidget = self._widgetTree.child('__time')
 
-    def propertyChanged(self,property,oldValue,newValue) :
+    def propertyChanged(self,property,oldValue,newValue):
         if property == 'offsetmeasure':
             self.__offsetMeasure = newValue
         elif property == 'command':
@@ -47,9 +48,14 @@ class MxLookupScanBrick(BaseGraphicScan) :
        
     def run(self):
         BaseGraphicScan.run(self)
+        startButton = self._widgetTree.child('__startScan')
+        startButton.hide()
 
+        stopButton = self._widgetTree.child('__stopScan')
+        stopButton.hide()
+        
         if self._horizontalMotors and self._verticalMotors:
-          startButton = self._widgetTree.child('__startScan')
+       
           startButton.setEnabled(True)
           mot1 = self._horizontalMotors[0]
           mot2 = self._verticalMotors[0]
@@ -246,6 +252,18 @@ class MxLookupScanBrick(BaseGraphicScan) :
         mot1 = self._horizontalMotors[0]
         mot2 = self._verticalMotors[0]
         x,y = self.__gridPoints[firstPoint,0],self.__gridPoints[firstPoint,1]
+        angle = self._graphicSelection.angle()[0]
+
+        self._shape_history.add_grid({"dx_mm": float(dist1),
+                                      "dy_mm": float(dist2),
+                                      "steps_x": int(inter1)+1,
+                                      "steps_y": int(inter2)+1,
+                                      "x1": float((x - self._beamx) / mot1.getProperty('unit') * self._XSize),
+                                      "y1": float((y - self._beamy) / mot2.getProperty('unit') * self._YSize),
+                                      "angle": angle})
+
+
+        
         self.emit(qt.PYSIGNAL("addToQueue"), ({ "dx_mm": float(dist1),
                                                 "dy_mm": float(dist2),
                                                 "steps_x": int(inter1)+1,

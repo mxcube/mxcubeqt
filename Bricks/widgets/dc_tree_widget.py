@@ -3,7 +3,7 @@ import gevent
 import gevent.event
 import pprint 
 import logging
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import queue_item
 import functools
 
@@ -21,7 +21,6 @@ SCFilterOptions = namedtuple('SCFilterOptions', ['ALL_SAMPLES',
 
 SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2)
 
-
 class DataCollectTree(QWidget):
     def __init__(self, parent = None, name = "data_collect", 
                  selection_changed = None):
@@ -36,13 +35,13 @@ class DataCollectTree(QWidget):
         self._loaded_sample_item = None
         self.centring_method = 0
         self.queue_hwobj = None
-        self.queue_model_root = queue_model.RootNode()
+        self.queue_model_hwobj = None
 
         # HW-Object set by TreeBrick
         self.sample_changer_hwobj = None
         self.diffractometer_hwobj = None
         self.hl_motor_hwobj = None
-        self.tree_brick = self.parent() # Maybe a bit ugly but Iam lazy :)
+        self.tree_brick = self.parent()
 
         self.sample_item_list = []
         self.collect_tree_task = None
@@ -64,6 +63,7 @@ class DataCollectTree(QWidget):
         self.up_pixmap = Icons.load("Up2.png")
         self.down_pixmap = Icons.load("Down2.png")
         self.delete_pixmap = Icons.load("Delete2.png")
+        self.ispyb_pixmap = Icons.load("SampleChanger2.png")
                         
         self.up_button = QPushButton(self, "up_button")
         self.up_button.setPixmap(self.up_pixmap)
@@ -173,18 +173,17 @@ class DataCollectTree(QWidget):
             return False
 
 
-
     def show_context_menu(self, item, point, col):
         menu = QPopupMenu(self.sample_list_view, "popup_menu")
 
         if item:
             if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                menu.insertItem(QString("Rename"), self.rename_list_view_item)
-                menu.insertSeparator(1)
+                #menu.insertItem(QString("Rename"), self.rename_list_view_item)
+                #menu.insertSeparator(1)
                 menu.insertItem(QString("Remove"), self.delete_click)
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
-                if not item.get_queue_entry().free_pin_mode:
+                if not item.get_model().free_pin_mode:
                     menu.insertItem(QString("Mount"), self.mount_sample)
                     menu.insertItem(QString("Un-Mount"), self.unmount_sample)
                 menu.insertSeparator(3)
@@ -202,24 +201,10 @@ class DataCollectTree(QWidget):
                 menu.insertItem(QString("Details"), self.show_details)
             
             menu.insertItem(QString("Collect"), self.context_collect_item)
-
-
-    # def copy_generic_dc_list_item(self):
-    #     dcs = self.get_selected_items()
-
-    #     if len(dcs) == 1:
-    #         task_node_item = dcs[0].parent()
-
-    #         # Copy the model node
-    #         dc = dcs[0].data
-    #         dc_copy = queue_model.QueueModelFactory.copy(type(dc), dc)
             
-    #         self._add_dc(task_node_item, dc_copy)
-
 
     def item_double_click(self):
         self.show_details()
-
 
 
     def context_collect_item(self):
@@ -247,6 +232,8 @@ class DataCollectTree(QWidget):
                 self.tree_brick.show_edna_tab(item)
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
+            elif isinstance(item, queue_item.GenericWorkflowQueueItem):
+                self.tree_brick.show_workflow_tab(item)
         elif len(items) == 0:
             self.tree_brick.show_sample_tab()
 
@@ -277,23 +264,7 @@ class DataCollectTree(QWidget):
                 warning("The image name is not unique, " + \
                 " change the run number to not overwrite your data.")
         
-        queue_model.QueueModelFactory().\
-            rename(item.data, str(text))
-
-        # if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-            
-        #     item.data.name = str(text)
-
-        #     child_item = item.firstChild()
-        #     while child_item:
-        #         context = queue_model.QueueModelFactory().get_context()
-
-             
-        #         child_item.data.parameters.directory = \
-        #             context.construct_dir_name(postfix = item.data.name)
-                
-        #         child_item = child_item.nextSibling()
-
+        item.set_name(str(text))
             
         if isinstance(item, queue_item.DataCollectionQueueItem) or \
                 isinstance(item, queue_item.CharacterisationQueueItem):
@@ -308,18 +279,19 @@ class DataCollectTree(QWidget):
         items = self.get_selected_items()
 
         if len(items) == 1:
-            if not items[0].get_queue_entry().free_pin_mode:
+            if not items[0].get_model().free_pin_mode:
 
-                message = "All centred positions associated with this " + \
-                    "sample will be lost, do you want to continue ?."
-                ans = QMessageBox.question(self,
-                                           "Data collection",
-                                           message,
-                                           QMessageBox.Yes,
-                                           QMessageBox.No,
-                                           QMessageBox.NoButton)
-                
-                if ans == QMessageBox.Yes:
+                #message = "All centred positions associated with this " + \
+                #    "sample will be lost, do you want to continue ?."
+                #ans = QMessageBox.question(self,
+                #                           "Data collection",
+                #                           message,
+                #                           QMessageBox.Yes,
+                #                           QMessageBox.No,
+                #                           QMessageBox.NoButton)
+
+                ans = True
+                if ans:
                     self.clear_centred_positions_cb()
                     location = items[0].get_model().location
 
@@ -372,11 +344,6 @@ class DataCollectTree(QWidget):
                                                        sample_location = location)
 
 
-    def sample_load_state_changed(self, loaded):
-        if loaded:
-            self.set_sample_pin_icon()  
-
-
     def sample_list_view_selection(self):
         items = self.get_selected_items()
 
@@ -400,7 +367,7 @@ class DataCollectTree(QWidget):
 
     def add_empty_task_node(self):
         samples = self.get_selected_samples()
-        task_node = queue_model.QueueModelFactory.create(queue_model.TaskNode)
+        task_node = queue_model_objects.TaskGroup()
         task_node.set_name('Collection group')
 
         task_node_tree_item = \
@@ -416,7 +383,7 @@ class DataCollectTree(QWidget):
             view_item = None
             qe = None
             
-            if isinstance(task, queue_model.DataCollection):
+            if isinstance(task, queue_model_objects.DataCollection):
                 view_item = queue_item.\
                             DataCollectionQueueItem(parent_tree_item,
                                                     parent_tree_item.lastItem(),
@@ -424,34 +391,34 @@ class DataCollectTree(QWidget):
                 
                 qe = queue_entry.DataCollectionQueueEntry(view_item, task)
                 
-            elif isinstance(task, queue_model.Characterisation):
+            elif isinstance(task, queue_model_objects.Characterisation):
                 view_item = queue_item.\
                             CharacterisationQueueItem(parent_tree_item,
                                                       parent_tree_item.lastItem(),
                                                       task.get_name())
 
-                qe = queue_entry.CharacterisationQueueEntry(view_item, task)
-            elif isinstance(task, queue_model.EnergyScan):
+                qe = queue_entry.CharacterisationGroupQueueEntry(view_item, task)
+            elif isinstance(task, queue_model_objects.EnergyScan):
                 view_item = queue_item.\
                             EnergyScanQueueItem(parent_tree_item,
                                                 parent_tree_item.lastItem(),
                                                 task.get_name())
 
                 qe = queue_entry.EnergyScanQueueEntry(view_item, task)
-            elif isinstance(task, queue_model.SampleCentring):
+            elif isinstance(task, queue_model_objects.SampleCentring):
                 view_item = queue_item.\
                             SampleCentringQueueItem(parent_tree_item,
                                                     parent_tree_item.lastItem(),
                                                     task.get_name())
                 
                 qe = queue_entry.SampleCentringQueueEntry(view_item, task)
-            elif isinstance(task, queue_model.Sample):
+            elif isinstance(task, queue_model_objects.Sample):
                 view_item = queue_item.SampleQueueItem(parent_tree_item,
                                                        parent_tree_item.lastItem(),
                                                        task.get_name())
             
                 qe = queue_entry.SampleQueueEntry(view_item, task)
-            elif isinstance(task, queue_model.TaskGroup):
+            elif isinstance(task, queue_model_objects.TaskGroup):
                 view_item = queue_item.\
                             DataCollectionGroupQueueItem(parent_tree_item,
                                                          parent_tree_item.lastItem(),
@@ -459,7 +426,7 @@ class DataCollectTree(QWidget):
             
                 qe = queue_entry.TaskGroupQueueEntry(view_item, task)
                 
-            if isinstance(task, queue_model.Sample):
+            if isinstance(task, queue_model_objects.Sample):
                 self.queue_hwobj.enqueue(qe)
             else:
                 parent_tree_item.get_queue_entry().enqueue(qe)
@@ -467,8 +434,37 @@ class DataCollectTree(QWidget):
             view_item.setOpen(True)
             view_item.setOn(set_on)
 
-            if isinstance(task, queue_model.TaskNode) and task.get_children():
+            if isinstance(task, queue_model_objects.TaskNode) and task.get_children():
                 self.add_to_queue(task.get_children(), view_item, set_on)
+
+        
+    def get_item_by_model(self, parent_node):
+        it = QListViewItemIterator(self.sample_list_view)
+        item = it.current()
+    
+        while item:
+            if item.get_model() is parent_node:
+                return item
+
+            it += 1
+            item = it.current()
+
+        return self.sample_list_view
+
+
+    def add_to_view(self, parent, task):
+        view_item = None
+        qe = None
+        
+        parent_tree_item = self.get_item_by_model(parent)
+        
+        
+        cls = queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
+        view_item = cls(parent_tree_item, parent_tree_item.lastItem(),
+                        task.get_name())
+                
+        view_item.setOpen(True)
+        self.queue_model_hwobj.view_created(view_item, task)
 
 
     def get_selected_items(self):
@@ -518,51 +514,32 @@ class DataCollectTree(QWidget):
 
 
     def filter_sample_list(self, option):
-        return
+        self.sample_list_view.clearSelection()
         if option == SC_FILTER_OPTIONS.ALL_SAMPLES:
-            self.free_pin_mode = False
-            sample_node = self.sample_list_view.firstChild()
-            sample_node.setText(0, sample_node.data.loc_str)
-            
-            while(sample_node):
-                sample_node.setVisible(True)
-                sample_node.get_queue_entry().free_pin_mode = False
-                sample_node = sample_node.nextSibling()
-
+            self.sample_list_view.clear()
+            self.queue_model_hwobj.select_model('ispyb')
+            self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
-            self.sample_list_view.clearSelection()
-            loaded_sample = (self.sample_changer_hwobj.currentBasket,
-                             self.sample_changer_hwobj.currentSample)
+            loaded_sample = self.sample_changer_hwobj.\
+                            getLoadedSampleLocation()
 
-            sample_node = self.sample_list_view.firstChild()
+            it = QListViewItemIterator(self.sample_list_view)
+            item = it.current()
+        
+            while item:
+                if isinstance(item, queue_item.SampleQueueItem):
+                    if item.get_model().location == loaded_sample:
+                        item.setSelected(True)
+                        item.setVisible(True)
+                    else:
+                        item.setVisible(False)
 
-            while(sample_node):
-                if sample_node.data.location == loaded_sample:
-                    self.free_pin_mode = False
-                    sample_node.get_queue_entry().free_pin_mode = False
-                    sample_node.setSelected(True)
-                    sample_node.setVisible(True)
-                else:
-                    sample_node.setVisible(False)
-                    
-                sample_node = sample_node.nextSibling()
+                it += 1
+                item = it.current()
 
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
-            self.sample_list_view.clearSelection()
-            self.free_pin_mode = True
-            sample_node = self.sample_list_view.firstChild()
-            sample_node.setSelected(True)
-            sample_node.setText(0, "-:-")
-            sample_node.get_queue_entry().free_pin_mode = True
-            sample_node.setVisible(True)
-            
-            # Skip the first sample node
-            sample_node = sample_node.nextSibling()
-            
-            # Hide the rest
-            while(sample_node):
-                sample_node.setVisible(False)
-                sample_node = sample_node.nextSibling()
+            self.sample_list_view.clear()
+            self.queue_model_hwobj.select_model('free-pin')
 
 
     def set_centring_method(self, method_number):
@@ -607,10 +584,17 @@ class DataCollectTree(QWidget):
             self.stop_collection()
 
 
+    def enable_sample_changer_widget(self, state):
+        self.parent().sample_changer_widget.synch_button.setEnabled(state)
+        self.parent().sample_changer_widget.centring_cbox.setEnabled(state)
+        self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
+
+
     def collect_items(self, items = None):
         self.user_stopped = False
         self.delete_button.setEnabled(False)
-        self.parent().sample_changer_widget.setEnabled(False)
+        self.enable_sample_changer_widget(False)
+        
         self.collecting = True
         self.collect_button.setText("      Stop   ")
         self.collect_button.setIconSet(QIconSet(self.stop_pixmap))
@@ -637,7 +621,7 @@ class DataCollectTree(QWidget):
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIconSet(QIconSet(self.play_pixmap))
         self.delete_button.setEnabled(True)
-        self.parent().sample_changer_widget.setEnabled(True)
+        self.enable_sample_changer_widget(True)
 
 
     def get_checked_items(self):
@@ -661,8 +645,9 @@ class DataCollectTree(QWidget):
                     if isinstance(item, queue_item.DataCollectionQueueItem):
                         self.tree_brick.show_sample_centring_tab()
 
-                    queue_model.QueueModelFactory().remove(item.get_model())
                     parent = item.parent()
+                    self.queue_model_hwobj.del_child(parent.get_model(),
+                                                     item.get_model())
                     qe = item.get_queue_entry()
                     parent.get_queue_entry().dequeue(qe)
                     parent.takeItem(item)
@@ -729,7 +714,7 @@ class DataCollectTree(QWidget):
         sample_list = []
         
         for sample_info in sc_content:
-            sample = queue_model.Sample(None)
+            sample = queue_model_objects.Sample()
             sample.init_from_sc_sample(sample_info)
             sample_list.append(sample)
 
@@ -741,12 +726,13 @@ class DataCollectTree(QWidget):
         location_samples = {}
 
         for lims_sample in lims_sample_list:
-            sample = queue_model.Sample(None)
+            sample = queue_model_objects.Sample()
             sample.init_from_lims_object(lims_sample)
 
-            if sample.lims_code is not '':
+            if sample.lims_code:
                 barcode_samples[sample.lims_code] = sample
-            else:
+                
+            if sample.lims_location:
                 location_samples[sample.lims_location] = sample
             
         return (barcode_samples, location_samples)
@@ -754,9 +740,32 @@ class DataCollectTree(QWidget):
 
     def enqueue_samples(self, sample_list):
         for sample in sample_list:
-            sample.set_parent(self.queue_model_root)
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+                                             get_model_root(), sample)
             self.add_to_queue([sample], self.sample_list_view, False)
 
+
+    def populate_free_pin(self):
+        self.queue_model_hwobj.select_model('free-pin')
+        sample = queue_model_objects.Sample()
+        sample.free_pin_mode = True
+        sample.set_name('free-pin')
+        self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
+                                         sample)
+
+
+    def populate_list_view(self, sample_list):
+        self.queue_hwobj.clear()
+        self.queue_model_hwobj.clear_model('ispyb')
+        self.sample_list_view.clear()
+        self.queue_model_hwobj.select_model('ispyb')
+        
+        for sample in sample_list:
+            sample.set_enabled(False)
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+                                             get_model_root(), sample)
+        self.set_sample_pin_icon()
+    
 
     def init_with_sc_content(self, sc_content):
         try:
@@ -768,19 +777,23 @@ class DataCollectTree(QWidget):
             self.loaded_sample = (-1, -1)
 
         self.queue_hwobj.clear()
+        self.queue_model_hwobj.clear_model('ispyb')
         self.sample_list_view.clear()
-        self.queue_model_root = queue_model.RootNode()
+        self.queue_model_hwobj.select_model('ispyb')
         
-               
         for sample_info in sc_content:
-            sample = queue_model.Sample(self.queue_model_root)
+            sample = queue_model_objects.Sample()
+            
             sample.loc_str = str(sample_info[1]) + ':' + str(sample_info[2])
             sample.location = (sample_info[1], sample_info[2])
             sample.set_name(sample.loc_str)
+            sample.set_enabled(False)
 
-            self.add_to_queue([sample], self.sample_list_view, False)
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+                                             get_model_root(), sample)
             
-
+        self.set_sample_pin_icon()
+            
     def get_mounted_sample_item(self):
         sample_items = queue_item.perform_on_children(self.sample_list_view,
                                                    queue_item.is_sample,
@@ -793,23 +806,33 @@ class DataCollectTree(QWidget):
 
 
     def set_sample_pin_icon(self):
-        sample_items = queue_item.perform_on_children(self.sample_list_view,
-                                                   queue_item.is_sample,
-                                                   queue_item.get_item)
+        it = QListViewItemIterator(self.sample_list_view)
+        item = it.current()
 
-        for item in sample_items:
-            if item.get_model().location == self.sample_changer_hwobj.\
-                    getLoadedSampleLocation():
-                item.setPixmap(0, self.pin_pixmap)
-            else:
-                item.setPixmap(0, QPixmap())
+        while item:
+            if isinstance(item, queue_item.SampleQueueItem):
+                if item.get_model().location == self.sample_changer_hwobj.\
+                        getLoadedSampleLocation():
+                    item.setPixmap(0, self.pin_pixmap)
+                    item.setSelected(True)
+                else:
+                    item.setPixmap(0, QPixmap())
+
+                if item.get_model().lims_location != (None, None):
+                    item.setPixmap(0, self.ispyb_pixmap)
         
+            it += 1
+            item = it.current()
+
+ 
 
     def init_with_ispyb_data(self, lims_sample_list):
         samples = {}
 
         for lims_sample in lims_sample_list:
-            sample = queue_model.Sample(self.queue_model_root)
+            sample = queue_model_objects.Sample()
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+                                             get_model_root(), sample)
             sample.init_from_lims_object(lims_sample)
             samples[(sample.lims_container_location,
                      sample.lims_sample_location)] = sample

@@ -1,4 +1,4 @@
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import qt
 
 from widgets.widget_utils import DataModelInputBinder
@@ -14,19 +14,18 @@ class AcquisitionWidgetSimple(qt.QWidget):
         # Attributes
         #
         if acq_params is None:
-            self._acquisition_parameters = queue_model.AcquisitionParameters()
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         else:
             self._acquisition_parameters = acq_params
 
 
         if path_template is None:
-            self._path_template = queue_model.PathTemplate()
+            self._path_template = queue_model_objects.PathTemplate()
         else:
             self._path_template = path_template
 
 
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
-
 
         #   
         # Layout
@@ -60,16 +59,35 @@ class AcquisitionWidgetSimple(qt.QWidget):
                            self.update_num_images)
 
 
-    def update_num_images(self, index):
-        if index is 0:
-            self._acquisition_parameters.num_images = 1
-            self._path_template.num_files = 1
-        elif index is 1:
-            self._acquisition_parameters.num_images = 2
-            self._path_template.num_files = 2
-        elif index is 2:
-            self._acquisition_parameters.num_images = 4
-            self._path_template.num_files = 4
+    def update_num_images(self, index = None, num_images = None):
+        if index:
+            if index is 0:
+                self._acquisition_parameters.num_images = 1
+                self._path_template.num_files = 1
+            elif index is 1:
+                self._acquisition_parameters.num_images = 2
+                self._path_template.num_files = 2
+            elif index is 2:
+                self._acquisition_parameters.num_images = 4
+                self._path_template.num_files = 4
+
+        if num_images:
+            if self.acq_widget_layout.num_images_cbox.count() > 3:
+                self.acq_widget_layout.num_images_cbox.removeItem(4)
+        
+            if num_images is 1:
+                self.acq_widget_layout.num_images_cbox.setCurrentItem(0)    
+            elif num_images is 2:
+                self.acq_widget_layout.num_images_cbox.setCurrentItem(1)
+            elif num_images is 4:
+                self.acq_widget_layout.num_images_cbox.setCurrentItem(2)
+            else:
+                self.acq_widget_layout.\
+                    num_images_cbox.insertItem(str(num_images))
+                self.acq_widget_layout.\
+                    num_images_cbox.setCurrentItem(3)
+
+            self._path_template.num_files = num_images
 
 
     def use_mad(self, state):
@@ -85,6 +103,10 @@ class AcquisitionWidgetSimple(qt.QWidget):
 
 
     def energy_selected(self, index):
+        pass
+
+
+    def set_bl_config(self, bl_config):
         pass
 
 
@@ -111,4 +133,5 @@ class AcquisitionWidgetSimple(qt.QWidget):
         self._acquisition_parameters = acquisition_parameters
         self._acquisition_mib.set_model(acquisition_parameters)
         self._path_template = path_template
-        self._path_template_mib.set_model(path_template)
+        self.update_num_images(None, acquisition_parameters.num_images)
+        #self._path_template_mib.set_model(path_template)

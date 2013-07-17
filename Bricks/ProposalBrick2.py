@@ -31,6 +31,7 @@ class ProposalBrick2(BlissWidget):
         self.ldapConnection=None
         self.dbConnection=None
         self.localLogin=None
+        self.session_hwobj = None
 
         # Initialize session info
         self.proposal=None
@@ -52,6 +53,7 @@ class ProposalBrick2(BlissWidget):
         self.addProperty('icons','string','')
         self.addProperty('serverStartDelay','integer',500)
         self.addProperty('dbConnection','string')
+        self.addProperty('session', 'string', '/session')
 
         self.defineSignal('sessionSelected',())
         self.defineSignal('setWindowTitle',())
@@ -189,6 +191,14 @@ class ProposalBrick2(BlissWidget):
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self,proposal,person,laboratory,session,localcontact):
         self.dbConnection.enable()
+        self.session_hwobj.proposal_code = proposal['code']
+        self.session_hwobj.session_id = session['sessionId']
+        self.session_hwobj.proposal_id = proposal['proposalId']
+
+        try:
+            self.session_hwobj.proposal_number = int(proposal['number'])
+        except (TypeError, ValueError):
+            self.session_hwobj.proposal_number = 0
 
         # Change mode
         self.loginBox.hide()
@@ -430,7 +440,9 @@ class ProposalBrick2(BlissWidget):
             try:
                 self.logoutButton.setPixmap(Icons.load(icons_list[1]))
             except IndexError:
-                pass                
+                pass
+        elif propertyName == 'session':
+            self.session_hwobj = self.getHardwareObject(newValue)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 

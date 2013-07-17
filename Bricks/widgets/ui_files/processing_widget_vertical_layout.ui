@@ -132,7 +132,7 @@
                                                 </size>
                                             </property>
                                         </widget>
-                                        <widget class="QLineEdit">
+                                        <widget class="QComboBox">
                                             <property name="name">
                                                 <cstring>space_group_ledit</cstring>
                                             </property>

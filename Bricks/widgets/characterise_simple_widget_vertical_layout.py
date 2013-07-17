@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui_files/characterise_simple_widget_vertical_layout.ui'
 #
-# Created: Mon Mar 25 09:56:13 2013
+# Created: Fri Jun 21 15:28:22 2013
 #      by: The PyQt User Interface Compiler (pyuic) 3.18.1
 #
 # WARNING! All changes made in this file will be lost!

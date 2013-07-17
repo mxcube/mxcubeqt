@@ -14,7 +14,8 @@ class EnergyScanParametersBrick(BaseComponents.BlissWidget):
         BaseComponents.BlissWidget.__init__(self, *args)
 
         self.addProperty('energy-scan', 'string', '')        
-
+        self.addProperty("session", "string", "/session")
+        
         # Layout
         main_layout = qt.QVBoxLayout(self)
         self.energy_scan_widget = EnergyScanParametersWidget(self)
@@ -24,8 +25,8 @@ class EnergyScanParametersBrick(BaseComponents.BlissWidget):
         self.defineSlot("populate_parameter_widget", ({}))
 
 
-    def populate_parameter_widget(self, energy_scan):
-        self.energy_scan_widget.populate_widget(energy_scan)
+    def populate_parameter_widget(self, item):
+        self.energy_scan_widget.populate_widget(item)
 
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -35,3 +36,6 @@ class EnergyScanParametersBrick(BaseComponents.BlissWidget):
         """
         if property_name == 'energy-scan':
             self.energy_scan_widget.periodic_table['mnemonic'] = new_value
+        elif property_name == 'session':
+            session_hwobj = self.getHardwareObject(new_value)
+            self.energy_scan_widget.data_path_widget.set_session(session_hwobj)

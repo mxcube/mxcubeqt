@@ -1,5 +1,5 @@
-import queue_model
 import qt
+import queue_model_objects_v1 as queue_model_objects
 
 
 from widgets.acquisition_widget_vertical_layout \
@@ -14,20 +14,21 @@ MAD_ENERGY_COMBO_NAMES = {'ip':0, 'pk':1, 'rm1':2, 'rm2':3}
 
 class AcquisitionWidget(qt.QWidget):
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
-                 path_template = None, layout = None):
-        
+                 path_template = None, layout = None):      
         qt.QWidget.__init__(self, parent, name, fl)
 
         #
         # Attributes
         #
+        self._bl_config = None
+
         if acq_params is None:
-            self._acquisition_parameters = queue_model.AcquisitionParameters()
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         else:
             self._acquisition_parameters = acq_params
 
         if path_template is None:
-            self._path_template = queue_model.PathTemplate()
+            self._path_template = queue_model_objects.PathTemplate()
         else:
             self._path_template = path_template
 
@@ -58,7 +59,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('first_image', 
                                                 self.acq_widget_layout.first_image_ledit,
                                                 int,
-                                                qt.QIntValidator(1, 1000, self))
+                                                qt.QIntValidator(1, 10000, self))
 
         self._acquisition_mib.bind_value_update('exp_time', 
                                                 self.acq_widget_layout.exp_time_ledit,
@@ -73,7 +74,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('num_images', 
                                                 self.acq_widget_layout.num_images_ledit,
                                                 int,
-                                                qt.QIntValidator(1, 1000, self))
+                                                qt.QIntValidator(1, 10000, self))
         
         self._acquisition_mib.bind_value_update('num_passes', 
                                                 self.acq_widget_layout.num_passes_ledit,
@@ -127,16 +128,17 @@ class AcquisitionWidget(qt.QWidget):
                            self.num_images_ledit_change)
 
 
-        has_shutter_less = queue_model.QueueModelFactory().get_context().\
-                           detector_has_shutterless()
-        self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
+    def set_bl_config(self, bl_config):
+        self._bl_config = bl_config
 
-
-        te = queue_model.QueueModelFactory().get_context().\
-                 tunable_wavelength()
+        te = bl_config.tunable_wavelength()
         self.set_tunable_energy(te)
-        
-            
+
+        has_shutter_less = self._bl_config.detector_has_shutterless()
+        self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
+        self.acq_widget_layout.shutterless_cbx.setOn(has_shutter_less)
+
+
     def first_image_ledit_change(self, new_value):
         self._path_template.start_num = int(new_value)
 
@@ -150,10 +152,12 @@ class AcquisitionWidget(qt.QWidget):
             self.previous_energy = self._acquisition_parameters.energy
             (name, energy) = self.get_mad_energy()
             self.set_energy(energy, 0)
-            self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, state))
+            self.emit(qt.PYSIGNAL('mad_energy_selected'),
+                      (name, energy, state))
         else:
             self.set_energy(self.previous_energy, 0)
-            self.emit(qt.PYSIGNAL('mad_energy_selected'), ('', self.previous_energy, state))
+            self.emit(qt.PYSIGNAL('mad_energy_selected'),
+                      ('', self.previous_energy, state))
 
 
     def get_mad_energy(self):
@@ -173,10 +177,10 @@ class AcquisitionWidget(qt.QWidget):
                            'rm1 - %.4f' % energy_scan_result.first_remote, 
                            'rm2 - %.4f' % energy_scan_result.second_remote])
 
-        if self._path_template.mad_prefix:
-            self.acq_widget_layout.mad_cbox.setOn(True)
-            self.acq_widget_layout.energies_combo.\
-                setCurrentItem(MAD_ENERGY_COMBO_NAMES[self._path_template.mad_prefix])
+        #if self._path_template.mad_prefix:
+        #    self.acq_widget_layout.mad_cbox.setOn(True)
+        #    self.acq_widget_layout.energies_combo.\
+        #        setCurrentItem(MAD_ENERGY_COMBO_NAMES[self._path_template.mad_prefix])
 
 
     def energy_selected(self, index):
@@ -184,6 +188,7 @@ class AcquisitionWidget(qt.QWidget):
             (name, energy) = self.get_mad_energy()
             self.set_energy(energy, 0)
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
+
 
     def set_energy(self, energy, wav):
         energy = round(float(energy), 4)

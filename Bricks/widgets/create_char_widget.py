@@ -1,9 +1,10 @@
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import queue_item
 import copy
 import widget_utils
 import logging
 import math
+import os
 import ShapeHistory as shape_history
 
 from qt import *
@@ -27,39 +28,20 @@ class CreateCharWidget(CreateTaskBase):
 
         #
         # Data attributes
-        #        
-        self._char = queue_model.Characterisation(None)
-        self._data_collection = self._char.reference_image_collection
-        self._path_template = self._data_collection.\
-                              acquisitions[0].path_template
-        
-        self._char_params = self._char.characterisation_parameters
-        self._char_params.experiment_type = queue_model.EXPERIMENT_TYPE.OSC
-        self._char_params_mib = DataModelInputBinder(self._char_params)
-
+        #
         self._current_selected_item = None
-
-        # The num images drop down default value is 1 
-        self._data_collection.acquisitions[0].\
-            acquisition_parameters.num_images = 2
-        self._char.characterisation_software =\
-            queue_model.COLLECTION_ORIGIN.EDNA
-        self._path_template.num_files = 2
-
-        self._path_template.reference_image_prefix = 'ref'
-        
+        self.init_models()
+        self._char_params_mib = DataModelInputBinder(self._char_params)
+   
         #
         # Layout
         #
         v_layout = QVBoxLayout(self, 2, 6, "v_layout")
-        self._acq_widget = \
-            AcquisitionWidgetSimple(self, acq_params = self._data_collection.\
-                                    acquisitions[0].acquisition_parameters,
-                                    path_template = self._path_template)
+        self._acq_widget = AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
+                                                   path_template = self._path_template)
                 
         self._vertical_dimension_widget = VerticalCrystalDimensionWidgetLayout(self)
-        self._char_widget = CharacteriseSimpleWidgetVerticalLayout(self, 
-                                                                 "characterise_widget")
+        self._char_widget = CharacteriseSimpleWidgetVerticalLayout(self, "characterise_widget")
 
 
         self._data_path_gbox = QVGroupBox('Data location', self, 'data_path_gbox')
@@ -116,48 +98,153 @@ class CreateCharWidget(CreateTaskBase):
                                                 float,
                                                 QDoubleValidator(0.0, 1000, 2, self))
 
-        self._char_params_mib.bind_value_update('space_group',
-                                                self._vertical_dimension_widget.space_group_ledit,
-                                                str,
-                                                None)
+        # self._char_params_mib.bind_value_update('space_group',
+        #                                         self._vertical_dimension_widget.space_group_ledit,
+        #                                         str,
+        #                                         None)
 
-
-#     def set_energy(self, pos, wav):
-#         self._data_collection.acquisitions[0].acquisition_parameters.energy = \
-#             round(float(wav), 4)
         
+        self._vertical_dimension_widget.space_group_ledit.\
+            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
+
+        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._prefix_ledit_change)
+
+
+        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+                     SIGNAL("textChanged(const QString &)"), 
+                     self._run_number_ledit_change)
+
+
+        self.connect(self._vertical_dimension_widget.space_group_ledit,
+                     SIGNAL("activated(int)"),
+                     self._space_group_change)    
+
+
+    def _space_group_change(self, index):
+       self._char_params.space_group = queue_model_objects.\
+                                       XTAL_SPACEGROUPS[index]
+
+    def _set_space_group(self, space_group):
+        index  = 0
         
-#     def set_transmission(self, trans):
-#         self._data_collection.acquisitions[0].acquisition_parameters.transmission = \
-#             round(float(trans), 1)
+        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
+            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+
+        self._space_group_change(index)
+        self._vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
+
+        
+    def _prefix_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.CharacterisationQueueItem):
+            prefix = self._path_template.get_prefix()
+            item.get_model().set_name(prefix)
+            item.setText(0, item.get_model().get_name())
         
 
-#     def set_resolution(self, res):
-#         self._data_collection.acquisitions[0].acquisition_parameters.\
-#             resolution = round(float(res), 4)
+    def _run_number_ledit_change(self, new_value):
+        item = self._current_selected_item
+        
+        if isinstance(item, queue_item.CharacterisationQueueItem):
+            if str(new_value).isdigit():
+                item.get_model().set_number(int(new_value))
+                item.setText(0, item.get_model().get_name())
 
 
-#     def set_run_number(self, run_number):
-#         self._data_collection.acquisitions[0].\
-#             path_template.run_number = run_number
-#         self.acq_widget.run_number_ledit.\
-#             setText(str(run_number))
+    def init_models(self):
+        self._char = queue_model_objects.Characterisation()
+        self._char_params = self._char.characterisation_parameters
+        self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
+
+        if self._bl_config_hwobj is not None:
+            self._acquisition_parameters = self._bl_config_hwobj.\
+                                           get_default_acquisition_parameters()
+
+            self._path_template =  self._bl_config_hwobj.\
+                                  get_default_path_template()
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            self._path_template = queue_model_objects.PathTemplate()
+
+        self._path_template.reference_image_prefix = 'ref'
+
+        # The num images drop down default value is 1
+        # we would like it to be 2
+        self._acquisition_parameters.num_images = 2
+        self._char.characterisation_software =\
+            queue_model_objects.COLLECTION_ORIGIN.EDNA
+        self._path_template.num_files = 2
+        self._acquisition_parameters.shutterless = False
+   
+        if self._beamline_setup_hwobj is not None:
+            try:
+                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+                transmission = round(float(transmission), 1)
+            except AttributeError:
+                transmission = 0
+
+            try:
+                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+                resolution = round(float(resolution), 4)
+            except AttributeError:
+                resolution = 0
+
+            try:
+                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+                energy = round(float(energy), 2)
+            except AttributeError:
+                energy = 0
+
+            self._acquisition_parameters.resolution = resolution
+            self._acquisition_parameters.energy = energy
+            self._acquisition_parameters.transmission = transmission
 
 
-#     def selection_changed(self, tree_item):
-#         self.current_selected_item = tree_item
-#         self.set_energies()
+    def _selection_changed(self, tree_item):
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
 
-#         if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-#                isinstance(tree_item, queue_item.DataCollectionQueueItem):
+            self.init_models()
+            sample_data_model = self.get_sample_item().get_model()
+            self.update_processing_parameters(sample_data_model.crystals[0])
+            (data_directory, proc_directory) = self.get_default_directory()
+                
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory            
+            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+            self._path_template.run_number = self._tree_brick.queue_model_hwobj.\
+                                             get_run_number(self._path_template)
+
+
+        elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+            self._char = tree_item.get_model()
+            data_collection = self._char.reference_image_collection
+            self._path_template = data_collection.acquisitions[0].path_template
             
-#             run_number = queue_model.\
-#                          get_largest_prefix_with_name(tree_item, 
-#                              self._data_collection.acquisitions[0].path_template.prefix) + 1 
-#             self.set_run_number(run_number)
-        
-#         elif isinstance(tree_item, queue_item.SampleQueueItem):
-#             self.set_run_number(1)
+            self._char_params = self._char.characterisation_parameters
+            self._acquisition_parameters = data_collection.acquisitions[0].\
+                                           acquisition_parameters
+            self._processing_parameters = data_collection.processing_parameters
+
+        self._set_space_group(self._char_params.space_group)
+        self._acq_widget.update_data_model(self._acquisition_parameters,
+                                           self._path_template)
+        self._data_path_widget.update_data_model(self._path_template)
+        self._char_params_mib.set_model(self._char_params)
+
+
+    def update_processing_parameters(self, crystal):
+        self._processing_parameters.space_group = crystal.space_group
+        self._processing_parameters.cell_a = crystal.cell_a
+        self._processing_parameters.cell_alpha = crystal.cell_alpha
+        self._processing_parameters.cell_b = crystal.cell_b
+        self._processing_parameters.cell_beta = crystal.cell_beta
+        self._processing_parameters.cell_c = crystal.cell_c
+        self._processing_parameters.cell_gamma = crystal.cell_gamma
 
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -171,7 +258,7 @@ class CreateCharWidget(CreateTaskBase):
             
             if self._tree_brick.diffractometer_hwobj:
                 pos_dict = self._tree_brick.diffractometer_hwobj.getPositions()
-                cpos = queue_model.CentredPosition(pos_dict)
+                cpos = queue_model_objects.CentredPosition(pos_dict)
 
             logging.getLogger("user_level_log").\
                 info("No centred position(s) was selected " + str(cpos) + \
@@ -188,14 +275,10 @@ class CreateCharWidget(CreateTaskBase):
                 sc = None
                  
                 if not shape.get_drawing():
-                    sc = queue_model.SampleCentring(parent_task_node)
+                    sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     tasks.append(sc)
 
-                data_collection = copy.deepcopy(self._data_collection)
-                data_collection.acquisitions[0].\
-                    acquisition_parameters.centred_position = \
-                    copy.deepcopy(shape.centred_position)
                 char_params = copy.deepcopy(self._char_params)
 
                 if shape.qub_point is not None:
@@ -203,29 +286,42 @@ class CreateCharWidget(CreateTaskBase):
                 else:
                     snapshot = self._shape_history.get_snapshot([])
 
-                data_collection.acquisitions[0].acquisition_parameters.\
-                    centred_position.snapshot_image = snapshot
+                # Acquisition for start position
+                acq = queue_model_objects.Acquisition()
+                acq.acquisition_parameters = \
+                    copy.deepcopy(self._acquisition_parameters)
+                acq.acquisition_parameters.collect_agent = \
+                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
+                acq.acquisition_parameters.\
+                    centred_position = shape.get_centred_positions()[0]
+                acq.path_template = copy.deepcopy(self._path_template)
+                acq.acquisition_parameters.centred_position.\
+                    snapshot_image = snapshot
+
+                processing_parameters = copy.deepcopy(self._processing_parameters)
+
+                data_collection = queue_model_objects.\
+                                  DataCollection([acq], sample.crystals[0],
+                                                 processing_parameters)
 
                 # Referance images for characterisations should be taken 90 deg apart
                 # this is achived by setting overap to 89
-                data_collection.acquisitions[0].\
-                    acquisition_parameters.overlap = 89
-
-                data_collection.experiment_type = queue_model.EXPERIMENT_TYPE.EDNA_REF
-                data_collection.crystal = sample.crystals[0]
+                acq.acquisition_parameters.overlap = 89
+                data_collection.acquisitions[0] = acq               
+                data_collection.experiment_type = queue_model_objects.EXPERIMENT_TYPE.EDNA_REF
 
                 if sc:
                     sc.set_task(data_collection)
                     
-                char_name = data_collection.acquisitions[0].path_template.get_prefix() + '_' + \
-                    str(data_collection.acquisitions[0].path_template.run_number)
-
-                char = queue_model.Characterisation(parent_task_node,
-                                                    data_collection, 
-                                                    char_params, char_name)
+                char = queue_model_objects.Characterisation(data_collection, 
+                                                            char_params)
+                char.set_name(data_collection.acquisitions[0].\
+                              path_template.get_prefix())
+                char.set_number(data_collection.acquisitions[0].\
+                                path_template.run_number)
 
                 # Increase run number for next collection
-                self.set_run_number(self._path_template.run_number + 1)
+                #self.set_run_number(self._path_template.run_number + 1)
 
                 tasks.append(char)
 

@@ -1,9 +1,10 @@
 import qt
 import logging
 import queue_item
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import widget_utils
 import abc
+import os
 
 class CreateTaskBase(qt.QWidget):
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
@@ -23,7 +24,19 @@ class CreateTaskBase(qt.QWidget):
          self._current_selected_item = None
          self._path_template = None
          self._energy_scan_result = None
+         self._session_hwobj = None
+         self._bl_config_hwobj = None
+         self._beamline_setup_hwobj = None
 
+         
+         qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
+                            self.tab_changed)
+
+
+    def tab_changed(self, tab_index, tab):
+        if tab_index is 0 and self._session_hwobj.proposal_code:
+            self.update_selection()
+            
 
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -31,6 +44,20 @@ class CreateTaskBase(qt.QWidget):
 
     def set_shape_history(self, shape_history):
         self._shape_history = shape_history
+
+
+    def set_session(self, session_hwobj):
+        self._session_hwobj = session_hwobj
+
+        if self._data_path_widget:
+            self._data_path_widget.set_session(session_hwobj)
+
+
+    def set_bl_config(self, bl_config):
+        self._bl_config_hwobj = bl_config
+
+        if self._acq_widget:
+            self._acq_widget.set_bl_config(bl_config)
 
 
     @abc.abstractmethod
@@ -110,78 +137,45 @@ class CreateTaskBase(qt.QWidget):
 
 
     def get_default_prefix(self, sample_data_node):
-        prefix = queue_model.QueueModelFactory.\
-            get_context().get_default_prefix(sample_data_node)
-
+        prefix = self._session_hwobj.get_default_prefix(sample_data_node)
         return prefix
 
         
-    def get_default_directory(self, sample_data_node):
-        group_item = self.get_group_item()
-        sample_item = self.get_sample_item()
-        sub_dir = str()
-
-        if group_item:
-            sub_dir = group_item.get_model().get_name().lower().replace(' ','')
-        else:
-            sub_dir = self.get_next_group_name(sample_item).\
-                lower().replace(' ','')
+    def get_default_directory(self):
+        item = self.get_sample_item()
             
-        data_directory = queue_model.QueueModelFactory.\
-                         get_context().get_image_directory(sample_data_node, 
-                                                           sub_dir = sub_dir)
-
-        proc_directory = queue_model.QueueModelFactory.\
-                         get_context().get_process_directory(sample_data_node, 
-                                                             sub_dir = sub_dir)
-        
-
+        data_directory = self._session_hwobj.\
+                         get_image_directory(item.get_model())
+        proc_directory = self._session_hwobj.\
+                         get_process_directory(item.get_model())
+    
         return (data_directory,
                 proc_directory)
 
 
-    def ispyb_logged_in(self, logged_in):        
-        data_path_widget = self.get_data_path_widget()
-        sample_item = self.get_sample_item()
-        sample_data_node = sample_item.get_model() if sample_item else None
+    def ispyb_logged_in(self, logged_in):
+        if logged_in:
+            data_path_widget = self.get_data_path_widget()
+            sample_item = self.get_sample_item()
+            sample_data_node = sample_item.get_model() if sample_item else None
 
-        if data_path_widget and sample_data_node:
-            (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
-            prefix = self.get_default_prefix(sample_data_node)
+            if data_path_widget and sample_data_node:
+                (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
+                prefix = self.get_default_prefix(sample_data_node)
 
-            data_path_widget.set_directory(data_directory)
-            data_path_widget.set_prefix(prefix)
-            self._path_template.process_directory = proc_directory
+                data_path_widget.set_directory(data_directory)
+                data_path_widget.set_prefix(prefix)
+                self._path_template.process_directory = proc_directory
             
 
     def selection_changed(self, tree_item):
         self._current_selected_item = tree_item
-        sample_item = self.get_sample_item()
-        sample_data_node = sample_item.get_model() if sample_item else None
-        group_item = self.get_group_item()
-        
-        acq_widget = self.get_acquisition_widget()
-
-        if acq_widget:
-            acq_widget.set_energies(sample_data_node.crystals[0].energy_scan_result)
-
-
-        data_path_widget = self.get_data_path_widget()
-        if data_path_widget and sample_data_node:
-            (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
-            data_path_widget.set_directory(data_directory)
-
-            prefix = self.get_default_prefix(sample_data_node)
-
-            run_number = queue_model.QueueModelFactory.\
-                get_context().get_free_run_number(prefix, data_directory)
-
-            data_path_widget.set_run_number(run_number)
-            data_path_widget.set_prefix(prefix)
-            self._path_template.process_directory = proc_directory
-
         self._selection_changed(tree_item)
-            
+
+
+    def update_selection(self):
+        self.selection_changed(self._current_selected_item)
+
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
@@ -197,15 +191,11 @@ class CreateTaskBase(qt.QWidget):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
-    def create_task(self, task_node, sample):
+    def create_task(self, task_node, sample):        
         tasks = self._create_task(task_node, sample)
         
-        # Increase run number for next collection
-        #if not isinstance(self._current_selected_item, 
-        #                  queue_item.SampleQueueItem):
-        #    self.set_run_number(self._path_template.run_number + 1)
-
         return tasks
+
 
     @abc.abstractmethod
     def _create_task(self, task_node, sample):
@@ -228,11 +218,10 @@ class CreateTaskBase(qt.QWidget):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a sample is selected.
-    def create_parent_task_node(self, sample_item):
-        sample_node = sample_item.get_model()
-        task_node = queue_model.TaskGroup(sample_node)
-        task_node.set_name(sample_item.get_next_free_name(self._task_node_name))
-
-        self.create_task(task_node, sample_node)
+    def create_parent_task_node(self):
+        group_task_node = queue_model_objects.TaskGroup()
+        group_task_node.set_name(self._task_node_name)
+        num = self._current_selected_item.get_model().get_next_number_for_name(self._task_node_name)
+        group_task_node.set_number(num)
                                 
-        return [task_node]
+        return group_task_node

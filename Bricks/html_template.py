@@ -1,5 +1,4 @@
 import math
-import queue_model
 
 
 HEADER = "<p><h1> Data Collection - Result Summary </h1></br></p>"
@@ -39,12 +38,9 @@ def image_table(paths):
     
 
 def html_report(data_collection):
-    paths = queue_model.QueueModelFactory.get_context().\
-            get_preview_image_paths(data_collection.previous_acquisition)
-
-    image_path = queue_model.QueueModelFactory.get_context().\
-                 build_image_path(data_collection.previous_acquisition.\
-                                  path_template)
+    paths = data_collection.previous_acquisition.get_preview_image_paths()
+    image_path = data_collection.previous_acquisition.\
+                 path_template.get_image_path()
 
     image_path = image_path.replace('%04d', '####')
     image_path =  "<p><h3>Image path: %s</br></h3></p>" % image_path

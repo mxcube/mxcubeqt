@@ -87,7 +87,7 @@
                                                 <string>Space group:</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLineEdit">
+                                        <widget class="QComboBox">
                                             <property name="name">
                                                 <cstring>space_group_ledit</cstring>
                                             </property>
@@ -108,7 +108,7 @@
                                 </widget>
                                 <spacer>
                                     <property name="name">
-                                        <cstring>spacer2</cstring>
+                                        <cstring>space_group_hspacer</cstring>
                                     </property>
                                     <property name="orientation">
                                         <enum>Horizontal</enum>

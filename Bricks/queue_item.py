@@ -2,23 +2,23 @@ import time
 import random
 import copy
 import functools
-import queue_model
+import queue_model_objects_v1 as queue_model_objects
 import gevent
 import gevent.event
 import collections
 import logging
 import os
 import pprint
-import qub_helper
 import widgets.widget_utils
 
 from qt import *
 from widgets.position_history_widget import COLLECTION_METHOD_NAME
-from queue_model import COLLECTION_ORIGIN
-from queue_model import STRATEGY_COMPLEXITY
-from queue_model import EXPERIMENT_TYPE
-from queue_model import STRATEGY_OPTION
-from queue_model import COLLECTION_ORIGIN_STR
+from queue_model_objects_v1 import COLLECTION_ORIGIN
+from queue_model_objects_v1 import STRATEGY_COMPLEXITY
+from queue_model_objects_v1 import EXPERIMENT_TYPE
+from queue_model_objects_v1 import STRATEGY_OPTION
+from queue_model_objects_v1 import COLLECTION_ORIGIN_STR
+
 
 class QueueItem(QCheckListItem):
     """
@@ -39,6 +39,7 @@ class QueueItem(QCheckListItem):
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
         self._queue_entry = None
+        self._data_model = None
 
         # All subclasses should have the following
         # data attributes.
@@ -55,23 +56,30 @@ class QueueItem(QCheckListItem):
 
     def stateChange(self, state):
         QCheckListItem.stateChange(self, state)
+        # The QCheckListItem is somewhat tricky:
+        # state = 0     The item is unchecked.
+        #
+        # state = 1     The item is checked but
+        #               not all of the children
+        #
+        # state = 2     The item and all its children are
+        #               checked.
+        #
+        # However the state passed by stateChanged are a boolean
+        # we have to use the state() member to get the actual state.
+        # Great !
+
         if self._queue_entry:
-            # The QCheckListItem is somewhat tricky:
-            # state = 0     The item is unchecked.
-            #
-            # state = 1     The item is checked but
-            #               not all of the children
-            #
-            # state = 2     The item and all its children are
-            #               checked.
-            #
-            # However the state passed by stateChanged are a boolean
-            # we have to use the state() member to get the actual state.
-            # Great !
             if self.state() > 0:
-                self._queue_entry.set_enabled(True)
+                self._queue_entry.set_enabled(True)                
             else:
                 self._queue_entry.set_enabled(False)
+
+        if self._data_model:
+            if self.state() > 0:
+                self._data_model.set_enabled(True)                
+            else:
+                self._data_model.set_enabled(False)
 
 
     def paintCell(self, painter, color_group, column, width, align):
@@ -158,6 +166,9 @@ class QueueItem(QCheckListItem):
         if self._queue_entry:
             self._queue_entry.set_enabled(state)
 
+        if self._data_model:
+            self._data_model.set_enabled(state)
+
 
     def set_queue_entry(self, queue_entry):
         self._queue_entry = queue_entry
@@ -168,7 +179,7 @@ class QueueItem(QCheckListItem):
 
 
     def get_model(self):
-        return self._queue_entry.get_data_model()
+        return self._data_model
 
 
     def get_next_free_name(self, name):
@@ -232,6 +243,11 @@ class CharacterisationQueueItem(TaskQueueItem):
 
 
 class EnergyScanQueueItem(TaskQueueItem):
+    def __init__(self, parent, after, text):
+        TaskQueueItem.__init__(self, parent, after, text)
+
+
+class GenericWorkflowQueueItem(TaskQueueItem):
     def __init__(self, parent, after, text):
         TaskQueueItem.__init__(self, parent, after, text)
 
@@ -308,3 +324,14 @@ def is_checked(node):
 
 def print_text(node):
     print "Executing node: " + node.text()
+
+
+MODEL_VIEW_MAPPINGS = \
+    {queue_model_objects.DataCollection: DataCollectionQueueItem,
+     queue_model_objects.Characterisation: CharacterisationQueueItem,
+     queue_model_objects.EnergyScan: EnergyScanQueueItem,
+     queue_model_objects.SampleCentring: SampleCentringQueueItem,
+     queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.Workflow: GenericWorkflowQueueItem,
+     queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
+

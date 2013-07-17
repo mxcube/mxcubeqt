@@ -1,8 +1,7 @@
+import os
 import qt
 import queue_item
-import queue_model
-import os
-
+import queue_model_objects_v1 as queue_model_objects
 
 from widgets.confirm_dialog_widget_vertical_layout \
      import ConfirmDialogWidgetVerticalLayout
@@ -56,6 +55,9 @@ class ConfirmDialog(qt.QDialog):
                            qt.SIGNAL("clicked()"),
                            self.cancel_button_click)
 
+        self.dialog_layout_widget.take_snapshosts_cbx.setOn(True)
+        self.dialog_layout_widget.force_dark_cbx.setOn(True)
+        
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
 
@@ -63,7 +65,7 @@ class ConfirmDialog(qt.QDialog):
     def set_items(self, checked_items):
         self.sample_items = []
         self.files_to_be_written = []
-        self.checked = checked_items
+        self.checked_items = checked_items
         collection_items = []
         current_sample_item = None
         num_images = 0
@@ -74,8 +76,8 @@ class ConfirmDialog(qt.QDialog):
             if isinstance(item, queue_item.SampleQueueItem):
                 self.sample_items.append(item)
                 current_sample_item = item                
-            if isinstance(item.get_model(), queue_model.DataCollection) or\
-                   isinstance(item.get_model(), queue_model.Characterisation):
+            if isinstance(item.get_model(), queue_model_objects.DataCollection) or\
+                   isinstance(item.get_model(), queue_model_objects.Characterisation):
                 collection_items.append(item)
                 file_paths = item.get_model().get_files_to_be_written()
                 num_images += len(file_paths)
@@ -105,13 +107,13 @@ class ConfirmDialog(qt.QDialog):
 
     def continue_button_click(self):
         for item in self.checked_items:
-            if isinstance(item.get_model(), queue_model.DataCollection):
+            if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_snapshots = dialog_layout_widget.take_snapshosts_cbx.isOn()
+                    take_snapshots = self.dialog_layout_widget.take_snapshosts_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_dark_current = dialog_layout_widget.force_dark_cbx.isOn()
+                    take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
-                    skip_existing_images = dialog_layout_widget.skip_existing_images_cbx.isOn()
+                    skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
         
         self.emit(qt.PYSIGNAL("continue_clicked"), (self.sample_items,))
         self.accept()
