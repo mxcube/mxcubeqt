@@ -16,6 +16,7 @@ from widgets.acquisition_widget import AcquisitionWidget
 from widgets.acquisition_widget_vertical_layout \
     import AcquisitionWidgetVerticalLayout
 from widgets.widget_utils import DataModelInputBinder
+from BlissFramework.Utils import widget_colors
 
 from widgets.processing_widget import ProcessingWidget
 
@@ -103,6 +104,11 @@ class CreateHelicalWidget(CreateTaskBase):
         self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
+
+
+        self.connect(self._data_path_widget,
+                     qt.PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
 
 
     def init_models(self):
@@ -240,6 +246,21 @@ class CreateHelicalWidget(CreateTaskBase):
         self.show_selected_lines()
 
 
+    def handle_path_conflict(self, widget, new_value):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if new_value != '':
+            if path_conflict:
+                logging.getLogger("user_level_log").\
+                    error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before adding to queue')
+
+                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            else:
+                widget.setPaletteBackgroundColor(widget_colors.WHITE)
+
+
     def selected_items(self):
         selected_items = []
                 
@@ -262,13 +283,24 @@ class CreateHelicalWidget(CreateTaskBase):
 
 
     def approve_creation(self):
+        selected_lines = False
+        
         if self.selected_items():
-            return True
+            selected_lines = True
         else:
             logging.getLogger("user_level_log").\
                 info("No lines selected, please select one or more lines.")
-            return False
 
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if path_conflict:
+            logging.getLogger("user_level_log").\
+                error('The current path settings will overwrite data' +\
+                      ' from another task. Correct the problem before adding to queue')
+
+        return (not path_conflict) and selected_lines 
+            
 
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group

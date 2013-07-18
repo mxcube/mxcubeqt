@@ -9,6 +9,7 @@ import MxLookupScanBrick
 
 
 from create_task_base import CreateTaskBase
+from BlissFramework.Utils import widget_colors
 from widgets.data_path_widget import DataPathWidget
 from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout
@@ -53,10 +54,13 @@ class CreateWorkflowWidget(CreateTaskBase):
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-
         self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
+
+        self.connect(self._data_path_widget,
+                     qt.PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
         
 
         #self.connect(self._workflow_cbox, qt.SIGNAL('activated ( const QString &)'),
@@ -114,6 +118,33 @@ class CreateWorkflowWidget(CreateTaskBase):
 
         self._data_path_widget.update_data_model(self._path_template)
 
+
+    def handle_path_conflict(self, widget, new_value):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if new_value != '':
+            if path_conflict:
+                logging.getLogger("user_level_log").\
+                    error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before adding to queue')
+
+                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            else:
+                widget.setPaletteBackgroundColor(widget_colors.WHITE)
+
+
+    def approve_creation(self):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if path_conflict:
+            logging.getLogger("user_level_log").\
+                error('The current path settings will overwrite data' +\
+                      ' from another task. Correct the problem before adding to queue')
+
+        return not path_conflict
+    
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.

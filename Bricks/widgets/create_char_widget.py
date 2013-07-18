@@ -18,6 +18,7 @@ from widgets.data_path_widget_vertical_layout import\
 from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
 from acquisition_widget_simple import AcquisitionWidgetSimple
+from BlissFramework.Utils import widget_colors
 
 class CreateCharWidget(CreateTaskBase):
     def __init__(self,parent = None,name = None, fl = 0):
@@ -119,7 +120,12 @@ class CreateCharWidget(CreateTaskBase):
 
         self.connect(self._vertical_dimension_widget.space_group_ledit,
                      SIGNAL("activated(int)"),
-                     self._space_group_change)    
+                     self._space_group_change)
+
+
+        self.connect(self._data_path_widget,
+                     PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
 
 
     def _space_group_change(self, index):
@@ -237,6 +243,21 @@ class CreateCharWidget(CreateTaskBase):
         self._char_params_mib.set_model(self._char_params)
 
 
+    def handle_path_conflict(self, widget, new_value):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if new_value != '':
+            if path_conflict:
+                logging.getLogger("user_level_log").\
+                    error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before adding to queue')
+
+                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            else:
+                widget.setPaletteBackgroundColor(widget_colors.WHITE)
+
+
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
         self._processing_parameters.cell_a = crystal.cell_a
@@ -245,6 +266,18 @@ class CreateCharWidget(CreateTaskBase):
         self._processing_parameters.cell_beta = crystal.cell_beta
         self._processing_parameters.cell_c = crystal.cell_c
         self._processing_parameters.cell_gamma = crystal.cell_gamma
+
+
+    def approve_creation(self):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if path_conflict:
+            logging.getLogger("user_level_log").\
+                error('The current path settings will overwrite data' +\
+                      ' from another task. Correct the problem before adding to queue')
+
+        return not path_conflict
 
 
     # Called by the owning widget (task_toolbox_widget) to create

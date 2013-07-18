@@ -19,6 +19,7 @@ from widgets.processing_widget \
 
 from queue_model_objects_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
+from BlissFramework import Icons
 
 
 class DCParametersWidget(QWidget):
@@ -27,8 +28,11 @@ class DCParametersWidget(QWidget):
         self._data_collection = None
         self.add_dc_cb = None
         self._tree_view_item = None
+        self.queue_controller_hwobj = None
+        self.queue_model = None
 
 
+        self.caution_pixmap = Icons.load("Caution2.png")
         self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
         self.acq_gbox = QVGroupBox("Acquisition", self)
         self.acq_gbox.setInsideMargin(2)
@@ -73,6 +77,10 @@ class DCParametersWidget(QWidget):
                      SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
+        self.connect(self.path_widget,
+                     PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
+
 
     def set_bl_config(self, bl_config):
         self.acq_widget.set_bl_config(bl_config)
@@ -89,6 +97,26 @@ class DCParametersWidget(QWidget):
         if str(new_value).isdigit():
             self._data_collection.set_number(int(new_value))
             self._tree_view_item.setText(0, self._data_collection.get_name())
+
+
+    def handle_path_conflict(self, widget, new_value):
+        path_template = self._data_collection.acquisitions[0].path_template
+        path_conflict = self.queue_model_hwobj.\
+                        check_for_path_collisions(path_template)
+
+        if new_value != '':
+            if path_conflict:
+                logging.getLogger("user_level_log").\
+                    error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before collecting')
+
+                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+                self._tree_view_item.setPixmap(0, self.caution_pixmap)
+                self.queue_controller_hwobj.disable(True)
+            else:
+                widget.setPaletteBackgroundColor(widget_colors.WHITE)
+                self._tree_view_item.setPixmap(0, QPixmap())
+                self.queue_controller_hwobj.disable(False)
 
 
     def __add_data_collection(self):

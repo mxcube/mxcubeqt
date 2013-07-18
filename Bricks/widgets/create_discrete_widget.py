@@ -18,6 +18,7 @@ from widgets.widget_utils import DataModelInputBinder
 from create_task_base import CreateTaskBase
 
 from widgets.processing_widget import ProcessingWidget
+from BlissFramework.Utils import widget_colors
 
 
 class CreateDiscreteWidget(CreateTaskBase):
@@ -76,6 +77,10 @@ class CreateDiscreteWidget(CreateTaskBase):
                      SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
+        self.connect(self._data_path_widget,
+                     PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
+        
 
     def init_models(self):
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
@@ -118,6 +123,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             has_shutter_less = self._bl_config_hwobj.detector_has_shutterless()
             self._acquisition_parameters.shutterless = has_shutter_less
 
+
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_item
         
@@ -125,7 +131,11 @@ class CreateDiscreteWidget(CreateTaskBase):
             prefix = self._path_template.get_prefix()
             item.get_model().set_name(prefix)
             item.setText(0, item.get_model().get_name())
-        
+
+
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
 
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_item
@@ -134,6 +144,24 @@ class CreateDiscreteWidget(CreateTaskBase):
             if str(new_value).isdigit():
                 item.get_model().set_number(int(new_value))
                 item.setText(0, item.get_model().get_name())
+
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+
+    def handle_path_conflict(self, widget, new_value):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if new_value != '':
+            if path_conflict:
+                logging.getLogger("user_level_log").\
+                    error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before adding to queue')
+
+                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            else:
+                widget.setPaletteBackgroundColor(widget_colors.WHITE)
 
 
     def set_tunable_energy(self, state):
@@ -195,6 +223,18 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                            self._path_template)
         self._data_path_widget.update_data_model(self._path_template)
+        
+
+    def approve_creation(self):
+        path_conflict = self._tree_brick.queue_model_hwobj.\
+                        check_for_path_collisions(self._path_template)
+
+        if path_conflict:
+            logging.getLogger("user_level_log").\
+                error('The current path settings will overwrite data' +\
+                      ' from another task. Correct the problem before adding to queue')
+
+        return not path_conflict
         
 
     # Called by the owning widget (task_toolbox_widget) to create

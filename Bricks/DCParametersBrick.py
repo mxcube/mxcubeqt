@@ -2,7 +2,6 @@ import logging
 import sys
 import pprint
 import html_template
-import decimal; decimal.getcontext().prec = 3; decimal.getcontext().rounding = decimal.ROUND_DOWN
 
 from widgets.dc_parameters_widget import DCParametersWidget
 from BlissFramework import BaseComponents
@@ -20,6 +19,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         self.energy_hwobj = None
         self.transmission_hwobj = None
         self.resolution_hwobj = None
+        self.queue_model_hwobj = None
 
         # Qt-Slots
         self.defineSlot("populate_parameter_widget",({}))
@@ -27,6 +27,8 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         # Properties
         self.addProperty("session", "string", "/session")
         self.addProperty("bl-config", "string", "/bl-config")
+        self.addProperty("queue-model", "string", "/queue-model")
+        self.addProperty("queue-controller", "string", "/queue-controller")
         
         # Layout
         self.stack = QWidgetStack(self, 'stack')
@@ -94,3 +96,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
             self.bl_config_hwobj = self.getHardwareObject(new_value)
             self.parameters_widget.set_bl_config(\
                 self.bl_config_hwobj)
+        elif property_name == 'queue-model':            
+            self.parameters_widget.queue_model_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'queue-controller':            
+            self.parameters_widget.queue_controller_hwobj = self.getHardwareObject(new_value)
