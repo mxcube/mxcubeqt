@@ -563,8 +563,8 @@ class DataCollectTree(QWidget):
     def collect_stop_toggle(self):
         if self.queue_hwobj.is_disabled():
             logging.getLogger("user_level_log").\
-                error('Can not start collect, see the tasks marked'+
-                      \ ' in the tree and solve the prorblems.')
+                error('Can not start collect, see the tasks marked' +\
+                      ' in the tree and solve the prorblems.')
             
         elif not self.collecting:
             # Unselect selected items.
