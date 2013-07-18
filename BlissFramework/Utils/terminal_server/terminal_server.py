@@ -123,7 +123,13 @@ class _MyLogHandler(logging.Handler):
 @bottle.route("/output_request")
 def send_output():
   client_id = bottle.request.GET["client_id"]
-  output = OUTPUT[client_id].get()
+  try:
+    output = OUTPUT[client_id].get()
+  except KeyError:
+    # an old client was waiting for us
+    OUTPUT.setdefault(client_id, gevent.queue.Queue())
+    return json.dumps("")
+ 
   if output == "\n":
     return json.dumps("")
   return json.dumps(output)
