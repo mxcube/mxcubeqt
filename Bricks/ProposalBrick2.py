@@ -75,7 +75,6 @@ class ProposalBrick2(BlissWidget):
         self.propType.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         dash_label=QLabel(" - ",self.loginBox)
         self.propNumber=QLineEdit(self.loginBox)
-        self.propNumber.setValidator(QIntValidator(0,99999,self.propNumber))
         self.propNumber.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.propNumber.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.propNumber.setFixedWidth(50)
@@ -194,11 +193,7 @@ class ProposalBrick2(BlissWidget):
         self.session_hwobj.proposal_code = proposal['code']
         self.session_hwobj.session_id = session['sessionId']
         self.session_hwobj.proposal_id = proposal['proposalId']
-
-        try:
-            self.session_hwobj.proposal_number = int(proposal['number'])
-        except (TypeError, ValueError):
-            self.session_hwobj.proposal_number = 0
+        self.session_hwobj.proposal_number = proposal['number']
 
         # Change mode
         self.loginBox.hide()
@@ -395,10 +390,6 @@ class ProposalBrick2(BlissWidget):
             
             return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
-        try:
-            prop_number=int(prop_number)
-        except (ValueError,TypeError):
-            return self.refuseLogin(None,"Invalid proposal number.")
 
         if self.ldapConnection is None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
