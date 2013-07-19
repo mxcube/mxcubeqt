@@ -1,5 +1,6 @@
 import logging
 import math
+from BlissFramework.Utils import widget_colors
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 from qt import *
@@ -9,13 +10,13 @@ __author__ = "Matias Guijarro"
 __version__ = 1.0
 
 
-SC_STATE_COLOR = { "FAULT": "red",
-                   "STANDBY": "green",
-                   "MOVING": "yellow",
+SC_STATE_COLOR = { "FAULT": widget_colors.LIGHT_RED,
+                   "STANDBY": widget_colors.LIGHT_GREEN,
+                   "MOVING": widget_colors.LIGHT_YELLOW,
                    "ALARM": "purple",
-                   "DISABLE": "grey",
-                   "RUNNING": "yellow",
-                   "UNKNOWN": "grey" }
+                   "DISABLE": widget_colors.GRAY,
+                   "RUNNING": widget_colors.LIGHT_YELLOW,
+                   "UNKNOWN": widget_colors.GRAY}
 
 
 class HorizontalSpacer(QWidget):
