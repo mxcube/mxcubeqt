@@ -14,6 +14,7 @@ from qt import *
 from qttable import QTable, QTableItem
 from collections import namedtuple
 from widgets.confirm_dialog import ConfirmDialog
+from BlissFramework.Utils import widget_colors
 
 SCFilterOptions = namedtuple('SCFilterOptions', ['ALL_SAMPLES', 
                                                  'MOUNTED_SAMPLE',
@@ -178,8 +179,8 @@ class DataCollectTree(QWidget):
 
         if item:
             if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                #menu.insertItem(QString("Rename"), self.rename_list_view_item)
-                #menu.insertSeparator(1)
+                menu.insertItem(QString("Rename"), self.rename_list_view_item)
+                menu.insertSeparator(1)
                 menu.insertItem(QString("Remove"), self.delete_click)
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
@@ -187,8 +188,8 @@ class DataCollectTree(QWidget):
                     menu.insertItem(QString("Mount"), self.mount_sample)
                     menu.insertItem(QString("Un-Mount"), self.unmount_sample)
                 menu.insertSeparator(3)
-                menu.insertItem(QString("Create Data Collection Group"), self.add_empty_task_node)
-                menu.insertSeparator(5)
+                #menu.insertItem(QString("Create Data Collection Group"), self.add_empty_task_node)
+                #menu.insertSeparator(5)
                 menu.insertItem(QString("Details"), self.show_details) 
                 menu.popup(point);
             else:
@@ -247,28 +248,8 @@ class DataCollectTree(QWidget):
 
 
     def item_renamed(self, item, col, text):
-        valid = True
-        parent = item.parent()
-        sibling = parent.firstChild()
-
-        while sibling:
-            if not (sibling is item):
-                if str(sibling.text()) == str(item.text()):
-                    valid = False
-                    break
-
-            sibling = sibling.nextSibling()
-
-        if not valid:
-            logging.getLogger("user_level_log").\
-                warning("The image name is not unique, " + \
-                " change the run number to not overwrite your data.")
-        
         item.set_name(str(text))
-            
-        if isinstance(item, queue_item.DataCollectionQueueItem) or \
-                isinstance(item, queue_item.CharacterisationQueueItem):
-            self.tree_brick.populate_parameters_tab(item)
+        item.get_model().set_name(text)
 
 
     def mount_sample(self):
@@ -373,9 +354,7 @@ class DataCollectTree(QWidget):
         task_node_tree_item = \
             queue_item.DataCollectionGroupQueueItem(samples[0], 
                                                     samples[0].lastItem(),
-                                                    task_node.get_name(), 
-                                                    QCheckListItem.CheckBoxController,
-                                                    data = task_node)
+                                                    task_node.get_name())
 
 
     def add_to_queue(self, task_list, parent_tree_item, set_on = True):
@@ -819,9 +798,10 @@ class DataCollectTree(QWidget):
                 if item.get_model().location == self.sample_changer_hwobj.\
                         getLoadedSampleLocation():
                     item.setPixmap(0, self.pin_pixmap)
-                    item.setSelected(True)
+                    item.setBackgroundColor(widget_colors.SKY_BLUE)
                 else:
                     item.setPixmap(0, QPixmap())
+                    item.restoreBackgroundColor()
 
                 if item.get_model().lims_location != (None, None):
                     item.setPixmap(0, self.ispyb_pixmap)
