@@ -32,7 +32,7 @@ class DataCollectTree(QWidget):
         self.collect_clicked = False
         self.collecting = False
         self.loaded_sample = (-1, -1)
-        self._loaded_sample_item = None
+        #self._loaded_sample_item = None
         self.centring_method = 0
         self.queue_hwobj = None
         self.queue_model_hwobj = None
@@ -310,8 +310,8 @@ class DataCollectTree(QWidget):
                         logging.getLogger('queue_exec').\
                             info("Sample loaded")
                         items[0].setText(1, "Sample loaded")
-                        self._loaded_sample_item.setPixmap(0, QPixmap())
-                        self._loaded_sample_item = items[0]
+                        #self._loaded_sample_item.setPixmap(0, QPixmap())
+                        #self._loaded_sample_item = items[0]
                         items[0].setSelected(True)  
         else:
             logging.getLogget("user_level_log").\
