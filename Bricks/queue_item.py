@@ -32,12 +32,12 @@ class QueueItem(QCheckListItem):
     bg_brush = QBrush(QColor(0, 128, 0))
     bg_normal_brush = QBrush(Qt.white)
 
-
     def __init__(self, *args, **kwargs):
         QCheckListItem.__init__(self, *args)
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
+        self.previous_bg_brush = QueueItem.bg_normal_brush
         self._queue_entry = None
         self._data_model = None
 
@@ -143,6 +143,15 @@ class QueueItem(QCheckListItem):
             self.brush = QueueItem.normal_brush
 
         self.listView().triggerUpdate()
+
+
+    def setBackgroundColor(self, color):
+        self.previous_bg_brush = self.bg_brush
+        self.bg_brush = QBrush(color)
+
+
+    def restoreBackgroundColor(self):
+        self.bg_brush = self.previous_bg_brush
 
     
     def lastItem(self):
