@@ -160,7 +160,7 @@ class CreateTaskBase(qt.QWidget):
             sample_data_node = sample_item.get_model() if sample_item else None
 
             if data_path_widget and sample_data_node:
-                (data_directory, proc_directory) = self.get_default_directory(sample_data_node)
+                (data_directory, proc_directory) = self.get_default_directory()
                 prefix = self.get_default_prefix(sample_data_node)
 
                 data_path_widget.set_directory(data_directory)
