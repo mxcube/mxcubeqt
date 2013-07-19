@@ -8,7 +8,6 @@ import queue_item
 import queue_model_objects_v1 as queue_model_objects
 
 from BlissFramework import Icons
-from BlissFramework.Utils import widget_colors
 from widgets.dc_tree_widget import DataCollectTree
 from widgets.dc_tree_widget import SC_FILTER_OPTIONS
 from widgets.sample_changer_widget_layout import SampleChangerWidgetLayout
@@ -241,6 +240,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         if not logged_in:
             sc_content = self.get_sc_content()
             self.dc_tree_widget.init_with_sc_content(sc_content)
+
+        self.dc_tree_widget.sample_list_view_selection()
 
 
     def enable_collect(self, state):
@@ -559,7 +560,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
-        self.dc_tree_widget.sample_list_view_selection()
 
         self.connect(self.queue_hwobj, 'queue_paused', 
                      self.dc_tree_widget.queue_paused_handler)
