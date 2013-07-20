@@ -14,6 +14,7 @@ from qt import *
 import BlissFramework
 from BlissFramework import GUISupervisor
 from BlissFramework.Utils import ErrorHandler
+from BlissFramework.Utils import terminal_server
 
 from HardwareRepository import HardwareRepository
 
@@ -40,6 +41,7 @@ def run(GUIConfigFile=None):
     parser.add_option('-d', '', action='store_true', dest="designMode", default=False, help="start GUI in Design mode")
     parser.add_option('-m', '', action='store_true', dest="showMaximized", default=False, help="maximize main window")	
     parser.add_option('', '--no-border', action='store_true', dest='noBorder', default=False, help="does not show borders on main window")
+    parser.add_option('-w', '--web-server-port', action='store', type="int", dest='webServerPort', default=0, help="port number for the remote interpreter web application server")
     #parser.add_option('', '--widgetcount', action='store_true', dest='widgetCount', default=False, help="prints debug message at the end about number of widgets left undestroyed")
 
     (opts, args) = parser.parse_args()
@@ -50,6 +52,11 @@ def run(GUIConfigFile=None):
         else:
             parser.error('Too many arguments.')
             sys.exit(1)
+
+    if opts.webServerPort:
+        interpreter = terminal_server.InteractiveInterpreter()
+        terminal_server.set_interpreter(interpreter) 
+        gevent.spawn(terminal_server.serve_forever, opts.webServerPort)
 
     #
     # get config from arguments
