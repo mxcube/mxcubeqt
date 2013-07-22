@@ -41,6 +41,8 @@ class ConfirmDialog(qt.QDialog):
         self.checked_items = []
         self.sample_items = []
         self.files_to_be_written = []
+        self.item_run_number_list = []
+        self.queue_model_hwobj = None
         
         # Layout
         qt.QVBoxLayout(self)
@@ -75,25 +77,36 @@ class ConfirmDialog(qt.QDialog):
         for item in checked_items:
             if isinstance(item, queue_item.SampleQueueItem):
                 self.sample_items.append(item)
-                current_sample_item = item                
-            if isinstance(item.get_model(), queue_model_objects.DataCollection) or\
-                   isinstance(item.get_model(), queue_model_objects.Characterisation):
+                current_sample_item = item                                
+
+            path_template = item.get_model().get_path_template()
+
+            if path_template:
+                if item.get_model().is_executed():
+                    self.item_run_number_list.append((item, path_template.run_number))
+
+                    # Increase the run-number for re-collect
+                    new_run_number = self.queue_model_hwobj.get_next_run_number(path_template,
+                                                                                exclude_current = False)
+                    item.get_model().set_number(new_run_number)
+                    path_template.run_number = new_run_number
+
                 collection_items.append(item)
-                file_paths = item.get_model().get_files_to_be_written()
+                file_paths = path_template.get_files_to_be_written()
                 num_images += len(file_paths)
-                
+
                 for fp in file_paths:
                     (dir_name, f_name) = os.path.split(fp)
                     sample_name = current_sample_item.get_model().get_display_name()
 
                     if sample_name is '':
                         sample_name = current_sample_item.get_model().loc_str
-                    
+
                     fl = FileListViewItem(self.dialog_layout_widget.file_list_view,
                                          sample_name, dir_name, f_name)
 
                     if os.path.isfile(fp):
-                        fl.set_brush(qt.QBrush(qt.Qt.red))
+                            fl.set_brush(qt.QBrush(qt.Qt.red))
 
         num_samples = len(self.sample_items)
         num_collections = len(collection_items)
@@ -120,6 +133,11 @@ class ConfirmDialog(qt.QDialog):
 
 
     def cancel_button_click(self):
+        for item, run_number in self.item_run_number_list:
+            item.get_model().set_number(run_number)
+            path_template = item.get_model().get_path_template()
+            path_template.run_number = run_number
+                    
         self.reject()
 
 
