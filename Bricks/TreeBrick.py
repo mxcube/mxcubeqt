@@ -312,6 +312,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
+            self.dc_tree_widget.confirm_dialog.queue_model_hwobj = self.queue_model_hwobj
             self.connect(self.queue_model_hwobj, 'child_added',
                          self.dc_tree_widget.add_to_view)
 
