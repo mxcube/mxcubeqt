@@ -33,7 +33,7 @@ class AcquisitionWidget(qt.QWidget):
             self._path_template = path_template
 
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
-        self._path_template_mib = DataModelInputBinder(self._path_template)
+        #self._path_template_mib = DataModelInputBinder(self._path_template)
 
         #   
         # Layout
@@ -212,7 +212,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_parameters = acquisition_parameters
         self._acquisition_mib.set_model(acquisition_parameters)
         self._path_template = path_template
-        self._path_template_mib.set_model(path_template)
+        #self._path_template_mib.set_model(path_template)
 
 
     def set_tunable_energy(self, state):
