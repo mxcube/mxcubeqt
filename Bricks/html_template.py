@@ -38,9 +38,8 @@ def image_table(paths):
     
 
 def html_report(data_collection):
-    paths = data_collection.previous_acquisition.get_preview_image_paths()
-    image_path = data_collection.previous_acquisition.\
-                 path_template.get_image_path()
+    paths = data_collection.acquisitions[0].get_preview_image_paths()
+    image_path = data_collection.acquisitions[0].path_template.get_image_path()
 
     image_path = image_path.replace('%04d', '####')
     image_path =  "<p><h3>Image path: %s</br></h3></p>" % image_path
