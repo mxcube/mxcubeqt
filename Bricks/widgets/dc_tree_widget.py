@@ -575,6 +575,14 @@ class DataCollectTree(QWidget):
 
 
     def collect_items(self, items = None):
+        for item in self.checked_items:
+            # update the run-number text incase of re-collect
+            item.setText(0, item.get_model().get_name())
+            #Clear status
+            item.setText(1, "")
+            item.setHighlighted(False)
+            item.setBackgroundColor(widget_colors.WHITE)
+        
         self.user_stopped = False
         self.delete_button.setEnabled(False)
         self.enable_sample_changer_widget(False)
