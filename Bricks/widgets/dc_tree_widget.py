@@ -540,6 +540,22 @@ class DataCollectTree(QWidget):
 
 
     def collect_stop_toggle(self):
+        #import sys; sys.stdout = sys.__stdout__; import pdb; pdb.set_trace()
+        #self.queue_model_hwobj.check_for_all_path_collisions()
+
+        self.checked_items = self.get_checked_items()
+        self.queue_hwobj.disable(False)
+        
+        for item in self.checked_items:
+            pt = item.get_model().get_path_template()
+
+            if pt:
+                path_conflict = self.queue_model_hwobj.\
+                                check_for_path_collisions(pt)
+                
+                if path_conflict:
+                    self.queue_hwobj.disable(True)
+        
         if self.queue_hwobj.is_disabled():
             logging.getLogger("user_level_log").\
                 error('Can not start collect, see the tasks marked' +\
@@ -550,8 +566,6 @@ class DataCollectTree(QWidget):
             selected_items = self.get_selected_items()
             for item in selected_items:
                 self.sample_list_view.setSelected(item, False)
-
-            self.checked_items = self.get_checked_items()
             
             if len(self.checked_items):
                 self.confirm_dialog.set_items(self.checked_items)
@@ -578,10 +592,18 @@ class DataCollectTree(QWidget):
         for item in self.checked_items:
             # update the run-number text incase of re-collect
             item.setText(0, item.get_model().get_name())
+
             #Clear status
             item.setText(1, "")
             item.setHighlighted(False)
-            item.setBackgroundColor(widget_colors.WHITE)
+
+            # Blue background and sample pin for mounted sample.
+            if item.get_model().location == self.sample_changer_hwobj.\
+                   getLoadedSampleLocation():
+                item.setPixmap(0, self.pin_pixmap)
+                item.setBackgroundColor(widget_colors.SKY_BLUE)
+            else:
+                item.setBackgroundColor(widget_colors.WHITE)
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)
@@ -807,9 +829,11 @@ class DataCollectTree(QWidget):
                         getLoadedSampleLocation():
                     item.setPixmap(0, self.pin_pixmap)
                     item.setBackgroundColor(widget_colors.SKY_BLUE)
+                    item.setSelected(True)
                 else:
                     item.setPixmap(0, QPixmap())
                     item.restoreBackgroundColor()
+                    item.setSelected(False)
 
                 if item.get_model().lims_location != (None, None):
                     item.setPixmap(0, self.ispyb_pixmap)
