@@ -191,7 +191,8 @@ class CreateDiscreteWidget(CreateTaskBase):
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-
+            
+            self.setDisabled(False)
             self.init_models()
             sample_data_model = self.get_sample_item().get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
@@ -206,6 +207,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                                              get_next_run_number(self._path_template)
         
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
+            self.setDisabled(False)
             data_collection = tree_item.get_model()
             self._path_template = data_collection.acquisitions[0].path_template
             self._acquisition_parameters = data_collection.acquisitions[0].\
@@ -218,6 +220,9 @@ class CreateDiscreteWidget(CreateTaskBase):
             self._processing_parameters = data_collection.processing_parameters
             self._energy_scan_result = data_collection.crystal.energy_scan_result
             self._acq_widget.set_energies(self._energy_scan_result)
+        else:
+            # Disable control
+            self.setDisabled(True)
             
         self._processing_widget.update_data_model(self._processing_parameters)
         self._acq_widget.update_data_model(self._acquisition_parameters,

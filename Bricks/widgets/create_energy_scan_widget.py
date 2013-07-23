@@ -91,6 +91,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
 
+            self.setDisabled(False)
             self.init_models()
             sample_data_model = self.get_sample_item().get_model()
 
@@ -103,8 +104,11 @@ class CreateEnergyScanWidget(CreateTaskBase):
                                              get_next_run_number(self._path_template)
             
         elif isinstance(tree_item, queue_item.EnergyScanQueueItem):
+            self.setDisabled(False)
             escan_model = tree_item.get_model()
             self._path_template = escan_model.path_template
+        else:
+            self.setDisabled(True)
 
         self._data_path_widget.update_data_model(self._path_template)
 

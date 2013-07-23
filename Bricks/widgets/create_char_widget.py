@@ -213,7 +213,7 @@ class CreateCharWidget(CreateTaskBase):
     def _selection_changed(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-
+            self.setDisabled(False)
             self.init_models()
             sample_data_model = self.get_sample_item().get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
@@ -225,8 +225,8 @@ class CreateCharWidget(CreateTaskBase):
             self._path_template.run_number = self._tree_brick.queue_model_hwobj.\
                                              get_next_run_number(self._path_template)
 
-
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+            self.setDisabled(False)
             self._char = tree_item.get_model()
             data_collection = self._char.reference_image_collection
             self._path_template = data_collection.acquisitions[0].path_template
@@ -235,6 +235,8 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
             self._processing_parameters = data_collection.processing_parameters
+        else:
+            self.setDisabled(True)
 
         self._set_space_group(self._char_params.space_group)
         self._acq_widget.update_data_model(self._acquisition_parameters,
