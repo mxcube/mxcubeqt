@@ -112,11 +112,9 @@ class DCParametersWidget(QWidget):
 
                 widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
                 self._tree_view_item.setPixmap(0, self.caution_pixmap)
-                self.queue_controller_hwobj.disable(True)
             else:
                 widget.setPaletteBackgroundColor(widget_colors.WHITE)
                 self._tree_view_item.setPixmap(0, QPixmap())
-                self.queue_controller_hwobj.disable(False)
 
 
     def __add_data_collection(self):
