@@ -84,7 +84,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('overlap', 
                                                 self.acq_widget_layout.overlap_ledit,
                                                 float,
-                                                qt.QDoubleValidator(0, 1000, 2, self))
+                                                qt.QDoubleValidator(-1000, 1000, 2, self))
 
         self._acquisition_mib.bind_value_update('energy',
                                                 self.acq_widget_layout.energy_ledit,
@@ -127,6 +127,10 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.num_images_ledit_change)
 
+        qt.QObject.connect(self.acq_widget_layout.overlap_ledit,
+                           qt.SIGNAL("textChanged(const QString &)"),
+                           self.overlap_changed)
+
 
     def set_bl_config(self, bl_config):
         self._bl_config = bl_config
@@ -145,6 +149,25 @@ class AcquisitionWidget(qt.QWidget):
 
     def num_images_ledit_change(self, new_value):
         self._path_template.num_files = int(new_value)
+
+
+    def overlap_changed(self, new_value):
+        has_shutter_less = self._bl_config.detector_has_shutterless()
+
+        if has_shutter_less:
+            try:
+                new_value = float(new_value)
+            except ValueError:
+                pass
+            
+            if new_value != 0:
+                self.acq_widget_layout.shutterless_cbx.setEnabled(False)
+                self.acq_widget_layout.shutterless_cbx.setOn(False)
+                self._acquisition_parameters.shutterless = False
+            else:         
+                self.acq_widget_layout.shutterless_cbx.setEnabled(True)
+                self.acq_widget_layout.shutterless_cbx.setOn(True)
+                self._acquisition_parameters.shutterless = True
 
 
     def use_mad(self, state):
