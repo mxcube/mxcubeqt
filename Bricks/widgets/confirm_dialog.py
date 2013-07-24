@@ -64,6 +64,16 @@ class ConfirmDialog(qt.QDialog):
         self.dialog_layout_widget.missing_two_cbx.hide()
 
 
+    def disable_dark_current_cbx(self):
+        self.dialog_layout_widget.force_dark_cbx.setEnabled(False)
+        self.dialog_layout_widget.force_dark_cbx.setOn(False)
+
+
+    def enable_dark_current_cbx(self):
+        self.dialog_layout_widget.force_dark_cbx.setEnabled(True)
+        self.dialog_layout_widget.force_dark_cbx.setOn(True)
+        
+
     def set_items(self, checked_items):
         self.sample_items = []
         self.files_to_be_written = []
