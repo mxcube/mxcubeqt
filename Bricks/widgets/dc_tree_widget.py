@@ -823,20 +823,25 @@ class DataCollectTree(QWidget):
         it = QListViewItemIterator(self.sample_list_view)
         item = it.current()
 
-        while item:
-            if isinstance(item, queue_item.SampleQueueItem):
-                if item.get_model().location == self.sample_changer_hwobj.\
-                        getLoadedSampleLocation():
-                    item.setPixmap(0, self.pin_pixmap)
-                    item.setBackgroundColor(widget_colors.SKY_BLUE)
-                    item.setSelected(True)
-                else:
-                    item.setPixmap(0, QPixmap())
-                    item.restoreBackgroundColor()
-                    item.setSelected(False)
+        self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
 
+        while item:
+            if self.is_mounted_sample_item(item):
+                item.setPixmap(0, self.pin_pixmap)
+                item.setBackgroundColor(widget_colors.SKY_BLUE)
+                item.setSelected(True)
+                self.sample_list_view_selection()
+            elif isinstance(item, queue_item.SampleQueueItem):
+                item.setPixmap(0, QPixmap())
+                item.restoreBackgroundColor()
+                item.setSelected(False)
+                item.setText(1, '')
+
+            if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
                     item.setPixmap(0, self.ispyb_pixmap)
+                    item.setText(0, item.get_model().loc_str + ' - ' \
+                                 + item.get_model().get_name())
         
             it += 1
             item = it.current()
