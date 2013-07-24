@@ -37,6 +37,7 @@ class DataCollectTree(QWidget):
         self.centring_method = 0
         self.queue_hwobj = None
         self.queue_model_hwobj = None
+        self.beamline_setup_hwobj = None
 
         # HW-Object set by TreeBrick
         self.sample_changer_hwobj = None
@@ -273,7 +274,7 @@ class DataCollectTree(QWidget):
 
                 ans = True
                 if ans:
-                    self.clear_centred_positions_cb()
+                    #self.clear_centred_positions_cb()
                     location = items[0].get_model().location
 
                     hl = 22
@@ -308,21 +309,14 @@ class DataCollectTree(QWidget):
 
         if len(items) == 1:
 
-            message = "All centred positions associated with this " + \
-                "sample will be lost, do you want to continue ?."
-            ans = QMessageBox.question(self,
-                                       "Data collection",
-                                       message,
-                                       QMessageBox.Yes,
-                                       QMessageBox.No,
-                                       QMessageBox.NoButton)
+            logging.getLogget("user_level_log").\
+                info("All centred positions associated with this " + \
+                     "sample will be lost, do you want to continue ?.")
 
-
-            if ans == QMessageBox.Yes:
-                self.clear_centred_positions_cb()
-                location = items[0].get_model().location
-                self.sample_changer_hwobj.unloadSample(22, 
-                                                       sample_location = location)
+            #self.clear_centred_positions_cb()
+            location = items[0].get_model().location
+            self.sample_changer_hwobj.unloadSample(22, 
+                                                   sample_location = location)
 
 
     def sample_list_view_selection(self):
@@ -436,7 +430,6 @@ class DataCollectTree(QWidget):
         qe = None
         
         parent_tree_item = self.get_item_by_model(parent)
-        
         
         cls = queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
         view_item = cls(parent_tree_item, parent_tree_item.lastItem(),
@@ -588,6 +581,13 @@ class DataCollectTree(QWidget):
         self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
 
 
+    def is_mounted_sample_item(self, item):
+        if isinstance(item, queue_item.SampleQueueItem):
+            if item.get_model().location == self.sample_changer_hwobj.\
+                   getLoadedSampleLocation():
+                return True
+
+
     def collect_items(self, items = None):
         for item in self.checked_items:
             # update the run-number text incase of re-collect
@@ -597,10 +597,9 @@ class DataCollectTree(QWidget):
             item.setText(1, "")
             item.setHighlighted(False)
 
-            # Blue background and sample pin for mounted sample.
-            if item.get_model().location == self.sample_changer_hwobj.\
-                   getLoadedSampleLocation():
+            if self.is_mounted_sample_item(item):
                 item.setPixmap(0, self.pin_pixmap)
+                # Blue background and sample pin for mounted sample.
                 item.setBackgroundColor(widget_colors.SKY_BLUE)
             else:
                 item.setBackgroundColor(widget_colors.WHITE)
