@@ -65,7 +65,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         if data_collection.is_collected():
             self.populate_results(data_collection)
             self.stack.raiseWidget(self.results_view)
-            self.toggle_page_button.setText("Back")
+            self.toggle_page_button.setText("View parameters")
         else:
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
