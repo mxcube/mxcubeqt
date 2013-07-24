@@ -49,7 +49,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("lims_client", "string", "")
         self.addProperty("dataCollect", "string", "")
         self.addProperty("dataAnalysis", "string", "")
-        self.addProperty("beamlineConfig", "string", "")
+        self.addProperty("bl_config", "string", "/bl-config")
         self.addProperty("sampleChanger", "string", "")
         self.addProperty("diffractometer", "string", "")
         self.addProperty("holderLengthMotor", "string", "")
@@ -58,6 +58,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("session", "string", "/session")
         self.addProperty("xml_rpc_server", "string", "/xml-rpc-server")
         self.addProperty("queue_model", "string", "/queue-model")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         # Qt - Slots
         self.defineSlot("logged_in", ())
@@ -317,7 +318,17 @@ class TreeBrick(BaseComponents.BlissWidget):
                          self.dc_tree_widget.add_to_view)
 
             self.dc_tree_widget.populate_free_pin()
+        elif property_name == 'bl_config':
+            self.bl_config_hwobj = self.getHardwareObject(new_value)
+            has_shutter_less = self.bl_config_hwobj.detector_has_shutterless()
 
+            if has_shutter_less:
+                self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
+                
+        elif property_name == 'beamline_setup':
+            self.dc_tree_widget.beamline_setup_hwobj = self.getHardwareObject(new_value)
+                
+  
 
     def get_sc_content(self):
         sc_content = []
@@ -529,6 +540,10 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def get_selected_groups(self):
         return self.dc_tree_widget.get_selected_dcgs()
+
+
+    def is_mounted_sample_item(self, item):
+        return self.dc_tree_widget.is_mounted_sample_item(item)
 
             
     # def get_mounted_sample_item(self, s):
