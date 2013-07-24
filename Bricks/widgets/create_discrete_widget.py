@@ -133,7 +133,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             item.setText(0, item.get_model().get_name())
 
 
-        path_conflict = self._tree_brick.queue_model_hwobj.\
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
 
@@ -145,12 +145,12 @@ class CreateDiscreteWidget(CreateTaskBase):
                 item.get_model().set_number(int(new_value))
                 item.setText(0, item.get_model().get_name())
 
-        path_conflict = self._tree_brick.queue_model_hwobj.\
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
 
     def handle_path_conflict(self, widget, new_value):
-        path_conflict = self._tree_brick.queue_model_hwobj.\
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
         if new_value != '':
@@ -203,7 +203,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._tree_brick.queue_model_hwobj.\
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                                              get_next_run_number(self._path_template)
         
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
@@ -230,8 +230,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._data_path_widget.update_data_model(self._path_template)
         
 
-    def approve_creation(self):
-        path_conflict = self._tree_brick.queue_model_hwobj.\
+    def approve_creation(self):  
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
         if path_conflict:
@@ -277,8 +277,10 @@ class CreateDiscreteWidget(CreateTaskBase):
             
             if isinstance(shape, shape_history.Point):
                 sc = None
+                sample_item = self.get_sample_item()
                 
-                if not shape.get_drawing():
+                if (not shape.get_drawing()) or \
+                       (not self._tree_brick.is_mounted_sample_item(sample_item)):
                     sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     tasks.append(sc)

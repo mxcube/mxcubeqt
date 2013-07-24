@@ -110,7 +110,7 @@ class CreateWorkflowWidget(CreateTaskBase):
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._tree_brick.queue_model_hwobj.\
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                                              get_next_run_number(self._path_template)
 
         elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
@@ -124,7 +124,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
 
     def handle_path_conflict(self, widget, new_value):
-        path_conflict = self._tree_brick.queue_model_hwobj.\
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
         if new_value != '':
@@ -139,7 +139,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
 
     def approve_creation(self):
-        path_conflict = self._tree_brick.queue_model_hwobj.\
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
         if path_conflict:
