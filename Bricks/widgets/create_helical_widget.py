@@ -68,7 +68,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
         self._acq_widget = AcquisitionWidget(self._acq_gbox, 
                                             "acquisition_widget",
-                                            layout = AcquisitionWidgetVerticalLayout,
+                                            layout = 'vertical',
                                             acq_params =  self._acquisition_parameters,
                                             path_template = self._path_template)
 
