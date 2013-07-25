@@ -56,7 +56,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         
         if char.is_executed():
             self.stack.raiseWidget(self.results_view)
-            self.toggle_page_button.setText("Back")
+            self.toggle_page_button.setText("View parameters")
 
             if char.html_report:
                 if self.results_view.mimeSourceFactory().\

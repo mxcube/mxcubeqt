@@ -43,7 +43,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
         self._acquisition_mib.bind_value_update('exp_time', 
                                                 self.acq_widget_layout.exp_time_ledit,
                                                 float,
-                                                qt.QDoubleValidator(0.001, 6000, 2, self))
+                                                qt.QDoubleValidator(0.001, 6000, 3, self))
         
         self._acquisition_mib.bind_value_update('osc_range', 
                                                 self.acq_widget_layout.osc_range_ledit,

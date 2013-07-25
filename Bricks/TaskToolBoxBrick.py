@@ -20,9 +20,10 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.addProperty("diffractometer", "string", "")
         self.addProperty("shape-history", "string", "/shape-history")
         self.addProperty("session", "string", "/session")
-        self.addProperty("bl-config", "string", "/bl-config")
+        self.addProperty("bl_config", "string", "/bl-config")
         self.addProperty("workflow", "string", "/ednaparams")   
         self.addProperty("beamline_setup", "string", "/beamline-setup")
+        self.addProperty("queue_model", "string", "/queue-model")
 
         #Data atributes
         self.shape_history = None
@@ -30,6 +31,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.ispyb_logged_in = False
         self.diffractometer_hwobj = None
         self.beamline_setup = None
+        self.queue_model_hwobj = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -112,7 +114,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         Overriding BaseComponents.BlissWidget (propertyChanged object) 
         run method.
         """
-        if property_name == 'bl-config':            
+        if property_name == 'bl_config':            
             self.bl_config_hwobj = self.getHardwareObject(new_value)
             self.task_tool_box_widget.set_bl_config(\
                 self.bl_config_hwobj)
@@ -125,9 +127,18 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
                 self.diffractometer_hwobj.connect("minidiffStateChanged", self.diffractometer_changed)
                 self.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
+
+                if self.queue_model_hwobj:
+                    self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
+                
             else:
                 logging.getLogger('user_level_log').error('Could not load beamline setup '+\
                                                           'check configuration !.')
+        elif property_name == 'queue_model':
+            self.queue_model_hwobj = self.getHardwareObject(new_value)
+            if self.beamline_setup_hwobj:
+                self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
+            
 
     def selection_changed(self, items):
         """

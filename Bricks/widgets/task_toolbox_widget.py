@@ -206,6 +206,10 @@ class TaskToolBoxWidget(qt.QWidget):
     def create_task_button_click(self):
         items = self.tree_brick.get_selected_items()
 
+        if not items:
+            logging.getLogger("user_level_log").error("Select the sample or group you "\
+                                                      "would like to add to.")
+
         for item in items:
             self.create_task(item.get_model())
 
