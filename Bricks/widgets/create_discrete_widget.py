@@ -1,5 +1,6 @@
 import os
 import logging
+import qtui
 import ShapeHistory as shape_history
 import queue_item
 import copy
@@ -38,10 +39,10 @@ class CreateDiscreteWidget(CreateTaskBase):
         # Layout
         #
         v_layout = QVBoxLayout(self, 2, 5, "v_layout")
-        self._acq_gbox = QVGroupBox('Acquisition', self, 'acq_gbox')
+        self._acq_gbox = QVGroupBox('Acquisition', self, 'acq_gbox')   
         self._acq_widget = AcquisitionWidget(self._acq_gbox, 
                                             "acquisition_widget",
-                                            layout = AcquisitionWidgetVerticalLayout,
+                                            layout = 'vertical',
                                             acq_params =  self._acquisition_parameters,
                                             path_template = self._path_template)
 
@@ -240,11 +241,21 @@ class CreateDiscreteWidget(CreateTaskBase):
                       ' from another task. Correct the problem before adding to queue')
 
         return not path_conflict
-        
+
+
+    def subwedges_for_inverse_beam(self, total_num_images, subwedge_size):
+        number_of_subwedges = total_num_images/subwedge_size
+        subwedges = []
+
+        for subwedge_num in range(0, number_of_subwedges):
+            subwedges.append((subwedge_num * subwedge_size + 1, subwedge_size))
+
+        return subwedges
+
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, parent_task_node, sample):       
+    def _create_task(self, parent_task_node, sample):
         selected_positions = []
         tasks = []
 
@@ -271,13 +282,32 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             logging.getLogger("user_level_log").\
                 warning(msg)
+
+        if self._acq_widget.use_inverse_beam():
+
+            total_num_images = self._acquisition_parameters.num_images
+            subwedge_size = self._acq_widget.get_num_subwedges()
             
-        for shape in selected_shapes:
+            sub_wedges = self.subwedges_for_inverse_beam(total_num_images,
+                                                         subwedge_size)
+
+            for sw in sub_wedges:
+                tasks.extend(self.create_dc(selected_shapes, sample, 1, sw[0], sw[1]))
+                tasks.extend(self.create_dc(selected_shapes, sample, 2, sw[0], sw[1], 180))
+            
+        else:
+            tasks.extend(self.create_dc(selected_shapes, sample))
+
+        return tasks
+
+    def create_dc(self, shapes, sample, run_number = None,
+                  start_image = None, num_images = None, osc_start = None):
+        tasks = []
+            
+        for shape in shapes:
             snapshot = None
             
-            if isinstance(shape, shape_history.Point):
-                sc = None
-                
+            if isinstance(shape, shape_history.Point):    
                 if not shape.get_drawing():
                     sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
@@ -301,13 +331,27 @@ class CreateDiscreteWidget(CreateTaskBase):
                     snapshot_image = snapshot
 
                 processing_parameters = copy.deepcopy(self._processing_parameters)
+
+                if run_number:
+                    acq.path_template.run_number = run_number
+
+                if start_image:
+                    acq.acquisition_parameters.first_image = start_image
+                    acq.path_template.start_num = start_image
+
+                if num_images:
+                    acq.acquisition_parameters.num_images = num_images
+                    acq.path_template.num_files = num_images
+
+                if osc_start:
+                    acq.acquisition_parameters.osc_start = osc_start
                 
                 dc = queue_model_objects.DataCollection([acq],
                                                         sample.crystals[0],
                                                         processing_parameters)
 
                 dc.set_name(acq.path_template.get_prefix())
-                dc.set_number(self._path_template.run_number)
+                dc.set_number(acq.path_template.run_number)
                 #self._path_template.run_number += 1
 
                 dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
@@ -316,6 +360,8 @@ class CreateDiscreteWidget(CreateTaskBase):
                     sc.set_task(dc)
                 
                 tasks.append(dc)
+
+            self.subwedges_for_inverse_beam(self._acquisition_parameters.num_images, 5)
 
         return tasks
     
