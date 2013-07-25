@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>477</width>
-            <height>294</height>
+            <width>383</width>
+            <height>306</height>
         </rect>
     </property>
     <property name="caption">
@@ -33,19 +33,19 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
                 <property name="spacing">
-                    <number>15</number>
+                    <number>20</number>
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>rone_hlayout</cstring>
+                        <cstring>row_one_layout</cstring>
                     </property>
                     <hbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
-                        </property>
-                        <property name="spacing">
-                            <number>20</number>
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
@@ -263,6 +263,23 @@
                                 </widget>
                             </hbox>
                         </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>row_one_spacer</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>16</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
                     </hbox>
                 </widget>
                 <widget class="QLayoutWidget">
@@ -456,15 +473,18 @@
                 </widget>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>rfour_hlayout</cstring>
+                        <cstring>row_three_layout</cstring>
                     </property>
                     <hbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
+                        <property name="spacing">
+                            <number>20</number>
+                        </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>cbx_vlayout</cstring>
+                                <cstring>row_three_col_one</cstring>
                             </property>
                             <vbox>
                                 <property name="name">
@@ -488,6 +508,62 @@
                                 </widget>
                             </vbox>
                         </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>row_three_col_two</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>subwedge_layout</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>subwedge_size_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Subwedge size:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>subwedge_size_ledit</cstring>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>subwedge_place_holder_spacing</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </vbox>
+                        </widget>
                         <spacer>
                             <property name="name">
                                 <cstring>cbx_spacer</cstring>
@@ -500,32 +576,32 @@
                             </property>
                             <property name="sizeHint">
                                 <size>
-                                    <width>1</width>
+                                    <width>20</width>
                                     <height>20</height>
                                 </size>
                             </property>
                         </spacer>
                     </hbox>
                 </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>vspacer</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Vertical</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
             </vbox>
         </widget>
-        <spacer>
-            <property name="name">
-                <cstring>hpsacer</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>1</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
     </hbox>
 </widget>
 <layoutdefaults spacing="6" margin="11"/>
