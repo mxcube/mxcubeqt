@@ -47,6 +47,7 @@ class ConfirmDialog(qt.QDialog):
         # Layout
         qt.QVBoxLayout(self)
         self.dialog_layout_widget = ConfirmDialogWidgetVerticalLayout(self)
+        self.dialog_layout_widget.child('file_list_view').setSorting(-1)
         self.layout().addWidget(self.dialog_layout_widget)
 
         qt.QObject.connect(self.dialog_layout_widget.continue_button,
@@ -102,8 +103,9 @@ class ConfirmDialog(qt.QDialog):
                     if sample_name is '':
                         sample_name = current_sample_item.get_model().loc_str
 
+                    last_item =  self.dialog_layout_widget.child('file_list_view').lastItem()
                     fl = FileListViewItem(self.dialog_layout_widget.file_list_view,
-                                         sample_name, dir_name, f_name)
+                                          last_item, sample_name, dir_name, f_name)
 
                     if os.path.isfile(fp):
                             fl.set_brush(qt.QBrush(qt.Qt.red))
