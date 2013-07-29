@@ -142,6 +142,9 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
         self.acq_widget_layout.shutterless_cbx.setOn(has_shutter_less)
 
+        if self._bl_config.disable_num_passes():
+            self.acq_widget_layout.num_passes_ledit.setDisabled(True)
+
 
     def first_image_ledit_change(self, new_value):
         self._path_template.start_num = int(new_value)
