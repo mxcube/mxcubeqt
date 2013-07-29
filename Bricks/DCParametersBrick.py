@@ -82,7 +82,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         if self.stack.visibleWidget() is self.parameters_widget:
             self.results_view.reload()
             self.stack.raiseWidget(self.results_view)
-            self.toggle_page_button.setText("Back")
+            self.toggle_page_button.setText("View parameters")
         else:
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
