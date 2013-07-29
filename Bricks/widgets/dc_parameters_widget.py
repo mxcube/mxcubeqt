@@ -37,7 +37,7 @@ class DCParametersWidget(QWidget):
         self.acq_gbox = QVGroupBox("Acquisition", self)
         self.acq_gbox.setInsideMargin(2)
         self.acq_widget = AcquisitionWidget(self.acq_gbox, 
-                          layout = AcquisitionWidgetHorizontalLayout)
+                          layout = 'horizontal')
 
         self.position_widget = SnapshotWidgetLayout(self)
         self._processing_gbox = QVGroupBox('Processing', self, 
