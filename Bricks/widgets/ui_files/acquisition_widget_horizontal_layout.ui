@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>697</width>
-            <height>284</height>
+            <width>708</width>
+            <height>206</height>
         </rect>
     </property>
     <property name="caption">
@@ -34,7 +34,7 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>6</number>
+                    <number>11</number>
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
@@ -529,7 +529,7 @@
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>10</height>
+                            <height>16</height>
                         </size>
                     </property>
                 </spacer>
@@ -668,12 +668,29 @@
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>16</height>
+                            <height>75</height>
                         </size>
                     </property>
                 </spacer>
             </vbox>
         </widget>
+        <spacer>
+            <property name="name">
+                <cstring>hspacer</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>21</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
     </hbox>
 </widget>
 <layoutdefaults spacing="6" margin="11"/>
