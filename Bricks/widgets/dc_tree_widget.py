@@ -318,7 +318,6 @@ class DataCollectTree(QWidget):
             self.sample_changer_hwobj.unloadSample(22, 
                                                    sample_location = location)
 
-
     def sample_list_view_selection(self):
         items = self.get_selected_items()
 
@@ -806,7 +805,8 @@ class DataCollectTree(QWidget):
                                              get_model_root(), sample)
             
         self.set_sample_pin_icon()
-            
+
+
     def get_mounted_sample_item(self):
         sample_items = queue_item.perform_on_children(self.sample_list_view,
                                                    queue_item.is_sample,
