@@ -279,8 +279,8 @@ class AcquisitionWidget(qt.QWidget):
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters
-        self._acquisition_mib.set_model(acquisition_parameters)
         self._path_template = path_template
+        self._acquisition_mib.set_model(acquisition_parameters)
         #self._path_template_mib.set_model(path_template)
 
 
