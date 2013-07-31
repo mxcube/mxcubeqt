@@ -97,8 +97,9 @@ class ConfirmDialog(qt.QDialog):
                     self.item_run_number_list.append((item, path_template.run_number))
 
                     # Increase the run-number for re-collect
-                    new_run_number = self.queue_model_hwobj.get_next_run_number(path_template,
-                                                                                exclude_current = False)
+                    new_run_number = self.queue_model_hwobj.\
+                                     get_next_run_number(path_template,
+                                                         exclude_current = False)
                     item.get_model().set_number(new_run_number)
                     path_template.run_number = new_run_number
 
