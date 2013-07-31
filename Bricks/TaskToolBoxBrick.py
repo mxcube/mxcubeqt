@@ -114,12 +114,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         Overriding BaseComponents.BlissWidget (propertyChanged object) 
         run method.
         """
-        if property_name == 'bl_config':            
-            self.bl_config_hwobj = self.getHardwareObject(new_value)
-            self.task_tool_box_widget.set_bl_config(\
-                self.bl_config_hwobj)
-
-        elif property_name == 'beamline_setup':
+        if property_name == 'beamline_setup':
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
 
             if self.beamline_setup_hwobj:
