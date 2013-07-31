@@ -260,6 +260,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 else:
                     snapshot = self._shape_history.get_snapshot([])
 
+
                 # Acquisition for start position
                 acq = queue_model_objects.Acquisition()
                 acq.acquisition_parameters = \
@@ -298,10 +299,14 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 if sc:
                     sc.set_task(dc)
-                
+
                 tasks.append(dc)
 
-            self.subwedges_for_inverse_beam(self._acquisition_parameters.num_images, 5)
+                self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                                 get_next_run_number(self._path_template)
+                self._data_path_widget.update_data_model(self._path_template)
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                       self._path_template)
 
         return tasks
     

@@ -308,8 +308,7 @@ class DataCollectTree(QWidget):
         items = self.get_selected_items()
 
         if len(items) == 1:
-
-            logging.getLogget("user_level_log").\
+            logging.getLogger("user_level_log").\
                 info("All centred positions associated with this " + \
                      "sample will be lost, do you want to continue ?.")
 
@@ -832,7 +831,7 @@ class DataCollectTree(QWidget):
                 self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
                 item.setPixmap(0, QPixmap())
-                item.restoreBackgroundColor()
+                #item.setBackgroundColor(widget_colors.WHITE)
                 item.setSelected(False)
                 item.setText(1, '')
 
