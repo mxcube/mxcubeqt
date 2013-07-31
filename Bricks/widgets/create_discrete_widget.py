@@ -19,8 +19,6 @@ from widgets.widget_utils import DataModelInputBinder
 from create_task_base import CreateTaskBase
 
 from widgets.processing_widget import ProcessingWidget
-from BlissFramework.Utils import widget_colors
-
 
 class CreateDiscreteWidget(CreateTaskBase):
     def __init__(self,parent = None,name = None, fl = 0):
@@ -84,18 +82,16 @@ class CreateDiscreteWidget(CreateTaskBase):
         
 
     def init_models(self):
+        CreateTaskBase.init_models(self)
+        
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._bl_config_hwobj is not None:
             self._acquisition_parameters = self._bl_config_hwobj.\
-                                           get_default_acquisition_parameters()
-
-            self._path_template =  self._bl_config_hwobj.\
-                                  get_default_path_template()    
+                                           get_default_acquisition_parameters()    
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
         
         if self._beamline_setup_hwobj is not None:
             try:
@@ -125,46 +121,6 @@ class CreateDiscreteWidget(CreateTaskBase):
             self._acquisition_parameters.shutterless = has_shutter_less
 
 
-    def _prefix_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.DataCollectionQueueItem):
-            prefix = self._path_template.get_prefix()
-            item.get_model().set_name(prefix)
-            item.setText(0, item.get_model().get_name())
-
-
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-
-    def _run_number_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.DataCollectionQueueItem):
-            if str(new_value).isdigit():
-                item.get_model().set_number(int(new_value))
-                item.setText(0, item.get_model().get_name())
-
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-
-    def handle_path_conflict(self, widget, new_value):
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
-
-
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
 
@@ -188,29 +144,20 @@ class CreateDiscreteWidget(CreateTaskBase):
                 if shape.get_centred_positions()[0] is cpos:
                     self._shape_history._drawing_event.set_selected(shape)
 
-
-    def _selection_changed(self, tree_item):
+                    
+    def single_item_selection(self, tree_item):
+        CreateTaskBase.single_item_selection(self, tree_item)
+        
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             
-            self.setDisabled(False)
-            self.init_models()
-            sample_data_model = self.get_sample_item().get_model()
+            sample_data_model = self.get_sample_item(tree_item).get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
             self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
-           
-            (data_directory, proc_directory) = self.get_default_directory()
-                
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                             get_next_run_number(self._path_template)
         
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             self.setDisabled(False)
             data_collection = tree_item.get_model()
-            self._path_template = data_collection.acquisitions[0].path_template
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
 
@@ -228,20 +175,10 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                            self._path_template)
-        self._data_path_widget.update_data_model(self._path_template)
-        
 
-    def approve_creation(self):  
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if path_conflict:
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                      ' from another task. Correct the problem before adding to queue')
-
-        return not path_conflict
-
+    def approve_creation(self):
+        return CreateTaskBase.approve_creation(self)
+    
 
     def subwedges_for_inverse_beam(self, total_num_images, subwedge_size):
         number_of_subwedges = total_num_images/subwedge_size
@@ -255,7 +192,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, parent_task_node, sample):
+    def _create_task(self, sample):
         selected_positions = []
         tasks = []
 
@@ -300,6 +237,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         return tasks
 
+
     def create_dc(self, shapes, sample, run_number = None,
                   start_image = None, num_images = None, osc_start = None):
         tasks = []
@@ -309,10 +247,10 @@ class CreateDiscreteWidget(CreateTaskBase):
             
             if isinstance(shape, shape_history.Point):
                 sc = None
-                sample_item = self.get_sample_item()
+                sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
+                                    is_mounted_sample(sample)
                 
-                if (not shape.get_drawing()) or \
-                       (not self._tree_brick.is_mounted_sample_item(sample_item)):
+                if (not shape.get_drawing()) or (not sample_is_mounted):
                     sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     tasks.append(sc)
@@ -356,8 +294,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 dc.set_name(acq.path_template.get_prefix())
                 dc.set_number(acq.path_template.run_number)
-                #self._path_template.run_number += 1
-
                 dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
 
                 if sc:

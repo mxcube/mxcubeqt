@@ -141,26 +141,10 @@ class CreateCharWidget(CreateTaskBase):
         self._space_group_change(index)
         self._vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
 
-        
-    def _prefix_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.CharacterisationQueueItem):
-            prefix = self._path_template.get_prefix()
-            item.get_model().set_name(prefix)
-            item.setText(0, item.get_model().get_name())
-        
-
-    def _run_number_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.CharacterisationQueueItem):
-            if str(new_value).isdigit():
-                item.get_model().set_number(int(new_value))
-                item.setText(0, item.get_model().get_name())
-
 
     def init_models(self):
+        CreateTaskBase.init_models(self)
+        
         self._char = queue_model_objects.Characterisation()
         self._char_params = self._char.characterisation_parameters
         self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
@@ -170,11 +154,8 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters = self._bl_config_hwobj.\
                                            get_default_acquisition_parameters()
 
-            self._path_template =  self._bl_config_hwobj.\
-                                  get_default_path_template()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
 
         self._path_template.reference_image_prefix = 'ref'
 
@@ -210,27 +191,18 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters.transmission = transmission
 
 
-    def _selection_changed(self, tree_item):
+    def single_item_selection(self, tree_item):
+        CreateTaskBase.single_item_selection(self, tree_item)
+        
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self.setDisabled(False)
-            self.init_models()
-            sample_data_model = self.get_sample_item().get_model()
+            sample_data_model = self.get_sample_item(tree_item).get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
-            (data_directory, proc_directory) = self.get_default_directory()
-                
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory            
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                             get_next_run_number(self._path_template)
 
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             self.setDisabled(False)
             self._char = tree_item.get_model()
             data_collection = self._char.reference_image_collection
-            self._path_template = data_collection.acquisitions[0].path_template
-            
             self._char_params = self._char.characterisation_parameters
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
@@ -241,23 +213,7 @@ class CreateCharWidget(CreateTaskBase):
         self._set_space_group(self._char_params.space_group)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                            self._path_template)
-        self._data_path_widget.update_data_model(self._path_template)
         self._char_params_mib.set_model(self._char_params)
-
-
-    def handle_path_conflict(self, widget, new_value):
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
 
 
     def update_processing_parameters(self, crystal):
@@ -272,20 +228,12 @@ class CreateCharWidget(CreateTaskBase):
 
 
     def approve_creation(self):
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if path_conflict:
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                      ' from another task. Correct the problem before adding to queue')
-
-        return not path_conflict
-
+        return CreateTaskBase.approve_creation(self)
+        
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
-    def _create_task(self, parent_task_node, sample):
+    def _create_task(self, sample):
         selected_positions = []
         tasks = []
 
@@ -309,10 +257,10 @@ class CreateCharWidget(CreateTaskBase):
             
             if isinstance(shape, shape_history.Point):
                 sc = None
-                sample_item = self.get_sample_item()
+                sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
+                                    is_mounted_sample(sample)
                 
-                if (not shape.get_drawing()) or \
-                       (not self._tree_brick.is_mounted_sample_item(sample_item)):
+                if (not shape.get_drawing()) or (not sample_is_mounted):
                     sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     tasks.append(sc)

@@ -112,15 +112,13 @@ class CreateHelicalWidget(CreateTaskBase):
 
 
     def init_models(self):
+        CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._bl_config_hwobj is not None:
             self._acquisition_parameters = self._bl_config_hwobj.\
-                                           get_default_acquisition_parameters()
-
-            self._path_template =  self._bl_config_hwobj.\
-                                  get_default_path_template()    
+                                           get_default_acquisition_parameters()   
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
@@ -153,41 +151,10 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters.shutterless = has_shutter_less
 
 
-    def _prefix_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.DataCollectionQueueItem):
-            prefix = self._path_template.get_prefix()
-            item.get_model().set_name(prefix)
-            item.setText(0, item.get_model().get_name())
-        
-
-    def _run_number_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.DataCollectionQueueItem):
-            if str(new_value).isdigit():
-                item.get_model().set_number(int(new_value))
-                item.setText(0, item.get_model().get_name())
-
-
-    def get_prefix_type(self):
-        return 'hel'
-
-
-    def set_transmission(self, trans):
-        self._acq_widget.update_transmission(trans)
-
-
-    def set_tunable_energy(self, state):
-        self._acq_widget.set_tunable_energy(state)
-
-        
     def add_clicked(self):
         selected_shapes = self._shape_history.selected_shapes.values()
 
         if len(selected_shapes) == 2:
-
             p1 = selected_shapes[1]
             p2 = selected_shapes[0]
             
@@ -246,21 +213,6 @@ class CreateHelicalWidget(CreateTaskBase):
         self.show_selected_lines()
 
 
-    def handle_path_conflict(self, widget, new_value):
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
-
-
     def selected_items(self):
         selected_items = []
                 
@@ -283,6 +235,8 @@ class CreateHelicalWidget(CreateTaskBase):
 
 
     def approve_creation(self):
+        base_result = CreateTaskBase.approve_creation(self)
+    
         selected_lines = False
         
         if self.selected_items():
@@ -291,15 +245,7 @@ class CreateHelicalWidget(CreateTaskBase):
             logging.getLogger("user_level_log").\
                 info("No lines selected, please select one or more lines.")
 
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if path_conflict:
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                      ' from another task. Correct the problem before adding to queue')
-
-        return (not path_conflict) and selected_lines 
+        return base_result and selected_lines 
             
 
     def update_processing_parameters(self, crystal):
@@ -323,24 +269,15 @@ class CreateHelicalWidget(CreateTaskBase):
                     self._shape_history._drawing_event.set_selected(shape)
 
 
-    def _selection_changed(self, tree_item):
+    def single_item_selection(self, tree_item):
+        CreateTaskBase.single_item_selection(self, tree_item)
+                                                             
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self.setDisabled(False)
-            self.init_models()
-            sample_data_model = self.get_sample_item().get_model()
+            sample_data_model = self.get_sample_item(tree_item).get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
             self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
 
-            (data_directory, proc_directory) = self.get_default_directory()
-                
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                             get_next_run_number(self._path_template)
-        
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             self.setDisabled(False)
             data_collection = tree_item.get_model()
@@ -366,9 +303,8 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                            self._path_template)
-        self._data_path_widget.update_data_model(self._path_template)
 
-    def _create_task(self, parent_task_node, sample):
+    def _create_task(self,  sample):
         data_collections = []
         selected_items = self.selected_items()
 

@@ -62,7 +62,6 @@ class CreateWorkflowWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
         
-
         #self.connect(self._workflow_cbox, qt.SIGNAL('activated ( const QString &)'),
         #             self.workflow_selected)
 
@@ -75,84 +74,26 @@ class CreateWorkflowWidget(CreateTaskBase):
                 self._workflow_cbox.insertItem(workflow['name'])
 
 
-    def _prefix_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.GenericWorkflowQueueItem):
-            prefix = self._path_template.get_prefix()
-            item.get_model().set_name(prefix)
-            item.setText(0, item.get_model().get_name())
-        
-
-    def _run_number_ledit_change(self, new_value):
-        item = self._current_selected_item
-        
-        if isinstance(item, queue_item.GenericWorkflowQueueItem):
-            if str(new_value).isdigit():
-                item.get_model().set_number(int(new_value))
-                item.setText(0, item.get_model().get_name())
-
-
     def init_models(self):
-        self._path_template = queue_model_objects.PathTemplate()
+        CreateTaskBase.init_models(self)
 
 
-    def _selection_changed(self, tree_item):
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+    def single_item_selection(self, tree_item):
+        CreateTaskBase.single_item_selection(self, tree_item)
 
+        if isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
             self.setDisabled(False)
-            self.init_models()
-            sample_data_model = self.get_sample_item().get_model()
-
-            (data_directory, proc_directory) = self.get_default_directory()
-                
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                             get_next_run_number(self._path_template)
-
-        elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
-            self.setDisabled(False)
-            workflow_model = tree_item.get_model()
-            self._path_template = workflow_model.path_template
         else:
             self.setDisabled(True)
 
-        self._data_path_widget.update_data_model(self._path_template)
-
-
-    def handle_path_conflict(self, widget, new_value):
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
-
 
     def approve_creation(self):
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
-
-        if path_conflict:
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                      ' from another task. Correct the problem before adding to queue')
-
-        return not path_conflict
+        return CreateTaskBase.approve_creation(self)
     
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, dcg, sample):
+    def _create_task(self, sample):
         tasks = []
 
         path_template = copy.deepcopy(self._path_template)
