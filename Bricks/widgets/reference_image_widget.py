@@ -27,16 +27,14 @@ class ReferenceImageWidget(QWidget):
         self.acq_gbox.setInsideMargin(2)
         self.acq_gbox.setTitle("Acquisition")
         
-        self.acq_widget = AcquisitionWidget(self.acq_gbox, 
-                                            'horizontal',
-                                            layout = AcquisitionWidgetHorizontalLayout)
+        self.acq_widget = AcquisitionWidget(self.acq_gbox, 'horizontal')
         self.acq_widget.setBackgroundMode(QWidget.PaletteBackground)
         self.acq_widget.acq_widget_layout.child('inverse_beam_cbx').hide()
         self.acq_widget.acq_widget_layout.child('shutterless_cbx').hide()
         self.acq_widget.acq_widget_layout.child('subwedge_size_label').hide()
         self.acq_widget.acq_widget_layout.child('subwedge_size_ledit').hide()
         self.acq_widget.acq_widget_layout.setFixedHeight(130)
-       
+        #self.acq_widget.acq_widget_layout.setWidth(130)
 
         self.tool_box.addItem(self.page_layout, "Acquisition parameters")
 
