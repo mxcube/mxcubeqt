@@ -140,14 +140,17 @@ class DCParametersWidget(QWidget):
         self._acquisition_mib = DataModelInputBinder(self._data_collection.\
                                 acquisitions[0].acquisition_parameters)
         
-        self.path_widget.update_data_model(data_collection.\
-                                           acquisitions[0].path_template)
         self.acq_widget.update_data_model(data_collection.acquisitions[0].\
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\
                                           path_template)
+        
+        self.path_widget.update_data_model(data_collection.\
+                                           acquisitions[0].path_template)
+
+
         self.processing_widget.update_data_model(data_collection.\
-                                                     processing_parameters)
+                                                 processing_parameters)
 
         self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
 
