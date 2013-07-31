@@ -1,5 +1,8 @@
-import queue_model_objects_v1 as queue_model_objects
+import os
+import qtui
 import qt
+import queue_model_objects_v1 as queue_model_objects
+
 
 from widgets.widget_utils import DataModelInputBinder
 from widgets.processing_widget_vertical_layout \
@@ -19,14 +22,20 @@ class ProcessingWidget(qt.QWidget):
         self._model_mib = DataModelInputBinder(self._model)
 
         h_layout = qt.QHBoxLayout(self)
-        self.layout_widget = ProcessingWidgetVerticalLayout(self)
+        widget = self.acq_widget_layout = qtui.QWidgetFactory.\
+                 create(os.path.join(os.path.dirname(__file__),
+                                     'ui_files/processing_widget_vertical_layout.ui'))
+        
+        widget.reparent(self, qt.QPoint(0,0))
+        self.layout_widget = widget
+        
         h_layout.addWidget(self.layout_widget)
-        self.layout_widget.upload_radio.setDisabled(True)
-        self.layout_widget.use_code_radio.setDisabled(True)
-        self.layout_widget.path_ledit.setDisabled(True)
-        self.layout_widget.browse_button.setDisabled(True)
+        self.layout_widget.child('upload_radio').setDisabled(True)
+        self.layout_widget.child('use_code_radio').setDisabled(True)
+        self.layout_widget.child('path_ledit').setDisabled(True)
+        self.layout_widget.child('browse_button').setDisabled(True)
 
-        self.layout_widget.space_group_ledit.\
+        self.layout_widget.child('space_group_ledit').\
             insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
         
         #self._model_mib.bind_value_update('space_group',
@@ -35,51 +44,51 @@ class ProcessingWidget(qt.QWidget):
         #                                  None)
 
         self._model_mib.bind_value_update('cell_a',
-                                          self.layout_widget.a_ledit,
+                                          self.layout_widget.child('a_ledit'),
                                           float,
                                           None)
         
         self._model_mib.bind_value_update('cell_alpha',
-                                          self.layout_widget.alpha_ledit,
+                                          self.layout_widget.child('alpha_ledit'),
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('cell_b',
-                                          self.layout_widget.b_ledit,
+                                          self.layout_widget.child('b_ledit'),
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('cell_beta',
-                                          self.layout_widget.beta_ledit,
+                                          self.layout_widget.child('beta_ledit'),
                                           float,
                                           None)  
 
         self._model_mib.bind_value_update('cell_c',
-                                          self.layout_widget.c_ledit,
+                                          self.layout_widget.child('c_ledit'),
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('cell_gamma',
-                                          self.layout_widget.gamma_ledit,
+                                          self.layout_widget.child('gamma_ledit'),
                                           float,
                                           None)  
         
         self._model_mib.bind_value_update('num_residues',
-                                          self.layout_widget.num_residues_ledit,
+                                          self.layout_widget.child('num_residues_ledit'),
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('process_data',
-                                          self.layout_widget.use_processing,
+                                          self.layout_widget.child('use_processing'),
                                           bool,
                                           None)
 
         self._model_mib.bind_value_update('anomalous',
-                                          self.layout_widget.use_anomalous,
+                                          self.layout_widget.child('use_anomalous'),
                                           bool,
                                           None)
 
-        self.connect(self.layout_widget.space_group_ledit,
+        self.connect(self.layout_widget.child('space_group_ledit'),
                      qt.SIGNAL("activated(int)"),
                      self._space_group_change)    
 
@@ -96,7 +105,7 @@ class ProcessingWidget(qt.QWidget):
             index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
         
         self._space_group_change(index)
-        self.layout_widget.space_group_ledit.setCurrentItem(index)
+        self.layout_widget.child('space_group_ledit').setCurrentItem(index)
         
 
     def update_data_model(self, model):
