@@ -101,8 +101,8 @@ class CreateTaskBase(qt.QWidget):
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_items[0]
         
-        if isinstance(item, queue_item.TaskGroupQueueItem) and \
-               not isinstance(item, queue_item.TaskGroupItem):
+        if isinstance(item, queue_item.TaskQueueItem) and \
+               not isinstance(item, queue_item.DataCollectionGroupQueueItem):
 
             if str(new_value).isdigit():
                 item.get_model().set_number(int(new_value))
