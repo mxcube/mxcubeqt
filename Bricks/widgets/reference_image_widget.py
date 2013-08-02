@@ -1,6 +1,5 @@
 from qt import *
 
-
 from widgets.acquisition_widget import AcquisitionWidget
 from widgets.acquisition_widget_horizontal_layout import \
     AcquisitionWidgetHorizontalLayout
@@ -34,8 +33,7 @@ class ReferenceImageWidget(QWidget):
         self.acq_widget.acq_widget_layout.child('subwedge_size_label').hide()
         self.acq_widget.acq_widget_layout.child('subwedge_size_ledit').hide()
         self.acq_widget.acq_widget_layout.setFixedHeight(130)
-        #self.acq_widget.acq_widget_layout.setWidth(130)
-
+      
         self.tool_box.addItem(self.page_layout, "Acquisition parameters")
 
         self.main_layout.addWidget(self.gbox)
