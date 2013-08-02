@@ -39,6 +39,8 @@ class DCParametersWidget(QWidget):
         self.acq_widget = AcquisitionWidget(self.acq_gbox, 
                           layout = 'horizontal')
 
+        self.acq_widget.setFixedHeight(170)
+
         self.position_widget = SnapshotWidgetLayout(self)
         self._processing_gbox = QVGroupBox('Processing', self, 
                                            'processing_gbox')
