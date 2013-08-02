@@ -224,12 +224,13 @@ class CreateTaskBase(qt.QWidget):
             
 
     def selection_changed(self, items):
-        self._current_selected_items = items
+        if items:
+            self._current_selected_items = items
         
-        if len(items) == 1:
-            self.single_item_selection(items[0])
-        elif len(items) > 1:
-            self.multiple_item_selection(items)
+            if len(items) == 1:
+                self.single_item_selection(items[0])
+            elif len(items) > 1:
+                self.multiple_item_selection(items)
 
 
     def update_selection(self):
