@@ -33,7 +33,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.current_cpos = None
         self.__collection_stopped = False 
         self.current_view = None
-        self.ispyb_logged_in = False
 
         # Framework 2 hardware objects
         self.collect_hwobj = None
@@ -133,7 +132,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         vlayout.setSpacing(10)
         self.layout().addWidget(self.sample_changer_widget)
         self.layout().addWidget(self.dc_tree_widget)
-        self.enable_collect(self.ispyb_logged_in)
+        self.enable_collect(False)
 
  
     def refresh_sample_list(self):
@@ -200,43 +199,37 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.dc_tree_widget.populate_list_view(sample_list)
 
 
-
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,
                     is_inhouse = None):
-        # Tried to log into ISPyB but it didnt work for some reason,
-        # no valid session.
-        if session_id is '':
-            logging.getLogger("user_level_log").\
-                warning('Could not log into ISPyB, data will not be stored in ISPyB.')
-            logging.getLogger("user_level_log").\
-                warning('Could not log into ISPyB, using inhouse user to collect data.')
+        pass
+        # # Tried to log into ISPyB but it didnt work for some reason,
+        # # no valid session.
+        # if session_id is '':
+        #     logging.getLogger("user_level_log").\
+        #         warning('Could not log into ISPyB, data will not be stored in ISPyB.')
+        #     logging.getLogger("user_level_log").\
+        #         warning('Could not log into ISPyB, using inhouse user to collect data.')
             
-        #    try:
-        #        self._lims_hwobj.disable()
-        #    except:
-        #        logging.warning('Could not disable lims.')
-        #        traceback.print_exc()
+        # #    try:
+        # #        self._lims_hwobj.disable()
+        # #    except:
+        # #        logging.warning('Could not disable lims.')
+        # #        traceback.print_exc()
 
-            self.session_hwobj.set_inhouse(True)
-        else:
-            lims_client = self._lims_hwobj
-            samples = lims_client.get_samples(prop_id, session_id)
-            sc_content = self.get_sc_content()
+        #     self.session_hwobj.set_inhouse(True)
+        # else:
+        #     lims_client = self._lims_hwobj
+        #     samples = lims_client.get_samples(prop_id, session_id)
+        #     sc_content = self.get_sc_content()
 
-            #smp = self.dc_tree_widget.crosscheck_sample_lists(sc_content, samples)
-            
-            #if samples:
-                #self.dc_tree_widget.init_with_ispyb_data(samples)
 
-            
     def logged_in(self, logged_in):
         """
         Connected to the signal loggedIn of ProposalBrick2.
         The signal is emitted when a user was succesfully logged in.
         """
-        self.ispyb_logged_in = logged_in
-        self.enable_collect(self.ispyb_logged_in)
+        self.enable_collect(logged_in)
 
         if not logged_in:
             sc_content = self.get_sc_content()
