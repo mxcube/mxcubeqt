@@ -33,7 +33,14 @@ class QueueItem(QCheckListItem):
     bg_normal_brush = QBrush(Qt.white)
 
     def __init__(self, *args, **kwargs):
-        QCheckListItem.__init__(self, *args)
+        # All subclasses should have the following
+        # data attributes.
+        self.deletable = kwargs.pop('deletable', False)
+        controller = kwargs.pop('controller', None)
+        args = args + (controller, )
+
+        QCheckListItem.__init__(self, *args, **kwargs)
+
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
@@ -41,10 +48,7 @@ class QueueItem(QCheckListItem):
         self._queue_entry = None
         self._data_model = None
 
-        # All subclasses should have the following
-        # data attributes.
-        self.deletable = kwargs.get('deletable', False)
-
+        
 
     def activate(self):
          """
@@ -205,10 +209,11 @@ class QueueItem(QCheckListItem):
 
 
 class SampleQueueItem(QueueItem):
-    def __init__(self, parent, after, text,
-                 controller = QCheckListItem.CheckBoxController):
-        QueueItem.__init__(self, parent, after, text, controller,
-                           deletable = False)
+    def __init__(self, *args, **kwargs):
+        kwargs['controller'] = QCheckListItem.CheckBoxController
+        kwargs['deletable'] = False
+        
+        QueueItem.__init__(self, *args, **kwargs)
 
 
     def update_pin_icon(self):
@@ -222,11 +227,11 @@ class SampleQueueItem(QueueItem):
         
 
 class TaskQueueItem(QueueItem):
-    def __init__(self, parent, after, text,
-                 controller = QCheckListItem.CheckBoxController,
-                 deletable = True):
-        QueueItem.__init__(self, parent, after, text, controller,
-                           deletable = True)
+    def __init__(self, *args, **kwargs):
+        kwargs['controller'] = QCheckListItem.CheckBoxController
+        kwargs['deletable'] = True
+        
+        QueueItem.__init__(self, *args, **kwargs)
 
 
     def get_sample_view_item(self):
@@ -237,33 +242,33 @@ class TaskQueueItem(QueueItem):
 
 
 class DataCollectionGroupQueueItem(TaskQueueItem):
-    def __init__(self, parent, after, text):
-        TaskQueueItem.__init__(self, parent, after, text)
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
     
 
 class DataCollectionQueueItem(TaskQueueItem):
-    def __init__(self, parent, after, text):
-        TaskQueueItem.__init__(self, parent, after, text)
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
 
 
 class CharacterisationQueueItem(TaskQueueItem):
-    def __init__(self, parent, after, text):
-        TaskQueueItem.__init__(self, parent, after, text)
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
 
 
 class EnergyScanQueueItem(TaskQueueItem):
-    def __init__(self, parent, after, text):
-        TaskQueueItem.__init__(self, parent, after, text)
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, args, kwargs)
 
 
 class GenericWorkflowQueueItem(TaskQueueItem):
-    def __init__(self, parent, after, text):
-        TaskQueueItem.__init__(self, parent, after, text)
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
 
 
 class SampleCentringQueueItem(TaskQueueItem):
-    def __init__(self, parent, after, text):
-        TaskQueueItem.__init__(self, parent, after, text)
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
 
 
 #
