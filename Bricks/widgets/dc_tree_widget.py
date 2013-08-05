@@ -28,12 +28,8 @@ class DataCollectTree(QWidget):
         QWidget.__init__(self, parent, name)
 
         # Internal members
-        self._holder_length = None
-        self._current_item_name = None
-        self.collect_clicked = False
         self.collecting = False
         self.loaded_sample = (-1, -1)
-        #self._loaded_sample_item = None
         self.centring_method = 0
         self.queue_hwobj = None
         self.queue_model_hwobj = None
@@ -243,7 +239,6 @@ class DataCollectTree(QWidget):
     def rename_list_view_item(self):
         items = self.get_selected_items()
         if len(items) == 1:
-            self._current_item_name = str(items[0].text())
             items[0].setRenameEnabled(0, True);
             items[0].startRename(0);
 
@@ -262,19 +257,8 @@ class DataCollectTree(QWidget):
 
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
-
-                #message = "All centred positions associated with this " + \
-                #    "sample will be lost, do you want to continue ?."
-                #ans = QMessageBox.question(self,
-                #                           "Data collection",
-                #                           message,
-                #                           QMessageBox.Yes,
-                #                           QMessageBox.No,
-                #                           QMessageBox.NoButton)
-
                 ans = True
                 if ans:
-                    #self.clear_centred_positions_cb()
                     location = items[0].get_model().location
 
                     hl = 22
@@ -292,8 +276,6 @@ class DataCollectTree(QWidget):
                         logging.getLogger('queue_exec').\
                             info("Sample loaded")
                         items[0].setText(1, "Sample loaded")
-                        #self._loaded_sample_item.setPixmap(0, QPixmap())
-                        #self._loaded_sample_item = items[0]
                         items[0].setSelected(True)  
         else:
             logging.getLogget("user_level_log").\
@@ -312,7 +294,6 @@ class DataCollectTree(QWidget):
                 info("All centred positions associated with this " + \
                      "sample will be lost, do you want to continue ?.")
 
-            #self.clear_centred_positions_cb()
             location = items[0].get_model().location
             self.sample_changer_hwobj.unloadSample(22, 
                                                    sample_location = location)
@@ -349,66 +330,6 @@ class DataCollectTree(QWidget):
                                                     task_node.get_name())
 
 
-    def add_to_queue(self, task_list, parent_tree_item, set_on = True):
-        for task in task_list:
-            view_item = None
-            qe = None
-            
-            if isinstance(task, queue_model_objects.DataCollection):
-                view_item = queue_item.\
-                            DataCollectionQueueItem(parent_tree_item,
-                                                    parent_tree_item.lastItem(),
-                                                    task.get_name())
-                
-                qe = queue_entry.DataCollectionQueueEntry(view_item, task)
-                
-            elif isinstance(task, queue_model_objects.Characterisation):
-                view_item = queue_item.\
-                            CharacterisationQueueItem(parent_tree_item,
-                                                      parent_tree_item.lastItem(),
-                                                      task.get_name())
-
-                qe = queue_entry.CharacterisationGroupQueueEntry(view_item, task)
-            elif isinstance(task, queue_model_objects.EnergyScan):
-                view_item = queue_item.\
-                            EnergyScanQueueItem(parent_tree_item,
-                                                parent_tree_item.lastItem(),
-                                                task.get_name())
-
-                qe = queue_entry.EnergyScanQueueEntry(view_item, task)
-            elif isinstance(task, queue_model_objects.SampleCentring):
-                view_item = queue_item.\
-                            SampleCentringQueueItem(parent_tree_item,
-                                                    parent_tree_item.lastItem(),
-                                                    task.get_name())
-                
-                qe = queue_entry.SampleCentringQueueEntry(view_item, task)
-            elif isinstance(task, queue_model_objects.Sample):
-                view_item = queue_item.SampleQueueItem(parent_tree_item,
-                                                       parent_tree_item.lastItem(),
-                                                       task.get_name())
-            
-                qe = queue_entry.SampleQueueEntry(view_item, task)
-            elif isinstance(task, queue_model_objects.TaskGroup):
-                view_item = queue_item.\
-                            DataCollectionGroupQueueItem(parent_tree_item,
-                                                         parent_tree_item.lastItem(),
-                                                         task.get_name())
-            
-                qe = queue_entry.TaskGroupQueueEntry(view_item, task)
-                
-            if isinstance(task, queue_model_objects.Sample):
-                self.queue_hwobj.enqueue(qe)
-            else:
-                parent_tree_item.get_queue_entry().enqueue(qe)
-
-            view_item.setOpen(True)
-            view_item.setOn(set_on)
-
-            if isinstance(task, queue_model_objects.TaskNode) and task.get_children():
-                self.add_to_queue(task.get_children(), view_item, set_on)
-
-        
     def get_item_by_model(self, parent_node):
         it = QListViewItemIterator(self.sample_list_view)
         item = it.current()
@@ -551,9 +472,6 @@ class DataCollectTree(QWidget):
 
 
     def collect_stop_toggle(self):
-        #import sys; sys.stdout = sys.__stdout__; import pdb; pdb.set_trace()
-        #self.queue_model_hwobj.check_for_all_path_collisions()
-
         self.checked_items = self.get_checked_items()
         self.queue_hwobj.disable(False)
         
