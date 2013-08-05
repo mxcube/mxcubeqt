@@ -14,14 +14,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         BaseComponents.BlissWidget.__init__(self, *args)
 
         # Framwork-2 properties
-        self.addProperty("energy-scan", "string", "")
-        self.addProperty("transmission", "string", "")
-        self.addProperty("resolution", "string", "")
-        self.addProperty("diffractometer", "string", "")
-        self.addProperty("shape-history", "string", "/shape-history")
-        self.addProperty("session", "string", "/session")
         self.addProperty("bl_config", "string", "/bl-config")
-        self.addProperty("workflow", "string", "/ednaparams")   
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("queue_model", "string", "/queue-model")
 
@@ -32,6 +25,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.diffractometer_hwobj = None
         self.beamline_setup = None
         self.queue_model_hwobj = None
+        self.bl_config_hwobj = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -82,7 +76,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
 
-
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):
@@ -119,20 +112,38 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
 
             if self.beamline_setup_hwobj:
                 self.diffractometer_hwobj = self.beamline_setup_hwobj.diffractometer_hwobj
-                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-                self.diffractometer_hwobj.connect("minidiffStateChanged", self.diffractometer_changed)
+                
+                if self.diffractometer_hwobj:
+                    self.diffractometer_hwobj.connect("minidiffStateChanged",
+                                                      self.diffractometer_changed)
+                    
                 self.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
 
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
-                
+
+                if self.bl_config_hwobj:
+                    self.beamline_setup_hwobj.bl_config_hwobj = self.bl_config_hwobj
+
+                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+                                    
             else:
                 logging.getLogger('user_level_log').error('Could not load beamline setup '+\
                                                           'check configuration !.')
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
+
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
+                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+
+        elif property_name == 'bl_config':
+            self.bl_config_hwobj = self.getHardwareObject(new_value)
+
+            if self.beamline_setup_hwobj:
+                self.beamline_setup_hwobj.bl_config_hwobj = self.bl_config_hwobj
+                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+            
             
 
     def selection_changed(self, items):

@@ -1,20 +1,16 @@
-import queue_entry
-import gevent
-import gevent.event
-import pprint 
 import logging
+import gevent
 import queue_model_objects_v1 as queue_model_objects
 import queue_item
-import functools
 
+from collections import namedtuple
+from qt import *
 from BlissFramework import Icons
+from BlissFramework.Utils import widget_colors
 from widgets.collect_progress_widget_layout  import CollectProgressWidgetLayout
 from position_history_widget import COLLECTION_METHOD_NAME
-from qt import *
-from qttable import QTable, QTableItem
-from collections import namedtuple
 from widgets.confirm_dialog import ConfirmDialog
-from BlissFramework.Utils import widget_colors
+
 
 SCFilterOptions = namedtuple('SCFilterOptions', ['ALL_SAMPLES', 
                                                  'MOUNTED_SAMPLE',
@@ -31,13 +27,12 @@ class DataCollectTree(QWidget):
         self.collecting = False
         self.loaded_sample = (-1, -1)
         self.centring_method = 0
-        self.queue_hwobj = None
+        self.queue_controller_hwobj = None
         self.queue_model_hwobj = None
         self.beamline_setup_hwobj = None
 
         # HW-Object set by TreeBrick
         self.sample_changer_hwobj = None
-        self.diffractometer_hwobj = None
         self.hl_motor_hwobj = None
         self.tree_brick = self.parent()
 
@@ -48,7 +43,7 @@ class DataCollectTree(QWidget):
         # Callbacks TODO:Document better
         self.selection_changed_cb = None
         self.collect_stop_cb = None
-        self.clear_centred_positions_cb = None
+        #self.clear_centred_positions_cb = None
         self.run_cb = None
 
         # Layout
@@ -458,10 +453,10 @@ class DataCollectTree(QWidget):
 
 
     def continue_button_click(self):
-        if not self.queue_hwobj.is_paused():
-            self.queue_hwobj.set_pause(True)
+        if not self.queue_controller_hwobj.is_paused():
+            self.queue_controller_hwobj.set_pause(True)
         else:
-            self.queue_hwobj.set_pause(False)
+            self.queue_controller_hwobj.set_pause(False)
 
 
     def queue_paused_handler(self, state):
@@ -473,7 +468,7 @@ class DataCollectTree(QWidget):
 
     def collect_stop_toggle(self):
         self.checked_items = self.get_checked_items()
-        self.queue_hwobj.disable(False)
+        self.queue_controller_hwobj.disable(False)
         
         for item in self.checked_items:
             pt = item.get_model().get_path_template()
@@ -483,9 +478,9 @@ class DataCollectTree(QWidget):
                                 check_for_path_collisions(pt)
                 
                 if path_conflict:
-                    self.queue_hwobj.disable(True)
+                    self.queue_controller_hwobj.disable(True)
         
-        if self.queue_hwobj.is_disabled():
+        if self.queue_controller_hwobj.is_disabled():
             logging.getLogger("user_level_log").\
                 error('Can not start collect, see the tasks marked' +\
                       ' in the tree and solve the prorblems.')
@@ -550,13 +545,13 @@ class DataCollectTree(QWidget):
         self.run_cb()
         
         try:
-            self.queue_hwobj.execute()
+            self.queue_controller_hwobj.execute()
         except Exception, e:
             raise e
 
         
     def stop_collection(self):
-        self.queue_hwobj.stop()
+        self.queue_controller_hwobj.stop()
         self.queue_stop_handler()
 
 
@@ -704,7 +699,7 @@ class DataCollectTree(QWidget):
 
 
     def populate_list_view(self, sample_list):
-        self.queue_hwobj.clear()
+        self.queue_controller_hwobj.clear()
         self.queue_model_hwobj.clear_model('ispyb')
         self.sample_list_view.clear()
         self.queue_model_hwobj.select_model('ispyb')
@@ -716,43 +711,43 @@ class DataCollectTree(QWidget):
         self.set_sample_pin_icon()
     
 
-    def init_with_sc_content(self, sc_content):
-        try:
-            current_sample_loc = self.sample_changer_hwobj.getLoadedSampleLocation()
-            self.loaded_sample = (self.sample_changer_hwobj.currentBasket,
-                                  self.sample_changer_hwobj.currentSample)
-        except:
-            current_sample_loc = ('-1', '-1')
-            self.loaded_sample = (-1, -1)
+    # def init_with_sc_content(self, sc_content):
+    #     try:
+    #         current_sample_loc = self.sample_changer_hwobj.getLoadedSampleLocation()
+    #         self.loaded_sample = (self.sample_changer_hwobj.currentBasket,
+    #                               self.sample_changer_hwobj.currentSample)
+    #     except:
+    #         current_sample_loc = ('-1', '-1')
+    #         self.loaded_sample = (-1, -1)
 
-        self.queue_hwobj.clear()
-        self.queue_model_hwobj.clear_model('ispyb')
-        self.sample_list_view.clear()
-        self.queue_model_hwobj.select_model('ispyb')
+    #     self.queue_controller_hwobj.clear()
+    #     self.queue_model_hwobj.clear_model('ispyb')
+    #     self.sample_list_view.clear()
+    #     self.queue_model_hwobj.select_model('ispyb')
         
-        for sample_info in sc_content:
-            sample = queue_model_objects.Sample()
+    #     for sample_info in sc_content:
+    #         sample = queue_model_objects.Sample()
             
-            sample.loc_str = str(sample_info[1]) + ':' + str(sample_info[2])
-            sample.location = (sample_info[1], sample_info[2])
-            sample.set_name(sample.loc_str)
-            sample.set_enabled(False)
+    #         sample.loc_str = str(sample_info[1]) + ':' + str(sample_info[2])
+    #         sample.location = (sample_info[1], sample_info[2])
+    #         sample.set_name(sample.loc_str)
+    #         sample.set_enabled(False)
 
-            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-                                             get_model_root(), sample)
+    #         self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+    #                                          get_model_root(), sample)
             
-        self.set_sample_pin_icon()
+    #     self.set_sample_pin_icon()
 
 
-    def get_mounted_sample_item(self):
-        sample_items = queue_item.perform_on_children(self.sample_list_view,
-                                                   queue_item.is_sample,
-                                                   queue_item.get_item)
+    # def get_mounted_sample_item(self):
+    #     sample_items = queue_item.perform_on_children(self.sample_list_view,
+    #                                                queue_item.is_sample,
+    #                                                queue_item.get_item)
         
-        for item in sample_items:
-            if item.get_model().location == self.sample_changer_hwobj.\
-                    getLoadedSampleLocation():
-                return item
+    #     for item in sample_items:
+    #         if item.get_model().location == self.sample_changer_hwobj.\
+    #                 getLoadedSampleLocation():
+    #             return item
 
 
     def set_sample_pin_icon(self):
@@ -769,7 +764,6 @@ class DataCollectTree(QWidget):
                 self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
                 item.setPixmap(0, QPixmap())
-                #item.setBackgroundColor(widget_colors.WHITE)
                 item.setSelected(False)
                 item.setText(1, '')
 
@@ -783,40 +777,31 @@ class DataCollectTree(QWidget):
             item = it.current()
 
  
+    # def init_with_ispyb_data(self, lims_sample_list):
+    #     samples = {}
 
-    def init_with_ispyb_data(self, lims_sample_list):
-        samples = {}
+    #     for lims_sample in lims_sample_list:
+    #         sample = queue_model_objects.Sample()
+    #         self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+    #                                          get_model_root(), sample)
+    #         sample.init_from_lims_object(lims_sample)
+    #         samples[(sample.lims_container_location,
+    #                  sample.lims_sample_location)] = sample
 
-        for lims_sample in lims_sample_list:
-            sample = queue_model_objects.Sample()
-            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-                                             get_model_root(), sample)
-            sample.init_from_lims_object(lims_sample)
-            samples[(sample.lims_container_location,
-                     sample.lims_sample_location)] = sample
-
-        sample_item = self.sample_list_view.firstChild()
+    #     sample_item = self.sample_list_view.firstChild()
             
-        while(sample_item):
-            sample_node = samples.get(sample_item.get_model().location, None)
+    #     while(sample_item):
+    #         sample_node = samples.get(sample_item.get_model().location, None)
 
-            if sample_node:
-                sample_item.data = sample_node
-                label = sample_item.data.loc_str + ' - ' + \
-                        sample_item.data.get_display_name()
-                sample_item.setText(0, label)
+    #         if sample_node:
+    #             sample_item.data = sample_node
+    #             label = sample_item.data.loc_str + ' - ' + \
+    #                     sample_item.data.get_display_name()
+    #             sample_item.setText(0, label)
             
-            sample_item = sample_item.nextSibling()
+    #         sample_item = sample_item.nextSibling()
 
 
-    def __select_mounted_sample(self, sc_data):
-        k = 0
-        for sample_info in sc_data:
-            if sample_info[4] == 16:
-                return k
-            k += 1
-
-            
     def __tr(self,s,c = None):
         return qApp.translate("DataCollectTree", s, c)
 

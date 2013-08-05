@@ -37,7 +37,7 @@ class CreateTaskBase(qt.QWidget):
 
     def init_models(self):
         if self._bl_config_hwobj is not None:
-            self._path_template =  self._bl_config_hwobj.get_default_path_template()
+            self._path_template = self._bl_config_hwobj.get_default_path_template()
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
@@ -66,6 +66,12 @@ class CreateTaskBase(qt.QWidget):
             except AttributeError:
                 resolution = 0
 
+            try:
+                energy =  bl_setup_hwobj.energy_hwobj.getCurrentEnergy()
+            except AttributeError:
+                energy = 0
+                
+            self.set_energy(energy, 0)
             self.set_transmission(transmission)
             self.set_resolution(resolution)
 
@@ -81,9 +87,6 @@ class CreateTaskBase(qt.QWidget):
             except AttributeError as ex:
                 logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                    'more hardware objects' + str(ex))
-
-                energy =  bl_setup_hwobj.energy_hwobj.getCurrentEnergy()
-                self.set_energy(energy, 0)
 
         if self._data_path_widget:
             self._data_path_widget.set_session(self._session_hwobj)
