@@ -423,15 +423,35 @@ class DataCollectTree(QWidget):
         return self.sample_list_view
 
 
+    def last_top_level_item(self):
+        sibling = self.sample_list_view.firstChild()
+        last_child = None
+
+        while(sibling):
+            last_child = sibling
+            sibling = sibling.nextSibling()
+            
+        return last_child
+        
+
     def add_to_view(self, parent, task):
         view_item = None
         qe = None
         
         parent_tree_item = self.get_item_by_model(parent)
+
+        if parent_tree_item is self.sample_list_view:
+            last_item = self.last_top_level_item()
+        else:
+            last_item = parent_tree_item.lastItem()
         
         cls = queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
-        view_item = cls(parent_tree_item, parent_tree_item.lastItem(),
-                        task.get_name())
+
+        if parent_tree_item.lastItem():
+            view_item = cls(parent_tree_item, last_item,
+                            task.get_name())
+        else:
+            view_item = cls(parent_tree_item, task.get_name())
                 
         view_item.setOpen(True)
         self.queue_model_hwobj.view_created(view_item, task)
