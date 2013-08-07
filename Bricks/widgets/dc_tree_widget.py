@@ -1,33 +1,35 @@
+import qt
 import logging
 import gevent
 import queue_model_objects_v1 as queue_model_objects
 import queue_item
 
 from collections import namedtuple
-from qt import *
 from BlissFramework import Icons
 from BlissFramework.Utils import widget_colors
 from widgets.collect_progress_widget_layout  import CollectProgressWidgetLayout
-from position_history_widget import COLLECTION_METHOD_NAME
 from widgets.confirm_dialog import ConfirmDialog
 
 
-SCFilterOptions = namedtuple('SCFilterOptions', ['ALL_SAMPLES', 
-                                                 'MOUNTED_SAMPLE',
-                                                 'FREE_PIN'])
+from position_history_widget import COLLECTION_METHOD_NAME
+
+
+SCFilterOptions = namedtuple('SCFilterOptions', 
+                             ['ALL_SAMPLES', 'MOUNTED_SAMPLE', 'FREE_PIN'])
 
 SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2)
 
-class DataCollectTree(QWidget):
+
+class DataCollectTree(qt.QWidget):
     def __init__(self, parent = None, name = "data_collect", 
                  selection_changed = None):
-        QWidget.__init__(self, parent, name)
+        qt.QWidget.__init__(self, parent, name)
 
         # Internal members
         self.collecting = False
         self.loaded_sample = (-1, -1)
         self.centring_method = 0
-        self.queue_controller_hwobj = None
+        self.queue_hwobj = None
         self.queue_model_hwobj = None
         self.beamline_setup_hwobj = None
 
@@ -47,8 +49,11 @@ class DataCollectTree(QWidget):
         self.run_cb = None
 
         # Layout
+        self.setCaption("Data collect")
+
         self.confirm_dialog = ConfirmDialog(self)
         self.confirm_dialog.setModal(True)
+
         self.pin_pixmap = Icons.load("sample_axis.png")
         self.task_pixmap = Icons.load("task.png")
         self.play_pixmap = Icons.load("VCRPlay.png")
@@ -58,27 +63,34 @@ class DataCollectTree(QWidget):
         self.delete_pixmap = Icons.load("Delete2.png")
         self.ispyb_pixmap = Icons.load("SampleChanger2.png")
                         
-        self.up_button = QPushButton(self, "up_button")
+        self.up_button = qt.QPushButton(self, "up_button")
         self.up_button.setPixmap(self.up_pixmap)
-        self.delete_button = QPushButton(self, "delete_button")
+
+        self.delete_button = qt.QPushButton(self, "delete_button")
         self.delete_button.setPixmap(self.delete_pixmap)
         self.delete_button.setDisabled(True)
-        self.down_button = QPushButton(self, "down_button")
+
+        self.down_button = qt.QPushButton(self, "down_button")
         self.down_button.setPixmap(self.down_pixmap)
-        self.collect_button = QPushButton(self, "collect_button")
+
+        self.collect_button = qt.QPushButton(self, "collect_button")
+        self.collect_button.setText("Collect Queue")
         self.collect_button.setFixedWidth(120)
-        self.collect_button.setIconSet(QIconSet(self.play_pixmap))
-        self.continue_button = QPushButton(self, "ok_button")
+        self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
+
+        self.continue_button = qt.QPushButton(self, "ok_button")
         self.continue_button.setText('Pause')
         self.continue_button.setEnabled(True)
-        #self.progress_bar = CollectProgressWidgetLayout(self, "progress_bar")
 
-        self.sample_list_view = QListView(self, "sample_list_view")
-        self.sample_list_view.setSelectionMode(QListView.Extended)
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
-                                       QSizePolicy.Expanding))   
-        self.sample_list_view.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
-                                                        QSizePolicy.Expanding))
+        self.sample_list_view = qt.QListView(self, "sample_list_view")
+        self.sample_list_view.setSelectionMode(qt.QListView.Extended)
+        self.sample_list_view.header().setLabel(0, "Sample location", 280)
+        self.sample_list_view.header().setLabel(1, "Status", 125)
+
+        self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
+                                          qt.QSizePolicy.Expanding))   
+        self.sample_list_view.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
+                                                           qt.QSizePolicy.Expanding))
     
         self.sample_list_view.setSorting(-1)
         self.sample_list_view.addColumn("", 250)
@@ -93,73 +105,58 @@ class DataCollectTree(QWidget):
             .setResizeEnabled(0, 1)
         self.sample_list_view.header().show()
 
-        self.sample_list_view.setFrameShape(QListView.StyledPanel)
-        self.sample_list_view.setFrameShadow(QListView.Sunken)
+        self.sample_list_view.setFrameShape(qt.QListView.StyledPanel)
+        self.sample_list_view.setFrameShadow(qt.QListView.Sunken)
         self.sample_list_view.setRootIsDecorated(1)
-        self.sample_list_view.setSelected(self.sample_list_view.firstChild(), 
-                                          True)
+        self.sample_list_view.setSelected(self.sample_list_view.firstChild(), True)
         
-        self.languageChange()
-        
-        layout = QVBoxLayout(self,0,0, 'main_layout')
-        button_layout = QHBoxLayout(None, 0, 0, 'button_layout')
+        layout = qt.QVBoxLayout(self,0,0, 'main_layout')
+        button_layout = qt.QHBoxLayout(None, 0, 0, 'button_layout')
         button_layout.addWidget(self.up_button)
         button_layout.addWidget(self.down_button)
         layout.setSpacing(10)
         layout.addWidget(self.sample_list_view)
-        self.buttons_grid_layout = QGridLayout(2, 5)
+        self.buttons_grid_layout = qt.QGridLayout(2, 5)
         layout.addLayout(self.buttons_grid_layout)
         self.buttons_grid_layout.addLayout(button_layout, 0, 0)
         self.buttons_grid_layout.addWidget(self.delete_button, 0, 4)
         self.buttons_grid_layout.addWidget(self.collect_button, 1, 0)
         self.buttons_grid_layout.addWidget(self.continue_button, 1, 4)
+
+        self.clearWState(qt.Qt.WState_Polished)
         
-        #layout.addWidget(self.progress_bar)
-        
-        
-        self.clearWState(Qt.WState_Polished)
-        
-        QObject.connect(self.up_button, SIGNAL("clicked()"),
-                        self.up_click)
+        qt.QObject.connect(self.up_button, qt.SIGNAL("clicked()"), self.up_click)
+        qt.QObject.connect(self.down_button, qt.SIGNAL("clicked()"), self.down_click)
+        qt.QObject.connect(self.delete_button, qt.SIGNAL("clicked()"), self.delete_click)
+        qt.QObject.connect(self.collect_button, qt.SIGNAL("clicked()"), self.collect_stop_toggle)
 
-        QObject.connect(self.down_button, SIGNAL("clicked()"),
-                         self.down_click)
+        qt.QObject.connect(self.sample_list_view, qt.SIGNAL("selectionChanged()"),
+                           self.sample_list_view_selection)
 
-        QObject.connect(self.delete_button, SIGNAL("clicked()"),
-                        self.delete_click)
-      
-        QObject.connect(self.collect_button, SIGNAL("clicked()"),
-                        self.collect_stop_toggle)
+        qt.QObject.connect(self.sample_list_view,
+                           qt.SIGNAL("contextMenuRequested(QListViewItem *, const QPoint& , int)"),
+                           self.show_context_menu)
 
-        QObject.connect(self.sample_list_view, 
-                        SIGNAL("selectionChanged()"),
-                        self.sample_list_view_selection)
+        qt.QObject.connect(self.sample_list_view, 
+                           qt.SIGNAL("itemRenamed(QListViewItem *, int , const QString& )"),
+                           self.item_renamed)
 
-        QObject.connect(self.sample_list_view,
-                        SIGNAL("contextMenuRequested(QListViewItem *, const QPoint& , int)"),
-                        self.show_context_menu)
+        qt.QObject.connect(self.sample_list_view,
+                           qt.SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"),
+                           self.item_double_click)
 
-        QObject.connect(self.sample_list_view, 
-                        SIGNAL("itemRenamed(QListViewItem *, int , const QString& )"),
-                        self.item_renamed)
+        qt.QObject.connect(self.confirm_dialog, qt.PYSIGNAL("continue_clicked"),
+                           self.collect_items)
 
-        QObject.connect(self.sample_list_view,
-                        SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"),
-                        self.item_double_click)
-
-        QObject.connect(self.confirm_dialog,
-                        PYSIGNAL("continue_clicked"),
-                        self.collect_items)
-
-        QObject.connect(self.continue_button, SIGNAL("clicked()"),
-                        self.continue_button_click)
+        qt.QObject.connect(self.continue_button, qt.SIGNAL("clicked()"),
+                           self.continue_button_click)
 
 
         self.sample_list_view.viewport().installEventFilter(self)
 
 
     def eventFilter(self, _object, event):
-        if event.type() == QEvent.MouseButtonDblClick:
+        if event.type() == qt.QEvent.MouseButtonDblClick:
             self.show_details()
             return True
         else:
@@ -167,33 +164,33 @@ class DataCollectTree(QWidget):
 
 
     def show_context_menu(self, item, point, col):
-        menu = QPopupMenu(self.sample_list_view, "popup_menu")
+        menu = qt.QPopupMenu(self.sample_list_view, "popup_menu")
 
         if item:
             if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                menu.insertItem(QString("Rename"), self.rename_list_view_item)
+                menu.insertItem(qt.QString("Rename"), self.rename_list_view_item)
                 menu.insertSeparator(1)
-                menu.insertItem(QString("Remove"), self.delete_click)
+                menu.insertItem(qt.QString("Remove"), self.delete_click)
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
                 if not item.get_model().free_pin_mode:
-                    menu.insertItem(QString("Mount"), self.mount_sample)
-                    menu.insertItem(QString("Un-Mount"), self.unmount_sample)
+                    menu.insertItem(qt.QString("Mount"), self.mount_sample)
+                    menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
                 menu.insertSeparator(3)
-                #menu.insertItem(QString("Create Data Collection Group"), self.add_empty_task_node)
+                #menu.insertItem(qt.QString("Create Data Collection Group"), self.add_empty_task_node)
                 #menu.insertSeparator(5)
-                menu.insertItem(QString("Details"), self.show_details) 
+                menu.insertItem(qt.QString("Details"), self.show_details) 
                 menu.popup(point);
             else:
                 menu.popup(point);
-                #menu.insertItem(QString("Duplicate"), self.copy_generic_dc_list_item)
-                #menu.insertItem(QString("Rename"), self.rename_list_view_item)
+                #menu.insertItem(qt.QString("Duplicate"), self.copy_generic_dc_list_item)
+                #menu.insertItem(qt.QString("Rename"), self.rename_list_view_item)
                 menu.insertSeparator(2)
-                menu.insertItem(QString("Remove"), self.delete_click)
+                menu.insertItem(qt.QString("Remove"), self.delete_click)
                 menu.insertSeparator(4)
-                menu.insertItem(QString("Details"), self.show_details)
+                menu.insertItem(qt.QString("Details"), self.show_details)
             
-            menu.insertItem(QString("Collect"), self.context_collect_item)
+            menu.insertItem(qt.QString("Collect"), self.context_collect_item)
             
 
     def item_double_click(self):
@@ -326,7 +323,7 @@ class DataCollectTree(QWidget):
 
 
     def get_item_by_model(self, parent_node):
-        it = QListViewItemIterator(self.sample_list_view)
+        it = qt.QListViewItemIterator(self.sample_list_view)
         item = it.current()
     
         while item:
@@ -429,7 +426,7 @@ class DataCollectTree(QWidget):
             loaded_sample = self.sample_changer_hwobj.\
                             getLoadedSampleLocation()
 
-            it = QListViewItemIterator(self.sample_list_view)
+            it = qt.QListViewItemIterator(self.sample_list_view)
             item = it.current()
         
             while item:
@@ -453,10 +450,10 @@ class DataCollectTree(QWidget):
 
 
     def continue_button_click(self):
-        if not self.queue_controller_hwobj.is_paused():
-            self.queue_controller_hwobj.set_pause(True)
+        if not self.queue_hwobj.is_paused():
+            self.queue_hwobj.set_pause(True)
         else:
-            self.queue_controller_hwobj.set_pause(False)
+            self.queue_hwobj.set_pause(False)
 
 
     def queue_paused_handler(self, state):
@@ -468,7 +465,7 @@ class DataCollectTree(QWidget):
 
     def collect_stop_toggle(self):
         self.checked_items = self.get_checked_items()
-        self.queue_controller_hwobj.disable(False)
+        self.queue_hwobj.disable(False)
         
         for item in self.checked_items:
             pt = item.get_model().get_path_template()
@@ -478,9 +475,9 @@ class DataCollectTree(QWidget):
                                 check_for_path_collisions(pt)
                 
                 if path_conflict:
-                    self.queue_controller_hwobj.disable(True)
+                    self.queue_hwobj.disable(True)
         
-        if self.queue_controller_hwobj.is_disabled():
+        if self.queue_hwobj.is_disabled():
             logging.getLogger("user_level_log").\
                 error('Can not start collect, see the tasks marked' +\
                       ' in the tree and solve the prorblems.')
@@ -498,7 +495,7 @@ class DataCollectTree(QWidget):
                 message = "No data collections selected, please select one" + \
                           " or more data collections"
 
-                QMessageBox.information(self,
+                qt.QMessageBox.information(self,
                                         "Data collection",
                                         message,
                                         "OK")
@@ -541,17 +538,17 @@ class DataCollectTree(QWidget):
         
         self.collecting = True
         self.collect_button.setText("      Stop   ")
-        self.collect_button.setIconSet(QIconSet(self.stop_pixmap))
+        self.collect_button.setIconSet(qt.QIconSet(self.stop_pixmap))
         self.run_cb()
         
         try:
-            self.queue_controller_hwobj.execute()
+            self.queue_hwobj.execute()
         except Exception, e:
             raise e
 
         
     def stop_collection(self):
-        self.queue_controller_hwobj.stop()
+        self.queue_hwobj.stop()
         self.queue_stop_handler()
 
 
@@ -563,7 +560,7 @@ class DataCollectTree(QWidget):
     def queue_execution_completed(self, status):
         self.collecting = False
         self.collect_button.setText("Collect Queue")
-        self.collect_button.setIconSet(QIconSet(self.play_pixmap))
+        self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
 
@@ -643,17 +640,6 @@ class DataCollectTree(QWidget):
                     older_sibling.moveItem(item)
 
 
-    def languageChange(self):
-        self.setCaption(self.__tr("Data collect"))
-        self.collect_button.setText(self.__tr("Collect Queue"))
-        self.sample_list_view.header().setLabel(0, 
-                                                self.__tr("Sample location"), 
-                                                280)
-        self.sample_list_view.header().setLabel(1, 
-                                                self.__tr("Status"), 
-                                                125)
-
-
     def samples_from_sc_content(self, sc_content):
         sample_list = []
         
@@ -699,7 +685,7 @@ class DataCollectTree(QWidget):
 
 
     def populate_list_view(self, sample_list):
-        self.queue_controller_hwobj.clear()
+        self.queue_hwobj.clear()
         self.queue_model_hwobj.clear_model('ispyb')
         self.sample_list_view.clear()
         self.queue_model_hwobj.select_model('ispyb')
@@ -711,47 +697,8 @@ class DataCollectTree(QWidget):
         self.set_sample_pin_icon()
     
 
-    # def init_with_sc_content(self, sc_content):
-    #     try:
-    #         current_sample_loc = self.sample_changer_hwobj.getLoadedSampleLocation()
-    #         self.loaded_sample = (self.sample_changer_hwobj.currentBasket,
-    #                               self.sample_changer_hwobj.currentSample)
-    #     except:
-    #         current_sample_loc = ('-1', '-1')
-    #         self.loaded_sample = (-1, -1)
-
-    #     self.queue_controller_hwobj.clear()
-    #     self.queue_model_hwobj.clear_model('ispyb')
-    #     self.sample_list_view.clear()
-    #     self.queue_model_hwobj.select_model('ispyb')
-        
-    #     for sample_info in sc_content:
-    #         sample = queue_model_objects.Sample()
-            
-    #         sample.loc_str = str(sample_info[1]) + ':' + str(sample_info[2])
-    #         sample.location = (sample_info[1], sample_info[2])
-    #         sample.set_name(sample.loc_str)
-    #         sample.set_enabled(False)
-
-    #         self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-    #                                          get_model_root(), sample)
-            
-    #     self.set_sample_pin_icon()
-
-
-    # def get_mounted_sample_item(self):
-    #     sample_items = queue_item.perform_on_children(self.sample_list_view,
-    #                                                queue_item.is_sample,
-    #                                                queue_item.get_item)
-        
-    #     for item in sample_items:
-    #         if item.get_model().location == self.sample_changer_hwobj.\
-    #                 getLoadedSampleLocation():
-    #             return item
-
-
     def set_sample_pin_icon(self):
-        it = QListViewItemIterator(self.sample_list_view)
+        it = qt.QListViewItemIterator(self.sample_list_view)
         item = it.current()
 
         self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
@@ -763,7 +710,7 @@ class DataCollectTree(QWidget):
                 item.setSelected(True)
                 self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
-                item.setPixmap(0, QPixmap())
+                item.setPixmap(0, qt.QPixmap())
                 item.setSelected(False)
                 item.setText(1, '')
 
@@ -775,35 +722,6 @@ class DataCollectTree(QWidget):
         
             it += 1
             item = it.current()
-
- 
-    # def init_with_ispyb_data(self, lims_sample_list):
-    #     samples = {}
-
-    #     for lims_sample in lims_sample_list:
-    #         sample = queue_model_objects.Sample()
-    #         self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-    #                                          get_model_root(), sample)
-    #         sample.init_from_lims_object(lims_sample)
-    #         samples[(sample.lims_container_location,
-    #                  sample.lims_sample_location)] = sample
-
-    #     sample_item = self.sample_list_view.firstChild()
-            
-    #     while(sample_item):
-    #         sample_node = samples.get(sample_item.get_model().location, None)
-
-    #         if sample_node:
-    #             sample_item.data = sample_node
-    #             label = sample_item.data.loc_str + ' - ' + \
-    #                     sample_item.data.get_display_name()
-    #             sample_item.setText(0, label)
-            
-    #         sample_item = sample_item.nextSibling()
-
-
-    def __tr(self,s,c = None):
-        return qApp.translate("DataCollectTree", s, c)
 
 
 

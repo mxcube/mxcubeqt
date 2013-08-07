@@ -1,40 +1,30 @@
-import os
-import queue_model_objects_v1 as queue_model_objects
 import logging
-import copy
-
-from qt import *
-from qttable import QTable, QTableItem
+import qt
+import queue_model_objects_v1 as queue_model_objects
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.acquisition_widget import AcquisitionWidget
-from acquisition_widget_horizontal_layout import\
-    AcquisitionWidgetHorizontalLayout
 from widgets.widget_utils import DataModelInputBinder
-from widgets.snapshot_widget_layout import\
-    SnapshotWidgetLayout
-
-from widgets.processing_widget \
-    import ProcessingWidget
+from widgets.snapshot_widget_layout import SnapshotWidgetLayout
+from widgets.processing_widget import ProcessingWidget
 
 from queue_model_objects_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
 from BlissFramework import Icons
 
 
-class DCParametersWidget(QWidget):
+class DCParametersWidget(qt.QWidget):
     def __init__(self, parent = None, name = "parameter_widget"):
-        QWidget.__init__(self, parent, name)
+        qt.QWidget.__init__(self, parent, name)
         self._data_collection = None
         self.add_dc_cb = None
         self._tree_view_item = None
-        self.queue_controller_hwobj = None
         self.queue_model = None
 
 
         self.caution_pixmap = Icons.load("Caution2.png")
         self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
-        self.acq_gbox = QVGroupBox("Acquisition", self)
+        self.acq_gbox = qt.QVGroupBox("Acquisition", self)
         self.acq_gbox.setInsideMargin(2)
         self.acq_widget = AcquisitionWidget(self.acq_gbox, 
                           layout = 'horizontal')
@@ -42,19 +32,19 @@ class DCParametersWidget(QWidget):
         self.acq_widget.setFixedHeight(170)
 
         self.position_widget = SnapshotWidgetLayout(self)
-        self._processing_gbox = QVGroupBox('Processing', self, 
+        self._processing_gbox = qt.QVGroupBox('Processing', self, 
                                            'processing_gbox')
 
         self.processing_widget = ProcessingWidget(self._processing_gbox)
         
-        v_layout = QVBoxLayout(self, 11, 10, "main_layout")
-        rone_hlayout = QHBoxLayout(v_layout, 10, "rone")
-        rone_vlayout = QVBoxLayout(rone_hlayout)
-        rone_sv_layout = QVBoxLayout(rone_hlayout)
+        v_layout = qt.QVBoxLayout(self, 11, 10, "main_layout")
+        rone_hlayout = qt.QHBoxLayout(v_layout, 10, "rone")
+        rone_vlayout = qt.QVBoxLayout(rone_hlayout)
+        rone_sv_layout = qt.QVBoxLayout(rone_hlayout)
         
         rone_vlayout.addWidget(self.path_widget)
         rone_vlayout.addWidget(self.acq_gbox)
-        rtwo_hlayout = QHBoxLayout(rone_vlayout, 10, "rtwo")
+        rtwo_hlayout = qt.QHBoxLayout(rone_vlayout, 10, "rtwo")
         rone_vlayout.addStretch(10)
         
         rone_sv_layout.addWidget(self.position_widget)
@@ -66,21 +56,21 @@ class DCParametersWidget(QWidget):
         v_layout.addStretch()
 
 
-        self.connect(self.acq_widget, PYSIGNAL('mad_energy_selected'),
+        self.connect(self.acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
 
         
         self.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
-                     SIGNAL("textChanged(const QString &)"), 
+                     qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
 
         self.connect(self.path_widget.data_path_widget_layout.run_number_ledit,
-                     SIGNAL("textChanged(const QString &)"), 
+                     qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
         self.connect(self.path_widget,
-                     PYSIGNAL("path_template_changed"),
+                     qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
 
@@ -116,7 +106,7 @@ class DCParametersWidget(QWidget):
                 self._tree_view_item.setPixmap(0, self.caution_pixmap)
             else:
                 widget.setPaletteBackgroundColor(widget_colors.WHITE)
-                self._tree_view_item.setPixmap(0, QPixmap())
+                self._tree_view_item.setPixmap(0, qt.QPixmap())
 
 
     def __add_data_collection(self):
@@ -161,7 +151,7 @@ class DCParametersWidget(QWidget):
             image = data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             image = image.scale(427, 320)
-            self.position_widget.svideo.setPixmap(QPixmap(image))
+            self.position_widget.svideo.setPixmap(qt.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
 

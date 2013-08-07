@@ -38,15 +38,15 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.beamline_config_hwobj = None
         self._lims_hwobj = None
         self.sample_changer = None
-        self.queue_controller_hwobj = None
+        self.queue_hwobj = None
 
         # Properties
-        self.addProperty("lims_client", "string", "")
         self.addProperty("bl_config", "string", "/bl-config")
         self.addProperty("holderLengthMotor", "string", "")
-        self.addProperty("queue", "string", "/queue-controller")
+        self.addProperty("queue", "string", "/queue")
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
+        self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
 
         # Qt - Slots
         # From ProposalBrick2
@@ -151,20 +151,20 @@ class TreeBrick(BaseComponents.BlissWidget):
         if property_name == 'holder_length_motor':
             self.dc_tree_widget.hl_motor_hwobj = self.getHardwareObject(new_value)
 
-        elif property_name == 'queue':
-            self.queue_controller_hwobj = self.getHardwareObject(new_value)
-            self.dc_tree_widget.queue_controller_hwobj = self.queue_controller_hwobj
+        elif property_name == 'queue':            
+            self.queue_hwobj = self.getHardwareObject(new_value)
+            self.dc_tree_widget.queue_hwobj = self.queue_hwobj
             
-            self.connect(self.queue_controller_hwobj, 'show_workflow_tab',
+            self.connect(self.queue_hwobj, 'show_workflow_tab',
                          self.show_workflow_tab_from_model)
 
-            self.connect(self.queue_controller_hwobj, 'queue_paused', 
+            self.connect(self.queue_hwobj, 'queue_paused', 
                          self.dc_tree_widget.queue_paused_handler)
 
-            self.connect(self.queue_controller_hwobj, 'queue_execution_finished', 
+            self.connect(self.queue_hwobj, 'queue_execution_finished', 
                          self.dc_tree_widget.queue_execution_completed)
 
-            self.connect(self.queue_controller_hwobj, 'queue_stopped', 
+            self.connect(self.queue_hwobj, 'queue_stopped', 
                          self.dc_tree_widget.queue_stop_handler)
 
 
@@ -199,8 +199,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.connect(self.sample_changer_hwobj, 'stateChanged', 
                              self.sample_load_state_changed)
 
-
-            xml_rpc_server_hwobj = bl_setup.xml_rpc_server_hwobj
+        elif property_name == 'xml_rpc_server':
+            xml_rpc_server_hwobj = self.getHardwareObject(new_value)
 
             if xml_rpc_server_hwobj:
                 self.connect(xml_rpc_server_hwobj, 'add_to_queue',

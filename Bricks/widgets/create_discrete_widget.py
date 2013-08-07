@@ -199,8 +199,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         if not self._selected_positions:
             cpos = None
 
-            if self._tree_brick.diffractometer_hwobj:
-                pos_dict = self._tree_brick.diffractometer_hwobj.getPositions()
+            if self._beamline_setup_hwobj.diffractometer_hwobj:
+                pos_dict = self._beamline_setup_hwobj.diffractometer_hwobj.getPositions()
                 cpos = queue_model_objects.CentredPosition(pos_dict)
 
             logging.getLogger("user_level_log").\

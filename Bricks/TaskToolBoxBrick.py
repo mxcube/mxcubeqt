@@ -76,6 +76,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
 
+
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):

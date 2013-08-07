@@ -1,15 +1,11 @@
-import logging
-import sys
-import pprint
+import qt
 import html_template
 
 from widgets.dc_parameters_widget import DCParametersWidget
 from BlissFramework import BaseComponents
-from BlissFramework import Icons
-from qt import *
-
 
 __category__ = 'mxCuBE_v3'
+
 
 class DCParametersBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
@@ -28,34 +24,31 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         self.addProperty("session", "string", "/session")
         self.addProperty("bl-config", "string", "/bl-config")
         self.addProperty("queue-model", "string", "/queue-model")
-        self.addProperty("queue-controller", "string", "/queue-controller")
         
         # Layout
-        self.stack = QWidgetStack(self, 'stack')
+        self.stack = qt.QWidgetStack(self, 'stack')
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
 
-        self.toggle_page_button = QPushButton('View Results', 
+        self.toggle_page_button = qt.QPushButton('View Results', 
                                               self, 'toggle_page_button')
         self.toggle_page_button.setFixedWidth(100)
 
-        self.results_view = QTextBrowser(self, "results_view")
+        self.results_view = qt.QTextBrowser(self, "results_view")
         self.stack.addWidget(self.parameters_widget)
         self.stack.addWidget(self.results_view)
         
-        main_layout = QVBoxLayout(self)
+        main_layout = qt.QVBoxLayout(self)
         self.layout().addWidget(self.stack)
-        bottom_layout = QHBoxLayout(main_layout)
+        bottom_layout = qt.QHBoxLayout(main_layout)
         bottom_layout.addStretch()
         bottom_layout.addWidget(self.toggle_page_button)
 
         # Logic
         self.stack.raiseWidget(self.parameters_widget)
         self.parameters_widget.collection_type = None
-        QObject.connect(self.toggle_page_button, 
-                        SIGNAL('clicked()'),
-                        self.toggle_page)
+        qt.QObject.connect(self.toggle_page_button, qt.SIGNAL('clicked()'),
+                           self.toggle_page)
 
-        
         self.toggle_page_button.setDisabled(True)
 
 
@@ -98,5 +91,3 @@ class DCParametersBrick(BaseComponents.BlissWidget):
                 self.bl_config_hwobj)
         elif property_name == 'queue-model':            
             self.parameters_widget.queue_model_hwobj = self.getHardwareObject(new_value)
-        elif property_name == 'queue-controller':            
-            self.parameters_widget.queue_controller_hwobj = self.getHardwareObject(new_value)
