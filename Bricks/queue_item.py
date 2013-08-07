@@ -3,6 +3,7 @@ import random
 import copy
 import functools
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 import gevent
 import gevent.event
 import collections
@@ -13,11 +14,11 @@ import widgets.widget_utils
 
 from qt import *
 from widgets.position_history_widget import COLLECTION_METHOD_NAME
-from queue_model_objects_v1 import COLLECTION_ORIGIN
-from queue_model_objects_v1 import STRATEGY_COMPLEXITY
-from queue_model_objects_v1 import EXPERIMENT_TYPE
-from queue_model_objects_v1 import STRATEGY_OPTION
-from queue_model_objects_v1 import COLLECTION_ORIGIN_STR
+from queue_model_enumerables_v1 import COLLECTION_ORIGIN
+from queue_model_enumerables_v1 import STRATEGY_COMPLEXITY
+from queue_model_enumerables_v1 import EXPERIMENT_TYPE
+from queue_model_enumerables_v1 import STRATEGY_OPTION
+from queue_model_enumerables_v1 import COLLECTION_ORIGIN_STR
 
 
 class QueueItem(QCheckListItem):
@@ -258,7 +259,7 @@ class CharacterisationQueueItem(TaskQueueItem):
 
 class EnergyScanQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
-        TaskQueueItem.__init__(self, args, kwargs)
+        TaskQueueItem.__init__(self, *args, **kwargs)
 
 
 class GenericWorkflowQueueItem(TaskQueueItem):

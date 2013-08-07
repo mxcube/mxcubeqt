@@ -83,7 +83,8 @@ class CreateWorkflowWidget(CreateTaskBase):
 
         if isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
             self.setDisabled(False)
-        else:
+        elif not(isinstance(tree_item, queue_item.SampleQueueItem) or \
+                     isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
             self.setDisabled(True)
 
 

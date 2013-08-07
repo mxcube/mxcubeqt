@@ -2,6 +2,7 @@ import os
 import qtui
 import qt
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 
 
 from widgets.widget_utils import DataModelInputBinder
@@ -36,7 +37,7 @@ class ProcessingWidget(qt.QWidget):
         self.layout_widget.child('browse_button').setDisabled(True)
 
         self.layout_widget.child('space_group_ledit').\
-            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
+            insertStrList(queue_model_enumerables.XTAL_SPACEGROUPS)
         
         #self._model_mib.bind_value_update('space_group',
         #                                  self.layout_widget.space_group_ledit,
@@ -94,15 +95,15 @@ class ProcessingWidget(qt.QWidget):
 
 
     def _space_group_change(self, index):
-        self._model.space_group = queue_model_objects.\
-                                 XTAL_SPACEGROUPS[index]
+        self._model.space_group = queue_model_enumerables.\
+            XTAL_SPACEGROUPS[index]
 
 
     def _set_space_group(self, space_group):
         index = 0
 
-        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
-            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
+            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
         
         self._space_group_change(index)
         self.layout_widget.child('space_group_ledit').setCurrentItem(index)

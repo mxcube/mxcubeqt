@@ -7,6 +7,7 @@ import copy
 import widget_utils
 import math
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 
 from qt import *
 from widgets.data_path_widget import DataPathWidget
@@ -86,14 +87,13 @@ class CreateDiscreteWidget(CreateTaskBase):
         
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
-
-        if self._bl_config_hwobj is not None:
-            self._acquisition_parameters = self._bl_config_hwobj.\
-                                           get_default_acquisition_parameters()    
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-        
+               
         if self._beamline_setup_hwobj is not None:
+            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
+            self._acquisition_parameters = self._beamline_setup_hwobj.\
+                get_default_acquisition_parameters()
+
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
@@ -108,17 +108,18 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             try:
                 energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-                energy = round(float(energy), 2)
+                if energy:
+                    energy = round(float(energy), 2)
+                else:
+                    energy = round(float(-1), 2)
             except AttributeError:
                 energy = 0
 
             self._acquisition_parameters.resolution = resolution
             self._acquisition_parameters.energy = energy
             self._acquisition_parameters.transmission = transmission
-
-        if self._bl_config_hwobj:
-            has_shutter_less = self._bl_config_hwobj.detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
 
     def set_tunable_energy(self, state):
@@ -266,7 +267,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 acq.acquisition_parameters.collect_agent = \
-                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
+                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
                 acq.acquisition_parameters.\
                     centred_position = shape.get_centred_positions()[0]
                 acq.path_template = copy.deepcopy(self._path_template)
@@ -295,7 +296,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 dc.set_name(acq.path_template.get_prefix())
                 dc.set_number(acq.path_template.run_number)
-                dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.NATIVE
+                dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
 
                 if sc:
                     sc.set_task(dc)

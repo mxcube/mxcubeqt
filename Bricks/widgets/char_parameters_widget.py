@@ -1,6 +1,7 @@
 import os
 import array
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 
 from qt import *
 from qttable import QTable, QTableItem
@@ -19,7 +20,7 @@ from widgets.widget_utils import DataModelInputBinder
 from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
 
-from queue_model_objects_v1 import COLLECTION_ORIGIN
+from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
 
 class CharParametersWidget(QWidget):
@@ -237,7 +238,7 @@ class CharParametersWidget(QWidget):
 
 
         self.vertical_dimension_widget.space_group_ledit.\
-            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
+            insertStrList(queue_model_enumerables.XTAL_SPACEGROUPS)
 
 
         QObject.connect(self.char_type_widget.charact_type_tbox,
@@ -273,14 +274,14 @@ class CharParametersWidget(QWidget):
 
 
     def _space_group_change(self, index):
-        self._char_params.space_group = queue_model_objects.\
+        self._char_params.space_group = queue_model_enumerables.\
                                         XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
         index  = 0
         
-        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
-            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
+            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
         self.vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
