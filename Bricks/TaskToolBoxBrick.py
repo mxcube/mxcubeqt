@@ -14,7 +14,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         BaseComponents.BlissWidget.__init__(self, *args)
 
         # Framwork-2 properties
-        self.addProperty("bl_config", "string", "/bl-config")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("queue_model", "string", "/queue-model")
 
@@ -25,7 +24,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.diffractometer_hwobj = None
         self.beamline_setup = None
         self.queue_model_hwobj = None
-        self.bl_config_hwobj = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -123,9 +121,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
 
-                if self.bl_config_hwobj:
-                    self.beamline_setup_hwobj.bl_config_hwobj = self.bl_config_hwobj
-
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
                                     
             else:
@@ -138,14 +133,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
 
-        elif property_name == 'bl_config':
-            self.bl_config_hwobj = self.getHardwareObject(new_value)
-
-            if self.beamline_setup_hwobj:
-                self.beamline_setup_hwobj.bl_config_hwobj = self.bl_config_hwobj
-                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-            
-            
 
     def selection_changed(self, items):
         """

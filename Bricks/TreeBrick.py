@@ -41,7 +41,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.queue_hwobj = None
 
         # Properties
-        self.addProperty("bl_config", "string", "/bl-config")
         self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("queue", "string", "/queue")
         self.addProperty("queue_model", "string", "/queue-model")
@@ -176,13 +175,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                          self.dc_tree_widget.add_to_view)
 
             self.dc_tree_widget.populate_free_pin()
-        elif property_name == 'bl_config':
-            self.bl_config_hwobj = self.getHardwareObject(new_value)
-            has_shutter_less = self.bl_config_hwobj.detector_has_shutterless()
 
-            if has_shutter_less:
-                self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
-                
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
             
@@ -198,6 +191,11 @@ class TreeBrick(BaseComponents.BlissWidget):
 
                 self.connect(self.sample_changer_hwobj, 'stateChanged', 
                              self.sample_load_state_changed)
+
+            has_shutter_less = bl_setup.detector_has_shutterless()
+
+            if has_shutter_less:
+                self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
 
         elif property_name == 'xml_rpc_server':
             xml_rpc_server_hwobj = self.getHardwareObject(new_value)

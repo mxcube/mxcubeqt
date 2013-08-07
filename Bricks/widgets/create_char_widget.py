@@ -1,4 +1,5 @@
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 import queue_item
 import copy
 import widget_utils
@@ -106,7 +107,7 @@ class CreateCharWidget(CreateTaskBase):
 
         
         self._vertical_dimension_widget.space_group_ledit.\
-            insertStrList(queue_model_objects.XTAL_SPACEGROUPS)
+            insertStrList(queue_model_enumerables.XTAL_SPACEGROUPS)
 
         self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
                      SIGNAL("textChanged(const QString &)"), 
@@ -129,14 +130,14 @@ class CreateCharWidget(CreateTaskBase):
 
 
     def _space_group_change(self, index):
-       self._char_params.space_group = queue_model_objects.\
+       self._char_params.space_group = queue_model_enumerables.\
                                        XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
         index  = 0
         
-        if space_group in queue_model_objects.XTAL_SPACEGROUPS:
-            index = queue_model_objects.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
+            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
         self._vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
@@ -147,27 +148,13 @@ class CreateCharWidget(CreateTaskBase):
         
         self._char = queue_model_objects.Characterisation()
         self._char_params = self._char.characterisation_parameters
-        self._char_params.experiment_type = queue_model_objects.EXPERIMENT_TYPE.OSC
+        self._char_params.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        if self._bl_config_hwobj is not None:
-            self._acquisition_parameters = self._bl_config_hwobj.\
-                                           get_default_acquisition_parameters()
+        if self._beamline_setup_hwobj is not None:            
+            self._acquisition_parameters = self._beamline_setup_hwobj.\
+                get_default_acquisition_parameters()
 
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-
-        self._path_template.reference_image_prefix = 'ref'
-
-        # The num images drop down default value is 1
-        # we would like it to be 2
-        self._acquisition_parameters.num_images = 2
-        self._char.characterisation_software =\
-            queue_model_objects.COLLECTION_ORIGIN.EDNA
-        self._path_template.num_files = 2
-        self._acquisition_parameters.shutterless = False
-   
-        if self._beamline_setup_hwobj is not None:
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
@@ -189,7 +176,17 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters.resolution = resolution
             self._acquisition_parameters.energy = energy
             self._acquisition_parameters.transmission = transmission
-
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            
+        self._path_template.reference_image_prefix = 'ref'
+        # The num images drop down default value is 1
+        # we would like it to be 2
+        self._acquisition_parameters.num_images = 2
+        self._char.characterisation_software =\
+            queue_model_enumerables.COLLECTION_ORIGIN.EDNA
+        self._path_template.num_files = 2
+        self._acquisition_parameters.shutterless = False
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -277,7 +274,7 @@ class CreateCharWidget(CreateTaskBase):
                 acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 acq.acquisition_parameters.collect_agent = \
-                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
+                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
                 acq.acquisition_parameters.\
                     centred_position = shape.get_centred_positions()[0]
                 acq.path_template = copy.deepcopy(self._path_template)
@@ -294,7 +291,7 @@ class CreateCharWidget(CreateTaskBase):
                 # this is achived by setting overap to 89
                 acq.acquisition_parameters.overlap = 89
                 data_collection.acquisitions[0] = acq               
-                data_collection.experiment_type = queue_model_objects.EXPERIMENT_TYPE.EDNA_REF
+                data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
 
                 if sc:
                     sc.set_task(data_collection)

@@ -28,7 +28,6 @@ class CreateTaskBase(qt.QWidget):
          self._path_template = None
          self._energy_scan_result = None
          self._session_hwobj = None
-         self._bl_config_hwobj = None
          self._beamline_setup_hwobj = None
          
          qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
@@ -36,8 +35,8 @@ class CreateTaskBase(qt.QWidget):
 
 
     def init_models(self):
-        if self._bl_config_hwobj is not None:
-            self._path_template = self._bl_config_hwobj.get_default_path_template()
+        if self._beamline_setup_hwobj is not None:
+            self._path_template = self._beamline_setup_hwobj.get_default_path_template()
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
@@ -51,10 +50,9 @@ class CreateTaskBase(qt.QWidget):
         self._beamline_setup_hwobj = bl_setup_hwobj
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
-        self._bl_config_hwobj = bl_setup_hwobj.bl_config_hwobj
 
         if self._acq_widget:
-            self._acq_widget.set_bl_config(self._bl_config_hwobj)
+            self._acq_widget.set_beamline_setup(self._beamline_setup_hwobj)
 
             try:
                 transmission = bl_setup_hwobj.transmission_hwobj.getAttFactor()

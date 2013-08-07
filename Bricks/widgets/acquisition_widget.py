@@ -23,7 +23,7 @@ class AcquisitionWidget(qt.QWidget):
         #
         # Attributes
         #
-        self._bl_config = None
+        self._beamline_setup = None
 
         if acq_params is None:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
@@ -159,17 +159,17 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
 
 
-    def set_bl_config(self, bl_config):
-        self._bl_config = bl_config
+    def set_beamline_setup(self, beamline_setup):
+        self._beamline_setup = beamline_setup
 
-        te = bl_config.tunable_wavelength()
+        te = beamline_setup.tunable_wavelength()
         self.set_tunable_energy(te)
 
-        has_shutter_less = self._bl_config.detector_has_shutterless()
+        has_shutter_less = self._beamline_setup.detector_has_shutterless()
         self.acq_widget_layout.child('shutterless_cbx').setEnabled(has_shutter_less)
         self.acq_widget_layout.child('shutterless_cbx').setOn(has_shutter_less)
 
-        if self._bl_config.disable_num_passes():
+        if self._beamline_setup.disable_num_passes():
             self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
 
 
@@ -182,7 +182,7 @@ class AcquisitionWidget(qt.QWidget):
 
 
     def overlap_changed(self, new_value):
-        has_shutter_less = self._bl_config.detector_has_shutterless()
+        has_shutter_less = self._beamline_setup.detector_has_shutterless()
 
         if has_shutter_less:
             try:

@@ -115,15 +115,14 @@ class CreateHelicalWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
-
-        if self._bl_config_hwobj is not None:
-            self._acquisition_parameters = self._bl_config_hwobj.\
-                                           get_default_acquisition_parameters()   
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
-        
+  
         if self._beamline_setup_hwobj is not None:
+            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
+
+            self._acquisition_parameters = self._beamline_setup_hwobj.\
+                get_default_acquisition_parameters()
+
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
@@ -145,10 +144,9 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters.resolution = resolution
             self._acquisition_parameters.energy = energy
             self._acquisition_parameters.transmission = transmission
-
-        if self._bl_config_hwobj:
-            has_shutter_less = self._bl_config_hwobj.detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            self._path_template = queue_model_objects.PathTemplate()
 
 
     def add_clicked(self):

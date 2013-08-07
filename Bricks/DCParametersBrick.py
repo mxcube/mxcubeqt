@@ -22,8 +22,8 @@ class DCParametersBrick(BaseComponents.BlissWidget):
 
         # Properties
         self.addProperty("session", "string", "/session")
-        self.addProperty("bl-config", "string", "/bl-config")
         self.addProperty("queue-model", "string", "/queue-model")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
         
         # Layout
         self.stack = qt.QWidgetStack(self, 'stack')
@@ -85,9 +85,8 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         if property_name == 'session':
             session_hwobj = self.getHardwareObject(new_value)
             self.parameters_widget.path_widget.set_session(session_hwobj)
-        elif property_name == 'bl-config':            
-            self.bl_config_hwobj = self.getHardwareObject(new_value)
-            self.parameters_widget.set_bl_config(\
-                self.bl_config_hwobj)
+        elif property_name == 'beamline_setup':            
+            self.beamline_setup = self.getHardwareObject(new_value)
+            self.parameters_widget.set_beamline_setup(self.beamline_setup)
         elif property_name == 'queue-model':            
             self.parameters_widget.queue_model_hwobj = self.getHardwareObject(new_value)

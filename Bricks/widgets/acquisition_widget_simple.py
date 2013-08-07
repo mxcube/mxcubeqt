@@ -106,7 +106,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
         pass
 
 
-    def set_bl_config(self, bl_config):
+    def set_beamline_setup(self, bl_setup):
         pass
 
 
