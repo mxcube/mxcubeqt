@@ -13,3 +13,16 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+IO
+==
+.. automodule:: io
+   :members:
+
+Shape history
+=============
+.. automodule:: ShapeHistory
+   :members:
+
+
+
+

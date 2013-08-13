@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# MxCuBE 2.0[D[D[3~[3~[3~ documentation build configuration file, created by
+# MxCuBE 2.0 documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug 13 04:14:25 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -16,7 +16,16 @@ import sys, os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.append(os.path.abspath('.'))
+#MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
+#sys.path.insert(0, MXCUBE_ROOT)
+#os.environ["CUSTOM_BRICKS_PATH"]=os.path.join(MXCUBE_ROOT, "Bricks")
+#os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareObjects")
+
+sys.path.append(os.path.abspath('../..'))
+#sys.path.append(os.path.abspath('../../BlissFramework'))
+sys.path.append(os.path.abspath('../../HardwareRepository'))
+from HardwareRepository.BaseHardwareObjects import HardwareObject
+sys.path.append(os.path.abspath('../../HardwareObjects'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -25,7 +34,7 @@ import sys, os
 extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -37,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'MxCuBE 2.0[D[D[3~[3~[3~'
+project = u'MxCuBE 2.0'
 copyright = u'2013, MxCuBE Collaboration'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -120,7 +129,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -172,7 +181,7 @@ htmlhelp_basename = 'MxCuBE20DD333doc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'MxCuBE20DD333.tex', u'MxCuBE 2.0{[}D{[}D{[}3\\textasciitilde{}{[}3\\textasciitilde{}{[}3\\textasciitilde{} Documentation',
+  ('index', 'MxCuBE20.tex', u'MxCuBE 2.0 Documentation',
    u'MxCuBE Collaboration', 'manual'),
 ]
 
