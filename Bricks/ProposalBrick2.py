@@ -3,9 +3,6 @@ from BlissFramework import Icons
 from qt import *
 import logging
 import time
-from datetime import datetime
-import os
-import sys
 
 from BlissFramework.Utils import widget_colors
 
@@ -259,7 +256,7 @@ class ProposalBrick2(BlissWidget):
             except (TypeError,IndexError,ValueError):
                 expiration_time=0
 
-        is_inhouse=self.dbConnection.isInhouseUser(proposal["code"],proposal["number"])
+        is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
         win_title="%s (%s-%s)" % (self["titlePrefix"],\
             self.dbConnection.translate(proposal["code"],'gui'),\
             proposal["number"])
@@ -505,7 +502,8 @@ class ProposalBrick2(BlissWidget):
                                 break
 
         if todays_session is None:
-            if not self.dbConnection.isInhouseUser(proposal_code,proposal_number):
+            is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
+            if not is_inhouse:
                 if BlissWidget.isInstanceRoleClient():
                     self.refuseLogin(None,"You don't have a session scheduled for today!")
                     return

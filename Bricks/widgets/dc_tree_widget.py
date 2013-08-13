@@ -7,12 +7,7 @@ import queue_item
 from collections import namedtuple
 from BlissFramework import Icons
 from BlissFramework.Utils import widget_colors
-from widgets.collect_progress_widget_layout  import CollectProgressWidgetLayout
 from widgets.confirm_dialog import ConfirmDialog
-
-
-from position_history_widget import COLLECTION_METHOD_NAME
-
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
                              ['ALL_SAMPLES', 'MOUNTED_SAMPLE', 'FREE_PIN'])
@@ -51,7 +46,7 @@ class DataCollectTree(qt.QWidget):
         # Layout
         self.setCaption("Data collect")
 
-        self.confirm_dialog = ConfirmDialog(self)
+        self.confirm_dialog = ConfirmDialog(self, 'Confirm Dialog')
         self.confirm_dialog.setModal(True)
 
         self.pin_pixmap = Icons.load("sample_axis.png")
@@ -349,8 +344,6 @@ class DataCollectTree(qt.QWidget):
 
     def add_to_view(self, parent, task):
         view_item = None
-        qe = None
-        
         parent_tree_item = self.get_item_by_model(parent)
 
         if parent_tree_item is self.sample_list_view:

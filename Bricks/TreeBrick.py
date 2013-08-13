@@ -1,22 +1,13 @@
-import traceback
 import logging
-import sys
-import time
-import os
-
+import qt
 import queue_item
-import queue_model_objects_v1 as queue_model_objects
 
-from BlissFramework import Icons
-from widgets.dc_tree_widget import DataCollectTree
-from widgets.dc_tree_widget import SC_FILTER_OPTIONS
-from widgets.sample_changer_widget_layout import SampleChangerWidgetLayout
 from collections import namedtuple
-from BlissFramework import BaseComponents
-from BlissFramework import Icons
+from BlissFramework import Icons, BaseComponents
 from SampleChangerBrick import SC_STATE_COLOR
-from qt import *
 
+from widgets.dc_tree_widget import DataCollectTree
+from widgets.sample_changer_widget_layout import SampleChangerWidgetLayout
 
 __category__ = 'mxCuBE_v3'
 
@@ -94,13 +85,13 @@ class TreeBrick(BaseComponents.BlissWidget):
         #self.defineSignal("clear_centred_positions", ())
 
         # Layout
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
-                                       QSizePolicy.Expanding))
+        self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
+                                          qt.QSizePolicy.Expanding))
                                        
         self.sample_changer_widget = SampleChangerWidgetLayout(self)
         self.refresh_pixmap = Icons.load("Refresh2.png")
         self.sample_changer_widget.synch_button.\
-            setIconSet(QIconSet(self.refresh_pixmap))
+            setIconSet(qt.QIconSet(self.refresh_pixmap))
         self.sample_changer_widget.synch_button.setText("Synch ISPyB")
         
 
@@ -110,23 +101,23 @@ class TreeBrick(BaseComponents.BlissWidget):
         #self.dc_tree_widget.clear_centred_positions_cb = \
         #    self.clear_centred_positions
 
-        QObject.connect(self.sample_changer_widget.details_button, 
-                        SIGNAL("clicked()"),
-                        self.toggle_sample_changer_tab)
+        qt.QObject.connect(self.sample_changer_widget.details_button, 
+                           qt.SIGNAL("clicked()"),
+                           self.toggle_sample_changer_tab)
 
-        QObject.connect(self.sample_changer_widget.filter_cbox,
-                        SIGNAL("activated(int)"),
-                        self.dc_tree_widget.filter_sample_list)
+        qt.QObject.connect(self.sample_changer_widget.filter_cbox,
+                           qt.SIGNAL("activated(int)"),
+                           self.dc_tree_widget.filter_sample_list)
+        
+        qt.QObject.connect(self.sample_changer_widget.centring_cbox,
+                           qt.SIGNAL("activated(int)"),
+                           self.dc_tree_widget.set_centring_method)
 
-        QObject.connect(self.sample_changer_widget.centring_cbox,
-                        SIGNAL("activated(int)"),
-                        self.dc_tree_widget.set_centring_method)
+        qt.QObject.connect(self.sample_changer_widget.synch_button,
+                           qt.SIGNAL("clicked()"),
+                           self.refresh_sample_list)
 
-        QObject.connect(self.sample_changer_widget.synch_button,
-                        SIGNAL("clicked()"),
-                        self.refresh_sample_list)
-
-        vlayout = QVBoxLayout(self, 0, 0, 'main_layout')
+        vlayout = qt.QVBoxLayout(self, 0, 0, 'main_layout')
         vlayout.setSpacing(10)
         self.layout().addWidget(self.sample_changer_widget)
         self.layout().addWidget(self.dc_tree_widget)
@@ -135,14 +126,14 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     # Framework 2 method
     def run(self):
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_centring_tab"), (False,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_centring_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
 
     # Framework 2 method
@@ -356,7 +347,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         
         try:
             sc_content = self.sample_changer_hwobj.getMatrixCodes()            
-        except Exception as ex:
+        except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
@@ -405,7 +396,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
         self.sample_changer_widget.details_button.\
-            setPaletteBackgroundColor(QColor(s_color))
+            setPaletteBackgroundColor(qt.QColor(s_color))
 
 
     #def set_holder_length(self, position):
@@ -414,87 +405,87 @@ class TreeBrick(BaseComponents.BlissWidget):
     
     def show_sample_centring_tab(self):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_centring_tab"), (False,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_centring_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
 
     def show_sample_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("populate_sample_details"), (item.get_model(),))
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_centring_tab"), (False,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (False,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("populate_sample_details"), (item.get_model(),))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_centring_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_dcg_tab(self):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dcg_tab"), (False,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
 
     def populate_parameters_tab(self, item = None):
-        self.emit(PYSIGNAL("populate_parameter_widget"),
+        self.emit(qt.PYSIGNAL("populate_parameter_widget"),
                   (item,))
         
 
     def show_datacollection_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (False,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_parameters_tab(item)
 
 
     def show_edna_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (False,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,))
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_edna_parameters_tab(item)
 
 
     def populate_edna_parameters_tab(self, item):
-        self.emit(PYSIGNAL("populate_edna_parameter_widget"),
+        self.emit(qt.PYSIGNAL("populate_edna_parameter_widget"),
                   (item,))
 
 
     def show_energy_scan_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,)) 
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (False,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_energy_scan_tab(item)
 
 
     def populate_energy_scan_tab(self, item):
-        self.emit(PYSIGNAL("populate_energy_scan_widget"), (item,))
+        self.emit(qt.PYSIGNAL("populate_energy_scan_widget"), (item,))
 
 
     def show_workflow_tab_from_model(self, model):
@@ -504,47 +495,47 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def show_workflow_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show details")
-        self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-        self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(PYSIGNAL("hide_edna_tab"), (True,))
-        self.emit(PYSIGNAL("hide_sample_tab"), (True,)) 
-        self.emit(PYSIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(PYSIGNAL("hide_workflow_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
         self.populate_workflow_tab(item)
 
 
     def populate_workflow_tab(self, item):
-        self.emit(PYSIGNAL("populate_workflow_tab"), (item,))
+        self.emit(qt.PYSIGNAL("populate_workflow_tab"), (item,))
         
 
     def toggle_sample_changer_tab(self): 
         if self.current_view is self.sample_changer_widget:
             self.current_view = None
-            self.emit(PYSIGNAL("hide_sample_changer_tab"), (True,))
+            self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
             self.dc_tree_widget.sample_list_view_selection()
             self.sample_changer_widget.details_button.setText("Show details")
 
         else:
             self.current_view = self.sample_changer_widget
-            self.emit(PYSIGNAL("hide_dc_parameters_tab"), (True,))
-            self.emit(PYSIGNAL("hide_dcg_tab"), (True,))
-            self.emit(PYSIGNAL("hide_sample_changer_tab"), (False,))
+            self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+            self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+            self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (False,))
             self.sample_changer_widget.details_button.setText("Hide details")
-            self.emit(PYSIGNAL("hide_sample_tab"), (True,))
+            self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         
 
     def selection_changed(self, items):
         if len(items) == 1:
             item = items[0]
             if isinstance(item, queue_item.SampleQueueItem):
-                self.emit(PYSIGNAL("populate_sample_details"), (item.get_model(),))
+                self.emit(qt.PYSIGNAL("populate_sample_details"), (item.get_model(),))
             elif isinstance(item, queue_item.DataCollectionQueueItem):
                 self.populate_parameters_tab(item)
             elif isinstance(item, queue_item.CharacterisationQueueItem):
                 self.populate_edna_parameters_tab(item)
 
-        self.emit(PYSIGNAL("selection_changed"), (items,))
+        self.emit(qt.PYSIGNAL("selection_changed"), (items,))
 
 
     # def new_centred_positions(self, state, centring_status):

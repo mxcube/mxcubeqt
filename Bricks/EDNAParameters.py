@@ -5,14 +5,12 @@ when the workflow engine needs some
 
 import types
 import logging
-import tempfile
 import os
 from qt import *
 from lxml import etree
 from BlissFramework.BaseComponents import BlissWidget
 #from XSDataMXv1 import XSDataCharacterisation
 from XSDataMXCuBEv1_3 import XSDataResultMXCuBE
-from XSDataMXCuBEv1_3 import XSDataMXCuBEParameters
 from ednaxmlhelper import get_field_containers, get_fields
 from paramsgui import FieldsWidget
 

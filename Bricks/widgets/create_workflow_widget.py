@@ -1,15 +1,10 @@
 import qt
-import logging
 import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
-import sys
-import os
 import MxLookupScanBrick
 
-
 from create_task_base import CreateTaskBase
-from BlissFramework.Utils import widget_colors
 from widgets.data_path_widget import DataPathWidget
 from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout

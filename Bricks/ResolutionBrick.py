@@ -1,5 +1,4 @@
 import logging
-import types
 
 from qt import *
 from BlissFramework.BaseComponents import BlissWidget
@@ -461,8 +460,9 @@ class ResolutionBrick(BlissWidget):
             self.setDetectorDistance(val)
 
     def setResolutionWidgetColor(self,state=None):
-        if state is None:
-            state=self.detectorMotor.NOTINITIALIZED
+        pass
+        #if state is None:
+        #    state=self.detectorMotor.NOTINITIALIZED
 
         #if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
         #    self.currentResolution.setDisabledLook(True)
@@ -472,8 +472,9 @@ class ResolutionBrick(BlissWidget):
         self.resolutionStateChanged(state)
 
     def setDetectorWidgetColor(self,state=None):
-        if state is None:
-            state=self.detectorMotor.NOTINITIALIZED
+        pass
+        #if state is None:
+        #    state=self.detectorMotor.NOTINITIALIZED
 
         #if state==self.detectorMotor.NOTINITIALIZED or state==self.detectorMotor.UNUSABLE:
         #    self.currentDetectorDistance.setDisabledLook(True)
@@ -483,41 +484,42 @@ class ResolutionBrick(BlissWidget):
         #self.detectorStateChanged(state)
 
     def resolutionStateChanged(self,state):
-        if state==self.detectorMotor.MOVESTARTED:
-            self.updateAngHistory(self.resolutionMotor.getPosition())
+        if self.detectorMotor is not None:
+            if state==self.detectorMotor.MOVESTARTED:
+                self.updateAngHistory(self.resolutionMotor.getPosition())
 
-        color=ResolutionBrick.STATE_COLORS[state]
-        unit=self.units.currentText()
-        if unit==chr(197):
-            if state==self.detectorMotor.READY:
-                self.newValue.blockSignals(True)
-                self.newValue.setText("")
-                self.newValue.blockSignals(False)
-                self.newValue.setEnabled(True)
-                #self.applyButton.setEnabled(True)
-            else:
-                self.newValue.setEnabled(False)
-                #self.applyButton.setEnabled(False)
-            if state==self.detectorMotor.MOVING or state==self.detectorMotor.MOVESTARTED:
-                self.stopButton.setEnabled(True)
-            else:
-                self.stopButton.setEnabled(False)
-        
-            self.newValue.setPaletteBackgroundColor(color)
+            color=ResolutionBrick.STATE_COLORS[state]
+            unit=self.units.currentText()
+            if unit==chr(197):
+                if state==self.detectorMotor.READY:
+                    self.newValue.blockSignals(True)
+                    self.newValue.setText("")
+                    self.newValue.blockSignals(False)
+                    self.newValue.setEnabled(True)
+                    #self.applyButton.setEnabled(True)
+                else:
+                    self.newValue.setEnabled(False)
+                    #self.applyButton.setEnabled(False)
+                if state==self.detectorMotor.MOVING or state==self.detectorMotor.MOVESTARTED:
+                    self.stopButton.setEnabled(True)
+                else:
+                    self.stopButton.setEnabled(False)
 
-            if state==self.detectorMotor.READY:
-                if self.originalBackgroundColor is None:
-                    self.originalBackgroundColor=self.paletteBackgroundColor()
-                color=self.originalBackgroundColor
+                self.newValue.setPaletteBackgroundColor(color)
 
-            w_palette=self.newValue.palette()
-            try:
-                cg=self.colorGroupDict[state]
-            except KeyError:
-                cg=QColorGroup(w_palette.disabled())
-                cg.setColor(cg.Background,color)
-                self.colorGroupDict[state]=cg
-            w_palette.setDisabled(cg)
+                if state==self.detectorMotor.READY:
+                    if self.originalBackgroundColor is None:
+                        self.originalBackgroundColor=self.paletteBackgroundColor()
+                    color=self.originalBackgroundColor
+
+                w_palette=self.newValue.palette()
+                try:
+                    cg=self.colorGroupDict[state]
+                except KeyError:
+                    cg=QColorGroup(w_palette.disabled())
+                    cg.setColor(cg.Background,color)
+                    self.colorGroupDict[state]=cg
+                w_palette.setDisabled(cg)
 
     def detectorStateChanged(self,state):
         if state==self.detectorMotor.MOVESTARTED:
