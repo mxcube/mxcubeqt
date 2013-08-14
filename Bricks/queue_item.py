@@ -1,37 +1,17 @@
-import time
-import random
-import copy
-import functools
 import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
-import gevent
-import gevent.event
-import collections
-import logging
-import os
-import pprint
-import widgets.widget_utils
+import qt
 
-from qt import *
-from widgets.position_history_widget import COLLECTION_METHOD_NAME
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN
-from queue_model_enumerables_v1 import STRATEGY_COMPLEXITY
-from queue_model_enumerables_v1 import EXPERIMENT_TYPE
-from queue_model_enumerables_v1 import STRATEGY_OPTION
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN_STR
-
-
-class QueueItem(QCheckListItem):
+class QueueItem(qt.QCheckListItem):
     """
     Use this class to create a new type of item for the collect tree/queue.
     """
 
-    normal_brush = QBrush(Qt.black)
-    highlighted_brush = QBrush(QColor(128, 128, 128))
-    normal_pen = QPen(Qt.black)
-    highlighted_pen = QPen(QColor(128, 128, 128))
-    bg_brush = QBrush(QColor(0, 128, 0))
-    bg_normal_brush = QBrush(Qt.white)
+    normal_brush = qt.QBrush(qt.Qt.black)
+    highlighted_brush = qt.QBrush(qt.QColor(128, 128, 128))
+    normal_pen = qt.QPen(qt.Qt.black)
+    highlighted_pen = qt.QPen(qt.QColor(128, 128, 128))
+    bg_brush = qt.QBrush(qt.QColor(0, 128, 0))
+    bg_normal_brush = qt.QBrush(qt.Qt.white)
 
     def __init__(self, *args, **kwargs):
         # All subclasses should have the following
@@ -40,7 +20,7 @@ class QueueItem(QCheckListItem):
         controller = kwargs.pop('controller', None)
         args = args + (controller, )
 
-        QCheckListItem.__init__(self, *args, **kwargs)
+        qt.QCheckListItem.__init__(self, *args, **kwargs)
 
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
@@ -56,11 +36,11 @@ class QueueItem(QCheckListItem):
          Inherited from QCheckListitem, called whenever the user presses the 
          mouse on this item or presses Space on it. 
          """
-         QCheckListItem.activate(self)
+         qt.QCheckListItem.activate(self)
 
 
     def stateChange(self, state):
-        QCheckListItem.stateChange(self, state)
+        qt.QCheckListItem.stateChange(self, state)
         # The QCheckListItem is somewhat tricky:
         # state = 0     The item is unchecked.
         #
@@ -98,12 +78,12 @@ class QueueItem(QCheckListItem):
 
         try:
             painter.save()
-            color_group = QColorGroup(color_group)
-            color_group.setColor(QColorGroup.Text, self.brush.color())
-            color_group.setBrush(QColorGroup.Text, self.brush)
-            color_group.setColor(QColorGroup.Base, self.bg_brush.color())
+            color_group = qt.QColorGroup(color_group)
+            color_group.setColor(qt.QColorGroup.Text, self.brush.color())
+            color_group.setBrush(qt.QColorGroup.Text, self.brush)
+            color_group.setColor(qt.QColorGroup.Base, self.bg_brush.color())
 
-            QCheckListItem.paintCell(self, painter, color_group, 
+            qt.QCheckListItem.paintCell(self, painter, color_group, 
                                      column, width, align)
         finally:
             painter.restore()
@@ -117,17 +97,17 @@ class QueueItem(QCheckListItem):
         can be worth reading.
         """
 
-        color_group.setColor(QColorGroup.Text, self.brush.color())
-        color_group.setBrush(QColorGroup.Text, self.brush)
+        color_group.setColor(qt.QColorGroup.Text, self.brush.color())
+        color_group.setBrush(qt.QColorGroup.Text, self.brush)
 
-        QCheckListItem.paintFocus(self, painter, color_group, rect)
+        qt.QCheckListItem.paintFocus(self, painter, color_group, rect)
 
-        color_group.setColor(QColorGroup.Text, self.normal_brush.color())
-        color_group.setBrush(QColorGroup.Text, self.normal_brush)
+        color_group.setColor(qt.QColorGroup.Text, self.normal_brush.color())
+        color_group.setBrush(qt.QColorGroup.Text, self.normal_brush)
 
 
     def moveItem(self, after):
-        QCheckListItem.moveItem(self, after)
+        qt.QCheckListItem.moveItem(self, after)
         container_qe = self.get_queue_entry().get_container()
         after_qe = after.get_queue_entry()
         container_qe.swap(after_qe, self.get_queue_entry())
@@ -152,7 +132,7 @@ class QueueItem(QCheckListItem):
 
     def setBackgroundColor(self, color):
         self.previous_bg_brush = self.bg_brush
-        self.bg_brush = QBrush(color)
+        self.bg_brush = qt.QBrush(color)
 
 
     def restoreBackgroundColor(self):
@@ -175,7 +155,7 @@ class QueueItem(QCheckListItem):
 
 
     def setOn(self, state):
-        QCheckListItem.setOn(self, state)
+        qt.QCheckListItem.setOn(self, state)
 
         if self._queue_entry:
             self._queue_entry.set_enabled(state)
@@ -195,23 +175,23 @@ class QueueItem(QCheckListItem):
     def get_model(self):
         return self._data_model
 
+    # Unused
+    # def get_next_free_name(self, name):
+    #     names = []
+    #     current_item = self.firstChild()
 
-    def get_next_free_name(self, name):
-        names = []
-        current_item = self.firstChild()
+    #     while current_item:
+    #         names.append(str(current_item.text()))
+    #         current_item = current_item.nextSibling()
 
-        while current_item:
-            names.append(str(current_item.text()))
-            current_item = current_item.nextSibling()
+    #     num = widgets.widget_utils.next_free_name(names, name)
 
-        num = widgets.widget_utils.next_free_name(names, name)
-
-        return name + ' - ' + str(num)
+    #     return name + ' - ' + str(num)
 
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        kwargs['controller'] = QCheckListItem.CheckBoxController
+        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
         kwargs['deletable'] = False
         
         QueueItem.__init__(self, *args, **kwargs)
@@ -221,7 +201,7 @@ class SampleQueueItem(QueueItem):
         dc_tree_widget = self.listView().parent()
 
         if  dc_tree_widget._loaded_sample_item:
-            dc_tree_widget._loaded_sample_item.setPixmap(0, QPixmap())
+            dc_tree_widget._loaded_sample_item.setPixmap(0, qt.QPixmap())
             
         dc_tree_widget._loaded_sample_item = self
         self.setPixmap(0, dc_tree_widget.pin_pixmap)
@@ -229,7 +209,7 @@ class SampleQueueItem(QueueItem):
 
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        kwargs['controller'] = QCheckListItem.CheckBoxController
+        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
         kwargs['deletable'] = True
         
         QueueItem.__init__(self, *args, **kwargs)
@@ -292,50 +272,35 @@ def perform_on_children(node, cond, fun):
 
     return result    
 
-
 def is_selected(node):
     return node.isSelected()
-
 
 def is_selected_sample(node):
     return node.isSelected() and isinstance(node, SampleQueueItem)
 
-
 def is_selected_dc(node):
     return node.isSelected() and isinstance(node, DataCollectionQueueItem)
-
 
 def is_selected_task_node(node):
     return node.isSelected() and isinstance(node, DataCollectionGroupQueueItem)
 
-
 def is_selected_task(node):
     return node.isSelected() and isinstance(node, TaskQueueItem)
-
 
 def is_task(node):
     return isinstance(node, TaskQueueItem)
 
-
-def is_dc(node):
-    return isinstance(node, DCListItem)
-
-
 def is_sample(node):
     return isinstance(node, SampleQueueItem)
-
 
 def get_item(node):
     return node
 
-
 def is_child_on(node):
     return node.state() > 0
 
-
 def is_checked(node):
     return node.state() > 0
-
 
 def print_text(node):
     print "Executing node: " + node.text()
