@@ -33,7 +33,7 @@ sys.path.append(os.path.abspath('../../HardwareObjects/'))
 extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['templates']
+templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -128,7 +128,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -166,7 +166,7 @@ html_static_path = ['static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'MxCuBE20DD333doc'
+htmlhelp_basename = 'MxCuBE20doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -179,10 +179,10 @@ htmlhelp_basename = 'MxCuBE20DD333doc'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [
-  ('index', 'MxCuBE20.tex', u'MxCuBE 2.0 Documentation',
-   u'MxCuBE Collaboration', 'manual'),
-]
+#latex_documents = [
+#  ('index', 'MxCuBE20.tex', u'MxCuBE 2.0 Documentation',
+#   u'MxCuBE Collaboration', 'manual'),
+#]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
