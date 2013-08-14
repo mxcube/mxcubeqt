@@ -1,3 +1,2 @@
--e git+https://github.com/mxcube/mxcube.git#egg=mxcube
 -e git+https://github.com/surfly/gevent.git#egg=gevent
 
