@@ -5,7 +5,7 @@ changes from version 1.0.
 
 .. rubric:: MxCuBE
 
-mxCuBE stands for macromolecular xtallography customized beamline environment;
+MxCuBE stands for macromolecular xtallography customized beamline environment;
 the project started in 2005 at `ESRF <http://www.esrf.eu>`_, since then it has
 been adopted by other institutes in Europe. In 2010, a collaboration
 agreement has been signed for the development of mxCuBE with the following
@@ -18,13 +18,13 @@ partners:
 * `EMBL <http://www.embl.org/>`_
 * `Global Phasing Ltd. <http://www.globalphasing.com/>`_
 
-mxCuBE consists of 2 main parts:
+MxCuBE consists of 2 main parts:
 * a graphical user interface
 * data acquisition control layer
 
 .. rubric:: Graphical user interface
 
-mxCuBE GUI is built on top of the `Bliss Framework-2 <http://github.com/mxcube/BlissFramework>`_,
+MxCuBE GUI is built on top of the `Bliss Framework-2 <http://github.com/mxcube/BlissFramework>`_,
 a tool developed at ESRF for building graphical interfaces based on Python 2.x
 and the Qt 3 toolkit, especially designed for beamline experiment control applications.
 
@@ -35,7 +35,7 @@ classes associated with a configuration XML file. Hardware Objects are instancia
 by the `Hardare Repository <http://github.com/mxcube/HardwareRepository>`_.
 
 Each Hardware Object should be based on an abstract class, defining a common API
-for mxCuBE. Then, implementation differs at each site depending on hardware and
+for MxCuBE. Then, implementation differs at each site depending on hardware and
 beamline specificities.
 
 
