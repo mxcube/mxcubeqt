@@ -39,6 +39,7 @@ Each Hardware Object should be based on an abstract class, defining a common API
 for MxCuBE. Then, implementation differs at each site depending on hardware and
 beamline specificities.
 
+See the :doc:`design_overview` for more details
 
 
 Tutorials and Examples
