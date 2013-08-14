@@ -1,2 +1,2 @@
--e git+https://github.com/surfly/gevent.git#egg=gevent
+gevent
 
