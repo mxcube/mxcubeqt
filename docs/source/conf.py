@@ -22,10 +22,9 @@ import sys, os
 #os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareObjects")
 
 sys.path.append(os.path.abspath('../..'))
-#sys.path.append(os.path.abspath('../../BlissFramework'))
-sys.path.append(os.path.abspath('../../HardwareRepository'))
-from HardwareRepository.BaseHardwareObjects import HardwareObject
-sys.path.append(os.path.abspath('../../HardwareObjects'))
+sys.path.append(os.path.abspath('../../BlissFramework'))
+sys.path.append(os.path.abspath('../../HardwareRepository/'))
+sys.path.append(os.path.abspath('../../HardwareObjects/'))
 
 # -- General configuration -----------------------------------------------------
 
