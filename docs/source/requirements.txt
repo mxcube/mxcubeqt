@@ -1,2 +1,3 @@
 gevent
-
+pydispatch
+pyqt3
