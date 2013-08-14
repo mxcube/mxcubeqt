@@ -4,7 +4,7 @@ Example configuration files for framework-2 hardware objects. These
 files can also be found in ExampleFiles/HardwareObjects.xml.
 
 .. hlist::
-   :columns: 3
+   :columns: 2
 
    * :download:`beamline-setup.xml <../../../ExampleFiles/HardwareObjects.xml/beamline-setup.xml>`
    * :download:`data-analysis.xml <../../../ExampleFiles/HardwareObjects.xml/data-analysis.xml>`

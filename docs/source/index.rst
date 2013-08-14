@@ -19,6 +19,7 @@ partners:
 * `Global Phasing Ltd. <http://www.globalphasing.com/>`_
 
 MxCuBE consists of 2 main parts:
+
 * a graphical user interface
 * data acquisition control layer
 
