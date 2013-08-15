@@ -1,10 +1,5 @@
 MxCuBE-2.0 Documentation
 ========================
-Welcome to the MxCuBE 2.0 documentation. It currently covers the 
-changes from version 1.0. 
-
-.. rubric:: MxCuBE
-
 MxCuBE stands for macromolecular xtallography customized beamline environment;
 the project started in 2005 at `ESRF <http://www.esrf.eu>`_, since then it has
 been adopted by other institutes in Europe. In 2010, a collaboration
@@ -18,10 +13,10 @@ partners:
 * `EMBL <http://www.embl.org/>`_
 * `Global Phasing Ltd. <http://www.globalphasing.com/>`_
 
-MxCuBE consists of 2 main parts:
+MxCuBE consist of 2 main parts:
 
-* a graphical user interface
-* data acquisition control layer
+* A graphical user interface
+* Data acquisition control layer
 
 .. rubric:: Graphical user interface
 
