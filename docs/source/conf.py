@@ -21,6 +21,7 @@ import sys, os
 #os.environ["CUSTOM_BRICKS_PATH"]=os.path.join(MXCUBE_ROOT, "Bricks")
 #os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareObjects")
 
+sys.path.append(os.path.abspath('dummy_modules/'))
 sys.path.append(os.path.abspath('../..'))
 sys.path.append(os.path.abspath('../../BlissFramework'))
 sys.path.append(os.path.abspath('../../HardwareRepository/'))
