@@ -1,0 +1,2 @@
+class QubDrawingEvent(object):
+    pass
