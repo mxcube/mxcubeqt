@@ -1,0 +1,2 @@
+class Qt(object):
+    pass
