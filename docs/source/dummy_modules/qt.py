@@ -2,6 +2,5 @@ class Qt(object):
     SizeAllCursor = None
 
 class QCursor(object):
-    pass
-
-
+    def __init__(self, val):
+        pass
