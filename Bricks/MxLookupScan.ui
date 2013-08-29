@@ -199,7 +199,7 @@
                         <cstring>__startScan</cstring>
                     </property>
                     <property name="text">
-                        <string>Fill queue</string>
+                        <string>Fill queue (do not use with workflow)</string>
                     </property>
                 </widget>
                 <widget class="QPushButton">
