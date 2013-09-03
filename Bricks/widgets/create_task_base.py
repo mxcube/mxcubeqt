@@ -2,9 +2,8 @@ import qt
 import logging
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
-import widget_utils
 import abc
-import os
+
 
 from BlissFramework.Utils import widget_colors
 
