@@ -2,9 +2,7 @@ import queue_model_objects_v1 as queue_model_objects
 import queue_item
 import logging
 import qt
-import sip
 import copy
-import os
 
 import ShapeHistory as shape_history
 
@@ -13,11 +11,6 @@ from widgets.data_path_widget import DataPathWidget
 from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
-from widgets.acquisition_widget_vertical_layout \
-    import AcquisitionWidgetVerticalLayout
-from widgets.widget_utils import DataModelInputBinder
-from BlissFramework.Utils import widget_colors
-
 from widgets.processing_widget import ProcessingWidget
 
 class CreateHelicalWidget(CreateTaskBase):
@@ -71,6 +64,10 @@ class CreateHelicalWidget(CreateTaskBase):
                                             layout = 'vertical',
                                             acq_params =  self._acquisition_parameters,
                                             path_template = self._path_template)
+
+
+        self._acq_widget.disable_inverse_beam(True)
+        
 
         self._data_path_gbox = qt.QVGroupBox('Data location', self, 'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
@@ -167,7 +164,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def remove_clicked(self):
         selected_items = self.selected_items()
-        remove_lines = []
 
         if selected_items:
             for item in selected_items:
