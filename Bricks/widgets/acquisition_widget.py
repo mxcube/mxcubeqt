@@ -115,7 +115,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('transmission',
                             self.acq_widget_layout.child('transmission_ledit'),
                             float,
-                            qt.QDoubleValidator(0, 1000, 2, self))
+                            qt.QDoubleValidator(0, 1000, 4, self))
 
         self._acquisition_mib.\
              bind_value_update('resolution',
@@ -266,13 +266,13 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('energy_ledit').setText("%.4f" % energy)
 
     def update_transmission(self, transmission):
-        transmission = round(float(transmission), 1)
+        transmission = round(float(transmission), 4)
         self.acq_widget_layout.child('transmission_ledit').\
-             setText(str(transmission))
+             setText("%.2f" % transmission)
         self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
-        resolution = round(float(resolution), 2)
+        resolution = round(float(resolution), 4)
         self.acq_widget_layout.child('resolution_ledit').\
              setText("%.2f" % resolution)
         self._acquisition_parameters.resolution = float(resolution)

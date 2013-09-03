@@ -96,22 +96,22 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-                transmission = round(float(transmission), 1)
+                transmission = round(float(transmission), 2)
             except AttributeError:
                 transmission = 0
 
             try:
                 resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 4)
+                resolution = round(float(resolution), 2)
             except AttributeError:
                 resolution = 0
 
             try:
                 energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
                 if energy:
-                    energy = round(float(energy), 2)
+                    energy = round(float(energy), 4)
                 else:
-                    energy = round(float(-1), 2)
+                    energy = round(float(-1), 4)
             except AttributeError:
                 energy = 0
 
