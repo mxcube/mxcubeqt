@@ -3,6 +3,7 @@ import logging
 import gevent
 import queue_model_objects_v1 as queue_model_objects
 import queue_item
+import queue_entry
 
 from collections import namedtuple
 from BlissFramework import Icons
@@ -244,26 +245,11 @@ class DataCollectTree(qt.QWidget):
 
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
-                ans = True
-                if ans:
-                    location = items[0].get_model().location
-
-                    hl = 22
-                    if self.hl_motor_hwobj:
-                        hl = self.hl_motor_hwobj.getPosition()
-
-                    try:
-                        self.sample_changer_hwobj.\
-                            loadSample(hl, sample_location = location, wait = True)
-                    except Exception as e:
-                        items[0].setText(1, "Error loading")
-                        logging.getLogger('user_level_log').\
-                            info("Error loading sample: " + e.message)   
-                    else:
-                        logging.getLogger('queue_exec').\
-                            info("Sample loaded")
-                        items[0].setText(1, "Sample loaded")
-                        items[0].setSelected(True)  
+                queue_entry.SampleQueueEntry(items[0], items[0].get_model())
+                queue_entry.sample_changer_hwobj = self.sample_changer_hwobj
+                queue_entry.diffractometer_hwobj = self.diffractometer_hwobj
+                queue_entry.execute()
+                items[0].setText(1, "")
         else:
             logging.getLogget("user_level_log").\
                 info('Its not possible to mount samples in free pin mode')
