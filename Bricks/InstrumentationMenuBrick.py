@@ -16,6 +16,7 @@ class InstrumentationMenuBrick(BlissWidget):
         self.instrumentationMenuId=None
 
         self.defineSignal("enableAutoStartLoopCentring", ())
+        self.defineSignal("toggle_kappa", ())
 
         # Initialize HO
         self.cryostreamHO=None
@@ -30,6 +31,7 @@ class InstrumentationMenuBrick(BlissWidget):
         self.addProperty('hutchtrigger','string','')
         self.addProperty('light','string','')
         self.addProperty('scintillator','string','')
+        self.addProperty('Kappa on/off','string', '')
         self.addProperty('aperture','string','')
         self.addProperty('menuTitle','string','Instrumentation')
         self.addProperty('menuPosition','integer',1)
@@ -136,6 +138,9 @@ class InstrumentationMenuBrick(BlissWidget):
             else:
                 self.hutchtriggerHO.macro(0)
 
+    def toggle_kappa(self):
+        self.emit(PYSIGNAL("toggle_kappa"), (None,))
+
     def run(self):
         self.mainMenu=BlissWidget._menuBar
 
@@ -178,6 +183,7 @@ class InstrumentationMenuBrick(BlissWidget):
                 self.apertureId=self.instrumentationMenu.insertItem("Aperture",self.apertureClicked)
                 self.apertureChanged(self.apertureHO.getWagoState())
 
+            self.instrumentationMenu.insertItem("Kappa on/off", self.toggle_kappa)
 
             self.instrumentationMenu.insertSeparator()
 
