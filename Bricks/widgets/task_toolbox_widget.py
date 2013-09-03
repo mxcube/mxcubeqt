@@ -1,15 +1,11 @@
 import logging
-import queue_item
-import queue_entry
 import queue_model_objects_v1 as queue_model_objects
 import qt
 
 
 from BlissFramework import Icons
-from collections import namedtuple
 from widgets.create_helical_widget import CreateHelicalWidget
 from widgets.create_discrete_widget import CreateDiscreteWidget
-from widgets.create_mesh_widget import CreateMeshWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.create_workflow_widget import CreateWorkflowWidget
