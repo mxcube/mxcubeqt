@@ -156,11 +156,6 @@
                                             <string>Automatic loop centring</string>
                                         </property>
                                     </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>Automatic crystal centring</string>
-                                        </property>
-                                    </item>
                                     <property name="name">
                                         <cstring>centring_cbox</cstring>
                                     </property>
