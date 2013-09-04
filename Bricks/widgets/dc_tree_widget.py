@@ -245,10 +245,11 @@ class DataCollectTree(qt.QWidget):
 
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
-                queue_entry.SampleQueueEntry(items[0], items[0].get_model())
-                queue_entry.sample_changer_hwobj = self.sample_changer_hwobj
-                queue_entry.diffractometer_hwobj = self.diffractometer_hwobj
-                queue_entry.execute()
+                qe = queue_entry.SampleQueueEntry(items[0], items[0].get_model())
+                qe.sample_changer_hwobj = self.beamline_setup_hwobj.sample_changer_hwobj
+                qe.diffractometer_hwobj = self.beamline_setup_hwobj.diffractometer_hwobj
+                qe.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
+                qe.execute()
                 items[0].setText(1, "")
         else:
             logging.getLogget("user_level_log").\
@@ -268,8 +269,8 @@ class DataCollectTree(qt.QWidget):
                      "sample will be lost, do you want to continue ?.")
 
             location = items[0].get_model().location
-            self.sample_changer_hwobj.unloadSample(22, 
-                                                   sample_location = location)
+            self.beamline_setup_hwobj.sample_changer_hwobj.\
+                 unloadSample(22, sample_location = location)
 
     def sample_list_view_selection(self):
         items = self.get_selected_items()
@@ -685,7 +686,7 @@ class DataCollectTree(qt.QWidget):
         while item:
             if self.is_mounted_sample_item(item):
                 item.setPixmap(0, self.pin_pixmap)
-                item.setBackgroundColor(widget_colors.SKY_BLUE)
+                #item.setBackgroundColor(widget_colors.SKY_BLUE)
                 item.setSelected(True)
                 self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
