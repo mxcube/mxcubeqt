@@ -427,13 +427,13 @@ class HutchMenuBrick(BlissWidget):
             self.__pointer.startDrawing()
 
     def drawAutoCentringPoint(self, x,y):
-      if x<0 or y<0:
+      if -1 in (x,y):
         self.__autoCentringPoint.hide()
-      else:
-        self.__autoCentringPoint.startDrawing()
-        self.__autoCentringPoint.setPoint(x,y)
-        self.__autoCentringPoint.stopDrawing()
-        self.__autoCentringPoint.show()
+        return
+      self.__autoCentringPoint.startDrawing()
+      self.__autoCentringPoint.setPoint(x,y)
+      self.__autoCentringPoint.stopDrawing()
+      self.__autoCentringPoint.show()
       
     def centringSuccessful(self,method,centring_status):
         self.__point.stopDrawing()
