@@ -1,4 +1,3 @@
-from qt import *
 import gevent
 from gevent.event import AsyncResult
 from Qub.Tools import QubImageSave
@@ -261,6 +260,7 @@ class MiniDiff(Equipment):
         # with automatic centring brick, otherwise we should not start auto loop centring
         # (for example: if we have been imported in Automatic Centring server, or in
         # mxCuBE hutch version with no automatic centring brick...) 
+        from qt import QApplication
         continue_auto_centring = False
         for w in QApplication.allWidgets():
           if callable(w.name) and str(w.name()) == 'autocentring':
@@ -551,48 +551,38 @@ class MiniDiff(Equipment):
         imgWidth = camera.getWidth()
         imgHeight = camera.getHeight()
 
-        def find_loop(show_point=True): #zoom=0, show_point=True, virtCenter=(-1,-1)):
+        def find_loop(pixels_per_mm_horizontal, show_point=True):
           #img_array = numpy.fromstring(camera.getChannelObject("image").getValue(), numpy.uint8)
           rgbImgChan    = camera.addChannel({ 'type': 'tango', 'name': 'rgbimage', "read_as_str": 1 }, "RgbImage")
           raw_data = rgbImgChan.getValue()
           snapshot_filename = os.path.join(tempfile.gettempdir(), "mxcube_sample_snapshot.png")
           Image.fromstring("RGB", (imgWidth, imgHeight), raw_data).save(snapshot_filename)
 
-          if True: #zoom == 0:
-              info, x, y = lucid.find_loop(snapshot_filename, debug=False)
-          #else:
-          #    info, x, y = lucid.find_loop_mesh(, showVisuals=False, zoom=zoom, virtCenter=virtCenter)
+          info, x, y = lucid.find_loop(snapshot_filename, pixels_per_mm_horizontal=pixels_per_mm_horizontal)
+          
           self.emitProgressMessage("Loop found: %s (%d, %d)" % (info, x, y))
           logging.debug("Loop found: %s (%d, %d)" % (info, x, y))
           if show_point:
               self.emit("newAutomaticCentringPoint", (x,y))
           return x,y
         
-        def face_finder(zoom=0):
-          img_array = numpy.fromstring(camera.getChannelObject("image").getValue(), numpy.uint8)
-          img_array.shape = (imgHeight, imgWidth)
-          num = lucid.find_face(img_array, zoom=zoom)
-          logging.info("loop size: %d", num)
-          return num
-
-        def centre_loop(pixelsPerMmY, pixelsPerMmZ, zoom=0): #, lastCoord=(-1, -1)):
+        def centre_loop(pixelsPerMmY, pixelsPerMmZ): #, lastCoord=(-1, -1)):
           X = []
           Y = []
           phiSavedDialPosition = phi.getDialPosition()
          
-          logging.debug("in centre_loop: pixelsPerMmY=%f, pixelsPerMmZ=%f", pixelsPerMmY, pixelsPerMmZ)
           self.emitProgressMessage("Doing automatic centring")
           a = 0
           for angle in (0, 90, 90):
             a+=1
             self.emitProgressMessage("%d: moving at angle %f" % (a, phi.getPosition()+angle))
             phi.syncMoveRelative(angle)
-            x, y = find_loop() #zoom=zoom) #, virtCenter=lastCoord) 
+            x, y = find_loop(pixelsPerMmY) 
             if x < 0 or y < 0:
               for i in range(1,5):
                 logging.debug("loop not found - moving back") 
                 phi.syncMoveRelative(-20)
-                x, y = find_loop() #zoom)
+                x, y = find_loop(pixelsPerMmY)
                 if x >=0:
                   if y < imgHeight/2:
                     y = 0
@@ -636,14 +626,14 @@ class MiniDiff(Equipment):
                          phiz: phiz.getPosition() + (y - beam_yc_real) }
           return centredPos
 
-        def check_centring(): #zoom=0):
+        def check_centring(pixels_per_mm_horizontal):
           centring_results = []
           lastCoord = [] 
           for angle in (0,-90,-90):
             phi.syncMoveRelative(angle)
             self.emit("newAutomaticCentringPoint", (-1,-1))
             logging.debug("checking centring at angle %d", phi.getPosition())
-            x, y = find_loop() #zoom, False)
+            x, y = find_loop(pixels_per_mm_horizontal)
             lastCoord.append((x,y))
             centring_results.append(x > imgWidth*0.35 and x < imgWidth*0.65 and y > imgHeight*0.35 and y < imgHeight*0.65)
             logging.debug("  centring is %s", "ok" if centring_results[-1] else "bad")
@@ -653,7 +643,7 @@ class MiniDiff(Equipment):
  
         #check if loop is there at the beginning
         i = 0
-        while -1 in find_loop():
+        while -1 in find_loop(self.pixelsPerMmY):
           phi.syncMoveRelative(90)
           i+=1
           if i>4:
@@ -683,32 +673,11 @@ class MiniDiff(Equipment):
 
           self.pixelsPerMmY, self.pixelsPerMmZ = self.getCalibrationData(zoom.getPosition())
 
-          #refactor last coordinates
-          #co = len(lastCoord)-1
-          #while co >= 0:
-          #    (x,y) = lastCoord[co]
-          #    img_center_x = imgWidth/2.0
-          #    img_center_y = imgHeight/2.0
-          #    x = int(round((float(x-img_center_x)/float(oldpPmY)*self.pixelsPerMmY)+img_center_x))
-          #    y = int(round((float(y-img_center_y)/float(oldpPmZ)*self.pixelsPerMmZ)+img_center_y))
-          #
-          #    lastCoord[co]=(x,y)
-          #    co-=1
-          
           # last centring
-          #motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ) #,2,lastCoord)
+          #motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ) 
           #move_to_centred_position(motor_pos)         
  
           return motor_pos
-
-          #checked,lastCoord = check_centring(2)
-          #if checked:
-          #   return motor_pos
-          #else:
-          #   motor_pos = centre_loop(self.pixelsPerMmY, self.pixelsPerMmZ,2)
-          #   move_to_centred_position(motor_pos)
-          #   if (check_centring(1))[0]:
-          #       return motor_pos
 
     def startAutoCentring(self,sample_info=None, loop_only=False):
         self.currentCentringProcedure = gevent.spawn(self.do_auto_centring, self.phiMotor,
