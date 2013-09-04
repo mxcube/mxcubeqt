@@ -482,12 +482,10 @@ class DataCollectTree(qt.QWidget):
         else:
             self.stop_collection()
 
-
     def enable_sample_changer_widget(self, state):
-        self.parent().sample_changer_widget.synch_button.setEnabled(state)
-        self.parent().sample_changer_widget.centring_cbox.setEnabled(state)
-        self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
-
+        self.parent().sample_changer_widget.child('synch_button').setEnabled(state)
+        self.parent().sample_changer_widget.child('centring_cbox').setEnabled(state)
+        self.parent().sample_changer_widget.child('filter_cbox').setEnabled(state)
 
     def is_mounted_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):
