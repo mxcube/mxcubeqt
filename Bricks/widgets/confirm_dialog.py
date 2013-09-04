@@ -93,15 +93,15 @@ class ConfirmDialog(qt.QDialog):
             path_template = item.get_model().get_path_template()
 
             if path_template:
-                if item.get_model().is_executed():
-                    self.item_run_number_list.append((item, path_template.run_number))
+#                 if item.get_model().is_executed():
+#                     self.item_run_number_list.append((item, path_template.run_number))
 
-                    # Increase the run-number for re-collect
-                    new_run_number = self.queue_model_hwobj.\
-                                     get_next_run_number(path_template,
-                                                         exclude_current = False)
-                    item.get_model().set_number(new_run_number)
-                    path_template.run_number = new_run_number
+#                     # Increase the run-number for re-collect
+#                     new_run_number = self.queue_model_hwobj.\
+#                                      get_next_run_number(path_template,
+#                                                          exclude_current = False)
+#                     item.get_model().set_number(new_run_number)
+#                     path_template.run_number = new_run_number
 
                 collection_items.append(item)
                 file_paths = path_template.get_files_to_be_written()
@@ -146,10 +146,10 @@ class ConfirmDialog(qt.QDialog):
 
 
     def cancel_button_click(self):
-        for item, run_number in self.item_run_number_list:
-            item.get_model().set_number(run_number)
-            path_template = item.get_model().get_path_template()
-            path_template.run_number = run_number
+#         for item, run_number in self.item_run_number_list:
+#             item.get_model().set_number(run_number)
+#             path_template = item.get_model().get_path_template()
+#             path_template.run_number = run_number
                     
         self.reject()
 
