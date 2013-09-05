@@ -1,7 +1,5 @@
 import logging
 import qt
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.acquisition_widget import AcquisitionWidget
@@ -9,7 +7,6 @@ from widgets.widget_utils import DataModelInputBinder
 from widgets.snapshot_widget_layout import SnapshotWidgetLayout
 from widgets.processing_widget import ProcessingWidget
 
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 from BlissFramework.Utils import widget_colors
 from BlissFramework import Icons
 
@@ -93,21 +90,23 @@ class DCParametersWidget(qt.QWidget):
 
 
     def handle_path_conflict(self, widget, new_value):
-        path_template = self._data_collection.acquisitions[0].path_template
-        path_conflict = self.queue_model_hwobj.\
-                        check_for_path_collisions(path_template)
+        dc_tree_widget = self._tree_view_item.listView().parent()
+        dc_tree_widget.check_for_path_collisions()
+        # path_template = self._data_collection.acquisitions[0].path_template
+        # path_conflict = self.queue_model_hwobj.\
+        #                 check_for_path_collisions(path_template)
 
-        if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before collecting')
+        # if new_value != '':
+        #     if path_conflict:
+        #         logging.getLogger("user_level_log").\
+        #             error('The current path settings will overwrite data' +\
+        #                   ' from another task. Correct the problem before collecting')
 
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-                self._tree_view_item.setPixmap(0, self.caution_pixmap)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
-                self._tree_view_item.setPixmap(0, qt.QPixmap())
+        #         widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+        #         self._tree_view_item.setPixmap(0, self.caution_pixmap)
+        #     else:
+        #         widget.setPaletteBackgroundColor(widget_colors.WHITE)
+        #         self._tree_view_item.setPixmap(0, qt.QPixmap())
 
 
     def __add_data_collection(self):

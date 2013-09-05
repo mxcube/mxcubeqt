@@ -32,18 +32,15 @@ class CreateTaskBase(qt.QWidget):
          qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
                             self.tab_changed)
 
-
     def init_models(self):
         if self._beamline_setup_hwobj is not None:
             self._path_template = self._beamline_setup_hwobj.get_default_path_template()
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
-
     def tab_changed(self, tab_index, tab):
         if tab_index is 0 and self._session_hwobj.proposal_code:
             self.update_selection()
-
 
     def set_beamline_setup(self, bl_setup_hwobj):
         self._beamline_setup_hwobj = bl_setup_hwobj
@@ -88,7 +85,6 @@ class CreateTaskBase(qt.QWidget):
         if self._data_path_widget:
             self._data_path_widget.set_session(self._session_hwobj)
 
-
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
         
@@ -96,7 +92,6 @@ class CreateTaskBase(qt.QWidget):
             prefix = self._path_template.get_prefix()
             item.get_model().set_name(prefix)
             item.setText(0, item.get_model().get_name())
-
         
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -108,8 +103,9 @@ class CreateTaskBase(qt.QWidget):
                 item.get_model().set_number(int(new_value))
                 item.setText(0, item.get_model().get_name())
 
-
     def handle_path_conflict(self, widget, new_value):
+        self._tree_brick.dc_tree_widget.check_for_path_collisions()
+        
         path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                         check_for_path_collisions(self._path_template)
 
@@ -122,16 +118,13 @@ class CreateTaskBase(qt.QWidget):
                 widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
             else:
                 widget.setPaletteBackgroundColor(widget_colors.WHITE)
-
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
 
-
     @abc.abstractmethod
     def set_energies(self):
         pass
-
  
     def mad_energy_selected(self, name, energy, state):
         data_path_widget = self.get_data_path_widget()
@@ -144,7 +137,6 @@ class CreateTaskBase(qt.QWidget):
 
             data_path_widget.set_prefix(self._path_template.base_prefix)
 
-
     def get_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):
             return item
@@ -152,7 +144,6 @@ class CreateTaskBase(qt.QWidget):
             return item.get_sample_view_item()
         else:
             return None
-
 
     def get_group_item(self, item):
         if isinstance(item, queue_item.DataCollectionGroupQueueItem):
@@ -162,14 +153,11 @@ class CreateTaskBase(qt.QWidget):
         else:
             return None
 
-
     def get_acquisition_widget(self):
         return self._acq_widget
 
-
     def get_data_path_widget(self):
         return self._data_path_widget
-
 
     def set_energy(self, energy, wavelength):
         if energy:
@@ -178,32 +166,27 @@ class CreateTaskBase(qt.QWidget):
             if acq_widget:
                 acq_widget.set_energy(energy, wavelength)
 
-
     def set_transmission(self, trans):
         acq_widget = self.get_acquisition_widget()
         
         if acq_widget:
             acq_widget.update_transmission(trans)
 
-
     def set_resolution(self, res):
         acq_widget = self.get_acquisition_widget()
         
         if acq_widget:
             acq_widget.update_resolution(res)
-     
-                                                 
+                                                      
     def set_run_number(self, run_number):
         data_path_widget = self.get_data_path_widget()
 
         if data_path_widget:
             data_path_widget.set_run_number(run_number)
 
-
     def get_default_prefix(self, sample_data_node):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node)
         return prefix
-
         
     def get_default_directory(self, tree_item):        
         item = self.get_sample_item(tree_item)
@@ -217,12 +200,10 @@ class CreateTaskBase(qt.QWidget):
     
         return (data_directory, proc_directory)
 
-
     def ispyb_logged_in(self, logged_in):
         if logged_in and self.get_data_path_widget():
             self.update_selection()
             
-
     def selection_changed(self, items):
         if items:
             self._current_selected_items = items
@@ -232,10 +213,8 @@ class CreateTaskBase(qt.QWidget):
             elif len(items) > 1:
                 self.multiple_item_selection(items)
 
-
     def update_selection(self):
         self.selection_changed(self._current_selected_items)
-
 
     def single_item_selection(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
@@ -261,16 +240,13 @@ class CreateTaskBase(qt.QWidget):
         if self._data_path_widget:
             self._data_path_widget.update_data_model(self._path_template)
 
-
     def multiple_item_selection(self, tree_items):
         pass
-
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
     def centred_position_selection(self, positions):
          self._selected_positions = positions
-
 
     # Should be called by the object that calls create_task,
     # and add_task.
@@ -288,13 +264,11 @@ class CreateTaskBase(qt.QWidget):
 
         return result
             
-
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
     def create_task(self, sample):        
         tasks = self._create_task(sample)        
         return tasks
-
 
     @abc.abstractmethod
     def _create_task(self, task_node, sample):
