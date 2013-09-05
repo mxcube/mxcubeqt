@@ -237,8 +237,9 @@ class CreateCharWidget(CreateTaskBase):
         if not self._selected_positions:
             cpos = None
             
-            if self._tree_brick.diffractometer_hwobj:
-                pos_dict = self._tree_brick.diffractometer_hwobj.getPositions()
+            if self._beamline_setup_hwobj.diffractometer_hwobj:
+                pos_dict = self._beamline_setup_hwobj.\
+                           diffractometer_hwobj.getPositions()
                 cpos = queue_model_objects.CentredPosition(pos_dict)
 
             logging.getLogger("user_level_log").\
@@ -294,7 +295,7 @@ class CreateCharWidget(CreateTaskBase):
                 data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
 
                 if sc:
-                    sc.set_task(data_collection)
+                    sc.add_task(data_collection)
                     
                 char = queue_model_objects.Characterisation(data_collection, 
                                                             char_params)
