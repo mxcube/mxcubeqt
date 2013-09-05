@@ -181,9 +181,15 @@ class AcquisitionWidget(qt.QWidget):
 
     def first_image_ledit_change(self, new_value):
         self._path_template.start_num = int(new_value)
+        widget = self.acq_widget_layout.child('first_image_ledit')
+        self.emit(qt.PYSIGNAL('path_template_changed'),
+                  (widget, new_value))
 
     def num_images_ledit_change(self, new_value):
         self._path_template.num_files = int(new_value)
+        widget = self.acq_widget_layout.child('num_images_ledit')
+        self.emit(qt.PYSIGNAL('path_template_changed'),
+                  (widget, new_value))
 
     def overlap_changed(self, new_value):
         has_shutter_less = self._beamline_setup.detector_has_shutterless()

@@ -67,6 +67,10 @@ class DCParametersWidget(qt.QWidget):
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
+        self.connect(self.acq_widget,
+                     qt.PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
+
         self.connect(self.path_widget,
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
@@ -92,21 +96,19 @@ class DCParametersWidget(qt.QWidget):
     def handle_path_conflict(self, widget, new_value):
         dc_tree_widget = self._tree_view_item.listView().parent()
         dc_tree_widget.check_for_path_collisions()
-        # path_template = self._data_collection.acquisitions[0].path_template
-        # path_conflict = self.queue_model_hwobj.\
-        #                 check_for_path_collisions(path_template)
+        path_template = self._data_collection.acquisitions[0].path_template
+        path_conflict = self.queue_model_hwobj.\
+                        check_for_path_collisions(path_template)
 
-        # if new_value != '':
-        #     if path_conflict:
-        #         logging.getLogger("user_level_log").\
-        #             error('The current path settings will overwrite data' +\
-        #                   ' from another task. Correct the problem before collecting')
+        if new_value != '':
+            if path_conflict:
+                logging.getLogger("user_level_log").\
+                    error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before collecting')
 
-        #         widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-        #         self._tree_view_item.setPixmap(0, self.caution_pixmap)
-        #     else:
-        #         widget.setPaletteBackgroundColor(widget_colors.WHITE)
-        #         self._tree_view_item.setPixmap(0, qt.QPixmap())
+                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            else:
+                widget.setPaletteBackgroundColor(widget_colors.WHITE)
 
 
     def __add_data_collection(self):

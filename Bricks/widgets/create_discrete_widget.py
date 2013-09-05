@@ -71,6 +71,10 @@ class CreateDiscreteWidget(CreateTaskBase):
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 
+        self.connect(self._acq_widget,
+                     qt.PYSIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
+
         self.connect(self._data_path_widget,
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
