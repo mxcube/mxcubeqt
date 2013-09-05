@@ -672,6 +672,8 @@ class DataCollectTree(qt.QWidget):
                      if path_conflict:
                          conflict = True
                          item.setPixmap(0, self.caution_pixmap)
+                     else:
+                         item.setPixmap(0, qt.QPixmap())
                          
             it += 1
             item = it.current()
