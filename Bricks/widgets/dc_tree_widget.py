@@ -142,6 +142,10 @@ class DataCollectTree(qt.QWidget):
                            qt.SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"),
                            self.item_double_click)
 
+        qt.QObject.connect(self.sample_list_view,
+                           qt.SIGNAL("mouseButtonClicked(int, QListViewItem *, const QPoint &, int)"),
+                           self.item_click)
+
         qt.QObject.connect(self.confirm_dialog, qt.PYSIGNAL("continue_clicked"),
                            self.collect_items)
 
@@ -189,6 +193,9 @@ class DataCollectTree(qt.QWidget):
             
     def item_double_click(self):
         self.show_details()
+
+    def item_click(self):
+        self.check_for_path_collisions()
 
     def context_collect_item(self):
         items = self.get_selected_items()
