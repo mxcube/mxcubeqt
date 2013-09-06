@@ -4,7 +4,7 @@ import queue_model_objects_v1 as queue_model_objects
 #from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
 from widgets.data_path_widget import DataPathWidget
-from SpecScanPlotBrick import SpecScanPlotBrick
+#from SpecScanPlotBrick import SpecScanPlotBrick
 
 
 class EnergyScanParametersWidget(qt.QWidget):
@@ -18,7 +18,6 @@ class EnergyScanParametersWidget(qt.QWidget):
         # Layout
         h_layout = qt.QHBoxLayout(self, 0, 0, "main_v_layout")
         col_one_vlayout = qt.QVBoxLayout(h_layout, 0, "row_one")
-        col_two_vlayout = qt.QVBoxLayout(h_layout, 0, "row_two")
 
         periodic_table_gbox = qt.QHGroupBox("Available Elements", self)
         self.periodic_table =  PeriodicTableBrick(periodic_table_gbox)
@@ -50,18 +49,22 @@ class EnergyScanParametersWidget(qt.QWidget):
         qt.QObject.connect(self.data_path_widget.data_path_widget_layout.run_number_ledit, 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._run_number_ledit_change)
-
+        
+        qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
+                           self.tab_changed)
 
     def _prefix_ledit_change(self, new_value):
         self.energy_scan.set_name(str(new_value))
         self._tree_view_item.setText(0, self.energy_scan.get_name())
-
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.energy_scan.set_number(int(new_value))
             self._tree_view_item.setText(0, self.energy_scan.get_name())
         
+    def tab_changed(self):
+        if self._tree_view_item:
+            self.populate_parameter_widget(self._tree_view_item)
 
     def populate_widget(self, item):
         self._tree_view_item = item
@@ -71,7 +74,6 @@ class EnergyScanParametersWidget(qt.QWidget):
         
         self.periodic_table.periodicTable.\
             tableElementChanged(self.energy_scan.symbol)
-
 
     def element_clicked(self, symbol, energy):
         self.energy_scan.symbol = symbol

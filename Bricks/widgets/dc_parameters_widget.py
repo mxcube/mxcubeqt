@@ -19,7 +19,6 @@ class DCParametersWidget(qt.QWidget):
         self._tree_view_item = None
         self.queue_model = None
 
-
         self.caution_pixmap = Icons.load("Caution2.png")
         self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
         self.acq_gbox = qt.QVGroupBox("Acquisition", self)
@@ -75,23 +74,22 @@ class DCParametersWidget(qt.QWidget):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
+        qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
+                           self.tab_changed)
 
     def set_beamline_setup(self, bl_setup):
         self.acq_widget.set_beamline_setup(bl_setup)
-
 
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].\
                  path_template.get_prefix()
         self._data_collection.set_name(prefix)
         self._tree_view_item.setText(0, self._data_collection.get_name())
-        
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self._data_collection.set_number(int(new_value))
             self._tree_view_item.setText(0, self._data_collection.get_name())
-
 
     def handle_path_conflict(self, widget, new_value):
         dc_tree_widget = self._tree_view_item.listView().parent()
@@ -110,10 +108,8 @@ class DCParametersWidget(qt.QWidget):
             else:
                 widget.setPaletteBackgroundColor(widget_colors.WHITE)
 
-
     def __add_data_collection(self):
         return self.add_dc_cb(self._data_collection, self.collection_type)
-
     
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.\
@@ -126,6 +122,9 @@ class DCParametersWidget(qt.QWidget):
             
         self.path_widget.set_prefix(path_template.base_prefix)
 
+    def tab_changed(self):
+        if self._tree_view_item:
+            self.populate_parameter_widget(self._tree_view_item)
 
     def populate_parameter_widget(self, item):
         data_collection = item.get_model()
@@ -133,7 +132,7 @@ class DCParametersWidget(qt.QWidget):
         self._data_collection = data_collection
         self._acquisition_mib = DataModelInputBinder(self._data_collection.\
                                 acquisitions[0].acquisition_parameters)
-        
+
         self.acq_widget.update_data_model(data_collection.acquisitions[0].\
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\
