@@ -2,10 +2,7 @@ import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 import queue_item
 import copy
-import widget_utils
 import logging
-import math
-import os
 import ShapeHistory as shape_history
 
 from qt import *
@@ -19,7 +16,7 @@ from widgets.data_path_widget_vertical_layout import\
 from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
 from acquisition_widget_simple import AcquisitionWidgetSimple
-from BlissFramework.Utils import widget_colors
+
 
 class CreateCharWidget(CreateTaskBase):
     def __init__(self,parent = None,name = None, fl = 0):
@@ -199,6 +196,10 @@ class CreateCharWidget(CreateTaskBase):
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             self.setDisabled(False)
             self._char = tree_item.get_model()
+
+            if self._char.get_path_template():
+                self._path_template = self._char.get_path_template()
+            
             data_collection = self._char.reference_image_collection
             self._char_params = self._char.characterisation_parameters
             self._acquisition_parameters = data_collection.acquisitions[0].\
@@ -207,10 +208,14 @@ class CreateCharWidget(CreateTaskBase):
         else:
             self.setDisabled(True)
 
-        self._set_space_group(self._char_params.space_group)
-        self._acq_widget.update_data_model(self._acquisition_parameters,
-                                           self._path_template)
-        self._char_params_mib.set_model(self._char_params)
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
+           isinstance(tree_item, queue_item.CharacterisationQueueItem):
+
+            self._set_space_group(self._char_params.space_group)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
+            self._char_params_mib.set_model(self._char_params)
 
 
     def update_processing_parameters(self, crystal):
@@ -231,7 +236,6 @@ class CreateCharWidget(CreateTaskBase):
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
     def _create_task(self, sample):
-        selected_positions = []
         tasks = []
 
         if not self._selected_positions:

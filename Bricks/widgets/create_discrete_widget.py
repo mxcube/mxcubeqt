@@ -157,6 +157,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             self.setDisabled(False)
             data_collection = tree_item.get_model()
+
+            if data_collection.get_path_template():
+                self._path_template = data_collection.get_path_template()
+
+            self._data_path_widget.update_data_model(self._path_template)
+            
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
 
@@ -173,10 +179,14 @@ class CreateDiscreteWidget(CreateTaskBase):
             # Disable control
             self.setDisabled(True)
 
-        self._processing_widget.update_data_model(self._processing_parameters)
-        self._acq_widget.update_data_model(self._acquisition_parameters,
-                                           self._path_template)
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionQueueItem):
 
+            self._processing_widget.update_data_model(self._processing_parameters)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
+        
     def approve_creation(self):
         return CreateTaskBase.approve_creation(self)
 

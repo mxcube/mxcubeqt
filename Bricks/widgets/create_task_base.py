@@ -231,12 +231,6 @@ class CreateTaskBase(qt.QWidget):
                                              get_next_run_number(self._path_template)
             self.setDisabled(False)
             
-        elif isinstance(tree_item, queue_item.TaskQueueItem):
-            task_model = tree_item.get_model()
-
-            if task_model.get_path_template():
-                self._path_template = task_model.get_path_template()
-
         if self._data_path_widget:
             self._data_path_widget.update_data_model(self._path_template)
 

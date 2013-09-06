@@ -1,3 +1,4 @@
+import queue_model_enumerables_v1 as queue_model_enumerables
 import queue_model_objects_v1 as queue_model_objects
 import queue_item
 import logging
@@ -107,7 +108,6 @@ class CreateHelicalWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
-
     def init_models(self):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
@@ -145,7 +145,6 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
 
-
     def add_clicked(self):
         selected_shapes = self._shape_history.selected_shapes.values()
 
@@ -161,7 +160,6 @@ class CreateHelicalWidget(CreateTaskBase):
             list_box_item = qt.QListBoxText(self._list_box, 'Line')
             self._list_item_map[list_box_item] = line
 
-
     def remove_clicked(self):
         selected_items = self.selected_items()
 
@@ -171,7 +169,6 @@ class CreateHelicalWidget(CreateTaskBase):
                 line = self._list_item_map[item]
                 self._shape_history.delete_shape(line)
                 del self._list_item_map[item]
-
 
     # Calback from shape_history, called when a shape is deleted
     def shape_deleted(self, shape):
@@ -188,7 +185,6 @@ class CreateHelicalWidget(CreateTaskBase):
                 del self._list_item_map[list_item]
                 self._shape_history.delete_shape(line)
 
-
     def centred_position_selection(self, positions):
         if len(positions) == 1:
             self._prev_pos = positions[0]
@@ -201,7 +197,6 @@ class CreateHelicalWidget(CreateTaskBase):
         else:
             self._prev_pos = None
             self._current_pos = None
-
 
     def list_box_selection_changed(self):
         self.show_selected_lines()
@@ -216,7 +211,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
         return selected_items
         
-
     def show_selected_lines(self):
         selected_items = self.selected_items()
 
@@ -226,7 +220,6 @@ class CreateHelicalWidget(CreateTaskBase):
                 line.highlight()
             else:
                 line.unhighlight()
-
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
@@ -241,7 +234,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
         return base_result and selected_lines 
             
-
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
         self._processing_parameters.cell_a = crystal.cell_a
@@ -251,7 +243,6 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_parameters.cell_c = crystal.cell_c
         self._processing_parameters.cell_gamma = crystal.cell_gamma
         self._processing_widget.update_data_model(self._processing_parameters)
-
 
     def select_shape_with_cpos(self, start_cpos, end_cpos):
         self._shape_history._drawing_event.de_select_all()
@@ -271,33 +262,40 @@ class CreateHelicalWidget(CreateTaskBase):
             sample_data_model = self.get_sample_item(tree_item).get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
             self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
+            self._processing_widget.update_data_model(self._processing_parameters)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             self.setDisabled(False)
             data_collection = tree_item.get_model()
-            self._path_template = data_collection.acquisitions[0].path_template
-            self._acquisition_parameters = data_collection.acquisitions[0].\
-                                           acquisition_parameters
 
-            if len(data_collection.acquisitions) == 2:
-                start_cpos = data_collection.acquisitions[0].acquisition_parameters.\
-                             centred_position
-                end_cpos = data_collection.acquisitions[1].acquisition_parameters.\
-                           centred_position
+            if data_collection.experiment_type == queue_model_enumerables.\
+               EXPERIMENT_TYPE.HELICAL:
+                
+                self._path_template = data_collection.acquisitions[0].path_template
 
-                self.select_shape_with_cpos(start_cpos, end_cpos)
+                self._acquisition_parameters = data_collection.acquisitions[0].\
+                                               acquisition_parameters
 
-            self._energy_scan_result = queue_model_objects.EnergyScanResult()
-            self._processing_parameters = data_collection.processing_parameters
-            self._energy_scan_result = data_collection.crystal.energy_scan_result
-            self._acq_widget.set_energies(self._energy_scan_result)
+                if len(data_collection.acquisitions) == 2:
+                    start_cpos = data_collection.acquisitions[0].acquisition_parameters.\
+                                 centred_position
+                    end_cpos = data_collection.acquisitions[1].acquisition_parameters.\
+                               centred_position
+
+                    self.select_shape_with_cpos(start_cpos, end_cpos)
+
+                self._energy_scan_result = queue_model_objects.EnergyScanResult()
+                self._processing_parameters = data_collection.processing_parameters
+                self._energy_scan_result = data_collection.crystal.energy_scan_result
+                self._acq_widget.set_energies(self._energy_scan_result)
+                self._processing_widget.update_data_model(self._processing_parameters)
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                   self._path_template)
         else:
             self.setDisabled(True)
-                  
-        self._processing_widget.update_data_model(self._processing_parameters)
-        self._acq_widget.update_data_model(self._acquisition_parameters,
-                                           self._path_template)
-
+  
     def _create_task(self,  sample):
         data_collections = []
         selected_items = self.selected_items()
@@ -350,7 +348,7 @@ class CreateHelicalWidget(CreateTaskBase):
                 dc.set_number(start_acq.path_template.run_number)
 
                 
-                dc.experiment_type = queue_model_objects.EXPERIMENT_TYPE.HELICAL
+                dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.HELICAL
 
                 data_collections.append(dc)
 
