@@ -285,9 +285,8 @@ class AcquisitionWidget(qt.QWidget):
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters
-        self._path_template = path_template
+        self._path_template = path_template        
         self._acquisition_mib.set_model(acquisition_parameters)
-        #self._path_template_mib.set_model(path_template)
 
     def set_tunable_energy(self, state):
         self.acq_widget_layout.child('energy_ledit').setEnabled(state)
