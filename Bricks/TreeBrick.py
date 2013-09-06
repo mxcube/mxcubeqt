@@ -202,7 +202,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                              self.add_to_queue)
 
                 self.connect(xml_rpc_server_hwobj, 'start_queue',
-                             self.dc_tree_widget.collect_items)
+                             self.dc_tree_widget.collect_stop_toggle)
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
