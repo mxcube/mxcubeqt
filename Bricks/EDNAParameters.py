@@ -14,8 +14,6 @@ from XSDataMXCuBEv1_3 import XSDataResultMXCuBE
 from ednaxmlhelper import get_field_containers, get_fields
 from paramsgui import FieldsWidget
 
-
-
 class EDNAParameters(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
@@ -137,8 +135,6 @@ class EDNAParameters(BlissWidget):
         self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1)
         self.params_widget.show()
         self.ok_button.setEnabled(True)
-        
-
 
     def send_parameters(self):
         if self.params_widget is not None:
@@ -181,17 +177,17 @@ class EDNAParameters(BlissWidget):
     def current_actor_changed(self, actor):
         if type(actor) == types.ListType or type(actor) == types.TupleType:
             actor = actor[0]
+        
         try:
             state = self.workflow.state.getValue()
             self.refresh_workflow_state(state, actor)
         except:
             self.info_label.setText('Lost connection with workflow engine')
         
-    def workflow_state_changed(self, new_state): 
-        new_state = str(new_state)
+    def workflow_state_changed(self, new_state):
         logging.debug('%s: new workflow state is %r', self.name(), new_state)
         if type(new_state) == types.ListType or type(new_state) == types.TupleType:
-            new_state = new_state[0]
+            new_state = str(new_state[0])
         try:
             actor = self.workflow.current_actor.getValue()
             self.refresh_workflow_state(new_state, actor)
