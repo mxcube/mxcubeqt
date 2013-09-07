@@ -217,6 +217,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             # centred positions for the shapes
             selected_shapes = self._shape_history.selected_shapes
             cpos_list = self.get_centred_positions(selected_shapes)
+            sc = None
 
         if self._acq_widget.use_inverse_beam():
 
