@@ -267,14 +267,12 @@ class CreateHelicalWidget(CreateTaskBase):
                                                self._path_template)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            self.setDisabled(False)
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == queue_model_enumerables.\
                EXPERIMENT_TYPE.HELICAL:
-                
+                self.setDisabled(False)
                 self._path_template = data_collection.acquisitions[0].path_template
-
                 self._acquisition_parameters = data_collection.acquisitions[0].\
                                                acquisition_parameters
 
@@ -315,7 +313,7 @@ class CreateHelicalWidget(CreateTaskBase):
                 start_acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 start_acq.acquisition_parameters.collect_agent = \
-                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
+                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
                 start_acq.acquisition_parameters.\
                     centred_position = shape.start_cpos
                 start_acq.path_template = copy.deepcopy(self._path_template)
@@ -329,7 +327,7 @@ class CreateHelicalWidget(CreateTaskBase):
                 end_acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 end_acq.acquisition_parameters.collect_agent = \
-                    queue_model_objects.COLLECTION_ORIGIN.MXCUBE
+                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
                 end_acq.acquisition_parameters.\
                     centred_position = shape.end_cpos
                 end_acq.path_template = copy.deepcopy(self._path_template)
