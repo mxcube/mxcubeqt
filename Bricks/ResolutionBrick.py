@@ -488,7 +488,9 @@ class ResolutionBrick(BlissWidget):
             if state==self.detectorMotor.MOVESTARTED:
                 self.updateAngHistory(self.resolutionMotor.getPosition())
 
-            color=ResolutionBrick.STATE_COLORS[state]
+            if state:
+                color=ResolutionBrick.STATE_COLORS[state]
+
             unit=self.units.currentText()
             if unit==chr(197):
                 if state==self.detectorMotor.READY:
