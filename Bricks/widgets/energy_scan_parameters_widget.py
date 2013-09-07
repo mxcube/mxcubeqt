@@ -64,7 +64,7 @@ class EnergyScanParametersWidget(qt.QWidget):
         
     def tab_changed(self):
         if self._tree_view_item:
-            self.populate_parameter_widget(self._tree_view_item)
+            self.populate_widget(self._tree_view_item)
 
     def populate_widget(self, item):
         self._tree_view_item = item
