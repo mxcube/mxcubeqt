@@ -212,6 +212,8 @@ class CreateTaskBase(qt.QWidget):
                 self.single_item_selection(items[0])
             elif len(items) > 1:
                 self.multiple_item_selection(items)
+        else:
+            self.setDisabled(True)
 
     def update_selection(self):
         self.selection_changed(self._current_selected_items)
