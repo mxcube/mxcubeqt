@@ -10,7 +10,7 @@ __category__ = "Motor"
 
 class MultiplePositionsBrick(BlissWidget):
     colorState = {
-        'NOTINITIALIZED': widget_colors.DARK_GRAY, 
+        'NOTINITIALIZED': widget_colors.LIGHT_RED, 
         'UNUSABLE': widget_colors.LIGHT_RED,
         'READY': widget_colors.LIGHT_GREEN,
         'MOVING': widget_colors.LIGHT_YELLOW,

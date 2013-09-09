@@ -123,6 +123,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         
         self.defineSlot('setEnabled',())
         self.defineSlot('setDisabled',())
+        self.defineSlot('toggle_enabled',())
 
     def setExpertMode(self,mode):
         #print "MotorSpinBoxBrick.setExpertMode",mode,self['hideInUser']
@@ -132,6 +133,9 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
                 self.containerBox.show()
             else:
                 self.containerBox.hide()
+
+    def toggle_enabled(self):
+        self.setEnabled(not self.isEnabled())
 
     def run(self):
         if self.inExpert is not None:

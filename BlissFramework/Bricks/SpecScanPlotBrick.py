@@ -16,18 +16,10 @@ except ImportError:
 
 __category__ = 'Scans'
 
-## class QSpecScan(QObject, SpecScan.SpecScanA):
-##     def __init__(self, specVersion):
-##         QObject.__init__(self)
-##         SpecScan.SpecScanA.__init__(self, specVersion)
     
 
-##     def newScan(self, scanParameters):
-##         self.emit(PYSIGNAL('newScan'), (scanParameters, ))
 
 
-##     def newScanPoint(self, i, x, y):
-##         self.emit(PYSIGNAL('newPoint'), (x, y, ))
 
 
 class SpecScanPlotBrick(BlissWidget):
@@ -38,7 +30,8 @@ class SpecScanPlotBrick(BlissWidget):
 
         self.scanObject = None
         self.xdata = []
-        self.ydata = []
+        self.ylable = ""
+        self.mylog = 0
 
         self.isConnected = None
         #self.canAddPoint = None
@@ -112,24 +105,42 @@ class SpecScanPlotBrick(BlissWidget):
         #self.canAddPoint = True
         self.emit(PYSIGNAL('newScan'), ())
         self.lblTitle.setText('<nobr><b>%s</b></nobr>' % scanParameters['title'])
+        self.xdata = []
+
+        self.graph.clearcurves()
         self.graph.xlabel(scanParameters['xlabel'])
-        self.graph.ylabel(scanParameters['ylabel'])
+        self.ylabel = scanParameters['ylabel']
+
+        ylabels = self.ylabel.split()
+        self.ydatas = [[] for x in range(len(ylabels))]
+        for labels,ydata in zip(ylabels,self.ydatas):
+            self.graph.newcurve(labels,self.xdata,ydata)
+            
+        
+        self.graph.ylabel(self.ylabel)
         if self.scanObject.getScanType() == SpecScan.TIMESCAN:
             self.graph.setx1timescale(True)
         else:
             self.graph.setx1timescale(False)
-        self.xdata = []
-        self.ydata = []
-        self.graph.newcurve('scan', self.xdata, self.ydata)
-        self.graph.replot() 
+        
+        try:
+            scanParameters['scaletype'] == 'log'
+            if self.mylog == 0 :
+                self.graph.toggleLogY()
+                self.mylog = 1
+        except:
+            if self.mylog == 1:
+              self.graph.toggleLogY()
+              self.mylog = 0
 
-    def newScanPoint(self, i, x, y):
-        #if not self.canAddPoint:
-        #    return
+        self.graph.replot()
+        
+    def newScanPoint(self, x, y):
         self.xdata.append(x)
-        self.ydata.append(y)
-        self.graph.newcurve('scan', self.xdata, self.ydata)
-        self.graph.replot() 
+        for label,ydata,yvalue in zip(self.ylabel.split(),self.ydatas,y.split()) :
+            ydata.append(float(yvalue))
+            self.graph.newcurve(label,self.xdata,ydata)
+        self.graph.replot()
         
 
     def handleBlissGraphSignal(self, signalDict):
