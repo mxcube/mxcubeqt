@@ -40,7 +40,7 @@ class AcquisitionWidget(qt.QWidget):
         h_layout = qt.QHBoxLayout(self)
 
         if layout == 'vertical':
-            widget = self.acq_widget_layout = qtui.QWidgetFactory.\
+            widget = qtui.QWidgetFactory.\
                      create(os.path.join(os.path.dirname(__file__),
                                          'ui_files/acquisition_widget_vertical_layout.ui'))
         elif layout == 'horizontal':

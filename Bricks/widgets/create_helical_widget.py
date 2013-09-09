@@ -1,9 +1,8 @@
-import queue_model_enumerables_v1 as queue_model_enumerables
-import queue_model_objects_v1 as queue_model_objects
-import queue_item
 import logging
 import qt
 import copy
+import queue_model_objects_v1 as qmo
+import queue_item
 
 import ShapeHistory as shape_history
 
@@ -13,6 +12,9 @@ from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from widgets.processing_widget import ProcessingWidget
+
+from queue_model_enumerables_v1 import EXPERIMENT_TYPE
+from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 
 class CreateHelicalWidget(CreateTaskBase):
     def __init__(self, parent = None,name = None, fl = 0):
@@ -25,7 +27,6 @@ class CreateHelicalWidget(CreateTaskBase):
         # Data attributes
         #
         self.init_models()
-        
         self._prev_pos = None
         self._current_pos = None
         self._list_item_map = {}
@@ -33,7 +34,6 @@ class CreateHelicalWidget(CreateTaskBase):
         #
         # Layout
         #
-        #lines_gbox = QGroupBox(self, "lines_group_box")
         v_layout = qt.QVBoxLayout(self, 2, 5, "v_layout")
         self._lines_gbox = qt.QGroupBox('Lines', self, "lines_gbox")
         self._lines_gbox.setColumnLayout(0, qt.Qt.Vertical)
@@ -60,26 +60,27 @@ class CreateHelicalWidget(CreateTaskBase):
 
 
         self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
-        self._acq_widget = AcquisitionWidget(self._acq_gbox, 
-                                            "acquisition_widget",
-                                            layout = 'vertical',
-                                            acq_params =  self._acquisition_parameters,
-                                            path_template = self._path_template)
+        self._acq_widget = \
+            AcquisitionWidget(self._acq_gbox,
+                              "acquisition_widget", layout='vertical',
+                              acq_params=self._acquisition_parameters,
+                              path_template=self._path_template)
 
 
         self._acq_widget.disable_inverse_beam(True)
-        
-
-        self._data_path_gbox = qt.QVGroupBox('Data location', self, 'data_path_gbox')
-        self._data_path_widget = DataPathWidget(self._data_path_gbox, 
-                                               data_model = self._path_template,
-                                               layout = DataPathWidgetVerticalLayout)
+        self._data_path_gbox = qt.QVGroupBox('Data location', self,
+                                             'data_path_gbox')
+        self._data_path_widget = \
+            DataPathWidget(self._data_path_gbox, 
+                           data_model = self._path_template,
+                           layout = DataPathWidgetVerticalLayout)
 
         self._processing_gbox = qt.QVGroupBox('Processing', self, 
-                                           'processing_gbox')
+                                              'processing_gbox')
         
-        self._processing_widget = ProcessingWidget(self._processing_gbox,
-                                                   data_model = self._processing_parameters)
+        self._processing_widget = \
+            ProcessingWidget(self._processing_gbox,
+                             data_model = self._processing_parameters)
 
         v_layout.addWidget(self._lines_gbox)
         v_layout.addWidget(self._acq_gbox)
@@ -93,16 +94,21 @@ class CreateHelicalWidget(CreateTaskBase):
                         self.remove_clicked)
 
         qt.QObject.connect(self._list_box, qt.SIGNAL("selectionChanged()"),
-                        self.list_box_selection_changed)
+                           self.list_box_selection_changed)
 
-        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+        prefix_ledit = self._data_path_widget.\
+                       data_path_widget_layout.prefix_ledit
+
+        run_number_ledit = self._data_path_widget.\
+                           data_path_widget_layout.run_number_ledit
+
+        self.connect(prefix_ledit, 
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+        self.connect(run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
-
 
         self.connect(self._data_path_widget,
                      qt.PYSIGNAL("path_template_changed"),
@@ -110,30 +116,34 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self._energy_scan_result = queue_model_objects.EnergyScanResult()
-        self._processing_parameters = queue_model_objects.ProcessingParameters()
+        self._energy_scan_result = qmo.EnergyScanResult()
+        self._processing_parameters = qmo.ProcessingParameters()
   
         if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
+            has_shutter_less = self._beamline_setup_hwobj.\
+                               detector_has_shutterless()
             self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters()
 
             try:
-                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+                transmission = self._beamline_setup_hwobj.\
+                               transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
             except AttributeError:
                 transmission = 0
 
             try:
-                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+                resolution = self._beamline_setup_hwobj.\
+                             resolution_hwobj.getPosition()
                 resolution = round(float(resolution), 4)
             except AttributeError:
                 resolution = 0
 
             try:
-                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+                energy = self._beamline_setup_hwobj.energy_hwobj.\
+                         getCurrentEnergy()
                 energy = round(float(energy), 2)
             except AttributeError:
                 energy = 0
@@ -142,8 +152,8 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters.energy = energy
             self._acquisition_parameters.transmission = transmission
         else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
+            self._acquisition_parameters = qmo.AcquisitionParameters()
+            self._path_template = qmo.PathTemplate()
 
     def add_clicked(self):
         selected_shapes = self._shape_history.selected_shapes.values()
@@ -152,8 +162,10 @@ class CreateHelicalWidget(CreateTaskBase):
             p1 = selected_shapes[1]
             p2 = selected_shapes[0]
             
-            line = shape_history.Line(self._shape_history.get_drawing(), p1.qub_point, p2.qub_point,
-                                     p1.centred_position, p2.centred_position)
+            line = shape_history.\
+                   Line(self._shape_history.get_drawing(),
+                        p1.qub_point, p2.qub_point,
+                        p1.centred_position, p2.centred_position)
 
             line.show()
             self._shape_history.add_shape(line)
@@ -270,8 +282,7 @@ class CreateHelicalWidget(CreateTaskBase):
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 
-            if data_collection.experiment_type == queue_model_enumerables.\
-               EXPERIMENT_TYPE.HELICAL:
+            if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
                 self._path_template = data_collection.acquisitions[0].path_template
                 self._acquisition_parameters = data_collection.acquisitions[0].\
@@ -285,7 +296,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
                     self.select_shape_with_cpos(start_cpos, end_cpos)
 
-                self._energy_scan_result = queue_model_objects.EnergyScanResult()
+                self._energy_scan_result = qmo.EnergyScanResult()
                 self._processing_parameters = data_collection.processing_parameters
                 self._energy_scan_result = data_collection.crystal.energy_scan_result
                 self._acq_widget.set_energies(self._energy_scan_result)
@@ -310,11 +321,11 @@ class CreateHelicalWidget(CreateTaskBase):
                     snapshot = self._shape_history.get_snapshot([])
 
                 # Acquisition for start position
-                start_acq = queue_model_objects.Acquisition()
+                start_acq = qmo.Acquisition()
                 start_acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 start_acq.acquisition_parameters.collect_agent = \
-                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
+                    COLLECTION_ORIGIN.MXCUBE
                 start_acq.acquisition_parameters.\
                     centred_position = shape.start_cpos
                 start_acq.path_template = copy.deepcopy(self._path_template)
@@ -324,11 +335,11 @@ class CreateHelicalWidget(CreateTaskBase):
                 start_acq.path_template.suffix = self._session_hwobj.suffix
 
                 # Add another acquisition for the end position
-                end_acq = queue_model_objects.Acquisition()
+                end_acq = qmo.Acquisition()
                 end_acq.acquisition_parameters = \
                     copy.deepcopy(self._acquisition_parameters)
                 end_acq.acquisition_parameters.collect_agent = \
-                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
+                    COLLECTION_ORIGIN.MXCUBE
                 end_acq.acquisition_parameters.\
                     centred_position = shape.end_cpos
                 end_acq.path_template = copy.deepcopy(self._path_template)
@@ -339,15 +350,15 @@ class CreateHelicalWidget(CreateTaskBase):
 
                 processing_parameters = copy.deepcopy(self._processing_parameters)
               
-                dc = queue_model_objects.DataCollection([start_acq, end_acq],
-                                                        sample.crystals[0],
-                                                        processing_parameters)
+                dc = qmo.DataCollection([start_acq, end_acq],
+                                        sample.crystals[0],
+                                        processing_parameters)
 
                 dc.set_name(start_acq.path_template.get_prefix())
                 dc.set_number(start_acq.path_template.run_number)
 
                 
-                dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.HELICAL
+                dc.experiment_type = EXPERIMENT_TYPE.HELICAL
 
                 data_collections.append(dc)
 
