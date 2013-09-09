@@ -159,6 +159,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self._shape_history.add_shape(line)
             list_box_item = qt.QListBoxText(self._list_box, 'Line')
             self._list_item_map[list_box_item] = line
+            self._list_box.setSelected(list_box_item, True)
 
     def remove_clicked(self):
         selected_items = self.selected_items()
