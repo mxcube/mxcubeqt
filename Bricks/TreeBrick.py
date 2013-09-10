@@ -81,6 +81,9 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         # Handle selection
         self.defineSignal("selection_changed",())
+        self.defineSignal("set_directory", ())
+        self.defineSignal("set_prefix", ())
+        self.defineSignal("set_sample", ())
 
         #self.defineSignal("clear_centred_positions", ())
 
@@ -209,26 +212,6 @@ class TreeBrick(BaseComponents.BlissWidget):
                     prop_id = None, start_date = None, prop_code = None,
                     is_inhouse = None):
         pass
-        # # Tried to log into ISPyB but it didnt work for some reason,
-        # # no valid session.
-        # if session_id is '':
-        #     logging.getLogger("user_level_log").\
-        #         warning('Could not log into ISPyB, data will not be stored in ISPyB.')
-        #     logging.getLogger("user_level_log").\
-        #         warning('Could not log into ISPyB, using inhouse user to collect data.')
-            
-        # #    try:
-        # #        self._lims_hwobj.disable()
-        # #    except:
-        # #        logging.warning('Could not disable lims.')
-        # #        traceback.print_exc()
-
-        #     self.session_hwobj.set_inhouse(True)
-        # else:
-        #     lims_client = self._lims_hwobj
-        #     samples = lims_client.get_samples(prop_id, session_id)
-        #     sc_content = self.get_sc_content()
-
 
     def logged_in(self, logged_in):
         """
@@ -243,7 +226,6 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.dc_tree_widget.populate_list_view(sc_sample_list)
 
         self.dc_tree_widget.sample_list_view_selection()
-
 
     def enable_collect(self, state):
         """
@@ -260,7 +242,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.dc_tree_widget.down_button.setDisabled(not state)
         self.dc_tree_widget.delete_button.setDisabled(not state)
 
-
     def get_tree_brick(self, tree_brick):
         """
         Gets the reference to the tree brick. Used to get a reference from
@@ -273,7 +254,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         :returns: None
         """
         tree_brick['tree_brick'] = self
-
 
     def refresh_sample_list(self):
         """
@@ -342,7 +322,6 @@ class TreeBrick(BaseComponents.BlissWidget):
 
             self.dc_tree_widget.populate_list_view(sample_list)
 
-
     def get_sc_content(self):
         """
         Gets the 'raw' data from the sample changer.
@@ -366,11 +345,6 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         return sc_content
 
-
-    #def clear_centred_positions(self):
-    #    self.emit(PYSIGNAL("clear_centred_positions"), (None,))
-
-
     def status_msg_changed(self, msg, color):
         """
         Status message from the SampleChangerBrick.
@@ -382,7 +356,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         logging.getLogger("user_level_log").info(msg)
 
-    
     def set_sample_pin_icon(self, matrices):
         """
         Updates the location of the sample pin when the
@@ -390,7 +363,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         is updated, but not exclusively, when a sample is changed.
         """
         self.dc_tree_widget.set_sample_pin_icon()
-
 
     def sample_load_state_changed(self, state):
         """
@@ -404,11 +376,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.sample_changer_widget.child('details_button').\
             setPaletteBackgroundColor(qt.QColor(s_color))
 
-
-    #def set_holder_length(self, position):
-    #    self._holder_length = position
-
-    
     def show_sample_centring_tab(self):
         self.sample_changer_widget.child('details_button').setText("Show details")
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
@@ -419,7 +386,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
-
 
     def show_sample_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show details")
@@ -443,12 +409,10 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
-
     def populate_parameters_tab(self, item = None):
         self.emit(qt.PYSIGNAL("populate_parameter_widget"),
                   (item,))
         
-
     def show_datacollection_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
@@ -459,7 +423,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_parameters_tab(item)
-
 
     def show_edna_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show details")
@@ -472,11 +435,9 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_edna_parameters_tab(item)
 
-
     def populate_edna_parameters_tab(self, item):
         self.emit(qt.PYSIGNAL("populate_edna_parameter_widget"),
                   (item,))
-
 
     def show_energy_scan_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show details")
@@ -489,16 +450,13 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_energy_scan_tab(item)
 
-
     def populate_energy_scan_tab(self, item):
         self.emit(qt.PYSIGNAL("populate_energy_scan_widget"), (item,))
-
 
     def show_workflow_tab_from_model(self, model):
         view_item = self.dc_tree_widget.get_item_by_model(model)
         self.show_workflow_tab(view_item)
         
-
     def show_workflow_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
@@ -510,11 +468,9 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
         self.populate_workflow_tab(item)
 
-
     def populate_workflow_tab(self, item):
         self.emit(qt.PYSIGNAL("populate_workflow_tab"), (item,))
         
-
     def toggle_sample_changer_tab(self): 
         if self.current_view is self.sample_changer_widget:
             self.current_view = None
@@ -530,69 +486,39 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.sample_changer_widget.child('details_button').setText("Hide details")
             self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         
-
     def selection_changed(self, items):
         if len(items) == 1:
             item = items[0]
             if isinstance(item, queue_item.SampleQueueItem):
                 self.emit(qt.PYSIGNAL("populate_sample_details"), (item.get_model(),))
+                self.emit_set_sample(item)
+                self.emit_set_directory()
+                self.emit_set_prefix(item)
             elif isinstance(item, queue_item.DataCollectionQueueItem):
                 self.populate_parameters_tab(item)
             elif isinstance(item, queue_item.CharacterisationQueueItem):
                 self.populate_edna_parameters_tab(item)
 
+
         self.emit(qt.PYSIGNAL("selection_changed"), (items,))
 
+    def emit_set_directory(self):
+        directory = self.session_hwobj.get_base_image_directory()
+        self.emit(qt.PYSIGNAL("set_directory"), (directory,))
 
-    # def new_centred_positions(self, state, centring_status):
-    #     p_dict = {}
+    def emit_set_prefix(self, item):
+        prefix = self.session_hwobj.get_default_prefix(item.get_model())
+        self.emit(qt.PYSIGNAL("set_prefix"), (prefix,))
+
+    def emit_set_sample(self, item):
+        sample_id = item.get_model().lims_id
+
+        if sample_id != -1:
+            self.emit(qt.PYSIGNAL("set_sample"), (sample_id,))
         
-    #     if 'motors' in centring_status and \
-    #             'extraMotors' in centring_status:
-
-    #         p_dict = dict(centring_status['motors'], 
-    #                       **centring_status['extraMotors'])
-
-    #     elif 'motors' in centring_status:
-    #         p_dict = dict(centring_status['motors']) 
-
-    #     if p_dict:
-    #         cpos = queue_model_objects.CentredPosition(p_dict)
-
-    #     self.current_cpos = cpos
-
-
     def get_selected_items(self):
         items = self.dc_tree_widget.get_selected_items()
         return items
-
-
-    # def get_selected_samples(self):
-    #     sample_items = self.dc_tree_widget.get_selected_samples()
-    #     return sample_items
-
-
-    # def get_selected_groups(self):
-    #     return self.dc_tree_widget.get_selected_dcgs()
-
-
-    # def is_mounted_sample_item(self, item):
-    #     return self.dc_tree_widget.is_mounted_sample_item(item)
-
-            
-    # def get_mounted_sample_item(self, s):
-    #     sample_item = self.dc_tree_widget.get_mounted_sample()
-    #     s['sample'] = sample_item.get_model()
-    
-
-    # def is_sample_selected(self, selected_sample_dict):
-    #     selected_sample = self.dc_tree_widget.is_sample_selected()
-
-    #     if selected_sample:        
-    #         selected_sample_dict["sample_selected"] = True
-    #     else:
-    #         selected_sample_dict["sample_selected"] = False
-
 
     def add_to_queue(self, task_list, parent_tree_item = None, set_on = True):
         if not parent_tree_item :
