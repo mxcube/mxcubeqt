@@ -205,7 +205,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                              self.add_to_queue)
 
                 self.connect(xml_rpc_server_hwobj, 'start_queue',
-                             self.dc_tree_widget.collect_stop_toggle)
+                             self.dc_tree_widget.collect_items)
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
@@ -466,10 +466,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
-        self.populate_workflow_tab(item)
-
-    def populate_workflow_tab(self, item):
-        self.emit(qt.PYSIGNAL("populate_workflow_tab"), (item,))
+        #self.populate_workflow_tab(item)
         
     def toggle_sample_changer_tab(self): 
         if self.current_view is self.sample_changer_widget:
@@ -494,6 +491,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.emit_set_sample(item)
                 self.emit_set_directory()
                 self.emit_set_prefix(item)
+                #self.populate_edna_parameter_widget(item)
             elif isinstance(item, queue_item.DataCollectionQueueItem):
                 self.populate_parameters_tab(item)
             elif isinstance(item, queue_item.CharacterisationQueueItem):
@@ -511,11 +509,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("set_prefix"), (prefix,))
 
     def emit_set_sample(self, item):
-        sample_id = item.get_model().lims_id
+        self.emit(qt.PYSIGNAL("set_sample"), (item,))
 
-        if sample_id != -1:
-            self.emit(qt.PYSIGNAL("set_sample"), (sample_id,))
-        
     def get_selected_items(self):
         items = self.dc_tree_widget.get_selected_items()
         return items

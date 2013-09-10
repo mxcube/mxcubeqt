@@ -25,7 +25,11 @@ class EDNAParameters(BlissWidget):
         #when starting a workflow we emit this signal and expect
         #to get the beamline params through the slot
         self.defineSlot('updateBeamlineParameters', ())
-        self.defineSlot("populate_workflow_widget",({}))  
+        self.defineSlot("populate_workflow_widget",({}))
+        self.defineSlot("set_sample", ())
+        self.defineSlot("set_directory", ())
+        self.defineSlot("set_prefix", ())
+        
         self.defineSignal('beamlineParametersNeeded', ())
         self.defineSignal('workflowAvailable', ())
 
@@ -322,15 +326,12 @@ class EDNAParameters(BlissWidget):
         else:
             self.session_id = int(login_infos[0])
 
-
-    def populate_workflow_widget(self, item):        
-        self.beamline_params['directory'] = item.get_model().path_template.directory
-        self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
-        self.beamline_params['run_number'] = item.get_model().path_template.run_number
- 
+    def set_sample(self, item):        
         self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
-        self.beamline_params['sample_node_id'] = item.get_model().get_parent().\
-                                                 get_parent()._node_id
-        self.beamline_params['group_node_id'] = item.get_model().get_parent()._node_id
+        self.beamline_params['sample_node_id'] = item.get_model()._node_id
 
-        #self.workflow_selected(item.get_model().get_type())
+    def set_directory(self, directory):
+        self.beamline_params['directory'] = directory
+
+    def set_prefix(self, prefix):
+        self.beamline_params['prefix'] = prefix
