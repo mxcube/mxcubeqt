@@ -424,7 +424,7 @@ class DataCollectTree(qt.QWidget):
             self.continue_button.setText('Pause')
 
     def collect_stop_toggle(self):
-        self.checked_items = self.get_checked_items()
+        checked_items = self.get_checked_items()
         self.queue_hwobj.disable(False)
 
         path_conflict = self.check_for_path_collisions()     
@@ -443,8 +443,8 @@ class DataCollectTree(qt.QWidget):
             for item in selected_items:
                 self.sample_list_view.setSelected(item, False)
             
-            if len(self.checked_items):
-                self.confirm_dialog.set_items(self.checked_items)
+            if len(checked_items):
+                self.confirm_dialog.set_items(checked_items)
                 self.confirm_dialog.show()
             else:
                 message = "No data collections selected, please select one" + \
@@ -468,8 +468,8 @@ class DataCollectTree(qt.QWidget):
                    getLoadedSampleLocation():
                 return True
 
-    def collect_items(self, items = None):
-        for item in self.checked_items:
+    def collect_items(self, items = []):
+        for item in items:
             # update the run-number text incase of re-collect
             item.setText(0, item.get_model().get_name())
 
