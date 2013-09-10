@@ -303,6 +303,8 @@ class CreateHelicalWidget(CreateTaskBase):
                 self._processing_widget.update_data_model(self._processing_parameters)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
+            else:
+                self.setDisabled(True)
         else:
             self.setDisabled(True)
   

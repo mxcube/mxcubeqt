@@ -155,26 +155,30 @@ class CreateDiscreteWidget(CreateTaskBase):
                               crystals[0].energy_scan_result)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            self.setDisabled(False)
             data_collection = tree_item.get_model()
 
-            if data_collection.get_path_template():
-                self._path_template = data_collection.get_path_template()
+            if data_collection.experiment_type != queue_model_enumerables.\
+                    EXPERIMENT_TYPE.HELICAL:
+                self.setDisabled(False)
+                if data_collection.get_path_template():
+                    self._path_template = data_collection.get_path_template()
 
-            self._data_path_widget.update_data_model(self._path_template)
-            
-            self._acquisition_parameters = data_collection.acquisitions[0].\
-                                           acquisition_parameters
+                self._data_path_widget.update_data_model(self._path_template)
 
-            if len(data_collection.acquisitions) == 1:
-                self.select_shape_with_cpos(self._acquisition_parameters.\
-                                            centred_position)
+                self._acquisition_parameters = data_collection.acquisitions[0].\
+                                               acquisition_parameters
 
-            self._energy_scan_result = queue_model_objects.EnergyScanResult()
-            self._processing_parameters = data_collection.processing_parameters
-            self._energy_scan_result = data_collection.crystal.\
-                                       energy_scan_result
-            self._acq_widget.set_energies(self._energy_scan_result)
+                if len(data_collection.acquisitions) == 1:
+                    self.select_shape_with_cpos(self._acquisition_parameters.\
+                                                centred_position)
+
+                self._energy_scan_result = queue_model_objects.EnergyScanResult()
+                self._processing_parameters = data_collection.processing_parameters
+                self._energy_scan_result = data_collection.crystal.\
+                                           energy_scan_result
+                self._acq_widget.set_energies(self._energy_scan_result)
+            else:
+                self.setDisabled(True)
         else:
             # Disable control
             self.setDisabled(True)

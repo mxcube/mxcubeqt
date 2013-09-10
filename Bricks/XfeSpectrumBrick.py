@@ -199,22 +199,9 @@ class XfeSpectrumBrick(BlissWidget):
         if d is not None and len(d)>0:
             self.setDirectory(d)
 
-    def setSample(self,samples_list):
-        #print "XfeSpectrumBrick.setSample",samples_list
-        if len(samples_list)==0:
-            self.blSampleId=None
-        else:
-            if len(samples_list)>1:
-                logging.getLogger().warning("XfeSpectrumBrick: multiple samples selected (attaching spectrum to the first sample only)!")
-            for sample in samples_list:
-                try:
-                    blsample_id=int(sample[0])
-                except:
-                    pass
-                else:
-                    self.blSampleId=blsample_id
-                    break
-
+    def setSample(self, samples_id):
+        self.blSampleId = sample_id
+       
     def setSession(self,session_id,prop_code=None,prop_number=None,prop_id=None,expiration_time=0):
         self.sessionId=session_id
         if prop_code is None or prop_number is None:
