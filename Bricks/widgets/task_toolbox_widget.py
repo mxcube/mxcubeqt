@@ -45,7 +45,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tool_box.addItem(self.char_page, "Characterise")
         self.tool_box.addItem(self.helical_page, "Helical")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-        self.tool_box.addItem(self.workflow_page, "Workflow")
+        #self.tool_box.addItem(self.workflow_page, "Workflow")
 
         self.add_pixmap = Icons.load("add_row.png")
         self.create_task_button = qt.QPushButton("  Add to queue", self)
