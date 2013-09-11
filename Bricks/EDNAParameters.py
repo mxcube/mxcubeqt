@@ -25,11 +25,7 @@ class EDNAParameters(BlissWidget):
         #when starting a workflow we emit this signal and expect
         #to get the beamline params through the slot
         self.defineSlot('updateBeamlineParameters', ())
-        self.defineSlot("populate_workflow_widget",({}))
-        self.defineSlot("set_sample", ())
-        self.defineSlot("set_directory", ())
-        self.defineSlot("set_prefix", ())
-        
+        self.defineSlot("populate_workflow_widget",({}))  
         self.defineSignal('beamlineParametersNeeded', ())
         self.defineSignal('workflowAvailable', ())
 
@@ -51,7 +47,9 @@ class EDNAParameters(BlissWidget):
         self.abort_button = QPushButton('Abort', self)
 
         self.workflow_list = QComboBox(self)
+        self.workflow_list.hide()
         self.start_button = QPushButton('Start', self)
+        self.start_button.hide()
         self.workflows_box.addWidget(self.workflow_list)
         self.workflows_box.addWidget(self.start_button)
 
@@ -281,7 +279,8 @@ class EDNAParameters(BlissWidget):
         #params.append(blparams.marshal())
         #self.workflow_output_file = filename
         logging.debug('starting workflow %s with params %r', name, params)
-        self.workflow.start(params)
+        #self.workflow.start(params)
+        return params
 
     def updateBeamlineParameters(self, params):
         logging.debug('got beamline param update, new values: %r', params)
@@ -305,6 +304,7 @@ class EDNAParameters(BlissWidget):
     def workflow_selected(self, name):
         if type(name) != types.StringType:
             name = str(name)
+        self.workflow_list.setCurrentText(name)
         #get the path of the html describing the WF
         workflow_doc = self.workflows[name]['doc']
         if self.params_widget is not None:
@@ -326,12 +326,6 @@ class EDNAParameters(BlissWidget):
         else:
             self.session_id = int(login_infos[0])
 
-    def set_sample(self, item):        
-        self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
-        self.beamline_params['sample_node_id'] = item.get_model()._node_id
 
-    def set_directory(self, directory):
-        self.beamline_params['directory'] = directory
-
-    def set_prefix(self, prefix):
-        self.beamline_params['prefix'] = prefix
+    def populate_workflow_widget(self, item):
+        self.workflow_selected(item.get_model().get_type())
