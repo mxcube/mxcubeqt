@@ -47,7 +47,9 @@ class EDNAParameters(BlissWidget):
         self.abort_button = QPushButton('Abort', self)
 
         self.workflow_list = QComboBox(self)
+        self.workflow_list.hide()
         self.start_button = QPushButton('Start', self)
+        self.start_button.hide()
         self.workflows_box.addWidget(self.workflow_list)
         self.workflows_box.addWidget(self.start_button)
 
@@ -277,7 +279,8 @@ class EDNAParameters(BlissWidget):
         #params.append(blparams.marshal())
         #self.workflow_output_file = filename
         logging.debug('starting workflow %s with params %r', name, params)
-        self.workflow.start(params)
+        #self.workflow.start(params)
+        return params
 
     def updateBeamlineParameters(self, params):
         logging.debug('got beamline param update, new values: %r', params)
@@ -301,6 +304,7 @@ class EDNAParameters(BlissWidget):
     def workflow_selected(self, name):
         if type(name) != types.StringType:
             name = str(name)
+        self.workflow_list.setCurrentText(name)
         #get the path of the html describing the WF
         workflow_doc = self.workflows[name]['doc']
         if self.params_widget is not None:
@@ -323,14 +327,5 @@ class EDNAParameters(BlissWidget):
             self.session_id = int(login_infos[0])
 
 
-    def populate_workflow_widget(self, item):        
-        self.beamline_params['directory'] = item.get_model().path_template.directory
-        self.beamline_params['prefix'] = item.get_model().path_template.get_prefix()
-        self.beamline_params['run_number'] = item.get_model().path_template.run_number
- 
-        self.beamline_params['collection_software'] = 'mxCuBE - 2.0'
-        self.beamline_params['sample_node_id'] = item.get_model().get_parent().\
-                                                 get_parent()._node_id
-        self.beamline_params['group_node_id'] = item.get_model().get_parent()._node_id
-
-        #self.workflow_selected(item.get_model().get_type())
+    def populate_workflow_widget(self, item):
+        self.workflow_selected(item.get_model().get_type())
