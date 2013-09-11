@@ -199,8 +199,11 @@ class XfeSpectrumBrick(BlissWidget):
         if d is not None and len(d)>0:
             self.setDirectory(d)
 
-    def setSample(self, samples_id):
-        self.blSampleId = sample_id
+    def setSample(self, item):
+        sample_id = item.get_model().lims_id
+
+        if sample_id != -1:
+            self.blSampleId = sample_id
        
     def setSession(self,session_id,prop_code=None,prop_number=None,prop_id=None,expiration_time=0):
         self.sessionId=session_id
