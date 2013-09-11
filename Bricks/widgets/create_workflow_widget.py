@@ -3,6 +3,7 @@ import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import MxLookupScanBrick
+import itertools
 
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
@@ -16,6 +17,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
         # Data attributes
         self.workflow_hwobj = None
+        self.workflows = {}
         
         self.init_models()
 
@@ -63,10 +65,21 @@ class CreateWorkflowWidget(CreateTaskBase):
 
     def set_workflow(self, workflow_hwobj):
         self._workflow_hwobj = workflow_hwobj
+        self.workflows.clear()
+        self._workflow_cbox.clear()
 
         if self._workflow_hwobj is not None:
             for workflow in self._workflow_hwobj.get_available_workflows():
                 self._workflow_cbox.insertItem(workflow['name'])
+                self.workflows[workflow['name']] = workflow
+
+
+    def set_shape_history(self, shape_history_hwobj):
+        self._grid_widget._shape_history = shape_history_hwobj
+        self._grid_widget._horizontalMotors = self._beamline_setup_hwobj.\
+                                              getObjectByRole('horizontal_motors')
+        self._grid_widget._verticalMotors = self._beamline_setup_hwobj.\
+                                            getObjectByRole('vertical_motors')
 
 
     def init_models(self):
@@ -85,7 +98,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
     def approve_creation(self):
         return CreateTaskBase.approve_creation(self)
-    
+
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
@@ -93,10 +106,26 @@ class CreateWorkflowWidget(CreateTaskBase):
         tasks = []
 
         path_template = copy.deepcopy(self._path_template)
+        path_template.num_files = 0
+
         wf = queue_model_objects.Workflow()
+        wf_name = str(self._workflow_cbox.currentText())
         wf.path_template = path_template
         wf.set_name(path_template.get_prefix())
-        wf.set_type(self._workflow_cbox.currentText())
+        wf.set_type(wf_name)
+        
+        beamline_params = {}
+        beamline_params['directory'] = wf.path_template.directory
+        beamline_params['prefix'] = wf.path_template.get_prefix()
+        beamline_params['run_number'] = wf.path_template.run_number
+        beamline_params['collection_software'] = 'mxCuBE - 2.0'
+        beamline_params['sample_node_id'] = sample._node_id
+
+        params_list = map(str, list(itertools.chain(*beamline_params.iteritems())))
+        params_list.insert(0, self.workflows[wf_name]['path'])
+        params_list.insert(0, 'modelpath')
+        
+        wf.params_list = params_list
         
         tasks.append(wf)
 
