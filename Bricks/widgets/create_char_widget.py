@@ -1,21 +1,21 @@
+import os
+import qtui
+import qt
+import copy
+import logging
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 import queue_item
-import copy
-import logging
 import ShapeHistory as shape_history
 
-from qt import *
 from widgets.widget_utils import DataModelInputBinder
-from widgets.characterise_simple_widget_vertical_layout import \
-    CharacteriseSimpleWidgetVerticalLayout
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
 from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout
-from widgets.vertical_crystal_dimension_widget_layout\
-    import VerticalCrystalDimensionWidgetLayout
 from acquisition_widget_simple import AcquisitionWidgetSimple
+
+from queue_model_enumerables_v1 import XTAL_SPACEGROUPS
 
 
 class CreateCharWidget(CreateTaskBase):
@@ -35,18 +35,34 @@ class CreateCharWidget(CreateTaskBase):
         #
         # Layout
         #
-        v_layout = QVBoxLayout(self, 2, 6, "v_layout")
-        self._acq_widget = AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
-                                                   path_template = self._path_template)
-                
-        self._vertical_dimension_widget = VerticalCrystalDimensionWidgetLayout(self)
-        self._char_widget = CharacteriseSimpleWidgetVerticalLayout(self, "characterise_widget")
+        v_layout = qt.QVBoxLayout(self, 2, 6, "v_layout")
+        
+        self._acq_widget = \
+            AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
+                                    path_template = self._path_template)
 
+        current_dir = os.path.dirname(__file__)
+        ui_file = 'ui_files/vertical_crystal_dimension_widget_layout.ui'
+        widget = qtui.QWidgetFactory.\
+                 create(os.path.join(current_dir, ui_file))
 
-        self._data_path_gbox = QVGroupBox('Data location', self, 'data_path_gbox')
-        self._data_path_widget = DataPathWidget(self._data_path_gbox, 
-                                               data_model = self._path_template,
-                                               layout = DataPathWidgetVerticalLayout)
+        widget.reparent(self, qt.QPoint(0,0))
+        self._vertical_dimension_widget = widget
+
+        ui_file = 'ui_files/characterise_simple_widget_vertical_layout.ui'
+        widget = qtui.QWidgetFactory.\
+                 create(os.path.join(current_dir, ui_file))
+
+        widget.reparent(self, qt.QPoint(0,0))
+        self._char_widget = widget
+
+        self._data_path_gbox = \
+            qt.QVGroupBox('Data location', self, 'data_path_gbox')
+        
+        self._data_path_widget = \
+            DataPathWidget(self._data_path_gbox, 
+                           data_model = self._path_template,
+                           layout = DataPathWidgetVerticalLayout)
 
         v_layout.addWidget(self._acq_widget)
         v_layout.addWidget(self._char_widget)
@@ -57,88 +73,98 @@ class CreateCharWidget(CreateTaskBase):
         #
         # Logic
         #
-        self._char_params_mib.bind_value_update('opt_sad', 
-                                                 self._char_widget.optimised_sad_cbx,
-                                                 bool,
-                                                 None)
+        optimised_sad_cbx = self._char_widget.\
+                            child('optimised_sad_cbx')
+        account_rad_dmg_cbx = self._char_widget.\
+                              child('account_rad_dmg_cbx')
+        start_comp_cbox = self._char_widget.child('start_comp_cbox')
+        induced_burn_cbx = self._char_widget.child('induced_burn_cbx')
+        max_vdim_ledit = self._vertical_dimension_widget.\
+                         child('max_vdim_ledit')
+        min_vdim_ledit = self._vertical_dimension_widget.\
+                         child('min_vdim_ledit')
+
+        min_vphi_ledit = self._vertical_dimension_widget.\
+                         child('min_vphi_ledit')
+
+        max_vphi_ledit = self._vertical_dimension_widget.\
+                         child('max_vphi_ledit')
+
+        space_group_ledit = self._vertical_dimension_widget.\
+                            child('space_group_ledit')
+        
+        self._char_params_mib.bind_value_update('opt_sad',
+                                                optimised_sad_cbx,
+                                                bool, None)
 
         self._char_params_mib.bind_value_update('account_rad_damage', 
-                                                 self._char_widget.account_rad_dmg_cbx,
-                                                 bool,
-                                                 None)
+                                                account_rad_dmg_cbx,
+                                                bool, None)
 
         self._char_params_mib.bind_value_update('determine_rad_params', 
-                                                 self._char_widget.induced_burn_cbx,
-                                                 bool,
-                                                 None)
+                                                induced_burn_cbx,
+                                                bool, None)
 
         self._char_params_mib.bind_value_update('strategy_complexity',
-                                                 self._char_widget.start_comp_cbox,
-                                                 int,
-                                                 None)
+                                                start_comp_cbox,
+                                                int, None)
 
-        self._char_params_mib.bind_value_update('max_crystal_vdim',
-                                                self._vertical_dimension_widget.max_vdim_ledit,
-                                                float,
-                                                QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.\
+            bind_value_update('max_crystal_vdim',
+                              max_vdim_ledit, float,
+                              qt.QDoubleValidator(0.0, 1000, 2, self))
 
-        self._char_params_mib.bind_value_update('min_crystal_vdim',
-                                                self._vertical_dimension_widget.min_vdim_ledit,
-                                                float,
-                                                QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.\
+            bind_value_update('min_crystal_vdim',
+                              min_vdim_ledit, float,
+                              qt.QDoubleValidator(0.0, 1000, 2, self))
 
-        self._char_params_mib.bind_value_update('min_crystal_vphi',
-                                                self._vertical_dimension_widget.min_vphi_ledit,
-                                                float,
-                                                QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.\
+            bind_value_update('min_crystal_vphi',
+                              min_vphi_ledit, float,
+                              qt.QDoubleValidator(0.0, 1000, 2, self))
 
-        self._char_params_mib.bind_value_update('max_crystal_vphi',
-                                                self._vertical_dimension_widget.max_vphi_ledit,
-                                                float,
-                                                QDoubleValidator(0.0, 1000, 2, self))
-
-        # self._char_params_mib.bind_value_update('space_group',
-        #                                         self._vertical_dimension_widget.space_group_ledit,
-        #                                         str,
-        #                                         None)
-
+        self._char_params_mib.\
+            bind_value_update('max_crystal_vphi',
+                              max_vphi_ledit, float,
+                              qt.QDoubleValidator(0.0, 1000, 2, self))
         
-        self._vertical_dimension_widget.space_group_ledit.\
-            insertStrList(queue_model_enumerables.XTAL_SPACEGROUPS)
+        space_group_ledit.insertStrList(XTAL_SPACEGROUPS)
 
-        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
-                     SIGNAL("textChanged(const QString &)"), 
+        prefix_ledit = self._data_path_widget.\
+                       data_path_widget_layout.prefix_ledit
+
+        run_number_ledit = self._data_path_widget.\
+                           data_path_widget_layout.run_number_ledit
+
+        self.connect(prefix_ledit,
+                     qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-
-        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
-                     SIGNAL("textChanged(const QString &)"), 
+        self.connect(run_number_ledit,
+                     qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
-
-        self.connect(self._vertical_dimension_widget.space_group_ledit,
-                     SIGNAL("activated(int)"),
+        self.connect(space_group_ledit,
+                     qt.SIGNAL("activated(int)"),
                      self._space_group_change)
 
-
         self.connect(self._data_path_widget,
-                     PYSIGNAL("path_template_changed"),
+                     qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
-
 
     def _space_group_change(self, index):
        self._char_params.space_group = queue_model_enumerables.\
                                        XTAL_SPACEGROUPS[index]
-
     def _set_space_group(self, space_group):
         index  = 0
         
-        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
-            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in XTAL_SPACEGROUPS:
+            index = XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
-        self._vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
-
+        self._vertical_dimension_widget.\
+            child('space_group_ledit').setCurrentItem(index)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -217,7 +243,6 @@ class CreateCharWidget(CreateTaskBase):
                                                self._path_template)
             self._char_params_mib.set_model(self._char_params)
 
-
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
         self._char_params.space_group = crystal.space_group
@@ -228,11 +253,9 @@ class CreateCharWidget(CreateTaskBase):
         self._processing_parameters.cell_c = crystal.cell_c
         self._processing_parameters.cell_gamma = crystal.cell_gamma
 
-
     def approve_creation(self):
         return CreateTaskBase.approve_creation(self)
         
-
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
     def _create_task(self, sample):
