@@ -37,7 +37,6 @@ class GreenletStdout:
 
     OUTPUT[client_id].put(output)
 
-sys.stdout = GreenletStdout()
 
 # patch socket module;
 # by default bottle doesn't set address as reusable
@@ -194,15 +193,19 @@ def execute_command():
 
 def do_execute(python_code_to_execute):
   try:
-    INTERPRETER.compile_and_run(python_code_to_execute)
-  except EOFError:
-    return {"error":"EOF","input":python_code_to_execute}
-  except RuntimeError, e:
-    error_string = str(e)
-    sys.stderr.write(error_string)
-    return {"error":error_string+"\n"}
-  else:
-    return {"error":""}
+      sys.stdout = GreenletStdout()
+      try:
+        INTERPRETER.compile_and_run(python_code_to_execute)
+      except EOFError:
+        return {"error":"EOF","input":python_code_to_execute}
+      except RuntimeError, e:
+        error_string = str(e)
+        sys.stderr.write(error_string)
+        return {"error":error_string+"\n"}
+      else:
+        return {"error":""}
+  finally:
+      sys.stdout = sys.__stdout__ 
 
 @bottle.route('/')
 def main():
