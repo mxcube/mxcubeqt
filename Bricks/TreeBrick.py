@@ -453,11 +453,10 @@ class TreeBrick(BaseComponents.BlissWidget):
     def populate_energy_scan_tab(self, item):
         self.emit(qt.PYSIGNAL("populate_energy_scan_widget"), (item,))
 
-    def show_workflow_tab_from_model(self, model):
-        view_item = self.dc_tree_widget.get_item_by_model(model)
-        self.show_workflow_tab(view_item)
+    def show_workflow_tab_from_model(self):
+        self.show_workflow_tab()
         
-    def show_workflow_tab(self, item):
+    def show_workflow_tab(self):
         self.sample_changer_widget.child('details_button').setText("Show details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
