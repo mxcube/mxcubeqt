@@ -146,6 +146,36 @@ class BaseGraphicScan(BlissWidget) :
         elif property == 'formatString' :
             self._formatString = self['formatString']
 
+            
+    def initialize_motors(self, property, motors):
+      if property == 'horizontal' or property == 'vertical' :
+            try:
+                hardwareObject = motors
+                if hardwareObject is None:
+                    return
+            except:
+                return
+            motors = []
+            l = qt.QStringList()
+            if not hardwareObject.hasObject('motors') :
+                try:
+                    l.append(hardwareObject.getMotorMnemonic())
+                    motors.append(hardwareObject)
+                except:
+                    logging.getLogger().error('is not a motor device nor an Equipment : no <motors> section')
+            else:
+                ho = hardwareObject['motors']
+                for motor in ho :
+                    motors.append(motor)
+                    l.append(motor.getMotorMnemonic())
+
+            if property == 'horizontal':
+                self._horizontalMotors = motors
+            else:
+                self._verticalMotors = motors
+
+            self._setMotor(property,l)
+
     def run(self):
         """
         get view
