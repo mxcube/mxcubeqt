@@ -88,8 +88,8 @@ class CreateTaskBase(qt.QWidget):
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
         
-        if isinstance(item, queue_item.TaskQueueItem):
-            prefix = self._path_template.get_prefix()
+        if isinstance(item, queue_item.TaskQueueItem) and \
+               not isinstance(item, queue_item.DataCollectionGroupQueueItem):
             item.get_model().set_name(prefix)
             item.setText(0, item.get_model().get_name())
         
@@ -98,7 +98,6 @@ class CreateTaskBase(qt.QWidget):
         
         if isinstance(item, queue_item.TaskQueueItem) and \
                not isinstance(item, queue_item.DataCollectionGroupQueueItem):
-
             if str(new_value).isdigit():
                 item.get_model().set_number(int(new_value))
                 item.setText(0, item.get_model().get_name())
