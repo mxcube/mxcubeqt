@@ -76,10 +76,14 @@ class CreateWorkflowWidget(CreateTaskBase):
 
     def set_shape_history(self, shape_history_hwobj):
         self._grid_widget._shape_history = shape_history_hwobj
-        self._grid_widget._horizontalMotors = self._beamline_setup_hwobj.\
-                                              getObjectByRole('horizontal_motors')
-        self._grid_widget._verticalMotors = self._beamline_setup_hwobj.\
-                                            getObjectByRole('vertical_motors')
+
+        motor =  self._beamline_setup_hwobj.\
+                getObjectByRole('horizontal_motors')
+        self._grid_widget.initialize_motors('horizontal', motor)
+
+        motor = self._beamline_setup_hwobj.\
+                getObjectByRole('vertical_motors')
+        self._grid_widget.initialize_motors('vertical', motor)
 
 
     def init_models(self):
