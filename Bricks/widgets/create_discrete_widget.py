@@ -192,7 +192,15 @@ class CreateDiscreteWidget(CreateTaskBase):
                                                self._path_template)
         
     def approve_creation(self):
-        return CreateTaskBase.approve_creation(self)
+        result = CreateTaskBase.approve_creation(self)
+        selected_shapes = self._shape_history.selected_shapes
+
+        for shape in selected_shapes:
+            if isinstance(shape, shape_history.Line):
+                result = False
+
+        return result
+        
 
     def subwedges_for_inverse_beam(self, total_num_images, subwedge_size):
         number_of_subwedges = total_num_images / subwedge_size
