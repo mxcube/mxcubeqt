@@ -68,7 +68,14 @@ class DCParametersBrick(BaseComponents.BlissWidget):
 
 
     def populate_results(self, data_collection):
-        self.results_view.setText(html_template.html_report(data_collection))
+        if data_collection.html_report[-4:] == 'html':
+            if self.results_view.mimeSourceFactory().\
+                   data(data_collection.html_report) == None:
+                self.results_view.setText(html_template.html_report(data_collection))
+            else:
+                self.results_view.setSource(data_collection.html_report)
+        else:
+            self.results_view.setText(html_template.html_report(data_collection))
         
 
     def toggle_page(self):
