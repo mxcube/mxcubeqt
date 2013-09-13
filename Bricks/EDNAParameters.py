@@ -327,5 +327,6 @@ class EDNAParameters(BlissWidget):
             self.session_id = int(login_infos[0])
 
 
-    def populate_workflow_widget(self, item):
-        self.workflow_selected(item.get_model().get_type())
+    def populate_workflow_widget(self, item, running = False):        
+        if item and not running:
+            self.workflow_selected(item.get_model().get_type())
