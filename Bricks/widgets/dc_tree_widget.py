@@ -222,7 +222,7 @@ class DataCollectTree(qt.QWidget):
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
             elif isinstance(item, queue_item.GenericWorkflowQueueItem):
-                self.tree_brick.show_workflow_tab()
+                self.tree_brick.show_workflow_tab(item)
         elif len(items) == 0:
             self.tree_brick.show_sample_tab()
 
