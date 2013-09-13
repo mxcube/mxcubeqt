@@ -454,9 +454,9 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("populate_energy_scan_widget"), (item,))
 
     def show_workflow_tab_from_model(self):
-        self.show_workflow_tab()
+        self.show_workflow_tab(None)
         
-    def show_workflow_tab(self):
+    def show_workflow_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
@@ -465,7 +465,12 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
-        #self.populate_workflow_tab(item)
+
+        running = self.queue_hwobj.is_executing() 
+        self.populate_workflow_tab(item, running=running)
+
+    def populate_workflow_tab(self, item, running = False):
+        self.emit(qt.PYSIGNAL("populate_workflow_tab"), (item, running))
         
     def toggle_sample_changer_tab(self): 
         if self.current_view is self.sample_changer_widget:
@@ -495,7 +500,6 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.populate_parameters_tab(item)
             elif isinstance(item, queue_item.CharacterisationQueueItem):
                 self.populate_edna_parameters_tab(item)
-
 
         self.emit(qt.PYSIGNAL("selection_changed"), (items,))
 
