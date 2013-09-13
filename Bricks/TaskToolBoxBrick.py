@@ -34,6 +34,8 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.defineSlot("set_session", ())
         self.defineSlot("selection_changed",())
         self.defineSlot("new_centred_position", ())
+        self.defineSlot("change_pixel_calibration", ())
+        self.defineSlot("change_beam_position", ())
 
         # Layout
         self.task_tool_box_widget = TaskToolBoxWidget(self)
@@ -132,6 +134,14 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+
+    def change_pixel_calibration(self, sizex, sizey):
+        self.task_tool_box_widget.workflow_page.\
+            _grid_widget.ChangePixelCalibration(sizex, sizey)
+
+    def change_beam_position(self, x, y):
+        self.task_tool_box_widget.workflow_page.\
+            _grid_widget.ChangeBeamPosition(x, y)
 
 
     def selection_changed(self, items):
