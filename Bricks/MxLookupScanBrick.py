@@ -20,12 +20,12 @@ class MxLookupScanBrick(BaseGraphicScan) :
         self._graphicSelection = None
         self.__gridPoints = None
         self._matchPoints = None
-        self.__offsetMeasure = 1e-3
+        self.__offsetMeasure = 1e3
         self.old_mot1_pos = None
         self.old_mot2_pos = None
         self._shape_history = None
         
-        self.addProperty('offsetmeasure','float',1e-3)
+        self.addProperty('offsetmeasure','float',1e3)
         self.defineSignal("addToQueue", ())
         self.defineSignal('clearQueue', ())
         self.defineSignal("dataCollectParametersRequest", ())
