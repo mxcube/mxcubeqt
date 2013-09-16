@@ -87,20 +87,24 @@ class CreateTaskBase(qt.QWidget):
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
-        
-        if isinstance(item, queue_item.TaskQueueItem) and \
-               not isinstance(item, queue_item.DataCollectionGroupQueueItem):
-            item.get_model().set_name(prefix)
-            item.setText(0, item.get_model().get_name())
+        model = item.get_model()
+
+        if self.isEnabled():
+            if isinstance(item, queue_item.TaskQueueItem) and \
+                   not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                model.set_name(prefix)
+                item.setText(0, model.get_name())
         
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_items[0]
-        
-        if isinstance(item, queue_item.TaskQueueItem) and \
-               not isinstance(item, queue_item.DataCollectionGroupQueueItem):
-            if str(new_value).isdigit():
-                item.get_model().set_number(int(new_value))
-                item.setText(0, item.get_model().get_name())
+        model = item.get_model()
+
+        if self.isEnabled():
+            if isinstance(item, queue_item.TaskQueueItem) and \
+                   not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                if str(new_value).isdigit():
+                    model.set_number(int(new_value))
+                    item.setText(0, model.get_name())
 
     def handle_path_conflict(self, widget, new_value):
         self._tree_brick.dc_tree_widget.check_for_path_collisions()
@@ -202,6 +206,14 @@ class CreateTaskBase(qt.QWidget):
     def ispyb_logged_in(self, logged_in):
         if logged_in and self.get_data_path_widget():
             self.update_selection()
+
+    def select_shape_with_cpos(self, cpos):
+        self._shape_history._drawing_event.de_select_all()
+
+        for shape in self._shape_history.get_shapes():
+            if len(shape.get_centred_positions()) == 1:
+                if shape.get_centred_positions()[0] is cpos:
+                    self._shape_history._drawing_event.set_selected(shape)    
             
     def selection_changed(self, items):
         if items:
