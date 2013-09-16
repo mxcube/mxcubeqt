@@ -225,11 +225,19 @@ class CreateCharWidget(CreateTaskBase):
 
             if self._char.get_path_template():
                 self._path_template = self._char.get_path_template()
+
+            self._data_path_widget.update_data_model(self._path_template)
             
             data_collection = self._char.reference_image_collection
+
             self._char_params = self._char.characterisation_parameters
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
+
+            if len(data_collection.acquisitions) == 1:
+                self.select_shape_with_cpos(self._acquisition_parameters.\
+                                            centred_position)
+
             self._processing_parameters = data_collection.processing_parameters
         else:
             self.setDisabled(True)
@@ -273,7 +281,7 @@ class CreateCharWidget(CreateTaskBase):
                 info("No centred position(s) was selected " + str(cpos) + \
                      " (current position) will be used.")
 
-            selected_shapes = [shape_history.Point(None, cpos, None)]
+            selected_shapes = [shape_history.Point(self._shape_history.get_drawing(), cpos, None)]
         else:
             selected_shapes = self._shape_history.selected_shapes
 
@@ -335,5 +343,6 @@ class CreateCharWidget(CreateTaskBase):
                 #self.set_run_number(self._path_template.run_number + 1)
 
                 tasks.append(char)
+                self._path_template.run_number += 1
 
         return tasks

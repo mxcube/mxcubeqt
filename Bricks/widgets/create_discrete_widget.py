@@ -134,14 +134,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_parameters.cell_gamma = crystal.cell_gamma
         self._processing_widget.update_data_model(self._processing_parameters)
 
-    def select_shape_with_cpos(self, cpos):
-        self._shape_history._drawing_event.de_select_all()
-
-        for shape in self._shape_history.get_shapes():
-            if len(shape.get_centred_positions()) == 1:
-                if shape.get_centred_positions()[0] is cpos:
-                    self._shape_history._drawing_event.set_selected(shape)
-
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
 
@@ -246,9 +238,12 @@ class CreateDiscreteWidget(CreateTaskBase):
                     tasks.extend(self.create_dc(sample, 2, sw[0], sw[1],
                                                 180, sc=sc, cpos=cpos))
 
+                self._path_template.run_number += 1
+
         else:
             for cpos in cpos_list:
                 tasks.extend(self.create_dc(sample, sc=sc, cpos=cpos))
+                self._path_template.run_number += 1
 
         return tasks
 
