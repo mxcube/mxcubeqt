@@ -192,7 +192,11 @@ class AcquisitionWidget(qt.QWidget):
                   (widget, new_value))
 
     def overlap_changed(self, new_value):
-        has_shutter_less = self._beamline_setup.detector_has_shutterless()
+
+        if self._beamline_setup:
+            has_shutter_less = self._beamline_setup.detector_has_shutterless()
+        else:
+            has_shutter_less = True
 
         if has_shutter_less:
             try:
