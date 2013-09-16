@@ -91,6 +91,7 @@ class EnergyScanBrick(BlissWidget):
         self.defineSignal('edgeScanEnergies',())
 
         self.parametersBox = QHGroupBox("Parameters",self)
+        self.parametersBox.hide()
         self.parametersBox.setInsideMargin(4)
         self.parametersBox.setInsideSpacing(2)
         self.parametersBox.setCheckable(True)
@@ -114,11 +115,14 @@ class EnergyScanBrick(BlissWidget):
         self.scanBox=QHGroupBox("Energy scan",self)
         self.scanBox.setInsideMargin(4)
         self.scanBox.setInsideSpacing(2)
+        self.scanBox.hide()
         self.startScanButton=MenuButton(self.scanBox,"Start scan")
+        self.startScanButton.hide()
         self.connect(self.startScanButton,PYSIGNAL('executeCommand'),self.startEnergyScan)
         self.connect(self.startScanButton,PYSIGNAL('cancelCommand'),self.cancelEnergyScan)
 
         self.statusBox=QHGroupBox("(no element)",self.scanBox)
+        self.statusBox.hide()
         #self.statusBox.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.MinimumExpanding)
         self.statusBox.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
         self.statusBox.setAlignment(QGroupBox.AlignCenter)
@@ -170,6 +174,7 @@ class EnergyScanBrick(BlissWidget):
         self.acceptBox.setSpacing(2)
         self.acceptButton=MenuButton2(self.acceptBox,"Accept")
         self.resetButton=MenuButton2(self.acceptBox,"Reset")
+        self.acceptBox.hide()
         QObject.connect(self.resetButton,SIGNAL('clicked()'),self.resetEnergies)
         QObject.connect(self.acceptButton,SIGNAL('clicked()'),self.acceptEnergies)
 
