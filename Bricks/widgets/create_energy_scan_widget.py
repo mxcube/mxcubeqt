@@ -109,7 +109,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
                                                          path_template)
             energy_scan.set_name(path_template.get_prefix())
             energy_scan.set_number(path_template.run_number)
-            energy_scan.symbol = self.periodic_table.current_element
+            energy_scan.element_symbol = self.periodic_table.current_element
             energy_scan.edge = self.periodic_table.current_edge
 
             data_collections.append(energy_scan)
