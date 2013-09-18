@@ -317,6 +317,16 @@ class CreateCharWidget(CreateTaskBase):
                 acq.acquisition_parameters.centred_position.\
                     snapshot_image = snapshot
 
+                if '<sample_name>' in acq.path_template.directory:
+                    name = sample.get_name().replace(':', '-')
+                    acq.path_template.directory = acq.path_template.directory.\
+                                                  replace('<sample_name>', name)
+
+                if '<acronym>-<name>' in acq.path_template.base_prefix:
+                    acq.path_template.base_prefix = self.get_default_prefix(sample)
+                    acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                                  get_next_run_number(acq.path_template)
+
                 processing_parameters = copy.deepcopy(self._processing_parameters)
 
                 data_collection = queue_model_objects.\
