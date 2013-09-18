@@ -261,6 +261,7 @@ class DataCollectTree(qt.QWidget):
         items = self.get_selected_items()
 
         if len(items) == 1:
+            self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
             logging.getLogger("user_level_log").\
                 info("All centred positions associated with this " + \
                      "sample will be lost, do you want to continue ?.")
@@ -618,6 +619,7 @@ class DataCollectTree(qt.QWidget):
             self.add_to_queue([sample], self.sample_list_view, False)
 
     def populate_free_pin(self):
+        self.queue_model_hwobj.clear_model('free-pin')
         self.queue_model_hwobj.select_model('free-pin')
         sample = queue_model_objects.Sample()
         sample.free_pin_mode = True
