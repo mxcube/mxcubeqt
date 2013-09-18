@@ -225,6 +225,8 @@ class TreeBrick(BaseComponents.BlissWidget):
             sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
             self.dc_tree_widget.populate_list_view(sc_sample_list)
 
+        self.dc_tree_widget.populate_free_pin()
+
         self.dc_tree_widget.sample_list_view_selection()
 
     def enable_collect(self, state):
