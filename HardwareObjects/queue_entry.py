@@ -871,6 +871,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
     def __init__(self, view=None, data_model=None):
         BaseQueueEntry.__init__(self, view, data_model)
         self.energy_scan_hwobj = None
+        self.session_hwobj = None
         self.energy_scan_task = None
         self._failed = False
 
@@ -881,12 +882,23 @@ class EnergyScanQueueEntry(BaseQueueEntry):
             energy_scan = self.get_data_model()
             self.get_view().setText(1, "Starting energy scan")
 
+            sample_model = self.get_data_model().\
+                           get_parent().get_parent()
+
+            sample_lims_id = sample_model.lims_id
+
+            # No sample id, pass None to startEnergyScan
+            if sample_lims_id == -1:
+                sample_lims_id = None
+
             self.energy_scan_task = \
                 gevent.spawn(self.energy_scan_hwobj.startEnergyScan,
                              energy_scan.element_symbol,
                              energy_scan.edge,
                              energy_scan.path_template.directory,
-                             energy_scan.path_template.get_prefix())
+                             energy_scan.path_template.get_prefix(),
+                             self.session_hwobj.session_id,
+                             sample_lims_id)
 
         self.energy_scan_task.get()
         self.energy_scan_hwobj.ready_event.wait()
@@ -910,6 +922,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         BaseQueueEntry.pre_execute(self)
         self._failed = False
         self.energy_scan_hwobj = self.beamline_setup.energy_hwobj
+        self.session_hwobj = self.beamline_setup.session_hwobj
 
         qc = self.get_queue_controller()
 

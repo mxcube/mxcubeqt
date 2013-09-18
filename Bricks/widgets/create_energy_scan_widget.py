@@ -75,9 +75,15 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
+        escan_model = tree_item.get_model()
 
         if isinstance(tree_item, queue_item.EnergyScanQueueItem):
             self.setDisabled(False)
+
+            if escan_model.get_path_template():
+                self._path_template = escan_model.get_path_template()
+
+            self._data_path_widget.update_data_model(self._path_template)
         elif not(isinstance(tree_item, queue_item.SampleQueueItem) or \
                      isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
             self.setDisabled(True)
@@ -104,7 +110,20 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         if self.periodic_table.current_edge:
             path_template = copy.deepcopy(self._path_template)
-            
+
+            if '<sample_name>' in path_template.directory:
+                name = sample.get_name().replace(':', '-')
+                path_template.directory = path_template.directory.\
+                                          replace('<sample_name>', name)
+
+                path_template.process_directory = path_template.process_directory.\
+                                                  replace('<sample_name>', name)
+                
+            if '<acronym>-<name>' in path_template.base_prefix:
+                path_template.base_prefix = self.get_default_prefix(sample)
+                path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                          get_next_run_number(path_template)
+
             energy_scan = queue_model_objects.EnergyScan(sample,
                                                          path_template)
             energy_scan.set_name(path_template.get_prefix())

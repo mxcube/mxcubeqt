@@ -215,7 +215,9 @@ class CreateDiscreteWidget(CreateTaskBase):
             # mounted create sample centring task.
             sc = self.create_sample_centring(sample)
             tasks.append(sc)
-            cpos_list = [None]
+            cpos = queue_model_objects.CentredPosition()
+            cpos.snapshot_image = self._shape_history.get_snapshot([])
+            cpos_list = [cpos]
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
@@ -285,7 +287,19 @@ class CreateDiscreteWidget(CreateTaskBase):
         acq.path_template = copy.deepcopy(self._path_template)
         acq.acquisition_parameters.centred_position = cpos
 
-        if run_number:
+        if '<sample_name>' in acq.path_template.directory:
+            name = sample.get_name().replace(':', '-')
+            acq.path_template.directory = acq.path_template.directory.\
+                                          replace('<sample_name>', name)
+            acq.path_template.process_directory = acq.path_template.process_directory.\
+                                                  replace('<sample_name>', name)
+
+        if '<acronym>-<name>' in acq.path_template.base_prefix:
+            acq.path_template.base_prefix = self.get_default_prefix(sample)
+            acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                          get_next_run_number(acq.path_template)
+
+        if run_number:        
             acq.path_template.run_number = run_number
 
         if start_image:

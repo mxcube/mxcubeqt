@@ -187,13 +187,16 @@ class CreateTaskBase(qt.QWidget):
         if data_path_widget:
             data_path_widget.set_run_number(run_number)
 
-    def get_default_prefix(self, sample_data_node):
-        prefix = self._session_hwobj.get_default_prefix(sample_data_node)
+    def get_default_prefix(self, sample_data_node = None, generic_name = False):
+        prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
         return prefix
         
-    def get_default_directory(self, tree_item):        
-        item = self.get_sample_item(tree_item)
-        sub_dir = item.get_model().get_name()
+    def get_default_directory(self, tree_item = None, sub_dir = None):
+        if tree_item:
+            item = self.get_sample_item(tree_item)
+            sub_dir = item.get_model().get_name()
+        else:
+            sub_dir = sub_dir
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
@@ -212,7 +215,7 @@ class CreateTaskBase(qt.QWidget):
 
         for shape in self._shape_history.get_shapes():
             if len(shape.get_centred_positions()) == 1:
-                if shape.get_centred_positions()[0] is cpos:
+                if shape.get_centred_positions()[0] == cpos:
                     self._shape_history._drawing_event.set_selected(shape)    
             
     def selection_changed(self, items):
@@ -235,7 +238,7 @@ class CreateTaskBase(qt.QWidget):
             self.init_models()
             sample_data_model = self.get_sample_item(tree_item).get_model()
             
-            (data_directory, proc_directory) = self.get_default_directory(tree_item)
+            (data_directory, proc_directory) = self.get_default_directory(tree_item = tree_item)
                 
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
@@ -248,7 +251,21 @@ class CreateTaskBase(qt.QWidget):
             self._data_path_widget.update_data_model(self._path_template)
 
     def multiple_item_selection(self, tree_items):
-        pass
+        tree_item = tree_items[0]
+        
+        if isinstance(tree_item, queue_item.SampleQueueItem):
+            self.init_models()
+            sample_data_model = self.get_sample_item(tree_item).get_model()
+            
+            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')
+                
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
+            self.setDisabled(False)
+            
+        if self._data_path_widget:
+            self._data_path_widget.update_data_model(self._path_template)
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
@@ -274,7 +291,9 @@ class CreateTaskBase(qt.QWidget):
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
     def create_task(self, sample):        
-        tasks = self._create_task(sample)        
+        tasks = self._create_task(sample)
+        self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                         get_next_run_number(self._path_template)
         return tasks
 
     @abc.abstractmethod
