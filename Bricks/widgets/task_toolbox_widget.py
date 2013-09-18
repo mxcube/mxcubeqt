@@ -108,14 +108,14 @@ class TaskToolBoxWidget(qt.QWidget):
 
         if not items:
             logging.getLogger("user_level_log").warning("Select the sample or group you "\
-                                                      "would like to add to.")
+                                                        "would like to add to.")
         if len(items) == 1:
             self.create_task(items[0].get_model())
         else:
-            logging.getLogger("user_level_log").warning("Select one item at the time.")
-            #for item in items:
-            #    self.create_task(item.get_model())
+            for item in items:
+                self.create_task(item.get_model())
 
+        self.tool_box.currentItem().update_selection()
 
     def create_task(self, task_node):
         if self.tool_box.currentItem().approve_creation():
@@ -123,14 +123,21 @@ class TaskToolBoxWidget(qt.QWidget):
             # Selected item is a sample
             if isinstance(task_node, queue_model_objects.Sample):
                 group_task_node = queue_model_objects.TaskGroup()
-                group_task_node.set_name('Task group')
-                num = task_node.get_next_number_for_name('Task group')
+                current_item = self.tool_box.currentItem()
+
+                if current_item is self.workflow_page:
+                    group_name = current_item._workflow_cbox.currentText()
+                else:
+                    group_name = current_item._task_node_name
+
+                group_task_node.set_name(group_name)
+                num = task_node.get_next_number_for_name(group_name)
                 group_task_node.set_number(num)
                 
                 self.tree_brick.queue_model_hwobj.\
                     add_child(task_node, group_task_node)
                 self.create_task(group_task_node)
-                self.tool_box.currentItem().update_selection()
+           
 
             # Selected item is a task group
             elif isinstance(task_node, queue_model_objects.TaskGroup):
@@ -140,12 +147,13 @@ class TaskToolBoxWidget(qt.QWidget):
                 for child_task_node in task_list:
                     self.tree_brick.queue_model_hwobj.\
                         add_child(task_node, child_task_node)
-                    self.tool_box.currentItem().update_selection()
+
+                #self.tool_box.currentItem().update_selection()
 
             # The selected item is a task
             else:
                 new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
                 self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
-                self.tool_box.currentItem().update_selection()
+                #self.tool_box.currentItem().update_selection()
 
                     
