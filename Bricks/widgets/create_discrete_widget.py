@@ -291,6 +291,8 @@ class CreateDiscreteWidget(CreateTaskBase):
             name = sample.get_name().replace(':', '-')
             acq.path_template.directory = acq.path_template.directory.\
                                           replace('<sample_name>', name)
+            acq.path_template.process_directory = acq.path_template.process_directory.\
+                                                  replace('<sample_name>', name)
 
         if '<acronym>-<name>' in acq.path_template.base_prefix:
             acq.path_template.base_prefix = self.get_default_prefix(sample)

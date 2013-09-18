@@ -115,6 +115,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 name = sample.get_name().replace(':', '-')
                 path_template.directory = path_template.directory.\
                                           replace('<sample_name>', name)
+
+                path_template.process_directory = path_template.process_directory.\
+                                                  replace('<sample_name>', name)
                 
             if '<acronym>-<name>' in path_template.base_prefix:
                 path_template.base_prefix = self.get_default_prefix(sample)
