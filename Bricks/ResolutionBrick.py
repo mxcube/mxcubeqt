@@ -490,6 +490,8 @@ class ResolutionBrick(BlissWidget):
 
             if state:
                 color=ResolutionBrick.STATE_COLORS[state]
+            else:
+                color = widget_colors.LIGHT_RED
 
             unit=self.units.currentText()
             if unit==chr(197):
