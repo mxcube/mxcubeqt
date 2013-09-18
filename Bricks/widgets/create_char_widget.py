@@ -293,7 +293,7 @@ class CreateCharWidget(CreateTaskBase):
                 sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
                                     is_mounted_sample(sample)
                 
-                if (not shape.get_drawing()) or (not sample_is_mounted):
+                if (not shape.screen_pos) or (not sample_is_mounted):
                     sc = queue_model_objects.SampleCentring()
                     sc.set_name('sample-centring')
                     tasks.append(sc)

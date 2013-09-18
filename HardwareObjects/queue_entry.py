@@ -630,17 +630,17 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                     list_item.setText(1, "Moving sample")
                 else:
                     self.collect_hwobj.getChannelObject("helical").setValue(0)
-                    log.info("Moving to centred position: " + str(cpos))
-                    list_item.setText(1, "Moving sample")
 
                 if cpos:
+                    log.info("Moving to centred position: " + str(cpos))
+                    list_item.setText(1, "Moving sample")
                     self.centring_task = self.diffractometer_hwobj.\
                                          moveToCentredPosition(cpos)
                     self.centring_task.get()
                 else:
                     pos_dict = self.diffractometer_hwobj.getPositions()
                     cpos = queue_model_objects.CentredPosition(pos_dict)
-                    snapshot = self.shape_history.get_snapshot([pos])
+                    snapshot = self.shape_history.get_snapshot([])
                     acq_1.acquisition_parameters.centred_position = cpos
                     acq_1.acquisition_parameters.centred_position.snapshot_image = snapshot
                     
@@ -872,6 +872,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         BaseQueueEntry.__init__(self, view, data_model)
         self.energy_scan_hwobj = None
         self.energy_scan_task = None
+        self._failed = False
 
     def execute(self):
         BaseQueueEntry.execute(self)
@@ -907,6 +908,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
 
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
+        self._failed = False
         self.energy_scan_hwobj = self.beamline_setup.energy_hwobj
 
         qc = self.get_queue_controller()
@@ -939,11 +941,15 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         qc.disconnect(self.energy_scan_hwobj, 'energyScanFailed',
                       self.energy_scan_failed)
 
+        if self._failed:
+            raise QueueAbortedException('Queue stopped', self)
+
     def energy_scan_status_changed(self, msg):
         logging.getLogger("user_level_log").info(msg)
 
     def energy_scan_started(self):
         logging.getLogger("user_level_log").info("Energy scan started.")
+        self.get_view().setText(1, "In progress")
 
     def energy_scan_finished(self, scan_info):
         energy_scan = self.get_data_model()
@@ -982,7 +988,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         self.get_view().setText(1, "Done")
 
     def energy_scan_failed(self):
-        logging.getLogger("user_level_log").info("Energy scan failed.")
+        self._failed = True
 
 
 class GenericWorkflowQueueEntry(BaseQueueEntry):

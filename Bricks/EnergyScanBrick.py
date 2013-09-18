@@ -342,6 +342,7 @@ class EnergyScanBrick(BlissWidget):
                 self.connect(self.energyScan, 'energyScanReady', self.scanReady)
                 self.connect(self.energyScan, 'connected', self.connected)
                 self.connect(self.energyScan, 'disconnected', self.disconnected)
+                self.connect(self.energyScan, 'chooch_finished', self.chooch_finished)
 
                 if self.energyScan.isConnected():
                     self.connected()
@@ -452,50 +453,63 @@ class EnergyScanBrick(BlissWidget):
         self.remoteInput.setEnabled(True)
         self.remote2Input.setEnabled(True)
 
-    def scanFinished(self, *args):
-        color=EnergyScanBrick.STATES['ok']
-  
-        try:
-          smis_name=os.environ["SMIS_BEAMLINE_NAME"].lower()
-          x,y=smis_name.split("-")
-          bldir=x+"eh"+y
-        except:
-          bldir=os.environ["SMIS_BEAMLINE_NAME"].lower()
-
-        scanArchiveFilePrefix="/data/pyarch/%s/%s/%s_escan_%s" % (bldir, self.archive_directory, self.prefixInput.text(), "_".join(self.element))
-        i=1
-        while os.path.isfile(os.path.extsep.join((scanArchiveFilePrefix+str(i), "raw"))):
-            i=i+1
-        
-        scanArchiveFilePrefix = scanArchiveFilePrefix+str(i) 
-        scanFilePrefix = os.path.join(str(self.directoryInput.text()), os.path.basename(scanArchiveFilePrefix))
-        
-        pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title = self.energyScan.doChooch(self.scanObject, self.element[0], self.element[1], scanArchiveFilePrefix, scanFilePrefix)
-
+    def chooch_finished(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl,
+                        rm, chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
         # display Chooch graphs
         self.choochGraphs.setTitle(title) 
         self.choochGraphs.newcurve("spline", chooch_graph_x, chooch_graph_y1)
         self.choochGraphs.newcurve("fp", chooch_graph_x, chooch_graph_y2)
         self.choochGraphs.replot()
 
-        # display Chooch results
-        energy_str=self['formatString'] % pk
-        self.peakInput.setText(energy_str)
-        energy_str=self['formatString'] % ip
-        self.inflectionInput.setText(energy_str)
-        energy_str=self['formatString'] % rm
-        self.remoteInput.setText(energy_str)
+    def scanFinished(self, *args):
+        pass
+     #    color=EnergyScanBrick.STATES['ok']
+  
+#         try:
+#           smis_name=os.environ["SMIS_BEAMLINE_NAME"].lower()
+#           x,y=smis_name.split("-")
+#           bldir=x+"eh"+y
+#         except:
+#           bldir=os.environ["SMIS_BEAMLINE_NAME"].lower()
 
-        self.scanStatus.setPaletteBackgroundColor(QColor(color))
+#         import pdb
+#         pdb.set_trace()
+#         self.element = (self.energyScan._element, self.energyScan._edge)
 
-        self.startScanButton.commandDone()
-        self.emit(PYSIGNAL("energyScanning"),(False,))
-        self.parametersBox.setEnabled(True)
-        self.acceptBox.setEnabled(True)
-        self.inflectionInput.setEnabled(True)
-        self.peakInput.setEnabled(True)
-        self.remoteInput.setEnabled(True)
-        self.remote2Input.setEnabled(True)
+#         scanArchiveFilePrefix="/data/pyarch/%s/%s/%s_escan_%s" % (bldir, self.archive_directory, self.prefixInput.text(), "_".join(self.element))
+#         i=1
+#         while os.path.isfile(os.path.extsep.join((scanArchiveFilePrefix+str(i), "raw"))):
+#             i=i+1
+        
+#         scanArchiveFilePrefix = scanArchiveFilePrefix+str(i) 
+#         scanFilePrefix = os.path.join(str(self.directoryInput.text()), os.path.basename(scanArchiveFilePrefix))
+        
+#         pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title = self.energyScan.doChooch(self.scanObject, self.element[0], self.element[1], scanArchiveFilePrefix, scanFilePrefix)
+
+#         # display Chooch graphs
+#         self.choochGraphs.setTitle(title) 
+#         self.choochGraphs.newcurve("spline", chooch_graph_x, chooch_graph_y1)
+#         self.choochGraphs.newcurve("fp", chooch_graph_x, chooch_graph_y2)
+#         self.choochGraphs.replot()
+
+#         # display Chooch results
+#         energy_str=self['formatString'] % pk
+#         self.peakInput.setText(energy_str)
+#         energy_str=self['formatString'] % ip
+#         self.inflectionInput.setText(energy_str)
+#         energy_str=self['formatString'] % rm
+#         self.remoteInput.setText(energy_str)
+
+#         self.scanStatus.setPaletteBackgroundColor(QColor(color))
+
+#         self.startScanButton.commandDone()
+#         self.emit(PYSIGNAL("energyScanning"),(False,))
+#         self.parametersBox.setEnabled(True)
+#         self.acceptBox.setEnabled(True)
+#         self.inflectionInput.setEnabled(True)
+#         self.peakInput.setEnabled(True)
+#         self.remoteInput.setEnabled(True)
+#         self.remote2Input.setEnabled(True)
 
     def clearEnergies(self):
         self.inflectionInput.setText("")
