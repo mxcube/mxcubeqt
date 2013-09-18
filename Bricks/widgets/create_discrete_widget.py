@@ -283,9 +283,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         acq.acquisition_parameters.collect_agent = \
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
         acq.path_template = copy.deepcopy(self._path_template)
-
-        if cpos:
-            acq.acquisition_parameters.centred_position = cpos
+        acq.acquisition_parameters.centred_position = cpos
 
         if run_number:
             acq.path_template.run_number = run_number
