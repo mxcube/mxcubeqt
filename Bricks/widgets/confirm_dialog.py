@@ -63,6 +63,7 @@ class ConfirmDialog(qt.QDialog):
         
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
+        self.setCaption('Confirm collection')
 
 
     def disable_dark_current_cbx(self):
