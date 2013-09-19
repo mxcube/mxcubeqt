@@ -7,8 +7,8 @@ class LogBarWidget(qt.QWidget):
         qt.QWidget.__init__(self, parent, name, fl)
 
         self.text_edit = qt.QTextEdit(self, "text_edit")
-        self.text_edit.setMinimumSize(qt.QSize(0, 40))
-        self.text_edit.setMaximumSize(qt.QSize(32767, 40))
+        self.text_edit.setMinimumSize(qt.QSize(0, 55))
+        self.text_edit.setMaximumSize(qt.QSize(32767, 55))
         self.text_edit.setTextFormat(qt.QTextEdit.LogText)
         self.text_edit.setWordWrap(qt.QTextEdit.WidgetWidth)
 
