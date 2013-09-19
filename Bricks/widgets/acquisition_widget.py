@@ -19,6 +19,7 @@ class AcquisitionWidget(qt.QWidget):
         # Attributes
         #
         self._beamline_setup = None
+        self.previous_energy = 0
 
         if acq_params is None:
             self._acquisition_parameters = queue_model_objects.\
@@ -164,6 +165,8 @@ class AcquisitionWidget(qt.QWidget):
                            self.subwedge_size_ledit_change)
 
         self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
+        self.acq_widget_layout.child('energies_combo').setDisabled(True)
+
 
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
@@ -215,6 +218,7 @@ class AcquisitionWidget(qt.QWidget):
                 self._acquisition_parameters.shutterless = True
 
     def use_mad(self, state):
+        self.acq_widget_layout.child('energies_combo').setEnabled(state)
         if state:
             self.previous_energy = self._acquisition_parameters.energy
             (name, energy) = self.get_mad_energy()
@@ -250,19 +254,34 @@ class AcquisitionWidget(qt.QWidget):
     def get_mad_energy(self):
         energy_str = str(self.acq_widget_layout.\
                          child('energies_combo').currentText())
-        (name, value) = energy_str.split('-')
+        (name, value) = energy_str.split(':')
+        
         name = name.strip()
         value = value.strip()
+        value = 0 if (value == '-') else value
 
         return (name, value)
 
     def set_energies(self, energy_scan_result):
         self.acq_widget_layout.child('energies_combo').clear()
+
+        inflection = ('ip: %.4f' % energy_scan_result.inflection) if \
+                     energy_scan_result.inflection else 'ip: -'
+
+        peak = ('pk: %.4f' % energy_scan_result.peak) if \
+               energy_scan_result.peak else 'pk: -'
+
+        first_remote = ('rm1: %.4f' % energy_scan_result.first_remote) if \
+                       energy_scan_result.first_remote else 'rm1: -'
+
+        second_remote = ('rm2: %.4f' % energy_scan_result.second_remote) if \
+                        energy_scan_result.second_remote else 'rm2: -'
+
         self.acq_widget_layout.child('energies_combo').\
-            insertStrList(['ip - %.4f' % energy_scan_result.inflection,
-                           'pk - %.4f' % energy_scan_result.peak,
-                           'rm1 - %.4f' % energy_scan_result.first_remote,
-                           'rm2 - %.4f' % energy_scan_result.second_remote])
+            insertStrList([inflection,
+                           peak,
+                           first_remote,
+                           second_remote])
 
     def energy_selected(self, index):
         if self.acq_widget_layout.child('mad_cbox').isChecked():
@@ -291,6 +310,7 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_parameters = acquisition_parameters
         self._path_template = path_template        
         self._acquisition_mib.set_model(acquisition_parameters)
+        self.use_mad(self.acq_widget_layout.child('mad_cbox').isChecked())
 
     def set_tunable_energy(self, state):
         self.acq_widget_layout.child('energy_ledit').setEnabled(state)
