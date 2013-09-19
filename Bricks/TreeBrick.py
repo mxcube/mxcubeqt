@@ -7,6 +7,7 @@ import queue_item
 from collections import namedtuple
 from BlissFramework import Icons, BaseComponents
 from SampleChangerBrick import SC_STATE_COLOR
+from HardwareRepository.HardwareRepository import dispatcher
 
 from widgets.dc_tree_widget import DataCollectTree
 
@@ -60,7 +61,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         #self.defineSlot("add_data_collection", ())
         #self.defineSlot("set_session", ())
 
-        
         # Qt - Signals
         # Hiding and showing the tabs
         self.defineSignal("hide_sample_tab", ())
@@ -145,6 +145,24 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+
+        # workaround for the remote access problem 
+        # (have to disable video display when DC is running)
+        if BaseComponents.BlissWidget.isInstanceRoleClient():
+          # find the video brick, make sure it is hidden when collecting data
+          # and that it is shown again when DC is finished 
+          for w in qt.QApplication.allWidgets():
+            if isinstance(w, BaseComponents.BlissWidget):
+              if "CameraBrick" in str(w.__class__):
+                def hide_video(w=w):
+                  w.hide()
+                self.__hide_video=hide_video
+                def show_video(w=w):
+                  w.show()
+                self.__show_video=show_video
+                dispatcher.connect(self.__hide_video, "collect_started")
+                dispatcher.connect(self.__show_video, "collect_finished")
+                break
 
 
     # Framework 2 method
