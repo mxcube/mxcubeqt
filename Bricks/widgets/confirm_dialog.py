@@ -142,7 +142,7 @@ class ConfirmDialog(qt.QDialog):
                 item.get_model().acquisitions[0].acquisition_parameters.\
                     skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
         
-        self.emit(qt.PYSIGNAL("continue_clicked"), (self.sample_items,))
+        self.emit(qt.PYSIGNAL("continue_clicked"), (self.sample_items, self.checked_items))
         self.accept()
 
 
