@@ -7,7 +7,7 @@ import queue_item
 from collections import namedtuple
 from BlissFramework import Icons, BaseComponents
 from SampleChangerBrick import SC_STATE_COLOR
-from HardwareRepository import dispatcher
+from HardwareRepository.HardwareRepository import dispatcher
 
 from widgets.dc_tree_widget import DataCollectTree
 
@@ -146,14 +146,20 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         # workaround for the remote access problem 
         # (have to disable video display when DC is running)
-        if BlissWidget.isInstanceClient():
+        if BaseComponents.BlissWidget.isInstanceRoleClient():
           # find the video brick, make sure it is hidden when collecting data
           # and that it is shown again when DC is finished 
-          for w in qt.QApplication.allWidgets()
-            if isinstance(w, BlissWidget):
-              if str(w.__class__).split('.')[-1] == "CameraBrick":
-                dispatcher.connect(w.hide, "collect_started")
-                dispatcher.connect(w.show, "collect_finished")
+          for w in qt.QApplication.allWidgets():
+            if isinstance(w, BaseComponents.BlissWidget):
+              if "CameraBrick" in str(w.__class__):
+                def hide_video(w=w):
+                  w.hide()
+                self.__hide_video=hide_video
+                def show_video(w=w):
+                  w.show()
+                self.__show_video=show_video
+                dispatcher.connect(self.__hide_video, "collect_started")
+                dispatcher.connect(self.__show_video, "collect_finished")
                 break
 
 
