@@ -129,17 +129,6 @@ class CreateTaskBase(qt.QWidget):
     def set_energies(self):
         pass
  
-    def mad_energy_selected(self, name, energy, state):
-        data_path_widget = self.get_data_path_widget()
-
-        if data_path_widget:
-            if state:
-                self._path_template.mad_prefix = name
-            else:
-                self._path_template.mad_prefix = ''
-
-            data_path_widget.set_prefix(self._path_template.base_prefix)
-
     def get_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):
             return item

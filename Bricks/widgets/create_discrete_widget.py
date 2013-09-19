@@ -134,6 +134,15 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_parameters.cell_gamma = crystal.cell_gamma
         self._processing_widget.update_data_model(self._processing_parameters)
 
+    def mad_energy_selected(self, name, energy, state):
+        if state:
+            self._path_template.mad_prefix = name
+        else:
+            self._path_template.mad_prefix = ''
+
+        data_path_widget = self.get_data_path_widget()
+        data_path_widget.set_prefix(self._path_template.base_prefix)
+
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
 
