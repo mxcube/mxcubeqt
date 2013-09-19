@@ -146,24 +146,34 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
+        camera_brick = None
+
+        for w in qt.QApplication.allWidgets():
+            if isinstance(w, BaseComponents.BlissWidget):
+                if "CameraBrick" in str(w.__class__):
+                    camera_brick = w
+                    camera_brick.installEventFilter(self)
+                    break
+
         # workaround for the remote access problem 
         # (have to disable video display when DC is running)
         if BaseComponents.BlissWidget.isInstanceRoleClient():
-          # find the video brick, make sure it is hidden when collecting data
-          # and that it is shown again when DC is finished 
-          for w in qt.QApplication.allWidgets():
-            if isinstance(w, BaseComponents.BlissWidget):
-              if "CameraBrick" in str(w.__class__):
-                def hide_video(w=w):
-                  w.hide()
-                self.__hide_video=hide_video
-                def show_video(w=w):
-                  w.show()
-                self.__show_video=show_video
-                dispatcher.connect(self.__hide_video, "collect_started")
-                dispatcher.connect(self.__show_video, "collect_finished")
-                break
+            # find the video brick, make sure it is hidden when collecting data
+            # and that it is shown again when DC is finished 
+            def hide_video(w=camera_brick):
+              w.hide()
+            self.__hide_video=hide_video
+            def show_video(w=camera_brick):
+              w.show()
+            self.__show_video=show_video
+            dispatcher.connect(self.__hide_video, "collect_started")
+            dispatcher.connect(self.__show_video, "collect_finished")
 
+    def eventFilter(self, _object, event):
+        if event.type() == qt.QEvent.MouseButtonPress:
+            if event.state() & qt.Qt.ShiftButton:
+                return True
+        return False
 
     # Framework 2 method
     def propertyChanged(self, property_name, old_value, new_value):
@@ -249,8 +259,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                         getLoadedSampleLocation()
 
         if loaded_sample == (None, None):
-            self.dc_tree_widget.filter_sample_list(1)
-            self.sample_changer_widget.child('filter_cbox').setCurrentItem(1)
+            self.dc_tree_widget.filter_sample_list(2)
+            self.sample_changer_widget.child('filter_cbox').setCurrentItem(2)
 
         self.dc_tree_widget.sample_list_view_selection()
 
