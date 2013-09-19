@@ -37,8 +37,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
                                                data_model = self._path_template,
                                                layout = DataPathWidgetVerticalLayout)
 
-        self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
-        self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
+        #self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
+        #self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
 
 
         v_layout.addWidget(h_box)
