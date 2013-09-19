@@ -23,7 +23,6 @@ class DataCollectTree(qt.QWidget):
 
         # Internal members
         self.collecting = False
-        self.loaded_sample = (-1, -1)
         self.centring_method = 0
         self.queue_hwobj = None
         self.queue_model_hwobj = None
@@ -159,6 +158,12 @@ class DataCollectTree(qt.QWidget):
         if event.type() == qt.QEvent.MouseButtonDblClick:
             self.show_details()
             return True
+        elif event.type() == qt.QEvent.KeyPress:
+            if event.key() == qt.Qt.Key_Shift:
+                print 'here'
+                return True
+            else:
+                return False
         else:
             return False
 
@@ -244,12 +249,15 @@ class DataCollectTree(qt.QWidget):
 
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
+                previous_qe = items[0].get_queue_entry()
                 qe = queue_entry.SampleQueueEntry(items[0], items[0].get_model())
                 qe.sample_changer_hwobj = self.beamline_setup_hwobj.sample_changer_hwobj
                 qe.diffractometer_hwobj = self.beamline_setup_hwobj.diffractometer_hwobj
                 qe.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
                 qe.execute()
                 items[0].setText(1, "")
+                previous_qe.set_view(items[0], True)
+                previous_qe.setdata_model(items[0].get_model())
         else:
             logging.getLogget("user_level_log").\
                 info('Its not possible to mount samples in free pin mode')
@@ -264,7 +272,7 @@ class DataCollectTree(qt.QWidget):
             self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
             logging.getLogger("user_level_log").\
                 info("All centred positions associated with this " + \
-                     "sample will be lost, do you want to continue ?.")
+                     "sample will be lost.")
 
             location = items[0].get_model().location
             self.beamline_setup_hwobj.sample_changer_hwobj.\
@@ -408,8 +416,9 @@ class DataCollectTree(qt.QWidget):
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('free-pin')
-
-    def set_centring_method(self, method_number):
+            self.sample_list_view.firstChild().setSelected(True)
+            
+    def set_centring_method(self, method_number):       
         self.centring_method = method_number
 
     def continue_button_click(self):
@@ -469,8 +478,8 @@ class DataCollectTree(qt.QWidget):
                    getLoadedSampleLocation():
                 return True
 
-    def collect_items(self, items = []):
-        for item in items:
+    def collect_items(self, items = [], checked_items = []):
+        for item in checked_items:
             # update the run-number text incase of re-collect
             item.setText(0, item.get_model().get_name())
 
@@ -478,12 +487,12 @@ class DataCollectTree(qt.QWidget):
             item.setText(1, "")
             item.setHighlighted(False)
 
-            if self.is_mounted_sample_item(item):
-                item.setPixmap(0, self.pin_pixmap)
+            #if self.is_mounted_sample_item(item):
+            #    item.setPixmap(0, self.pin_pixmap)
                 # Blue background and sample pin for mounted sample.
-                item.setBackgroundColor(widget_colors.SKY_BLUE)
-            else:
-                item.setBackgroundColor(widget_colors.WHITE)
+                #item.setBackgroundColor(widget_colors.SKY_BLUE)
+            #else:
+            item.setBackgroundColor(widget_colors.WHITE)
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)
