@@ -132,6 +132,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.layout().addWidget(self.dc_tree_widget)
         self.enable_collect(False)
 
+        self.sample_changer_widget.child('centring_cbox').setCurrentItem(1)
+        self.dc_tree_widget.set_centring_method(1)
 
     # Framework 2 method
     def run(self):
@@ -224,6 +226,13 @@ class TreeBrick(BaseComponents.BlissWidget):
             sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
             self.dc_tree_widget.populate_list_view(sc_sample_list)
             self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+
+        loaded_sample = self.sample_changer_hwobj.\
+                        getLoadedSampleLocation()
+
+        if loaded_sample == (None, None):
+            self.dc_tree_widget.filter_sample_list(1)
+            self.sample_changer_widget.child('filter_cbox').setCurrentItem(1)
 
         self.dc_tree_widget.sample_list_view_selection()
 
@@ -377,7 +386,7 @@ class TreeBrick(BaseComponents.BlissWidget):
             setPaletteBackgroundColor(qt.QColor(s_color))
 
     def show_sample_centring_tab(self):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_centring_tab"), (False,))
@@ -388,7 +397,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_sample_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("populate_sample_details"), (item.get_model(),))
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
@@ -400,7 +409,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_dcg_tab(self):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (False,))
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
@@ -414,7 +423,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                   (item,))
         
     def show_datacollection_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (False,))
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
@@ -425,7 +434,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.populate_parameters_tab(item)
 
     def show_edna_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
@@ -440,7 +449,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                   (item,))
 
     def show_energy_scan_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
@@ -457,7 +466,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.show_workflow_tab(None)
         
     def show_workflow_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show details")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
@@ -477,14 +486,14 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.current_view = None
             self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
             self.dc_tree_widget.sample_list_view_selection()
-            self.sample_changer_widget.child('details_button').setText("Show details")
+            self.sample_changer_widget.child('details_button').setText("Show SC-details")
 
         else:
             self.current_view = self.sample_changer_widget
             self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
             self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
             self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (False,))
-            self.sample_changer_widget.child('details_button').setText("Hide details")
+            self.sample_changer_widget.child('details_button').setText("Hide SC-details")
             self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         
     def selection_changed(self, items):
