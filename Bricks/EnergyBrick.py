@@ -177,7 +177,6 @@ class EnergyBrick(BlissWidget):
 
         elif propertyName == 'alwaysReadonly':
             pass
-
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -243,8 +242,8 @@ class EnergyBrick(BlissWidget):
                 self.topBox.setCheckable(False)
                 self.staticEnergy.setText(str(curr_energy))
                 self.staticWavelength.setText(str(curr_wavelength))
-                #self.staticEnergy.setDisabledLook(False)
-                #self.staticWavelength.setDisabledLook(False)
+                self.staticEnergy.setReadOnly(True)
+                self.staticWavelength.setReadOnly(True)
             self.energyChanged(curr_energy,curr_wavelength)
         else:
             self.topBox.setEnabled(False)
@@ -253,8 +252,8 @@ class EnergyBrick(BlissWidget):
             self.staticBox.show()
             self.topBox.setTitle('Energy')
             self.topBox.setCheckable(False)
-            #self.staticEnergy.setDisabledLook(True)
-            #self.staticWavelength.setDisabledLook(True)
+            self.staticEnergy.setReadOnly(True)
+            self.staticWavelength.setReadOnly(True)
 
     def connected(self):
         #print "EnergyBrick.connected"
