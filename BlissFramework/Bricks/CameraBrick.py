@@ -70,6 +70,7 @@ __category__ = "Camera"
 
 from BlissFramework.BaseComponents import BlissWidget
 import logging
+import os
 import qt
 from Qub.Widget.QubAction import QubToggleAction
 from Qub.Widget.QubActionSet import QubZoomRectangle
@@ -90,6 +91,9 @@ from Qub.Objects.QubStdData2Image import QubStdData2Image,QubStdData2ImagePlug
 from Qub.Print.QubPrintPreview import QubPrintPreview
 from Qub.Widget.QubDialog import QubSaveImageDialog,QubMeasureListDialog,QubBrightnessContrastDialog
 
+DISABLED_JPEG = file(os.path.join(os.path.dirname(__file__), "disabled.jpeg"), "r").read()
+DISABLED_WIDTH = 659
+DISABLED_HEIGHT = 493
 
 ###
 ### Brick to display a video of the sample
@@ -99,6 +103,7 @@ class CameraBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         self.camera       = None
+        self.update_disabled = False
         self.__cameraName = None
 
         self.__zoomList = [1.5,2,2.5,3,3.5,4]
@@ -297,7 +302,17 @@ class CameraBrick(BlissWidget):
             #self.disconnect(self.camera,qt.PYSIGNAL('imageReceived'),self.__imageReceived)
             self.imageReceivedConnected = False
 
+    def disable_update(self):
+        self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
+        self.update_disabled = True
+
+    def enable_update(self):
+        self.update_disabled = False
+
     def __imageReceived(self,image,width,height,force_update=False):
+        if self.update_disabled:
+            return
+
         if not force_update:
             if not self.isVisible():
                 return
