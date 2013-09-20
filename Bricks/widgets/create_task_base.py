@@ -156,6 +156,7 @@ class CreateTaskBase(qt.QWidget):
             acq_widget = self.get_acquisition_widget()
         
             if acq_widget:
+                acq_widget.previous_energy = energy
                 acq_widget.set_energy(energy, wavelength)
 
     def set_transmission(self, trans):

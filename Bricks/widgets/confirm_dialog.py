@@ -58,9 +58,10 @@ class ConfirmDialog(qt.QDialog):
                            qt.SIGNAL("clicked()"),
                            self.cancel_button_click)
 
-        self.dialog_layout_widget.take_snapshosts_cbx.setOn(True)
+        self.dialog_layout_widget.take_snapshosts_cbx.setOn(False)
         self.dialog_layout_widget.force_dark_cbx.setOn(True)
-        
+
+        self.dialog_layout_widget.take_snapshosts_cbx.hide()
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
         self.setCaption('Confirm collection')

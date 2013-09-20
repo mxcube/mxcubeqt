@@ -135,6 +135,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def mad_energy_selected(self, name, energy, state):
+        item = self._current_selected_items[0]
+        model = item.get_model()
+
         if state:
             self._path_template.mad_prefix = name
         else:
@@ -142,6 +145,12 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         data_path_widget = self.get_data_path_widget()
         data_path_widget.set_prefix(self._path_template.base_prefix)
+
+        if self.isEnabled():
+            if isinstance(item, queue_item.TaskQueueItem) and \
+                   not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                model.set_name(self._path_template.get_prefix())
+                item.setText(0, model.get_name())
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)

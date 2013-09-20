@@ -273,11 +273,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         :returns: None
         """
-        self.dc_tree_widget.sample_list_view.setDisabled(not state)
-        self.dc_tree_widget.collect_button.setDisabled(not state)
-        self.dc_tree_widget.up_button.setDisabled(not state)
-        self.dc_tree_widget.down_button.setDisabled(not state)
-        self.dc_tree_widget.delete_button.setDisabled(not state)
+        self.dc_tree_widget.enable_collect(state)
 
     def get_tree_brick(self, tree_brick):
         """

@@ -166,7 +166,8 @@ class AcquisitionWidget(qt.QWidget):
 
         self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
         self.acq_widget_layout.child('energies_combo').setDisabled(True)
-
+        self.acq_widget_layout.child('energies_combo').\
+            insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
@@ -310,7 +311,21 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_parameters = acquisition_parameters
         self._path_template = path_template        
         self._acquisition_mib.set_model(acquisition_parameters)
-        self.use_mad(self.acq_widget_layout.child('mad_cbox').isChecked())
+        
+        #Update mad widgets
+        mad = True if self._path_template.mad_prefix != '' else False
+
+        if mad:
+            mad_prefix = self._path_template.mad_prefix
+            index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
+            self.acq_widget_layout.child('mad_cbox').setChecked(True)
+            self.acq_widget_layout.child('energies_combo').\
+                setCurrentItem(index)
+            self.use_mad(mad)
+        else:
+            self.acq_widget_layout.child('mad_cbox').setChecked(False)
+            self.acq_widget_layout.child('energies_combo').\
+                setCurrentItem(0)
 
     def set_tunable_energy(self, state):
         self.acq_widget_layout.child('energy_ledit').setEnabled(state)
