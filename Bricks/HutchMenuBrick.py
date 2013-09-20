@@ -606,10 +606,7 @@ class HutchMenuBrick(BlissWidget):
           self.__beam.hide()
         except AttributeError:
           pass
-        if self.buttonCentre.executing:
-           self.buttonAccept.setEnabled(False)
-           self.buttonReject.setEnabled(False)
-        else:
+        if not self.buttonCentre.executing:
            self.sampleCentreBox.setEnabled(False)
 
     def miniDiffStateChanged(self,state):
