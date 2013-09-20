@@ -131,17 +131,22 @@ class DCParametersWidget(qt.QWidget):
         self._tree_view_item = item
         self._data_collection = data_collection
         self._acquisition_mib = DataModelInputBinder(self._data_collection.\
-                                acquisitions[0].acquisition_parameters)
+                                                         acquisitions[0].acquisition_parameters)
+
+        # The acq_widget sends a signal to the path_widget, and it relies
+        # on that both models upto date, we need to refactor this part
+        # so that both models are set before taking ceratin actions.
+        # Thos workaround, works for the time beeing.
+        self.path_widget._data_model = data_collection.acquisitions[0].path_template
 
         self.acq_widget.update_data_model(data_collection.acquisitions[0].\
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\
                                           path_template)
-        
+
         self.path_widget.update_data_model(data_collection.\
                                            acquisitions[0].path_template)
-
-
+        
         self.processing_widget.update_data_model(data_collection.\
                                                  processing_parameters)
 
