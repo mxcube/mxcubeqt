@@ -167,6 +167,13 @@ class DataCollectTree(qt.QWidget):
         else:
             return False
 
+    def enable_collect(self, state):
+        self.sample_list_view.setDisabled(not state)
+        self.collect_button.setDisabled(not state)
+        self.up_button.setDisabled(not state)
+        self.down_button.setDisabled(not state)
+        self.delete_button.setDisabled(not state)
+
     def show_context_menu(self, item, point, col):
         menu = qt.QPopupMenu(self.sample_list_view, "popup_menu")
 
@@ -242,6 +249,7 @@ class DataCollectTree(qt.QWidget):
         item.get_model().set_name(text)
 
     def mount_sample(self):
+        self.enable_collect(False)
         gevent.spawn(self.mount_sample_task)
 
     def mount_sample_task(self):
@@ -256,8 +264,10 @@ class DataCollectTree(qt.QWidget):
                 qe.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
                 qe.execute()
                 items[0].setText(1, "")
-                previous_qe.set_view(items[0], True)
-                previous_qe.setdata_model(items[0].get_model())
+                previous_qe.set_view(items[0])
+                previous_qe.set_data_model(items[0].get_model())
+                self.enable_collect(True)
+                
         else:
             logging.getLogget("user_level_log").\
                 info('Its not possible to mount samples in free pin mode')
