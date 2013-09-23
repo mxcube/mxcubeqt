@@ -176,7 +176,7 @@ class CreateCharWidget(CreateTaskBase):
 
         if self._beamline_setup_hwobj is not None:            
             self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters()
+                get_default_characterisation_parameters()
 
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
