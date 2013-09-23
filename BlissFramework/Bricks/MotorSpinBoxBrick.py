@@ -460,8 +460,8 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
             self.connect(self.motor,PYSIGNAL('positionChanged'),self.positionChanged,instanceFilter=True)
             self.connect(self.motor,PYSIGNAL('stateChanged'),self.stateChanged,instanceFilter=True)
 
-        self.updateGUI()
         self.posHistory=[]
+        self.updateGUI()
         self['label']=self['label']
         #self['defaultStep']=self['defaultStep']
 
