@@ -206,14 +206,13 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
-            
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
             self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
             self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
             self.session_hwobj = bl_setup.session_hwobj
             self._lims_hwobj = bl_setup.lims_client_hwobj
 
-            if self.sample_changer_hwobj:
+            if self.sample_changer_hwobj is not None:
                 self.connect(self.sample_changer_hwobj, 'matrixCodesUpdate',
                              self.set_sample_pin_icon)
 
