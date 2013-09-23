@@ -30,6 +30,7 @@ class CommandMenuBrick(BlissWidget):
         self.defineSignal('commandStarted',())
         self.defineSignal('commandDone',())
         self.defineSignal('commandFailed',())
+        #self.defineSlot('enable_widget', ())
 
         self.safetyShutter = None
         self.commandHO = None
@@ -177,6 +178,12 @@ class CommandMenuBrick(BlissWidget):
             else:
                 but=self.commandButtons[but_name]
                 but.setIcons(icon_name,stop_icon_name,cancel_icon_name)
+                
+    #def enable_widget(self, state):
+    #    if state:
+    #        self.setEnabled(True)
+    #    else:
+    #        self.setDisabled(True)
 
     def setConfirmationMessages(self,confirmations):
         confirmations_list=confirmations.split('/')

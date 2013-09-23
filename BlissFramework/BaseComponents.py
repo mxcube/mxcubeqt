@@ -574,6 +574,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
         #
         dispatcher.connect(self.__hardwareObjectDiscarded, 'hardwareObjectDiscarded', HardwareRepository.HardwareRepository())
  
+        self.defineSlot('enable_widget', ())
         
     def __run(self):
         self.setAcceptDrops(False)
@@ -855,6 +856,11 @@ class BlissWidget(QWidget, Connectable.Connectable):
     def setExpertMode(self, expert):
         pass
     
+    def enable_widget(self, state):
+      if state:
+        self.setEnabled(True)
+      else:
+        self.setDisabled(True)
   
 class NullBrick(BlissWidget):
     def __init__(self, *args):
