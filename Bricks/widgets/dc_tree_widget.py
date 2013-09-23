@@ -27,6 +27,7 @@ class DataCollectTree(qt.QWidget):
         self.queue_hwobj = None
         self.queue_model_hwobj = None
         self.beamline_setup_hwobj = None
+        self.sample_centring_result = gevent.event.AsyncResult()
 
         # HW-Object set by TreeBrick
         self.sample_changer_hwobj = None
@@ -201,7 +202,7 @@ class DataCollectTree(qt.QWidget):
                 menu.insertSeparator(4)
                 menu.insertItem(qt.QString("Details"), self.show_details)
             
-            menu.insertItem(qt.QString("Collect"), self.context_collect_item)
+            #menu.insertItem(qt.QString("Collect"), self.context_collect_item)
             
     def item_double_click(self):
         self.show_details()
@@ -254,24 +255,33 @@ class DataCollectTree(qt.QWidget):
 
     def mount_sample_task(self):
         items = self.get_selected_items()
-
+        
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
-                previous_qe = items[0].get_queue_entry()
-                qe = queue_entry.SampleQueueEntry(items[0], items[0].get_model())
-                qe.sample_changer_hwobj = self.beamline_setup_hwobj.sample_changer_hwobj
-                qe.diffractometer_hwobj = self.beamline_setup_hwobj.diffractometer_hwobj
-                qe.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
-                qe.execute()
-                items[0].setText(1, "")
-                previous_qe.set_view(items[0])
-                previous_qe.set_data_model(items[0].get_model())
-                self.enable_collect(True)
-                
+                self.sample_centring_result = gevent.event.AsyncResult()
+                try:
+                    queue_entry.mount_sample(self.beamline_setup_hwobj, items[0],
+                                             items[0].get_model(), self.centring_done,
+                                             self.sample_centring_result)
+                except Exception as e:
+                    items[0].setText(1, "Error loading")
+                    msg = "Error loading sample, please check" +\
+                          " sample changer: " + e.message
+                    logging.getLogger("user_level_log").error(msg)
+                finally:
+                    self.enable_collect(True)
         else:
             logging.getLogget("user_level_log").\
                 info('Its not possible to mount samples in free pin mode')
-            
+
+    def centring_done(self, success, centring_info):
+        if success:
+            self.sample_centring_result.set(centring_info)
+        else:
+            msg = "Loop centring failed or was cancelled, " +\
+                  "please continue manually."
+            logging.getLogger("user_level_log").warning(msg)
+
     def unmount_sample(self):
         gevent.spawn(self.unmount_sample_task)
 
