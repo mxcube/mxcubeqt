@@ -62,6 +62,10 @@ class TreeBrick(BaseComponents.BlissWidget):
         #self.defineSlot("set_session", ())
 
         # Qt - Signals
+        self.defineSignal("enable_hutch_menu", ())
+        self.defineSignal("enable_command_menu", ())
+        self.defineSignal("enable_task_toolbox", ())
+
         # Hiding and showing the tabs
         self.defineSignal("hide_sample_tab", ())
         self.defineSignal("hide_dc_parameters_tab", ())
@@ -273,6 +277,15 @@ class TreeBrick(BaseComponents.BlissWidget):
         :returns: None
         """
         self.dc_tree_widget.enable_collect(state)
+
+    def enable_hutch_menu(self, state):
+        self.emit(qt.PYSIGNAL("enable_hutch_menu"), (state,))
+
+    def enable_command_menu(self, state):
+        self.emit(qt.PYSIGNAL("enable_command_menu"), (state,))
+
+    def enable_task_toolbox(self, state):
+        self.emit(qt.PYSIGNAL("enable_task_toolbox"), (state,))
 
     def get_tree_brick(self, tree_brick):
         """
