@@ -159,12 +159,6 @@ class DataCollectTree(qt.QWidget):
         if event.type() == qt.QEvent.MouseButtonDblClick:
             self.show_details()
             return True
-        elif event.type() == qt.QEvent.KeyPress:
-            if event.key() == qt.Qt.Key_Shift:
-                print 'here'
-                return True
-            else:
-                return False
         else:
             return False
 
@@ -449,8 +443,14 @@ class DataCollectTree(qt.QWidget):
 
     def queue_paused_handler(self, state):
         if state:
+            self.parent().enable_hutch_menu(True)
+            self.parent().enable_command_menu(True)
+            self.parent().enable_task_toolbox(True)
             self.continue_button.setText('Continue')
         else:
+            self.parent().enable_hutch_menu(False)
+            self.parent().enable_command_menu(False)
+            self.parent().enable_task_toolbox(False)
             self.continue_button.setText('Pause')
 
     def collect_stop_toggle(self):
@@ -521,6 +521,7 @@ class DataCollectTree(qt.QWidget):
         self.collecting = True
         self.collect_button.setText("      Stop   ")
         self.collect_button.setIconSet(qt.QIconSet(self.stop_pixmap))
+        self.parent().enable_hutch_menu(False)
         self.run_cb()
         
         try:
@@ -542,6 +543,9 @@ class DataCollectTree(qt.QWidget):
         self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
+        self.parent().enable_hutch_menu(True)
+        self.parent().enable_command_menu(True)
+        self.parent().enable_task_toolbox(True)
 
     def get_checked_items(self):
         res = queue_item.perform_on_children(self.sample_list_view,
