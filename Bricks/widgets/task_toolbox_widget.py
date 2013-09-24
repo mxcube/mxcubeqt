@@ -64,6 +64,9 @@ class TaskToolBoxWidget(qt.QWidget):
         qt.QObject.connect(self.create_task_button, qt.SIGNAL("clicked()"),
                            self.create_task_button_click)
 
+        qt.QObject.connect(self.tool_box, qt.SIGNAL("currentChanged( int )"),
+                           self.current_page_changed)
+
 
     def set_tree_brick(self, brick):
         """
@@ -93,14 +96,24 @@ class TaskToolBoxWidget(qt.QWidget):
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).ispyb_logged_in(logged_in)
 
-     
+
+    def current_page_changed(self, item_index):
+        items = self.tree_brick = self.tree_brick.get_selected_items()
+        self.tool_box.item(item_index).selection_changed(items)
+
+
     def selection_changed(self, items):
         """
         Called by the parent widget when selection in the tree changes.
         """
-        if items:
-            for i in range(0, self.tool_box.count()):
-                self.tool_box.item(i).selection_changed(items)
+        current_page = self.tool_box.currentItem()
+        current_page.selection_changed(items)
+        
+#         for i in range(0, self.tool_box.count()):
+#             page = self.tool_box.item(i)
+
+#             if page is current_page
+#                 page.selection_changed(items)
 
 
     def create_task_button_click(self):
