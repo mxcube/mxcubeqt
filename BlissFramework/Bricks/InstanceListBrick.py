@@ -6,6 +6,7 @@ from qt import *
 import logging
 #import DataCollectBrick2
 import InstanceServer
+import gevent
 from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
 import email.Utils
 import smtplib
@@ -72,6 +73,7 @@ class InstanceListBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
         
         self.addProperty("mnemonic", "string", "")
+        self.addProperty("xmlrpc_server", "string", "/xml-rpc-server")
         self.addProperty("icons", "string", "")
         self.addProperty("giveControlTimeout", "integer", 30)
         self.addProperty("initializeServer", "boolean", False)
@@ -82,6 +84,7 @@ class InstanceListBrick(BlissWidget):
 
         self.instanceServer = None
         self.hutchtrigger = None
+        self.xmlrpc_server = None
 
         self.giveControlDialog=None
         self.timeoutLeft=-1
@@ -169,6 +172,8 @@ class InstanceListBrick(BlissWidget):
                 self.connect(self.instanceServer,PYSIGNAL('clientChanged'), self.clientChanged)
                 self.connect(self.instanceServer,PYSIGNAL('clientClosed'), self.clientClosed)
                 self.connect(self.instanceServer,PYSIGNAL('widgetCall'), self.widgetCall)
+        elif propertyName=="xmlrpc_server":
+            self.xmlrpc_server = self.getHardwareObject(newValue)
         elif propertyName == 'hutchtrigger':
             self.hutchtrigger = self.getHardwareObject(newValue)
             if self.hutchtrigger is not None:
@@ -507,6 +512,9 @@ class InstanceListBrick(BlissWidget):
                 BlissWidget.setInstanceMode(BlissWidget.INSTANCE_MODE_SLAVE)
 
         if have_control:
+            if self.xmlrpc_server:
+              gevent.spawn_later(1, self.xmlrpc_server.open)
+
             self.inControl=None
             self.takeControlButton.setEnabled(False)
             self.askForControlButton.setEnabled(False)
@@ -520,6 +528,9 @@ class InstanceListBrick(BlissWidget):
             self.listBox.setSelectionMode(QListBox.NoSelection)
 
         else:
+            if self.xmlrpc_server:
+                self.xmlrpc_server.close()
+
             if BlissWidget.isInstanceUserIdLogged():
                 self.askForControlButton.setEnabled(True)
             elif BlissWidget.isInstanceUserIdInhouse():
