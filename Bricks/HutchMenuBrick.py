@@ -42,6 +42,7 @@ class HutchMenuBrick(BlissWidget):
         self.slitbox  = None
         self.sampleChanger=None
         self.collectObj = None
+        self.queue_hwobj = None
         #self.allowMoveToBeamCentring = False
 
         # Define properties
@@ -55,6 +56,7 @@ class HutchMenuBrick(BlissWidget):
         self.addProperty('label','string','Sample centring')
         #self.addProperty('displaySlitbox', 'boolean', True)
         self.addProperty('displayBeam', 'boolean', True)
+        self.addProperty('queue', 'string', '/queue')
 
         # Define signals and slots
         self.defineSignal('enableMinidiff',())
@@ -221,6 +223,8 @@ class HutchMenuBrick(BlissWidget):
             self.extraCommands['mnemonic']=newValue
         elif propertyName=='extraCommandsIcons':
             self.extraCommands['icons']=newValue
+        elif propertyName=='queue':
+            self.queue_hwobj = self.getHardwareObject(newValue)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -391,6 +395,9 @@ class HutchMenuBrick(BlissWidget):
 
         self.emit(PYSIGNAL("newCentredPos"), (state, centring_status))
 
+        if self.queue_hwobj.is_executing():
+            self.setEnabled(False)
+
     def centringSnapshots(self,state):
         if state is None:
             self.isShooting=True
@@ -400,6 +407,7 @@ class HutchMenuBrick(BlissWidget):
             self.sampleCentreBox.setEnabled(True)
 
     def centringStarted(self,method,flexible):
+        self.setEnabled(True)
         self.emit(PYSIGNAL("enableMinidiff"), (False,))
         if self.insideDataCollection:
           self.emit(PYSIGNAL("centringStarted"), ())
