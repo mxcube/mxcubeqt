@@ -74,6 +74,7 @@ class DataCollectTree(qt.QWidget):
         self.collect_button.setText("Collect Queue")
         self.collect_button.setFixedWidth(120)
         self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
+        self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
 
         self.continue_button = qt.QPushButton(self, "ok_button")
         self.continue_button.setText('Pause')
@@ -520,6 +521,7 @@ class DataCollectTree(qt.QWidget):
         
         self.collecting = True
         self.collect_button.setText("      Stop   ")
+        self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.collect_button.setIconSet(qt.QIconSet(self.stop_pixmap))
         self.parent().enable_hutch_menu(False)
         self.run_cb()
@@ -541,6 +543,7 @@ class DataCollectTree(qt.QWidget):
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
+        self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
         self.parent().enable_hutch_menu(True)
