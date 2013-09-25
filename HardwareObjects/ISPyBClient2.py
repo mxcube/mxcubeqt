@@ -28,6 +28,9 @@ _WSDL_ROOT = ''
 _WS_BL_SAMPLE_URL = _WSDL_ROOT + 'ToolsForBLSampleWebService?wsdl'
 _WS_SHIPPING_URL = _WSDL_ROOT + 'ToolsForShippingWebService?wsdl'
 _WS_COLLECTION_URL = _WSDL_ROOT + 'ToolsForCollectionWebService?wsdl'
+_WS_USERNAME = 'ispybws1'
+_WS_PASSWORD = '!5pybws1'
+
 
 _CONNECTION_ERROR_MSG = "Could not connect to ISPyB, please verify that " + \
                         "the server is running and that your " + \
@@ -143,12 +146,23 @@ class ISPyBClient2(HardwareObject):
                     'ToolsForShippingWebService?wsdl'
                 _WS_COLLECTION_URL = _WSDL_ROOT + \
                     'ToolsForCollectionWebService?wsdl'
+
+                t1 = HttpAuthenticated(username = _WS_USERNAME,
+                                      password = _WS_PASSWORD)
+
+                t2 = HttpAuthenticated(username = _WS_USERNAME,
+                                      password = _WS_PASSWORD)
+
+                t3 = HttpAuthenticated(username = _WS_USERNAME,
+                                      password = _WS_PASSWORD)
                 
-                try: 
-                    self.__shipping = Client(_WS_SHIPPING_URL, timeout = 3)
-                    self.__collection = Client(_WS_COLLECTION_URL, timeout = 3)
-                    self.__tools_ws = Client(_WS_BL_SAMPLE_URL, timeout = 3)
-                    
+                try:
+                    self.__shipping = Client(_WS_SHIPPING_URL, timeout = 3,
+                                             transport = t1, cache = None)
+                    self.__collection = Client(_WS_COLLECTION_URL, timeout = 3,
+                                               transport = t2, cache = None)
+                    self.__tools_ws = Client(_WS_BL_SAMPLE_URL, timeout = 3,
+                                             transport = t3, cache = None)
                 except URLError:
                     logging.getLogger("ispyb_client")\
                         .exception(_CONNECTION_ERROR_MSG)
@@ -218,7 +232,7 @@ class ISPyBClient2(HardwareObject):
             try:         
                 try:
                     person = self.__shipping.service.\
-                             findPersonByCodeAndNumber(proposal_code, 
+                             findPersonByProposal(proposal_code, 
                                                        proposal_number)
 
                 except WebFault, e:
@@ -227,8 +241,8 @@ class ISPyBClient2(HardwareObject):
  
                 try: 
                     proposal = self.__shipping.service.\
-                        findProposalByCodeAndNumber(proposal_code, 
-                                                    proposal_number)
+                        findProposal(proposal_code, 
+                                     proposal_number)
 
                     proposal.code = proposal_code
                 except WebFault, e:
@@ -237,7 +251,7 @@ class ISPyBClient2(HardwareObject):
 
                 try: 
                     lab = self.__shipping.service.\
-                        findLaboratoryByCodeAndNumber(proposal_code, 
+                        findLaboratoryByProposal(proposal_code, 
                                                       proposal_number)
                 except WebFault, e:
                     logging.getLogger("ispyb_client").exception(e.message)
@@ -245,7 +259,7 @@ class ISPyBClient2(HardwareObject):
 
                 try:
                     res_sessions = self.__collection.service.\
-                        findSessionsByCodeAndNumberAndBeamLine(proposal_code,
+                        findSessionsByProposalAndBeamLine(proposal_code,
                                                                proposal_number,
                                                                self.beamline_name)
                     sessions = []
