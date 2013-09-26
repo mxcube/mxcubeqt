@@ -340,4 +340,4 @@ class AcquisitionWidget(qt.QWidget):
         else:
             self.acq_widget_layout.child('inverse_beam_cbx').show()
             self.acq_widget_layout.child('subwedge_size_label').show()
-            self.acq_widget_layout.child('subwedge_size_ledit').show3()
+            self.acq_widget_layout.child('subwedge_size_ledit').show()

@@ -157,7 +157,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-
+            self._acq_widget.disable_inverse_beam(False)
             sample_data_model = self.get_sample_item(tree_item).get_model()
             self.update_processing_parameters(sample_data_model.crystals[0])
             self._acq_widget.\
@@ -170,6 +170,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             if data_collection.experiment_type != queue_model_enumerables.\
                     EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
+                self._acq_widget.disable_inverse_beam(True)
                 if data_collection.get_path_template():
                     self._path_template = data_collection.get_path_template()
 
@@ -212,12 +213,15 @@ class CreateDiscreteWidget(CreateTaskBase):
         return result
         
 
-    def subwedges_for_inverse_beam(self, total_num_images, subwedge_size):
+    def get_subwedges(self, total_num_images, subwedge_size,
+                      osc_range, osc_offset):
         number_of_subwedges = total_num_images / subwedge_size
         subwedges = []
 
         for subwedge_num in range(0, number_of_subwedges):
-            subwedges.append((subwedge_num * subwedge_size + 1, subwedge_size))
+            osc_start = osc_offset + (osc_range * subwedge_size * subwedge_num)
+            subwedges.append((subwedge_num * subwedge_size + 1,
+                              subwedge_size, osc_start))
 
         return subwedges
 
@@ -244,19 +248,31 @@ class CreateDiscreteWidget(CreateTaskBase):
             sc = None
 
         if self._acq_widget.use_inverse_beam():
-
             total_num_images = self._acquisition_parameters.num_images
             subwedge_size = self._acq_widget.get_num_subwedges()
+            osc_range = self._acquisition_parameters.osc_range
+            osc_start = self._acquisition_parameters.osc_start
+            run_number = self._path_template.run_number
 
-            sub_wedges = self.subwedges_for_inverse_beam(total_num_images,
-                                                         subwedge_size)
+            wedge_one = self.get_subwedges(total_num_images, subwedge_size,
+                                           osc_range, osc_start)
+
+            wedge_one = [pair + (run_number,) for pair in wedge_one]
+
+            wedge_two = self.get_subwedges(total_num_images,
+                                           subwedge_size, osc_range,
+                                           180 + osc_start)
+            
+            wedge_two = [pair + (run_number + 1,) for pair in wedge_two]
+
+            subwedges = [sw_pair for pair in zip(wedge_one, wedge_two) for sw_pair in pair]
+
+            self._acq_widget.set_use_inverse_beam(False)
 
             for cpos in cpos_list:
-                for sw in sub_wedges:
-                    tasks.extend(self.create_dc(sample, 1, sw[0], sw[1],
-                                                sc=sc, cpos=cpos))
-                    tasks.extend(self.create_dc(sample, 2, sw[0], sw[1],
-                                                180, sc=sc, cpos=cpos))
+                for sw in subwedges:
+                    tasks.extend(self.create_dc(sample, sw[3], sw[0], sw[1],
+                                                sw[2], sc=sc, cpos=cpos, inverse_beam = True))
 
                 self._path_template.run_number += 1
 
@@ -293,7 +309,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def create_dc(self, sample, run_number=None, start_image=None,
                   num_images=None, osc_start=None, sc=None,
-                  cpos=None):
+                  cpos=None, inverse_beam = False):
         tasks = []
 
         # Acquisition for start position
@@ -330,6 +346,9 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         if osc_start:
             acq.acquisition_parameters.osc_start = osc_start
+
+        if inverse_beam:
+            acq.acquisition_parameters.inverse_beam = False
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
         dc = queue_model_objects.DataCollection([acq],
