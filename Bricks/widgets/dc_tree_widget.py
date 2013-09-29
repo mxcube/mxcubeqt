@@ -56,7 +56,7 @@ class DataCollectTree(qt.QWidget):
         self.stop_pixmap = Icons.load("Stop.png")
         self.up_pixmap = Icons.load("Up2.png")
         self.down_pixmap = Icons.load("Down2.png")
-        self.delete_pixmap = Icons.load("Delete2.png")
+        self.delete_pixmap = Icons.load("bin_small.png")
         self.ispyb_pixmap = Icons.load("SampleChanger2.png")
         self.caution_pixmap = Icons.load("Caution2.png")
                         
@@ -659,7 +659,7 @@ class DataCollectTree(qt.QWidget):
         self.queue_model_hwobj.select_model('free-pin')
         sample = queue_model_objects.Sample()
         sample.free_pin_mode = True
-        sample.set_name('free-pin')
+        sample.set_name('manually-mounted')
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
 
