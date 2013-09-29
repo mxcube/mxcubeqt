@@ -3,7 +3,7 @@ import logging
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import abc
-
+import copy
 
 from BlissFramework.Utils import widget_colors
 
@@ -35,6 +35,13 @@ class CreateTaskBase(qt.QWidget):
     def init_models(self):
         if self._beamline_setup_hwobj is not None:
             self._path_template = self._beamline_setup_hwobj.get_default_path_template()
+            (data_directory, proc_directory) = self.get_default_directory()
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix()
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                             get_next_run_number(self._path_template)
+            
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
@@ -81,9 +88,10 @@ class CreateTaskBase(qt.QWidget):
             except AttributeError as ex:
                 logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                    'more hardware objects' + str(ex))
-
         if self._data_path_widget:
             self._data_path_widget.set_session(self._session_hwobj)
+
+        self.init_models()
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -225,16 +233,18 @@ class CreateTaskBase(qt.QWidget):
     def single_item_selection(self, tree_item):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
            isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self.init_models()
-            sample_data_model = self.get_sample_item(tree_item).get_model()
+            self._path_template = copy.deepcopy(self._path_template)
             
-            (data_directory, proc_directory) = self.get_default_directory(tree_item = tree_item)
+            #self.init_models()
+            #sample_data_model = self.get_sample_item(tree_item).get_model()
+            
+            #(data_directory, proc_directory) = self.get_default_directory(tree_item = tree_item)
                 
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                             get_next_run_number(self._path_template)
+            #self._path_template.directory = data_directory
+            #self._path_template.process_directory = proc_directory
+            #self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+            #self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            #                                 get_next_run_number(self._path_template)
             self.setDisabled(False)
             
         if self._data_path_widget:
@@ -244,8 +254,8 @@ class CreateTaskBase(qt.QWidget):
         tree_item = tree_items[0]
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            self.init_models()
-            sample_data_model = self.get_sample_item(tree_item).get_model()
+            #self.init_models()
+            #sample_data_model = self.get_sample_item(tree_item).get_model()
             
             (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')
                 

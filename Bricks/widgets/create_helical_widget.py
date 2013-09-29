@@ -272,12 +272,14 @@ class CreateHelicalWidget(CreateTaskBase):
                                                              
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
-            self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
-            self._processing_widget.update_data_model(self._processing_parameters)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            self._processing_parameters = copy.deepcopy(self._processing_parameters)
+            #sample_data_model = self.get_sample_item(tree_item).get_model()
+            #self.update_processing_parameters(sample_data_model.crystals[0])
+            #self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
+            #self._processing_widget.update_data_model(self._processing_parameters)
+            #self._acq_widget.update_data_model(self._acquisition_parameters,
+            #                                   self._path_template)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()

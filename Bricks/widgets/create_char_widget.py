@@ -216,8 +216,10 @@ class CreateCharWidget(CreateTaskBase):
         
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
+            self._char_params = copy.deepcopy(self._char_params)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            #sample_data_model = self.get_sample_item(tree_item).get_model()
+            #self.update_processing_parameters(sample_data_model.crystals[0])
 
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             self.setDisabled(False)

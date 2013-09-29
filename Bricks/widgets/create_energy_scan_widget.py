@@ -4,15 +4,12 @@ import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import sys
-import os
-
 #from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
 from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout
-from BlissFramework.Utils import widget_colors
 
 class CreateEnergyScanWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
