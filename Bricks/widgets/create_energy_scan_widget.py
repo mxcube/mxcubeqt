@@ -21,7 +21,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 5, "main_v_layout")
         h_box = qt.QHGroupBox('Available elements', self)
-        self.periodic_table = PeriodicTableBrick(h_box) #QPeriodicTable.QPeriodicTable(h_box)
+        self.periodic_table = PeriodicTableBrick(h_box)
         font = self.periodic_table.font()
         font.setPointSize(8)
         self.periodic_table.setFont(font)
@@ -33,10 +33,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
                                                data_model = self._path_template,
                                                layout = DataPathWidgetVerticalLayout)
-
-        #self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
-        #self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
-
 
         v_layout.addWidget(h_box)
         v_layout.addWidget(self._data_path_gbox)

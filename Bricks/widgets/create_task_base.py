@@ -295,8 +295,6 @@ class CreateTaskBase(qt.QWidget):
     # a task. When a task_node is selected.
     def create_task(self, sample):        
         tasks = self._create_task(sample)
-        #self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-        #                                 get_next_run_number(self._path_template)
         return tasks
 
     @abc.abstractmethod

@@ -30,18 +30,12 @@ class TaskToolBoxWidget(qt.QWidget):
 
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         self.discrete_page.setBackgroundMode(qt.QWidget.PaletteBackground)
-
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)
-
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.helical_page.setBackgroundMode(qt.QWidget.PaletteBackground)
-
-        self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, 
-                                                       "energy_scan")
-
-        self.workflow_page = CreateWorkflowWidget(self.tool_box,
-                                                  'workflow')
+        self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
+        self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Discrete")
         self.tool_box.addItem(self.char_page, "Characterise")
@@ -69,7 +63,6 @@ class TaskToolBoxWidget(qt.QWidget):
         qt.QObject.connect(self.tool_box, qt.SIGNAL("currentChanged( int )"),
                            self.current_page_changed)
 
-
     def set_tree_brick(self, brick):
         """
         Sets the tree brick of each page in the toolbox.
@@ -78,7 +71,6 @@ class TaskToolBoxWidget(qt.QWidget):
 
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).set_tree_brick(brick)
-        
 
     def set_beamline_setup(self, beamline_setup_hwobj):
         self._beamline_setup_hwobj = beamline_setup_hwobj
@@ -88,7 +80,6 @@ class TaskToolBoxWidget(qt.QWidget):
         self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
         self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
         self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energy_hwobj)
-      
 
     def ispyb_logged_in(self, logged_in):
         """
@@ -98,7 +89,6 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).ispyb_logged_in(logged_in)
-
             
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
@@ -117,7 +107,6 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tool_box.item(page_index).selection_changed(tree_items)
         self.previous_page_index = page_index
 
-
     def selection_changed(self, items):
         """
         Called by the parent widget when selection in the tree changes.
@@ -125,14 +114,14 @@ class TaskToolBoxWidget(qt.QWidget):
         current_page = self.tool_box.currentItem()
         current_page.selection_changed(items)
 
-
     def create_task_button_click(self):
         if self.tool_box.currentItem().approve_creation():
             items = self.tree_brick.get_selected_items()
 
             if not items:
-                logging.getLogger("user_level_log").warning("Select the sample or group you "\
-                                                            "would like to add to.")
+                logging.getLogger("user_level_log").\
+                    warning("Select the sample or group you "\
+                            "would like to add to.")
             if len(items) == 1:
                 self.create_task(items[0].get_model())
             else:
@@ -144,7 +133,6 @@ class TaskToolBoxWidget(qt.QWidget):
                 get_next_run_number(pt)
 
             self.tool_box.currentItem().update_selection()
-        
 
     def create_task(self, task_node):
         # Selected item is a sample
@@ -177,4 +165,5 @@ class TaskToolBoxWidget(qt.QWidget):
         # The selected item is a task
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
-            self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
+            self.tree_brick.queue_model_hwobj.\
+                add_child(task_node.get_parent(), new_node)
