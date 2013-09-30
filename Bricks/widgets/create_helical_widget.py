@@ -342,16 +342,16 @@ class CreateHelicalWidget(CreateTaskBase):
                 
                 if '<sample_name>' in start_acq.path_template.directory:
                     name = sample.get_name().replace(':', '-')
-                    start_acq.path_template.directory = acq.path_template.directory.\
-                                                  replace('<sample_name>', name)
+                    start_acq.path_template.directory = start_acq.path_template.directory.\
+                                                        replace('<sample_name>', name)
 
-                    start_acq.path_template.process_directory = acq.path_template.process_directory.\
+                    start_acq.path_template.process_directory = start_acq.path_template.process_directory.\
                                                                 replace('<sample_name>', name)
 
                 if '<acronym>-<name>' in start_acq.path_template.base_prefix:
                     start_acq.path_template.base_prefix = self.get_default_prefix(sample)
                     start_acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                                  get_next_run_number(stat_acq.path_template)
+                                                  get_next_run_number(start_acq.path_template)
 
                 # Add another acquisition for the end position
                 end_acq = qmo.Acquisition()
