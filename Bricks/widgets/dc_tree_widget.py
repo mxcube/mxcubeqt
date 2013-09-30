@@ -103,6 +103,7 @@ class DataCollectTree(qt.QWidget):
             .setResizeEnabled(0, 1)
         self.sample_list_view.header().show()
 
+        self.sample_list_view.header().hide()
         self.sample_list_view.setFrameShape(qt.QListView.StyledPanel)
         self.sample_list_view.setFrameShadow(qt.QListView.Sunken)
         self.sample_list_view.setRootIsDecorated(1)
@@ -152,7 +153,6 @@ class DataCollectTree(qt.QWidget):
 
         qt.QObject.connect(self.continue_button, qt.SIGNAL("clicked()"),
                            self.continue_button_click)
-
 
         self.sample_list_view.viewport().installEventFilter(self)
 
