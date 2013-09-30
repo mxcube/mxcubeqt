@@ -143,14 +143,12 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.task_tool_box_widget.workflow_page.\
             _grid_widget.ChangeBeamPosition(x, y)
 
-
     def selection_changed(self, items):
         """
         Connected to the signal "selection_changed" of the TreeBrick. 
         Called when the selection in the tree changes.
         """
         self.task_tool_box_widget.selection_changed(items)
-
 
     def shape_selected(self, selected_positions):
         """
@@ -164,13 +162,11 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.task_tool_box_widget.\
             char_page.centred_position_selection(selected_positions)
 
-
     def shape_deleted(self, shape):
         """
         Callback for the DrawingEvent object called when a shape is deleted.
         """
         self.task_tool_box_widget.helical_page.shape_deleted(shape)
-
 
     def new_centred_position(self, state, centring_status):
         """
@@ -208,7 +204,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 logging.getLogger('HWR').\
                     exception('Could not get screen positons for %s' % cpos)
                 traceback.print_exc()
-
 
     def diffractometer_changed(self, *args):
         """
