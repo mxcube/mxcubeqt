@@ -47,6 +47,7 @@ class ConfirmDialog(qt.QDialog):
         # Layout
         qt.QVBoxLayout(self)
         self.dialog_layout_widget = ConfirmDialogWidgetVerticalLayout(self)
+        self.dialog_layout_widget.child('take_snapshosts_cbx').hide()
         self.dialog_layout_widget.child('file_list_view').setSorting(-1)
         self.layout().addWidget(self.dialog_layout_widget)
 
@@ -137,7 +138,7 @@ class ConfirmDialog(qt.QDialog):
         for item in self.checked_items:
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_snapshots = self.dialog_layout_widget.take_snapshosts_cbx.isOn()
+                    take_snapshots = False #self.dialog_layout_widget.take_snapshosts_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
                     take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
