@@ -24,7 +24,7 @@ class CreateTaskBase(qt.QWidget):
          # Abstract attributes
          self._acq_widget = None
          self._data_path_widget = None
-         self._current_selected_items = None
+         self._current_selected_items = []
          self._path_template = None
          self._energy_scan_result = None
          self._session_hwobj = None
