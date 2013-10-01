@@ -134,10 +134,6 @@ class TaskToolBoxWidget(qt.QWidget):
                 for item in items:
                     self.create_task(item.get_model())
 
-            pt = self.tool_box.currentItem()._path_template
-            pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(pt)
-
             self.tool_box.currentItem().update_selection()
 
     def create_task(self, task_node):
@@ -173,3 +169,7 @@ class TaskToolBoxWidget(qt.QWidget):
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             self.tree_brick.queue_model_hwobj.\
                 add_child(task_node.get_parent(), new_node)
+
+        pt = self.tool_box.currentItem()._path_template
+        pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            get_next_run_number(pt)
