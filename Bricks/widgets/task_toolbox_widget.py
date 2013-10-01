@@ -102,7 +102,8 @@ class TaskToolBoxWidget(qt.QWidget):
         # Get the directory form the previous page and update 
         # the new page with the direcotry and run_number from the old.
         # IFF sample or group selected.
-        if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or\
+                isinstance(tree_item, queue_item.SampleQueueItem):
             new_pt = self.tool_box.item(page_index)._path_template
             previous_pt = self.tool_box.item(self.previous_page_index)._path_template
             new_pt.directory = previous_pt.directory
