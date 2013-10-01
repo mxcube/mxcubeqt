@@ -82,8 +82,6 @@ class DataCollectTree(qt.QWidget):
 
         self.sample_list_view = qt.QListView(self, "sample_list_view")
         self.sample_list_view.setSelectionMode(qt.QListView.Extended)
-        self.sample_list_view.header().setLabel(0, "Sample location", 280)
-        self.sample_list_view.header().setLabel(1, "Status", 125)
 
         self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
                                           qt.QSizePolicy.Expanding))   
@@ -91,17 +89,9 @@ class DataCollectTree(qt.QWidget):
                                                            qt.QSizePolicy.Expanding))
     
         self.sample_list_view.setSorting(-1)
-        self.sample_list_view.addColumn("", 250)
-        self.sample_list_view.addColumn("", 125)
-        self.sample_list_view.header()\
-            .setClickEnabled(0, 0)
-        self.sample_list_view.header()\
-            .setResizeEnabled(0, 0)
-        self.sample_list_view.header()\
-            .setClickEnabled(0, 1)
-        self.sample_list_view.header()\
-            .setResizeEnabled(0, 1)
-        self.sample_list_view.header().show()
+        self.sample_list_view.addColumn("", 280)
+        self.sample_list_view.addColumn("", 120)
+        self.sample_list_view.header().hide()
 
         self.sample_list_view.setFrameShape(qt.QListView.StyledPanel)
         self.sample_list_view.setFrameShadow(qt.QListView.Sunken)
@@ -241,7 +231,6 @@ class DataCollectTree(qt.QWidget):
             items[0].startRename(0);
 
     def item_renamed(self, item, col, text):
-        item.set_name(str(text))
         item.get_model().set_name(text)
 
     def mount_sample(self):
@@ -500,6 +489,7 @@ class DataCollectTree(qt.QWidget):
                 return True
 
     def collect_items(self, items = [], checked_items = []):
+        self.beamline_setup_hwobj.shape_history_hwobj.de_select_all()
         for item in checked_items:
             # update the run-number text incase of re-collect
             item.setText(0, item.get_model().get_name())
