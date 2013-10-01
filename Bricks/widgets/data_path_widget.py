@@ -155,6 +155,7 @@ class DataPathWidget(qt.QWidget):
             #self.data_path_widget_layout.folder_ledit.\
             #    setPaletteBackgroundColor(widget_colors.WHITE)
         else:
+            self.data_path_widget_layout.folder_ledit.setText('')
             #self.data_path_widget_layout.folder_ledit.\
             #    setPaletteBackgroundColor(widget_colors.LIGHT_RED)
             self._data_model.directory = base_image_dir
