@@ -239,14 +239,25 @@ class CreateTaskBase(qt.QWidget):
         sample_data_model = sample_item.get_model()
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            (data_directory, proc_directory) = self.get_default_directory(tree_item)
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+            self._path_template = copy.deepcopy(self._path_template)
+            self._shape_history.de_select_all()
+
+            if sample_data_model.lims_id != -1:
+                (data_directory, proc_directory) = self.get_default_directory(tree_item)
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
+                self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                get_next_run_number(self._path_template)
+
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self._path_template = copy.deepcopy(self._path_template)
+            self._shape_history.de_select_all()
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                get_next_run_number(self._path_template)
             self.setDisabled(False)
             
         if self._acq_widget:
@@ -260,9 +271,6 @@ class CreateTaskBase(qt.QWidget):
         tree_item = tree_items[0]
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            #self.init_models()
-            #sample_data_model = self.get_sample_item(tree_item).get_model()
-            
             (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')
                 
             self._path_template.directory = data_directory
