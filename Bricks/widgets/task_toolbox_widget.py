@@ -81,6 +81,11 @@ class TaskToolBoxWidget(qt.QWidget):
         self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
         self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energy_hwobj)
 
+        # Remove energy scan page from non tunable wavelentgh beamlines
+        if not beamline_setup_hwobj.tunable_wavelength():
+            self.tool_box.removeItem(self.energy_scan_page)
+            self.energy_scan_page.hide()
+
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)
