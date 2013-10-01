@@ -8,6 +8,7 @@ import datetime
 import types
 from BlissFramework.Utils.GraphicScan import BaseGraphicScan
 from BlissFramework import Icons
+from HardwareRepository.HardwareRepository import dispatcher
 
 from Qub.Objects.QubDrawingManager import QubPolygoneDrawingMgr
 from Qub.Objects.QubDrawingCanvasTools import QubCanvasGrid
@@ -68,6 +69,9 @@ class MxLookupScanBrick(BaseGraphicScan) :
         table.setText(0, 0, "2")
         table.setText(1, 0, "2")
 
+        dispatcher.connect(self._askedForGrid, "grid")
+        
+
     def mot1_position_changed(self, new_pos):
         if self.old_mot1_pos is None:
           self.old_mot1_pos = new_pos
@@ -78,6 +82,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
           dx = new_pos - self.old_mot1_pos
           current_x = self._graphicSelection.x()[0]
           current_y = self._graphicSelection.y()[0]
+          #new_x = current_x-(dx*0.85*mot1.getProperty('unit')/self._XSize)
           new_x = current_x-(dx*mot1.getProperty('unit')/self._XSize)
           self._graphicSelection.move(new_x,current_y, 0)
           points = self._graphicSelection.points()
@@ -213,7 +218,11 @@ class MxLookupScanBrick(BaseGraphicScan) :
              p += translation
              self._graphicSelection.setPoints(p.tolist())
 
-    def __refreshSteps(self) :
+    def _askedForGrid(self, grid_dict):
+        self.__createGridPoints()
+        grid_dict.update(self.__refreshSteps())
+
+    def __refreshSteps(self):
         table = self._widgetTree.child('__gridTable')
         # DISTANCE
         stringVal = table.text(0,2)
@@ -247,28 +256,19 @@ class MxLookupScanBrick(BaseGraphicScan) :
         try:
           firstPoint = self._matchPoints.index(True)
         except:
-          self.emit(qt.PYSIGNAL("addToQueue"), ({}, ))
           return
         mot1 = self._horizontalMotors[0]
         mot2 = self._verticalMotors[0]
         x,y = self.__gridPoints[firstPoint,0],self.__gridPoints[firstPoint,1]
         angle = self._graphicSelection.angle()[0]
 
-        self._shape_history.add_grid({"dx_mm": float(dist1),
-                                      "dy_mm": float(dist2),
-                                      "steps_x": int(inter1)+1,
-                                      "steps_y": int(inter2)+1,
-                                      "x1": float((x - self._beamx) / mot1.getProperty('unit') * self._XSize),
-                                      "y1": float((y - self._beamy) / mot2.getProperty('unit') * self._YSize),
-                                      "angle": angle})
-        
-        self.emit(qt.PYSIGNAL("addToQueue"), ({ "dx_mm": float(dist1),
-                                                "dy_mm": float(dist2),
-                                                "steps_x": int(inter1)+1,
-                                                "steps_y": int(inter2)+1,
-                                                "x1": float((x - self._beamx)/ mot1.getProperty('unit') * self._XSize),
-                                                "y1": float((y - self._beamy)/ mot2.getProperty('unit') * self._YSize) }, ))
-
+        return {"dx_mm": float(dist1),
+                "dy_mm": float(dist2),
+                "steps_x": int(inter1)+1,
+                "steps_y": int(inter2)+1,
+                "x1": float((x - self._beamx) / mot1.getProperty('unit') * self._XSize),
+                "y1": float((y - self._beamy) / mot2.getProperty('unit') * self._YSize),
+                "angle": angle}
  
     def _movetoStart(self) :
         if not self._matchPoints :
