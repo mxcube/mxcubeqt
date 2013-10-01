@@ -143,7 +143,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         else:
             self._path_template.mad_prefix = ''
 
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            get_next_run_number(self._path_template)
+
         data_path_widget = self.get_data_path_widget()
+        data_path_widget.set_run_number(run_number)
         data_path_widget.set_prefix(self._path_template.base_prefix)
 
         if self.isEnabled():
