@@ -80,7 +80,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('exp_time',
                                self.acq_widget_layout.child('exp_time_ledit'),
                                float,
-                               qt.QDoubleValidator(0.001, 6000, 3, self))
+                               qt.QDoubleValidator(0.036, 6000, 3, self))
 
         self._acquisition_mib.\
              bind_value_update('osc_range',
@@ -221,13 +221,16 @@ class AcquisitionWidget(qt.QWidget):
     def use_mad(self, state):
         self.acq_widget_layout.child('energies_combo').setEnabled(state)
         if state:
-            self.previous_energy = self._acquisition_parameters.energy
             (name, energy) = self.get_mad_energy()
-            self.set_energy(energy, 0)
+
+            if energy != 0:
+                self.set_energy(energy, 0)
+
             self.emit(qt.PYSIGNAL('mad_energy_selected'),
                       (name, energy, state))
         else:
             self.set_energy(self.previous_energy, 0)
+            energy = self._beamline_setup.energy_hwobj.getCurrentEnergy()
             self.emit(qt.PYSIGNAL('mad_energy_selected'),
                       ('', self.previous_energy, state))
 
@@ -287,7 +290,9 @@ class AcquisitionWidget(qt.QWidget):
     def energy_selected(self, index):
         if self.acq_widget_layout.child('mad_cbox').isChecked():
             (name, energy) = self.get_mad_energy()
-            self.set_energy(energy, 0)
+            if energy != 0:
+                self.set_energy(energy, 0)
+            
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
 
     def set_energy(self, energy, wav):
@@ -321,7 +326,7 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('mad_cbox').setChecked(True)
             self.acq_widget_layout.child('energies_combo').\
                 setCurrentItem(index)
-            self.use_mad(mad)
+            #self.use_mad(mad)
         else:
             self.acq_widget_layout.child('mad_cbox').setChecked(False)
             self.acq_widget_layout.child('energies_combo').\
