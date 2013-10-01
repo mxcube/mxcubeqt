@@ -103,7 +103,9 @@ class CreateTaskBase(qt.QWidget):
         if self.isEnabled():
             if isinstance(item, queue_item.TaskQueueItem) and \
                    not isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                model.set_name(new_value)
+                self._path_template.base_prefix = str(new_value)
+                name = self._path_template.get_prefix()
+                model.set_name(name)
                 item.setText(0, model.get_name())
         
     def _run_number_ledit_change(self, new_value):
