@@ -185,11 +185,11 @@ class CreateDiscreteWidget(CreateTaskBase):
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
 
-                self._energy_scan_result = queue_model_objects.EnergyScanResult()
+                #self._energy_scan_result = queue_model_objects.EnergyScanResult()
                 self._processing_parameters = data_collection.processing_parameters
-                self._energy_scan_result = data_collection.crystal.\
-                                           energy_scan_result
-                self._acq_widget.set_energies(self._energy_scan_result)
+                #self._energy_scan_result = data_collection.crystal.\
+                #                           energy_scan_result
+                #self._acq_widget.set_energies(self._energy_scan_result)
             else:
                 self.setDisabled(True)
         else:
@@ -366,8 +366,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         tasks.append(dc)
 
-        self._path_template.run_number = self._beamline_setup_hwobj.\
-            queue_model_hwobj.get_next_run_number(self._path_template)
         self._data_path_widget.update_data_model(self._path_template)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                                        self._path_template)

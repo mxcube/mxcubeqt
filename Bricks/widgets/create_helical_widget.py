@@ -30,6 +30,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._prev_pos = None
         self._current_pos = None
         self._list_item_map = {}
+        self.init_models()
 
         #
         # Layout
@@ -196,7 +197,6 @@ class CreateHelicalWidget(CreateTaskBase):
             for (list_item, line) in items_to_remove:
                 self._list_box.removeItem(self._list_box.index(list_item))
                 del self._list_item_map[list_item]
-                self._shape_history.delete_shape(line)
 
     def centred_position_selection(self, positions):
         if len(positions) == 1:
@@ -309,6 +309,14 @@ class CreateHelicalWidget(CreateTaskBase):
                 self.setDisabled(True)
         else:
             self.setDisabled(True)
+
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionQueueItem):
+
+            self._processing_widget.update_data_model(self._processing_parameters)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
   
     def _create_task(self,  sample):
         data_collections = []
