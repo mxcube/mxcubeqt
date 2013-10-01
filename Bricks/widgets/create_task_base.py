@@ -278,6 +278,15 @@ class CreateTaskBase(qt.QWidget):
     def centred_position_selection(self, positions):
          self._selected_positions = positions
 
+         if len(self._current_selected_items) == 1 and len(positions) == 1:
+             item = self._current_selected_items[0]
+             pos = positions[0]
+
+             if isinstance(pos, shape_history.Point):
+                 if self._acq_widget and isinstance(item, queue_item.TaskQueueItem):
+                     cpos = pos.get_centred_positions()[0]
+                     self._acquisition_parameters.centred_position = cpos
+
     # Should be called by the object that calls create_task,
     # and add_task.
     def approve_creation(self):
