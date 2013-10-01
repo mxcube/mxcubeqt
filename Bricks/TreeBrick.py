@@ -545,6 +545,10 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.populate_parameters_tab(item)
             elif isinstance(item, queue_item.CharacterisationQueueItem):
                 self.populate_edna_parameters_tab(item)
+            elif isinstance(item, queue_item.EnergyScanQueueItem):
+                self.populate_energy_scan_tab(item)
+            elif isinstance(item, queue_item.GenericWorkflowQueueItem):
+                self.populate_workflow_tab(item)
 
         self.emit(qt.PYSIGNAL("selection_changed"), (items,))
 

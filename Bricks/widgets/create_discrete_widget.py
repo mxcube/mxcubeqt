@@ -143,7 +143,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         else:
             self._path_template.mad_prefix = ''
 
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            get_next_run_number(self._path_template)
+
         data_path_widget = self.get_data_path_widget()
+        data_path_widget.set_run_number(run_number)
         data_path_widget.set_prefix(self._path_template.base_prefix)
 
         if self.isEnabled():
@@ -157,12 +161,9 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._acq_widget.disable_inverse_beam(False)
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
-            self._acq_widget.\
-                 set_energies(sample_data_model.\
-                              crystals[0].energy_scan_result)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
@@ -183,11 +184,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
 
-                self._energy_scan_result = queue_model_objects.EnergyScanResult()
                 self._processing_parameters = data_collection.processing_parameters
-                self._energy_scan_result = data_collection.crystal.\
-                                           energy_scan_result
-                self._acq_widget.set_energies(self._energy_scan_result)
             else:
                 self.setDisabled(True)
         else:
@@ -364,8 +361,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         tasks.append(dc)
 
-        self._path_template.run_number = self._beamline_setup_hwobj.\
-            queue_model_hwobj.get_next_run_number(self._path_template)
         self._data_path_widget.update_data_model(self._path_template)
         self._acq_widget.update_data_model(self._acquisition_parameters,
                                                        self._path_template)

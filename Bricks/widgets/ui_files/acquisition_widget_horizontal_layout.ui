@@ -546,7 +546,7 @@
                                 <cstring>shutterless_cbx</cstring>
                             </property>
                             <property name="text">
-                                <string>Shuterless</string>
+                                <string>Shutterless</string>
                             </property>
                         </widget>
                         <spacer>

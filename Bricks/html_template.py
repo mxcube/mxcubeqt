@@ -41,7 +41,7 @@ def html_report(data_collection):
     paths = data_collection.acquisitions[0].get_preview_image_paths()
 
     if data_collection.acquisitions[0].acquisition_parameters.shutterless:
-        temp [paths[0], paths[-1]]
+        temp = [paths[0], paths[-1]]
         paths = temp
     
     image_path = data_collection.acquisitions[0].path_template.get_image_path()

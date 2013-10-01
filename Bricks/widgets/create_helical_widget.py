@@ -30,6 +30,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._prev_pos = None
         self._current_pos = None
         self._list_item_map = {}
+        self.init_models()
 
         #
         # Layout
@@ -196,7 +197,6 @@ class CreateHelicalWidget(CreateTaskBase):
             for (list_item, line) in items_to_remove:
                 self._list_box.removeItem(self._list_box.index(list_item))
                 del self._list_item_map[list_item]
-                self._shape_history.delete_shape(line)
 
     def centred_position_selection(self, positions):
         if len(positions) == 1:
@@ -272,12 +272,8 @@ class CreateHelicalWidget(CreateTaskBase):
                                                              
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
-            self._acq_widget.set_energies(sample_data_model.crystals[0].energy_scan_result)
-            self._processing_widget.update_data_model(self._processing_parameters)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            self._processing_parameters = copy.deepcopy(self._processing_parameters)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
@@ -307,6 +303,14 @@ class CreateHelicalWidget(CreateTaskBase):
                 self.setDisabled(True)
         else:
             self.setDisabled(True)
+
+        if isinstance(tree_item, queue_item.SampleQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
+           isinstance(tree_item, queue_item.DataCollectionQueueItem):
+
+            self._processing_widget.update_data_model(self._processing_parameters)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
   
     def _create_task(self,  sample):
         data_collections = []
@@ -338,16 +342,16 @@ class CreateHelicalWidget(CreateTaskBase):
                 
                 if '<sample_name>' in start_acq.path_template.directory:
                     name = sample.get_name().replace(':', '-')
-                    start_acq.path_template.directory = acq.path_template.directory.\
-                                                  replace('<sample_name>', name)
+                    start_acq.path_template.directory = start_acq.path_template.directory.\
+                                                        replace('<sample_name>', name)
 
-                    start_acq.path_template.process_directory = acq.path_template.process_directory.\
+                    start_acq.path_template.process_directory = start_acq.path_template.process_directory.\
                                                                 replace('<sample_name>', name)
 
                 if '<acronym>-<name>' in start_acq.path_template.base_prefix:
                     start_acq.path_template.base_prefix = self.get_default_prefix(sample)
                     start_acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                                  get_next_run_number(stat_acq.path_template)
+                                                  get_next_run_number(start_acq.path_template)
 
                 # Add another acquisition for the end position
                 end_acq = qmo.Acquisition()

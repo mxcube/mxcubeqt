@@ -4,15 +4,12 @@ import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import sys
-import os
-
 #from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
 from widgets.data_path_widget_vertical_layout import\
     DataPathWidgetVerticalLayout
-from BlissFramework.Utils import widget_colors
 
 class CreateEnergyScanWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
@@ -24,7 +21,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 5, "main_v_layout")
         h_box = qt.QHGroupBox('Available elements', self)
-        self.periodic_table = PeriodicTableBrick(h_box) #QPeriodicTable.QPeriodicTable(h_box)
+        self.periodic_table = PeriodicTableBrick(h_box)
         font = self.periodic_table.font()
         font.setPointSize(8)
         self.periodic_table.setFont(font)
@@ -36,10 +33,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
                                                data_model = self._path_template,
                                                layout = DataPathWidgetVerticalLayout)
-
-        #self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
-        #self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
-
 
         v_layout.addWidget(h_box)
         v_layout.addWidget(self._data_path_gbox)

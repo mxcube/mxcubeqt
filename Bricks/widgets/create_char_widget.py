@@ -216,8 +216,8 @@ class CreateCharWidget(CreateTaskBase):
         
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            self.update_processing_parameters(sample_data_model.crystals[0])
+            self._char_params = copy.deepcopy(self._char_params)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             self.setDisabled(False)
@@ -350,9 +350,6 @@ class CreateCharWidget(CreateTaskBase):
                               path_template.get_prefix())
                 char.set_number(data_collection.acquisitions[0].\
                                 path_template.run_number)
-
-                # Increase run number for next collection
-                #self.set_run_number(self._path_template.run_number + 1)
 
                 tasks.append(char)
                 self._path_template.run_number += 1

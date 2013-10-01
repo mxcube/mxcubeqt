@@ -85,7 +85,7 @@ class DataPathWidget(qt.QWidget):
 
     def _browse_clicked(self):
         get_dir = qt.QFileDialog(self)
-        given_dir = self._data_model.directory
+        given_dir = self._session_hwobj.get_base_image_directory()
 
         d = str(get_dir.getExistingDirectory(given_dir, self, "",
                                              "Select a directory", 
@@ -149,19 +149,19 @@ class DataPathWidget(qt.QWidget):
         dir_parts = directory.split(base_image_dir)
 
         if len(dir_parts) > 1:
-            sub_dir = dir_parts[1]
-        
+            sub_dir = dir_parts[1]        
             self._data_model.directory = directory
             self.data_path_widget_layout.folder_ledit.setText(sub_dir)
-            self.data_path_widget_layout.folder_ledit.\
-                setPaletteBackgroundColor(widget_colors.WHITE)
+            #self.data_path_widget_layout.folder_ledit.\
+            #    setPaletteBackgroundColor(widget_colors.WHITE)
         else:
-            self.data_path_widget_layout.folder_ledit.\
-                setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            self.data_path_widget_layout.folder_ledit.setText('')
+            #self.data_path_widget_layout.folder_ledit.\
+            #    setPaletteBackgroundColor(widget_colors.LIGHT_RED)
             self._data_model.directory = base_image_dir
-            logging.getLogger('user_level_log').\
-                info("The selected data location is invalid, please select" \
-                     " a directory within: " + base_image_dir)
+            #logging.getLogger('user_level_log').\
+            #    info("The selected data location is invalid, please select" \
+            #         " a directory within: " + base_image_dir)
 
         self.data_path_widget_layout.base_path_label.setText(base_image_dir)
 

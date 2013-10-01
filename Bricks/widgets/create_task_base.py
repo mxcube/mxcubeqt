@@ -3,7 +3,8 @@ import logging
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import abc
-
+import copy
+import ShapeHistory as shape_history
 
 from BlissFramework.Utils import widget_colors
 
@@ -23,7 +24,7 @@ class CreateTaskBase(qt.QWidget):
          # Abstract attributes
          self._acq_widget = None
          self._data_path_widget = None
-         self._current_selected_items = None
+         self._current_selected_items = []
          self._path_template = None
          self._energy_scan_result = None
          self._session_hwobj = None
@@ -35,6 +36,15 @@ class CreateTaskBase(qt.QWidget):
     def init_models(self):
         if self._beamline_setup_hwobj is not None:
             self._path_template = self._beamline_setup_hwobj.get_default_path_template()
+            (data_directory, proc_directory) = self.get_default_directory()
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix()
+
+            if hasattr(self._beamline_setup_hwobj, 'queue_model_hwobj'):
+                self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                    get_next_run_number(self._path_template)
+            
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
@@ -81,9 +91,10 @@ class CreateTaskBase(qt.QWidget):
             except AttributeError as ex:
                 logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                    'more hardware objects' + str(ex))
-
         if self._data_path_widget:
             self._data_path_widget.set_session(self._session_hwobj)
+
+        self.init_models()
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -92,7 +103,9 @@ class CreateTaskBase(qt.QWidget):
         if self.isEnabled():
             if isinstance(item, queue_item.TaskQueueItem) and \
                    not isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                model.set_name(new_value)
+                self._path_template.base_prefix = str(new_value)
+                name = self._path_template.get_prefix()
+                model.set_name(name)
                 item.setText(0, model.get_name())
         
     def _run_number_ledit_change(self, new_value):
@@ -183,8 +196,12 @@ class CreateTaskBase(qt.QWidget):
         
     def get_default_directory(self, tree_item = None, sub_dir = None):
         if tree_item:
-            item = self.get_sample_item(tree_item)
+            item = self.get_sample_item(tree_item)            
             sub_dir = item.get_model().get_name()
+
+            if isinstance(item, queue_item.SampleQueueItem):
+                if item.get_model().lims_id == -1:
+                    sub_dir = ''
         else:
             sub_dir = sub_dir
             
@@ -197,16 +214,11 @@ class CreateTaskBase(qt.QWidget):
         return (data_directory, proc_directory)
 
     def ispyb_logged_in(self, logged_in):
-        if logged_in and self.get_data_path_widget():
-            self.update_selection()
+        self.init_models()
+        self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        self._shape_history._drawing_event.de_select_all()
-
-        for shape in self._shape_history.get_shapes():
-            if len(shape.get_centred_positions()) == 1:
-                if shape.get_centred_positions()[0] == cpos:
-                    self._shape_history._drawing_event.set_selected(shape)    
+        self._shape_history.select_shape_with_cpos(cpos)
             
     def selection_changed(self, items):
         if items:
@@ -223,20 +235,35 @@ class CreateTaskBase(qt.QWidget):
         self.selection_changed(self._current_selected_items)
 
     def single_item_selection(self, tree_item):
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self.init_models()
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            
-            (data_directory, proc_directory) = self.get_default_directory(tree_item = tree_item)
-                
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+        sample_item = self.get_sample_item(tree_item)
+        sample_data_model = sample_item.get_model()
+
+        if isinstance(tree_item, queue_item.SampleQueueItem):
+            self._path_template = copy.deepcopy(self._path_template)
+            self._shape_history.de_select_all()
+
+            if sample_data_model.lims_id != -1:
+                (data_directory, proc_directory) = self.get_default_directory(tree_item)
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
+                self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                             get_next_run_number(self._path_template)
+                get_next_run_number(self._path_template)
+
+            self.setDisabled(False)
+
+        elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+            self._path_template = copy.deepcopy(self._path_template)
+            self._shape_history.de_select_all()
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                get_next_run_number(self._path_template)
             self.setDisabled(False)
             
+        if self._acq_widget:
+            energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+            self._acq_widget.set_energies(energy_scan_result)
+
         if self._data_path_widget:
             self._data_path_widget.update_data_model(self._path_template)
 
@@ -244,9 +271,6 @@ class CreateTaskBase(qt.QWidget):
         tree_item = tree_items[0]
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            self.init_models()
-            sample_data_model = self.get_sample_item(tree_item).get_model()
-            
             (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')
                 
             self._path_template.directory = data_directory
@@ -261,6 +285,15 @@ class CreateTaskBase(qt.QWidget):
     # one or several centred positions are selected.
     def centred_position_selection(self, positions):
          self._selected_positions = positions
+
+         if len(self._current_selected_items) == 1 and len(positions) == 1:
+             item = self._current_selected_items[0]
+             pos = positions[0]
+
+             if isinstance(pos, shape_history.Point):
+                 if self._acq_widget and isinstance(item, queue_item.TaskQueueItem):
+                     cpos = pos.get_centred_positions()[0]
+                     self._acquisition_parameters.centred_position = cpos
 
     # Should be called by the object that calls create_task,
     # and add_task.
@@ -282,8 +315,6 @@ class CreateTaskBase(qt.QWidget):
     # a task. When a task_node is selected.
     def create_task(self, sample):        
         tasks = self._create_task(sample)
-        self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                         get_next_run_number(self._path_template)
         return tasks
 
     @abc.abstractmethod
