@@ -137,8 +137,8 @@ class ConfirmDialog(qt.QDialog):
     def continue_button_click(self):
         for item in self.checked_items:
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_snapshots = False #self.dialog_layout_widget.take_snapshosts_cbx.isOn()
+                #item.get_model().acquisitions[0].acquisition_parameters.\
+                #    take_snapshots = False #self.dialog_layout_widget.take_snapshosts_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
                     take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
