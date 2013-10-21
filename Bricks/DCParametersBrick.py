@@ -91,7 +91,11 @@ class DCParametersBrick(BaseComponents.BlissWidget):
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'session':
             session_hwobj = self.getHardwareObject(new_value)
-            self.parameters_widget.path_widget.set_session(session_hwobj)
+            self.parameters_widget.path_widget._base_image_dir = \
+                session_hwobj.get_base_image_directory()
+            self.parameters_widget.path_widget._base_process_dir = \
+                session_hwobj.get_base_process_directory()
+
         elif property_name == 'beamline_setup':            
             self.beamline_setup = self.getHardwareObject(new_value)
             self.parameters_widget.set_beamline_setup(self.beamline_setup)

@@ -1,6 +1,5 @@
 import qt
 import os
-import logging
 import queue_model_objects_v1 as queue_model_objects
 
 from widgets.data_path_widget_horizontal_layout \
@@ -19,7 +18,8 @@ class DataPathWidget(qt.QWidget):
         #
         # Attributes
         #
-        self._session_hwobj = None
+        self._base_image_dir = None
+        self._base_process_dir = None
         
         if data_model is None:
             self._data_model = queue_model_objects.PathTemplate()
@@ -27,7 +27,6 @@ class DataPathWidget(qt.QWidget):
             self._data_model = data_model
         
         self._data_model_pm = DataModelInputBinder(self._data_model)
-
 
         #
         # Layout
@@ -43,7 +42,6 @@ class DataPathWidget(qt.QWidget):
 
         h_layout.addWidget(self.data_path_widget_layout)
 
-
         #
         # Logic
         #
@@ -51,11 +49,6 @@ class DataPathWidget(qt.QWidget):
                                               self.data_path_widget_layout.prefix_ledit,
                                               str,
                                               None)
-
-        #self._data_model_pm.bind_value_update('directory', 
-        #                                      self.data_path_widget_layout.folder_ledit,
-        #                                      str,
-        #                                      None)
         
         self._data_model_pm.bind_value_update('run_number', 
                                               self.data_path_widget_layout.run_number_ledit,
@@ -78,14 +71,9 @@ class DataPathWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self._folder_ledit_change)
 
-
-    def set_session(self, session_hwobj):
-        self._session_hwobj = session_hwobj
-
-
     def _browse_clicked(self):
         get_dir = qt.QFileDialog(self)
-        given_dir = self._session_hwobj.get_base_image_directory()
+        given_dir = self._base_image_dir
 
         d = str(get_dir.getExistingDirectory(given_dir, self, "",
                                              "Select a directory", 
@@ -95,13 +83,11 @@ class DataPathWidget(qt.QWidget):
         if d is not None and len(d) > 0:
             self.set_directory(d)
 
-
     def _prefix_ledit_change(self, new_value):
         self.set_prefix(new_value)
         self.emit(qt.PYSIGNAL('path_template_changed'),
                   (self.data_path_widget_layout.prefix_ledit,
                    new_value))
-
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
@@ -110,11 +96,9 @@ class DataPathWidget(qt.QWidget):
                       (self.data_path_widget_layout.run_number_ledit,
                        new_value))
 
-
     def _folder_ledit_change(self, new_value):        
-        base_image_dir = self._session_hwobj.get_base_image_directory()
-        base_proc_dir = self._session_hwobj.get_base_process_directory()
-
+        base_image_dir = self._base_image_dir
+        base_proc_dir = self._base_process_dir
         new_sub_dir = str(new_value)
 
         if len(new_sub_dir) > 0:
@@ -135,42 +119,31 @@ class DataPathWidget(qt.QWidget):
                   (self.data_path_widget_layout.folder_ledit,
                    new_value))
 
-
     def set_data_path(self, path):
         (dir_name, file_name) = os.path.split(path)
         self.set_directory(dir_name)
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
         self.data_path_widget_layout.file_name_value_label.setText(file_name)
-
     
     def set_directory(self, directory):
-        base_image_dir = self._session_hwobj.get_base_image_directory()
+        base_image_dir = self._base_image_dir
         dir_parts = directory.split(base_image_dir)
 
         if len(dir_parts) > 1:
             sub_dir = dir_parts[1]        
             self._data_model.directory = directory
             self.data_path_widget_layout.folder_ledit.setText(sub_dir)
-            #self.data_path_widget_layout.folder_ledit.\
-            #    setPaletteBackgroundColor(widget_colors.WHITE)
         else:
             self.data_path_widget_layout.folder_ledit.setText('')
-            #self.data_path_widget_layout.folder_ledit.\
-            #    setPaletteBackgroundColor(widget_colors.LIGHT_RED)
             self._data_model.directory = base_image_dir
-            #logging.getLogger('user_level_log').\
-            #    info("The selected data location is invalid, please select" \
-            #         " a directory within: " + base_image_dir)
 
         self.data_path_widget_layout.base_path_label.setText(base_image_dir)
-
 
     def set_run_number(self, run_number):
         self._data_model.run_number = int(run_number)
         self.data_path_widget_layout.run_number_ledit.\
             setText(str(run_number))
-
 
     def set_prefix(self, base_prefix):
         self._data_model.base_prefix = str(base_prefix)
@@ -179,7 +152,6 @@ class DataPathWidget(qt.QWidget):
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
         self.data_path_widget_layout.file_name_value_label.setText(file_name)
-
 
     def update_data_model(self, data_model):
         self._data_model = data_model
