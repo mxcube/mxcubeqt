@@ -406,7 +406,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         self.dc_tree_widget.set_sample_pin_icon()
 
-    def sample_load_state_changed(self, state):
+    def sample_load_state_changed(self, state, *args):
         """
         The state in the sample loading procedure changed.
         Ie from Loading to mounted

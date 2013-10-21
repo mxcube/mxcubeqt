@@ -810,7 +810,7 @@ class SampleChangerBrick3(BlissWidget):
                 #self.sampleChangerInUse(self.sampleChanger.sampleChangerInUse())
                 #self.sampleChangerCanLoad(self.sampleChanger.sampleChangerCanLoad())
                 #self.minidiffCanMove(self.sampleChanger.minidiffCanMove())
-                #self.loadedSampleChanged(self.sampleChanger.getLoadedSample(),forced=True)
+                self.loadedSampleChanged(self.sampleChanger.getLoadedSample())
                 #self.basketTransferModeChanged(self.sampleChanger.getBasketTransferMode())
         elif propertyName == 'showSelectButton':
             self.scanBaskets.showSelectButton(newValue)
@@ -848,44 +848,27 @@ class SampleChangerBrick3(BlissWidget):
     def switchToSampleTransferMode(self):
         self.sampleChanger.changeMode(SampleChangerMode.Normal, wait=False)
 
-    def loadedSampleChanged(self,loaded_sample_dict,forced=False):
-        #print "*** SampleChangerBrick3.loadedSampleChanged",loaded_sample_dict
-
-        try:
-            loaded=loaded_sample_dict["loaded"]
-        except:
-            loaded=False
-
-        if loaded:
-            try:
-                barcode=loaded_sample_dict["barcode"]
-            except:
-                barcode=None
-
-            try:
-                basket=int(loaded_sample_dict["basket"])
-                vial=int(loaded_sample_dict["vial"])
-            except:
-                location=None
-            else:
-                location=(basket,vial)
+    def loadedSampleChanged(self,sample):
+        if sample is None:
+            # get current location in SC
+            sample = self.sampleChanger.getSelectedSample()
+            loaded = False
         else:
-            barcode=None
-            location=None
+            loaded = True
 
+        if sample is None:
+            # basket transfer mode?
+            barcode = ""
+            location = (-1, -1)
+        else:
+            barcode = sample.getID()
+            location = sample.getCoords()
+ 
         self.currentSample.setLoadedMatrixCode(barcode)
         self.currentSample.setLoadedLocation(location)
         self.currentSample.setLoaded(loaded)
 
-        """
-        for basket in self.baskets:
-            basket.setLoadedVial()
-        if location is not None:
-            basket=location[0]
-            sample=location[1]
-            self.baskets[basket-1].setLoadedVial(sample)
-        """
-        if loaded and not forced:
+        if loaded:
             self.emit(PYSIGNAL("sampleGotLoaded"),())
 
 
