@@ -63,7 +63,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
 
-        self.connect(self.dp_layout.run_number_ledit,
+        self.connect(dp_layout.run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 
