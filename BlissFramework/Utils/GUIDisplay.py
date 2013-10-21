@@ -337,6 +337,8 @@ class WindowDisplayWidget(qt.QScrollView):
                       self.insertTab(page["widget"], page["label"], page["index"])
                     self.showPage(page["widget"])
                     page["hidden"] = False
+                  else:
+                    self.showPage(page["widget"])
                 #page_info =""
                 #for i in range(self.count()):
                 #  page_info+="PAGE %d: %s, %s "% (i, self.tabLabel(self.page(i)), self.page(i))
