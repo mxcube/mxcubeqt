@@ -1029,7 +1029,7 @@ class SampleChangerBrick3(BlissWidget):
         for i, basket_checkbox in enumerate(self.baskets):
           baskets_to_scan.append(SC3.Basket.getBasketAddress(i+1) if basket_checkbox.isChecked() else None)
          
-        self.sampleChanger.scan(filter(None, baskets_to_scan), wait=False)
+        self.sampleChanger.scan(filter(None, baskets_to_scan), recursive=True, wait=False)
 
     def infoChanged(self):
         baskets = self.sampleChanger.getComponents()
