@@ -315,7 +315,7 @@ class CreateTaskBase(qt.QWidget):
         if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
-            sc = self.create_sample_centring(sample)
+            sc = queue_model_objects.SampleCentring('sample-centring')
             tasks.append(sc)
 
         temp_tasks = self._create_task(sample, shape)

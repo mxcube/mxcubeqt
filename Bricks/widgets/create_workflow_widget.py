@@ -113,7 +113,7 @@ class CreateWorkflowWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, sample):
+    def _create_task(self, sample, shape):
         tasks = []
 
         path_template = copy.deepcopy(self._path_template)
