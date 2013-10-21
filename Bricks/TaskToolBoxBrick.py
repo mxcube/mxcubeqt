@@ -122,8 +122,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
 
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
-
-                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+                    self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
                                     
             else:
                 logging.getLogger('user_level_log').error('Could not load beamline setup '+\

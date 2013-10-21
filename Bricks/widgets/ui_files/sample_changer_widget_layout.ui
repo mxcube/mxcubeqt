@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>347</width>
-            <height>89</height>
+            <width>389</width>
+            <height>111</height>
         </rect>
     </property>
     <property name="caption">
@@ -25,6 +25,11 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>gbox</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <pointsize>12</pointsize>
+                </font>
             </property>
             <property name="title">
                 <string>Sample list</string>
@@ -70,6 +75,11 @@
                                             <property name="name">
                                                 <cstring>filter_label</cstring>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <pointsize>10</pointsize>
+                                                </font>
+                                            </property>
                                             <property name="text">
                                                 <string>Show:</string>
                                             </property>
@@ -92,6 +102,11 @@
                                             </item>
                                             <property name="name">
                                                 <cstring>filter_cbox</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <pointsize>10</pointsize>
+                                                </font>
                                             </property>
                                         </widget>
                                     </hbox>
@@ -123,6 +138,11 @@
                                             <height>0</height>
                                         </size>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>10</pointsize>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Show SC-details</string>
                                     </property>
@@ -141,6 +161,11 @@
                                     <property name="name">
                                         <cstring>centring_label</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>10</pointsize>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Centring:</string>
                                     </property>
@@ -158,6 +183,11 @@
                                     </item>
                                     <property name="name">
                                         <cstring>centring_cbox</cstring>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>10</pointsize>
+                                        </font>
                                     </property>
                                 </widget>
                                 <spacer>
@@ -180,6 +210,11 @@
                                 <widget class="QPushButton">
                                     <property name="name">
                                         <cstring>synch_button</cstring>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>10</pointsize>
+                                        </font>
                                     </property>
                                     <property name="text">
                                         <string>S</string>

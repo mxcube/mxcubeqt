@@ -65,7 +65,7 @@ class ProposalBrick2(BlissWidget):
         self.contentsBox.setInsideSpacing(0)
 
         self.loginBox=QHBox(self.contentsBox, 'login_box')
-        code_label=QLabel("Code:",self.loginBox)
+        code_label=QLabel("  Code: ",self.loginBox)
         self.propType=QComboBox(self.loginBox)
         self.propType.setEditable(True)
         self.propType.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
@@ -75,7 +75,7 @@ class ProposalBrick2(BlissWidget):
         self.propNumber.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.propNumber.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.propNumber.setFixedWidth(50)
-        password_label=QLabel("Password:",self.loginBox)
+        password_label=QLabel("   Password: ",self.loginBox)
         self.propPassword=QLineEdit(self.loginBox)
         self.propPassword.setEchoMode(QLineEdit.Password)
         self.propPassword.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
@@ -92,6 +92,9 @@ class ProposalBrick2(BlissWidget):
 
         self.logoutButton=QToolButton(self.contentsBox)
         self.logoutButton.setTextLabel("Logout")
+        font = self.logoutButton.font()
+        font.setPointSize(10)
+        self.logoutButton.setFont(font)
         self.logoutButton.setUsesTextLabel(True)
         self.logoutButton.setTextPosition(QToolButton.BesideIcon)
         self.logoutButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -100,6 +103,10 @@ class ProposalBrick2(BlissWidget):
 
         labels_box=QHBox(self.contentsBox, 'contents_box')
         labels_box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        font = labels_box.font()
+        font.setPointSize(10)
+        labels_box.setFont(font)
+
         self.titleLabel=QLabel(labels_box)
         self.titleLabel.setAlignment(Qt.AlignCenter)
         self.titleLabel.hide()
@@ -286,6 +293,14 @@ class ProposalBrick2(BlissWidget):
 
         start_server_event=ProposalGUIEvent(self.startServers,())
         qApp.postEvent(self,start_server_event)
+
+        font = self.contentsBox.font()
+        font.setPointSize(12)
+        self.contentsBox.setFont(font)
+
+        font = self.loginBox.font()
+        font.setPointSize(10)
+        self.loginBox.setFont(font)
 
     def startServers(self):
         if self.instanceServer is not None:

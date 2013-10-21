@@ -25,9 +25,15 @@ class TaskToolBoxWidget(qt.QWidget):
         self.v_layout = qt.QVBoxLayout(self)
         self.v_layout.setSpacing(10)
         self.method_group_box = qt.QVGroupBox("Collection method", self)
+        font = self.method_group_box.font()
+        font.setPointSize(12)
+        self.method_group_box.setFont(font)
     
         self.tool_box = qt.QToolBox(self.method_group_box , "tool_box")
-
+        font = self.tool_box.font()
+        font.setPointSize(10)
+        self.tool_box.setFont(font)
+        
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         self.discrete_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
@@ -76,7 +82,8 @@ class TaskToolBoxWidget(qt.QWidget):
         self._beamline_setup_hwobj = beamline_setup_hwobj
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).set_beamline_setup(beamline_setup_hwobj)
-       
+
+        self.shape_history = beamline_setup_hwobj.shape_history_hwobj
         self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
         self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
         self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energy_hwobj)
@@ -128,15 +135,19 @@ class TaskToolBoxWidget(qt.QWidget):
                 logging.getLogger("user_level_log").\
                     warning("Select the sample or group you "\
                             "would like to add to.")
-            if len(items) == 1:
-                self.create_task(items[0].get_model())
             else:
                 for item in items:
-                    self.create_task(item.get_model())
+                    shapes = self.shape_history.selected_shapes
+
+                    if len(shapes):
+                        for shape in shapes:
+                            self.create_task(item.get_model(), shape)
+                    else:
+                        self.create_task(item.get_model())
 
             self.tool_box.currentItem().update_selection()
 
-    def create_task(self, task_node):
+    def create_task(self, task_node, shape = None):
         # Selected item is a sample
         if isinstance(task_node, queue_model_objects.Sample):
             group_task_node = queue_model_objects.TaskGroup()
@@ -151,24 +162,21 @@ class TaskToolBoxWidget(qt.QWidget):
             num = task_node.get_next_number_for_name(group_name)
             group_task_node.set_number(num)
 
-            self.tree_brick.queue_model_hwobj.\
-                add_child(task_node, group_task_node)
-            self.create_task(group_task_node)
+            self.tree_brick.queue_model_hwobj.add_child(task_node, group_task_node)
+            self.create_task(group_task_node, shape)
 
         # Selected item is a task group
         elif isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-            task_list = self.tool_box.currentItem().create_task(sample)
+            task_list = self.tool_box.currentItem().create_task(sample, shape)
 
             for child_task_node in task_list:
-                self.tree_brick.queue_model_hwobj.\
-                    add_child(task_node, child_task_node)
+                self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
 
         # The selected item is a task
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
-            self.tree_brick.queue_model_hwobj.\
-                add_child(task_node.get_parent(), new_node)
+            self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
 
         pt = self.tool_box.currentItem()._path_template
         pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
