@@ -4,10 +4,9 @@ import sys
 import os
 import pprint
 import qt
-
+MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
+sys.path.insert(0, MXCUBE_ROOT)
 app = qt.QApplication([])
-sys.path.insert(0, os.path.join(os.environ["HOME"], "applications"))
-#sys.path.insert(0, os.path.join(os.environ["HOME"], "python", "bliss_modules"))
 
 from BlissFramework.Utils import PropertyBag
 #from BlissFramework import Configuration
