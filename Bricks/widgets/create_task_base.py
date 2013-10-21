@@ -10,6 +10,19 @@ from BlissFramework.Utils import widget_colors
 
 
 class CreateTaskBase(qt.QWidget):
+    """
+    Base class for widgets that are used to create tasks.
+    Contains methods for handling the PathTemplate,
+    AcqusitionParameters object, and other functionalty for
+    creating Task objects.
+
+    The members self._acq_widget and self._data_path_widget
+    are used to reference the widgets for respective widgets.
+
+    Tests for self.acq_widgets and self._data_path_widget is
+    be made, to make this class generic for widgets not using
+    the objects PathTemplate and AcquisitionParameters.
+    """
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
          qt.QWidget.__init__(self, parent, name, fl)
          
@@ -17,8 +30,8 @@ class CreateTaskBase(qt.QWidget):
          self._tree_brick = None
          self._task_node_name = task_node_name
 
-         # Centred positons that currently are selected in the parent widget,
-         # position_history_brick.
+         # Centred positons that currently are selected in the parent
+         # widget, position_history_brick.
          self._selected_positions = []
 
          # Abstract attributes
@@ -34,21 +47,30 @@ class CreateTaskBase(qt.QWidget):
                             self.tab_changed)
 
     def init_models(self):
-        if self._beamline_setup_hwobj is not None:
-            self._path_template = self._beamline_setup_hwobj.get_default_path_template()
-            (data_directory, proc_directory) = self.get_default_directory()
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix()
+        bl_setup = self._beamline_setup_hwobj
+        
+        if bl_setup is not None:
 
-            if hasattr(self._beamline_setup_hwobj, 'queue_model_hwobj'):
-                self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            # Initialize the path_template of the widget to default
+            # values read from the beamline setup
+            if self._data_path_widget:
+                (data_directory, proc_directory) = self.get_default_directory()
+                self._path_template = bl_setup.get_default_path_template()
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
+                self._path_template.base_prefix = self.get_default_prefix()
+                self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
-            
+
+            if self._acq_widget:
+                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def tab_changed(self, tab_index, tab):
+        # Update the selection if in the main tab and logged in to
+        # ISPyB
         if tab_index is 0 and self._session_hwobj.proposal_code:
             self.update_selection()
 
@@ -57,42 +79,11 @@ class CreateTaskBase(qt.QWidget):
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
 
-        if self._acq_widget:
-            self._acq_widget.set_beamline_setup(self._beamline_setup_hwobj)
-
-            try:
-                transmission = bl_setup_hwobj.transmission_hwobj.getAttFactor()
-            except AttributeError:
-                transmission = 0
-
-            try:
-                resolution = bl_setup_hwobj.resolution_hwobj.getPosition()
-            except AttributeError:
-                resolution = 0
-
-            try:
-                energy =  bl_setup_hwobj.energy_hwobj.getCurrentEnergy()
-            except AttributeError:
-                energy = 0
-                
-            self.set_energy(energy, 0)
-            self.set_transmission(transmission)
-            self.set_resolution(resolution)
-
-            try:
-                bl_setup_hwobj.energy_hwobj.connect('energyChanged',
-                                                    self.set_energy)
-                
-                bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged',
-                                                          self.set_transmission)
-                
-                bl_setup_hwobj.resolution_hwobj.connect('positionChanged',
-                                                        self.set_resolution)
-            except AttributeError as ex:
-                logging.getLogger("HWR").exception('Could not connect to one or '+\
-                                                   'more hardware objects' + str(ex))
         if self._data_path_widget:
-            self._data_path_widget.set_session(self._session_hwobj)
+            self._data_path_widget._base_image_dir = \
+                self._session_hwobj.get_base_image_directory()
+            self._data_path_widget._base_process_dir = \
+                self._session_hwobj.get_base_process_directory()
 
         self.init_models()
 
@@ -240,6 +231,7 @@ class CreateTaskBase(qt.QWidget):
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
             self._path_template = copy.deepcopy(self._path_template)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._shape_history.de_select_all()
 
             if sample_data_model.lims_id != -1:
@@ -263,7 +255,8 @@ class CreateTaskBase(qt.QWidget):
         if self._acq_widget:
             energy_scan_result = sample_data_model.crystals[0].energy_scan_result
             self._acq_widget.set_energies(energy_scan_result)
-
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
         if self._data_path_widget:
             self._data_path_widget.update_data_model(self._path_template)
 
@@ -313,10 +306,27 @@ class CreateTaskBase(qt.QWidget):
             
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
-    def create_task(self, sample):        
-        tasks = self._create_task(sample)
+    def create_task(self, sample, shape):
+        (tasks, sc) = ([], None)
+        sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
+                            is_mounted_sample(sample)
+        free_pin_mode = sample.free_pin_mode
+
+        if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
+            # No centred positions selected, or selected sample not
+            # mounted create sample centring task.
+            sc = self.create_sample_centring(sample)
+            tasks.append(sc)
+
+        temp_tasks = self._create_task(sample, shape)
+
+        for task in temp_tasks:
+            if sc:
+                sc.add_task(task)
+            tasks.append(task)
+
         return tasks
 
     @abc.abstractmethod
-    def _create_task(self, task_node, sample):
+    def _create_task(self, task_node, shape):
         pass

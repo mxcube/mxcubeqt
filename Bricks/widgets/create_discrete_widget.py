@@ -81,45 +81,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
-
-        if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.\
-                               detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
-            self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters()
-
-            try:
-                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-                transmission = round(float(transmission), 2)
-            except AttributeError:
-                transmission = 0
-
-            try:
-                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 2)
-            except AttributeError:
-                resolution = 0
-
-            try:
-                energy = self._beamline_setup_hwobj.\
-                         energy_hwobj.getCurrentEnergy()
-                if energy:
-                    energy = round(float(energy), 4)
-                else:
-                    energy = round(float(-1), 4)
-            except AttributeError:
-                energy = 0
-
-            self._acquisition_parameters.resolution = resolution
-            self._acquisition_parameters.energy = energy
-            self._acquisition_parameters.transmission = transmission
-        else:
-            self._acquisition_parameters = queue_model_objects.\
-                                           AcquisitionParameters()
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -158,47 +121,36 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
+            self._processing_widget.update_data_model(self._processing_parameters)
             self._acq_widget.disable_inverse_beam(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            data_collection = tree_item.get_model()
+            dc = tree_item.get_model()
 
-            if data_collection.experiment_type != queue_model_enumerables.\
-                    EXPERIMENT_TYPE.HELICAL:
+            if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
                 self._acq_widget.disable_inverse_beam(True)
-                if data_collection.get_path_template():
-                    self._path_template = data_collection.get_path_template()
+
+                if dc.get_path_template():
+                    self._path_template = dc.get_path_template()
 
                 self._data_path_widget.update_data_model(self._path_template)
+                self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
 
-                self._acquisition_parameters = data_collection.acquisitions[0].\
-                                               acquisition_parameters
-
-                if len(data_collection.acquisitions) == 1:
+                if len(dc.acquisitions) == 1:
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
 
-                self._processing_parameters = data_collection.processing_parameters
+                self._processing_parameters = dc.processing_parameters
+                self._processing_widget.update_data_model(self._processing_parameters)
             else:
                 self.setDisabled(True)
         else:
-            # Disable control
             self.setDisabled(True)
 
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionQueueItem):
-
-            self._processing_widget.update_data_model(self._processing_parameters)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
-        
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
         selected_shapes = self._shape_history.selected_shapes
@@ -208,7 +160,6 @@ class CreateDiscreteWidget(CreateTaskBase):
                 result = False
 
         return result
-        
 
     def get_subwedges(self, total_num_images, subwedge_size,
                       osc_range, osc_offset):
@@ -224,25 +175,21 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, sample):
+    def _create_task(self, sample, shape):
         tasks = []
-        sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
-                            is_mounted_sample(sample)
 
-        if (not self._selected_positions) or (not sample_is_mounted):
-            # No centred positions selected, or selected sample not
-            # mounted create sample centring task.
-            sc = self.create_sample_centring(sample)
-            tasks.append(sc)
+        if not shape:
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._shape_history.get_snapshot([])
-            cpos_list = [cpos]
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            selected_shapes = self._shape_history.selected_shapes
-            cpos_list = self.get_centred_positions(selected_shapes)
-            sc = None
+            if isinstance(shape, shape_history.Point):
+                snapshot = self._shape_history.\
+                           get_snapshot([shape.qub_point])
+
+                cpos = shape.get_centred_positions()[0]
+                cpos.snapshot_image = snapshot
 
         if self._acq_widget.use_inverse_beam():
             total_num_images = self._acquisition_parameters.num_images
@@ -266,17 +213,14 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             self._acq_widget.set_use_inverse_beam(False)
 
-            for cpos in cpos_list:
-                for sw in subwedges:
-                    tasks.extend(self.create_dc(sample, sw[3], sw[0], sw[1],
-                                                sw[2], sc=sc, cpos=cpos, inverse_beam = True))
-
+            for sw in subwedges:
+                tasks.extend(self.create_dc(sample, sw[3], sw[0], sw[1],
+                    sw[2], cpos=cpos, inverse_beam = True))
                 self._path_template.run_number += 1
 
         else:
-            for cpos in cpos_list:
-                tasks.extend(self.create_dc(sample, sc=sc, cpos=cpos))
-                self._path_template.run_number += 1
+            tasks.extend(self.create_dc(sample, cpos=cpos))
+            self._path_template.run_number += 1
 
         return tasks
 
@@ -284,26 +228,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         sc = queue_model_objects.SampleCentring()
         sc.set_name('sample-centring')
         return sc
-
-    def get_centred_positions(self, shapes):
-        centred_positions = []
-
-        for shape in shapes:
-            snapshot = None
-
-            if isinstance(shape, shape_history.Point):
-                if shape.qub_point is not None:
-                    snapshot = self._shape_history.\
-                               get_snapshot([shape.qub_point])
-                else:
-                    snapshot = self._shape_history.get_snapshot([])
-
-                centred_position = shape.get_centred_positions()[0]
-                centred_position.snapshot_image = snapshot
-                centred_positions.append(centred_position)
-
-        return centred_positions
-
+    
     def create_dc(self, sample, run_number=None, start_image=None,
                   num_images=None, osc_start=None, sc=None,
                   cpos=None, inverse_beam = False):
