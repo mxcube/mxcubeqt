@@ -258,10 +258,7 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.dc_tree_widget.populate_list_view(sc_sample_list)
             self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
 
-        loaded_sample = self.sample_changer_hwobj.\
-                        getLoadedSampleLocation()
-
-        if loaded_sample == (None, None):
+        if not self.sample_changer_hwobj.hasLoadedSample():
             self.dc_tree_widget.filter_sample_list(2)
             self.sample_changer_widget.child('filter_cbox').setCurrentItem(2)
 

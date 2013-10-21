@@ -401,14 +401,18 @@ class DataCollectTree(qt.QWidget):
             self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample = self.sample_changer_hwobj.\
-                            getLoadedSampleLocation()
+                                 getLoadedSample()
+            try:
+                loaded_sample_loc = loaded_sample.getCoords()
+            except:
+                loaded_sample_loc = None
 
             it = qt.QListViewItemIterator(self.sample_list_view)
             item = it.current()
         
             while item:
                 if isinstance(item, queue_item.SampleQueueItem):
-                    if item.get_model().location == loaded_sample:
+                    if item.get_model().location == loaded_sample_loc:
                         item.setSelected(True)
                         item.setVisible(True)
                     else:
@@ -484,8 +488,9 @@ class DataCollectTree(qt.QWidget):
 
     def is_mounted_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):
-            if item.get_model().location == self.sample_changer_hwobj.\
-                   getLoadedSampleLocation():
+            if not self.sample_changer_hwobj.hasLoadedSample():
+                return False
+            if item.get_model().location == self.sample_changer_hwobj.getLoadedSample().getCoords():
                 return True
 
     def collect_items(self, items = [], checked_items = []):
