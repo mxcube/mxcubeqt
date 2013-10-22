@@ -371,19 +371,22 @@ class TreeBrick(BaseComponents.BlissWidget):
         :returns: A list with tuples, containing the sample information.
         """
         sc_content = []
-        
-        try:
-            sc_content = self.sample_changer_hwobj.getMatrixCodes()            
+      
+        try: 
+            for sample in self.sample_changer_hwobj.getSampleList():
+                matrix = sample.getID() or ""
+                basket_index = sample.getContainer().getIndex()
+                vial_index = sample.getIndex()
+                basket_code = sample.getContainer().getID() or ""
+            
+                sc_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
+            import pdb;pdb.set_trace()
         except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
                      " the sample changer is turned on. Using free pin mode")
             sc_content = [('', -1, -1, '', 1)]
-            #self.dc_tree_widget.init_with_sc_content(sc_content)
-            #self.dc_tree_widget.filter_sample_list(SC_FILTER_OPTIONS.FREE_PIN)
-            #self.sample_changer_widget.filter_cbox.\
-            #    setCurrentItem(SC_FILTER_OPTIONS.FREE_PIN)
 
         return sc_content
 
