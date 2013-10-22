@@ -1,18 +1,16 @@
-import ShapeHistory as shape_history
-import queue_item
 import copy
 import qt
+import ShapeHistory as shape_history
+import queue_item
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects_v1 as qmo
 import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
+from widgets.processing_widget import ProcessingWidget
+from widgets.data_path_widget_vertical_layout import DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from create_task_base import CreateTaskBase
-
-from widgets.processing_widget import ProcessingWidget
 
 
 class CreateDiscreteWidget(CreateTaskBase):
@@ -22,9 +20,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         if not name:
             self.setName("create_discrete_widget")
 
-        #
-        # Data attributes
-        #
         self.previous_energy = None
         self.init_models()
 
@@ -60,14 +55,15 @@ class CreateDiscreteWidget(CreateTaskBase):
         v_layout.addWidget(self._processing_gbox)
         v_layout.addStretch()
 
+        dp_layout = self._data_path_widget.data_path_widget_layout
         self.connect(self._acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
-
-        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit,
+        
+        self.connect(dp_layout.prefix_ledit,
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
 
-        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+        self.connect(dp_layout.run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 
@@ -81,8 +77,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self._energy_scan_result = queue_model_objects.EnergyScanResult()
-        self._processing_parameters = queue_model_objects.ProcessingParameters()
+        self._energy_scan_result = qmo.EnergyScanResult()
+        self._processing_parameters = qmo.ProcessingParameters()
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -161,25 +157,13 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         return result
 
-    def get_subwedges(self, total_num_images, subwedge_size,
-                      osc_range, osc_offset):
-        number_of_subwedges = total_num_images / subwedge_size
-        subwedges = []
-
-        for subwedge_num in range(0, number_of_subwedges):
-            osc_start = osc_offset + (osc_range * subwedge_size * subwedge_num)
-            subwedges.append((subwedge_num * subwedge_size + 1,
-                              subwedge_size, osc_start))
-
-        return subwedges
-
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
         tasks = []
 
         if not shape:
-            cpos = queue_model_objects.CentredPosition()
+            cpos = qmo.CentredPosition()
             cpos.snapshot_image = self._shape_history.get_snapshot([])
         else:
             # Shapes selected and sample is mounted, get the
@@ -198,36 +182,21 @@ class CreateDiscreteWidget(CreateTaskBase):
             osc_start = self._acquisition_parameters.osc_start
             run_number = self._path_template.run_number
 
-            wedge_one = self.get_subwedges(total_num_images, subwedge_size,
-                                           osc_range, osc_start)
-
-            wedge_one = [pair + (run_number,) for pair in wedge_one]
-
-            wedge_two = self.get_subwedges(total_num_images,
-                                           subwedge_size, osc_range,
-                                           180 + osc_start)
-            
-            wedge_two = [pair + (run_number + 1,) for pair in wedge_two]
-
-            subwedges = [sw_pair for pair in zip(wedge_one, wedge_two) for sw_pair in pair]
+            subwedges = qmo.create_inverse_beam_sw(total_num_images,
+                        subwedge_size, osc_range, osc_start, run_number)
 
             self._acq_widget.set_use_inverse_beam(False)
 
             for sw in subwedges:
                 tasks.extend(self.create_dc(sample, sw[3], sw[0], sw[1],
-                    sw[2], cpos=cpos, inverse_beam = True))
+                                            sw[2], cpos=cpos,
+                                            inverse_beam = True))
                 self._path_template.run_number += 1
-
         else:
             tasks.extend(self.create_dc(sample, cpos=cpos))
             self._path_template.run_number += 1
 
         return tasks
-
-    def create_sample_centring(self, sample):
-        sc = queue_model_objects.SampleCentring()
-        sc.set_name('sample-centring')
-        return sc
     
     def create_dc(self, sample, run_number=None, start_image=None,
                   num_images=None, osc_start=None, sc=None,
@@ -235,7 +204,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         # Acquisition for start position
-        acq = queue_model_objects.Acquisition()
+        acq = qmo.Acquisition()
         acq.acquisition_parameters = \
             copy.deepcopy(self._acquisition_parameters)
         acq.acquisition_parameters.collect_agent = \
@@ -273,21 +242,17 @@ class CreateDiscreteWidget(CreateTaskBase):
             acq.acquisition_parameters.inverse_beam = False
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
-        dc = queue_model_objects.DataCollection([acq],
-                                                sample.crystals[0],
-                                                processing_parameters)
+        dc = qmo.DataCollection([acq], sample.crystals[0],
+                                processing_parameters)
 
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
 
-        if sc:
-            sc.add_task(dc)
-
         tasks.append(dc)
 
         self._data_path_widget.update_data_model(self._path_template)
         self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                       self._path_template)
+                                           self._path_template)
 
         return tasks

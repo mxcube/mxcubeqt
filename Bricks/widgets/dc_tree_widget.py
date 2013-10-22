@@ -11,7 +11,7 @@ from BlissFramework.Utils import widget_colors
 from widgets.confirm_dialog import ConfirmDialog
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
-                             ['ALL_SAMPLES', 'MOUNTED_SAMPLE', 'FREE_PIN'])
+                             ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN'])
 
 SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2)
 
@@ -395,7 +395,7 @@ class DataCollectTree(qt.QWidget):
 
     def filter_sample_list(self, option):
         self.sample_list_view.clearSelection()
-        if option == SC_FILTER_OPTIONS.ALL_SAMPLES:
+        if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('ispyb')
             self.set_sample_pin_icon()

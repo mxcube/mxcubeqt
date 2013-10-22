@@ -48,12 +48,16 @@ class CreateTaskBase(qt.QWidget):
 
     def init_models(self):
         bl_setup = self._beamline_setup_hwobj
-        
-        if bl_setup is not None:
 
+        if bl_setup is not None:
             # Initialize the path_template of the widget to default
             # values read from the beamline setup
             if self._data_path_widget:
+                self._data_path_widget._base_image_dir = \
+                    self._session_hwobj.get_base_image_directory()
+                self._data_path_widget._base_process_dir = \
+                    self._session_hwobj.get_base_process_directory()
+
                 (data_directory, proc_directory) = self.get_default_directory()
                 self._path_template = bl_setup.get_default_path_template()
                 self._path_template.directory = data_directory
@@ -78,13 +82,6 @@ class CreateTaskBase(qt.QWidget):
         self._beamline_setup_hwobj = bl_setup_hwobj
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
-
-        if self._data_path_widget:
-            self._data_path_widget._base_image_dir = \
-                self._session_hwobj.get_base_image_directory()
-            self._data_path_widget._base_process_dir = \
-                self._session_hwobj.get_base_process_directory()
-
         self.init_models()
 
     def _prefix_ledit_change(self, new_value):
@@ -230,26 +227,39 @@ class CreateTaskBase(qt.QWidget):
         sample_data_model = sample_item.get_model()
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
+            #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            self._shape_history.de_select_all()
 
+            # Sample with lims information, use values from lims
+            # to set the data path.
             if sample_data_model.lims_id != -1:
                 (data_directory, proc_directory) = self.get_default_directory(tree_item)
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
 
+            # Get the next available run number at this level of the
+            # model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
+
+            #Update energy transmission and resolution
+            if self._acq_widget:
+                self._update_etr()
 
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+            #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
-            self._shape_history.de_select_all()
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
+
+            #Update energy transmission and resolution
+            if self._acq_widget:
+                self._update_etr()
+
             self.setDisabled(False)
             
         if self._acq_widget:
@@ -259,6 +269,15 @@ class CreateTaskBase(qt.QWidget):
                                                self._path_template)
         if self._data_path_widget:
             self._data_path_widget.update_data_model(self._path_template)
+
+    def _update_etr(self):
+        energy = self.bl_setup._get_energy()
+        transmission = self.bl_setup._get_transmission()
+        resolution = self.bl_setup._get_resolution()
+                
+        self._acquisition_parameters.energy = energy
+        self._acquisition_parameters.transmission = transmission
+        self._acquisition_parameters.resolution = resolution
 
     def multiple_item_selection(self, tree_items):
         tree_item = tree_items[0]
@@ -315,7 +334,7 @@ class CreateTaskBase(qt.QWidget):
         if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
-            sc = self.create_sample_centring(sample)
+            sc = queue_model_objects.SampleCentring('sample-centring')
             tasks.append(sc)
 
         temp_tasks = self._create_task(sample, shape)

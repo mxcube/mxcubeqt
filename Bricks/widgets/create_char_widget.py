@@ -266,92 +266,65 @@ class CreateCharWidget(CreateTaskBase):
         
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
-    def _create_task(self, sample):
+    def _create_task(self, sample, shape):
         tasks = []
 
-        if not self._selected_positions:
-            cpos = None
-            
-            if self._beamline_setup_hwobj.diffractometer_hwobj:
-                pos_dict = self._beamline_setup_hwobj.\
-                           diffractometer_hwobj.getPositions()
-                cpos = queue_model_objects.CentredPosition(pos_dict)
-
-            logging.getLogger("user_level_log").\
-                info("No centred position(s) was selected " + str(cpos) + \
-                     " (current position) will be used.")
-
-            selected_shapes = [shape_history.Point(self._shape_history.get_drawing(), cpos, None)]
+        if not shape:
+            cpos = queue_model_objects.CentredPosition()
+            cpos.snapshot_image = self._shape_history.get_snapshot([])
         else:
-            selected_shapes = self._shape_history.selected_shapes
-
-        for shape in selected_shapes:
-            snapshot = None
-            
+            # Shapes selected and sample is mounted, get the
+            # centred positions for the shapes
             if isinstance(shape, shape_history.Point):
-                sc = None
-                sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
-                                    is_mounted_sample(sample)
-                
-                if (not shape.screen_pos) or (not sample_is_mounted):
-                    sc = queue_model_objects.SampleCentring()
-                    sc.set_name('sample-centring')
-                    tasks.append(sc)
+                snapshot = self._shape_history.\
+                           get_snapshot([shape.qub_point])
 
-                char_params = copy.deepcopy(self._char_params)
+                cpos = shape.get_centred_positions()[0]
+                cpos.snapshot_image = snapshot
 
-                if shape.qub_point is not None:
-                    snapshot = self._shape_history.get_snapshot([shape.qub_point])
-                else:
-                    snapshot = self._shape_history.get_snapshot([])
+        char_params = copy.deepcopy(self._char_params)
 
-                # Acquisition for start position
-                acq = queue_model_objects.Acquisition()
-                acq.acquisition_parameters = \
-                    copy.deepcopy(self._acquisition_parameters)
-                acq.acquisition_parameters.collect_agent = \
+        # Acquisition for start position
+        acq = queue_model_objects.Acquisition()
+        acq.acquisition_parameters = \
+            copy.deepcopy(self._acquisition_parameters)
+        acq.acquisition_parameters.collect_agent = \
                     queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
-                acq.acquisition_parameters.\
-                    centred_position = shape.get_centred_positions()[0]
-                acq.path_template = copy.deepcopy(self._path_template)
-                acq.acquisition_parameters.centred_position.\
-                    snapshot_image = snapshot
+        acq.acquisition_parameters.centred_position = cpos
+        acq.path_template = copy.deepcopy(self._path_template)
 
-                if '<sample_name>' in acq.path_template.directory:
-                    name = sample.get_name().replace(':', '-')
-                    acq.path_template.directory = acq.path_template.directory.\
+        if '<sample_name>' in acq.path_template.directory:
+            name = sample.get_name().replace(':', '-')
+            acq.path_template.directory = acq.path_template.directory.\
+                                          replace('<sample_name>', name)
+            acq.path_template.process_directory = acq.path_template.process_directory.\
                                                   replace('<sample_name>', name)
-                    acq.path_template.process_directory = acq.path_template.process_directory.\
-                                                          replace('<sample_name>', name)
 
-                if '<acronym>-<name>' in acq.path_template.base_prefix:
-                    acq.path_template.base_prefix = self.get_default_prefix(sample)
-                    acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                                  get_next_run_number(acq.path_template)
+        if '<acronym>-<name>' in acq.path_template.base_prefix:
+            acq.path_template.base_prefix = self.get_default_prefix(sample)
+            acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                          get_next_run_number(acq.path_template)
 
-                processing_parameters = copy.deepcopy(self._processing_parameters)
+        processing_parameters = copy.deepcopy(self._processing_parameters)
 
-                data_collection = queue_model_objects.\
-                                  DataCollection([acq], sample.crystals[0],
-                                                 processing_parameters)
+        data_collection = queue_model_objects.\
+                          DataCollection([acq], sample.crystals[0],
+                                         processing_parameters)
 
-                # Referance images for characterisations should be taken 90 deg apart
-                # this is achived by setting overap to 89
-                acq.acquisition_parameters.overlap = 89
-                data_collection.acquisitions[0] = acq               
-                data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
+        # Referance images for characterisations should be taken 90 deg apart
+        # this is achived by setting overap to -89
+        acq.acquisition_parameters.overlap = -89
+        data_collection.acquisitions[0] = acq               
+        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
 
-                if sc:
-                    sc.add_task(data_collection)
-                    
-                char = queue_model_objects.Characterisation(data_collection, 
-                                                            char_params)
-                char.set_name(data_collection.acquisitions[0].\
-                              path_template.get_prefix())
-                char.set_number(data_collection.acquisitions[0].\
-                                path_template.run_number)
+        char = queue_model_objects.Characterisation(data_collection, 
+                                                    char_params)
+        char.set_name(data_collection.acquisitions[0].\
+                      path_template.get_prefix())
+        char.set_number(data_collection.acquisitions[0].\
+                        path_template.run_number)
 
-                tasks.append(char)
-                self._path_template.run_number += 1
+        tasks.append(char)
+        self._path_template.run_number += 1
 
         return tasks
