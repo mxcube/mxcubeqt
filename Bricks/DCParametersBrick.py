@@ -16,6 +16,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         self.transmission_hwobj = None
         self.resolution_hwobj = None
         self.queue_model_hwobj = None
+        self.session_hwobj = None
 
         # Qt-Slots
         self.defineSlot("populate_parameter_widget",({}))
@@ -30,7 +31,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
 
         self.toggle_page_button = qt.QPushButton('View Results', 
-                                              self, 'toggle_page_button')
+                                                 self, 'toggle_page_button')
         self.toggle_page_button.setFixedWidth(100)
 
         self.results_view = qt.QTextBrowser(self, "results_view")
@@ -53,6 +54,11 @@ class DCParametersBrick(BaseComponents.BlissWidget):
 
 
     def populate_parameter_widget(self, item):
+        self.parameters_widget.path_widget._base_image_dir = \
+            self.session_hwobj.get_base_image_directory()
+        self.parameters_widget.path_widget._base_process_dir = \
+            self.session_hwobj.get_base_process_directory()
+
         data_collection = item.get_model()
         
         if data_collection.is_collected():
@@ -90,12 +96,7 @@ class DCParametersBrick(BaseComponents.BlissWidget):
       
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'session':
-            session_hwobj = self.getHardwareObject(new_value)
-            self.parameters_widget.path_widget._base_image_dir = \
-                session_hwobj.get_base_image_directory()
-            self.parameters_widget.path_widget._base_process_dir = \
-                session_hwobj.get_base_process_directory()
-
+            self.session_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'beamline_setup':            
             self.beamline_setup = self.getHardwareObject(new_value)
             self.parameters_widget.set_beamline_setup(self.beamline_setup)
