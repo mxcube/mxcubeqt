@@ -129,13 +129,14 @@ class CreateDiscreteWidget(CreateTaskBase):
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
                 self._acq_widget.disable_inverse_beam(True)
-
-                if dc.get_path_template():
-                    self._path_template = dc.get_path_template()
-
+                
+                self._path_template = dc.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
-                self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
 
+                self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                       self._path_template)
+                
                 if len(dc.acquisitions) == 1:
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
