@@ -127,31 +127,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters()
-
-            try:
-                transmission = self._beamline_setup_hwobj.\
-                               transmission_hwobj.getAttFactor()
-                transmission = round(float(transmission), 1)
-            except AttributeError:
-                transmission = 0
-
-            try:
-                resolution = self._beamline_setup_hwobj.\
-                             resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 4)
-            except AttributeError:
-                resolution = 0
-
-            try:
-                energy = self._beamline_setup_hwobj.energy_hwobj.\
-                         getCurrentEnergy()
-                energy = round(float(energy), 2)
-            except AttributeError:
-                energy = 0
-
-            self._acquisition_parameters.resolution = resolution
-            self._acquisition_parameters.energy = energy
-            self._acquisition_parameters.transmission = transmission
         else:
             self._acquisition_parameters = qmo.AcquisitionParameters()
             self._path_template = qmo.PathTemplate()
@@ -312,75 +287,75 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acq_widget.update_data_model(self._acquisition_parameters,
                                                self._path_template)
   
-    def _create_task(self,  sample):
+    def _create_task(self,  sample, shape):
         data_collections = []
-        selected_items = self.selected_items()
+        #selected_items = self.selected_items()
 
-        for item in selected_items:
-            shape = self._list_item_map[item]
-            snapshot = None
+        #for item in selected_items:
+        #    shape = self._list_item_map[item]
+        #    snapshot = None
 
-            if isinstance(shape, shape_history.Line ):
-                if shape.get_qub_objects() is not None:
-                    snapshot = self._shape_history.get_snapshot(shape.get_qub_objects())
-                else:
-                    snapshot = self._shape_history.get_snapshot([])
+        if isinstance(shape, shape_history.Line ):
+            if shape.get_qub_objects() is not None:
+                snapshot = self._shape_history.get_snapshot(shape.get_qub_objects())
+            else:
+                snapshot = self._shape_history.get_snapshot([])
 
-                # Acquisition for start position
-                start_acq = qmo.Acquisition()
-                start_acq.acquisition_parameters = \
-                    copy.deepcopy(self._acquisition_parameters)
-                start_acq.acquisition_parameters.collect_agent = \
-                    COLLECTION_ORIGIN.MXCUBE
-                start_acq.acquisition_parameters.\
-                    centred_position = shape.start_cpos
-                start_acq.path_template = copy.deepcopy(self._path_template)
-                start_acq.acquisition_parameters.centred_position.\
-                    snapshot_image = snapshot
+            # Acquisition for start position
+            start_acq = qmo.Acquisition()
+            start_acq.acquisition_parameters = \
+                copy.deepcopy(self._acquisition_parameters)
+            start_acq.acquisition_parameters.collect_agent = \
+                COLLECTION_ORIGIN.MXCUBE
+            start_acq.acquisition_parameters.\
+                centred_position = shape.start_cpos
+            start_acq.path_template = copy.deepcopy(self._path_template)
+            start_acq.acquisition_parameters.centred_position.\
+                snapshot_image = snapshot
 
-                start_acq.path_template.suffix = self._session_hwobj.suffix
-                
-                if '<sample_name>' in start_acq.path_template.directory:
-                    name = sample.get_name().replace(':', '-')
-                    start_acq.path_template.directory = start_acq.path_template.directory.\
-                                                        replace('<sample_name>', name)
+            start_acq.path_template.suffix = self._session_hwobj.suffix
 
-                    start_acq.path_template.process_directory = start_acq.path_template.process_directory.\
-                                                                replace('<sample_name>', name)
+            if '<sample_name>' in start_acq.path_template.directory:
+                name = sample.get_name().replace(':', '-')
+                start_acq.path_template.directory = start_acq.path_template.directory.\
+                                                    replace('<sample_name>', name)
 
-                if '<acronym>-<name>' in start_acq.path_template.base_prefix:
-                    start_acq.path_template.base_prefix = self.get_default_prefix(sample)
-                    start_acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                                  get_next_run_number(start_acq.path_template)
+                start_acq.path_template.process_directory = start_acq.path_template.process_directory.\
+                                                            replace('<sample_name>', name)
 
-                # Add another acquisition for the end position
-                end_acq = qmo.Acquisition()
-                end_acq.acquisition_parameters = \
-                    copy.deepcopy(self._acquisition_parameters)
-                end_acq.acquisition_parameters.collect_agent = \
-                    COLLECTION_ORIGIN.MXCUBE
-                end_acq.acquisition_parameters.\
-                    centred_position = shape.end_cpos
-                end_acq.path_template = copy.deepcopy(self._path_template)
-                end_acq.acquisition_parameters.centred_position.\
-                    snapshot_image = snapshot
+            if '<acronym>-<name>' in start_acq.path_template.base_prefix:
+                start_acq.path_template.base_prefix = self.get_default_prefix(sample)
+                start_acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
+                                              get_next_run_number(start_acq.path_template)
 
-                end_acq.path_template.suffix = self._session_hwobj.suffix
+            # Add another acquisition for the end position
+            end_acq = qmo.Acquisition()
+            end_acq.acquisition_parameters = \
+                copy.deepcopy(self._acquisition_parameters)
+            end_acq.acquisition_parameters.collect_agent = \
+                COLLECTION_ORIGIN.MXCUBE
+            end_acq.acquisition_parameters.\
+                centred_position = shape.end_cpos
+            end_acq.path_template = copy.deepcopy(self._path_template)
+            end_acq.acquisition_parameters.centred_position.\
+                snapshot_image = snapshot
 
-                processing_parameters = copy.deepcopy(self._processing_parameters)
-              
-                dc = qmo.DataCollection([start_acq, end_acq],
-                                        sample.crystals[0],
-                                        processing_parameters)
+            end_acq.path_template.suffix = self._session_hwobj.suffix
 
-                dc.set_name(start_acq.path_template.get_prefix())
-                dc.set_number(start_acq.path_template.run_number)
+            processing_parameters = copy.deepcopy(self._processing_parameters)
 
-                
-                dc.experiment_type = EXPERIMENT_TYPE.HELICAL
+            dc = qmo.DataCollection([start_acq, end_acq],
+                                    sample.crystals[0],
+                                    processing_parameters)
 
-                data_collections.append(dc)
-                self._path_template.run_number += 1
+            dc.set_name(start_acq.path_template.get_prefix())
+            dc.set_number(start_acq.path_template.run_number)
+
+
+            dc.experiment_type = EXPERIMENT_TYPE.HELICAL
+
+            data_collections.append(dc)
+            self._path_template.run_number += 1
 
         return data_collections
                    
