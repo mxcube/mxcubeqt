@@ -280,7 +280,7 @@ class DataCollectTree(qt.QWidget):
 
             location = items[0].get_model().location
             self.beamline_setup_hwobj.sample_changer_hwobj.\
-                 unloadSample(22, sample_location = location)
+                 unload(22, sample_location = location, wait = False)
 
     def sample_list_view_selection(self):
         items = self.get_selected_items()
