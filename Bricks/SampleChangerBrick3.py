@@ -903,11 +903,11 @@ class SampleChangerBrick3(BlissWidget):
             pass
 
         
-    def sampleLoadSuccess(self,already_loaded):
+    def sampleLoadSuccess(self):
         pass
 
-    def sampleLoadFail(self,state):
-        self.sampleChangerStateChanged(state)
+    def sampleLoadFail(self):
+        pass
 
     def sampleUnloadSuccess(self):
         pass
@@ -915,18 +915,11 @@ class SampleChangerBrick3(BlissWidget):
     def sampleUnloadFail(self,state):
         self.sampleChangerStateChanged(state)
 
-    """
-    def sampleLoadStateChanged(self, loaded):
-        pass
-        #self.currentSample.setLoaded(loaded)
-    """
-
     def sampleChangerStatusChanged(self,status):
         self.status.setStatusMsg(status)
 
     def sampleChangerStateChanged(self, state, previous_state=None):
         logging.getLogger().debug('SampleChangerBrick3: state changed (%s)' % state)
-        #import pdb;pdb.set_trace()
         self.status.setState(state)
         self.currentBasket.setState(state)
         self.currentSample.setState(state)
@@ -964,24 +957,18 @@ class SampleChangerBrick3(BlissWidget):
         self.sampleChanger.select(address, wait=False) 
 
     def loadThisSample(self,basket_index,vial_index):
-        #print "LOAD THIS SAMPLE",basket_index,vial_index
         if self.doubleClickLoads.isChecked():
             sample_loc=(basket_index,vial_index)
-            sc_can_load=self.sampleChanger.canLoadSample(None,sample_loc)
             holder_len=self.currentSample.getHolderLength()
-            if sc_can_load:
-                self.sampleChanger.loadSample(holder_len,None,sample_loc,self.sampleLoadSuccess,self.sampleLoadFail)
-            else:
-                logging.getLogger().warning('SampleChangerBrick3: cannot load sample in location %s)' % sample_loc)
+            self.sampleChanger.load(holder_len,None,sample_loc,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
 
     def loadSample(self,holder_len):
-        self.sampleChanger.loadSample(holder_len,None,None,self.sampleLoadSuccess,self.sampleLoadFail)
+        self.sampleChanger.load(holder_len,None,None,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
 
     def unloadSample(self,holder_len,matrix_code,location):
-        #print "SampleChangerBrick2.unloadSample",holder_len,matrix_code
         if matrix_code:
             location=None
-        self.sampleChanger.unloadSample(holder_len,matrix_code,location,self.sampleUnloadSuccess,self.sampleUnloadFail)
+        self.sampleChanger.unload(holder_len,matrix_code,location,self.sampleUnloadSuccess,self.sampleUnloadFail,wait=False)
 
     def clearMatrices(self):
         for basket in self.baskets:
