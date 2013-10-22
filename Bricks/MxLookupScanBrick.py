@@ -38,6 +38,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
         timeWidget = self._widgetTree.child('__time')
         timeWidget.setValidator(qt.QDoubleValidator(timeWidget))
         timeWidget = self._widgetTree.child('__time')
+        timeWidget.hide()
 
     def propertyChanged(self,property,oldValue,newValue):
         if property == 'offsetmeasure':

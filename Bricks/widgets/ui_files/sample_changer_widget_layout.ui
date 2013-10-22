@@ -81,13 +81,13 @@
                                                 </font>
                                             </property>
                                             <property name="text">
-                                                <string>Show:</string>
+                                                <string>Mode:</string>
                                             </property>
                                         </widget>
                                         <widget class="QComboBox">
                                             <item>
                                                 <property name="text">
-                                                    <string>All samples</string>
+                                                    <string>Sample changer</string>
                                                 </property>
                                             </item>
                                             <item>
