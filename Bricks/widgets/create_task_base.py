@@ -48,12 +48,16 @@ class CreateTaskBase(qt.QWidget):
 
     def init_models(self):
         bl_setup = self._beamline_setup_hwobj
-        
-        if bl_setup is not None:
 
+        if bl_setup is not None:
             # Initialize the path_template of the widget to default
             # values read from the beamline setup
             if self._data_path_widget:
+                self._data_path_widget._base_image_dir = \
+                    self._session_hwobj.get_base_image_directory()
+                self._data_path_widget._base_process_dir = \
+                    self._session_hwobj.get_base_process_directory()
+
                 (data_directory, proc_directory) = self.get_default_directory()
                 self._path_template = bl_setup.get_default_path_template()
                 self._path_template.directory = data_directory
@@ -78,13 +82,6 @@ class CreateTaskBase(qt.QWidget):
         self._beamline_setup_hwobj = bl_setup_hwobj
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
-
-        if self._data_path_widget:
-            self._data_path_widget._base_image_dir = \
-                self._session_hwobj.get_base_image_directory()
-            self._data_path_widget._base_process_dir = \
-                self._session_hwobj.get_base_process_directory()
-
         self.init_models()
 
     def _prefix_ledit_change(self, new_value):
