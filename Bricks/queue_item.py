@@ -196,7 +196,6 @@ class SampleQueueItem(QueueItem):
         
         QueueItem.__init__(self, *args, **kwargs)
 
-
     def update_pin_icon(self):
         dc_tree_widget = self.listView().parent()
 
@@ -214,13 +213,11 @@ class TaskQueueItem(QueueItem):
         
         QueueItem.__init__(self, *args, **kwargs)
 
-
     def get_sample_view_item(self):
         if isinstance(self.parent(), SampleQueueItem):
             return self.parent()
-        else:
+        elif self.parent():
             return self.parent().get_sample_view_item()
-
 
 class DataCollectionGroupQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
