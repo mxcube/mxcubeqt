@@ -153,6 +153,12 @@ class CreateCharWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
+        self.connect(induced_burn_cbx, qt.SIGNAL("toggled(bool)"),
+                     self.use_induced_burn)
+
+    def use_induced_burn(self, state):
+        self._acquisition_parameters.induce_burn = state
+
     def _space_group_change(self, index):
        self._char_params.space_group = queue_model_enumerables.\
                                        XTAL_SPACEGROUPS[index]
