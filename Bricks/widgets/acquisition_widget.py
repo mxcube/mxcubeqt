@@ -298,18 +298,18 @@ class AcquisitionWidget(qt.QWidget):
     def set_energy(self, energy, wav):
         #energy = round(float(energy), 4)
         self._acquisition_parameters.energy = energy
-        self.acq_widget_layout.child('energy_ledit').setText("%.4f" % energy)
+        self.acq_widget_layout.child('energy_ledit').setText("%.4f" % float(energy))
 
     def update_transmission(self, transmission):
         #transmission = round(float(transmission), 4)
         self.acq_widget_layout.child('transmission_ledit').\
-             setText("%.2f" % transmission)
+             setText("%.2f" % float(transmission))
         self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
         #resolution = round(float(resolution), 4)
         self.acq_widget_layout.child('resolution_ledit').\
-             setText("%.2f" % resolution)
+             setText("%.2f" % float(resolution))
         self._acquisition_parameters.resolution = float(resolution)
 
     def update_data_model(self, acquisition_parameters, path_template):
