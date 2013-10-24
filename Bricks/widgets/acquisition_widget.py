@@ -296,18 +296,18 @@ class AcquisitionWidget(qt.QWidget):
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
 
     def set_energy(self, energy, wav):
-        energy = round(float(energy), 4)
+        #energy = round(float(energy), 4)
         self._acquisition_parameters.energy = energy
         self.acq_widget_layout.child('energy_ledit').setText("%.4f" % energy)
 
     def update_transmission(self, transmission):
-        transmission = round(float(transmission), 4)
+        #transmission = round(float(transmission), 4)
         self.acq_widget_layout.child('transmission_ledit').\
              setText("%.2f" % transmission)
         self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
-        resolution = round(float(resolution), 4)
+        #resolution = round(float(resolution), 4)
         self.acq_widget_layout.child('resolution_ledit').\
              setText("%.2f" % resolution)
         self._acquisition_parameters.resolution = float(resolution)
