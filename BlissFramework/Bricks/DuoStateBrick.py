@@ -326,6 +326,13 @@ class WrapperHO(QObject):
 
         if self.devClass=="TangoShutter":
             self.devClass="Shutter"
+
+        #2011-08-30-bessy-mh: let the wrapper also feel responsible for my new ShutterEpics hardware object
+        #                     identical to the original Shutter hardware object
+        if self.devClass == "ShutterEpics":
+            self.devClass = "Shutter"
+        #2011-08-30-bessy-mh: end
+
             
         if not self.devClass in ("WagoPneu", "Shutter", "SpecMotorWSpecPositions", "Procedure"):
           self.devClass = "WagoPneu"
