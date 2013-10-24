@@ -426,10 +426,11 @@ class DataCollectTree(qt.QWidget):
         self.centring_method = method_number
 
     def continue_button_click(self):
-        if not self.queue_hwobj.is_paused():
-            self.queue_hwobj.set_pause(True)
-        else:
-            self.queue_hwobj.set_pause(False)
+        if self.queue_hwobj.is_executing():
+            if not self.queue_hwobj.is_paused():
+                self.queue_hwobj.set_pause(True)
+            else:
+                self.queue_hwobj.set_pause(False)
 
     def queue_paused_handler(self, state):
         if state:
@@ -437,11 +438,14 @@ class DataCollectTree(qt.QWidget):
             self.parent().enable_command_menu(True)
             self.parent().enable_task_toolbox(True)
             self.continue_button.setText('Continue')
+            self.continue_button.setPaletteBackgroundColor(widget_colors.LIGHT_YELLOW)
         else:
             self.parent().enable_hutch_menu(False)
             self.parent().enable_command_menu(False)
             self.parent().enable_task_toolbox(False)
             self.continue_button.setText('Pause')
+            color = self.paletteBackgroundColor()
+            self.continue_button.setPaletteBackgroundColor(color)
 
     def collect_stop_toggle(self):
         checked_items = self.get_checked_items()

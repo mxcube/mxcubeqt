@@ -60,7 +60,7 @@
                                 <cstring>textLabel1</cstring>
                             </property>
                             <property name="text">
-                                <string>time</string>
+                                <string></string>
                             </property>
                         </widget>
                         <widget class="QLineEdit">
