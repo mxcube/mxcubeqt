@@ -43,6 +43,7 @@ class HutchMenuBrick(BlissWidget):
         self.sampleChanger=None
         self.collectObj = None
         self.queue_hwobj = None
+        self._bx, self._by = (None, None)
         #self.allowMoveToBeamCentring = False
 
         # Define properties
@@ -690,12 +691,13 @@ class HutchMenuBrick(BlissWidget):
         except:
             logging.getLogger().exception("HutchMenuBrick: problem starting up display")
 
-    def _drawBeam(self, by):
+    def _drawBeam(self):
         try:
           self.__rectangularBeam.show()
-          if None in (by, self._bx):
+          if None in (self._by, self._bx):
             return
           bx = self._bx
+          by = self._by
           pxmmy=self.minidiff.pixelsPerMmY
           pxmmz=self.minidiff.pixelsPerMmZ
           if self._bshape == "rectangular":
@@ -711,7 +713,8 @@ class HutchMenuBrick(BlissWidget):
         #logging.info("UPDATE BEAM %s", ret)
         self._bx = float(ret["size_x"])
         self._bshape = ret["shape"]
-        self._drawBeam(float(ret["size_y"]))
+        self._by = float(ret["size_y"])
+        self._drawBeam()
 
     def updateBeam(self,force=False):
         if self["displayBeam"]:
@@ -758,7 +761,7 @@ class HutchMenuBrick(BlissWidget):
                     self.__scaleY = pxsize_z
                 else:
                     self.emit(PYSIGNAL("calibrationChanged"), (pxsize_y, pxsize_z))
-                    self.slitsPositionChanged()
+                    self._drawBeam()
                     self.__scale.show()
                
 
