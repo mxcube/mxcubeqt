@@ -67,6 +67,7 @@ class CreateTaskBase(qt.QWidget):
                     get_next_run_number(self._path_template)
 
             if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
