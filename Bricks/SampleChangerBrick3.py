@@ -792,14 +792,14 @@ class SampleChangerBrick3(BlissWidget):
         elif propertyName == 'mnemonic':
             self.sampleChanger = self.getHardwareObject(newValue)
             if self.sampleChanger is not None:
-                self.connect(self.sampleChanger, SampleChanger.__STATUS_CHANGED_EVENT__, self.sampleChangerStatusChanged)
-                self.connect(self.sampleChanger, SampleChanger.__STATE_CHANGED_EVENT__, self.sampleChangerStateChanged)
-                self.connect(self.sampleChanger, SampleChanger.__INFO_CHANGED_EVENT__, self.infoChanged)
-                self.connect(self.sampleChanger, SampleChanger.__SELECTION_CHANGED_EVENT__, self.selectionChanged)
+                self.connect(self.sampleChanger, SampleChanger.STATUS_CHANGED_EVENT, self.sampleChangerStatusChanged)
+                self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT, self.sampleChangerStateChanged)
+                self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, self.infoChanged)
+                self.connect(self.sampleChanger, SampleChanger.SELECTION_CHANGED_EVENT, self.selectionChanged)
                 #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
                 #self.connect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
                 #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
-                self.connect(self.sampleChanger, SampleChanger.__LOADED_SAMPLE_CHANGED_EVENT__, self.loadedSampleChanged)
+                self.connect(self.sampleChanger, SampleChanger.LOADED_SAMPLE_CHANGED_EVENT, self.loadedSampleChanged)
                  
                 #self.currentSample.hideHolderLength(self.sampleChanger.isMicrodiff())
                 #self.status.hideOperationalControl(self.sampleChanger.isMicrodiff())
