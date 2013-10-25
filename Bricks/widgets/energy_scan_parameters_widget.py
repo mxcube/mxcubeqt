@@ -21,7 +21,7 @@ class EnergyScanParametersWidget(qt.QWidget):
 
         periodic_table_gbox = qt.QHGroupBox("Available Elements", self)
         self.periodic_table =  PeriodicTableBrick(periodic_table_gbox)
-            #QPeriodicTable.QPeriodicTable(periodic_table_gbox)
+        #QPeriodicTable.QPeriodicTable(periodic_table_gbox)
         self.periodic_table.setFixedHeight(341)
         self.periodic_table.setFixedWidth(650)
         #font = periodic_table.font()
@@ -39,7 +39,6 @@ class EnergyScanParametersWidget(qt.QWidget):
 
         qt.QObject.connect(self.periodic_table, qt.PYSIGNAL('edgeSelected'), 
                            self.element_clicked)
-
 
         qt.QObject.connect(self.data_path_widget.data_path_widget_layout.prefix_ledit, 
                            qt.SIGNAL("textChanged(const QString &)"), 

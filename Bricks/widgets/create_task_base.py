@@ -67,6 +67,7 @@ class CreateTaskBase(qt.QWidget):
                     get_next_run_number(self._path_template)
 
             if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
@@ -80,6 +81,15 @@ class CreateTaskBase(qt.QWidget):
 
     def set_beamline_setup(self, bl_setup_hwobj):
         self._beamline_setup_hwobj = bl_setup_hwobj
+
+        try:
+            bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
+            bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
+            bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
+        except AttributeError as ex:
+            logging.getLogger("HWR").exception('Could not connect to one or '+\
+                                               'more hardware objects' + str(ex))
+        
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
@@ -152,10 +162,22 @@ class CreateTaskBase(qt.QWidget):
     def get_data_path_widget(self):
         return self._data_path_widget
 
-    def set_energy(self, energy, wavelength):
-        if energy:
-            acq_widget = self.get_acquisition_widget()
+    def _item_is_group_or_sample(self):
+        result = False
         
+        if self._current_selected_items:
+            item = self._current_selected_items[0]
+        
+            if isinstance(item, queue_item.SampleQueueItem) or \
+                isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                    result = True
+                    
+        return result
+
+    def set_energy(self, energy, wavelength):         
+        if self._item_is_group_or_sample() and energy:
+            acq_widget = self.get_acquisition_widget()
+            
             if acq_widget:
                 acq_widget.previous_energy = energy
                 acq_widget.set_energy(energy, wavelength)
@@ -163,13 +185,13 @@ class CreateTaskBase(qt.QWidget):
     def set_transmission(self, trans):
         acq_widget = self.get_acquisition_widget()
         
-        if acq_widget:
+        if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_transmission(trans)
 
     def set_resolution(self, res):
         acq_widget = self.get_acquisition_widget()
         
-        if acq_widget:
+        if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_resolution(res)
                                                       
     def set_run_number(self, run_number):
@@ -253,6 +275,7 @@ class CreateTaskBase(qt.QWidget):
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
 
@@ -261,19 +284,21 @@ class CreateTaskBase(qt.QWidget):
                 self._update_etr()
 
             self.setDisabled(False)
+
+        if self._item_is_group_or_sample:
+            if self._acq_widget:
+                energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+                self._acq_widget.set_energies(energy_scan_result)
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                   self._path_template)
             
-        if self._acq_widget:
-            energy_scan_result = sample_data_model.crystals[0].energy_scan_result
-            self._acq_widget.set_energies(energy_scan_result)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
-        if self._data_path_widget:
-            self._data_path_widget.update_data_model(self._path_template)
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
 
     def _update_etr(self):
-        energy = self.bl_setup._get_energy()
-        transmission = self.bl_setup._get_transmission()
-        resolution = self.bl_setup._get_resolution()
+        energy = self._beamline_setup_hwobj._get_energy()
+        transmission = self._beamline_setup_hwobj._get_transmission()
+        resolution = self._beamline_setup_hwobj._get_resolution()
                 
         self._acquisition_parameters.energy = energy
         self._acquisition_parameters.transmission = transmission

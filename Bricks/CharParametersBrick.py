@@ -11,6 +11,8 @@ class CharParametersBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
         BaseComponents.BlissWidget.__init__(self, *args)
 
+        self.session_hwobj = None
+
         # Framwork-2 properties
         self.addProperty("tunable-energy", "boolean", "True")
         self.addProperty("session", "string", "/session")
@@ -45,6 +47,11 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         self.toggle_page_button.setDisabled(True)
 
     def populate_edna_parameter_widget(self, item):
+        self.parameters_widget.path_widget._base_image_dir = \
+            self.session_hwobj.get_base_image_directory()
+        self.parameters_widget.path_widget._base_process_dir = \
+            self.session_hwobj.get_base_process_directory()
+
         char = item.get_model()
 
         if char.is_executed():
@@ -58,8 +65,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
                 else:
                     self.results_view.setSource(char.html_report)
             else:
-                self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
-                    
+                self.results_view.setText("<center><h1>Characterisation failed</h1></center>")           
         else:
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
@@ -81,8 +87,4 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         if property_name == 'tunable-energy':
             self.parameters_widget.acq_widget.set_tunable_energy(new_value)            
         elif property_name == 'session':
-            session_hwobj = self.getHardwareObject(new_value)
-            self.parameters_widget.path_widget._base_image_dir = \
-                session_hwobj.get_base_image_directory()
-            self.parameters_widget.path_widget._base_process_dir = \
-                session_hwobj.get_base_process_directory()
+            self.session_hwobj = self.getHardwareObject(new_value)
