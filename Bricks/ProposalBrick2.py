@@ -236,19 +236,21 @@ class ProposalBrick2(BlissWidget):
             if laboratory.has_key('name'):
                 person_name=person_name+" "+laboratory['name']
             localcontact_name=personFullName(localcontact)
-            title="<big><b>%s-%s %s</b></big>" % (proposal['code'],proposal['number'],title)
+            #title="<big><b>%s-%s %s</b></big>" % (proposal['code'],proposal['number'],title)
             if localcontact:
                 header="%s Dates: %s to %s Local contact: %s" % (person_name,start_date,end_date,localcontact_name)
             else:
                 header="%s Dates: %s to %s" % (person_name,start_date,end_date)
 
             # Set interface info and signal the new session
-            #self.proposalLabel.setText("<nobr><i>(%s)</i>" % header)
-            self.titleLabel.setText("<nobr><b>%s</b>" % title)
-            self.titleLabel.show()
+            proposal_text = "%s-%s" % (proposal['code'],proposal['number'])
+            self.titleLabel.setText("<nobr><b><big>%s</big></b>" % proposal_text)
+            tooltip = "\n".join([proposal_text, header, title]) 
             if comments:
-                #QToolTip.add(self.proposalLabel,"Comments: "+comments)
-                QToolTip.add(self.titleLabel,"Comments: "+comments)
+                tooltip+='\n'
+                tooltip+='Comments: '+comments 
+            QToolTip.add(self.titleLabel, tooltip)
+            self.titleLabel.show()
 
             try:
                 end_time=session['endDate'].split()[1]
