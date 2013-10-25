@@ -1,43 +1,13 @@
 import logging
-import math
 from BlissFramework.Utils import widget_colors
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
-from qt import *
-from sample_changer.GenericSampleChanger import SampleChangerState, SampleChangerMode, SampleChanger
 from sample_changer import SC3
+# imports SampleChangerState, SC_STATE_COLOR, etc.
+from sample_changer_helper import *
+from qt import *
 
 __category__ = "mxCuBE"
-
-SC_STATE_COLOR = { SampleChangerState.Fault: widget_colors.LIGHT_RED,
-                   SampleChangerState.Ready: widget_colors.LIGHT_GREEN,
-                   SampleChangerState.StandBy: widget_colors.LIGHT_GREEN,
-                   SampleChangerState.Moving: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Unloading: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Selecting: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Loading: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Scanning: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Resetting: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.ChangingMode: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Initializing: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Closing: widget_colors.LIGHT_YELLOW,
-                   SampleChangerState.Charging: widget_colors.LIGHT_GREEN,
-                   SampleChangerState.Alarm: widget_colors.LIGHT_RED,
-                   SampleChangerState.Disabled: None,
-                   SampleChangerState.Unknown: None}
-
-SC_STATE_GENERAL = { SampleChangerState.Ready: True,
-                     SampleChangerState.Alarm: True } 
-
-SC_SAMPLE_COLOR = { "LOADED": widget_colors.LIGHT_GREEN,
-                    "UNLOADED": widget_colors.DARK_GRAY,
-                    "LOADING": widget_colors.LIGHT_YELLOW,
-                    "UNLOADING": widget_colors.LIGHT_YELLOW,
-                    "UNKNOWN": None }
-
-SC_LOADED_COLOR = { -1: None,
-                     0: Qt.white,
-                     1: Qt.green}
 
 class VialView(QWidget):
     (VIAL_UNKNOWN,VIAL_NONE,VIAL_NOBARCODE,VIAL_BARCODE,VIAL_AXIS,VIAL_ALREADY_LOADED,VIAL_NOBARCODE_LOADED)=(0,1,2,3,4,5,6)
@@ -727,7 +697,6 @@ class SampleChangerBrick3(BlissWidget):
  
         for i in range(5):
           QObject.connect(self.baskets[i],PYSIGNAL("loadThisSample"),self.loadThisSample)
-          QObject.connect(self.baskets[i],PYSIGNAL("basketPresence"), self.basketPresenceChanged) 
           self.baskets[i].setChecked(False)
           self.baskets[i].setEnabled(False)
 
@@ -974,10 +943,6 @@ class SampleChangerBrick3(BlissWidget):
         for basket in self.baskets:
             basket.clearMatrices()
         self.emit(PYSIGNAL("scanBasketUpdate"),(None,))
-
-    def basketPresenceChanged(self, basket, is_present):
-        if self.sampleChanger is not None:
-          self.sampleChanger.setBasketSampleInformation([basket, 0, is_present, 0, 0])
 
     def sampleChangerContentsChanged(self, baskets):
         self.clearMatrices()

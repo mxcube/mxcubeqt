@@ -6,8 +6,8 @@ import queue_item
 
 from collections import namedtuple
 from BlissFramework import Icons, BaseComponents
-from SampleChangerBrick import SC_STATE_COLOR
 from HardwareRepository.HardwareRepository import dispatcher
+from sample_changer_helper import *
 
 from widgets.dc_tree_widget import DataCollectTree
 
@@ -217,11 +217,10 @@ class TreeBrick(BaseComponents.BlissWidget):
             self._lims_hwobj = bl_setup.lims_client_hwobj
 
             if self.sample_changer_hwobj is not None:
-                self.connect(self.sample_changer_hwobj, 'matrixCodesUpdate',
-                             self.set_sample_pin_icon)
-
-                self.connect(self.sample_changer_hwobj, 'stateChanged', 
+                self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
+                self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, 
+                             self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
 
@@ -380,7 +379,6 @@ class TreeBrick(BaseComponents.BlissWidget):
                 basket_code = sample.getContainer().getID() or ""
             
                 sc_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
-            import pdb;pdb.set_trace()
         except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
@@ -401,7 +399,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         logging.getLogger("user_level_log").info(msg)
 
-    def set_sample_pin_icon(self, matrices):
+    def set_sample_pin_icon(self):
         """
         Updates the location of the sample pin when the
         matrix code information changes. The matrix code information
