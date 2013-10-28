@@ -1,0 +1,5 @@
+<device class="MicrodiffMotorPX2">
+  <username>Vertical</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <motor_name>PhiTableZAxis</motor_name>
+</device>

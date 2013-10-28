@@ -1,0 +1,6 @@
+<device class="MicrodiffMotorPX2">
+  <username>Horizontal</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <motor_name>PhiTableYAxis</motor_name>
+  <interval>1000</interval>
+</device>
