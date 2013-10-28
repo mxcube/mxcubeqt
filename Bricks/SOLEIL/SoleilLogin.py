@@ -6,7 +6,7 @@ import time
 
 from BlissFramework.Utils import widget_colors
 
-__category__ = 'mxCuBE'
+__category__ = 'SOLEIL'
 
 PROPOSAL_GUI_EVENT = QEvent.User
 class ProposalGUIEvent(QCustomEvent):
