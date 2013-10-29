@@ -1,0 +1,6 @@
+<device class="MicrodiffMotorPX2">
+  <username>phix</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <motor_name>PhiTableXAxis</motor_name>
+  <interval>1000</interval>
+</device>

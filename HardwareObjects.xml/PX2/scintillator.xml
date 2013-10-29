@@ -1,0 +1,6 @@
+<device class="Scintillator">
+  <specversion>SPEC_HOST:SPEC_VERSION</specversion>
+  <command type="spec" name="set in">yagin</command>
+  <command type="spec" name="set out">yagout</command>
+  <channel type="spec" name="dev_state">YAG_STATE</channel>
+</device>

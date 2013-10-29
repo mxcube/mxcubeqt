@@ -1,0 +1,7 @@
+<device class="InOut">
+    <username>Microdiff light</username>
+    <offset>0</offset>
+    <command type="tango" name="set_in">lightin</command>
+    <command type="tango" name="set_out">lightout</command>
+    <channel type="tango" name="state" tangoname="i11-ma-cx1/ex/md2" polling="1000">BackLightIsOn</channel>
+</device>

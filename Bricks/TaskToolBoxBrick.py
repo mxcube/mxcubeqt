@@ -20,7 +20,8 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         #Data atributes
         self.shape_history = None
         self.tree_brick = None
-        self.ispyb_logged_in = False
+        #self.ispyb_logged_in = False - ESRF default behaviour is to disabled the box until logged in
+        self.ispyb_logged_in = True
         self.diffractometer_hwobj = None
         self.beamline_setup = None
         self.queue_model_hwobj = None
@@ -62,19 +63,20 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.task_tool_box_widget.workflow_page.\
             _grid_widget._shape_history = self.shape_history
         
-        self.shape_history.set_drawing(d.get('drawing', None))
-        self.shape_history.get_drawing_event_handler().\
-            selection_cb = self.shape_selected
-        self.shape_history.get_drawing_event_handler().\
-            deletion_cb = self.shape_deleted
+        if self.shape_history:
+           self.shape_history.set_drawing(d.get('drawing', None))
+           self.shape_history.get_drawing_event_handler().\
+               selection_cb = self.shape_selected
+           self.shape_history.get_drawing_event_handler().\
+               deletion_cb = self.shape_deleted
         
-        try:
-            self.shape_history.get_drawing_event_handler().\
-                move_to_centred_position_cb = self.diffractometer_hwobj.\
+           try:
+               self.shape_history.get_drawing_event_handler().\
+                   move_to_centred_position_cb = self.diffractometer_hwobj.\
                                               moveToCentredPosition
-        except AttributeError:
-            logging.error('Could not get diffractometer_hwobj, check your configuration')
-            traceback.print_exc()
+           except AttributeError:
+               logging.error('Could not get diffractometer_hwobj, check your configuration')
+               traceback.print_exc()
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
