@@ -9,61 +9,84 @@ class MD2TimeoutError:
     pass
 
 class MicrodiffMotorPX2(Device):      
+
     (NOTINITIALIZED, UNUSABLE, READY, MOVESTARTED, MOVING, ONLIMIT) = (0,1,2,3,4,5)
+
     MotorLimits = {'CentringTableYAxis': (-7., 7.), 'CentringTableXAxis': (-7., 7.), 'Phi': (-360., 360.), 'PhiTableXAxis': (-0.15, 0.15), 'PhiTableYAxis': (-7., 7.), 'PhiTableZAxis': (-7, 7)}
+
     def __init__(self, name):
         Device.__init__(self, name)
         self.motor_pos_attr_suffix = "Position"
-        #print 'MS debug 16.11.2012, MicrodiffMotorPX2 __init__() self.offset', self.offset
         self.offset = 0
-        print 'self', self
         
     def init(self): 
-        self.motorState = MicrodiffMotorPX2.NOTINITIALIZED
+        self.motorState   = MicrodiffMotorPX2.NOTINITIALIZED
         self.global_state = ""
-        self.position_attr = self.addChannel({"type":"tango", "name":"position", "polling":"1000" }, self.motor_name + self.motor_pos_attr_suffix)
+
+        logging.info("Initiliazing motor %s on device %s " % (self.name(), self.tangoname) )
+
+        # For some reason addChannel in polling mode does not seem to work with present version
+        # to be checked with Matias ?
+
+        #self.position_attr_name = self.motor_name + self.motor_pos_attr_suffix
+        #self.position_attr = self.addChannel({"type":"tango", "name":"myposition", "polling":"1000" }, self.position_attr_name )
+        #self.state_attr = self.addChannel({"type":"tango", "name":"state", "polling":"1000" }, "State")
+        #self.motors_state_attr = self.addChannel({"type":"tango", "name":"motor_states", "polling":"1000"}, "MotorStates")
+        #self.motors_state_attr.connectSignal("update", self._motorStateChanged)
+        
+        self.position_attr = self.getChannelObject("position")
         self.position_attr.connectSignal("update", self.motorPositionChanged)
         
-        self.state_attr = self.addChannel({"type":"tango", "name":"state", "polling":"1000" }, "State")
-        self.state_attr.connectSignal("update", self.globalStateChanged)
+        self.state_attr = self.getChannelObject("state")
+        self.state_attr.connectSignal("update", self.globalStateChanged )
         
-        self.motors_state_attr = self.addChannel({"type":"tango", "name":"motor_states", "polling":"1000"}, "MotorStates")
-        self.motors_state_attr.connectSignal("update", self._motorStateChanged)
-        
+        logging.info("Position motor %s at init time is %s " % (self.name(), self.position_attr.getValue() ) )
+
         self._motor_abort = self.addCommand( {"type":"tango", "name":"abort" }, "Reset")
 
         # this is ugly : I added it to make the centring procedure happy
         self.specName = self.motor_name
 
     def connectNotify(self, signal):
-        if self.position_attr.isConnected():
-            if signal == 'positionChanged':
-                self.emit('positionChanged', (self.getPosition(), ))
-            elif signal == 'stateChanged':
-                self.motorStateChanged(self.getState())
-            elif signal == 'limitsChanged':
-                self.motorLimitsChanged()  
- 
-    def updateState(self):
-        #print("motor %s: is ready %d (standby? %s (%s), motorstate %d)", self.name(), self.global_state == "STANDBY" and self.motorState > MicrodiffMotorPX2.UNUSABLE, self.global_state=="STANDBY" and "true" or "false", self.global_state, self.motorState)
-        #self.setIsReady(self.global_state in ("STANDBY","ALARM") and self.motorState > MicrodiffMotorPX2.UNUSABLE)
-        self.setIsReady(self.motorState > MicrodiffMotorPX2.UNUSABLE)
+        if signal == 'positionChanged':
+            self.emit('positionChanged', (self.getPosition(), ))
+        elif signal == 'stateChanged':
+            self.motorStateChanged(self.getState())
+        elif signal == 'limitsChanged':
+            self.motorLimitsChanged()  
  
     def globalStateChanged(self, state):
-        #logging.getLogger().debug("motor %s: Global state is %s", self.name(), str(state))
+        logging.getLogger().debug("motor %s: Global state is %s", self.name(), str(state))
         self.global_state = str(state)
         self.updateState()
 
+    def updateState(self):
+        if self.global_state in ("ALARM", ):
+            self.motorState = self.UNUSABLE
+        elif self.global_state in ("MOVING", ):
+            self.motorState = self.MOVING
+        elif self.global_state in ("STANDBY", ):
+            self.motorState = self.READY
+        else:
+            self.motorState = self.UNUSABLE
+
+        logging.info("microdiffMotorPX2: motor: %s - global state is %s (motor is %d) " % (self.name(), self.global_state, self.motorState) )
+
+        self.emit('stateChanged', (self.motorState, ))
+
+        self.setIsReady(self.global_state in ("STANDBY","ALARM") and self.motorState > self.UNUSABLE)
+
     def _motorStateChanged(self, motor_states):
+        logging.info("motor states changed")
         d = dict([x.split("=") for x in motor_states.split()])
         new_motor_state = int(d[self.motor_name])
         if self.motorState == new_motor_state:
           return
         self.motorState = new_motor_state
-        #print "----------------> %s: in _motorStateChanged: motor state changed to %s" % ( self.name(), self.motorState)
         self.motorStateChanged(self.motorState)
 
     def motorStateChanged(self, state):
+        self.motorState = state
         self.updateState()
         self.emit('stateChanged', (self.motorState, ))
 
@@ -88,7 +111,7 @@ class MicrodiffMotorPX2(Device):
         #  return 
         #private["old_pos"]=absolutePosition 
 
-        #logging.getLogger().debug("%s: position changed %f", self.name(), absolutePosition)
+        logging.getLogger().debug("%s: position changed %f", self.name(), absolutePosition)
         self.emit('positionChanged', (absolutePosition, ))
 
     def getPosition(self):
@@ -99,7 +122,6 @@ class MicrodiffMotorPX2(Device):
 
     def move(self, absolutePosition):
         self.position_attr.setValue(absolutePosition) #absolutePosition-self.offset)
-        
         
     def moveRelative(self, relativePosition):
         self.move(self.getPosition() + relativePosition)
@@ -127,11 +149,9 @@ class MicrodiffMotorPX2(Device):
         while s=="MOVING":
           s = str(self.state_attr.getValue())
           qApp.processEvents(20)
-           
  
     def getMotorMnemonic(self):
         return self.motor_name
-
 
     def stop(self):
         self._motor_abort()

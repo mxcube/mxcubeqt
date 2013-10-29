@@ -36,5 +36,6 @@
             <device role="beamcenterz" hwrid="/beamcenterZ"></device>-->
         </sample>
     </motors>
+    <samplechanger>/sc-mockup</samplechanger>
     <wagolight>/wago_light</wagolight>
 </equipment>

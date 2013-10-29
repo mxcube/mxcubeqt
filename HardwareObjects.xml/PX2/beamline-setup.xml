@@ -1,17 +1,19 @@
 <!-- Example beamline setup file -->
 
 <object class="BeamlineSetup" role="BeamlineSetup">
+
   <!-- Objects directly associatd with hardware -->
-  <object href="/transmission-mockup" role="transmission"/>
+  <object href="/transmission-mockup"   role="transmission"/>
   <object href="/diffractometer-mockup" role="diffractometer"/>
-  <object href="/sc-mockup" role="sample_changer"/>    
-  <object href="/resolution-mockup" role="resolution"/>
+  <object href="/sc-mockup"             role="sample_changer"/>    
+  <object href="/resolution-mockup"     role="resolution"/>
 
   <!-- Software (abstract) concepts -->
-  <object href="/shape-history" role="shape_history"/>
-  <object href="/session" role="session"/>
+  <object href="/shape-history"      role="shape_history"/>
+  <object href="/session"            role="session"/>
   <object href="/lims-client-mockup" role="lims_client"/>
-  <object href="/data-analysis" role="data_analysis"/>
+  <object href="/data-analysis"      role="data_analysis"/>
+
   <!--<object href="/workflow-mockup" role="workflow"/> -->
  
   <!-- Procedures and routines -->

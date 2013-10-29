@@ -2,5 +2,7 @@
     <username>Beam Center Horizontal</username>
     <tangoname>i11-ma-cx1/ex/md2</tangoname>
     <motor_name>BeamPositionHorizontal</motor_name>
+    <channel type="tango" polling="1000" name="position">BeamPositionHorizontalPosition</channel>
+    <channel type="tango" polling="1000" name="state">State</channel>
     <interval>1000</interval>
 </device>

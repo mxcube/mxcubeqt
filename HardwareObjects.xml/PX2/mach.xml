@@ -1,9 +1,6 @@
-<device class = "MachCurrent">
+<device class = "TangoMachCurrent">
   <username>Mach</username>
   <tangoname>ans/ca/machinestatus</tangoname>
-  <channel type="tango" name="OperatorMsg" polling="2000">operatorMessage</channel>
-  <channel type="tango" name="Current" polling="2000">current</channel>
-  <channel type="tango" name="FillingMode" polling="2000">fillingMode</channel>
-  <channel type="tango" name="RefillCountdown" polling="2000">lifetime</channel>
+  <channel type="tango" name="current" polling="4000">current</channel>
 </device>
 
