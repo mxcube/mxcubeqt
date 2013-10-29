@@ -13,8 +13,8 @@ from widgets.dc_tree_widget import DataCollectTree
 
 __category__ = 'mxCuBE_v3'
 
-ViewType = namedtuple('ViewType', ['ISPYB', 'MANUAL', 'SC'])
-TREE_VIEW_TYPE = ViewType(0, 1, 2)
+#ViewType = namedtuple('ViewType', ['ISPYB', 'MANUAL', 'SC'])
+#TREE_VIEW_TYPE = ViewType(0, 1, 2)
 
 
 class TreeBrick(BaseComponents.BlissWidget):
