@@ -130,8 +130,10 @@ class CreateTaskBase(qt.QWidget):
                           ' from another task. Correct the problem before adding to queue')
 
                 widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
+            else: 
+                # There is already incorrect input, do not chage background.
+                if widget.paletteBackgroundColor() != widget_colors.LIGHT_RED:
+                    widget.setPaletteBackgroundColor(widget_colors.WHITE)
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick

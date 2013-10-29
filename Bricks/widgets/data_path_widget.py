@@ -84,7 +84,12 @@ class DataPathWidget(qt.QWidget):
             self.set_directory(d)
 
     def _prefix_ledit_change(self, new_value):
-        self.set_prefix(new_value)
+        self._data_model.base_prefix = str(new_value)
+        file_name = self._data_model.get_image_file_name()
+        file_name = file_name.replace('%' + self._data_model.precision + 'd',
+                                      int(self._data_model.precision) * '#' )
+        self.data_path_widget_layout.file_name_value_label.setText(file_name)
+
         self.emit(qt.PYSIGNAL('path_template_changed'),
                   (self.data_path_widget_layout.prefix_ledit,
                    new_value))
