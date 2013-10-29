@@ -68,13 +68,13 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('osc_start',
                                self.acq_widget_layout.child('osc_start_ledit'),
                                float,
-                               qt.QDoubleValidator(0, 1000, 2, self))
+                               qt.QDoubleValidator(-1000, 1000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('first_image',
                               self.acq_widget_layout.child('first_image_ledit'),
                               int,
-                              qt.QIntValidator(1, 10000, self))
+                              qt.QIntValidator(1, 9999, self))
 
         self._acquisition_mib.\
              bind_value_update('exp_time',
@@ -184,19 +184,20 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
 
     def first_image_ledit_change(self, new_value):
-        self._path_template.start_num = int(new_value)
-        widget = self.acq_widget_layout.child('first_image_ledit')
-        self.emit(qt.PYSIGNAL('path_template_changed'),
-                  (widget, new_value))
+        if str(new_value).isdigit():
+            self._path_template.start_num = int(new_value)
+            widget = self.acq_widget_layout.child('first_image_ledit')
+            self.emit(qt.PYSIGNAL('path_template_changed'),
+                      (widget, new_value))
 
     def num_images_ledit_change(self, new_value):
-        self._path_template.num_files = int(new_value)
-        widget = self.acq_widget_layout.child('num_images_ledit')
-        self.emit(qt.PYSIGNAL('path_template_changed'),
-                  (widget, new_value))
+        if str(new_value).isdigit():
+            self._path_template.num_files = int(new_value)
+            widget = self.acq_widget_layout.child('num_images_ledit')
+            self.emit(qt.PYSIGNAL('path_template_changed'),
+                      (widget, new_value))
 
     def overlap_changed(self, new_value):
-
         if self._beamline_setup:
             has_shutter_less = self._beamline_setup.detector_has_shutterless()
         else:
