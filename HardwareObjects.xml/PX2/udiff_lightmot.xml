@@ -1,0 +1,5 @@
+<device class="MicrodiffLight">
+  <username>Back light</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <motor_name>BackLight</motor_name>
+</device>

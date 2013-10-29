@@ -1,0 +1,12 @@
+<device class = "BLEnergy">
+    <username>Energy</username>
+    <tangoname>i11-ma-c00/ex/beamlineenergy</tangoname>
+    <tangoname2>i11-ma-c03/op/mono1</tangoname2>
+    <tangoname3>ans-c11/ei/m-u24_energy</tangoname3>
+    <tangoname4>i11-ma-c05/ex/tab.1-mt_tz</tangoname4>
+    <tangoname5>i11-ma-c03/op/mono1-mt_rx</tangoname5>
+    <channel type="tango" polling="500" name="energy">energy</channel>
+    <channel type="tango" polling="500" name="state">State</channel>
+    <interval>1000</interval>
+    <backlash>False</backlash>
+</device>

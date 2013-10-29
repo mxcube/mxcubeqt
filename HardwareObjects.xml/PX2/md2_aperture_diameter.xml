@@ -1,0 +1,24 @@
+<!-- md2-zoomlevel has zoomlevel, backlightlevel and the frontlinelevel but not pixelsize and beamposition -->
+<!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
+<device class="TangoMotorMD2PhasesWPositionsPX2">
+    <username>Aperture diameter</username>
+    <tangoname>i11-ma-cx1/ex/md2</tangoname> <!--check!-->
+    <channel type="tango" polling="1000" name="state">State</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">CurrentApertureIndex</channel>
+    <delta>0.1</delta>
+    <interval>1000</interval>
+    <positions>
+        <position>
+            <username>100</username>
+            <offset>1</offset>
+        </position>
+        <position>
+            <username>50</username>
+            <offset>2</offset>
+        </position>
+        <position>
+            <username>20</username>
+            <offset>3</offset>
+        </position>
+    </positions>
+</device>

@@ -379,19 +379,20 @@ class TaskGroupQueueEntry(BaseQueueEntry):
         BaseQueueEntry.execute(self)
         group_data = {'sessionId': self.session_hwobj.session_id}
 
-        try:
+        if self.lims_client_hwobj:
+          try:
             gid = self.lims_client_hwobj.\
-                  _store_data_collection_group(group_data)
+                store_data_collection_group(group_data)
             self.get_data_model().lims_group_id = gid
-        except Exception as ex:
+          except Exception as ex:
             msg = 'Could not create the data collection group' + \
-                  ' in lims. Reason: ' + ex.message, self
+                       ' in lims. Reason: ' + ex.message, self
             raise QueueExecutionException(msg)
 
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
         self.lims_client_hwobj = self.beamline_setup.lims_client_hwobj
-        self.session_hwobj = self.beamline_setup.session_hwobj
+        self.session_hwobj     = self.beamline_setup.session_hwobj
 
     def post_execute(self):
         BaseQueueEntry.post_execute(self)
