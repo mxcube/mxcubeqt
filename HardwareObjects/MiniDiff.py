@@ -29,6 +29,8 @@ def manual_centring(phi, phiy, phiz, sampx, sampy, pixelsPerMmY, pixelsPerMmZ, i
   if all([x.isReady() for x in (phi, phiy, phiz, sampx, sampy)]):
     phiSavedPosition = phi.getPosition()
     phiSavedDialPosition = phi.getDialPosition()
+    logging.info("MiniDiff phi saved dial = %f " % phiSavedDialPosition)
+    phiSavedDialPosition = 327.3 
   else:
     raise RuntimeError, "motors not ready"
 
@@ -47,7 +49,8 @@ def manual_centring(phi, phiy, phiz, sampx, sampy, pixelsPerMmY, pixelsPerMmZ, i
     yc = (Y[0]+Y[2]) / 2
     y =  Y[0] - yc
     x =  yc - Y[1]
-    b1 = -math.radians(phiSavedDialPosition)
+    #b1 = -math.radians(phiSavedDialPosition)
+    b1 = -math.radians(phiSavedPosition - phiSavedDialPosition)
     rotMatrix = numpy.matrix([math.cos(b1), -math.sin(b1), math.sin(b1), math.cos(b1)])
     rotMatrix.shape = (2,2)
     dx, dy = numpy.dot(numpy.array([x,y]), numpy.array(rotMatrix))/pixelsPerMmY 
@@ -143,7 +146,7 @@ class MiniDiff(Equipment):
 
 
     def init(self):
-        self.phiy_direction = 1
+        #self.phiy_direction = 1
         
         self.centringMethods={MiniDiff.MANUAL3CLICK_MODE: self.start3ClickCentring,\
             MiniDiff.C3D_MODE: self.startAutoCentring }
@@ -218,7 +221,7 @@ class MiniDiff(Equipment):
             self.connect(self.sampleYMotor, 'positionChanged', self.sampleYMotorMoved)
             self.connect(self.sampleYMotor, "positionChanged", self.emitDiffractometerMoved)
         else:
-            logging.getLogger("HWR").error('MiniDiff: sampx motor is not defined in minidiff equipment %s', str(self.name()))
+            logging.getLogger("HWR").error('MiniDiff: sampy motor is not defined in minidiff equipment %s', str(self.name()))
         if self.camera is None:
             logging.getLogger("HWR").error('MiniDiff: camera is not defined in minidiff equipment %s', str(self.name()))
         else:
@@ -293,7 +296,24 @@ class MiniDiff(Equipment):
 
 
     def isReady(self):
-      return self.isValid() and all([not m.motorIsMoving() for m in (self.sampleXMotor, self.sampleYMotor, self.zoomMotor, self.phiMotor, self.phizMotor, self.phiyMotor)])
+      if self.isValid():
+         motorsQuiet = True 
+         logging.info("Motor sampleX is %s" % str(self.sampleYMotor) )
+         logging.info("Motor sampleY is %s" % str(self.sampleYMotor) )
+         logging.info("Motor zoom is %s" % str(self.zoomMotor) )
+         logging.info("Motor phi is %s" % str(self.phiMotor) )
+         logging.info("Motor phiz is %s" % str(self.phizMotor) )
+         logging.info("Motor phiy is %s" % str(self.phiyMotor) )
+   
+         for m in (self.sampleXMotor, self.sampleYMotor, self.zoomMotor, self.phiMotor, self.phizMotor, self.phiyMotor):
+            if m.motorIsMoving():
+                 motorsQuiet = False
+   
+         return motorsQuiet
+      else:
+         return False
+
+      #return self.isValid() and all([not m.motorIsMoving() for m in (self.sampleXMotor, self.sampleYMotor, self.zoomMotor, self.phiMotor, self.phizMotor, self.phiyMotor)])
     
 
     def isValid(self):
@@ -570,7 +590,7 @@ class MiniDiff(Equipment):
         def centre_loop(pixelsPerMmY, pixelsPerMmZ): #, lastCoord=(-1, -1)):
           X = []
           Y = []
-          phiSavedDialPosition = phi.getDialPosition()
+          phiSavedDialPosition = 327.3 #phi.getDialPosition()
          
           self.emitProgressMessage("Doing automatic centring")
           a = 0

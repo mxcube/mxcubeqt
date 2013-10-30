@@ -60,6 +60,9 @@ class MicrodiffMotorPX2(Device):
         self.global_state = str(state)
         self.updateState()
 
+    def motorIsMoving(self):
+        return (self.global_state == self.MOVING )
+
     def updateState(self):
         if self.global_state in ("ALARM", ):
             self.motorState = self.UNUSABLE

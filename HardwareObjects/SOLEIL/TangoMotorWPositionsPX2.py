@@ -74,6 +74,11 @@ class TangoMotorWPositionsPX2(TangoMotorZoomPX2.TangoMotorZoomPX2):
             self.emit(signal, (self.getZoomLevel(), ))
             
 
+    def motorIsMoving(self):
+        if self.getState() == 4:  # Moving
+           return True
+        else:
+           return False
     def getZoomLevel(self):
         return self.device.ZoomLevel, self.device.PhiTableXAxisPosition
         
