@@ -386,6 +386,7 @@ class HutchMenuBrick(BlissWidget):
         self.buttonReject.setEnabled(False)
 
     def centringAccepted(self,state,centring_status):
+        logging.info("Centring has been accepted")
         if self.collectObj is not None:
             self.collectObj.setCentringStatus(centring_status)
         self.buttonAccept.setEnabled(False)

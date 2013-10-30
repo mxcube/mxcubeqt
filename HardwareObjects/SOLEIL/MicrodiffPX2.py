@@ -98,6 +98,7 @@ class ManualCentringProcedure(ProcedureIterator):
         #(self.pixelsPerMmY, self.pixelsPerMmZ, self.beamPositionX, self.beamPositionY)
         self.pixelsPerMmY, self.pixelsPerMmZ, self.beam_xc, self.beam_yc = minidiff.getCalibrationData3(minidiff.md2.ZoomLevel)
         self.PhiReference = 327.3
+        self.PhiReference = 322.3
         getNewCalibration()
         print 
         print 'MS debug 13.11.2011 pixelsPerMmY', self.pixelsPerMmY

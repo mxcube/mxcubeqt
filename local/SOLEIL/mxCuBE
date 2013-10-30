@@ -1,0 +1,10 @@
+#! /bin/bash
+# Startup script for HardwareRepositoryServer for Proxima beamlines
+
+INSTITUTE=SOLEIL
+BEAMLINE=PX2
+
+GUIFILE=/home/blissadm/mxcube/local/${INSTITUTE}/mxcube${BEAMLINE}.gui
+
+exec /home/blissadm/bin/startGUI $* ${GUIFILE}
+

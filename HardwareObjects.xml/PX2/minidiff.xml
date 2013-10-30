@@ -2,6 +2,7 @@
 <!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
 <equipment class="MiniDiff">
     <username>Goniometer</username>
+    <phiy_direction>-1</phiy_direction>
     
     <referencePosition>
         <phi delta="0.1">0.0</phi>
@@ -32,24 +33,24 @@
         <sampx>0.0</sampx>
         <sampy>0.0</sampy>
     </resetPosition>
-    <device role="camera" hwrid="/ge1350c"></device>
+    <device role="camera" hwrid="/gc655c"></device>
     <motors>
         <phi-shutter>
-            <device role="phi" hwrid="/tangoPhi"></device>
-            <device role="omega" hwrid="/tangoOmega"></device>
-            <device role="kappa" hwrid="/tangoKappa"></device>
-            <device role="phiz" hwrid="/phiz"></device>  
+            <device role="phi" hwrid="/phi"></device>
+            <device role="phiz" hwrid="/vertical"></device>  
+            <!-- device role="omega" hwrid="/tangoOmega"></device -->
+            <!-- device role="kappa" hwrid="/tangoKappa"></device -->
         </phi-shutter>
         <sample>
             <device role="zoom" hwrid="/zoom"></device>
-            <!--device role="light" hwrid="/light"></device-->
-            <!--device role="focus" hwrid="/phix"></device-->
-            <device role="phiy" hwrid="/mscPhiy"></device>  
-            <device role="sampx" hwrid="/mscSampx"></device>
-            <device role="sampy" hwrid="/mscSampy"></device>
-            <device role="beamcenterx" hwrid="/beamcenterX"></device>
-            <device role="beamcenterz" hwrid="/beamcenterZ"></device>
+            <device role="light" hwrid="/udiff_lightmot"></device>
+            <device role="focus" hwrid="/phix"></device>
+            <device role="phiy" hwrid="/horizontal"></device>  
+            <device role="sampx" hwrid="/sampx"></device>
+            <device role="sampy" hwrid="/sampy"></device>
+            <!-- device role="beamcenterx" hwrid="/beamcenterX"></device -->
+            <!-- device role="beamcenterz" hwrid="/beamcenterZ"></device -->
         </sample>
     </motors>
-    <wagolight>/lightarm</wagolight>
+    <wagolight>/udiff_light</wagolight>
 </equipment>
