@@ -104,21 +104,23 @@ class TaskToolBoxWidget(qt.QWidget):
             
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
-        tree_item = tree_items[0]
 
-        # Get the directory form the previous page and update 
-        # the new page with the direcotry and run_number from the old.
-        # IFF sample or group selected.
-        if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or\
-                isinstance(tree_item, queue_item.SampleQueueItem):
-            new_pt = self.tool_box.item(page_index)._path_template
-            previous_pt = self.tool_box.item(self.previous_page_index)._path_template
-            new_pt.directory = previous_pt.directory
-            new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(new_pt)
-       
-        self.tool_box.item(page_index).selection_changed(tree_items)
-        self.previous_page_index = page_index
+        if len(tree_items) > 0:        
+            tree_item = tree_items[0]
+
+            # Get the directory form the previous page and update 
+            # the new page with the direcotry and run_number from the old.
+            # IFF sample or group selected.
+            if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or\
+                    isinstance(tree_item, queue_item.SampleQueueItem):
+                new_pt = self.tool_box.item(page_index)._path_template
+                previous_pt = self.tool_box.item(self.previous_page_index)._path_template
+                new_pt.directory = previous_pt.directory
+                new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                    get_next_run_number(new_pt)
+
+            self.tool_box.item(page_index).selection_changed(tree_items)
+            self.previous_page_index = page_index
 
     def selection_changed(self, items):
         """
