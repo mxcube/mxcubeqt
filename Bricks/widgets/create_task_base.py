@@ -248,9 +248,9 @@ class CreateTaskBase(qt.QWidget):
 
     def single_item_selection(self, tree_item):
         sample_item = self.get_sample_item(tree_item)
-        sample_data_model = sample_item.get_model()
-
+        
         if isinstance(tree_item, queue_item.SampleQueueItem):
+            sample_data_model = sample_item.get_model()
             #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
@@ -289,6 +289,7 @@ class CreateTaskBase(qt.QWidget):
 
         if self._item_is_group_or_sample:
             if self._acq_widget:
+                sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
