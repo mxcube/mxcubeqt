@@ -43,8 +43,8 @@
         </phi-shutter>
         <sample>
             <device role="zoom" hwrid="/zoom"></device>
-            <!--device role="light" hwrid="/light"></device-->
-            <!--device role="focus" hwrid="/phix"></device-->
+            <device role="light" hwrid="/udiff_lightmot"></device>
+            <device role="focus" hwrid="/phix"></device>
             <device role="phiy" hwrid="/horizontal"></device>  
             <device role="sampx" hwrid="/sampx"></device>
             <device role="sampy" hwrid="/sampy"></device>
@@ -52,5 +52,5 @@
             <!-- device role="beamcenterz" hwrid="/beamcenterZ"></device -->
         </sample>
     </motors>
-    <wagolight>/wago_light</wagolight>
+    <wagolight>/udiff_light</wagolight>
 </equipment>

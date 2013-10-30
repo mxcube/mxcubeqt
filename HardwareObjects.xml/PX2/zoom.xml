@@ -1,6 +1,7 @@
 <!-- md2-zoomlevel has zoomlevel, backlightlevel and the frontlinelevel but not pixelsize and beamposition -->
 <!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
-<device class="TangoMotorWPositionsPX2">
+<!-- device class="TangoMotorWPositionsPX2" -->
+<device class="TangoDCMotorWPositions">
     <username>Zoom</username>
     <!--   <tangoname>i10-c-cx1/ex/zoom.1-mt_tz</tangoname> -->
     <tangoname>i11-ma-cx1/ex/md2</tangoname> <!--check!-->
@@ -9,7 +10,8 @@
 <!--    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="ZoomPredefinedPosition">ZoomPredefinedPosition</channel>
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="ZoomPosition">ZoomPosition</channel>
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="ZoomLevel">ZoomLevel</channel>-->
-    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">ZoomPosition</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">ZoomLevel</channel>
+    <datatype>int</datatype>
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="focus_position">PhiTableXAxisPosition</channel>
     <delta>0.1</delta>
     <interval>1000</interval>

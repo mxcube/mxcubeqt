@@ -1,4 +1,4 @@
-<device class="MicrodiffMotorPX2">
+<device class="TangoDCMotor">
   <username>Aperture Vertical</username>
   <tangoname>i11-ma-cx1/ex/md2</tangoname>
   <motor_name>ApertureVertical</motor_name>
