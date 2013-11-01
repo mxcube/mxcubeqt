@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+import sys
+import os
+
+sys.path.append("/home/blissadm/python_modules/lib/python2.6/site-packages")
+
+MXCUBE_ROOT = "/home/blissadm/mxcube"
+
+#
+# be aware this setting is for local HardwareObjects.xml (no server is used here)
+#
+HARDWARE_REPOSITORY_SERVER   = os.path.join(MXCUBE_ROOT,"HardwareObjects.xml/PX2")
+#
+#HARDWARE_REPOSITORY_SERVER   = localhost:hwr
+#
+brickpaths = []
+hwopaths   = []
+
+if "CUSTOM_BRICKS_PATH" in os.environ:
+   brickpaths.append( os.environ["CUSTOM_BRICKS_PATH"] ) 
+
+brickpaths.append( os.path.join(MXCUBE_ROOT,"Bricks") )
+brickpaths.append( os.path.join(MXCUBE_ROOT,"Bricks/SOLEIL") )
+
+if "CUSTOM_HARDWARE_OBJECTS_PATH" in os.environ:
+   hwopaths.append( os.environ["CUSTOM_HARDARE_OBJECTS_PATH"] ) 
+hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareObjects") )
+hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareObjects/SOLEIL") )
+hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareRepository/HardwareObjects") )
+
+CUSTOM_HARDWARE_OBJECTS_PATH = ":".join( hwopaths )
+
+os.environ["CUSTOM_BRICKS_PATH"]           = ":".join( brickpaths )
+os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"] = ":".join( hwopaths )
+os.environ["HARDWARE_REPOSITORY_SERVER"]   = HARDWARE_REPOSITORY_SERVER
+
+#sys.path.insert(0,"/home/blissadm/python_modules/lib/python2.6/site-packages")
+sys.path.insert(0, MXCUBE_ROOT)
+
+
+from BlissFramework import startGUI
+
+startGUI.run()
+

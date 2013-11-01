@@ -1,0 +1,8 @@
+<device class="InOut">
+    <username>FrontEnd</username>
+    <tangoname>tdl-i11-ma/vi/tdl.1</tangoname>
+    <command type="tango" tangoname="tdl-i11-ma/vi/tdl.1" name="set_in">Open</command>
+    <command type="tango" tangoname="tdl-i11-ma/vi/tdl.1" name="set_out">Close</command>
+    <channel type="tango" tangoname="tdl-i11-ma/vi/tdl.1" polling="1000" name="state">State</channel>
+</device>
+
