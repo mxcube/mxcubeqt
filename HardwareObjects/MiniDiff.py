@@ -140,6 +140,8 @@ class MiniDiff(Equipment):
         self.pixelsPerMmZ=None
         self.imgWidth = None
         self.imgHeight = None
+    
+        self.centredTime = 0
 
         self.connect(self, 'equipmentReady', self.equipmentReady)
         self.connect(self, 'equipmentNotReady', self.equipmentNotReady)     
@@ -326,6 +328,12 @@ class MiniDiff(Equipment):
             self.camera is not None
 
 
+    def getBeamInfo(self, callback=None, error_callback=None):
+        logging.info(" I AM command getBeamInfo in MiniDiff.py ")
+        cmd_obj = self.getCommandObject("getBeamInfo")
+        if cmd_obj:
+           cmd_obj( callback, error_callback )
+
     def apertureChanged(self, *args):
         # will trigger minidiffReady signal for update of beam size in video
         self.equipmentReady()
@@ -396,23 +404,32 @@ class MiniDiff(Equipment):
 
 
     def phizMotorMoved(self, pos):
-        self.invalidateCentring()
-
+        logging.info("MiniDiff.py - phiz moved")
+        if time.time() - self.centredTime > 1.0:
+          self.invalidateCentring()
 
     def phiyMotorMoved(self, pos):
-        self.invalidateCentring()
+        logging.info("MiniDiff.py - phiy moved")
+        if time.time() - self.centredTime > 1.0:
+           self.invalidateCentring()
 
 
     def sampleXMotorMoved(self, pos):
-        self.invalidateCentring()
+        logging.info("MiniDiff.py - samplex moved")
+        if time.time() - self.centredTime > 1.0:
+           self.invalidateCentring()
 
 
     def sampleYMotorMoved(self, pos):
-        self.invalidateCentring()
+        logging.info("MiniDiff.py - sampley moved")
+        if time.time() - self.centredTime > 1.0:
+           self.invalidateCentring()
 
 
     def sampleChangerSampleIsLoaded(self, state):
-        self.invalidateCentring()
+        logging.info("MiniDiff.py - sample changer is loaded ")
+        if time.time() - self.centredTime > 1.0:
+           self.invalidateCentring()
 
 
     def moveToBeam(self, x, y):
@@ -517,6 +534,7 @@ class MiniDiff(Equipment):
         return x, y
  
     def manualCentringDone(self, manual_centring_procedure):
+        logging.info("manual centring DONE")
         try:
           motor_pos = manual_centring_procedure.get()
           if isinstance(motor_pos, gevent.GreenletExit):
@@ -525,6 +543,7 @@ class MiniDiff(Equipment):
           logging.exception("Could not complete manual centring")
           self.emitCentringFailed()
         else:
+          logging.info("Moving sample to centred position")
           self.emitProgressMessage("Moving sample to centred position...")
           self.emitCentringMoving()
           try:
@@ -534,7 +553,8 @@ class MiniDiff(Equipment):
             self.emitCentringFailed()
           else:
             self.phiMotor.syncMoveRelative(-180)
-          #logging.info("EMITTING CENTRING SUCCESSFUL")
+          logging.info("EMITTING CENTRING SUCCESSFUL")
+          self.centredTime = time.time()
           self.emitCentringSuccessful()
           self.emitProgressMessage("")
 
@@ -749,6 +769,7 @@ class MiniDiff(Equipment):
 
     def emitCentringSuccessful(self):
         if self.currentCentringProcedure is not None:
+            logging.info("MiniDiff: emitting centringSuccessful ")
             curr_time=time.strftime("%Y-%m-%d %H:%M:%S")
             self.centringStatus["endTime"]=curr_time
 

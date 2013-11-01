@@ -362,6 +362,7 @@ class HutchMenuBrick(BlissWidget):
     def acceptClicked(self):
         if self.standardColor is not None:
             self.buttonAccept.setPaletteBackgroundColor(self.standardColor)
+        logging.info("disabling accept because accept was clicked")  
         self.buttonAccept.setEnabled(False)
         self.buttonReject.setEnabled(False)
         self.minidiff.acceptCentring()
@@ -369,6 +370,7 @@ class HutchMenuBrick(BlissWidget):
     def rejectClicked(self):
         if self.standardColor is not None:
             self.buttonReject.setPaletteBackgroundColor(self.standardColor)
+        logging.info("disabling accept because reject was clicked")  
         self.buttonReject.setEnabled(False)
         self.buttonAccept.setEnabled(False)
         self.minidiff.rejectCentring()
@@ -376,12 +378,14 @@ class HutchMenuBrick(BlissWidget):
 
     def centringMoving(self):
         self.isMoving=True
+        logging.info("disabling accept because centring is moving ")  
         self.buttonAccept.setEnabled(False)
         self.buttonReject.setEnabled(False)
 
     def centringInvalid(self):
         if self.collectObj is not None:
             self.collectObj.setCentringStatus(None)
+        logging.info("disabling accept because centring is invalid ")  
         self.buttonAccept.setEnabled(False)
         self.buttonReject.setEnabled(False)
 
@@ -389,6 +393,7 @@ class HutchMenuBrick(BlissWidget):
         logging.info("Centring has been accepted")
         if self.collectObj is not None:
             self.collectObj.setCentringStatus(centring_status)
+        logging.info("disabling accept because centring has been accepted ")  
         self.buttonAccept.setEnabled(False)
         self.buttonReject.setEnabled(False)
         if self.insideDataCollection:
@@ -428,6 +433,7 @@ class HutchMenuBrick(BlissWidget):
         """
         self.currentCentring = CentringMethod(method)
         self.buttonCentre.commandStarted()
+        logging.info("disabling accept because centring has been started ")  
         self.buttonAccept.setEnabled(False)
         self.buttonReject.setEnabled(False)
 
@@ -453,6 +459,8 @@ class HutchMenuBrick(BlissWidget):
         self.__pointer.stopDrawing()
         self.__pointer.hide()
 
+        logging.info("HutchMenuBrick:  centringSuccesful received")
+
         self.clickedPoints=[]
         self.emitWidgetSynchronize()
 
@@ -461,6 +469,7 @@ class HutchMenuBrick(BlissWidget):
             #    self.currentCentring.setPaletteBackgroundColor(self.defaultBackgroundColor)
             self.currentCentring=None
 
+        logging.info("HutchMenuBrick:  enabling buttons")
         self.buttonAccept.setEnabled(True)
         self.buttonReject.setEnabled(True)
         if self.insideDataCollection:
@@ -503,6 +512,7 @@ class HutchMenuBrick(BlissWidget):
             #    self.currentCentring.setPaletteBackgroundColor(self.defaultBackgroundColor)
             self.currentCentring=None
 
+        logging.info("disabling accept because centing failed")  
         self.buttonAccept.setEnabled(False)
         if self.insideDataCollection:
             if self.standardColor is None:
@@ -723,9 +733,10 @@ class HutchMenuBrick(BlissWidget):
               try:
                 self.__beam.move(beam_x, beam_y)
                 try:
-                  get_beam_info = self.minidiff.getCommandObject("getBeamInfo")
+                  #get_beam_info = self.minidiff.getCommandObject("getBeamInfo")
                   if force or get_beam_info.isSpecReady():
-                    get_beam_info(callback=self._updateBeam, error_callback=None)
+                    self.minidiff.getBeamInfo( callback= self._updateBeam, error_callback=None)
+                    #get_beam_info(callback=self._updateBeam, error_callback=None)
                 except:
                   logging.getLogger().exception("Could not get beam size: cannot display beam")
                   self.__beam.hide()

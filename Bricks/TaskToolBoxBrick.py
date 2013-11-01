@@ -50,6 +50,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         Overriding BaseComponents.BlissWidget (Framework-2 object) run method. 
         """
         # Get a reference to the TreeBrick.
+        logging.info("running TaskToolBrick . Shape history is:  %s" % str(self.shape_history) )
         tree_brick = {}
         self.emit(qt.PYSIGNAL("getTreeBrick"), (tree_brick,))
         self.tree_brick = tree_brick.get('tree_brick', None)
@@ -63,7 +64,9 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.task_tool_box_widget.workflow_page.\
             _grid_widget._shape_history = self.shape_history
         
-        if self.shape_history:
+        logging.info("running TaskToolBrick . Got a view:  %s" % str(d) )
+
+        if self.shape_history is not None:
            self.shape_history.set_drawing(d.get('drawing', None))
            self.shape_history.get_drawing_event_handler().\
                selection_cb = self.shape_selected
@@ -77,6 +80,8 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
            except AttributeError:
                logging.error('Could not get diffractometer_hwobj, check your configuration')
                traceback.print_exc()
+        else:
+           logging.info("Ooooh. TaskToolBrick has no shape history")
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
@@ -111,6 +116,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         run method.
         """
         if property_name == 'beamline_setup':
+            logging.info("TaskToolBoxBrick / setting property beamline_setup")
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
 
             if self.beamline_setup_hwobj:
@@ -121,6 +127,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                                                       self.diffractometer_changed)
                     
                 self.shape_history = self.beamline_setup_hwobj.shape_history_hwobj
+                logging.info("TaskToolBoxBrick / got a shape history here %s " % str(self.shape_history) )
 
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj

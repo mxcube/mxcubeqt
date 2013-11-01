@@ -24,6 +24,8 @@ class SampleChangerMockup(Equipment):#, AbstractSampleChanger):
     def __init__(self, *args, **kwargs):
         Equipment.__init__(self, *args, **kwargs)
         self.current_sample = (1,1)
+        self.currentSample = 1
+        self.currentBasket = 3
 
     def getMatrixCodes(self, codes = None):
         return LOADED_SAMPLES
@@ -57,6 +59,12 @@ class SampleChangerMockup(Equipment):#, AbstractSampleChanger):
 
     def getLoadedSample(self):
         return self.current_sample
+
+    def getLoadedSampleDataMatrix(self):
+        return "Nice-little-matrix"
+
+    def currentBasketDataMatrix(self):
+        return "Nice-little-current-basket"
 
     def abort(self):
         return True

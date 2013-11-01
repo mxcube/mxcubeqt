@@ -167,6 +167,12 @@ class AbstractMultiCollect(object):
     @task
     def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment):
         pass
+
+    @abc.abstractmethod
+    @task
+    def finalize_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment):
+        pass
+      
       
 
     @abc.abstractmethod
@@ -393,6 +399,7 @@ class AbstractMultiCollect(object):
           jpeg_thumbnail_file_template = None
          
         # database filling
+        logging.info("<AbstractMultiCollect> - LIMS is %s" % str(self.bl_control.lims))
         if self.bl_control.lims:
             data_collect_parameters["collection_start_time"] = time.strftime("%Y-%m-%d %H:%M:%S")
             if self.bl_control.machine_current is not None:
@@ -412,7 +419,11 @@ class AbstractMultiCollect(object):
               
         # Creating the directory for images and processing information
         self.create_directories(file_parameters['directory'],  file_parameters['process_directory'])
-        self.xds_directory, self.mosflm_directory = self.prepare_input_files(file_parameters["directory"], file_parameters["prefix"], file_parameters["run_number"], file_parameters['process_directory'])
+
+        if self.bl_control.lims and self.bl_config.input_files_server:
+            self.xds_directory, self.mosflm_directory = self.prepare_input_files(file_parameters["directory"], file_parameters["prefix"], file_parameters["run_number"], file_parameters['process_directory'])
+        else:
+            self.xds_directory, self.mosflm_directory = None, None
 
 
 	sample_id, sample_location, sample_code = self.get_sample_info_from_parameters(data_collect_parameters)
@@ -635,7 +646,8 @@ class AbstractMultiCollect(object):
             data_collect_parameters["dark"] = 0
 
             # at this point input files should have been written           
-            if data_collect_parameters.get("processing", False)=="True":
+            if self.bl_control.lims and self.bl_config.input_files_server:
+              if data_collect_parameters.get("processing", False)=="True":
                 self.trigger_auto_processing("before",
                                        self.xds_directory,
                                        data_collect_parameters["EDNA_files_dir"],
@@ -701,8 +713,9 @@ class AbstractMultiCollect(object):
                                               
                     self.emit("collectImageTaken", frame)
                         
-                    if data_collect_parameters.get("processing", False)=="True":
-                      self.trigger_auto_processing("image",
+                    if self.bl_control.lims and self.bl_config.input_files_server:
+                      if data_collect_parameters.get("processing", False)=="True":
+                         self.trigger_auto_processing("image",
                                                    self.xds_directory, 
                                                    data_collect_parameters["EDNA_files_dir"],
                                                    data_collect_parameters["anomalous"],
@@ -713,6 +726,8 @@ class AbstractMultiCollect(object):
                                                    data_collect_parameters.get("sample_reference", {}).get("spacegroup", ""),
                                                    data_collect_parameters.get("sample_reference", {}).get("cell", ""))
                 frame += 1
+
+            self.finalize_acquisition()
                 
 
     @task

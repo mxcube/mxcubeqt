@@ -5,6 +5,8 @@ import time
 from HardwareRepository.BaseHardwareObjects import Device
 from HardwareRepository.Command.Tango import TangoCommand
 
+from qt import qApp
+
 class TangoDCMotor(Device):
     
     MOVESTARTED    = 0
@@ -161,7 +163,7 @@ class TangoDCMotor(Device):
             qApp.processEvents(100)
         
     def getMotorMnemonic(self):
-        return self.specName
+        return self.name()
 
     def move(self, absolutePosition):
         """Move the motor to the required position

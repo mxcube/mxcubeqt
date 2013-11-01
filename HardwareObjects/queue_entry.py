@@ -533,6 +533,8 @@ class DataCollectionQueueEntry(BaseQueueEntry):
         BaseQueueEntry.pre_execute(self)
 
         self.collect_hwobj = self.beamline_setup.collect_hwobj
+        logging.info("queue_entry. Preparing data collection. beamline setup from  %s" % str(self.beamline_setup))
+        logging.info("queue_entry. Preparing data collection on object %s" % str(self.collect_hwobj))
         self.diffractometer_hwobj = self.beamline_setup.diffractometer_hwobj
         self.shape_history = self.beamline_setup.shape_history_hwobj
         self.session = self.beamline_setup.session_hwobj
@@ -578,8 +580,13 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                      self.collect_number_of_frames)
 
     def collect_dc(self, dc, list_item):
-        if self.collect_hwobj:
-            log = logging.getLogger("user_level_log")
+
+        log = logging.getLogger("user_level_log")
+
+        log.info("queue_entry. Start data collection on object %s" % str(self.collect_hwobj))
+
+        if self.collect_hwobj is not None:
+     
             acq_1 = dc.acquisitions[0]
             cpos = acq_1.acquisition_parameters.centred_position
             #acq_1.acquisition_parameters.take_snapshots = True
@@ -589,7 +596,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
             try:
                 if dc.experiment_type is EXPERIMENT_TYPE.HELICAL:
                     acq_1, acq_2 = (dc.acquisitions[0], dc.acquisitions[1])
-                    self.collect_hwobj.getChannelObject("helical").setValue(1)
+                    #self.collect_hwobj.getChannelObject("helical").setValue(1)
 
                     start_cpos = acq_1.acquisition_parameters.\
                                  centred_position.as_dict()
@@ -597,8 +604,10 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                                centred_position.as_dict()
 
                     helical_oscil_pos = {'1': start_cpos, '2': end_cpos}
-                    self.collect_hwobj.getChannelObject('helical_pos').\
-                        setValue(helical_oscil_pos)
+                    #self.collect_hwobj.getChannelObject('helical_pos').\
+                        #setValue(helical_oscil_pos)
+
+                    self.collect_hwobj.set_helical(True, helical_oscil_pos)
 
                     msg = "Helical data collection with start" +\
                           "position: " + str(pprint.pformat(start_cpos)) + \
@@ -609,7 +618,8 @@ class DataCollectionQueueEntry(BaseQueueEntry):
 
                     list_item.setText(1, "Moving sample")
                 else:
-                    self.collect_hwobj.getChannelObject("helical").setValue(0)
+                    #self.collect_hwobj.getChannelObject("helical").setValue(0)
+                    self.collect_hwobj.set_helical(False)
 
                 empty_cpos = queue_model_objects.CentredPosition()
 
@@ -640,6 +650,8 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                 list_item.setText(1, 'Stopped')
                 raise QueueAbortedException('Queue stopped', self)
             except Exception as ex:
+                import traceback
+                logging.info("data collection exec. exception occurred. %s " % traceback.format_exc() )
                 raise QueueExecutionException(ex.message, self)
         else:
             log.error("Could not call the data collection routine," +\

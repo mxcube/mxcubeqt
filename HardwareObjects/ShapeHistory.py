@@ -74,11 +74,12 @@ class ShapeHistory(HardwareObject):
 
         :returns: None
         """
-        if self._drawing:
+        if self._drawing is not None:
             logging.getLogger('HWR').info('Setting previous drawing:' + \
                                           str(self._drawing) + ' to ' + \
                                           str(drawing))
             
+        logging.info("Shape history. Setting drawing to %s " % self._drawing )
         self._drawing = drawing
         self._drawing.addDrawingEvent(self._drawing_event)
 

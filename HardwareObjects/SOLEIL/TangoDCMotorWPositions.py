@@ -84,17 +84,18 @@ class TangoDCMotorWPositions(TangoDCMotor):
         self.predefinedPositionsNamesList.sort(lambda x, y: int(round(self.predefinedPositions[x] - self.predefinedPositions[y])))
 
     def checkPredefinedPosition(self):
-        positionName,pos = self.getCurrentPositionName()
+        positionName = self.getCurrentPositionName()
+        pos = self.getPosition()
         logging.info('checkPredefinedPosition (MY) %s. %s' % (str(positionName), str(pos)) )
-        self.emit('predefinedPositionChanged', (positionName, pos, ))
+        self.emit('predefinedPositionChanged', positionName, pos)
 
     def getCurrentPositionName(self):
          pos = self.getPosition()
          for positionName in self.predefinedPositions:
              if self.predefinedPositions[positionName] >= pos-self.delta and self.predefinedPositions[positionName] <= pos+self.delta:
-                return positionName , pos
+                return positionName 
          else:
-            return "", None
+            return ""
 
     def getPredefinedPositionsList(self):
         return self.predefinedPositionsNamesList
