@@ -4,21 +4,23 @@
 
   <!-- Objects directly associatd with hardware -->
   <object href="/transmission-mockup"   role="transmission"/>
-  <object href="/diffractometer-mockup" role="diffractometer"/>
+  <object href="/minidiff" role="diffractometer"/>
   <object href="/sc-mockup"             role="sample_changer"/>    
   <object href="/resolution-mockup"     role="resolution"/>
 
   <!-- Software (abstract) concepts -->
   <object href="/shape-history"      role="shape_history"/>
   <object href="/session"            role="session"/>
-  <object href="/lims-client-mockup" role="lims_client"/>
+  <!-- object href="/lims-client-mockup" role="lims_client"/ -->
   <object href="/data-analysis"      role="data_analysis"/>
+  <object href="/mxcollect"          role="collect"/>
+ 
 
   <!--<object href="/workflow-mockup" role="workflow"/> -->
  
   <!-- Procedures and routines -->
   <object href="/energyscan-mockup" role="energy"/>
-  <!-- <object href="/collect-mockup" role="collect"/> -->
+  <!-- object href="/collect-mockup" role="collect"/ --> 
 
   <!-- Is it possible to change the beam wavelentgh.
        Should perhaps be associated with the diffractometer -->

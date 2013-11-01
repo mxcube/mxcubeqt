@@ -1,9 +1,13 @@
 <!-- Q: redundant? -->
 <!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
-<equipment class="MiniDiff">
+<equipment class="MiniDiffPX2">
     <username>Goniometer</username>
+    <tangoname>i11-ma-cx1/ex/md2</tangoname>
     <phiy_direction>-1</phiy_direction>
     
+    <!-- command type="tango" name="start_scan">StartScan</command -->
+    <!-- channel type="tango" name="scan_start_angle">ScanStartAngle</command-->
+
     <referencePosition>
         <phi delta="0.1">0.0</phi>
         <phiz delta="0.01">0.0</phiz>
