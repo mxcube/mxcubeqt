@@ -848,14 +848,9 @@ class SampleChangerBrick3(BlissWidget):
         self.sampleChanger.reset()
 
     def resetBasketsSamplesInfo(self):
-        cmd = self.sampleChanger.resetBasketsInformation() 
-        self.sampleChangerContentsChanged([None]*5)
+        self.sampleChanger.clearInfo()
  
     def setSession(self,session_id):
-        #try:
-        #    self.matrixCodesChanged(self.sampleChanger.getMatrixCodes())
-        #except:
-        #    pass
         pass
 
     def setExpertMode(self,state):
@@ -979,15 +974,14 @@ class SampleChangerBrick3(BlissWidget):
             vial_index = sample.getIndex()   
             basket_code = sample.getContainer().getID()  
             if sample.isPresent():
-                if sample.isLoaded():
-                    presences[basket_index][vial_index]=[VialView.VIAL_AXIS,matrix]
-                else:
-                    if matrix:
-                        presences[basket_index][vial_index]=[VialView.VIAL_ALREADY_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_BARCODE,matrix]
-                    else:
-                        presences[basket_index][vial_index]=[VialView.VIAL_NOBARCODE_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_NOBARCODE,matrix]
+              if matrix:
+                presences[basket_index][vial_index]=[VialView.VIAL_ALREADY_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_BARCODE,matrix]
+              else:
+                presences[basket_index][vial_index]=[VialView.VIAL_NOBARCODE_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_NOBARCODE,matrix]
             else:     
                presences[basket_index][vial_index]=[VialView.VIAL_NONE, ""]
+            if sample.isLoaded():
+               presences[basket_index][vial_index]=[VialView.VIAL_AXIS,matrix]
 
         for i, basket in enumerate(self.baskets):
             presence=presences[i]

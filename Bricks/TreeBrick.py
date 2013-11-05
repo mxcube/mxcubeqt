@@ -217,9 +217,9 @@ class TreeBrick(BaseComponents.BlissWidget):
             self._lims_hwobj = bl_setup.lims_client_hwobj
 
             if self.sample_changer_hwobj is not None:
-                self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT,
+                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, 
+                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
