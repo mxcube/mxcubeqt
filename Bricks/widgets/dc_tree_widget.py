@@ -675,7 +675,7 @@ class DataCollectTree(qt.QWidget):
         it = qt.QListViewItemIterator(self.sample_list_view)
         item = it.current()
 
-        self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
+        #self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
 
         while item:
             if self.is_mounted_sample_item(item):
