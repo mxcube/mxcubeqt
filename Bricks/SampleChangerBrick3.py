@@ -1,38 +1,13 @@
 import logging
-import math
 from BlissFramework.Utils import widget_colors
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
+from sample_changer import SC3
+# imports SampleChangerState, SC_STATE_COLOR, etc.
+from sample_changer_helper import *
 from qt import *
-import SampleChanger
 
 __category__ = "mxCuBE"
-
-SC_STATE_COLOR = { "FAULT": widget_colors.LIGHT_RED,
-                   "STANDBY": widget_colors.LIGHT_GREEN,
-                   "MOVING": widget_colors.LIGHT_GREEN,
-                   "ALARM": widget_colors.LIGHT_RED,
-                   "DISABLE": None,
-                   "RUNNING": widget_colors.LIGHT_YELLOW,
-                   "UNKNOWN": None}
-
-SC_STATE_GENERAL = { "FAULT": False,
-                     "STANDBY": True,
-                     "MOVING": False,
-                     "ALARM": True,
-                     "DISABLE": False,
-                     "RUNNING": False,
-                     "UNKNOWN": False}
-
-SC_SAMPLE_COLOR = { "LOADED": widget_colors.LIGHT_GREEN,
-                    "UNLOADED": widget_colors.DARK_GRAY,
-                    "LOADING": widget_colors.LIGHT_YELLOW,
-                    "UNLOADING": widget_colors.LIGHT_YELLOW,
-                    "UNKNOWN": None }
-
-SC_LOADED_COLOR = { -1: None,
-                     0: Qt.white,
-                     1: Qt.green}
 
 class VialView(QWidget):
     (VIAL_UNKNOWN,VIAL_NONE,VIAL_NOBARCODE,VIAL_BARCODE,VIAL_AXIS,VIAL_ALREADY_LOADED,VIAL_NOBARCODE_LOADED)=(0,1,2,3,4,5,6)
@@ -245,14 +220,8 @@ class BasketView(QWidget):
     def loadThisSample(self,basket_index,vial_index):
         self.emit(PYSIGNAL("loadThisSample"),(basket_index,vial_index))
 
-    def setState(self,state):
-        if state is None:
-            state="UNKNOWN"
-        try:
-            enabled=SC_STATE_GENERAL[str(state)]
-        except:
-            enabled=False
-        self.setEnabled(enabled)
+    def setState(self, state):
+        self.setEnabled(SC_STATE_GENERAL.get(state, False))
 
     def toggleBasketPresence(self, on):
         self.emit(PYSIGNAL("basketPresence"), (self.basket_index, on))
@@ -266,7 +235,6 @@ class CurrentView(QWidget):
         self.standardColor=QWidget.white
         self.currentSelection=1
         self.title=title
-        self.lastState="UNKNOWN"
 
         self.contentsBox=QVGroupBox(title,self)
         self.contentsBox.setInsideMargin(4)
@@ -310,13 +278,7 @@ class CurrentView(QWidget):
         self.selected.blockSignals(False)
 
     def setState(self,state):
-        if state is None:
-            state="UNKNOWN"
-        self.lastState=state
-        try:
-            enabled=SC_STATE_GENERAL[str(state)]
-        except:
-            enabled=False
+        enabled=SC_STATE_GENERAL.get(state, False)
         for wid in self.commandsWidget:
             wid.setEnabled(enabled)
 
@@ -388,13 +350,17 @@ class CurrentSampleView(CurrentView):
         self.holderLength.editor().setAlignment(QWidget.AlignRight)
         self.holderLengthUnit=QLabel("mm",self.commandsBox)
         self.commandsBox.layout().addWidget(self.holderLengthUnit, 1, 2)
+        self.holderLength.hide()
+        self.holderLengthUnit.hide()
+        self.holderLengthLabel.hide()
 
         self.buttonLoad=QToolButton(self.commandsBox)
         self.buttonLoad.setTextLabel("Mount sample")
         self.buttonLoad.setUsesTextLabel(True)
         self.buttonLoad.setTextPosition(QToolButton.BesideIcon)
-        QObject.connect(self.buttonLoad,SIGNAL("clicked()"),self.buttonClicked)
+        #QObject.connect(self.buttonLoad,SIGNAL("clicked()"),self.buttonClicked)
         self.commandsBox.layout().addMultiCellWidget(self.buttonLoad, 2, 2, 0, 2)
+        self.buttonLoad.hide()
 
         self.commandsWidget.append(self.holderLengthLabel)
         self.commandsWidget.append(self.holderLength)
@@ -467,7 +433,7 @@ class CurrentSampleView(CurrentView):
         self.emit(PYSIGNAL("sample_changer_state"), (msg,))
 
     def setStateColor(self,state):
-        color = SC_SAMPLE_COLOR[state]
+        color = SC_SAMPLE_COLOR.get(state)
         if color  is None:
             color = QWidget.paletteBackgroundColor(self)
         else:
@@ -498,13 +464,13 @@ class CurrentSampleView(CurrentView):
             txt=str(self.buttonLoad.textLabel()).split()[0]
             self.buttonLoad.setTextLabel("%s %d:%02d" % (txt,location[0],location[1]))
 
-    def buttonClicked(self):
-        holder_len=self.getHolderLength()
-        txt=str(self.buttonLoad.textLabel()).split()[0]
-        if txt=="Mount":
-            self.emit(PYSIGNAL("loadSample"),(holder_len,))
-        elif txt=="Unmount":
-            self.emit(PYSIGNAL("unloadSample"),(holder_len,self.loadedMatrixCode,self.loadedLocation))
+    #def buttonClicked(self):
+    #    holder_len=self.getHolderLength()
+    #    txt=str(self.buttonLoad.textLabel()).split()[0]
+    #    if txt=="Mount":
+    #        self.emit(PYSIGNAL("loadSample"),(holder_len,))
+    #    elif txt=="Unmount":
+    #        self.emit(PYSIGNAL("unloadSample"),(holder_len,self.loadedMatrixCode,self.loadedLocation))
 
 class StatusView(QWidget):
     def __init__(self,parent):
@@ -555,24 +521,18 @@ class StatusView(QWidget):
 
     def setState(self,state):
         #logging.getLogger().debug('SampleChangerBrick2: state changed (%s)' % state)
-
-        if state is None:
-            state="UNKNOWN"
-
-        color = SC_STATE_COLOR.get(state, None) #SC_STATE_COLOR[state]
+        color = SC_STATE_COLOR.get(state, None)
         if color is None:
             color = QWidget.paletteBackgroundColor(self)
         else:
             self.lblStatus.setPaletteBackgroundColor(color)
 
-        self.contentsBox.setTitle("%s" % state.capitalize())
-
-        try:
-            enabled=SC_STATE_GENERAL[str(state)]
-        except:
-            enabled=False
+        state_str = SampleChangerState.tostring(state)
+        self.contentsBox.setTitle(state_str)
+        
+        enabled=SC_STATE_GENERAL.get(state, False)
         self.lblStatus.setEnabled(enabled)
-        if str(state)=="FAULT":
+        if state==SampleChangerState.Fault:
             self.buttonReset.setEnabled(True)
         else:
             self.buttonReset.setEnabled(enabled and self.inExpert)
@@ -680,12 +640,7 @@ class ScanBasketsView(QWidget):
         self.emit(PYSIGNAL("selectBasketsSamples"), ())
 
     def setState(self,state):
-        if state is None:
-            state="UNKNOWN"
-        try:
-            enabled=SC_STATE_GENERAL[str(state)]
-        except:
-            enabled=False
+        enabled=SC_STATE_GENERAL.get(state, False)
         for wid in self.commandsWidget:
             wid.setEnabled(enabled)
 
@@ -725,6 +680,7 @@ class SampleChangerBrick3(BlissWidget):
         #self.contentsBox.setInsideMargin(4)
         #self.contentsBox.setInsideSpacing(2)
 
+        QLabel("<b><i>NEW: Mount/unmount samples by right-clicking on the data collection tree on the left</b></i>", self.contentsBox)
         self.status=StatusView(self.contentsBox)
         self.cmdSwitchToSampleTransfer = QPushButton("Switch to Sample Transfer mode", self.contentsBox)
         self.currentBasket=CurrentBasketView(self.contentsBox)
@@ -746,11 +702,11 @@ class SampleChangerBrick3(BlissWidget):
  
         for i in range(5):
           QObject.connect(self.baskets[i],PYSIGNAL("loadThisSample"),self.loadThisSample)
-          QObject.connect(self.baskets[i],PYSIGNAL("basketPresence"), self.basketPresenceChanged) 
           self.baskets[i].setChecked(False)
           self.baskets[i].setEnabled(False)
 
         self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.scContents)
+        self.doubleClickLoads.hide()
 
         self.scanBaskets=ScanBasketsView(self.scContents)
 
@@ -809,67 +765,53 @@ class SampleChangerBrick3(BlissWidget):
                 pass
 
         elif propertyName == 'mnemonic':
+            self.sampleChanger = self.getHardwareObject(newValue)
             if self.sampleChanger is not None:
-                self.disconnect(self.sampleChanger, PYSIGNAL("statusChanged"),self.sampleChangerStatusChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("stateChanged"), self.sampleChangerStateChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("matrixCodesUpdate"), self.matrixCodesChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("basketChanged"), self.selectedBasketChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("sampleChanged"), self.selectedSampleChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("selectedBasketDataMatrixChanged"), self.selectedBasketDataMatrixChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("selectedSampleDataMatrixChanged"), self.selectedSampleDataMatrixChanged)
-                self.disconnect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
-                self.disconnect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
-                self.disconnect(self.sampleChanger, PYSIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
-                self.disconnect(self.sampleChanger, PYSIGNAL("loadedSampleChanged"), self.loadedSampleChanged)
-
-            self.sampleChanger=self.getHardwareObject(newValue)
-            if self.sampleChanger is not None:
-                self.connect(self.sampleChanger, PYSIGNAL("statusChanged"),self.sampleChangerStatusChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("stateChanged"), self.sampleChangerStateChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("matrixCodesUpdate"), self.matrixCodesChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("basketChanged"), self.selectedBasketChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("sampleChanged"), self.selectedSampleChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("selectedBasketDataMatrixChanged"), self.selectedBasketDataMatrixChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("selectedSampleDataMatrixChanged"), self.selectedSampleDataMatrixChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
-                self.connect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
-                self.connect(self.sampleChanger, PYSIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
-                self.connect(self.sampleChanger, PYSIGNAL("loadedSampleChanged"), self.loadedSampleChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("sampleChangerContentsUpdated"), self.sampleChangerContentsChanged)
-                self.connect(self.sampleChanger, PYSIGNAL("sampleChangerBasketTransferModeChanged"), self.basketTransferModeChanged)
+                self.connect(self.sampleChanger, SampleChanger.STATUS_CHANGED_EVENT, self.sampleChangerStatusChanged)
+                self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT, self.sampleChangerStateChanged)
+                self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, self.infoChanged)
+                self.connect(self.sampleChanger, SampleChanger.SELECTION_CHANGED_EVENT, self.selectionChanged)
+                #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
+                #self.connect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
+                #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
+                self.connect(self.sampleChanger, SampleChanger.LOADED_SAMPLE_CHANGED_EVENT, self.loadedSampleChanged)
                  
-                self.currentSample.hideHolderLength(self.sampleChanger.isMicrodiff())
-                self.status.hideOperationalControl(self.sampleChanger.isMicrodiff())
+                #self.currentSample.hideHolderLength(self.sampleChanger.isMicrodiff())
+                #self.status.hideOperationalControl(self.sampleChanger.isMicrodiff())
                 self.sampleChangerStatusChanged(self.sampleChanger.getStatus())
                 self.sampleChangerStateChanged(self.sampleChanger.getState())
-                self.matrixCodesChanged(self.sampleChanger.getMatrixCodes())
-                self.sampleChangerInUse(self.sampleChanger.sampleChangerInUse())
-                self.sampleChangerCanLoad(self.sampleChanger.sampleChangerCanLoad())
-                self.minidiffCanMove(self.sampleChanger.minidiffCanMove())
-                self.loadedSampleChanged(self.sampleChanger.getLoadedSample(),forced=True)
-                self.basketTransferModeChanged(self.sampleChanger.getBasketTransferMode())
-            else:
-                self.sampleChangerStateChanged("UNKNOWN")
-                self.sampleChangerStatusChanged("Unknown sample changer")
-                self.loadedSampleChanged({},forced=True)
-                #self.sampleLoadStateChanged(None)
-
+                self.infoChanged()
+                self.selectionChanged()
+                #self.sampleChangerInUse(self.sampleChanger.sampleChangerInUse())
+                #self.sampleChangerCanLoad(self.sampleChanger.sampleChangerCanLoad())
+                #self.minidiffCanMove(self.sampleChanger.minidiffCanMove())
+                self.loadedSampleChanged(self.sampleChanger.getLoadedSample())
+                #self.basketTransferModeChanged(self.sampleChanger.getBasketTransferMode())
         elif propertyName == 'showSelectButton':
             self.scanBaskets.showSelectButton(newValue)
             for basket in self.baskets:
                 basket.setUnselectable(newValue)
-
         elif propertyName == 'defaultHolderLength':
             self.currentSample.setHolderLength(newValue)
-
         elif propertyName == 'doubleClickLoads':
-            self.doubleClickLoads.setChecked(newValue)
-
+            self.doubleClickLoads.setChecked(False) #newValue)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
     def status_msg_changed(self, msg, color):
         self.emit(PYSIGNAL("status_msg_changed"), (msg, color))
+
+    def selectionChanged(self):
+        sample = self.sampleChanger.getSelectedSample()
+        basket = self.sampleChanger.getSelectedComponent()
+        if sample is None:
+            self.currentSample.setSelected(0)
+        else:
+            self.currentSample.setSelected(sample.getIndex()+1)
+        if basket is None:
+            self.currentBasket.setSelected(0)
+        else:
+            self.currentBasket.setSelected(basket.getIndex()+1)
 
     def instanceModeChanged(self,mode):
         if mode==BlissWidget.INSTANCE_MODE_SLAVE:
@@ -879,46 +821,29 @@ class SampleChangerBrick3(BlissWidget):
         self.cmdSwitchToSampleTransfer.setEnabled(basket_transfer)
 
     def switchToSampleTransferMode(self):
-        self.sampleChanger.switchToSampleTransferMode()
+        self.sampleChanger.changeMode(SampleChangerMode.Normal, wait=False)
 
-    def loadedSampleChanged(self,loaded_sample_dict,forced=False):
-        #print "*** SampleChangerBrick3.loadedSampleChanged",loaded_sample_dict
-
-        try:
-            loaded=loaded_sample_dict["loaded"]
-        except:
-            loaded=False
-
-        if loaded:
-            try:
-                barcode=loaded_sample_dict["barcode"]
-            except:
-                barcode=None
-
-            try:
-                basket=int(loaded_sample_dict["basket"])
-                vial=int(loaded_sample_dict["vial"])
-            except:
-                location=None
-            else:
-                location=(basket,vial)
+    def loadedSampleChanged(self,sample):
+        if sample is None:
+            # get current location in SC
+            sample = self.sampleChanger.getSelectedSample()
+            loaded = False
         else:
-            barcode=None
-            location=None
+            loaded = True
 
+        if sample is None:
+            # basket transfer mode?
+            barcode = ""
+            location = (-1, -1)
+        else:
+            barcode = sample.getID()
+            location = sample.getCoords()
+ 
         self.currentSample.setLoadedMatrixCode(barcode)
         self.currentSample.setLoadedLocation(location)
         self.currentSample.setLoaded(loaded)
 
-        """
-        for basket in self.baskets:
-            basket.setLoadedVial()
-        if location is not None:
-            basket=location[0]
-            sample=location[1]
-            self.baskets[basket-1].setLoadedVial(sample)
-        """
-        if loaded and not forced:
+        if loaded:
             self.emit(PYSIGNAL("sampleGotLoaded"),())
 
 
@@ -929,14 +854,9 @@ class SampleChangerBrick3(BlissWidget):
         self.sampleChanger.reset()
 
     def resetBasketsSamplesInfo(self):
-        cmd = self.sampleChanger.resetBasketsInformation() 
-        self.sampleChangerContentsChanged([None]*5)
+        self.sampleChanger.clearInfo()
  
     def setSession(self,session_id):
-        #try:
-        #    self.matrixCodesChanged(self.sampleChanger.getMatrixCodes())
-        #except:
-        #    pass
         pass
 
     def setExpertMode(self,state):
@@ -953,11 +873,11 @@ class SampleChangerBrick3(BlissWidget):
             pass
 
         
-    def sampleLoadSuccess(self,already_loaded):
+    def sampleLoadSuccess(self):
         pass
 
-    def sampleLoadFail(self,state):
-        self.sampleChangerStateChanged(state)
+    def sampleLoadFail(self):
+        pass
 
     def sampleUnloadSuccess(self):
         pass
@@ -965,50 +885,19 @@ class SampleChangerBrick3(BlissWidget):
     def sampleUnloadFail(self,state):
         self.sampleChangerStateChanged(state)
 
-    """
-    def sampleLoadStateChanged(self, loaded):
-        pass
-        #self.currentSample.setLoaded(loaded)
-    """
-
     def sampleChangerStatusChanged(self,status):
-        #print "SAMPLE CHANGER MSG IS",status
         self.status.setStatusMsg(status)
 
-    def sampleChangerStateChanged(self,state):
+    def sampleChangerStateChanged(self, state, previous_state=None):
         logging.getLogger().debug('SampleChangerBrick3: state changed (%s)' % state)
         self.status.setState(state)
         self.currentBasket.setState(state)
         self.currentSample.setState(state)
         for basket in self.baskets:
             basket.setState(state)
-        self.doubleClickLoads.setMyState(state)
+        #self.doubleClickLoads.setMyState(state)
         self.scanBaskets.setState(state)
-        try:
-            enabled=SC_STATE_GENERAL[str(state)]
-        except:
-            enabled=False
-        self.cmdResetBasketsSamples.setEnabled(enabled)
-
-    def selectedBasketChanged(self,basket):
-        #print "SampleChangerBrick2.selectedBasketChanged",basket,self.basketPresence
-        self.currentBasket.setSelected(basket)
-
-        for basket in self.baskets:
-            basket.setCurrentVial((basket,self.sampleChanger.currentSample))
-
-    def selectedSampleChanged(self,sample):
-        self.currentSample.setSelected(sample)
-
-        for basket in self.baskets:
-            basket.setCurrentVial((self.sampleChanger.currentBasket,sample))
-
-    def selectedBasketDataMatrixChanged(self,matrixCode):
-        self.currentBasket.setMatrixCode(matrixCode)
-
-    def selectedSampleDataMatrixChanged(self,matrixCode):
-        #print "SAMPLE MATRIX CHANGED",matrixCode
-        self.currentSample.setMatrixCode(matrixCode)
+        self.cmdResetBasketsSamples.setEnabled(SC_STATE_GENERAL.get(state, False))
 
     def sampleChangerCanLoad(self,can_load):
         self.status.setSampleChangerLoadStatus(can_load)
@@ -1027,40 +916,35 @@ class SampleChangerBrick3(BlissWidget):
         if not self.sampleChanger.minidiffGetControl():
             self.status.setMinidiffStatus(self.sampleChanger.minidiffCanMove())
 
-    def changeBasket(self,basket):
-        self.sampleChanger.changeSelectedBasket(basket)
+    def changeBasket(self,basket_number):
+        address = SC3.Basket.getBasketAddress(basket_number)
+        self.sampleChanger.select(address, wait=False)
 
-    def changeSample(self,sample):
-        self.sampleChanger.changeSelectedSample(sample)
+    def changeSample(self,sample_number):
+        basket_index = self.sampleChanger.getSelectedComponent().getIndex()
+        basket_number = basket_index + 1
+        address = SC3.Pin.getSampleAddress(basket_number, sample_number)
+        self.sampleChanger.select(address, wait=False) 
 
     def loadThisSample(self,basket_index,vial_index):
-        #print "LOAD THIS SAMPLE",basket_index,vial_index
+        return
         if self.doubleClickLoads.isChecked():
             sample_loc=(basket_index,vial_index)
-            sc_can_load=self.sampleChanger.canLoadSample(None,sample_loc)
             holder_len=self.currentSample.getHolderLength()
-            if sc_can_load:
-                self.sampleChanger.loadSample(holder_len,None,sample_loc,self.sampleLoadSuccess,self.sampleLoadFail)
-            else:
-                logging.getLogger().warning('SampleChangerBrick3: cannot load sample in location %s)' % sample_loc)
+            self.sampleChanger.load(holder_len,None,sample_loc,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
 
     def loadSample(self,holder_len):
-        self.sampleChanger.loadSample(holder_len,None,None,self.sampleLoadSuccess,self.sampleLoadFail)
+        self.sampleChanger.load(holder_len,None,None,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
 
     def unloadSample(self,holder_len,matrix_code,location):
-        #print "SampleChangerBrick2.unloadSample",holder_len,matrix_code
         if matrix_code:
             location=None
-        self.sampleChanger.unloadSample(holder_len,matrix_code,location,self.sampleUnloadSuccess,self.sampleUnloadFail)
+        self.sampleChanger.unload(holder_len,matrix_code,location,self.sampleUnloadSuccess,self.sampleUnloadFail,wait=False)
 
     def clearMatrices(self):
         for basket in self.baskets:
             basket.clearMatrices()
         self.emit(PYSIGNAL("scanBasketUpdate"),(None,))
-
-    def basketPresenceChanged(self, basket, is_present):
-        if self.sampleChanger is not None:
-          self.sampleChanger.setBasketSampleInformation([basket, 0, is_present, 0, 0])
 
     def sampleChangerContentsChanged(self, baskets):
         self.clearMatrices()
@@ -1075,74 +959,42 @@ class SampleChangerBrick3(BlissWidget):
     def scanBasket(self):
         if not self['showSelectButton']:
             self.baskets[self.currentBasket.selected.value()-1].setChecked(True)
-        #self.updateBasketSampleInformation()
-        self.sampleChanger.scanCurrentBasket()
-
-    def scanAllBasketsDone(self,matrices=None):
-        pass
+        self.sampleChanger.scan(self.sampleChanger.getSelectedComponent(), recursive=True, wait=False)
 
     def scanAllBaskets(self):
         baskets_to_scan = []
-        for basket_checkbox in self.baskets:
-          baskets_to_scan.append(basket_checkbox.isChecked() and 1 or 0)
-             
-        self.sampleChanger.scanBaskets(baskets_to_scan, self.scanAllBasketsDone,self.scanAllBasketsDone)
+        for i, basket_checkbox in enumerate(self.baskets):
+          baskets_to_scan.append(SC3.Basket.getBasketAddress(i+1) if basket_checkbox.isChecked() else None)
+         
+        self.sampleChanger.scan(filter(None, baskets_to_scan), recursive=True, wait=False)
 
-    def matrixCodesChanged(self,matrix_codes):
-        try:
-            basket_presence=self.sampleChanger.getBasketPresence()
-        except:
-            basket_presence=()
-        presences=[]
-        for b in range(5):
-            try:
-                b_presence=int(basket_presence[b])
-            except:
-                b_presence=SampleChanger.SampleChanger.STATE_BASKET_UNKNOWN
-            if b_presence==SampleChanger.SampleChanger.STATE_BASKET_NOTPRESENT:
-                flags=[[VialView.VIAL_NONE]]*10
-            elif b_presence==SampleChanger.SampleChanger.STATE_BASKET_PRESENT:
-                flags=[[VialView.VIAL_NONE]]*10
-            else:
-                flags=[[VialView.VIAL_UNKNOWN]]*10
-            presences.append(flags)
+    def infoChanged(self):
+        baskets = self.sampleChanger.getComponents()
+        
+        presences = []
+        for basket in baskets:
+            presences.append([[VialView.VIAL_UNKNOWN]]*10 if basket.isPresent() else [[VialView.VIAL_NONE]]*10)
+     
+        for sample in self.sampleChanger.getSampleList():
+            matrix = sample.getID() or ""
+            basket_index = sample.getContainer().getIndex()
+            vial_index = sample.getIndex()   
+            basket_code = sample.getContainer().getID()  
+            if sample.isPresent():
+              if matrix:
+                presences[basket_index][vial_index]=[VialView.VIAL_ALREADY_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_BARCODE,matrix]
+              else:
+                presences[basket_index][vial_index]=[VialView.VIAL_NOBARCODE_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_NOBARCODE,matrix]
+            else:     
+               presences[basket_index][vial_index]=[VialView.VIAL_NONE, ""]
+            if sample.isLoaded():
+               presences[basket_index][vial_index]=[VialView.VIAL_AXIS,matrix]
 
-        cleared_matrix_codes=[]
-        for code in matrix_codes:
-            matrix=code[0]
-            basket=code[1]
-            vial=code[2]
-            try:
-                basket_code=str(code[3])
-            except:
-                basket_code=""
-
-            flag=int(code[4])
-            cleared_matrix_codes.append(code)
-            if flag & 8:
-                presences[basket-1][vial-1]=[VialView.VIAL_AXIS,matrix]
-            else:
-                if flag & 1:
-                  presences[basket-1][vial-1]=[VialView.VIAL_NONE, ""]
-                else:
-                  if flag & 4:
-                     if flag  & 16:
-                        presences[basket-1][vial-1]=[VialView.VIAL_ALREADY_LOADED,matrix]
-                     else:
-                        presences[basket-1][vial-1]=[VialView.VIAL_BARCODE,matrix]
-                  else:
-                     if flag & 16:
-                        presences[basket-1][vial-1]=[VialView.VIAL_NOBARCODE_LOADED, matrix]
-                     else:
-                        presences[basket-1][vial-1]=[VialView.VIAL_NOBARCODE]
-
-        i=0
-        for basket in self.baskets:
+        for i, basket in enumerate(self.baskets):
             presence=presences[i]
-            i+=1
             basket.setMatrices(presence)
         
-        self.emit(PYSIGNAL("scanBasketUpdate"),(cleared_matrix_codes,))
+        #self.emit(PYSIGNAL("scanBasketUpdate"),(cleared_matrix_codes,))
 
     def selectBasketsSamples(self):
         retval=self.basketsSamplesSelectionDialog.exec_loop()
