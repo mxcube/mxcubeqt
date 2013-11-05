@@ -350,13 +350,17 @@ class CurrentSampleView(CurrentView):
         self.holderLength.editor().setAlignment(QWidget.AlignRight)
         self.holderLengthUnit=QLabel("mm",self.commandsBox)
         self.commandsBox.layout().addWidget(self.holderLengthUnit, 1, 2)
+        self.holderLength.hide()
+        self.holderLengthUnit.hide()
+        self.holderLengthLabel.hide()
 
         self.buttonLoad=QToolButton(self.commandsBox)
         self.buttonLoad.setTextLabel("Mount sample")
         self.buttonLoad.setUsesTextLabel(True)
         self.buttonLoad.setTextPosition(QToolButton.BesideIcon)
-        QObject.connect(self.buttonLoad,SIGNAL("clicked()"),self.buttonClicked)
+        #QObject.connect(self.buttonLoad,SIGNAL("clicked()"),self.buttonClicked)
         self.commandsBox.layout().addMultiCellWidget(self.buttonLoad, 2, 2, 0, 2)
+        self.buttonLoad.hide()
 
         self.commandsWidget.append(self.holderLengthLabel)
         self.commandsWidget.append(self.holderLength)
@@ -460,13 +464,13 @@ class CurrentSampleView(CurrentView):
             txt=str(self.buttonLoad.textLabel()).split()[0]
             self.buttonLoad.setTextLabel("%s %d:%02d" % (txt,location[0],location[1]))
 
-    def buttonClicked(self):
-        holder_len=self.getHolderLength()
-        txt=str(self.buttonLoad.textLabel()).split()[0]
-        if txt=="Mount":
-            self.emit(PYSIGNAL("loadSample"),(holder_len,))
-        elif txt=="Unmount":
-            self.emit(PYSIGNAL("unloadSample"),(holder_len,self.loadedMatrixCode,self.loadedLocation))
+    #def buttonClicked(self):
+    #    holder_len=self.getHolderLength()
+    #    txt=str(self.buttonLoad.textLabel()).split()[0]
+    #    if txt=="Mount":
+    #        self.emit(PYSIGNAL("loadSample"),(holder_len,))
+    #    elif txt=="Unmount":
+    #        self.emit(PYSIGNAL("unloadSample"),(holder_len,self.loadedMatrixCode,self.loadedLocation))
 
 class StatusView(QWidget):
     def __init__(self,parent):
@@ -676,6 +680,7 @@ class SampleChangerBrick3(BlissWidget):
         #self.contentsBox.setInsideMargin(4)
         #self.contentsBox.setInsideSpacing(2)
 
+        QLabel("<b><i>NEW: Mount/unmount samples by right-clicking on the data collection tree on the left</b></i>", self.contentsBox)
         self.status=StatusView(self.contentsBox)
         self.cmdSwitchToSampleTransfer = QPushButton("Switch to Sample Transfer mode", self.contentsBox)
         self.currentBasket=CurrentBasketView(self.contentsBox)
@@ -701,6 +706,7 @@ class SampleChangerBrick3(BlissWidget):
           self.baskets[i].setEnabled(False)
 
         self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.scContents)
+        self.doubleClickLoads.hide()
 
         self.scanBaskets=ScanBasketsView(self.scContents)
 
@@ -788,7 +794,7 @@ class SampleChangerBrick3(BlissWidget):
         elif propertyName == 'defaultHolderLength':
             self.currentSample.setHolderLength(newValue)
         elif propertyName == 'doubleClickLoads':
-            self.doubleClickLoads.setChecked(newValue)
+            self.doubleClickLoads.setChecked(False) #newValue)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -889,7 +895,7 @@ class SampleChangerBrick3(BlissWidget):
         self.currentSample.setState(state)
         for basket in self.baskets:
             basket.setState(state)
-        self.doubleClickLoads.setMyState(state)
+        #self.doubleClickLoads.setMyState(state)
         self.scanBaskets.setState(state)
         self.cmdResetBasketsSamples.setEnabled(SC_STATE_GENERAL.get(state, False))
 
@@ -921,6 +927,7 @@ class SampleChangerBrick3(BlissWidget):
         self.sampleChanger.select(address, wait=False) 
 
     def loadThisSample(self,basket_index,vial_index):
+        return
         if self.doubleClickLoads.isChecked():
             sample_loc=(basket_index,vial_index)
             holder_len=self.currentSample.getHolderLength()
