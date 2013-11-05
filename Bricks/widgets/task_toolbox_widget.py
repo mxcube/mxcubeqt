@@ -165,7 +165,7 @@ class TaskToolBoxWidget(qt.QWidget):
                         for shape in shapes:
                             self.create_task(task_model, shape)
                     else:
-                        self.create_task(task_model.get_model())
+                        self.create_task(task_model)
 
             self.tool_box.currentItem().update_selection()
 
