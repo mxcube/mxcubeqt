@@ -425,6 +425,8 @@ class DataCollectTree(qt.QWidget):
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('free-pin')
             self.sample_list_view.firstChild().setSelected(True)
+
+        self.sample_list_view_selection()
             
     def set_centring_method(self, method_number):       
         self.centring_method = method_number
