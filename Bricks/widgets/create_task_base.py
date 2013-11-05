@@ -355,8 +355,13 @@ class CreateTaskBase(qt.QWidget):
     # a task. When a task_node is selected.
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
-        sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
-                            is_mounted_sample(sample)
+       
+        try: 
+            sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
+                                getLoadedSample().getCoords() == sample.location
+        except AttributeError:
+            sample_is_mounted = False
+
         free_pin_mode = sample.free_pin_mode
 
         if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
