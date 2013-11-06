@@ -386,7 +386,7 @@ class TaskGroupQueueEntry(BaseQueueEntry):
         except Exception as ex:
             msg = 'Could not create the data collection group' + \
                   ' in lims. Reason: ' + ex.message, self
-            raise QueueExecutionException(msg)
+            raise QueueExecutionException(msg, self)
 
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
@@ -412,7 +412,7 @@ class SampleQueueEntry(BaseQueueEntry):
             if self.sample_changer_hwobj is not None:
                 log.info("Loading sample " + self._data_model.loc_str)
                 sample_mounted = self.sample_changer_hwobj.\
-                                 is_mounted_sample(self._data_model)
+                                 is_mounted_sample(self._data_model.location)
                 if not sample_mounted:
                     self.sample_centring_result = gevent.event.AsyncResult()
                     try:
@@ -579,8 +579,9 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                      self.collect_number_of_frames)
 
     def collect_dc(self, dc, list_item):
+        log = logging.getLogger("user_level_log")
+
         if self.collect_hwobj:
-            log = logging.getLogger("user_level_log")
             acq_1 = dc.acquisitions[0]
             cpos = acq_1.acquisition_parameters.centred_position
             

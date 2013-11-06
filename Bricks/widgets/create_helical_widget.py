@@ -205,7 +205,8 @@ class CreateHelicalWidget(CreateTaskBase):
         for list_item in self._list_item_map.keys():
             line = self._list_item_map[list_item]
             if list_item in selected_items:
-                line.highlight()
+                #line.highlight()
+                self._shape_history.select_shape(line)
             else:
                 line.unhighlight()
 
