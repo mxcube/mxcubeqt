@@ -181,6 +181,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
     # Move motor to top limit
     def moveUp(self):
         self.demandMove=1
+        self.updateGUI()
         state=self.motor.getState()
         if state==self.motor.READY:
             if self['invertButtons']:
@@ -191,6 +192,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
     # Move motor to bottom limit
     def moveDown(self):
         self.demandMove=-1
+        self.updateGUI()
         state=self.motor.getState()
         if state==self.motor.READY:
             if self['invertButtons']:
@@ -220,6 +222,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
                 s=1.0
         if self.motor is not None:
             if self.motor.isReady():
+                self.setSpinBoxColor(self.motor.READY)
                 self.motor.moveRelative(-s)
 
     # Force an update on the brick interface
@@ -232,7 +235,10 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
                     self.positionChanged(self.motor.getPosition())
                 self.stateChanged(self.motor.getState())
             except:
-                self.stateChanged(self.motor.UNUSABLE)
+                if self.motor:
+                   self.stateChanged(self.motor.UNUSABLE)
+                else:
+                   pass
         else:
             self.containerBox.setEnabled(False)
 
@@ -360,6 +366,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
 
     # Moves the motor when the spin box text is changed
     def valueChangedInt(self,value):
+        self.updateGUI()
         #print "valueChangedInt",value
         if self.motor is not None:
             self.motor.move(value)
@@ -367,6 +374,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
     # Moves the motor when the spin box text is changed
     def valueChangedStr(self,value):
         #print "valueChangedStr",value
+        self.updateGUI()
         if self.motor is not None:
             self.motor.move(float(str(value)))
 

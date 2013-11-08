@@ -164,6 +164,6 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
         for i in range(len(self.positions)):
             if self.positions[i] == positionName:
                 self.lstPositions.setCurrentItem(i+1)
-            if len(self.buttons) > 0:
-                self.buttons[i].setOn(True)
+                if len(self.buttons) > 0:
+                     self.buttons[i].setOn(True)
                 break
