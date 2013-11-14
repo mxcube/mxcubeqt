@@ -249,12 +249,13 @@ class TreeBrick(BaseComponents.BlissWidget):
         The signal is emitted when a user was succesfully logged in.
         """
         self.enable_collect(logged_in)
-
+        
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
             sc_content = self.get_sc_content()
-            sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
-            self.dc_tree_widget.populate_list_view(sc_sample_list)
+            if sc_content:
+              sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
+              self.dc_tree_widget.populate_list_view(sc_sample_list)
             self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
 
         if not self.sample_changer_hwobj.hasLoadedSample():

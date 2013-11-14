@@ -3,7 +3,7 @@ from BlissFramework import Icons
 from qt import *
 import logging
 import time
-
+import os
 from BlissFramework.Utils import widget_colors
 
 __category__ = 'mxCuBE'
@@ -286,23 +286,46 @@ class ProposalBrick2(BlissWidget):
             self.propType.insertItem(cd)
 
     def run(self):
-        state = (self.localLogin and self.ldapConnection) is not None
-        self.setEnabled(state)
+        self.setEnabled(self.session_hwobj is not None)
+          
+        # find if we are using ldap, dbconnection, etc. or not
+        if None in (self.ldapConnection, self.dbConnection):
+          self.loginBox.hide()
+          self.titleLabel.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
+          self.titleLabel.show()
 
-        self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
-        self.emit(PYSIGNAL("sessionSelected"),(None, ))
-        self.emit(PYSIGNAL("loggedIn"), (False, ))
+          self.session_hwobj.proposal_code = ""
+          self.session_hwobj.session_id = 1
+          self.session_hwobj.proposal_id = ""
+          self.session_hwobj.proposal_number = "" 
+
+          self.emit(PYSIGNAL("setWindowTitle"), (self["titlePrefix"],))
+          self.emit(PYSIGNAL("loggedIn"), (False, ))
+          self.emit(PYSIGNAL("sessionSelected"),(None, ))
+          self.emit(PYSIGNAL("loggedIn"), (True, ))
+          self.emit(PYSIGNAL("sessionSelected"), (self.session_hwobj.session_id,
+                                                  str(os.environ["USER"]),
+                                                  0,
+                                                  '',
+                                                  '',
+                                                  self.session_hwobj.session_id, 
+                                                  False))
+        else: 
+          self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
+          self.emit(PYSIGNAL("sessionSelected"),(None, ))
+          self.emit(PYSIGNAL("loggedIn"), (False, ))
 
         start_server_event=ProposalGUIEvent(self.startServers,())
         qApp.postEvent(self,start_server_event)
 
-        font = self.contentsBox.font()
-        font.setPointSize(12)
-        self.contentsBox.setFont(font)
+        #self.contentsBox.font()
+        #font.setPointSize(12)
+        #self.contentsBox.setFont(font)
 
-        font = self.loginBox.font()
-        font.setPointSize(10)
-        self.loginBox.setFont(font)
+        #font = self.loginBox.font()
+        #font.setPointSize(10)
+        #self.loginBox.setFont(font)
+        
 
     def startServers(self):
         if self.instanceServer is not None:
