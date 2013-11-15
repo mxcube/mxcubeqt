@@ -210,11 +210,9 @@ class CreateHelicalWidget(CreateTaskBase):
         for list_item in self._list_item_map.keys():
             line = self._list_item_map[list_item]
             if list_item in selected_items:
-                #line.highlight()
                 self._shape_history.select_shape(line)
             else:
                 self._shape_history.de_select_shape(line)
-                #line.unhighlight()
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
