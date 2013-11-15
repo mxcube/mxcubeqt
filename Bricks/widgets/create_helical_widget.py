@@ -147,6 +147,11 @@ class CreateHelicalWidget(CreateTaskBase):
             self._shape_history.add_shape(line)
             list_box_item = qt.QListBoxText(self._list_box, 'Line')
             self._list_item_map[list_box_item] = line
+
+            # De select previous items
+            for item in self.selected_items():
+                self._list_box.setSelected(item, False)
+            
             self._list_box.setSelected(list_box_item, True)
 
     def remove_clicked(self):
@@ -235,29 +240,36 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def select_shape_with_cpos(self, start_cpos, end_cpos):
-        self._shape_history._drawing_event.de_select_all()
+        self._shape_history.de_select_all()
+
+        # De select previous items
+        for item in self.selected_items():
+            self._list_box.setSelected(item, False)
 
         for shape in self._shape_history.get_shapes():
             if len(shape.get_centred_positions()) == 2:
                 if shape.get_centred_positions()[0] is start_cpos and\
                        shape.get_centred_positions()[1] is end_cpos:
-                    self._shape_history._drawing_event.set_selected(shape)
-
+                    self._shape_history.select_shape(shape)
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
                                                              
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
+            self._processing_widget.update_data_model(self._processing_parameters)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
-                self._path_template = data_collection.acquisitions[0].path_template
+
+                self._path_template = data_collection.get_path_template()
+                self._data_path_widget.update_data_model(self._path_template)
+                
                 self._acquisition_parameters = data_collection.acquisitions[0].\
                                                acquisition_parameters
 
