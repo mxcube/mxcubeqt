@@ -278,13 +278,12 @@ class CreateHelicalWidget(CreateTaskBase):
 
                     self.select_shape_with_cpos(start_cpos, end_cpos)
 
-                self._energy_scan_result = qmo.EnergyScanResult()
-                self._processing_parameters = data_collection.processing_parameters
-                self._energy_scan_result = data_collection.crystal.energy_scan_result
-                self._acq_widget.set_energies(self._energy_scan_result)
-                self._processing_widget.update_data_model(self._processing_parameters)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
+
+                self._processing_parameters = data_collection.processing_parameters
+                self._processing_widget.update_data_model(self._processing_parameters)
+
             else:
                 self.setDisabled(True)
         else:
