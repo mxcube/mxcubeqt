@@ -194,7 +194,6 @@ class CreateHelicalWidget(CreateTaskBase):
     def list_box_selection_changed(self):
         self.show_selected_lines()
 
-
     def selected_items(self):
         selected_items = []
                 
