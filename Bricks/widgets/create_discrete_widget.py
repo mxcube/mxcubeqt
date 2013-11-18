@@ -173,7 +173,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 snapshot = self._shape_history.\
                            get_snapshot([shape.qub_point])
 
-                cpos = shape.get_centred_positions()[0]
+                cpos = copy.deepcopy(shape.get_centred_positions()[0])
                 cpos.snapshot_image = snapshot
 
         if self._acq_widget.use_inverse_beam():
