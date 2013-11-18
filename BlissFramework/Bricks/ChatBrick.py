@@ -68,7 +68,10 @@ class ChatBrick(BaseComponents.BlissWidget):
           self.loadChatHistory()
 
     def loadChatHistory(self):
-        chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (self.session_id, self.instanceServer.isClient() and "client" or "server")
+        if self.instanceServer is not None:
+            chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (self.session_id, self.instanceServer.isClient() and "client" or "server")
+        else:
+            return
         try:
             chat_history = open(chat_history_filename, "r")
         except:
@@ -110,7 +113,7 @@ class ChatBrick(BaseComponents.BlissWidget):
         new_line = "<font color=%s><b>(%s)%s</b> %s%s%s</font>" % (color, now,header,msg_prefix,message,msg_suffix)
         self.conversation.append(new_line)
        
-        if self.session_id is not None: 
+        if self.session_id is not None and self.instanceServer is not None: 
           chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (self.session_id, self.instanceServer.isClient() and "client" or "server")
           try:
             if time.time() - os.stat(chat_history_filename).st_mtime > 24*3600:

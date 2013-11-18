@@ -171,7 +171,7 @@ class CommandButton(QVBox):
 
 
     def commandReplyArrived(self, *args):
-        pass
+        self.enableCommand()
 
     def enableCommand(self):
         self.cmdExecute.setTextLabel(self.cmdObject.userName())
