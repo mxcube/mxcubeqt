@@ -238,23 +238,29 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def select_shape_with_cpos(self, start_cpos, end_cpos):
         self._shape_history.de_select_all()
-
-        # De select previous items
-        for item in self.selected_items():
-            self._list_box.setSelected(item, False)
+        selected_line = None
 
         for shape in self._shape_history.get_shapes():
-            if len(shape.get_centred_positions()) == 2:
-                if shape.get_centred_positions()[0] is start_cpos and\
-                       shape.get_centred_positions()[1] is end_cpos:
+            if isinstance(shape, shape_history.Line):
+                if shape.get_centred_positions()[0] == start_cpos and\
+                       shape.get_centred_positions()[1] == end_cpos:
                     self._shape_history.select_shape(shape)
+                    selected_line = shape
+
+        #de-select previous selected list items and
+        #select the current shape (Line).
+        for (list_item, shape) in self._list_item_map.iteritems():
+
+            if selected_line is shape:
+                self._list_box.setSelected(list_item, True)
+            else:
+                self._list_box.setSelected(list_item, False)
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
                                                              
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
 
@@ -299,11 +305,6 @@ class CreateHelicalWidget(CreateTaskBase):
   
     def _create_task(self,  sample, shape):
         data_collections = []
-        #selected_items = self.selected_items()
-
-        #for item in selected_items:
-        #    shape = self._list_item_map[item]
-        #    snapshot = None
 
         if isinstance(shape, shape_history.Line ):
             if shape.get_qub_objects() is not None:
@@ -318,7 +319,7 @@ class CreateHelicalWidget(CreateTaskBase):
             start_acq.acquisition_parameters.collect_agent = \
                 COLLECTION_ORIGIN.MXCUBE
             start_acq.acquisition_parameters.\
-                centred_position = shape.start_cpos
+                centred_position = copy.deepcopy(shape.start_cpos)
             start_acq.path_template = copy.deepcopy(self._path_template)
             start_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
