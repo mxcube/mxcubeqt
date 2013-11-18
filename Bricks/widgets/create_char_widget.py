@@ -2,7 +2,6 @@ import os
 import qtui
 import qt
 import copy
-import logging
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 import queue_item
@@ -184,6 +183,11 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_characterisation_parameters()
 
+
+            #test = self._beamline_setup_hwobj.get_default_edna_parameters()
+            #import pdb
+            #pdb.set_trace()
+            
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
