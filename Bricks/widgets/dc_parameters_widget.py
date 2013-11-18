@@ -136,7 +136,7 @@ class DCParametersWidget(qt.QWidget):
         # The acq_widget sends a signal to the path_widget, and it relies
         # on that both models upto date, we need to refactor this part
         # so that both models are set before taking ceratin actions.
-        # Thos workaround, works for the time beeing.
+        # This workaround, works for the time beeing.
         self.path_widget._data_model = data_collection.acquisitions[0].path_template
 
         self.acq_widget.update_data_model(data_collection.acquisitions[0].\
@@ -156,6 +156,7 @@ class DCParametersWidget(qt.QWidget):
                 centred_position.snapshot_image:
             image = data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
+            
             image = image.scale(427, 320)
             self.position_widget.svideo.setPixmap(qt.QPixmap(image))
 
