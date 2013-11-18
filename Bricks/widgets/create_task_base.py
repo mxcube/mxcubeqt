@@ -333,6 +333,8 @@ class CreateTaskBase(qt.QWidget):
              if isinstance(pos, shape_history.Point):
                  if self._acq_widget and isinstance(item, queue_item.TaskQueueItem):
                      cpos = pos.get_centred_positions()[0]
+                     snapshot = self._shape_history.get_snapshot([pos.qub_point])
+                     cpos.snapshot_image = snapshot        
                      self._acquisition_parameters.centred_position = cpos
 
     # Should be called by the object that calls create_task,
