@@ -99,6 +99,7 @@ class TaskToolBoxWidget(qt.QWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
+        #import pdb;pdb.set_trace()
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).ispyb_logged_in(logged_in)
             
