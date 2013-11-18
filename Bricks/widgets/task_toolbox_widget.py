@@ -1,8 +1,7 @@
 import logging
 import qt
-import queue_model_objects_v1 as queue_model_objects
 import queue_item
-
+import queue_model_objects_v1 as queue_model_objects
 
 from BlissFramework import Icons
 from widgets.create_helical_widget import CreateHelicalWidget
@@ -10,6 +9,7 @@ from widgets.create_discrete_widget import CreateDiscreteWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.create_workflow_widget import CreateWorkflowWidget
+from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 
 
 class TaskToolBoxWidget(qt.QWidget):
@@ -126,6 +126,25 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         Called by the parent widget when selection in the tree changes.
         """
+
+        if len(items) == 1:
+
+            if isinstance(items[0], queue_item.DataCollectionQueueItem):
+                data_collection = items[0].get_model()
+
+                if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
+                    self.tool_box.setCurrentItem(self.helical_page)
+                else:
+                    self.tool_box.setCurrentItem(self.discrete_page)
+
+            elif isinstance(items[0], queue_item.CharacterisationQueueItem):
+                self.tool_box.setCurrentItem(self.char_page)
+            elif isinstance(items[0], queue_item.EnergyScanQueueItem):
+                self.tool_box.setCurrentItem(self.energy_scan_page)
+            elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
+                self.tool_box.setCurrentItem(self.worklfow_page)
+                
+
         current_page = self.tool_box.currentItem()
         current_page.selection_changed(items)
 
