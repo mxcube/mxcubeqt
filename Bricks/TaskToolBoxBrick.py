@@ -41,7 +41,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.task_tool_box_widget = TaskToolBoxWidget(self)
         qt.QVBoxLayout(self)
         self.layout().addWidget(self.task_tool_box_widget)
-        self.setDisabled(not self.ispyb_logged_in)
+        self.setEnabled(self.ispyb_logged_in)
 
 
     def run(self):
@@ -71,10 +71,14 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         try:
             self.shape_history.get_drawing_event_handler().\
                 move_to_centred_position_cb = self.diffractometer_hwobj.\
-                                              moveToCentredPosition
+                                              moveToCentredPosition                            
         except AttributeError:
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
+
+        session_hwobj = self.beamline_setup_hwobj.session_hwobj
+        if session_hwobj.session_id:
+            self.setEnabled(True)
 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
@@ -98,8 +102,9 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
+        #import pdb;pdb.set_trace()
         self.ispyb_logged_in = logged_in
-        self.setDisabled(not logged_in)
+        self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)
         
     
@@ -123,7 +128,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                     self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-                                    
             else:
                 logging.getLogger('user_level_log').error('Could not load beamline setup '+\
                                                           'check configuration !.')
