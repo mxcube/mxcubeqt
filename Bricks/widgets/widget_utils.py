@@ -47,15 +47,25 @@ class DataModelInputBinder(object):
    
     def init_bindings(self):
         for (key, value) in self.bindings.iteritems():
-            if isinstance(value[0], qt.QLineEdit):
-                value[0].setText(str(getattr(self.__pobj, key)))
-            elif isinstance(value[0], qt.QLabel):        
-                value[0].setText(str(getattr(self.__pobj, key)))
-            elif isinstance(value[0], qt.QComboBox):
-                value[0].setCurrentItem(int(getattr(self.__pobj, key)))
-            elif isinstance(value[0], qt.QCheckBox) or \
-                    isinstance(value[0], qt.QRadioButton):
-                value[0].setChecked(bool(getattr(self.__pobj, key)))
+            type_fn = value[2]
+            validator = value[1]
+            widget = value[0]
+            
+            if isinstance(widget, qt.QLineEdit):
+                if type_fn is float and validator:
+                    pattern = "%." + str(validator.decimals()) + 'f'
+                    widget.setText(pattern % float(getattr(self.__pobj, key)))
+                else:
+                    widget.setText(str(getattr(self.__pobj, key)))
+                
+                widget.setText(str(getattr(self.__pobj, key)))
+            elif isinstance(widget, qt.QLabel):        
+                widget.setText(str(getattr(self.__pobj, key)))
+            elif isinstance(widget, qt.QComboBox):
+                widget.setCurrentItem(int(getattr(self.__pobj, key)))
+            elif isinstance(widget, qt.QCheckBox) or \
+                    isinstance(widget, qt.QRadioButton):
+                widget.setChecked(bool(getattr(self.__pobj, key)))
 
     def bind_value_update(self, field_name, widget, type_fn, validator = None):
         self.bindings[field_name] = (widget, validator, type_fn)
@@ -68,8 +78,11 @@ class DataModelInputBinder(object):
                                                           new_value,
                                                           type_fn, 
                                                           validator))
-            
-            widget.setText(str(getattr(self.__pobj, field_name)))
+            if type_fn is float and validator:
+                pattern = "%." + str(validator.decimals()) + 'f'
+                widget.setText(pattern % float(getattr(self.__pobj, field_name)))
+            else:
+                widget.setText(str(getattr(self.__pobj, field_name)))
 
 
         elif isinstance(widget, qt.QLabel):        
