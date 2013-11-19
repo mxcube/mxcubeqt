@@ -173,21 +173,19 @@ class CreateCharWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        
+        self._init_models()
+
+    def _init_models(self):
         self._char = queue_model_objects.Characterisation()
         self._char_params = self._char.characterisation_parameters
-        self._char_params.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:            
             self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_characterisation_parameters()
+                get_default_char_acq_parameters()
 
-
-            #test = self._beamline_setup_hwobj.get_default_edna_parameters()
-            #import pdb
-            #pdb.set_trace()
-            
+            self._char_params = self._beamline_setup_hwobj.\
+                                get_default_characterisation_parameters()
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
@@ -226,6 +224,7 @@ class CreateCharWidget(CreateTaskBase):
         
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+            self._init_models()
             self._char_params = copy.deepcopy(self._char_params)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
@@ -335,6 +334,6 @@ class CreateCharWidget(CreateTaskBase):
                         path_template.run_number)
 
         tasks.append(char)
-        self._path_template.run_number += 1
+        #self._path_template.run_number += 1
 
         return tasks
