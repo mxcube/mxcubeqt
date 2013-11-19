@@ -80,7 +80,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('exp_time',
                                self.acq_widget_layout.child('exp_time_ledit'),
                                float,
-                               qt.QDoubleValidator(0.036, 6000, 3, self))
+                               qt.QDoubleValidator(0.037, 6000, 3, self))
 
         self._acquisition_mib.\
              bind_value_update('osc_range',
@@ -116,13 +116,13 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('transmission',
                             self.acq_widget_layout.child('transmission_ledit'),
                             float,
-                            qt.QDoubleValidator(0, 1000, 4, self))
+                            qt.QDoubleValidator(0, 1000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('resolution',
                                self.acq_widget_layout.child('resolution_ledit'),
                                float,
-                               qt.QDoubleValidator(0, 1000, 4, self))
+                               qt.QDoubleValidator(0, 1000, 3, self))
 
         self._acquisition_mib.\
              bind_value_update('inverse_beam',
@@ -297,20 +297,17 @@ class AcquisitionWidget(qt.QWidget):
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
 
     def set_energy(self, energy, wav):
-        #energy = round(float(energy), 4)
         self._acquisition_parameters.energy = energy
         self.acq_widget_layout.child('energy_ledit').setText("%.4f" % float(energy))
 
     def update_transmission(self, transmission):
-        #transmission = round(float(transmission), 4)
         self.acq_widget_layout.child('transmission_ledit').\
              setText("%.2f" % float(transmission))
         self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
-        #resolution = round(float(resolution), 4)
         self.acq_widget_layout.child('resolution_ledit').\
-             setText("%.2f" % float(resolution))
+             setText("%.3f" % float(resolution))
         self._acquisition_parameters.resolution = float(resolution)
 
     def update_data_model(self, acquisition_parameters, path_template):
