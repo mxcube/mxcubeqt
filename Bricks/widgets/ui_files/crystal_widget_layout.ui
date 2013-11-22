@@ -8,14 +8,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>409</width>
-            <height>229</height>
+            <width>500</width>
+            <height>441</height>
         </rect>
     </property>
     <property name="caption">
         <string>CrystalWidget</string>
     </property>
-    <hbox>
+    <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
@@ -501,7 +501,24 @@
                 </widget>
             </vbox>
         </widget>
-    </hbox>
+        <spacer>
+            <property name="name">
+                <cstring>spacer36</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>1</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
 </widget>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
