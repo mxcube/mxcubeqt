@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>708</width>
-            <height>226</height>
+            <width>773</width>
+            <height>303</height>
         </rect>
     </property>
     <property name="caption">
@@ -27,29 +27,23 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>main_layout</cstring>
+                <cstring>layout68</cstring>
             </property>
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="margin">
-                    <number>11</number>
-                </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>row_one_layout</cstring>
+                        <cstring>layout66</cstring>
                     </property>
                     <hbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
-                        <property name="spacing">
-                            <number>20</number>
-                        </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>col_one_vlayout</cstring>
+                                <cstring>layout62</cstring>
                             </property>
                             <vbox>
                                 <property name="name">
@@ -57,7 +51,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>col_one_hlayout</cstring>
+                                        <cstring>layout61</cstring>
                                     </property>
                                     <hbox>
                                         <property name="name">
@@ -65,15 +59,15 @@
                                         </property>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>col_one_label_layout</cstring>
+                                                <cstring>layout58</cstring>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
                                                 </property>
-                                                <widget class="QLabel">
+                                                <widget class="QCheckBox">
                                                     <property name="name">
-                                                        <cstring>osc_start_label</cstring>
+                                                        <cstring>osc_start_cbox</cstring>
                                                     </property>
                                                     <property name="text">
                                                         <string>Oscillation start:</string>
@@ -668,7 +662,7 @@
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>75</height>
+                            <height>16</height>
                         </size>
                     </property>
                 </spacer>
@@ -686,7 +680,7 @@
             </property>
             <property name="sizeHint">
                 <size>
-                    <width>21</width>
+                    <width>16</width>
                     <height>20</height>
                 </size>
             </property>
