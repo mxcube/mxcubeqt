@@ -164,11 +164,20 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.subwedge_size_ledit_change)
 
+        qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.osc_start_cbox_click)
+
         self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
         self.acq_widget_layout.child('energies_combo').setDisabled(True)
         self.acq_widget_layout.child('energies_combo').\
             insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
+        self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
+
+    def osc_start_cbox_click(self, state):
+        self.acq_widget_layout.child('osc_start_ledit').setEnabled(state)
+    
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
@@ -309,6 +318,9 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('resolution_ledit').\
              setText("%.3f" % float(resolution))
         self._acquisition_parameters.resolution = float(resolution)
+
+    def update_osc_start(self, new_value):
+        pass
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters

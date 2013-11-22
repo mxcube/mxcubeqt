@@ -86,6 +86,7 @@ class CreateTaskBase(qt.QWidget):
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
+            bl_setup_hwobj.omega_axis.connect('positionChanged', self.update_osc_start)
         except AttributeError as ex:
             logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                'more hardware objects' + str(ex))
@@ -93,6 +94,12 @@ class CreateTaskBase(qt.QWidget):
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
+
+    def update_osc_start(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            acq_widget.update_osc_start(new_value)
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]

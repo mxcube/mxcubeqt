@@ -42,8 +42,7 @@ class CreateCharWidget(CreateTaskBase):
 
         current_dir = os.path.dirname(__file__)
         ui_file = 'ui_files/vertical_crystal_dimension_widget_layout.ui'
-        widget = qtui.QWidgetFactory.\
-                 create(os.path.join(current_dir, ui_file))
+        widget = qtui.QWidgetFactory.create(os.path.join(current_dir, ui_file))
 
         widget.reparent(self, qt.QPoint(0,0))
         self._vertical_dimension_widget = widget
@@ -64,10 +63,10 @@ class CreateCharWidget(CreateTaskBase):
                            layout = DataPathWidgetVerticalLayout)
 
         v_layout.addWidget(self._acq_widget)
+        v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._char_widget)
         v_layout.addWidget(self._vertical_dimension_widget)
-        v_layout.addWidget(self._data_path_gbox)
-        v_layout.addStretch(10)
+        v_layout.addStretch(100)
 
         #
         # Logic
@@ -77,7 +76,7 @@ class CreateCharWidget(CreateTaskBase):
         account_rad_dmg_cbx = self._char_widget.\
                               child('account_rad_dmg_cbx')
         start_comp_cbox = self._char_widget.child('start_comp_cbox')
-        induced_burn_cbx = self._char_widget.child('induced_burn_cbx')
+        #induced_burn_cbx = self._char_widget.child('induced_burn_cbx')
         max_vdim_ledit = self._vertical_dimension_widget.\
                          child('max_vdim_ledit')
         min_vdim_ledit = self._vertical_dimension_widget.\
@@ -100,9 +99,9 @@ class CreateCharWidget(CreateTaskBase):
                                                 account_rad_dmg_cbx,
                                                 bool, None)
 
-        self._char_params_mib.bind_value_update('determine_rad_params', 
-                                                induced_burn_cbx,
-                                                bool, None)
+        #self._char_params_mib.bind_value_update('determine_rad_params', 
+        #                                        induced_burn_cbx,
+        #                                        bool, None)
 
         self._char_params_mib.bind_value_update('strategy_complexity',
                                                 start_comp_cbox,
@@ -152,8 +151,8 @@ class CreateCharWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
-        self.connect(induced_burn_cbx, qt.SIGNAL("toggled(bool)"),
-                     self.use_induced_burn)
+        #self.connect(induced_burn_cbx, qt.SIGNAL("toggled(bool)"),
+        #             self.use_induced_burn)
 
     def use_induced_burn(self, state):
         self._acquisition_parameters.induce_burn = state
