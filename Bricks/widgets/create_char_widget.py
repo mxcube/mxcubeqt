@@ -193,7 +193,7 @@ class CreateCharWidget(CreateTaskBase):
 
             try:
                 resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 4)
+                resolution = round(float(resolution), 3)
             except AttributeError:
                 resolution = 0
 
