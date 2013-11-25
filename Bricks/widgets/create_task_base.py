@@ -86,7 +86,7 @@ class CreateTaskBase(qt.QWidget):
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
-            bl_setup_hwobj.omega_axis.connect('positionChanged', self.update_osc_start)
+            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
         except AttributeError as ex:
             logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                'more hardware objects' + str(ex))

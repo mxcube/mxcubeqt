@@ -176,8 +176,19 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
 
     def osc_start_cbox_click(self, state):
+        self.update_osc_start(self._beamline_setup._get_omega_axis_position())
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(state)
-    
+
+    def update_osc_start(self, new_value):
+        if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
+            osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
+            osc_start_value = 0
+            try:
+                osc_start_value = round(float(new_value),2)
+                osc_start_ledit.setText("%.2f" % osc_start_value)
+            except:
+                osc_start_ledit.setText("%.2f" % osc_start_value)
+            
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
@@ -318,9 +329,6 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('resolution_ledit').\
              setText("%.3f" % float(resolution))
         self._acquisition_parameters.resolution = float(resolution)
-
-    def update_osc_start(self, new_value):
-        pass
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters
