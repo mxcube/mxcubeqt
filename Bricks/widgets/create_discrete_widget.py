@@ -128,6 +128,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
+                self.get_acquisition_widget().use_osc_start(True)
+                
                 self._acq_widget.disable_inverse_beam(True)
                 
                 self._path_template = dc.get_path_template()

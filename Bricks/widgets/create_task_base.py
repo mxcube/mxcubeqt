@@ -296,6 +296,7 @@ class CreateTaskBase(qt.QWidget):
 
         if self._item_is_group_or_sample:
             if self._acq_widget:
+                self._acq_widget.use_osc_start(False)
                 sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)

@@ -183,11 +183,18 @@ class AcquisitionWidget(qt.QWidget):
         if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
             osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
             osc_start_value = 0
+
             try:
                 osc_start_value = round(float(new_value),2)
-                osc_start_ledit.setText("%.2f" % osc_start_value)
-            except:
-                osc_start_ledit.setText("%.2f" % osc_start_value)
+            except TypeError:
+                pass
+            
+            osc_start_ledit.setText("%.2f" % osc_start_value)
+            self._acquisition_parameters.osc_start = osc_start_value
+
+    def use_osc_start(self, state):
+        self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
+        self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
@@ -202,6 +209,9 @@ class AcquisitionWidget(qt.QWidget):
 
         if self._beamline_setup.disable_num_passes():
             self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
+
+        has_aperture = self._beamline_setup.has_aperture()
+        self.hide_aperture(has_aperture)    
 
     def first_image_ledit_change(self, new_value):
         if str(new_value).isdigit():
