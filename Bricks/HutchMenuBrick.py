@@ -584,7 +584,8 @@ class HutchMenuBrick(BlissWidget):
     def connectNotify(self, signalName):
         if signalName=='beamPositionChanged':
             if self.minidiff and self.minidiff.isReady():
-    	        self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.imgWidth/2, self.minidiff.imgHeight/2))
+                print "BeamPositionSignal: ", self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()
+    	        self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()))
         elif signalName=='calibrationChanged':
             if self.minidiff and self.minidiff.isReady():
                 try:
@@ -598,7 +599,8 @@ class HutchMenuBrick(BlissWidget):
         try:
             pxmmy=self.minidiff.pixelsPerMmY
             pxmmz=self.minidiff.pixelsPerMmZ
-            self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.imgWidth/2, self.minidiff.imgHeight/2))
+            print "BeamPositionSignal: ", self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()
+            self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()))
         except:
             pxmmy=None
             pxmmz=None 
