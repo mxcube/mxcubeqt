@@ -242,6 +242,10 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
 
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
+            self.get_acquisition_widget().use_osc_start(True)
+
             if len(data_collection.acquisitions) == 1:
                 self.select_shape_with_cpos(self._acquisition_parameters.\
                                             centred_position)
@@ -250,14 +254,13 @@ class CreateCharWidget(CreateTaskBase):
         else:
             self.setDisabled(True)
 
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-           isinstance(tree_item, queue_item.CharacterisationQueueItem):
+#         if isinstance(tree_item, queue_item.SampleQueueItem) or \
+#            isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
 
-            self._set_space_group(self._char_params.space_group)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
-            self._char_params_mib.set_model(self._char_params)
+#             self._set_space_group(self._char_params.space_group)
+#             self._acq_widget.update_data_model(self._acquisition_parameters,
+#                                                self._path_template)
+#             self._char_params_mib.set_model(self._char_params)
 
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group

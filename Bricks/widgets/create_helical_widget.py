@@ -286,10 +286,10 @@ class CreateHelicalWidget(CreateTaskBase):
 
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-
+                self.get_acquisition_widget().use_osc_start(True)
+                
                 self._processing_parameters = data_collection.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
-
             else:
                 self.setDisabled(True)
         else:

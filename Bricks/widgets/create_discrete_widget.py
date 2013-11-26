@@ -128,7 +128,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
-                self.get_acquisition_widget().use_osc_start(True)
                 
                 self._acq_widget.disable_inverse_beam(True)
                 
@@ -138,13 +137,14 @@ class CreateDiscreteWidget(CreateTaskBase):
                 self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                        self._path_template)
-                
+                self.get_acquisition_widget().use_osc_start(True)
                 if len(dc.acquisitions) == 1:
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
 
                 self._processing_parameters = dc.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
+                self.get_acquisition_widget().use_osc_start(True)
             else:
                 self.setDisabled(True)
         else:

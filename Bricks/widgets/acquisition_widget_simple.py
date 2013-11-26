@@ -99,12 +99,15 @@ class AcquisitionWidgetSimple(qt.QWidget):
         if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
             osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
             osc_start_value = 0
+
             try:
                 osc_start_value = round(float(new_value),2)
-                osc_start_ledit.setText("%.2f" % osc_start_value)
-            except:
-                osc_start_ledit.setText("%.2f" % osc_start_value)
-
+            except TypeError:
+                pass
+            
+            osc_start_ledit.setText("%.2f" % osc_start_value)
+            self._acquisition_parameters.osc_start = osc_start_value
+    
     def update_num_images(self, index = None, num_images = None):
         if index:
             if index is 0:
@@ -187,3 +190,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
         else:
             self.acq_widget_layout.child('aperture_ledit').hide()
             self.acq_widget_layout.child('aperture_cbox').hide()
+
+    def use_osc_start(self, state):
+        self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
+        self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
