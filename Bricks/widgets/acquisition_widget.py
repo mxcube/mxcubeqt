@@ -374,3 +374,12 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('inverse_beam_cbx').show()
             self.acq_widget_layout.child('subwedge_size_label').show()
             self.acq_widget_layout.child('subwedge_size_ledit').show()
+
+    def hide_aperture(self, state):
+        if not state:
+            ledit = self.acq_widget_layout.child('aperture_ledit')
+            cbox = self.acq_widget_layout.child('aperture_cbox')
+            self.acq_widget_layout.removeChild(ledit)
+            self.acq_widget_layout.removeChild(cbox)
+        
+        

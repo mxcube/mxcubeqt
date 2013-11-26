@@ -148,6 +148,12 @@ class AcquisitionWidgetSimple(qt.QWidget):
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
+        te = beamline_setup.tunable_wavelength()
+        self.set_tunable_energy(te)
+
+        has_aperture = self._beamline_setup.has_aperture()
+        self.hide_aperture(has_aperture)    
+
     def set_energy(self, energy, wav):
         self._acquisition_parameters.energy = energy
         self.acq_widget_layout.child('energy_ledit').setText("%.4f" % float(energy))
@@ -170,3 +176,14 @@ class AcquisitionWidgetSimple(qt.QWidget):
         self._acquisition_mib.set_model(acquisition_parameters)
         self._path_template = path_template
         self.update_num_images(None, acquisition_parameters.num_images)
+
+    def set_tunable_energy(self, state):
+        self.acq_widget_layout.child('energy_ledit').setEnabled(state)
+
+    def hide_aperture(self, state):
+        if state:
+            self.acq_widget_layout.child('aperture_ledit').show()
+            self.acq_widget_layout.child('aperture_cbox').show()
+        else:
+            self.acq_widget_layout.child('aperture_ledit').hide()
+            self.acq_widget_layout.child('aperture_cbox').hide()
