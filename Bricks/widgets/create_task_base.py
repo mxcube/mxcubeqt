@@ -294,6 +294,7 @@ class CreateTaskBase(qt.QWidget):
 
             self.setDisabled(False)
 
+        if self._item_is_group_or_sample():
         if self._item_is_group_or_sample:
             if self._acq_widget:
                 sample_data_model = sample_item.get_model()
