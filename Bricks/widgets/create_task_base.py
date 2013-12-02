@@ -269,8 +269,7 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
 
-            # Get the next available run number at this level of the
-            # model.
+            # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
 
