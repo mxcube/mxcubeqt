@@ -18,6 +18,7 @@ class DCParametersWidget(qt.QWidget):
         self.add_dc_cb = None
         self._tree_view_item = None
         self.queue_model = None
+        self._beamline_setup_hwobj = None
 
         self.caution_pixmap = Icons.load("Caution2.png")
         self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
@@ -77,6 +78,7 @@ class DCParametersWidget(qt.QWidget):
 
     def set_beamline_setup(self, bl_setup):
         self.acq_widget.set_beamline_setup(bl_setup)
+        self._beamline_setup_hwobj = bl_setup
 
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].\
@@ -118,11 +120,12 @@ class DCParametersWidget(qt.QWidget):
             path_template.mad_prefix = ''
 
         run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-          get_next_run_number(self._path_template)
+          get_next_run_number(path_template)
 
         self.path_widget.set_run_number(run_number)
         self.path_widget.set_prefix(path_template.base_prefix)
         model = self._tree_view_item.get_model()
+        model.set_name(path_template.get_prefix())
         self._tree_view_item.setText(0, model.get_name())
         
     def tab_changed(self):
