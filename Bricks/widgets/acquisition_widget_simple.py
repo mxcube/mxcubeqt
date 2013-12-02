@@ -170,9 +170,6 @@ class AcquisitionWidgetSimple(qt.QWidget):
         self.acq_widget_layout.child('resolution_ledit').\
              setText("%.3f" % float(resolution))
         self._acquisition_parameters.resolution = float(resolution)
-
-    def set_tunable_energy(self, state):
-        pass
     
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters
