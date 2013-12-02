@@ -143,6 +143,7 @@ class DCParametersWidget(qt.QWidget):
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\
                                           path_template)
+        self.acq_widget.use_osc_start(True)
 
         self.path_widget.update_data_model(data_collection.\
                                            acquisitions[0].path_template)

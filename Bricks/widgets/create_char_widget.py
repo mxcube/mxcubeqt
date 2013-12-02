@@ -224,8 +224,12 @@ class CreateCharWidget(CreateTaskBase):
         if isinstance(tree_item, queue_item.SampleQueueItem) or \
                isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self._init_models()
-            self._char_params = copy.deepcopy(self._char_params)
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            self._set_space_group(self._char_params.space_group)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                self._path_template)
+            self._char_params_mib.set_model(self._char_params)
+            #self._char_params = copy.deepcopy(self._char_params)
+            #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             self.setDisabled(False)
@@ -253,14 +257,6 @@ class CreateCharWidget(CreateTaskBase):
             self._processing_parameters = data_collection.processing_parameters
         else:
             self.setDisabled(True)
-
-#         if isinstance(tree_item, queue_item.SampleQueueItem) or \
-#            isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-
-#             self._set_space_group(self._char_params.space_group)
-#             self._acq_widget.update_data_model(self._acquisition_parameters,
-#                                                self._path_template)
-#             self._char_params_mib.set_model(self._char_params)
 
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group

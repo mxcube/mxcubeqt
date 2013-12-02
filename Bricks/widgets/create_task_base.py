@@ -257,7 +257,6 @@ class CreateTaskBase(qt.QWidget):
         sample_item = self.get_sample_item(tree_item)
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            self.get_acquisition_widget().use_osc_start(False)
             sample_data_model = sample_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
@@ -282,7 +281,6 @@ class CreateTaskBase(qt.QWidget):
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self.get_acquisition_widget().use_osc_start(False)
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
@@ -295,14 +293,14 @@ class CreateTaskBase(qt.QWidget):
             self.setDisabled(False)
 
         if self._item_is_group_or_sample():
-        if self._item_is_group_or_sample:
             if self._acq_widget:
                 sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-            
+                self.get_acquisition_widget().use_osc_start(False)
+
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
                 

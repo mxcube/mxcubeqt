@@ -128,7 +128,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
                 self.setDisabled(False)
-                
+
                 self._acq_widget.disable_inverse_beam(True)
                 
                 self._path_template = dc.get_path_template()
@@ -144,7 +144,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 self._processing_parameters = dc.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
-                self.get_acquisition_widget().use_osc_start(True)
             else:
                 self.setDisabled(True)
         else:
@@ -226,7 +225,6 @@ class CreateDiscreteWidget(CreateTaskBase):
             acq.path_template.base_prefix = self.get_default_prefix(sample)
             acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
                                           get_next_run_number(acq.path_template)
-
         if run_number:        
             acq.path_template.run_number = run_number
 
