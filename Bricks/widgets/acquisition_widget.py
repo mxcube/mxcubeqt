@@ -352,13 +352,12 @@ class AcquisitionWidget(qt.QWidget):
             mad_prefix = self._path_template.mad_prefix
             index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
             self.acq_widget_layout.child('mad_cbox').setChecked(True)
-            self.acq_widget_layout.child('energies_combo').\
-                setCurrentItem(index)
-            #self.use_mad(mad)
+            self.acq_widget_layout.child('energies_combo').setEnabled(True)
+            self.acq_widget_layout.child('energies_combo').setCurrentItem(index)
         else:
             self.acq_widget_layout.child('mad_cbox').setChecked(False)
-            self.acq_widget_layout.child('energies_combo').\
-                setCurrentItem(0)
+            self.acq_widget_layout.child('energies_combo').setEnabled(False)
+            self.acq_widget_layout.child('energies_combo').setCurrentItem(0)
 
     def set_tunable_energy(self, state):
         self.acq_widget_layout.child('energy_ledit').setEnabled(state)
