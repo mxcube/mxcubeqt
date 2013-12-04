@@ -68,7 +68,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('osc_start',
                                self.acq_widget_layout.child('osc_start_ledit'),
                                float,
-                               qt.QDoubleValidator(-1000, 1000, 2, self))
+                               qt.QDoubleValidator(-10000, 10000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('first_image',
@@ -323,7 +323,7 @@ class AcquisitionWidget(qt.QWidget):
             (name, energy) = self.get_mad_energy()
             if energy != 0:
                 self.set_energy(energy, 0)
-            
+
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
 
     def set_energy(self, energy, wav):
