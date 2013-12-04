@@ -57,6 +57,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         if char.is_executed():
             self.stack.raiseWidget(self.results_view)
             self.toggle_page_button.setText("View parameters")
+            self.parameters_widget.set_enabled(False)
 
             if char.html_report:
                 if self.results_view.mimeSourceFactory().\
@@ -65,13 +66,13 @@ class CharParametersBrick(BaseComponents.BlissWidget):
                 else:
                     self.results_view.setSource(char.html_report)
             else:
-                self.results_view.setText("<center><h1>Characterisation failed</h1></center>")           
+                self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
         else:
+            self.parameters_widget.set_enabled(True)
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-        self.parameters_widget.\
-            populate_parameter_widget(item)
+        self.parameters_widget.populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(char.is_executed())
 
     def toggle_page(self):

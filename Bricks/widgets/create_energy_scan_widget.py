@@ -70,7 +70,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         escan_model = tree_item.get_model()
 
-        if isinstance(tree_item, queue_item.EnergyScanQueueItem):
+        if isinstance(tree_item, queue_item.EnergyScanQueueItem) and \
+               (not tree_item.get_model().is_executed()):
             self.setDisabled(False)
 
             if escan_model.get_path_template():
