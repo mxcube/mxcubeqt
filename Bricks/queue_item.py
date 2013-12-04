@@ -28,45 +28,46 @@ class QueueItem(qt.QCheckListItem):
         self.previous_bg_brush = QueueItem.bg_normal_brush
         self._queue_entry = None
         self._data_model = None
-
-        
+        self._checkable = True
 
     def activate(self):
          """
          Inherited from QCheckListitem, called whenever the user presses the 
          mouse on this item or presses Space on it. 
          """
-         qt.QCheckListItem.activate(self)
-
+         if self._checkable:
+             qt.QCheckListItem.activate(self)
 
     def stateChange(self, state):
-        qt.QCheckListItem.stateChange(self, state)
-        # The QCheckListItem is somewhat tricky:
-        # state = 0     The item is unchecked.
-        #
-        # state = 1     The item is checked but
-        #               not all of the children
-        #
-        # state = 2     The item and all its children are
-        #               checked.
-        #
-        # However the state passed by stateChanged are a boolean
-        # we have to use the state() member to get the actual state.
-        # Great !
+        if self._checkable:
+            qt.QCheckListItem.stateChange(self, state)
+            # The QCheckListItem is somewhat tricky:
+            # state = 0     The item is unchecked.
+            #
+            # state = 1     The item is checked but
+            #               not all of the children
+            #
+            # state = 2     The item and all its children are
+            #               checked.
+            #
+            # However the state passed by stateChanged are a boolean
+            # we have to use the state() member to get the actual state.
+            # Great !
 
-        if self._queue_entry:
-            if self.state() > 0:
-                self._queue_entry.set_enabled(True)                
-            else:
-                self._queue_entry.set_enabled(False)
+            if self._queue_entry:
+                if self.state() > 0:
+                    self._queue_entry.set_enabled(True)                
+                else:
+                    self._queue_entry.set_enabled(False)
 
-        if self._data_model:
-            if self.state() > 0:
-                self._data_model.set_enabled(True)                
-            else:
-                self._data_model.set_enabled(False)
-
-
+            if self._data_model:
+                if self.state() > 0:
+                    self._data_model.set_enabled(True)                
+                else:
+                    self._data_model.set_enabled(False)
+        else:
+            self.setOn(False)
+            
     def paintCell(self, painter, color_group, column, width, align):
         """
         Inherited from QCheckListItem, called before this item is drawn
@@ -88,7 +89,6 @@ class QueueItem(qt.QCheckListItem):
         finally:
             painter.restore()
 
-
     def paintFocus(self, painter, color_group, rect):
         """
         Inherited from QCheckListItem, called when the item get focus.
@@ -105,13 +105,11 @@ class QueueItem(qt.QCheckListItem):
         color_group.setColor(qt.QColorGroup.Text, self.normal_brush.color())
         color_group.setBrush(qt.QColorGroup.Text, self.normal_brush)
 
-
     def moveItem(self, after):
         qt.QCheckListItem.moveItem(self, after)
         container_qe = self.get_queue_entry().get_container()
         after_qe = after.get_queue_entry()
         container_qe.swap(after_qe, self.get_queue_entry())
-
         
     def setHighlighted(self, enable):    
         """
@@ -129,15 +127,12 @@ class QueueItem(qt.QCheckListItem):
 
         self.listView().triggerUpdate()
 
-
     def setBackgroundColor(self, color):
         self.previous_bg_brush = self.bg_brush
         self.bg_brush = qt.QBrush(color)
 
-
     def restoreBackgroundColor(self):
         self.bg_brush = self.previous_bg_brush
-
     
     def lastItem(self):
         """
@@ -153,40 +148,29 @@ class QueueItem(qt.QCheckListItem):
             
         return last_child
 
-
     def setOn(self, state):
-        qt.QCheckListItem.setOn(self, state)
+        if self._checkable:
+            qt.QCheckListItem.setOn(self, state)
 
-        if self._queue_entry:
-            self._queue_entry.set_enabled(state)
+            if self._queue_entry:
+                self._queue_entry.set_enabled(state)
 
-        if self._data_model:
-            self._data_model.set_enabled(state)
+            if self._data_model:
+                self._data_model.set_enabled(state)
+        else:
+            qt.QCheckListItem.setOn(self, False)
 
+    def set_checkable(self, state):
+        self._checkable = state
 
     def set_queue_entry(self, queue_entry):
         self._queue_entry = queue_entry
 
-
     def get_queue_entry(self):
         return self._queue_entry
 
-
     def get_model(self):
         return self._data_model
-
-    # Unused
-    # def get_next_free_name(self, name):
-    #     names = []
-    #     current_item = self.firstChild()
-
-    #     while current_item:
-    #         names.append(str(current_item.text()))
-    #         current_item = current_item.nextSibling()
-
-    #     num = widgets.widget_utils.next_free_name(names, name)
-
-    #     return name + ' - ' + str(num)
 
 
 class SampleQueueItem(QueueItem):

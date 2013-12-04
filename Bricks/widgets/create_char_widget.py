@@ -231,7 +231,8 @@ class CreateCharWidget(CreateTaskBase):
             #self._char_params = copy.deepcopy(self._char_params)
             #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
-        elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+        elif isinstance(tree_item, queue_item.CharacterisationQueueItem) and \
+                 (not tree_item.get_model().is_executed()):
             self.setDisabled(False)
             self._char = tree_item.get_model()
 

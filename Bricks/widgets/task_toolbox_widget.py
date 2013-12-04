@@ -30,7 +30,6 @@ class TaskToolBoxWidget(qt.QWidget):
         self.method_group_box.setFont(font)
     
         self.tool_box = qt.QToolBox(self.method_group_box , "tool_box")
-        self.tool_box.setFixedWidth(475)
         font = self.tool_box.font()
         font.setPointSize(10)
         self.tool_box.setFont(font)
@@ -199,11 +198,7 @@ class TaskToolBoxWidget(qt.QWidget):
             for child_task_node in task_list:
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
 
-        # The selected item is a task
+        # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
-
-        pt = self.tool_box.currentItem()._path_template
-        pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-            get_next_run_number(pt)

@@ -67,12 +67,17 @@ class EnergyScanParametersWidget(qt.QWidget):
 
     def populate_widget(self, item):
         self._tree_view_item = item
-        
         self.energy_scan = item.get_model()
-        self.data_path_widget.update_data_model(self.energy_scan.path_template)
-        
-        self.periodic_table.periodicTable.\
-            tableElementChanged(self.energy_scan.element_symbol)
+
+        if self.energy_scan.is_executed():
+            self.data_path_widget.setEnabled(False)
+            self.periodic_table.setEnabled(False)
+        else:
+            self.data_path_widget.setEnabled(True)
+            self.periodic_table.setEnabled(True)
+            self.data_path_widget.update_data_model(self.energy_scan.path_template)
+            self.periodic_table.periodicTable.\
+                tableElementChanged(self.energy_scan.element_symbol)
 
     def element_clicked(self, symbol, energy):
         self.energy_scan.element_symbol = symbol

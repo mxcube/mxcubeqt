@@ -373,25 +373,27 @@ class TaskGroupQueueEntry(BaseQueueEntry):
     def __init__(self, view=None, data_model=None):
         BaseQueueEntry.__init__(self, view, data_model)
         self.lims_client_hwobj = None
-        self._lims_group_id = 0
         self.session_hwobj = None
 
     def execute(self):
         BaseQueueEntry.execute(self)
-        # Creating a collection group with the current session id
-        # and a dummy exepriment type OSC. The experiment type
-        # will be updated when the collections are stored.
-        group_data = {'sessionId': self.session_hwobj.session_id,
-                      'experimentType': 'OSC'}
+        gid = self.get_data_model().lims_group_id
 
-        try:
-            gid = self.lims_client_hwobj.\
-                  _store_data_collection_group(group_data)
-            self.get_data_model().lims_group_id = gid
-        except Exception as ex:
-            msg = 'Could not create the data collection group' + \
-                  ' in lims. Reason: ' + ex.message, self
-            raise QueueExecutionException(msg, self)
+        if not gid:
+            # Creating a collection group with the current session id
+            # and a dummy exepriment type OSC. The experiment type
+            # will be updated when the collections are stored.
+            group_data = {'sessionId': self.session_hwobj.session_id,
+                          'experimentType': 'OSC'}
+
+            try:
+                gid = self.lims_client_hwobj.\
+                      _store_data_collection_group(group_data)
+                self.get_data_model().lims_group_id = gid
+            except Exception as ex:
+                msg = 'Could not create the data collection group' + \
+                      ' in lims. Reason: ' + ex.message, self
+                raise QueueExecutionException(msg, self)
 
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
@@ -454,6 +456,16 @@ class SampleQueueEntry(BaseQueueEntry):
 
     def post_execute(self):
         BaseQueueEntry.post_execute(self)
+        task_ids = []
+
+        for child in self.get_data_model().get_children():
+            for grand_child in child.get_children():
+                if isinstance(grand_child, queue_model_objects.DataCollection):
+                    xds_dir = grand_child.acquisitions[0].path_template.process_directory
+                    task_ids.append((grand_child.id, xds_dir))
+
+        #print task_ids
+        
         self._view.setText(1, "")
 
 
@@ -584,6 +596,8 @@ class DataCollectionQueueEntry(BaseQueueEntry):
         qc.disconnect(self.collect_hwobj, 'collectNumberOfFrames',
                      self.collect_number_of_frames)
 
+        self.get_view().set_checkable(False)
+
     def collect_dc(self, dc, list_item):
         log = logging.getLogger("user_level_log")
 
@@ -591,8 +605,9 @@ class DataCollectionQueueEntry(BaseQueueEntry):
             acq_1 = dc.acquisitions[0]
             cpos = acq_1.acquisition_parameters.centred_position
             #acq_1.acquisition_parameters.take_snapshots = True
+            sample = self.get_data_model().get_parent().get_parent()
             param_list = queue_model_objects.\
-                to_collect_dict(dc, self.session)
+                to_collect_dict(dc, self.session, sample)
 
             try:
                 if dc.experiment_type is EXPERIMENT_TYPE.HELICAL:
@@ -737,6 +752,10 @@ class CharacterisationGroupQueueEntry(BaseQueueEntry):
         char = self.get_data_model()
         reference_image_collection = char.reference_image_collection
 
+        # Trick to make sure that the reference collection
+        # has a sample.
+        reference_image_collection._parent = char.get_parent()
+
         gid = self.get_data_model().get_parent().lims_group_id
         reference_image_collection.lims_group_id = gid
 
@@ -845,9 +864,7 @@ class CharacterisationQueueEntry(BaseQueueEntry):
             else:
                 self.get_view().setText(1, "No result")
                 self.status = QUEUE_ENTRY_STATUS.WARNING
-                log.info("EDNA-Characterisation completed " +\
-                         "successfully but without collection plan.")
-                log.warning("Characterisation completed" +\
+                log.warning("Characterisation completed " +\
                             "successfully but without collection plan.")
         else:
             self.get_view().setText(1, "Charact. Failed")
@@ -1116,6 +1133,7 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
 
             view.setText(1, "Centring !")
             async_result.get()
+            view.setText(1, "Centring done !")
         finally:
             dm.disconnect("centringAccepted", centring_done_cb)
 
