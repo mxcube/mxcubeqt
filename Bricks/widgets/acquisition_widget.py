@@ -351,9 +351,9 @@ class AcquisitionWidget(qt.QWidget):
         if mad:
             mad_prefix = self._path_template.mad_prefix
             index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
+            self.acq_widget_layout.child('energies_combo').setCurrentItem(index)
             self.acq_widget_layout.child('mad_cbox').setChecked(True)
             self.acq_widget_layout.child('energies_combo').setEnabled(True)
-            self.acq_widget_layout.child('energies_combo').setCurrentItem(index)
         else:
             self.acq_widget_layout.child('mad_cbox').setChecked(False)
             self.acq_widget_layout.child('energies_combo').setEnabled(False)
