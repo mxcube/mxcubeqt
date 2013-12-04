@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>837</width>
-            <height>405</height>
+            <width>822</width>
+            <height>254</height>
         </rect>
     </property>
     <property name="caption">
@@ -34,7 +34,7 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="spacing">
-                    <number>20</number>
+                    <number>15</number>
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
@@ -515,7 +515,7 @@
                     </property>
                     <property name="sizeHint">
                         <size>
-                            <width>20</width>
+                            <width>1</width>
                             <height>20</height>
                         </size>
                     </property>
@@ -715,7 +715,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>30</height>
+                    <height>1</height>
                 </size>
             </property>
         </spacer>
