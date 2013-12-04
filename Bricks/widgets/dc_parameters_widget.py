@@ -133,9 +133,9 @@ class DCParametersWidget(qt.QWidget):
             self.populate_parameter_widget(self._tree_view_item)
 
     def set_enabled(self, state):
-        self.acq_gbox.setEnabled(True)
-        self.path_widget.setEnabled(True)
-        self._processing_gbox.setEnabled(True)
+        self.acq_gbox.setEnabled(state)
+        self.path_widget.setEnabled(state)
+        self._processing_gbox.setEnabled(state)
 
     def populate_parameter_widget(self, item):
         data_collection = item.get_model()
