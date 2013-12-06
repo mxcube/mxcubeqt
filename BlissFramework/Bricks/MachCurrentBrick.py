@@ -120,8 +120,9 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
             else:
                 txt="00:00"
             self.refillCountdown.display(txt)
+            self.refillCountdown.show()
         except TypeError,ValueError:
-            pass
+            self.refillCountdown.hide()
 
         if opmsg is not None and opmsg!="" and opmsg!="unknown":
             QToolTip.add(self.current,opmsg)
