@@ -990,7 +990,7 @@ class SampleChangerBrick3(BlissWidget):
             if sample.isLoaded():
                presences[basket_index][vial_index]=[VialView.VIAL_AXIS,matrix]
 
-        for i, basket in enumerate(self.baskets):
+        for i, basket in enumerate(baskets):
             presence=presences[i]
             basket.setMatrices(presence)
         
