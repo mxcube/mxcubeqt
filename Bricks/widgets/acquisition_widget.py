@@ -80,7 +80,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('exp_time',
                                self.acq_widget_layout.child('exp_time_ledit'),
                                float,
-                               qt.QDoubleValidator(0.037, 6000, 3, self))
+                               qt.QDoubleValidator(0.003, 6000, 3, self))
 
         self._acquisition_mib.\
              bind_value_update('osc_range',
