@@ -333,6 +333,6 @@ class CreateCharWidget(CreateTaskBase):
                         path_template.run_number)
 
         tasks.append(char)
-        #self._path_template.run_number += 1
+        self._path_template.run_number += 1
 
         return tasks
