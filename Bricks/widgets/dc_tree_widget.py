@@ -281,6 +281,7 @@ class DataCollectTree(qt.QWidget):
             location = items[0].get_model().location
             self.beamline_setup_hwobj.sample_changer_hwobj.\
                  unload(22, sample_location = location, wait = False)
+            items[0].setOn(False)
 
     def sample_list_view_selection(self):
         items = self.get_selected_items()
@@ -684,14 +685,10 @@ class DataCollectTree(qt.QWidget):
 
         while item:
             if self.is_mounted_sample_item(item):
-                item.setPixmap(0, self.pin_pixmap)
-                #item.setBackgroundColor(widget_colors.SKY_BLUE)
-                item.setSelected(True)
+                item.set_mounted_style(True)
                 self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
-                item.setPixmap(0, qt.QPixmap())
-                item.setSelected(False)
-                item.setText(1, '')
+                item.set_mounted_style(False)
 
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):

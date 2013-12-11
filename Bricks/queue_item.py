@@ -1,6 +1,11 @@
 import queue_model_objects_v1 as queue_model_objects
 import qt
 
+from BlissFramework import Icons
+from BlissFramework.Utils import widget_colors
+
+PIN_PIXMAP = Icons.load("sample_axis.png")
+
 class QueueItem(qt.QCheckListItem):
     """
     Use this class to create a new type of item for the collect tree/queue.
@@ -29,6 +34,7 @@ class QueueItem(qt.QCheckListItem):
         self._queue_entry = None
         self._data_model = None
         self._checkable = True
+        self._font_is_bold = False
 
     def activate(self):
          """
@@ -76,12 +82,11 @@ class QueueItem(qt.QCheckListItem):
         The qt3 documentation has more information about this method that
         can be worth reading.
         """
-
         try:
-            #painter.save()
-            #f = painter.font()
-            #f.setBold(True)
-            #painter.setFont(f)
+            painter.save()
+            f = painter.font()
+            f.setBold(self._font_is_bold)
+            painter.setFont(f)
             color_group = qt.QColorGroup(color_group)
             color_group.setColor(qt.QColorGroup.Text, self.brush.color())
             color_group.setBrush(qt.QColorGroup.Text, self.brush)
@@ -136,6 +141,9 @@ class QueueItem(qt.QCheckListItem):
 
     def restoreBackgroundColor(self):
         self.bg_brush = self.previous_bg_brush
+
+    def setFontBold(self, state):
+        self._font_is_bold = state
     
     def lastItem(self):
         """
@@ -180,7 +188,8 @@ class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
         kwargs['controller'] = qt.QCheckListItem.CheckBoxController
         kwargs['deletable'] = False
-        
+        self.mounted_style = False
+
         QueueItem.__init__(self, *args, **kwargs)
 
     def update_pin_icon(self):
@@ -191,7 +200,21 @@ class SampleQueueItem(QueueItem):
             
         dc_tree_widget._loaded_sample_item = self
         self.setPixmap(0, dc_tree_widget.pin_pixmap)
-        
+
+    def set_mounted_style(self, state):
+        self.mounted_style = state
+
+        if state:
+            self.setPixmap(0, PIN_PIXMAP)
+            self.setBackgroundColor(widget_colors.SKY_BLUE)
+            self.setSelected(True)
+            self.setFontBold(True)
+        else:
+            self.setPixmap(0, qt.QPixmap())
+            self.restoreBackgroundColor()
+            self.setSelected(False)
+            self.setFontBold(False)
+            self.setText(1, '')
 
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
