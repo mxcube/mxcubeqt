@@ -570,12 +570,14 @@ class InstanceListBrick(BlissWidget):
                 msg_event=UserInfoDialogEvent("I've gained control of the application.",\
                     email_fromaddrs,email_toaddrs,email_subject,is_local,\
                     self.font().pointSize())                
-                qApp.postEvent(self,msg_event)
+                logging.getLogger('user_level_log').warning("You have gained control of the application.")
+                #qApp.postEvent(self,msg_event)
             else:
                 msg_event=MsgDialogEvent(QMessageBox.Warning,\
                     "I've lost control of the application!",\
                     self.font().pointSize())
-                qApp.postEvent(self,msg_event)
+                logging.getLogger('user_level_log').warning("You have lost control of the application!")
+                #qApp.postEvent(self,msg_event)
 
     def passControl(self,has_control_id):
         #print "InstanceListBrick.passControl",has_control_id,self.connections
