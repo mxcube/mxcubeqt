@@ -78,7 +78,10 @@ class QueueItem(qt.QCheckListItem):
         """
 
         try:
-            painter.save()
+            #painter.save()
+            #f = painter.font()
+            #f.setBold(True)
+            #painter.setFont(f)
             color_group = qt.QColorGroup(color_group)
             color_group.setColor(qt.QColorGroup.Text, self.brush.color())
             color_group.setBrush(qt.QColorGroup.Text, self.brush)
