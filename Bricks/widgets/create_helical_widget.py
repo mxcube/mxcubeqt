@@ -269,7 +269,10 @@ class CreateHelicalWidget(CreateTaskBase):
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
-                self.setDisabled(False)
+                if tree_item.get_model().is_executed():
+                    self.setDisabled(True)
+                else:
+                    self.setDisabled(False)
 
                 self._path_template = data_collection.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)

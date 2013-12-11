@@ -123,12 +123,14 @@ class CreateDiscreteWidget(CreateTaskBase):
             self._processing_widget.update_data_model(self._processing_parameters)
             self._acq_widget.disable_inverse_beam(False)
 
-        elif isinstance(tree_item, queue_item.DataCollectionQueueItem) and \
-                 (not tree_item.get_model().is_executed()):
+        elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             dc = tree_item.get_model()
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
-                self.setDisabled(False)
+                if tree_item.get_model().is_executed():
+                    self.setDisabled(True)
+                else:
+                    self.setDisabled(False)
 
                 self._acq_widget.disable_inverse_beam(True)
                 
