@@ -254,9 +254,9 @@ class DataCollectTree(qt.QWidget):
                     logging.getLogger("user_level_log").error(msg)
                 finally:
                     self.enable_collect(True)
-        else:
-            logging.getLogget("user_level_log").\
-                info('Its not possible to mount samples in free pin mode')
+            else:
+                logging.getLogger("user_level_log").\
+                  info('Its not possible to mount samples in free pin mode')
 
     def centring_done(self, success, centring_info):
         if success:
