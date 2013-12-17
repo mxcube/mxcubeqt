@@ -259,9 +259,13 @@ class FieldsWidget(qt.QWidget):
         self.field_widgets = list()
         
 
-        qt.QVBoxLayout(self)
-        grid = qt.QGridLayout()
+#        qt.QVBoxLayout(self)
+#        grid = qt.QGridLayout()
+        qt.QGridLayout(self)
 #        button_box = qt.QHBoxLayout()
+        # We're trying to pack everything together on the lower left corner of the GUI
+        self.setSizePolicy(qt.QSizePolicy.Fixed,
+                           qt.QSizePolicy.Fixed)
 
         current_row = 0
         for field in fields:
@@ -274,14 +278,17 @@ class FieldsWidget(qt.QWidget):
                 logging.debug('creating widget with options: %s', field)
                 w = make_widget(self, field)
                 # message will be alone in the layout so that will not fsck up the layout
-                grid.addMultiCellWidget(w, current_row, current_row, 0, 1)
+                self.layout().addMultiCellWidget(w, current_row, current_row, 0, 1)
             else:
                 label = qt.QLabel(field['uiLabel'], self)
                 logging.debug('creating widget with options: %s', field)
                 w = make_widget(self, field)
+                # Temporary (like this brick ...) hack to get a nicer UI
+                w.setSizePolicy(qt.QSizePolicy.Fixed,
+                                qt.QSizePolicy.Fixed)
                 self.field_widgets.append(w)
-                grid.addWidget(label, current_row, 0)
-                grid.addWidget(w, current_row, 1)
+                self.layout().addWidget(label, current_row, 0, qt.Qt.AlignLeft)
+                self.layout().addWidget(w, current_row, 1, qt.Qt.AlignLeft)
         
             current_row += 1
 
@@ -295,7 +302,6 @@ class FieldsWidget(qt.QWidget):
 #        button_box.addWidget(ok_button)
 #        button_box.addWidget(cancel_button)
 
-        self.layout().addLayout(grid)
 #        self.layout().addLayout(button_box)
 
     def set_values(self, values):
