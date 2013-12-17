@@ -55,6 +55,12 @@ class EDNAParameters(BlissWidget):
 
         self.layout().addMultiCellLayout(self.workflows_box, 0, 0, 0, 1)
 
+        # UGLY DIRTY HACK, (c) Thomas:
+        # We want the params and continue to be on the bottom left
+        # Make it so the first row takes all space. The row is empty now
+        # since someone modified the brick to not display the workflow list anymore
+        self.layout().setRowStretch(0, 10)
+
         #self.info_label = QLabel(self)
         #self.info_label.setSizePolicy(QSizePolicy.MinimumExpanding,
         #                              QSizePolicy.Fixed)
@@ -127,8 +133,8 @@ class EDNAParameters(BlissWidget):
             containers = get_field_containers(xml_root)
             if len(containers) == 0: return
             fields = get_fields(containers[0])
-            if self.params_widget is not None:
-                self.layout().removeChild(self.params_widget)
+        if self.params_widget is not None:
+            self.layout().removeChild(self.params_widget)
         self.params_widget = FieldsWidget(fields, self)
 
         current_values = self.workflow.get_values_map()
