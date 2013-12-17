@@ -323,7 +323,7 @@ class EDNAParameters(BlissWidget):
         else:
             self.params_widget.setText('<center><b>no documentation available</b></center>')
         # add the browser to the layout
-        self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1)
+        self.layout().addMultiCellWidget(self.params_widget, 0, 0, 0, 1)
         self.params_widget.show()
 
 
