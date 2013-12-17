@@ -65,7 +65,10 @@ class EDNAParameters(BlissWidget):
         #self.info_label.setSizePolicy(QSizePolicy.MinimumExpanding,
         #                              QSizePolicy.Fixed)
 
-        self.layout().addWidget(self.ok_button, 2, 0, Qt.AlignLeft | Qt.AlignBottom)
+        # Hack to get some space between the parameters and the continue button
+        self.layout().addWidget(self.ok_button, 3, 0, Qt.AlignLeft | Qt.AlignBottom)
+        # second row is empty but should take at least 10 px
+        self.layout().setRowSpacing(2, 10)
         #self.layout().addWidget(self.abort_button, 2, 1)
         #self.layout().addMultiCellWidget(self.info_label, 3, 3, 0, 1)
 
