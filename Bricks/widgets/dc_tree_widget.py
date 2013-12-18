@@ -287,10 +287,10 @@ class DataCollectTree(qt.QWidget):
         if len(items) == 1:
             item = items[0]
             
-            if item.deletable:
-                self.delete_button.setDisabled(False)
-            else:
-                self.delete_button.setDisabled(True)
+            #if item.deletable:
+            #    self.delete_button.setDisabled(False)
+            #else:
+            #    self.delete_button.setDisabled(True)
 
         if len(items) > 1:
             for item in items:
@@ -508,18 +508,11 @@ class DataCollectTree(qt.QWidget):
         self.beamline_setup_hwobj.shape_history_hwobj.de_select_all()
         for item in checked_items:
             # update the run-number text incase of re-collect
-            item.setText(0, item.get_model().get_name())
+            #item.setText(0, item.get_model().get_name())
 
             #Clear status
             item.setText(1, "")
-            item.setHighlighted(False)
-
-            #if self.is_mounted_sample_item(item):
-            #    item.setPixmap(0, self.pin_pixmap)
-                # Blue background and sample pin for mounted sample.
-                #item.setBackgroundColor(widget_colors.SKY_BLUE)
-            #else:
-            item.setBackgroundColor(widget_colors.WHITE)
+            item.reset_style()
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)
@@ -564,20 +557,16 @@ class DataCollectTree(qt.QWidget):
 
         return res
  
-    def delete_click(self):
-        selected_items = self.get_selected_items()
+    def delete_click(self, selected_items = None):
+        if not selected_items:
+            selected_items = self.get_selected_items()
         
         for item in selected_items:
             if item.deletable:
-                if not item.parent().isSelected() or \
-                   isinstance(item.parent(), queue_item.SampleQueueItem):
-                    if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                        self.tree_brick.show_sample_centring_tab()
+                parent = item.parent()
+                if not parent.isSelected() or (not parent.deletable):
+                    self.tree_brick.show_sample_centring_tab()
 
-                    if isinstance(item, queue_item.DataCollectionQueueItem):
-                        self.tree_brick.show_sample_centring_tab()
-
-                    parent = item.parent()
                     self.queue_model_hwobj.del_child(parent.get_model(),
                                                      item.get_model())
                     qe = item.get_queue_entry()
@@ -586,6 +575,17 @@ class DataCollectTree(qt.QWidget):
 
                     if not parent.firstChild():
                         parent.setOn(False)
+            else:
+                item.reset_style()
+                child = item.firstChild() 
+                children = []
+
+                while child: 
+                    children.append(child)
+                    child = child.nextSibling()
+
+                for child in children:
+                    self.delete_click(selected_items = [child])
 
         self.check_for_path_collisions()
 
