@@ -42,7 +42,7 @@ class LogBarBrick(BaseComponents.BlissWidget):
 
             self._status_bar_widget.text_edit.\
                 append("<font color=%s>[%s]" % (color, date_time) + \
-                           " "*5 + "<b>%s</b></font>" % msg)
+                           " "*5 + "%s</font>" % msg)
 
             if level == logging.WARNING or level == logging.ERROR:
                 self._status_bar_widget.toggle_background_color()
