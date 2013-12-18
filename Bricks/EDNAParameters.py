@@ -44,7 +44,7 @@ class EDNAParameters(BlissWidget):
         QGridLayout(self, 4, 2)
         self.workflows_box = QHBoxLayout()
         self.ok_button = QPushButton('Continue', self)
-        self.abort_button = QPushButton('Abort', self)
+        #self.abort_button = QPushButton('Abort', self)
 
         self.workflow_list = QComboBox(self)
         self.workflow_list.hide()
@@ -55,18 +55,27 @@ class EDNAParameters(BlissWidget):
 
         self.layout().addMultiCellLayout(self.workflows_box, 0, 0, 0, 1)
 
-        self.info_label = QLabel(self)
-        self.info_label.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                      QSizePolicy.Fixed)
+        # UGLY DIRTY HACK, (c) Thomas:
+        # We want the params and continue to be on the bottom left
+        # Make it so the first row takes all space. The row is empty now
+        # since someone modified the brick to not display the workflow list anymore
+        self.layout().setRowStretch(0, 10)
 
-        self.layout().addWidget(self.ok_button, 2, 0)
-        self.layout().addWidget(self.abort_button, 2, 1)
-        self.layout().addMultiCellWidget(self.info_label, 3, 3, 0, 1)
+        #self.info_label = QLabel(self)
+        #self.info_label.setSizePolicy(QSizePolicy.MinimumExpanding,
+        #                              QSizePolicy.Fixed)
+
+        # Hack to get some space between the parameters and the continue button
+        self.layout().addWidget(self.ok_button, 3, 0, Qt.AlignLeft | Qt.AlignBottom)
+        # second row is empty but should take at least 10 px
+        self.layout().setRowSpacing(2, 10)
+        #self.layout().addWidget(self.abort_button, 2, 1)
+        #self.layout().addMultiCellWidget(self.info_label, 3, 3, 0, 1)
 
         QObject.connect(self.ok_button, SIGNAL('clicked()'),
                         self.send_parameters)
-        QObject.connect(self.abort_button, SIGNAL('clicked()'),
-                        self.abort_workflow)
+        #QObject.connect(self.abort_button, SIGNAL('clicked()'),
+        #                self.abort_workflow)
         QObject.connect(self.start_button, SIGNAL('clicked()'),
                         self.start_workflow)
         QObject.connect(self.workflow_list, SIGNAL('activated ( const QString &)'),
@@ -127,14 +136,14 @@ class EDNAParameters(BlissWidget):
             containers = get_field_containers(xml_root)
             if len(containers) == 0: return
             fields = get_fields(containers[0])
-            if self.params_widget is not None:
-                self.layout().removeChild(self.params_widget)
+        if self.params_widget is not None:
+            self.layout().removeChild(self.params_widget)
         self.params_widget = FieldsWidget(fields, self)
 
         current_values = self.workflow.get_values_map()
         logging.debug('current values are: %s', current_values)
         self.params_widget.set_values(current_values)
-        self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1)
+        self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1, Qt.AlignBottom | Qt.AlignLeft)
         self.params_widget.show()
         self.ok_button.setEnabled(True)
 
@@ -173,7 +182,7 @@ class EDNAParameters(BlissWidget):
             message = 'Workflow engine is in a state it should not be in (%r)' % (new_state, )
             #self.start_button.setEnabled(new_state == "ON")
             #self.workflow_list.setEnabled(new_state == "ON")
-        self.info_label.setText(message)
+        #self.info_label.setText(message)
         logging.info(message)
 
     def current_actor_changed(self, actor):
@@ -184,7 +193,8 @@ class EDNAParameters(BlissWidget):
             state = self.workflow.state.getValue()
             self.refresh_workflow_state(state, actor)
         except:
-            self.info_label.setText('Lost connection with workflow engine')
+            pass
+            #self.info_label.setText('Lost connection with workflow engine')
         
     def workflow_state_changed(self, new_state):
         logging.debug('%s: new workflow state is %r', self.name(), new_state)
@@ -194,7 +204,8 @@ class EDNAParameters(BlissWidget):
             actor = self.workflow.current_actor.getValue()
             self.refresh_workflow_state(new_state, actor)
         except:
-            self.info_label.setText('Lost connection with workflow engine')
+            pass
+            #self.info_label.setText('Lost connection with workflow engine')
         if new_state == "ON" and self.previous_workflow_state == "RUNNING":
             # workflow finished, open the output file and use an EDNACaracterize method to
             # continue the work
@@ -315,7 +326,7 @@ class EDNAParameters(BlissWidget):
         else:
             self.params_widget.setText('<center><b>no documentation available</b></center>')
         # add the browser to the layout
-        self.layout().addMultiCellWidget(self.params_widget, 1, 1, 0, 1)
+        self.layout().addMultiCellWidget(self.params_widget, 0, 0, 0, 1)
         self.params_widget.show()
 
 
