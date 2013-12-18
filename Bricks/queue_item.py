@@ -144,7 +144,12 @@ class QueueItem(qt.QCheckListItem):
 
     def setFontBold(self, state):
         self._font_is_bold = state
-    
+
+    def reset_style(self):
+        self.setBackgroundColor(widget_colors.WHITE)
+        self.setFontBold(False)
+        self.setHighlighted(False)
+
     def lastItem(self):
         """
         :returns: The last item of this child.
@@ -215,6 +220,12 @@ class SampleQueueItem(QueueItem):
             self.setSelected(False)
             self.setFontBold(False)
             self.setText(1, '')
+
+    def reset_style(self):
+        QueueItem.reset_style(self)
+        if self.mounted_style:
+            self.set_mounted_style(True)
+            
 
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
