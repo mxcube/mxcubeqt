@@ -59,6 +59,7 @@ the repository, for the first time it has to be created by making a copy of exam
 * [Qub](http://github.com/mxcube/qub)
 * [PyChooch](http://github.com/mxcube/pychooch)
 * [PyMca](http://sourceforge.net/projects/pymca/)
+* [PyTango] (http://www.tango-controls.org/static/PyTango/latest/doc/html/)
 
 SpecClient(http://github.com/mxcube/specclient) is an optional dependency. If it is
 not present, the Hardware Repository Server does not work, though. In this case
