@@ -72,7 +72,8 @@ Install PyTango and PyMca by issuing the following commands, make sure to be roo
     apt-get install pymca	
     apt-get install python2.6-pytango
 
-Install the other dependenices needed through the blissinstaller or by typing:
+Install the other dependenices needed through the blissinstaller or type the following as
+blissadm:
 
     bliss_rpm Qub	
     bliss_rpm PyChooch
