@@ -67,7 +67,7 @@ not present, the Hardware Repository Server does not work, though. In this case
 it is possible to specify a directory containing the Hardware Objects XML files instead
 of a "host:port" string for the --hardwareRepository command line argument.
 
-### Installing dpendencies for Debain 6 (ESRF)
+#### Installing dpendencies for Debain 6 (ESRF)
 The ESRF install of Debian 6 is pre-installed with PyQt and PyQwt 5.
 Install PyTango and PyMca, make sure to be root.
 
