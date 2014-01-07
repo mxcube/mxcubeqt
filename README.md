@@ -71,16 +71,16 @@ of a "host:port" string for the --hardwareRepository command line argument.
 The ESRF install of Debian 6 is pre-installed with PyQt and PyQwt 5.
 Install PyTango and PyMca, make sure to be root.
 
-   apt-get install pymca	
-   apt-get install python2.6-pytango
+    apt-get install pymca	
+    apt-get install python2.6-pytango
 
 Install the other dependenices needed through the blissinstaller or by typing.
 
-   bliss_rpm Qub	
-   bliss_rpm PyChooch
-   bliss_rpm PyDispatcher
-   bliss_rpm SpecClient-gevent
-   bliss_rpm gevent
+    bliss_rpm Qub	
+    bliss_rpm PyChooch
+    bliss_rpm PyDispatcher
+    bliss_rpm SpecClient-gevent
+    bliss_rpm gevent
 
 ## Running mxCuBE
 
