@@ -43,8 +43,6 @@ Cloning can be done by the following commands:
     git checkout <latest_tag>
     git submodule init; git submodule update
 
-Or alternatively you can clone the repository with the --recursive option.
-
 Within the *bin* directory you can find scripts to start mxCuBE and the HWR server.
 By default the *mxcube* script loads *mxcube.gui* ; this file is **not** shipped with 
 the repository, for the first time it has to be created by making a copy of example_mxcube.gui.
@@ -69,12 +67,12 @@ of a "host:port" string for the --hardwareRepository command line argument.
 
 #### Installing dpendencies for Debain 6 (ESRF)
 The ESRF install of Debian 6 is pre-installed with PyQt and PyQwt 5.
-Install PyTango and PyMca, make sure to be root.
+Install PyTango and PyMca by issuing the following commands, make sure to be root.
 
     apt-get install pymca	
     apt-get install python2.6-pytango
 
-Install the other dependenices needed through the blissinstaller or by typing.
+Install the other dependenices needed through the blissinstaller or by typing:
 
     bliss_rpm Qub	
     bliss_rpm PyChooch
