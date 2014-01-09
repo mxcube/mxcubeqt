@@ -95,7 +95,10 @@ class CreateWorkflowWidget(CreateTaskBase):
         wf_model = tree_item.get_model()
 
         if isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
-            self.setDisabled(False)
+            if tree_item.get_model().is_executed():
+                self.setDisabled(True)
+            else:
+                self.setDisabled(False)
             
             if wf_model.get_path_template():
                 self._path_template = wf_model.get_path_template()

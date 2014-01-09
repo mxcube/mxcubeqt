@@ -18,6 +18,7 @@ class DCParametersWidget(qt.QWidget):
         self.add_dc_cb = None
         self._tree_view_item = None
         self.queue_model = None
+        self._beamline_setup_hwobj = None
 
         self.caution_pixmap = Icons.load("Caution2.png")
         self.path_widget = DataPathWidget(self, 'dc_params_path_widget')
@@ -56,11 +57,9 @@ class DCParametersWidget(qt.QWidget):
         self.connect(self.acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
 
-        
         self.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
-
 
         self.connect(self.path_widget.data_path_widget_layout.run_number_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
@@ -79,6 +78,7 @@ class DCParametersWidget(qt.QWidget):
 
     def set_beamline_setup(self, bl_setup):
         self.acq_widget.set_beamline_setup(bl_setup)
+        self._beamline_setup_hwobj = bl_setup
 
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].\
@@ -112,19 +112,30 @@ class DCParametersWidget(qt.QWidget):
         return self.add_dc_cb(self._data_collection, self.collection_type)
     
     def mad_energy_selected(self, name, energy, state):
-        path_template = self._data_collection.\
-            acquisitions[0].path_template
+        path_template = self._data_collection.acquisitions[0].path_template
 
         if state:
             path_template.mad_prefix = name
         else:
             path_template.mad_prefix = ''
-            
-        self.path_widget.set_prefix(path_template.base_prefix)
 
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+          get_next_run_number(path_template)
+
+        self.path_widget.set_run_number(run_number)
+        self.path_widget.set_prefix(path_template.base_prefix)
+        model = self._tree_view_item.get_model()
+        model.set_name(path_template.get_prefix())
+        self._tree_view_item.setText(0, model.get_name())
+        
     def tab_changed(self):
         if self._tree_view_item:
             self.populate_parameter_widget(self._tree_view_item)
+
+    def set_enabled(self, state):
+        self.acq_gbox.setEnabled(state)
+        self.path_widget.setEnabled(state)
+        self._processing_gbox.setEnabled(state)
 
     def populate_parameter_widget(self, item):
         data_collection = item.get_model()
@@ -139,18 +150,18 @@ class DCParametersWidget(qt.QWidget):
         # This workaround, works for the time beeing.
         self.path_widget._data_model = data_collection.acquisitions[0].path_template
 
+        self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
         self.acq_widget.update_data_model(data_collection.acquisitions[0].\
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\
                                           path_template)
+        self.acq_widget.use_osc_start(True)
 
         self.path_widget.update_data_model(data_collection.\
                                            acquisitions[0].path_template)
         
         self.processing_widget.update_data_model(data_collection.\
                                                  processing_parameters)
-
-        self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
 
         if data_collection.acquisitions[0].acquisition_parameters.\
                 centred_position.snapshot_image:

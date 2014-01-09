@@ -86,6 +86,7 @@ class CreateTaskBase(qt.QWidget):
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
+            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
         except AttributeError as ex:
             logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                'more hardware objects' + str(ex))
@@ -93,6 +94,12 @@ class CreateTaskBase(qt.QWidget):
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
+
+    def update_osc_start(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            acq_widget.update_osc_start(new_value)
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -251,7 +258,6 @@ class CreateTaskBase(qt.QWidget):
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
-            #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
@@ -263,8 +269,7 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
 
-            # Get the next available run number at this level of the
-            # model.
+            # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
 
@@ -275,7 +280,6 @@ class CreateTaskBase(qt.QWidget):
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
@@ -287,16 +291,18 @@ class CreateTaskBase(qt.QWidget):
 
             self.setDisabled(False)
 
-        if self._item_is_group_or_sample:
+        if self._item_is_group_or_sample():
             if self._acq_widget:
                 sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-            
+                self.get_acquisition_widget().use_osc_start(False)
+
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
+                
 
     def _update_etr(self):
         energy = self._beamline_setup_hwobj._get_energy()

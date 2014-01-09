@@ -127,9 +127,7 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         Called by the parent widget when selection in the tree changes.
         """
-
         if len(items) == 1:
-
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
 
@@ -198,11 +196,7 @@ class TaskToolBoxWidget(qt.QWidget):
             for child_task_node in task_list:
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
 
-        # The selected item is a task
+        # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
-
-        pt = self.tool_box.currentItem()._path_template
-        pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-            get_next_run_number(pt)

@@ -268,7 +268,10 @@ class CreateHelicalWidget(CreateTaskBase):
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
-                self.setDisabled(False)
+                if tree_item.get_model().is_executed():
+                    self.setDisabled(True)
+                else:
+                    self.setDisabled(False)
 
                 self._path_template = data_collection.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
@@ -286,10 +289,10 @@ class CreateHelicalWidget(CreateTaskBase):
 
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-
+                self.get_acquisition_widget().use_osc_start(True)
+                
                 self._processing_parameters = data_collection.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
-
             else:
                 self.setDisabled(True)
         else:

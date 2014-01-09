@@ -96,7 +96,7 @@ class CreateDiscreteWidget(CreateTaskBase):
     def mad_energy_selected(self, name, energy, state):
         item = self._current_selected_items[0]
         model = item.get_model()
-
+        
         if state:
             self._path_template.mad_prefix = name
         else:
@@ -127,7 +127,11 @@ class CreateDiscreteWidget(CreateTaskBase):
             dc = tree_item.get_model()
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
-                self.setDisabled(False)
+                if tree_item.get_model().is_executed():
+                    self.setDisabled(True)
+                else:
+                    self.setDisabled(False)
+
                 self._acq_widget.disable_inverse_beam(True)
                 
                 self._path_template = dc.get_path_template()
@@ -135,8 +139,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
                 self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                       self._path_template)
-                
+                                                    self._path_template)
+                self.get_acquisition_widget().use_osc_start(True)
                 if len(dc.acquisitions) == 1:
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
@@ -224,7 +228,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             acq.path_template.base_prefix = self.get_default_prefix(sample)
             acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
                                           get_next_run_number(acq.path_template)
-
+    
         if run_number:        
             acq.path_template.run_number = run_number
 
@@ -252,8 +256,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         tasks.append(dc)
 
-        self._data_path_widget.update_data_model(self._path_template)
-        self._acq_widget.update_data_model(self._acquisition_parameters,
-                                           self._path_template)
+        #self._data_path_widget.update_data_model(self._path_template)
+        #self._acq_widget.update_data_model(self._acquisition_parameters,
+        #                                   self._path_template)
 
         return tasks

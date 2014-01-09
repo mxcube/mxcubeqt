@@ -1,0 +1,97 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>Grouped_processing</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>Grouped_processing</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>623</width>
+            <height>480</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Grouped processing</string>
+    </property>
+    <property name="toolTip" stdset="0">
+        <string>Run grouped processing on the collections in the list</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>main_vlayout</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>title_label</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Grouped processing:</string>
+                    </property>
+                </widget>
+                <widget class="QListBox">
+                    <property name="name">
+                        <cstring>collection_listbox</cstring>
+                    </property>
+                    <property name="acceptDrops">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>button_layout</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>add_button</cstring>
+                            </property>
+                            <property name="text">
+                                <string>+</string>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>button_spacer</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>41</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>remove_button</cstring>
+                            </property>
+                            <property name="text">
+                                <string>-</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </vbox>
+        </widget>
+    </hbox>
+</widget>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -52,7 +52,6 @@ class DCParametersBrick(BaseComponents.BlissWidget):
 
         self.toggle_page_button.setDisabled(True)
 
-
     def populate_parameter_widget(self, item):
         self.parameters_widget.path_widget._base_image_dir = \
             self.session_hwobj.get_base_image_directory()
@@ -62,16 +61,17 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         data_collection = item.get_model()
         
         if data_collection.is_collected():
+            self.parameters_widget.set_enabled(False)
             self.populate_results(data_collection)
             self.stack.raiseWidget(self.results_view)
             self.toggle_page_button.setText("View parameters")
         else:
+            self.parameters_widget.set_enabled(True)
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
         self.parameters_widget.populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(data_collection.is_collected())
-
 
     def populate_results(self, data_collection):
         if data_collection.html_report[-4:] == 'html':
@@ -83,7 +83,6 @@ class DCParametersBrick(BaseComponents.BlissWidget):
         else:
             self.results_view.setText(html_template.html_report(data_collection))
         
-
     def toggle_page(self):
         if self.stack.visibleWidget() is self.parameters_widget:
             self.results_view.reload()
@@ -93,7 +92,6 @@ class DCParametersBrick(BaseComponents.BlissWidget):
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-      
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)

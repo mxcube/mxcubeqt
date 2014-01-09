@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>491</width>
-            <height>190</height>
+            <width>466</width>
+            <height>195</height>
         </rect>
     </property>
     <property name="caption">
@@ -312,7 +312,7 @@
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>16</height>
+                            <height>1</height>
                         </size>
                     </property>
                 </spacer>
@@ -330,7 +330,7 @@
             </property>
             <property name="sizeHint">
                 <size>
-                    <width>16</width>
+                    <width>1</width>
                     <height>20</height>
                 </size>
             </property>
