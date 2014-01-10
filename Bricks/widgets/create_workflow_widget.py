@@ -85,7 +85,6 @@ class CreateWorkflowWidget(CreateTaskBase):
                 getObjectByRole('vertical_motors')
         self._grid_widget.initialize_motors('vertical', motor)
 
-
     def init_models(self):
         CreateTaskBase.init_models(self)
 
