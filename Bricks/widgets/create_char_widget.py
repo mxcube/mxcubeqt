@@ -231,9 +231,12 @@ class CreateCharWidget(CreateTaskBase):
             #self._char_params = copy.deepcopy(self._char_params)
             #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
-        elif isinstance(tree_item, queue_item.CharacterisationQueueItem) and \
-                 (not tree_item.get_model().is_executed()):
-            self.setDisabled(False)
+        elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+            if tree_item.get_model().is_executed():
+                self.setDisabled(True)
+            else:
+                self.setDisabled(False)
+
             self._char = tree_item.get_model()
 
             if self._char.get_path_template():
@@ -333,6 +336,6 @@ class CreateCharWidget(CreateTaskBase):
                         path_template.run_number)
 
         tasks.append(char)
-        #self._path_template.run_number += 1
+        self._path_template.run_number += 1
 
         return tasks

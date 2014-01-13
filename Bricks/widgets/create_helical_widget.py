@@ -264,12 +264,14 @@ class CreateHelicalWidget(CreateTaskBase):
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
 
-        elif isinstance(tree_item, queue_item.DataCollectionQueueItem) and \
-                 (not tree_item.get_model().is_executed()):
+        elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
-                self.setDisabled(False)
+                if tree_item.get_model().is_executed():
+                    self.setDisabled(True)
+                else:
+                    self.setDisabled(False)
 
                 self._path_template = data_collection.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)

@@ -127,9 +127,7 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         Called by the parent widget when selection in the tree changes.
         """
-
         if len(items) == 1:
-
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
 

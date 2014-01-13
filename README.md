@@ -37,15 +37,17 @@ beamline specificities.
 ### git repository organization
 
 This repository includes two submodules, for both BlissFramework and HardwareRepository.
-After cloning you have to initialize and update submodules:
+Cloning can be done by the following commands:
 
+    git clone https://github.com/mxcube/mxcube.git mxcube-2
+    git checkout <latest_tag>
     git submodule init; git submodule update
-
-Or alternatively you can clone the repository with the --recursive option.
 
 Within the *bin* directory you can find scripts to start mxCuBE and the HWR server.
 By default the *mxcube* script loads *mxcube.gui* ; this file is **not** shipped with 
 the repository, for the first time it has to be created by making a copy of example_mxcube.gui.
+
+     cp example_mxcube.gui mxcube.gui
 
 ### Dependencies
 
@@ -57,11 +59,28 @@ the repository, for the first time it has to be created by making a copy of exam
 * [Qub](http://github.com/mxcube/qub)
 * [PyChooch](http://github.com/mxcube/pychooch)
 * [PyMca](http://sourceforge.net/projects/pymca/)
+* [PyTango] (http://www.tango-controls.org/static/PyTango/latest/doc/html/)
 
 SpecClient(http://github.com/mxcube/specclient) is an optional dependency. If it is
 not present, the Hardware Repository Server does not work, though. In this case
 it is possible to specify a directory containing the Hardware Objects XML files instead
 of a "host:port" string for the --hardwareRepository command line argument.
+
+#### Installing dpendencies for Debain 6 (ESRF)
+The ESRF install of Debian 6 is pre-installed with PyQt and PyQwt 5.
+Install PyTango and PyMca by issuing the following commands, make sure to be root.
+
+    apt-get install pymca	
+    apt-get install python2.6-pytango
+
+Install the other dependenices needed through the blissinstaller or type the following as
+blissadm:
+
+    bliss_rpm Qub	
+    bliss_rpm PyChooch
+    bliss_rpm PyDispatcher
+    bliss_rpm SpecClient-gevent
+    bliss_rpm gevent
 
 ## Running mxCuBE
 
