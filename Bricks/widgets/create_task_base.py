@@ -131,16 +131,7 @@ class CreateTaskBase(qt.QWidget):
                         check_for_path_collisions(self._path_template)
 
         if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else: 
-                # There is already incorrect input, do not chage background.
-                if widget.paletteBackgroundColor() != widget_colors.LIGHT_RED:
-                    widget.setPaletteBackgroundColor(widget_colors.WHITE)
+            self._data_path_widget.indicate_path_conflict(path_conflict)                    
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -371,14 +362,17 @@ class CreateTaskBase(qt.QWidget):
             sample_is_mounted = False
 
         free_pin_mode = sample.free_pin_mode
+        temp_tasks = self._create_task(sample, shape)
 
         if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
-            sc = queue_model_objects.SampleCentring('sample-centring')
-            tasks.append(sc)
 
-        temp_tasks = self._create_task(sample, shape)
+            # Check if the tasks requires centring, assumes that all
+            # the "sub tasks" has the same centring requirements.
+            if temp_tasks[0].requires_centring():
+                sc = queue_model_objects.SampleCentring('sample-centring')
+                tasks.append(sc)
 
         for task in temp_tasks:
             if sc:
