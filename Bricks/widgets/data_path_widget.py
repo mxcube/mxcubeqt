@@ -1,5 +1,6 @@
 import qt
 import os
+import logging
 import queue_model_objects_v1 as queue_model_objects
 
 from widgets.data_path_widget_horizontal_layout \
@@ -20,6 +21,7 @@ class DataPathWidget(qt.QWidget):
         #
         self._base_image_dir = None
         self._base_process_dir = None
+        self.path_conflict_state = False
         
         if data_model is None:
             self._data_model = queue_model_objects.PathTemplate()
@@ -165,4 +167,35 @@ class DataPathWidget(qt.QWidget):
         self.set_data_path(data_model.get_image_path())
         self._data_model_pm.set_model(data_model)
 
+    def indicate_path_conflict(self, conflict):
+
+        if conflict:
+            self.data_path_widget_layout.prefix_ledit.\
+                setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            
+            self.data_path_widget_layout.run_number_ledit.\
+                setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+
+            self.data_path_widget_layout.folder_ledit.\
+                setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+
+            logging.getLogger("user_level_log").\
+                error('The current path settings will overwrite data' +\
+                          ' from another task. Correct the problem before adding to queue')
+        else:
+            # We had a conflict previous, but its corrected now !
+            if self.path_conflict_state:
+                logging.getLogger("user_level_log").info('Path valid')
+
+            self.data_path_widget_layout.prefix_ledit.\
+                setPaletteBackgroundColor(widget_colors.WHITE)
+            
+            self.data_path_widget_layout.run_number_ledit.\
+                setPaletteBackgroundColor(widget_colors.WHITE)
+
+            self.data_path_widget_layout.folder_ledit.\
+                setPaletteBackgroundColor(widget_colors.WHITE)
+
+        self.path_conflict_state = conflict
+            
 
