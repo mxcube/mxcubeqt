@@ -127,10 +127,14 @@ class CreateDiscreteWidget(CreateTaskBase):
             dc = tree_item.get_model()
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
-                if tree_item.get_model().is_executed():
+                if dc.is_executed():
                     self.setDisabled(True)
                 else:
                     self.setDisabled(False)
+
+                sample_data_model = self.get_sample_item(tree_item).get_model()
+                energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+                self._acq_widget.set_energies(energy_scan_result)
 
                 self._acq_widget.disable_inverse_beam(True)
                 
