@@ -59,6 +59,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         d = {}
         self.emit(qt.PYSIGNAL("getView"), (d, ))
         self.task_tool_box_widget.workflow_page._grid_widget.connectToView(d)
+        self.task_tool_box_widget.workflow_page._grid_widget._setColor(qt.QWidget.green)
         self.task_tool_box_widget.workflow_page.\
             _grid_widget._shape_history = self.shape_history
         
