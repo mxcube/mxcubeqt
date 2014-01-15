@@ -89,10 +89,12 @@ class DataPathWidget(qt.QWidget):
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
         self.data_path_widget_layout.file_name_value_label.setText(file_name)
-
+        
         self.emit(qt.PYSIGNAL('path_template_changed'),
                   (self.data_path_widget_layout.prefix_ledit,
                    new_value))
+
+        self.data_path_widget_layout.run_number_ledit.setText('1')
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
