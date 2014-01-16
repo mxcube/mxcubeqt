@@ -101,7 +101,7 @@
                                 <cstring>__grabButton</cstring>
                             </property>
                             <property name="text">
-                                <string>Grab</string>
+                                <string>Define grid</string>
                             </property>
                             <property name="toggleButton">
                                 <bool>true</bool>
