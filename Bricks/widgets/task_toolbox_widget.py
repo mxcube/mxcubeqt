@@ -30,6 +30,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.method_group_box.setFont(font)
     
         self.tool_box = qt.QToolBox(self.method_group_box , "tool_box")
+        self.tool_box.setFixedWidth(475)
         font = self.tool_box.font()
         font.setPointSize(10)
         self.tool_box.setFont(font)

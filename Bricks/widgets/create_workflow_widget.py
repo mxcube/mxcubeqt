@@ -35,9 +35,8 @@ class CreateWorkflowWidget(CreateTaskBase):
                                                 data_model = self._path_template,
                                                 layout = DataPathWidgetVerticalLayout)
 
-        self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
-        self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
-
+        self._data_path_widget.data_path_widget_layout.child('file_name_label').setText('')
+        self._data_path_widget.data_path_widget_layout.child('file_name_value_label').hide()
 
         self._grid_widget = MxLookupScanBrick.\
                             MxLookupScanBrick(self, 'grid_widget')
@@ -47,21 +46,17 @@ class CreateWorkflowWidget(CreateTaskBase):
         v_layout.addWidget(self._grid_widget)
         v_layout.addStretch()
 
-        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+        self.connect(self._data_path_widget.data_path_widget_layout.child('prefix_ledit'), 
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+        self.connect(self._data_path_widget.data_path_widget_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
         self.connect(self._data_path_widget,
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
-        
-        #self.connect(self._workflow_cbox, qt.SIGNAL('activated ( const QString &)'),
-        #             self.workflow_selected)
-
 
     def set_workflow(self, workflow_hwobj):
         self._workflow_hwobj = workflow_hwobj

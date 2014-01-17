@@ -4,11 +4,7 @@ import qt
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
-
 from widgets.widget_utils import DataModelInputBinder
-from widgets.processing_widget_vertical_layout \
-    import ProcessingWidgetVerticalLayout
-
 
 class ProcessingWidget(qt.QWidget):
     def __init__(self, parent = None, name = None, fl = 0, data_model = None):
@@ -31,19 +27,10 @@ class ProcessingWidget(qt.QWidget):
         self.layout_widget = widget
         
         h_layout.addWidget(self.layout_widget)
-        self.layout_widget.child('upload_radio').setDisabled(True)
-        self.layout_widget.child('use_code_radio').setDisabled(True)
-        self.layout_widget.child('path_ledit').setDisabled(True)
-        self.layout_widget.child('browse_button').setDisabled(True)
-
+       
         self.layout_widget.child('space_group_ledit').\
             insertStrList(queue_model_enumerables.XTAL_SPACEGROUPS)
         
-        #self._model_mib.bind_value_update('space_group',
-        #                                  self.layout_widget.space_group_ledit,
-        #                                  int,
-        #                                  None)
-
         self._model_mib.bind_value_update('cell_a',
                                           self.layout_widget.child('a_ledit'),
                                           float,
@@ -93,11 +80,9 @@ class ProcessingWidget(qt.QWidget):
                      qt.SIGNAL("activated(int)"),
                      self._space_group_change)    
 
-
     def _space_group_change(self, index):
         self._model.space_group = queue_model_enumerables.\
             XTAL_SPACEGROUPS[index]
-
 
     def _set_space_group(self, space_group):
         index = 0
@@ -107,7 +92,6 @@ class ProcessingWidget(qt.QWidget):
         
         self._space_group_change(index)
         self.layout_widget.child('space_group_ledit').setCurrentItem(index)
-        
 
     def update_data_model(self, model):
         self._model = model

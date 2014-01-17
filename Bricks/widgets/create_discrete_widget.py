@@ -8,7 +8,6 @@ import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.processing_widget import ProcessingWidget
-from widgets.data_path_widget_vertical_layout import DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from create_task_base import CreateTaskBase
 
@@ -35,13 +34,17 @@ class CreateDiscreteWidget(CreateTaskBase):
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
+        self._acq_gbox.setFixedSize(450, 320)
+
         self._data_path_gbox = qt.QVGroupBox('Data location',
                                              self, 'data_path_gbox')
+        self._data_path_gbox.setFixedSize(450, 220)
+        
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox,
                            'create_dc_path_widget',
                            data_model=self._path_template,
-                           layout=DataPathWidgetVerticalLayout)
+                           layout='vertical')
 
         self._processing_gbox = qt.QVGroupBox('Processing', self,
                                               'processing_gbox')
@@ -50,6 +53,9 @@ class CreateDiscreteWidget(CreateTaskBase):
             ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
 
+        self._processing_gbox.setFixedSize(450, 180)
+
+        
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._processing_gbox)
@@ -59,11 +65,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.connect(self._acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
         
-        self.connect(dp_layout.prefix_ledit,
+        self.connect(dp_layout.child('prefix_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
 
-        self.connect(dp_layout.run_number_ledit,
+        self.connect(dp_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 

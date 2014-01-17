@@ -8,9 +8,23 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>466</width>
-            <height>195</height>
+            <width>461</width>
+            <height>223</height>
         </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>1</hsizetype>
+            <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="maximumSize">
+        <size>
+            <width>475</width>
+            <height>230</height>
+        </size>
     </property>
     <property name="caption">
         <string>Data path</string>
@@ -27,30 +41,36 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>main_layout</cstring>
+                <cstring>layout76</cstring>
             </property>
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>5</number>
+                </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>rone_layout</cstring>
+                        <cstring>layout74</cstring>
                     </property>
-                    <hbox>
+                    <vbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
+                        <property name="spacing">
+                            <number>4</number>
+                        </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>rone_cone_vlayout</cstring>
+                                <cstring>layout64</cstring>
                             </property>
-                            <vbox>
+                            <hbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
-                                </property>
-                                <property name="spacing">
-                                    <number>30</number>
                                 </property>
                                 <widget class="QLabel">
                                     <property name="name">
@@ -66,6 +86,172 @@
                                         <string>Folder:</string>
                                     </property>
                                 </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer22</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>21</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout73</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout71</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="spacing">
+                                            <number>0</number>
+                                        </property>
+                                        <spacer>
+                                            <property name="name">
+                                                <cstring>spacer23</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Fixed</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>10</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>base_path_label</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>410</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>410</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                            <property name="paletteBackgroundColor">
+                                                <color>
+                                                    <red>192</red>
+                                                    <green>192</green>
+                                                    <blue>192</blue>
+                                                </color>
+                                            </property>
+                                            <property name="frameShape">
+                                                <enum>Box</enum>
+                                            </property>
+                                            <property name="frameShadow">
+                                                <enum>Plain</enum>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="readOnly">
+                                                <bool>true</bool>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout72</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="spacing">
+                                            <number>0</number>
+                                        </property>
+                                        <spacer>
+                                            <property name="name">
+                                                <cstring>spacer23_2</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Fixed</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>10</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>folder_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>0</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>410</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout75</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout67</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
                                 <widget class="QLabel">
                                     <property name="name">
                                         <cstring>file_name_label</cstring>
@@ -80,224 +266,161 @@
                                         <string>File name:</string>
                                     </property>
                                 </widget>
-                            </vbox>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>file_name_value_label</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>250</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                        <size>
+                                            <width>250</width>
+                                            <height>32767</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>file_name_hspacer</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>19</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>browse_button</cstring>
+                                    </property>
+                                    <property name="maximumSize">
+                                        <size>
+                                            <width>75</width>
+                                            <height>32767</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Browse</string>
+                                    </property>
+                                </widget>
+                            </hbox>
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>rone_ctwo_layout</cstring>
+                                <cstring>rtwo_hlayout</cstring>
                             </property>
-                            <vbox>
+                            <hbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
                                 </property>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>base_path_label</cstring>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>350</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property name="maximumSize">
-                                        <size>
-                                            <width>350</width>
-                                            <height>32767</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                    <property name="readOnly">
-                                        <bool>true</bool>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>folder_ledit</cstring>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>350</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property name="maximumSize">
-                                        <size>
-                                            <width>350</width>
-                                            <height>32767</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>file_name_hlayout</cstring>
+                                        <cstring>rtwo_cone_vlayout</cstring>
                                     </property>
-                                    <hbox>
+                                    <vbox>
                                         <property name="name">
                                             <cstring>unnamed</cstring>
                                         </property>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>file_name_value_label</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>250</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>250</width>
-                                                    <height>32767</height>
-                                                </size>
+                                                <cstring>prefix_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string></string>
+                                                <string>Prefix</string>
                                             </property>
                                         </widget>
-                                        <spacer>
+                                        <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>file_name_hspacer</cstring>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Horizontal</enum>
-                                            </property>
-                                            <property name="sizeType">
-                                                <enum>Expanding</enum>
-                                            </property>
-                                            <property name="sizeHint">
-                                                <size>
-                                                    <width>1</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
-                                        <widget class="QPushButton">
-                                            <property name="name">
-                                                <cstring>browse_button</cstring>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>75</width>
-                                                    <height>32767</height>
-                                                </size>
+                                                <cstring>run_number_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Browse</string>
+                                                <string>Run number</string>
                                             </property>
                                         </widget>
-                                    </hbox>
-                                </widget>
-                            </vbox>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>rtwo_hlayout</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>rtwo_cone_vlayout</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>prefix_label</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Prefix</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>run_number_label</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Run number</string>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>rtwo_ctwo_vlayout</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>prefix_ledit</cstring>
-                                    </property>
-                                    <property name="maximumSize">
-                                        <size>
-                                            <width>225</width>
-                                            <height>32767</height>
-                                        </size>
-                                    </property>
+                                    </vbox>
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>run_number_layout</cstring>
+                                        <cstring>rtwo_ctwo_vlayout</cstring>
                                     </property>
-                                    <hbox>
+                                    <vbox>
                                         <property name="name">
                                             <cstring>unnamed</cstring>
                                         </property>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>run_number_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>0</height>
-                                                </size>
+                                                <cstring>prefix_ledit</cstring>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>225</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
                                         </widget>
-                                        <spacer>
+                                        <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>run_number_spacer</cstring>
+                                                <cstring>run_number_layout</cstring>
                                             </property>
-                                            <property name="orientation">
-                                                <enum>Horizontal</enum>
-                                            </property>
-                                            <property name="sizeType">
-                                                <enum>Expanding</enum>
-                                            </property>
-                                            <property name="sizeHint">
-                                                <size>
-                                                    <width>1</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
-                                    </hbox>
+                                            <hbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLineEdit">
+                                                    <property name="name">
+                                                        <cstring>run_number_ledit</cstring>
+                                                    </property>
+                                                    <property name="minimumSize">
+                                                        <size>
+                                                            <width>50</width>
+                                                            <height>0</height>
+                                                        </size>
+                                                    </property>
+                                                    <property name="maximumSize">
+                                                        <size>
+                                                            <width>50</width>
+                                                            <height>32767</height>
+                                                        </size>
+                                                    </property>
+                                                </widget>
+                                                <spacer>
+                                                    <property name="name">
+                                                        <cstring>run_number_spacer</cstring>
+                                                    </property>
+                                                    <property name="orientation">
+                                                        <enum>Horizontal</enum>
+                                                    </property>
+                                                    <property name="sizeType">
+                                                        <enum>Expanding</enum>
+                                                    </property>
+                                                    <property name="sizeHint">
+                                                        <size>
+                                                            <width>1</width>
+                                                            <height>20</height>
+                                                        </size>
+                                                    </property>
+                                                </spacer>
+                                            </hbox>
+                                        </widget>
+                                    </vbox>
                                 </widget>
-                            </vbox>
+                            </hbox>
                         </widget>
-                    </hbox>
+                    </vbox>
                 </widget>
                 <spacer>
                     <property name="name">
@@ -307,12 +430,12 @@
                         <enum>Vertical</enum>
                     </property>
                     <property name="sizeType">
-                        <enum>Expanding</enum>
+                        <enum>MinimumExpanding</enum>
                     </property>
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>1</height>
+                            <height>0</height>
                         </size>
                     </property>
                 </spacer>
@@ -330,7 +453,7 @@
             </property>
             <property name="sizeHint">
                 <size>
-                    <width>1</width>
+                    <width>21</width>
                     <height>20</height>
                 </size>
             </property>
