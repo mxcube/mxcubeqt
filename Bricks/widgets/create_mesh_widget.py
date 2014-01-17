@@ -25,7 +25,7 @@ class CreateMeshWidget(QWidget):
         cols_ledit = QLineEdit(self)
         cols_ledit.setMaximumSize(QSize(50,25))
         
-        grab_button = QPushButton("Grab", self)
+        grab_button = QPushButton("Define grid", self)
         show_button = QPushButton("Show", self)
         
         col_one_vlayout.addWidget(rows_label)

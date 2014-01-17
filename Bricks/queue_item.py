@@ -206,7 +206,7 @@ class SampleQueueItem(QueueItem):
         dc_tree_widget._loaded_sample_item = self
         self.setPixmap(0, dc_tree_widget.pin_pixmap)
 
-    def set_mounted_style(self, state):
+    def set_mounted_style(self, state, clear_background = False):
         self.mounted_style = state
 
         if state:
@@ -216,15 +216,22 @@ class SampleQueueItem(QueueItem):
             self.setFontBold(True)
         else:
             self.setPixmap(0, qt.QPixmap())
-            self.restoreBackgroundColor()
+
+            if clear_background:
+               self.setBackgroundColor(widget_colors.WHITE)  
+            else:
+                queue_entry = self.get_queue_entry()
+
+                if queue_entry:
+                    queue_entry._set_background_color()
+
             self.setSelected(False)
             self.setFontBold(False)
             self.setText(1, '')
 
     def reset_style(self):
         QueueItem.reset_style(self)
-        if self.mounted_style:
-            self.set_mounted_style(True)
+        self.set_mounted_style(self.mounted_style, clear_background = True)
             
 
 class TaskQueueItem(QueueItem):
