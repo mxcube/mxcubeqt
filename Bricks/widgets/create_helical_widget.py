@@ -8,8 +8,6 @@ import ShapeHistory as shape_history
 
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from widgets.processing_widget import ProcessingWidget
 
@@ -74,7 +72,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox, 
                            data_model = self._path_template,
-                           layout = DataPathWidgetVerticalLayout)
+                           layout = 'vertical')
 
         self._processing_gbox = qt.QVGroupBox('Processing', self, 
                                               'processing_gbox')
@@ -98,10 +96,10 @@ class CreateHelicalWidget(CreateTaskBase):
                            self.list_box_selection_changed)
 
         prefix_ledit = self._data_path_widget.\
-                       data_path_widget_layout.prefix_ledit
+                       data_path_widget_layout.child('prefix_ledit')
 
         run_number_ledit = self._data_path_widget.\
-                           data_path_widget_layout.run_number_ledit
+                           data_path_widget_layout.child('run_number_ledit')
 
         self.connect(prefix_ledit, 
                      qt.SIGNAL("textChanged(const QString &)"), 

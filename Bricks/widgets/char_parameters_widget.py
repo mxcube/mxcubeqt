@@ -247,11 +247,11 @@ class CharParametersWidget(qt.QWidget):
                            qt.SIGNAL("toggled(bool)"),
                            self.enable_aimed_mult_ledit)
 
-        qt.QObject.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
+        qt.QObject.connect(self.path_widget.data_path_widget_layout.child('prefix_ledit'), 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._prefix_ledit_change)
         
-        qt.QObject.connect(self.path_widget.data_path_widget_layout.run_number_ledit, 
+        qt.QObject.connect(self.path_widget.data_path_widget_layout.child('run_number_ledit'), 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._run_number_ledit_change)
 

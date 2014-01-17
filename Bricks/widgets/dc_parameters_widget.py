@@ -57,11 +57,11 @@ class DCParametersWidget(qt.QWidget):
         self.connect(self.acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
 
-        self.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
+        self.connect(self.path_widget.data_path_widget_layout.child('prefix_ledit'), 
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-        self.connect(self.path_widget.data_path_widget_layout.run_number_ledit,
+        self.connect(self.path_widget.data_path_widget_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 

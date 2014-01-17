@@ -375,9 +375,10 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('subwedge_size_ledit').show()        
 
     def hide_aperture(self, state):
-        if state:
-            self.acq_widget_layout.child('aperture_ledit').show()
-            self.acq_widget_layout.child('aperture_cbox').show()
-        else:
-            self.acq_widget_layout.child('aperture_ledit').hide()
-            self.acq_widget_layout.child('aperture_cbox').hide()
+        pass
+        #if state:
+        #    self.acq_widget_layout.child('aperture_ledit').show()
+        #    self.acq_widget_layout.child('aperture_cbox').show()
+        #else:
+        #    self.acq_widget_layout.child('aperture_ledit').hide()
+        #    self.acq_widget_layout.child('aperture_cbox').hide()
