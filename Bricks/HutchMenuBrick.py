@@ -584,8 +584,9 @@ class HutchMenuBrick(BlissWidget):
     def connectNotify(self, signalName):
         if signalName=='beamPositionChanged':
             if self.minidiff and self.minidiff.isReady():
-                print "BeamPositionSignal: ", self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()
-    	        self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()))
+                beam_xc = self.minidiff.getBeamPosX()
+                beam_yc = self.minidiff.getBeamPosY()
+                self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc))
         elif signalName=='calibrationChanged':
             if self.minidiff and self.minidiff.isReady():
                 try:
@@ -599,8 +600,9 @@ class HutchMenuBrick(BlissWidget):
         try:
             pxmmy=self.minidiff.pixelsPerMmY
             pxmmz=self.minidiff.pixelsPerMmZ
-            print "BeamPositionSignal: ", self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()
-            self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY()))
+            beam_xc = self.minidiff.getBeamPosX()
+            beam_yc = self.minidiff.getBeamPosY()
+            self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc))
         except:
             pxmmy=None
             pxmmz=None 
@@ -720,7 +722,8 @@ class HutchMenuBrick(BlissWidget):
 
     def updateBeam(self,force=False):
         if self["displayBeam"]:
-              beam_x, beam_y = (self.minidiff.imgWidth/2, self.minidiff.imgHeight/2)
+              beam_x = self.minidiff.getBeamPosX()
+              beam_y = self.minidiff.getBeamPosY()
               try:
                 self.__beam.move(beam_x, beam_y)
                 try:
@@ -765,6 +768,7 @@ class HutchMenuBrick(BlissWidget):
                     self.emit(PYSIGNAL("calibrationChanged"), (pxsize_y, pxsize_z))
                     self._drawBeam()
                     self.__scale.show()
+            self.updateBeam(True)
                
 
     # Slits changed: update beam size
