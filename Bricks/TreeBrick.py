@@ -370,6 +370,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         
         :returns: A list with tuples, containing the sample information.
         """
+        # import pdb; pdb.set_trace()
         sc_content = []
       
         try: 
