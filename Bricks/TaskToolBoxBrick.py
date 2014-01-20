@@ -24,6 +24,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.diffractometer_hwobj = None
         self.beamline_setup = None
         self.queue_model_hwobj = None
+        self.session_hwobj = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -77,11 +78,15 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
 
-        session_hwobj = self.beamline_setup_hwobj.session_hwobj
-        if session_hwobj.session_id:
+        self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
+        if self.session_hwobj.session_id:
             self.setEnabled(True)
 
-
+    def user_group_saved(self, new_user_group):
+        self.session_hwobj.set_user_group(str(new_user_group))
+        msg = 'Base path is: %s' % self.session_hwobj.get_base_image_directory()
+        logging.getLogger('user_level_log').info(msg)
+        
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):

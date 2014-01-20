@@ -55,14 +55,14 @@ class ProposalBrick2(BlissWidget):
         self.defineSignal('sessionSelected',())
         self.defineSignal('setWindowTitle',())
         self.defineSignal('loggedIn', ())
+        self.defineSignal('user_group_saved', ())
         self.defineSlot('setButtonEnabled',())
         self.defineSlot('impersonateProposal',())
-
 
         # Initialize GUI elements
         self.contentsBox=QHGroupBox("User",self)
         self.contentsBox.setInsideMargin(4)
-        self.contentsBox.setInsideSpacing(0)
+        self.contentsBox.setInsideSpacing(5)
 
         self.loginBox=QHBox(self.contentsBox, 'login_box')
         code_label=QLabel("  Code: ",self.loginBox)
@@ -90,6 +90,34 @@ class ProposalBrick2(BlissWidget):
         self.loginButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.connect(self.loginButton,SIGNAL('clicked()'),self.login)
 
+        #labels_box=QHBox(self.contentsBox, 'contents_box')
+        #labels_box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        #font = labels_box.font()
+        #font.setPointSize(10)
+        #labels_box.setFont(font)
+
+        #self.proposalLabel=QLabel(ProposalBrick2.NOBODY_STR,labels_box)
+        #self.proposalLabel.setAlignment(Qt.AlignCenter)
+
+        self.user_group_layout = QHBox(self.contentsBox, 'group_box')
+
+        self.titleLabel=QLabel(self.user_group_layout)
+        self.titleLabel.setAlignment(Qt.AlignCenter)
+        self.titleLabel.hide()
+
+        self.user_group_label = QLabel("  Group: ", self.user_group_layout)
+        self.user_group_ledit = QLineEdit(self.user_group_layout)
+        self.user_group_ledit.setFixedWidth(100)
+        self.user_group_save_button = QToolButton(self.user_group_layout)
+        self.user_group_save_button.setText("Save")
+        self.connect(self.user_group_save_button, SIGNAL('clicked()'), self.save_group)
+        self.connect(self.user_group_ledit,
+                     SIGNAL('textChanged(const QString &)'), self.user_group_changed)
+        self.user_group_label.hide()
+        self.user_group_ledit.hide()
+        self.user_group_save_button.hide()
+        self.saved_group = True
+
         self.logoutButton=QToolButton(self.contentsBox)
         self.logoutButton.setTextLabel("Logout")
         font = self.logoutButton.font()
@@ -101,24 +129,27 @@ class ProposalBrick2(BlissWidget):
         self.connect(self.logoutButton,SIGNAL('clicked()'),self.openLogoutDialog)
         self.logoutButton.hide()
 
-        labels_box=QHBox(self.contentsBox, 'contents_box')
-        labels_box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
-        font = labels_box.font()
-        font.setPointSize(10)
-        labels_box.setFont(font)
-
-        self.titleLabel=QLabel(labels_box)
-        self.titleLabel.setAlignment(Qt.AlignCenter)
-        self.titleLabel.hide()
-        #self.proposalLabel=QLabel(ProposalBrick2.NOBODY_STR,labels_box)
-        #self.proposalLabel.setAlignment(Qt.AlignCenter)
-
         # Initialize layout
         QHBoxLayout(self)
         self.layout().addWidget(self.contentsBox)
         self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         self.contentsBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
+    def save_group(self):
+        self.saved_group = True
+        self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
+        msg = 'User group set to: %s' % str(self.user_group_ledit.text())
+        logging.getLogger("user_level_log").info(msg)
+        self.emit(PYSIGNAL("user_group_saved"), (self.user_group_ledit.text(),))
+
+    def user_group_changed(self, value):
+        if self.saved_group:
+            msg = 'User group changed, press save to apply change'
+            logging.getLogger("user_level_log").info(msg)
+            self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+
+        self.saved_group = False
+        
     def customEvent(self,event):
         #logging.getLogger().debug("ProposalBrick2: custom event (%s)" % str(event))
 
@@ -183,6 +214,10 @@ class ProposalBrick2(BlissWidget):
         self.loginBox.show()
         self.logoutButton.hide()
         self.titleLabel.hide()
+        self.user_group_label.hide()
+        self.user_group_ledit.hide()
+        self.user_group_save_button.hide()
+        
         #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
        
@@ -244,14 +279,17 @@ class ProposalBrick2(BlissWidget):
 
             # Set interface info and signal the new session
             proposal_text = "%s-%s" % (proposal['code'],proposal['number'])
-            self.titleLabel.setText("<nobr><b><big>%s</big></b>" % proposal_text)
+            self.titleLabel.setText("<nobr>   User: <b>%s</b>" % proposal_text)
             tooltip = "\n".join([proposal_text, header, title]) 
             if comments:
                 tooltip+='\n'
                 tooltip+='Comments: '+comments 
             QToolTip.add(self.titleLabel, tooltip)
             self.titleLabel.show()
-
+            self.user_group_label.show()
+            self.user_group_ledit.show()
+            self.user_group_save_button.show()
+        
             try:
                 end_time=session['endDate'].split()[1]
                 end_date_list=end_date.split('-')
@@ -293,6 +331,9 @@ class ProposalBrick2(BlissWidget):
           self.loginBox.hide()
           self.titleLabel.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
           self.titleLabel.show()
+          self.user_group_label.show()
+          self.user_group_ledit.show()
+          self.user_group_save_button.show()
 
           self.session_hwobj.proposal_code = ""
           self.session_hwobj.session_id = 1
