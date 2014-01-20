@@ -85,6 +85,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
 
     def user_group_saved(self, new_user_group):
         self.session_hwobj.set_user_group(str(new_user_group))
+        self.task_tool_box_widget.update_data_path_model()
         msg = 'Base path is: %s' % self.session_hwobj.get_base_image_directory()
         logging.getLogger('user_level_log').info(msg)
         

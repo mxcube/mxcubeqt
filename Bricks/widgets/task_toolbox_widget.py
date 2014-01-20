@@ -94,6 +94,13 @@ class TaskToolBoxWidget(qt.QWidget):
             self.tool_box.removeItem(self.energy_scan_page)
             self.energy_scan_page.hide()
 
+    def update_data_path_model(self):
+        for i in range(0, self.tool_box.count()):
+            item = self.tool_box.item(i)
+            item.init_data_path_model()
+            item.update_selection()
+
+            
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)

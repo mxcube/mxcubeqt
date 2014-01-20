@@ -47,6 +47,20 @@ class CreateTaskBase(qt.QWidget):
                             self.tab_changed)
 
     def init_models(self):
+        self.init_acq_model()
+        self.init_data_path_model()
+
+    def init_acq_model(self):
+        bl_setup = self._beamline_setup_hwobj
+
+        if bl_setup is not None:
+            if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
+                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+
+    def init_data_path_model(self):
         bl_setup = self._beamline_setup_hwobj
 
         if bl_setup is not None:
@@ -65,13 +79,8 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.base_prefix = self.get_default_prefix()
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
-
-            if self._acq_widget:
-                self._acq_widget.set_beamline_setup(bl_setup)
-                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to

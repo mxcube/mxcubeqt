@@ -146,7 +146,7 @@ class ProposalBrick2(BlissWidget):
     def user_group_changed(self, value):
         if self.saved_group:
             msg = 'User group changed, press save to apply change'
-            logging.getLogger("user_level_log").info(msg)
+            logging.getLogger("user_level_log").warning(msg)
             self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
 
         self.saved_group = False
