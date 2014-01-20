@@ -5,6 +5,7 @@ import logging
 import MiniDiff
 import CommandMenuBrick
 import os
+import time
 import tempfile
 
 from Qub.Objects.QubDrawingManager import QubPointDrawingMgr, Qub2PointSurfaceDrawingMgr, QubAddDrawing
@@ -722,6 +723,7 @@ class HutchMenuBrick(BlissWidget):
 
     def updateBeam(self,force=False):
         if self["displayBeam"]:
+              if not self.minidiff.isReady(): time.sleep(0.2)
               beam_x = self.minidiff.getBeamPosX()
               beam_y = self.minidiff.getBeamPosY()
               try:
