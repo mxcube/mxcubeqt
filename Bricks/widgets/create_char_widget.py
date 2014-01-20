@@ -219,8 +219,7 @@ class CreateCharWidget(CreateTaskBase):
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
             self._init_models()
             self._set_space_group(self._char_params.space_group)
             self._acq_widget.update_data_model(self._acquisition_parameters,
