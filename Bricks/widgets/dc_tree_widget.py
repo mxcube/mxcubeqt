@@ -66,6 +66,7 @@ class DataCollectTree(qt.QWidget):
         self.delete_button = qt.QPushButton(self, "delete_button")
         self.delete_button.setPixmap(self.delete_pixmap)
         self.delete_button.setDisabled(True)
+        qt.QToolTip.add(self.delete_button, "Delete highlighted queue entries")
 
         self.down_button = qt.QPushButton(self, "down_button")
         self.down_button.setPixmap(self.down_pixmap)
@@ -79,6 +80,7 @@ class DataCollectTree(qt.QWidget):
         self.continue_button = qt.QPushButton(self, "ok_button")
         self.continue_button.setText('Pause')
         self.continue_button.setEnabled(True)
+        qt.QToolTip.add(self.continue_button, "Pause after current data collection")
 
         self.sample_list_view = qt.QListView(self, "sample_list_view")
         self.sample_list_view.setSelectionMode(qt.QListView.Extended)
