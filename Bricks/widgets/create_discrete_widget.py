@@ -34,12 +34,8 @@ class CreateDiscreteWidget(CreateTaskBase):
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
-        self._acq_gbox.setFixedSize(450, 320)
-
         self._data_path_gbox = qt.QVGroupBox('Data location',
-                                             self, 'data_path_gbox')
-        self._data_path_gbox.setFixedSize(450, 220)
-        
+                                             self, 'data_path_gbox')        
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox,
                            'create_dc_path_widget',
@@ -52,9 +48,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget = \
             ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
-
-        self._processing_gbox.setFixedSize(450, 180)
-
         
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)

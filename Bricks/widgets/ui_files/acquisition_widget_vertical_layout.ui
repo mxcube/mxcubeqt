@@ -6,24 +6,24 @@
     </property>
     <property name="geometry">
         <rect>
-            <x>1</x>
-            <y>4</y>
-            <width>450</width>
-            <height>350</height>
+            <x>0</x>
+            <y>0</y>
+            <width>518</width>
+            <height>358</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
-            <hsizetype>0</hsizetype>
-            <vsizetype>0</vsizetype>
+            <hsizetype>7</hsizetype>
+            <vsizetype>7</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
     </property>
     <property name="maximumSize">
         <size>
-            <width>450</width>
-            <height>350</height>
+            <width>32767</width>
+            <height>32767</height>
         </size>
     </property>
     <property name="caption">
@@ -34,7 +34,7 @@
             <cstring>unnamed</cstring>
         </property>
         <property name="margin">
-            <number>0</number>
+            <number>2</number>
         </property>
         <property name="spacing">
             <number>0</number>
@@ -44,7 +44,7 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout87</cstring>
+                <cstring>main_layout</cstring>
             </property>
             <vbox>
                 <property name="name">
@@ -58,7 +58,7 @@
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>layout41</cstring>
+                        <cstring>container_layout</cstring>
                     </property>
                     <vbox>
                         <property name="name">
@@ -69,7 +69,7 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout18</cstring>
+                                <cstring>rone_container_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -80,7 +80,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>layout37</cstring>
+                                        <cstring>rone_cone_container_layout</cstring>
                                     </property>
                                     <hbox>
                                         <property name="name">
@@ -88,7 +88,7 @@
                                         </property>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>layout36</cstring>
+                                                <cstring>rone_cone_label_layout</cstring>
                                             </property>
                                             <vbox>
                                                 <property name="name">
@@ -122,7 +122,7 @@
                                         </widget>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>row_one_ledit_vlayout</cstring>
+                                                <cstring>rone_cone_ledit_layout</cstring>
                                             </property>
                                             <vbox>
                                                 <property name="name">
@@ -185,7 +185,7 @@
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rone_ctwo_hlayout</cstring>
+                                        <cstring>rone_ctwo_container_layout</cstring>
                                     </property>
                                     <hbox>
                                         <property name="name">
@@ -193,7 +193,7 @@
                                         </property>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>row_two_labels_vlayout</cstring>
+                                                <cstring>row_one_ctwo_label_layout</cstring>
                                             </property>
                                             <vbox>
                                                 <property name="name">
@@ -230,7 +230,7 @@
                                         </widget>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>row_two_ledit_vlayout</cstring>
+                                                <cstring>row_one_ctwo_ledit_layout</cstring>
                                             </property>
                                             <vbox>
                                                 <property name="name">
@@ -295,7 +295,7 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout40</cstring>
+                                <cstring>rtwo_container_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -306,7 +306,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>row_three_labels_layout</cstring>
+                                        <cstring>rtwo_label_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -348,7 +348,7 @@
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>layout39</cstring>
+                                        <cstring>rtwo_ledit_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -373,7 +373,7 @@
                                         </widget>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>layout38</cstring>
+                                                <cstring>mad_container_layout</cstring>
                                             </property>
                                             <hbox>
                                                 <property name="name">
@@ -484,7 +484,7 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout20</cstring>
+                                <cstring>cthree_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -581,7 +581,7 @@
                 </widget>
                 <spacer>
                     <property name="name">
-                        <cstring>vspacer_2</cstring>
+                        <cstring>vspacer</cstring>
                     </property>
                     <property name="orientation">
                         <enum>Vertical</enum>
@@ -600,7 +600,7 @@
         </widget>
         <spacer>
             <property name="name">
-                <cstring>row_one_spacer_2_3</cstring>
+                <cstring>hspacer</cstring>
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>

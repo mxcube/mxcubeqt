@@ -6,7 +6,7 @@ import abc
 import copy
 import ShapeHistory as shape_history
 
-from BlissFramework.Utils import widget_colors
+#from BlissFramework.Utils import widget_colors
 
 
 class CreateTaskBase(qt.QWidget):
