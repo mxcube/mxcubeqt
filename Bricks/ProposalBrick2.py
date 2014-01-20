@@ -109,8 +109,9 @@ class ProposalBrick2(BlissWidget):
         self.user_group_ledit = QLineEdit(self.user_group_layout)
         self.user_group_ledit.setFixedWidth(100)
         self.user_group_save_button = QToolButton(self.user_group_layout)
-        self.user_group_save_button.setText("Save")
+        self.user_group_save_button.setText("Set")
         self.connect(self.user_group_save_button, SIGNAL('clicked()'), self.save_group)
+        self.connect(self.user_group_ledit, SIGNAL('returnPressed ()'), self.save_group)
         self.connect(self.user_group_ledit,
                      SIGNAL('textChanged(const QString &)'), self.user_group_changed)
         self.user_group_label.hide()
