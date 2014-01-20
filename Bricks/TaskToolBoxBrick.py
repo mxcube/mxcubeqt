@@ -1,3 +1,4 @@
+import os
 import qt
 import queue_model_objects_v1 as queue_model_objects
 import logging
@@ -86,6 +87,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
     def user_group_saved(self, new_user_group):
         self.session_hwobj.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
+        os.makedirs(self.session_hwobj.get_base_image_directory())
         msg = 'Base path is: %s' % self.session_hwobj.get_base_image_directory()
         logging.getLogger('user_level_log').info(msg)
         
