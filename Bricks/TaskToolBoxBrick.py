@@ -37,6 +37,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.defineSlot("new_centred_position", ())
         self.defineSlot("change_pixel_calibration", ())
         self.defineSlot("change_beam_position", ())
+        self.defineSlot("user_group_saved", ())
 
         # Layout
         self.task_tool_box_widget = TaskToolBoxWidget(self)
@@ -108,7 +109,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
-        #import pdb;pdb.set_trace()
         self.ispyb_logged_in = logged_in
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)
