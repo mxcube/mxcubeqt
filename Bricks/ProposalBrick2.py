@@ -137,12 +137,19 @@ class ProposalBrick2(BlissWidget):
         self.contentsBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
     def save_group(self):
-        self.saved_group = True
-        self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
-        msg = 'User group set to: %s' % str(self.user_group_ledit.text())
-        logging.getLogger("user_level_log").info(msg)
-        self.emit(PYSIGNAL("user_group_saved"), (self.user_group_ledit.text(),))
+        user_group = str(self.user_group_ledit.text())
 
+        if user_group.isalnum() or user_group == "":
+            self.saved_group = True
+            self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
+            msg = 'User group set to: %s' % str(self.user_group_ledit.text())
+            logging.getLogger("user_level_log").info(msg)
+            self.emit(PYSIGNAL("user_group_saved"), (self.user_group_ledit.text(),))
+        else:
+            msg = 'User group not valid, please enter a valid user group'
+            logging.getLogger("user_level_log").info(msg)
+            self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+            
     def user_group_changed(self, value):
         if self.saved_group:
             msg = 'User group changed, press set to apply change'
