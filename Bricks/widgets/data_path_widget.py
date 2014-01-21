@@ -98,8 +98,6 @@ class DataPathWidget(qt.QWidget):
                   (self.data_path_widget_layout.child('prefix_ledit'),
                    new_value))
 
-        self.data_path_widget_layout.child('run_number_ledit').setText('1')
-
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.set_run_number(new_value)

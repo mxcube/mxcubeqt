@@ -280,16 +280,16 @@ class CreateTaskBase(qt.QWidget):
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self._path_template = copy.deepcopy(self._path_template)
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(self._path_template)
+            # self._path_template = copy.deepcopy(self._path_template)
+            # self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            # self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            #     get_next_run_number(self._path_template)
 
-            #Update energy transmission and resolution
-            if self._acq_widget:
-                self._update_etr()
+            # #Update energy transmission and resolution
+            # if self._acq_widget:
+            #     self._update_etr()
 
-            self.setDisabled(False)
+            self.setDisabled(True)
 
         if self._item_is_group_or_sample():
             if self._acq_widget:

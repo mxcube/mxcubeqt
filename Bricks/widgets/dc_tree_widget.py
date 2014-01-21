@@ -62,6 +62,7 @@ class DataCollectTree(qt.QWidget):
                         
         self.up_button = qt.QPushButton(self, "up_button")
         self.up_button.setPixmap(self.up_pixmap)
+        self.up_button.setFixedHeight(25)
 
         self.delete_button = qt.QPushButton(self, "delete_button")
         self.delete_button.setPixmap(self.delete_pixmap)
@@ -70,10 +71,11 @@ class DataCollectTree(qt.QWidget):
 
         self.down_button = qt.QPushButton(self, "down_button")
         self.down_button.setPixmap(self.down_pixmap)
+        self.down_button.setFixedHeight(25)
 
         self.collect_button = qt.QPushButton(self, "collect_button")
         self.collect_button.setText("Collect Queue")
-        self.collect_button.setFixedWidth(120)
+        self.collect_button.setFixedWidth(125)
         self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
         self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
 
@@ -92,7 +94,7 @@ class DataCollectTree(qt.QWidget):
     
         self.sample_list_view.setSorting(-1)
         self.sample_list_view.addColumn("", 280)
-        self.sample_list_view.addColumn("", 120)
+        self.sample_list_view.addColumn("", 115)
         self.sample_list_view.header().hide()
 
         self.sample_list_view.header().hide()
@@ -147,6 +149,7 @@ class DataCollectTree(qt.QWidget):
                            self.continue_button_click)
 
         self.sample_list_view.viewport().installEventFilter(self)
+        self.setFixedWidth(415)
 
     def eventFilter(self, _object, event):
         if event.type() == qt.QEvent.MouseButtonDblClick:
