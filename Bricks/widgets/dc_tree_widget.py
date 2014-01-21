@@ -95,7 +95,7 @@ class DataCollectTree(qt.QWidget):
     
         self.sample_list_view.setSorting(-1)
         self.sample_list_view.addColumn("", 280)
-        self.sample_list_view.addColumn("", 115)
+        self.sample_list_view.addColumn("", 130)
         self.sample_list_view.header().hide()
 
         self.sample_list_view.header().hide()
