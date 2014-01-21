@@ -443,6 +443,9 @@ class ProposalBrick2(BlissWidget):
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
+        self.saved_group = False
+        self.user_group_ledit.setPaletteBackgroundColor(widget_colors.WHITE)
+        self.user_group_ledit.setText('')
         self.setEnabled(False)
 
         prop_type=str(self.propType.currentText())
