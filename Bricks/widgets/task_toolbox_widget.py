@@ -94,6 +94,13 @@ class TaskToolBoxWidget(qt.QWidget):
             self.tool_box.removeItem(self.energy_scan_page)
             self.energy_scan_page.hide()
 
+    def update_data_path_model(self):
+        for i in range(0, self.tool_box.count()):
+            item = self.tool_box.item(i)
+            item.init_data_path_model()
+            item.update_selection()
+
+            
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)
@@ -129,6 +136,12 @@ class TaskToolBoxWidget(qt.QWidget):
         Called by the parent widget when selection in the tree changes.
         """
         if len(items) == 1:
+            
+            if isinstance(items[0], queue_item.DataCollectionGroupQueueItem):
+                self.create_task_button.setEnabled(False)
+            else:
+                self.create_task_button.setEnabled(True)
+
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
 
@@ -142,8 +155,7 @@ class TaskToolBoxWidget(qt.QWidget):
             elif isinstance(items[0], queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentItem(self.energy_scan_page)
             elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
-                self.tool_box.setCurrentItem(self.worklfow_page)
-                
+                self.tool_box.setCurrentItem(self.workflow_page)
 
         current_page = self.tool_box.currentItem()
         current_page.selection_changed(items)

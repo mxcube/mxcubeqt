@@ -25,8 +25,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         font.setPointSize(8)
         self.periodic_table.setFont(font)
         
-        h_box.setMaximumWidth(454)
-        h_box.setMaximumHeight(300)
+        h_box.setMaximumWidth(470)
+        h_box.setMaximumHeight(310)
 
         self._data_path_gbox = qt.QVGroupBox('Data location', self, 'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
