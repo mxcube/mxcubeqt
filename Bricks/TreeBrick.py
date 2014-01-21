@@ -92,8 +92,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         #self.defineSignal("clear_centred_positions", ())
 
         # Layout
-        self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
-                                          qt.QSizePolicy.Expanding))
+        #self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
+        #                                  qt.QSizePolicy.Expanding))
 
         widget = qtui.QWidgetFactory.\
                  create(os.path.join(os.path.dirname(__file__),
