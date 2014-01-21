@@ -37,6 +37,7 @@ class CreateCharWidget(CreateTaskBase):
         self._acq_widget = \
             AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
                                     path_template = self._path_template)
+        self._acq_widget.setFixedHeight(165)
 
         current_dir = os.path.dirname(__file__)
         ui_file = 'ui_files/vertical_crystal_dimension_widget_layout.ui'
