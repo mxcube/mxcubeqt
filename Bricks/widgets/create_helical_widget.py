@@ -8,8 +8,6 @@ import ShapeHistory as shape_history
 
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from widgets.processing_widget import ProcessingWidget
 
@@ -46,19 +44,21 @@ class CreateHelicalWidget(CreateTaskBase):
         self._list_box = qt.QListBox(self._lines_gbox, "helical_page")
         self._list_box.setSelectionMode(qt.QListBox.Extended)
         self._list_box.setFixedWidth(175)
+        self._list_box.setFixedHeight(50)
 
         lines_gbox_layout.addWidget(self._list_box)
 
         button_layout = qt.QVBoxLayout(None, 0, 6, "button_layout")
-        button_layout.setSpacing(20)
+        button_layout.setSpacing(5)
         add_button = qt.QPushButton("+", self._lines_gbox, "add_button")
-        add_button.setFixedWidth(25)
+        add_button.setFixedWidth(20)
+        add_button.setFixedHeight(20)
         remove_button = qt.QPushButton("-", self._lines_gbox, "add_button")
-        remove_button.setFixedWidth(25)
+        remove_button.setFixedWidth(20)
+        remove_button.setFixedHeight(20)        
         button_layout.addWidget(add_button)
         button_layout.addWidget(remove_button)
         lines_gbox_layout.addLayout(button_layout)
-
 
         self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
         self._acq_widget = \
@@ -74,7 +74,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox, 
                            data_model = self._path_template,
-                           layout = DataPathWidgetVerticalLayout)
+                           layout = 'vertical')
 
         self._processing_gbox = qt.QVGroupBox('Processing', self, 
                                               'processing_gbox')
@@ -98,10 +98,10 @@ class CreateHelicalWidget(CreateTaskBase):
                            self.list_box_selection_changed)
 
         prefix_ledit = self._data_path_widget.\
-                       data_path_widget_layout.prefix_ledit
+                       data_path_widget_layout.child('prefix_ledit')
 
         run_number_ledit = self._data_path_widget.\
-                           data_path_widget_layout.run_number_ledit
+                           data_path_widget_layout.child('run_number_ledit')
 
         self.connect(prefix_ledit, 
                      qt.SIGNAL("textChanged(const QString &)"), 
@@ -259,8 +259,7 @@ class CreateHelicalWidget(CreateTaskBase):
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
                                                              
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
 

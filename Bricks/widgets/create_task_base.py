@@ -6,7 +6,7 @@ import abc
 import copy
 import ShapeHistory as shape_history
 
-from BlissFramework.Utils import widget_colors
+#from BlissFramework.Utils import widget_colors
 
 
 class CreateTaskBase(qt.QWidget):
@@ -47,6 +47,20 @@ class CreateTaskBase(qt.QWidget):
                             self.tab_changed)
 
     def init_models(self):
+        self.init_acq_model()
+        self.init_data_path_model()
+
+    def init_acq_model(self):
+        bl_setup = self._beamline_setup_hwobj
+
+        if bl_setup is not None:
+            if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
+                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+
+    def init_data_path_model(self):
         bl_setup = self._beamline_setup_hwobj
 
         if bl_setup is not None:
@@ -65,13 +79,8 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.base_prefix = self.get_default_prefix()
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
-
-            if self._acq_widget:
-                self._acq_widget.set_beamline_setup(bl_setup)
-                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
@@ -131,16 +140,7 @@ class CreateTaskBase(qt.QWidget):
                         check_for_path_collisions(self._path_template)
 
         if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else: 
-                # There is already incorrect input, do not chage background.
-                if widget.paletteBackgroundColor() != widget_colors.LIGHT_RED:
-                    widget.setPaletteBackgroundColor(widget_colors.WHITE)
+            self._data_path_widget.indicate_path_conflict(path_conflict)                    
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -280,16 +280,16 @@ class CreateTaskBase(qt.QWidget):
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self._path_template = copy.deepcopy(self._path_template)
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(self._path_template)
+            # self._path_template = copy.deepcopy(self._path_template)
+            # self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            # self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            #     get_next_run_number(self._path_template)
 
-            #Update energy transmission and resolution
-            if self._acq_widget:
-                self._update_etr()
+            # #Update energy transmission and resolution
+            # if self._acq_widget:
+            #     self._update_etr()
 
-            self.setDisabled(False)
+            self.setDisabled(True)
 
         if self._item_is_group_or_sample():
             if self._acq_widget:
@@ -371,14 +371,17 @@ class CreateTaskBase(qt.QWidget):
             sample_is_mounted = False
 
         free_pin_mode = sample.free_pin_mode
+        temp_tasks = self._create_task(sample, shape)
 
         if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
-            sc = queue_model_objects.SampleCentring('sample-centring')
-            tasks.append(sc)
 
-        temp_tasks = self._create_task(sample, shape)
+            # Check if the tasks requires centring, assumes that all
+            # the "sub tasks" has the same centring requirements.
+            if temp_tasks[0].requires_centring():
+                sc = queue_model_objects.SampleCentring('sample-centring')
+                tasks.append(sc)
 
         for task in temp_tasks:
             if sc:

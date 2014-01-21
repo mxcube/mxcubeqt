@@ -8,7 +8,6 @@ import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.processing_widget import ProcessingWidget
-from widgets.data_path_widget_vertical_layout import DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from create_task_base import CreateTaskBase
 
@@ -36,12 +35,12 @@ class CreateDiscreteWidget(CreateTaskBase):
                               path_template=self._path_template)
 
         self._data_path_gbox = qt.QVGroupBox('Data location',
-                                             self, 'data_path_gbox')
+                                             self, 'data_path_gbox')        
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox,
                            'create_dc_path_widget',
                            data_model=self._path_template,
-                           layout=DataPathWidgetVerticalLayout)
+                           layout='vertical')
 
         self._processing_gbox = qt.QVGroupBox('Processing', self,
                                               'processing_gbox')
@@ -49,7 +48,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget = \
             ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
-
+        
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._processing_gbox)
@@ -59,11 +58,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.connect(self._acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
         
-        self.connect(dp_layout.prefix_ledit,
+        self.connect(dp_layout.child('prefix_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
 
-        self.connect(dp_layout.run_number_ledit,
+        self.connect(dp_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 
@@ -117,8 +116,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem): 
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
             self._acq_widget.disable_inverse_beam(False)
@@ -127,10 +125,14 @@ class CreateDiscreteWidget(CreateTaskBase):
             dc = tree_item.get_model()
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
-                if tree_item.get_model().is_executed():
+                if dc.is_executed():
                     self.setDisabled(True)
                 else:
                     self.setDisabled(False)
+
+                sample_data_model = self.get_sample_item(tree_item).get_model()
+                energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+                self._acq_widget.set_energies(energy_scan_result)
 
                 self._acq_widget.disable_inverse_beam(True)
                 

@@ -4,12 +4,11 @@ import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import sys
-#from PyMca import QPeriodicTable
+
 from PeriodicTableBrick import PeriodicTableBrick
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
+
 
 class CreateEnergyScanWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
@@ -26,25 +25,25 @@ class CreateEnergyScanWidget(CreateTaskBase):
         font.setPointSize(8)
         self.periodic_table.setFont(font)
         
-        h_box.setMaximumWidth(454)
-        h_box.setMaximumHeight(300)
+        h_box.setMaximumWidth(470)
+        h_box.setMaximumHeight(310)
 
         self._data_path_gbox = qt.QVGroupBox('Data location', self, 'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
                                                data_model = self._path_template,
-                                               layout = DataPathWidgetVerticalLayout)
+                                               layout = 'vertical')
 
         v_layout.addWidget(h_box)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addStretch()
 
 
-        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+        self.connect(self._data_path_widget.data_path_widget_layout.child('prefix_ledit'), 
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
 
-        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+        self.connect(self._data_path_widget.data_path_widget_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
         

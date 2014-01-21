@@ -1,3 +1,4 @@
+import os
 import qt
 import queue_model_objects_v1 as queue_model_objects
 import logging
@@ -24,6 +25,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.diffractometer_hwobj = None
         self.beamline_setup = None
         self.queue_model_hwobj = None
+        self.session_hwobj = None
         
         #Signals
         self.defineSignal("getView", ())
@@ -36,6 +38,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.defineSlot("new_centred_position", ())
         self.defineSlot("change_pixel_calibration", ())
         self.defineSlot("change_beam_position", ())
+        self.defineSlot("user_group_saved", ())
 
         # Layout
         self.task_tool_box_widget = TaskToolBoxWidget(self)
@@ -59,6 +62,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         d = {}
         self.emit(qt.PYSIGNAL("getView"), (d, ))
         self.task_tool_box_widget.workflow_page._grid_widget.connectToView(d)
+        self.task_tool_box_widget.workflow_page._grid_widget._setColor(qt.QWidget.green)
         self.task_tool_box_widget.workflow_page.\
             _grid_widget._shape_history = self.shape_history
         
@@ -76,11 +80,17 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
 
-        session_hwobj = self.beamline_setup_hwobj.session_hwobj
-        if session_hwobj.session_id:
+        self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
+        if self.session_hwobj.session_id:
             self.setEnabled(True)
 
-
+    def user_group_saved(self, new_user_group):
+        self.session_hwobj.set_user_group(str(new_user_group))
+        self.task_tool_box_widget.update_data_path_model()
+        os.makedirs(self.session_hwobj.get_base_image_directory())
+        msg = 'Base path is: %s' % self.session_hwobj.get_base_image_directory()
+        logging.getLogger('user_level_log').info(msg)
+        
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):
@@ -102,7 +112,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
-        #import pdb;pdb.set_trace()
         self.ispyb_logged_in = logged_in
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)

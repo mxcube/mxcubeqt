@@ -10,8 +10,6 @@ import ShapeHistory as shape_history
 from widgets.widget_utils import DataModelInputBinder
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
 from acquisition_widget_simple import AcquisitionWidgetSimple
 
 from queue_model_enumerables_v1 import XTAL_SPACEGROUPS
@@ -60,7 +58,7 @@ class CreateCharWidget(CreateTaskBase):
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox, 
                            data_model = self._path_template,
-                           layout = DataPathWidgetVerticalLayout)
+                           layout = 'vertical')
 
         v_layout.addWidget(self._acq_widget)
         v_layout.addWidget(self._data_path_gbox)
@@ -130,10 +128,10 @@ class CreateCharWidget(CreateTaskBase):
         space_group_ledit.insertStrList(XTAL_SPACEGROUPS)
 
         prefix_ledit = self._data_path_widget.\
-                       data_path_widget_layout.prefix_ledit
+                       data_path_widget_layout.child('prefix_ledit')
 
         run_number_ledit = self._data_path_widget.\
-                           data_path_widget_layout.run_number_ledit
+                           data_path_widget_layout.child('run_number_ledit')
 
         self.connect(prefix_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
@@ -221,8 +219,7 @@ class CreateCharWidget(CreateTaskBase):
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
             self._init_models()
             self._set_space_group(self._char_params.space_group)
             self._acq_widget.update_data_model(self._acquisition_parameters,
