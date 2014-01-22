@@ -181,7 +181,7 @@
                                     </item>
                                     <item>
                                         <property name="text">
-                                            <string>Automatic loop centring</string>
+                                            <string>Automatic</string>
                                         </property>
                                     </item>
                                     <property name="name">
