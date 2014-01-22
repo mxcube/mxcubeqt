@@ -53,7 +53,9 @@ class TaskToolBoxWidget(qt.QWidget):
         self.add_pixmap = Icons.load("add_row.png")
         self.create_task_button = qt.QPushButton("  Add to queue", self)
         self.create_task_button.setIconSet(qt.QIconSet(self.add_pixmap))
-
+        msg = "Add the collection method to the selected sample"
+        qt.QToolTip.add(self.create_task_button, msg)
+        
         self.v_layout.addWidget(self.method_group_box)
 
         self.button_hlayout = qt.QHBoxLayout(None)

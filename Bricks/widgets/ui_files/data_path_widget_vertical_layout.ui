@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>450</width>
+            <width>430</width>
             <height>221</height>
         </rect>
     </property>
@@ -84,6 +84,9 @@
                                     </property>
                                     <property name="text">
                                         <string>Folder:</string>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Automatic processing results in PROCESSED_DATA directory</string>
                                     </property>
                                 </widget>
                                 <spacer>
