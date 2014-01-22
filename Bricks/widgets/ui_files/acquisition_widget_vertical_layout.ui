@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>518</width>
-            <height>358</height>
+            <width>453</width>
+            <height>338</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -50,17 +50,14 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="margin">
-                    <number>0</number>
-                </property>
                 <property name="spacing">
-                    <number>0</number>
+                    <number>15</number>
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>container_layout</cstring>
+                        <cstring>rone_container_layout</cstring>
                     </property>
-                    <vbox>
+                    <hbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
@@ -69,244 +66,15 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>rone_container_layout</cstring>
+                                <cstring>rone_cone_container_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
                                 </property>
-                                <property name="spacing">
-                                    <number>15</number>
-                                </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rone_cone_container_layout</cstring>
-                                    </property>
-                                    <hbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QLayoutWidget">
-                                            <property name="name">
-                                                <cstring>rone_cone_label_layout</cstring>
-                                            </property>
-                                            <vbox>
-                                                <property name="name">
-                                                    <cstring>unnamed</cstring>
-                                                </property>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>osc_range_label</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Oscillation range:</string>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>overlap_label</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Oscillation overlap:</string>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QCheckBox">
-                                                    <property name="name">
-                                                        <cstring>osc_start_cbox</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Oscillation start:</string>
-                                                    </property>
-                                                </widget>
-                                            </vbox>
-                                        </widget>
-                                        <widget class="QLayoutWidget">
-                                            <property name="name">
-                                                <cstring>rone_cone_ledit_layout</cstring>
-                                            </property>
-                                            <vbox>
-                                                <property name="name">
-                                                    <cstring>unnamed</cstring>
-                                                </property>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>osc_range_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>overlap_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>osc_start_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                            </vbox>
-                                        </widget>
-                                    </hbox>
-                                </widget>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>rone_ctwo_container_layout</cstring>
-                                    </property>
-                                    <hbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QLayoutWidget">
-                                            <property name="name">
-                                                <cstring>row_one_ctwo_label_layout</cstring>
-                                            </property>
-                                            <vbox>
-                                                <property name="name">
-                                                    <cstring>unnamed</cstring>
-                                                </property>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>first_iamge_label</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>First image:</string>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>num_images_label</cstring>
-                                                    </property>
-                                                    <property name="acceptDrops">
-                                                        <bool>true</bool>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Number of images:</string>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>num_passes_label</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Number of passes:</string>
-                                                    </property>
-                                                </widget>
-                                            </vbox>
-                                        </widget>
-                                        <widget class="QLayoutWidget">
-                                            <property name="name">
-                                                <cstring>row_one_ctwo_ledit_layout</cstring>
-                                            </property>
-                                            <vbox>
-                                                <property name="name">
-                                                    <cstring>unnamed</cstring>
-                                                </property>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>first_image_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>num_images_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>num_passes_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                            </vbox>
-                                        </widget>
-                                    </hbox>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>rtwo_container_layout</cstring>
-                            </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="spacing">
-                                    <number>15</number>
-                                </property>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>rtwo_label_layout</cstring>
+                                        <cstring>rone_cone_label_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -314,41 +82,33 @@
                                         </property>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>exp_time_label</cstring>
+                                                <cstring>osc_range_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Exposure time:</string>
+                                                <string>Oscillation range:</string>
                                             </property>
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>energy_label</cstring>
+                                                <cstring>overlap_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Energy (KeV):</string>
+                                                <string>Oscillation overlap:</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLabel">
+                                        <widget class="QCheckBox">
                                             <property name="name">
-                                                <cstring>resolution_label</cstring>
+                                                <cstring>osc_start_cbox</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Resolution (Å):</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>transmission_label</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Transmission (%):</string>
+                                                <string>Oscillation start:</string>
                                             </property>
                                         </widget>
                                     </vbox>
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rtwo_ledit_layout</cstring>
+                                        <cstring>rone_cone_ledit_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -356,7 +116,7 @@
                                         </property>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>exp_time_ledit</cstring>
+                                                <cstring>osc_range_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
@@ -371,213 +131,469 @@
                                                 </size>
                                             </property>
                                         </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>overlap_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>osc_start_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>rone_ctwo_container_layout</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>row_one_ctwo_label_layout</cstring>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>first_iamge_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>First image:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>num_images_label</cstring>
+                                            </property>
+                                            <property name="acceptDrops">
+                                                <bool>true</bool>
+                                            </property>
+                                            <property name="text">
+                                                <string>Number of images:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>num_passes_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Number of passes:</string>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>row_one_ctwo_ledit_layout</cstring>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>first_image_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>num_images_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>num_passes_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>rtwo_container_layout</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="spacing">
+                            <number>15</number>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>rtwo_label_layout</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>exp_time_label</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Exposure time:</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>energy_label</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Energy (KeV):</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>resolution_label</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Resolution (Å):</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>transmission_label</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Transmission (%):</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>rtwo_ledit_layout</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>exp_time_ledit</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>50</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                        <size>
+                                            <width>50</width>
+                                            <height>32767</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>mad_container_layout</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="spacing">
+                                            <number>15</number>
+                                        </property>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>energy_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>75</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>75</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>mad_container_layout</cstring>
+                                                <cstring>mad_layout</cstring>
                                             </property>
                                             <hbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
                                                 </property>
                                                 <property name="spacing">
-                                                    <number>15</number>
+                                                    <number>10</number>
                                                 </property>
-                                                <widget class="QLineEdit">
+                                                <widget class="QCheckBox">
                                                     <property name="name">
-                                                        <cstring>energy_ledit</cstring>
-                                                    </property>
-                                                    <property name="minimumSize">
-                                                        <size>
-                                                            <width>75</width>
-                                                            <height>0</height>
-                                                        </size>
-                                                    </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>75</width>
-                                                            <height>32767</height>
-                                                        </size>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLayoutWidget">
-                                                    <property name="name">
-                                                        <cstring>mad_layout</cstring>
-                                                    </property>
-                                                    <hbox>
-                                                        <property name="name">
-                                                            <cstring>unnamed</cstring>
-                                                        </property>
-                                                        <property name="spacing">
-                                                            <number>10</number>
-                                                        </property>
-                                                        <widget class="QCheckBox">
-                                                            <property name="name">
-                                                                <cstring>mad_cbox</cstring>
-                                                            </property>
-                                                            <property name="text">
-                                                                <string>MAD</string>
-                                                            </property>
-                                                        </widget>
-                                                        <widget class="QComboBox">
-                                                            <property name="name">
-                                                                <cstring>energies_combo</cstring>
-                                                            </property>
-                                                        </widget>
-                                                    </hbox>
-                                                </widget>
-                                                <spacer>
-                                                    <property name="name">
-                                                        <cstring>row_one_spacer_2</cstring>
-                                                    </property>
-                                                    <property name="orientation">
-                                                        <enum>Horizontal</enum>
-                                                    </property>
-                                                    <property name="sizeType">
-                                                        <enum>Expanding</enum>
-                                                    </property>
-                                                    <property name="sizeHint">
-                                                        <size>
-                                                            <width>1</width>
-                                                            <height>20</height>
-                                                        </size>
-                                                    </property>
-                                                </spacer>
-                                            </hbox>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>resolution_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>32767</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>transmission_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>32767</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                    </vbox>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>cthree_layout</cstring>
-                            </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="spacing">
-                                    <number>15</number>
-                                </property>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>row_three_col_one</cstring>
-                                    </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QCheckBox">
-                                            <property name="name">
-                                                <cstring>inverse_beam_cbx</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Inverse beam</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QCheckBox">
-                                            <property name="name">
-                                                <cstring>shutterless_cbx</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Shutterless</string>
-                                            </property>
-                                        </widget>
-                                    </vbox>
-                                </widget>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>row_three_col_two</cstring>
-                                    </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QLayoutWidget">
-                                            <property name="name">
-                                                <cstring>subwedge_layout</cstring>
-                                            </property>
-                                            <hbox>
-                                                <property name="name">
-                                                    <cstring>unnamed</cstring>
-                                                </property>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>subwedge_size_label</cstring>
+                                                        <cstring>mad_cbox</cstring>
                                                     </property>
                                                     <property name="text">
-                                                        <string>Subwedge size:</string>
+                                                        <string>MAD</string>
+                                                    </property>
+                                                    <property name="toolTip" stdset="0">
+                                                        <string>Check to use energies from energy scan</string>
                                                     </property>
                                                 </widget>
-                                                <widget class="QLineEdit">
+                                                <widget class="QComboBox">
                                                     <property name="name">
-                                                        <cstring>subwedge_size_ledit</cstring>
+                                                        <cstring>energies_combo</cstring>
                                                     </property>
-                                                    <property name="maximumSize">
-                                                        <size>
-                                                            <width>50</width>
-                                                            <height>32767</height>
-                                                        </size>
+                                                    <property name="toolTip" stdset="0">
+                                                        <string>Check to use energies from energy scan</string>
                                                     </property>
                                                 </widget>
                                             </hbox>
                                         </widget>
                                         <spacer>
                                             <property name="name">
-                                                <cstring>subwedge_place_holder_spacing</cstring>
+                                                <cstring>row_one_spacer_2</cstring>
                                             </property>
                                             <property name="orientation">
-                                                <enum>Vertical</enum>
+                                                <enum>Horizontal</enum>
                                             </property>
                                             <property name="sizeType">
-                                                <enum>Fixed</enum>
+                                                <enum>Expanding</enum>
                                             </property>
                                             <property name="sizeHint">
                                                 <size>
-                                                    <width>25</width>
-                                                    <height>25</height>
+                                                    <width>1</width>
+                                                    <height>20</height>
                                                 </size>
                                             </property>
                                         </spacer>
-                                    </vbox>
+                                    </hbox>
                                 </widget>
-                            </hbox>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>resolution_ledit</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>50</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                        <size>
+                                            <width>50</width>
+                                            <height>32767</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>transmission_ledit</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>50</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                        <size>
+                                            <width>50</width>
+                                            <height>32767</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
-                    </vbox>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>rthree_container</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="spacing">
+                            <number>15</number>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>row_three_col_one</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>inverse_beam_cbx</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Inverse beam</string>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Check to use inverse beam and specify subwedge size</string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>shutterless_cbx</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Shutterless</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>row_three_col_two</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>subwedge_layout</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>subwedge_size_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Subwedge size:</string>
+                                            </property>
+                                            <property name="toolTip" stdset="0">
+                                                <string>Check to use inverse beam and specify subwedge size</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>subwedge_size_ledit</cstring>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                            <property name="toolTip" stdset="0">
+                                                <string>Check to use inverse beam and specify subwedge size</string>
+                                            </property>
+                                        </widget>
+                                        <spacer>
+                                            <property name="name">
+                                                <cstring>inverse_beam_hspacer</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>1</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </hbox>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>subwedge_place_holder_spacing</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </vbox>
+                        </widget>
+                    </hbox>
                 </widget>
                 <spacer>
                     <property name="name">

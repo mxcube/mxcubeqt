@@ -15,6 +15,9 @@
     <property name="caption">
         <string>SampleChangerWidget</string>
     </property>
+    <property name="toolTip" stdset="0">
+        <string>Load sample list from ISPyB</string>
+    </property>
     <hbox>
         <property name="name">
             <cstring>unnamed</cstring>
