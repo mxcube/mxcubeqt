@@ -45,6 +45,8 @@ class CreateHelicalWidget(CreateTaskBase):
         self._list_box.setSelectionMode(qt.QListBox.Extended)
         self._list_box.setFixedWidth(175)
         self._list_box.setFixedHeight(50)
+        list_box_tool_tip = "Select the line(s) to perfrom helical scan on"
+        qt.QToolTip.add(self._list_box, list_box_tool_tip)
 
         lines_gbox_layout.addWidget(self._list_box)
 
@@ -59,6 +61,12 @@ class CreateHelicalWidget(CreateTaskBase):
         button_layout.addWidget(add_button)
         button_layout.addWidget(remove_button)
         lines_gbox_layout.addLayout(button_layout)
+
+        add_button_tool_tip = "Add a line between two saved positions, " \
+                              "CTRL click to select more than one position"
+        qt.QToolTip.add(add_button, add_button_tool_tip)
+        remove_button_tool_tip = "Remove selected line(s)"
+        qt.QToolTip.add(remove_button, remove_button_tool_tip)
 
         self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
         self._acq_widget = \

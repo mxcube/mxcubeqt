@@ -113,6 +113,10 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         succesfully logged in.
         """
         self.ispyb_logged_in = logged_in
+        
+        if self.session_hwobj is not None:
+            self.session_hwobj.set_user_group('')
+            
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)
         

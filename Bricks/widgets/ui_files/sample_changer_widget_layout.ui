@@ -15,6 +15,9 @@
     <property name="caption">
         <string>SampleChangerWidget</string>
     </property>
+    <property name="toolTip" stdset="0">
+        <string>Load sample list from ISPyB</string>
+    </property>
     <hbox>
         <property name="name">
             <cstring>unnamed</cstring>
@@ -178,7 +181,7 @@
                                     </item>
                                     <item>
                                         <property name="text">
-                                            <string>Automatic loop centring</string>
+                                            <string>Automatic</string>
                                         </property>
                                     </item>
                                     <property name="name">

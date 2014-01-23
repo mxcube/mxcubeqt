@@ -213,16 +213,19 @@ class CreateTaskBase(qt.QWidget):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
         return prefix
         
-    def get_default_directory(self, tree_item = None, sub_dir = None):
+    def get_default_directory(self, tree_item = None, sub_dir = ''):
+        group_name = self._session_hwobj.get_group_name()
+
+        if group_name:
+            sub_dir = group_name + '/' + sub_dir
+
         if tree_item:
             item = self.get_sample_item(tree_item)            
-            sub_dir = item.get_model().get_name()
+            sub_dir += item.get_model().get_name()
 
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_id == -1:
-                    sub_dir = ''
-        else:
-            sub_dir = sub_dir
+                    sub_dir += ''
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)

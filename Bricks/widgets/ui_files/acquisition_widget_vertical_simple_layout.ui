@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>489</width>
-            <height>235</height>
+            <height>234</height>
         </rect>
     </property>
     <property name="maximumSize">
@@ -49,7 +49,7 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>6</number>
+                    <number>11</number>
                 </property>
                 <property name="spacing">
                     <number>10</number>
@@ -439,23 +439,6 @@
                 </widget>
             </vbox>
         </widget>
-        <spacer>
-            <property name="name">
-                <cstring>vspacer</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>1</height>
-                </size>
-            </property>
-        </spacer>
     </vbox>
 </widget>
 <layoutdefaults spacing="6" margin="11"/>

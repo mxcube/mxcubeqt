@@ -82,6 +82,7 @@ class DataCollectTree(qt.QWidget):
         self.continue_button = qt.QPushButton(self, "ok_button")
         self.continue_button.setText('Pause')
         self.continue_button.setEnabled(True)
+        self.continue_button.setFixedWidth(75)
         qt.QToolTip.add(self.continue_button, "Pause after current data collection")
 
         self.sample_list_view = qt.QListView(self, "sample_list_view")
@@ -94,7 +95,7 @@ class DataCollectTree(qt.QWidget):
     
         self.sample_list_view.setSorting(-1)
         self.sample_list_view.addColumn("", 280)
-        self.sample_list_view.addColumn("", 115)
+        self.sample_list_view.addColumn("", 130)
         self.sample_list_view.header().hide()
 
         self.sample_list_view.header().hide()
