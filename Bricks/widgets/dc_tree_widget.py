@@ -11,9 +11,9 @@ from BlissFramework.Utils import widget_colors
 from widgets.confirm_dialog import ConfirmDialog
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
-                             ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN'])
+                             ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE'])
 
-SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2)
+SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 4)
 
 
 class DataCollectTree(qt.QWidget):
@@ -430,8 +430,15 @@ class DataCollectTree(qt.QWidget):
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('free-pin')
             self.set_sample_pin_icon()
+        elif option == SC_FILTER_OPTIONS.PLATE:
+            #self.sample_list_view.clear()
+            #self.sample_list_view.setDisabled(True)
+            #logging.getLogger("user_level_log").error('')
+            self.beamline_setup_hwobj.collect_hwobj.\
+                enable_crystal_snapshots(True)
 
         self.sample_list_view_selection()
+        
             
     def set_centring_method(self, method_number):       
         self.centring_method = method_number
@@ -564,7 +571,7 @@ class DataCollectTree(qt.QWidget):
         return res
  
     def delete_click(self, selected_items = None):
-        if not selected_items:
+        if not isinstance(selected_items, list):
             selected_items = self.get_selected_items()
         
         for item in selected_items:

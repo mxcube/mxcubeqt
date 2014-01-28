@@ -103,6 +103,11 @@
                                                     <string>Manually mounted</string>
                                                 </property>
                                             </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>Plate</string>
+                                                </property>
+                                            </item>
                                             <property name="name">
                                                 <cstring>filter_cbox</cstring>
                                             </property>
