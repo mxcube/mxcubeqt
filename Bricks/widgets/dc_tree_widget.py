@@ -13,7 +13,7 @@ from widgets.confirm_dialog import ConfirmDialog
 SCFilterOptions = namedtuple('SCFilterOptions', 
                              ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE'])
 
-SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 4)
+SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
 
 
 class DataCollectTree(qt.QWidget):
@@ -436,7 +436,7 @@ class DataCollectTree(qt.QWidget):
             #self.sample_list_view.clear()
             #self.sample_list_view.setDisabled(True)
             msg= 'In plate mode, not taking crystal snapshots'
-            logging.getLogger("user_level_log").error(msg)
+            logging.getLogger("user_level_log").warning(msg)
             self.beamline_setup_hwobj.collect_hwobj.\
               enable_crystal_snapshots(False)
 
