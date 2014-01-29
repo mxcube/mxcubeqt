@@ -44,9 +44,9 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
-        self.tool_box.addItem(self.discrete_page, "Discrete")
-        self.tool_box.addItem(self.char_page, "Characterise")
-        self.tool_box.addItem(self.helical_page, "Helical")
+        self.tool_box.addItem(self.discrete_page, "Standard Collection")
+        self.tool_box.addItem(self.char_page, "Characterisation")
+        self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         self.tool_box.addItem(self.workflow_page, "Advanced")
 
