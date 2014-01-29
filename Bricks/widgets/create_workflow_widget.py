@@ -7,9 +7,6 @@ import itertools
 
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
-
 
 class CreateWorkflowWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
@@ -33,13 +30,12 @@ class CreateWorkflowWidget(CreateTaskBase):
                                              'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
                                                 data_model = self._path_template,
-                                                layout = DataPathWidgetVerticalLayout)
+                                                layout = 'vertical')
 
         self._data_path_widget.data_path_widget_layout.child('file_name_label').setText('')
         self._data_path_widget.data_path_widget_layout.child('file_name_value_label').hide()
 
-        self._grid_widget = MxLookupScanBrick.\
-                            MxLookupScanBrick(self, 'grid_widget')
+        self._grid_widget = MxLookupScanBrick.MxLookupScanBrick(self, 'grid_widget')
 
         v_layout.addWidget(self._workflow_type_gbox)
         v_layout.addWidget(self._data_path_gbox)

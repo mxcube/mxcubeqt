@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>461</width>
-            <height>223</height>
+            <width>430</width>
+            <height>221</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -22,8 +22,8 @@
     </property>
     <property name="maximumSize">
         <size>
-            <width>475</width>
-            <height>230</height>
+            <width>32767</width>
+            <height>32767</height>
         </size>
     </property>
     <property name="caption">
@@ -41,7 +41,7 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout76</cstring>
+                <cstring>main_layout</cstring>
             </property>
             <vbox>
                 <property name="name">
@@ -55,7 +55,7 @@
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>layout74</cstring>
+                        <cstring>main_folder_layout</cstring>
                     </property>
                     <vbox>
                         <property name="name">
@@ -66,7 +66,7 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout64</cstring>
+                                <cstring>folder_heading_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -85,10 +85,13 @@
                                     <property name="text">
                                         <string>Folder:</string>
                                     </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Automatic processing results in PROCESSED_DATA directory</string>
+                                    </property>
                                 </widget>
                                 <spacer>
                                     <property name="name">
-                                        <cstring>spacer22</cstring>
+                                        <cstring>folder_heading_hspacer</cstring>
                                     </property>
                                     <property name="orientation">
                                         <enum>Horizontal</enum>
@@ -107,7 +110,7 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout73</cstring>
+                                <cstring>folder_ledit_layout</cstring>
                             </property>
                             <vbox>
                                 <property name="name">
@@ -118,7 +121,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>layout71</cstring>
+                                        <cstring>fixed_folder_ledit_layout</cstring>
                                     </property>
                                     <hbox>
                                         <property name="name">
@@ -129,7 +132,7 @@
                                         </property>
                                         <spacer>
                                             <property name="name">
-                                                <cstring>spacer23</cstring>
+                                                <cstring>fixed_folder_hspacer</cstring>
                                             </property>
                                             <property name="orientation">
                                                 <enum>Horizontal</enum>
@@ -156,7 +159,7 @@
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>410</width>
+                                                    <width>32767</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -184,7 +187,7 @@
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>layout72</cstring>
+                                        <cstring>user_folder_ledit</cstring>
                                     </property>
                                     <hbox>
                                         <property name="name">
@@ -195,7 +198,7 @@
                                         </property>
                                         <spacer>
                                             <property name="name">
-                                                <cstring>spacer23_2</cstring>
+                                                <cstring>user_folder_hspacer</cstring>
                                             </property>
                                             <property name="orientation">
                                                 <enum>Horizontal</enum>
@@ -222,7 +225,7 @@
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>410</width>
+                                                    <width>32767</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -238,7 +241,7 @@
                 </widget>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>layout75</cstring>
+                        <cstring>main_file_name_layout</cstring>
                     </property>
                     <vbox>
                         <property name="name">
@@ -246,7 +249,7 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout67</cstring>
+                                <cstring>file_name_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -321,7 +324,7 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>rtwo_hlayout</cstring>
+                                <cstring>prefix_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -329,7 +332,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rtwo_cone_vlayout</cstring>
+                                        <cstring>cone_vlayout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -355,7 +358,7 @@
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rtwo_ctwo_vlayout</cstring>
+                                        <cstring>ctwo_vlayout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -441,23 +444,6 @@
                 </spacer>
             </vbox>
         </widget>
-        <spacer>
-            <property name="name">
-                <cstring>hspacer</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>21</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
     </hbox>
 </widget>
 <layoutdefaults spacing="6" margin="11"/>

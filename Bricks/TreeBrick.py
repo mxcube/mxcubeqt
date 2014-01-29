@@ -92,8 +92,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         #self.defineSignal("clear_centred_positions", ())
 
         # Layout
-        self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
-                                          qt.QSizePolicy.Expanding))
+        #self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
+        #                                  qt.QSizePolicy.Expanding))
 
         widget = qtui.QWidgetFactory.\
                  create(os.path.join(os.path.dirname(__file__),
@@ -237,11 +237,11 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.connect(xml_rpc_server_hwobj, 'start_queue',
                              self.dc_tree_widget.collect_items)
 
-
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,
                     is_inhouse = None):
-        pass
+
+         self.session_hwobj.set_session_start_date(start_date)
 
     def logged_in(self, logged_in):
         """

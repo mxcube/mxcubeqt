@@ -6,7 +6,7 @@ import abc
 import copy
 import ShapeHistory as shape_history
 
-from BlissFramework.Utils import widget_colors
+#from BlissFramework.Utils import widget_colors
 
 
 class CreateTaskBase(qt.QWidget):
@@ -47,6 +47,20 @@ class CreateTaskBase(qt.QWidget):
                             self.tab_changed)
 
     def init_models(self):
+        self.init_acq_model()
+        self.init_data_path_model()
+
+    def init_acq_model(self):
+        bl_setup = self._beamline_setup_hwobj
+
+        if bl_setup is not None:
+            if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
+                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+
+    def init_data_path_model(self):
         bl_setup = self._beamline_setup_hwobj
 
         if bl_setup is not None:
@@ -65,13 +79,8 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.base_prefix = self.get_default_prefix()
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
-
-            if self._acq_widget:
-                self._acq_widget.set_beamline_setup(bl_setup)
-                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
@@ -204,16 +213,19 @@ class CreateTaskBase(qt.QWidget):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
         return prefix
         
-    def get_default_directory(self, tree_item = None, sub_dir = None):
+    def get_default_directory(self, tree_item = None, sub_dir = ''):
+        group_name = self._session_hwobj.get_group_name()
+
+        if group_name:
+            sub_dir = group_name + '/' + sub_dir
+
         if tree_item:
             item = self.get_sample_item(tree_item)            
-            sub_dir = item.get_model().get_name()
+            sub_dir += item.get_model().get_name()
 
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_id == -1:
-                    sub_dir = ''
-        else:
-            sub_dir = sub_dir
+                    sub_dir += ''
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
@@ -271,16 +283,16 @@ class CreateTaskBase(qt.QWidget):
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self._path_template = copy.deepcopy(self._path_template)
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(self._path_template)
+            # self._path_template = copy.deepcopy(self._path_template)
+            # self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            # self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            #     get_next_run_number(self._path_template)
 
-            #Update energy transmission and resolution
-            if self._acq_widget:
-                self._update_etr()
+            # #Update energy transmission and resolution
+            # if self._acq_widget:
+            #     self._update_etr()
 
-            self.setDisabled(False)
+            self.setDisabled(True)
 
         if self._item_is_group_or_sample():
             if self._acq_widget:

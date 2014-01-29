@@ -44,19 +44,29 @@ class CreateHelicalWidget(CreateTaskBase):
         self._list_box = qt.QListBox(self._lines_gbox, "helical_page")
         self._list_box.setSelectionMode(qt.QListBox.Extended)
         self._list_box.setFixedWidth(175)
+        self._list_box.setFixedHeight(50)
+        list_box_tool_tip = "Select the line(s) to perfrom helical scan on"
+        qt.QToolTip.add(self._list_box, list_box_tool_tip)
 
         lines_gbox_layout.addWidget(self._list_box)
 
         button_layout = qt.QVBoxLayout(None, 0, 6, "button_layout")
-        button_layout.setSpacing(20)
+        button_layout.setSpacing(5)
         add_button = qt.QPushButton("+", self._lines_gbox, "add_button")
-        add_button.setFixedWidth(25)
+        add_button.setFixedWidth(20)
+        add_button.setFixedHeight(20)
         remove_button = qt.QPushButton("-", self._lines_gbox, "add_button")
-        remove_button.setFixedWidth(25)
+        remove_button.setFixedWidth(20)
+        remove_button.setFixedHeight(20)        
         button_layout.addWidget(add_button)
         button_layout.addWidget(remove_button)
         lines_gbox_layout.addLayout(button_layout)
 
+        add_button_tool_tip = "Add a line between two saved positions, " \
+                              "CTRL click to select more than one position"
+        qt.QToolTip.add(add_button, add_button_tool_tip)
+        remove_button_tool_tip = "Remove selected line(s)"
+        qt.QToolTip.add(remove_button, remove_button_tool_tip)
 
         self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
         self._acq_widget = \
@@ -257,8 +267,7 @@ class CreateHelicalWidget(CreateTaskBase):
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
                                                              
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
 
