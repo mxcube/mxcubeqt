@@ -150,7 +150,7 @@ class SpecScanPlotBrick(BlissWidget):
         
     def newScanPoint(self, x, y):
         self.xdata.append(x)
-        for label,ydata,yvalue in zip(self.ylabel.split(),self.ydatas,y.split()) :
+        for label,ydata,yvalue in zip(self.ylabel.split(),self.ydatas,str(y).split()) :
             ydata.append(float(yvalue))
             self.graph.newcurve(label,self.xdata,ydata)
         self.graph.replot()
