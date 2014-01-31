@@ -55,7 +55,7 @@ def addCustomBricksDirs(bricksDirs):
     if type(bricksDirs) == types.ListType:
         newBricksDirs = filter(os.path.isdir, map(os.path.abspath, bricksDirs))
 
-        for newBrickDir in newBricksDirs:
+        for newBrickDir in reversed(newBricksDirs):
             if not newBrickDir in sys.path:
                 #print 'inserted in sys.path = %s' % newBrickDir
                 sys.path.insert(0, newBrickDir)
