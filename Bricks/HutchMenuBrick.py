@@ -766,9 +766,10 @@ class HutchMenuBrick(BlissWidget):
                     self.__scaleY = pxsize_z
                 else:
                     self.emit(PYSIGNAL("calibrationChanged"), (pxsize_y, pxsize_z))
-                    self._drawBeam()
+                    self.updateBeam(True)
+                    #self._drawBeam()
                     self.__scale.show()
-            self.updateBeam(True)
+            
                
 
     # Slits changed: update beam size
