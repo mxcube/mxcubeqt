@@ -578,8 +578,8 @@ class DataCollectTree(qt.QWidget):
             selected_items = self.get_selected_items()
         
         for item in selected_items:
-            if item.deletable:
-                parent = item.parent()
+            parent = item.parent()
+            if parent and item.deletable:
                 if not parent.isSelected() or (not parent.deletable):
                     self.tree_brick.show_sample_centring_tab()
 
