@@ -133,7 +133,8 @@ class QueueItem(qt.QCheckListItem):
             self.pen = QueueItem.normal_pen
             self.brush = QueueItem.normal_brush
 
-        self.listView().triggerUpdate()
+        if self.listView():
+            self.listView().triggerUpdate()
 
     def setBackgroundColor(self, color):
         self.previous_bg_brush = self.bg_brush
