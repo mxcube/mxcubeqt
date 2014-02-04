@@ -14,7 +14,7 @@ from create_task_base import CreateTaskBase
 
 class CreateDiscreteWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
-        CreateTaskBase.__init__(self, parent, name, fl, 'Discrete')
+        CreateTaskBase.__init__(self, parent, name, fl, 'Standard')
 
         if not name:
             self.setName("create_discrete_widget")
@@ -34,8 +34,8 @@ class CreateDiscreteWidget(CreateTaskBase):
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
-        self._data_path_gbox = qt.QVGroupBox('Data location',
-                                             self, 'data_path_gbox')        
+        self._data_path_gbox = qt.QVGroupBox('Data location', self,
+                                             'data_path_gbox')        
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox,
                            'create_dc_path_widget',
@@ -257,9 +257,5 @@ class CreateDiscreteWidget(CreateTaskBase):
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
 
         tasks.append(dc)
-
-        #self._data_path_widget.update_data_model(self._path_template)
-        #self._acq_widget.update_data_model(self._acquisition_parameters,
-        #                                   self._path_template)
 
         return tasks

@@ -152,6 +152,14 @@ class EDNAParameters(BlissWidget):
             params_map = self.params_widget.get_parameters_map()
             logging.debug('setting values %r', params_map)
             self.workflow.set_values_map(params_map)
+        # Try to change back to sample centering tab
+        try:
+            tabWidget = self.parent().parent().parent().parent().parent()
+            tabWidget.setCurrentPage(0)
+        except:
+            # We don't care if it doesn't work..
+            pass
+
     
     def refresh_workflow_state(self, new_state, actor):
         #abort button should never be disabled
