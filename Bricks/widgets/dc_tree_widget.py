@@ -400,7 +400,7 @@ class DataCollectTree(qt.QWidget):
 
     def filter_sample_list(self, option):
         self.sample_list_view.clearSelection()
-        self.beamline_setup_hwobj.collect_hwobj.enable_crystal_snapshots(True)
+        self.beamline_setup_hwobj.set_plate_mode(False)
         
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_list_view.clear()
@@ -437,12 +437,10 @@ class DataCollectTree(qt.QWidget):
             #self.sample_list_view.setDisabled(True)
             msg= 'In plate mode, not taking crystal snapshots'
             logging.getLogger("user_level_log").warning(msg)
-            self.beamline_setup_hwobj.collect_hwobj.\
-              enable_crystal_snapshots(False)
+            self.beamline_setup_hwobj.set_plate_mode(True)
 
         self.sample_list_view_selection()
         
-            
     def set_centring_method(self, method_number):       
         self.centring_method = method_number
 

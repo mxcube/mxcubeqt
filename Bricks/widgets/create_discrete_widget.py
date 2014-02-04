@@ -258,8 +258,4 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         tasks.append(dc)
 
-        #self._data_path_widget.update_data_model(self._path_template)
-        #self._acq_widget.update_data_model(self._acquisition_parameters,
-        #                                   self._path_template)
-
         return tasks
