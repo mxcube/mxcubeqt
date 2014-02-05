@@ -230,7 +230,7 @@ class CreateHelicalWidget(CreateTaskBase):
             selected_lines = True
         else:
             logging.getLogger("user_level_log").\
-                info("No lines selected, please select one or more lines.")
+                warning("No lines selected, please select one or more lines.")
 
         return base_result and selected_lines 
             
