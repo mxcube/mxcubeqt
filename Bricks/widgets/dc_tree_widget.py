@@ -572,13 +572,15 @@ class DataCollectTree(qt.QWidget):
         return res
  
     def delete_click(self, selected_items = None):
+        children = []
+
         if not isinstance(selected_items, list):
             selected_items = self.get_selected_items()
         
         for item in selected_items:
             parent = item.parent()
-            if item.deletable and parent:
-                if not parent.isSelected():
+            if item.deletable:
+                if not parent.isSelected() or (not parent.deletable):
                     self.tree_brick.show_sample_centring_tab()
 
                     self.queue_model_hwobj.del_child(parent.get_model(),
@@ -592,14 +594,13 @@ class DataCollectTree(qt.QWidget):
             else:
                 item.reset_style()
                 child = item.firstChild() 
-                children = []
 
                 while child: 
                     children.append(child)
                     child = child.nextSibling()
 
-                for child in children:
-                    self.delete_click(selected_items = [child])
+        if children:
+            self.delete_click(selected_items = children)
 
         self.check_for_path_collisions()
 
