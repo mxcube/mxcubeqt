@@ -24,8 +24,8 @@ class CatsBrick(BaseComponents.BlissWidget):
         qt.QHBoxLayout(self)
         self.layout().addWidget(self.widget)
         
-        #qt.QObject.connect(self.widget.btLoadSample,qt.SIGNAL('clicked()'),self._loadSample)        
-        qt.QObject.connect(self.widget.btLoadSample,qt.SIGNAL('clicked()'),self.onMenuLoad)        
+        qt.QObject.connect(self.widget.btLoadSample,qt.SIGNAL('clicked()'),self._loadSample)        
+        #qt.QObject.connect(self.widget.btLoadSample,qt.SIGNAL('clicked()'),self.onMenuLoad)        
         qt.QObject.connect(self.widget.btUnloadSample,qt.SIGNAL('clicked()'),self._unloadSample)
         qt.QObject.connect(self.widget.btAbort,qt.SIGNAL('clicked()'),self._abort)                     
                 
