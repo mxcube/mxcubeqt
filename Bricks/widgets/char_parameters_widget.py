@@ -247,11 +247,11 @@ class CharParametersWidget(qt.QWidget):
                            qt.SIGNAL("toggled(bool)"),
                            self.enable_aimed_mult_ledit)
 
-        qt.QObject.connect(self.path_widget.data_path_widget_layout.prefix_ledit, 
+        qt.QObject.connect(self.path_widget.data_path_widget_layout.child('prefix_ledit'), 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._prefix_ledit_change)
         
-        qt.QObject.connect(self.path_widget.data_path_widget_layout.run_number_ledit, 
+        qt.QObject.connect(self.path_widget.data_path_widget_layout.child('run_number_ledit'), 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._run_number_ledit_change)
 
@@ -300,11 +300,26 @@ class CharParametersWidget(qt.QWidget):
         self.opt_parameters_widget.phi_end_ledit.setEnabled(status)
 
     def enable_opt_parameters_widget(self, state):
-        self.opt_parameters_widget.setEnabled(not state)
+        if not self._char.is_executed():
+            self.opt_parameters_widget.setEnabled(not state)
+        else:
+            self.opt_parameters_widget.setEnabled(False)
 
     def tab_changed(self):
         if self._tree_view_item:
             self.populate_parameter_widget(self._tree_view_item)
+
+    def set_enabled(self, state):
+        self.char_type_widget.setEnabled(state)
+        self.routine_dc_widget.setEnabled(state)
+        self.sad_widget.setEnabled(state)
+        self.rad_dmg_char_widget.setEnabled(state)
+        self.reference_img_widget.setEnabled(state)
+        self.acq_widget.setEnabled(state)
+        self.path_widget.setEnabled(state)
+        self.opt_parameters_widget.setEnabled(state)
+        self.rad_dmg_widget.setEnabled(state)
+        self.vertical_dimension_widget.setEnabled(state)
 
     def populate_parameter_widget(self, tree_view_item):
         self._tree_view_item = tree_view_item

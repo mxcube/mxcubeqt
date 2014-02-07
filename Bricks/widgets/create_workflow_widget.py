@@ -7,9 +7,6 @@ import itertools
 
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
-
 
 class CreateWorkflowWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
@@ -33,35 +30,29 @@ class CreateWorkflowWidget(CreateTaskBase):
                                              'data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox, 
                                                 data_model = self._path_template,
-                                                layout = DataPathWidgetVerticalLayout)
+                                                layout = 'vertical')
 
-        self._data_path_widget.data_path_widget_layout.file_name_label.setText('')
-        self._data_path_widget.data_path_widget_layout.file_name_value_label.hide()
+        self._data_path_widget.data_path_widget_layout.child('file_name_label').setText('')
+        self._data_path_widget.data_path_widget_layout.child('file_name_value_label').hide()
 
-
-        self._grid_widget = MxLookupScanBrick.\
-                            MxLookupScanBrick(self, 'grid_widget')
+        self._grid_widget = MxLookupScanBrick.MxLookupScanBrick(self, 'grid_widget')
 
         v_layout.addWidget(self._workflow_type_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._grid_widget)
         v_layout.addStretch()
 
-        self.connect(self._data_path_widget.data_path_widget_layout.prefix_ledit, 
+        self.connect(self._data_path_widget.data_path_widget_layout.child('prefix_ledit'), 
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-        self.connect(self._data_path_widget.data_path_widget_layout.run_number_ledit,
+        self.connect(self._data_path_widget.data_path_widget_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
         self.connect(self._data_path_widget,
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
-        
-        #self.connect(self._workflow_cbox, qt.SIGNAL('activated ( const QString &)'),
-        #             self.workflow_selected)
-
 
     def set_workflow(self, workflow_hwobj):
         self._workflow_hwobj = workflow_hwobj
@@ -85,7 +76,6 @@ class CreateWorkflowWidget(CreateTaskBase):
                 getObjectByRole('vertical_motors')
         self._grid_widget.initialize_motors('vertical', motor)
 
-
     def init_models(self):
         CreateTaskBase.init_models(self)
 
@@ -95,7 +85,10 @@ class CreateWorkflowWidget(CreateTaskBase):
         wf_model = tree_item.get_model()
 
         if isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
-            self.setDisabled(False)
+            if tree_item.get_model().is_executed():
+                self.setDisabled(True)
+            else:
+                self.setDisabled(False)
             
             if wf_model.get_path_template():
                 self._path_template = wf_model.get_path_template()

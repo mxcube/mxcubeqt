@@ -68,7 +68,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('osc_start',
                                self.acq_widget_layout.child('osc_start_ledit'),
                                float,
-                               qt.QDoubleValidator(-1000, 1000, 2, self))
+                               qt.QDoubleValidator(-10000, 10000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('first_image',
@@ -80,7 +80,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('exp_time',
                                self.acq_widget_layout.child('exp_time_ledit'),
                                float,
-                               qt.QDoubleValidator(0.037, 6000, 3, self))
+                               qt.QDoubleValidator(0.003, 6000, 3, self))
 
         self._acquisition_mib.\
              bind_value_update('osc_range',
@@ -164,11 +164,38 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.subwedge_size_ledit_change)
 
+        qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.osc_start_cbox_click)
+
         self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
         self.acq_widget_layout.child('energies_combo').setDisabled(True)
         self.acq_widget_layout.child('energies_combo').\
             insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
+        self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
+
+    def osc_start_cbox_click(self, state):
+        self.update_osc_start(self._beamline_setup._get_omega_axis_position())
+        self.acq_widget_layout.child('osc_start_ledit').setEnabled(state)
+
+    def update_osc_start(self, new_value):
+        if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
+            osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
+            osc_start_value = 0
+
+            try:
+                osc_start_value = round(float(new_value),2)
+            except TypeError:
+                pass
+            
+            osc_start_ledit.setText("%.2f" % osc_start_value)
+            self._acquisition_parameters.osc_start = osc_start_value
+
+    def use_osc_start(self, state):
+        self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
+        self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
+            
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
@@ -182,6 +209,9 @@ class AcquisitionWidget(qt.QWidget):
 
         if self._beamline_setup.disable_num_passes():
             self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
+
+        has_aperture = self._beamline_setup.has_aperture()
+        self.hide_aperture(has_aperture)    
 
     def first_image_ledit_change(self, new_value):
         if str(new_value).isdigit():
@@ -293,7 +323,7 @@ class AcquisitionWidget(qt.QWidget):
             (name, energy) = self.get_mad_energy()
             if energy != 0:
                 self.set_energy(energy, 0)
-            
+
             self.emit(qt.PYSIGNAL('mad_energy_selected'), (name, energy, True))
 
     def set_energy(self, energy, wav):
@@ -321,14 +351,13 @@ class AcquisitionWidget(qt.QWidget):
         if mad:
             mad_prefix = self._path_template.mad_prefix
             index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
+            self.acq_widget_layout.child('energies_combo').setCurrentItem(index)
             self.acq_widget_layout.child('mad_cbox').setChecked(True)
-            self.acq_widget_layout.child('energies_combo').\
-                setCurrentItem(index)
-            #self.use_mad(mad)
+            self.acq_widget_layout.child('energies_combo').setEnabled(True)
         else:
             self.acq_widget_layout.child('mad_cbox').setChecked(False)
-            self.acq_widget_layout.child('energies_combo').\
-                setCurrentItem(0)
+            self.acq_widget_layout.child('energies_combo').setEnabled(False)
+            self.acq_widget_layout.child('energies_combo').setCurrentItem(0)
 
     def set_tunable_energy(self, state):
         self.acq_widget_layout.child('energy_ledit').setEnabled(state)
@@ -343,4 +372,13 @@ class AcquisitionWidget(qt.QWidget):
         else:
             self.acq_widget_layout.child('inverse_beam_cbx').show()
             self.acq_widget_layout.child('subwedge_size_label').show()
-            self.acq_widget_layout.child('subwedge_size_ledit').show()
+            self.acq_widget_layout.child('subwedge_size_ledit').show()        
+
+    def hide_aperture(self, state):
+        pass
+        #if state:
+        #    self.acq_widget_layout.child('aperture_ledit').show()
+        #    self.acq_widget_layout.child('aperture_cbox').show()
+        #else:
+        #    self.acq_widget_layout.child('aperture_ledit').hide()
+        #    self.acq_widget_layout.child('aperture_cbox').hide()

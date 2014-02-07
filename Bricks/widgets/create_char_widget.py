@@ -10,8 +10,6 @@ import ShapeHistory as shape_history
 from widgets.widget_utils import DataModelInputBinder
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
-from widgets.data_path_widget_vertical_layout import\
-    DataPathWidgetVerticalLayout
 from acquisition_widget_simple import AcquisitionWidgetSimple
 
 from queue_model_enumerables_v1 import XTAL_SPACEGROUPS
@@ -39,11 +37,11 @@ class CreateCharWidget(CreateTaskBase):
         self._acq_widget = \
             AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
                                     path_template = self._path_template)
+        self._acq_widget.setFixedHeight(170)
 
         current_dir = os.path.dirname(__file__)
         ui_file = 'ui_files/vertical_crystal_dimension_widget_layout.ui'
-        widget = qtui.QWidgetFactory.\
-                 create(os.path.join(current_dir, ui_file))
+        widget = qtui.QWidgetFactory.create(os.path.join(current_dir, ui_file))
 
         widget.reparent(self, qt.QPoint(0,0))
         self._vertical_dimension_widget = widget
@@ -61,13 +59,13 @@ class CreateCharWidget(CreateTaskBase):
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox, 
                            data_model = self._path_template,
-                           layout = DataPathWidgetVerticalLayout)
+                           layout = 'vertical')
 
         v_layout.addWidget(self._acq_widget)
+        v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._char_widget)
         v_layout.addWidget(self._vertical_dimension_widget)
-        v_layout.addWidget(self._data_path_gbox)
-        v_layout.addStretch(10)
+        v_layout.addStretch(100)
 
         #
         # Logic
@@ -77,7 +75,7 @@ class CreateCharWidget(CreateTaskBase):
         account_rad_dmg_cbx = self._char_widget.\
                               child('account_rad_dmg_cbx')
         start_comp_cbox = self._char_widget.child('start_comp_cbox')
-        induced_burn_cbx = self._char_widget.child('induced_burn_cbx')
+        #induced_burn_cbx = self._char_widget.child('induced_burn_cbx')
         max_vdim_ledit = self._vertical_dimension_widget.\
                          child('max_vdim_ledit')
         min_vdim_ledit = self._vertical_dimension_widget.\
@@ -100,9 +98,9 @@ class CreateCharWidget(CreateTaskBase):
                                                 account_rad_dmg_cbx,
                                                 bool, None)
 
-        self._char_params_mib.bind_value_update('determine_rad_params', 
-                                                induced_burn_cbx,
-                                                bool, None)
+        #self._char_params_mib.bind_value_update('determine_rad_params', 
+        #                                        induced_burn_cbx,
+        #                                        bool, None)
 
         self._char_params_mib.bind_value_update('strategy_complexity',
                                                 start_comp_cbox,
@@ -131,10 +129,10 @@ class CreateCharWidget(CreateTaskBase):
         space_group_ledit.insertStrList(XTAL_SPACEGROUPS)
 
         prefix_ledit = self._data_path_widget.\
-                       data_path_widget_layout.prefix_ledit
+                       data_path_widget_layout.child('prefix_ledit')
 
         run_number_ledit = self._data_path_widget.\
-                           data_path_widget_layout.run_number_ledit
+                           data_path_widget_layout.child('run_number_ledit')
 
         self.connect(prefix_ledit,
                      qt.SIGNAL("textChanged(const QString &)"), 
@@ -152,8 +150,8 @@ class CreateCharWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
-        self.connect(induced_burn_cbx, qt.SIGNAL("toggled(bool)"),
-                     self.use_induced_burn)
+        #self.connect(induced_burn_cbx, qt.SIGNAL("toggled(bool)"),
+        #             self.use_induced_burn)
 
     def use_induced_burn(self, state):
         self._acquisition_parameters.induce_burn = state
@@ -194,7 +192,7 @@ class CreateCharWidget(CreateTaskBase):
 
             try:
                 resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 4)
+                resolution = round(float(resolution), 3)
             except AttributeError:
                 resolution = 0
 
@@ -222,14 +220,21 @@ class CreateCharWidget(CreateTaskBase):
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
             self._init_models()
-            self._char_params = copy.deepcopy(self._char_params)
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            self._set_space_group(self._char_params.space_group)
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                self._path_template)
+            self._char_params_mib.set_model(self._char_params)
+            #self._char_params = copy.deepcopy(self._char_params)
+            #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
-            self.setDisabled(False)
+            if tree_item.get_model().is_executed():
+                self.setDisabled(True)
+            else:
+                self.setDisabled(False)
+
             self._char = tree_item.get_model()
 
             if self._char.get_path_template():
@@ -243,6 +248,10 @@ class CreateCharWidget(CreateTaskBase):
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
 
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
+            self.get_acquisition_widget().use_osc_start(True)
+
             if len(data_collection.acquisitions) == 1:
                 self.select_shape_with_cpos(self._acquisition_parameters.\
                                             centred_position)
@@ -250,15 +259,6 @@ class CreateCharWidget(CreateTaskBase):
             self._processing_parameters = data_collection.processing_parameters
         else:
             self.setDisabled(True)
-
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-           isinstance(tree_item, queue_item.CharacterisationQueueItem):
-
-            self._set_space_group(self._char_params.space_group)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
-            self._char_params_mib.set_model(self._char_params)
 
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
@@ -334,6 +334,6 @@ class CreateCharWidget(CreateTaskBase):
                         path_template.run_number)
 
         tasks.append(char)
-        #self._path_template.run_number += 1
+        self._path_template.run_number += 1
 
         return tasks

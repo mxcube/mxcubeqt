@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>324</width>
-            <height>158</height>
+            <width>361</width>
+            <height>153</height>
         </rect>
     </property>
     <property name="caption">
@@ -161,14 +161,6 @@
                                                     </property>
                                                     <property name="text">
                                                         <string>Optimised SAD</string>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QCheckBox">
-                                                    <property name="name">
-                                                        <cstring>induced_burn_cbx</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Induced burn</string>
                                                     </property>
                                                 </widget>
                                             </vbox>

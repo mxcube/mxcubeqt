@@ -41,8 +41,11 @@ class LogBarBrick(BaseComponents.BlissWidget):
             date_time = "%s %s" % (record.getDate(), record.getTime())
 
             self._status_bar_widget.text_edit.\
-                append("[<font color=%s>%s]</font>" % (color, date_time) + \
-                           " "*5 + "%s" % msg)
+                append("<font color=%s>[%s]" % (color, date_time) + \
+                           " "*5 + "<b>%s</b></font>" % msg)
+
+            if level == logging.WARNING or level == logging.ERROR:
+                self._status_bar_widget.toggle_background_color()
 
 
     appendLogRecord = append_log_record

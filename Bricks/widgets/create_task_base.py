@@ -6,7 +6,7 @@ import abc
 import copy
 import ShapeHistory as shape_history
 
-from BlissFramework.Utils import widget_colors
+#from BlissFramework.Utils import widget_colors
 
 
 class CreateTaskBase(qt.QWidget):
@@ -47,6 +47,20 @@ class CreateTaskBase(qt.QWidget):
                             self.tab_changed)
 
     def init_models(self):
+        self.init_acq_model()
+        self.init_data_path_model()
+
+    def init_acq_model(self):
+        bl_setup = self._beamline_setup_hwobj
+
+        if bl_setup is not None:
+            if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
+                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
+        else:
+            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+
+    def init_data_path_model(self):
         bl_setup = self._beamline_setup_hwobj
 
         if bl_setup is not None:
@@ -65,13 +79,8 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.base_prefix = self.get_default_prefix()
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
-
-            if self._acq_widget:
-                self._acq_widget.set_beamline_setup(bl_setup)
-                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
         else:
             self._path_template = queue_model_objects.PathTemplate()
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
@@ -86,6 +95,7 @@ class CreateTaskBase(qt.QWidget):
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
+            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
         except AttributeError as ex:
             logging.getLogger("HWR").exception('Could not connect to one or '+\
                                                'more hardware objects' + str(ex))
@@ -93,6 +103,12 @@ class CreateTaskBase(qt.QWidget):
         self._shape_history = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
+
+    def update_osc_start(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            acq_widget.update_osc_start(new_value)
 
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -124,16 +140,7 @@ class CreateTaskBase(qt.QWidget):
                         check_for_path_collisions(self._path_template)
 
         if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else: 
-                # There is already incorrect input, do not chage background.
-                if widget.paletteBackgroundColor() != widget_colors.LIGHT_RED:
-                    widget.setPaletteBackgroundColor(widget_colors.WHITE)
+            self._data_path_widget.indicate_path_conflict(path_conflict)                    
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -206,16 +213,19 @@ class CreateTaskBase(qt.QWidget):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
         return prefix
         
-    def get_default_directory(self, tree_item = None, sub_dir = None):
+    def get_default_directory(self, tree_item = None, sub_dir = ''):
+        group_name = self._session_hwobj.get_group_name()
+
+        if group_name:
+            sub_dir = group_name + '/' + sub_dir
+
         if tree_item:
             item = self.get_sample_item(tree_item)            
-            sub_dir = item.get_model().get_name()
+            sub_dir += item.get_model().get_name()
 
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_id == -1:
-                    sub_dir = ''
-        else:
-            sub_dir = sub_dir
+                    sub_dir += ''
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
@@ -234,12 +244,20 @@ class CreateTaskBase(qt.QWidget):
             
     def selection_changed(self, items):
         if items:
-            self._current_selected_items = items
-        
             if len(items) == 1:
+                self._current_selected_items = items
                 self.single_item_selection(items[0])
-            elif len(items) > 1:
-                self.multiple_item_selection(items)
+            elif len(items) > 1:                
+                sample_items = []
+
+                # Allow mutiple selections on sample items, only.
+                for item in items:
+                    if isinstance(item, queue_item.SampleQueueItem):
+                        sample_items.append(item)
+
+                if sample_items:
+                    self._current_selected_items = sample_items
+                    self.multiple_item_selection(sample_items)
         else:
             self.setDisabled(True)
 
@@ -251,52 +269,47 @@ class CreateTaskBase(qt.QWidget):
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
-            #self._shape_history.de_select_all()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
             # Sample with lims information, use values from lims
-            # to set the data path.
+            # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
                 (data_directory, proc_directory) = self.get_default_directory(tree_item)
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+            elif self._session_hwobj.get_group_name() != '':
+                base_dir = self._session_hwobj.get_base_image_directory()
+                # Update with group name as long as user didn't specify
+                # differnt path.
+                if base_dir == self._path_template.directory:
+                    (data_directory, proc_directory) = self.get_default_directory()
+                    self._path_template.directory = data_directory
+                    self._path_template.process_directory = proc_directory
+                    self._path_template.base_prefix = self.get_default_prefix()
 
-            # Get the next available run number at this level of the
-            # model.
+            # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
 
             #Update energy transmission and resolution
             if self._acq_widget:
                 self._update_etr()
-
-            self.setDisabled(False)
-
-        elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            #self._shape_history.de_select_all()
-            self._path_template = copy.deepcopy(self._path_template)
-            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(self._path_template)
-
-            #Update energy transmission and resolution
-            if self._acq_widget:
-                self._update_etr()
-
-            self.setDisabled(False)
-
-        if self._item_is_group_or_sample:
-            if self._acq_widget:
                 sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-            
+                self.get_acquisition_widget().use_osc_start(False)
+
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
+
+            self.setDisabled(False)
+
+        elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+            self.setDisabled(True)
 
     def _update_etr(self):
         energy = self._beamline_setup_hwobj._get_energy()
@@ -311,15 +324,34 @@ class CreateTaskBase(qt.QWidget):
         tree_item = tree_items[0]
         
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')
-                
+            sample_data_model = tree_item.get_model()
+            self._path_template = copy.deepcopy(self._path_template)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+
+            # Sample with lims information, use values from lims
+            # to set the data path.
+            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')    
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
+
+            # Get the next available run number at this level of the model.
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+                get_next_run_number(self._path_template)
+
+            #Update energy transmission and resolution
+            if self._acq_widget:
+                self._update_etr()
+                energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+                self._acq_widget.set_energies(energy_scan_result)
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                   self._path_template)
+                self.get_acquisition_widget().use_osc_start(False)
+
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
+
             self.setDisabled(False)
-            
-        if self._data_path_widget:
-            self._data_path_widget.update_data_model(self._path_template)
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
@@ -365,14 +397,17 @@ class CreateTaskBase(qt.QWidget):
             sample_is_mounted = False
 
         free_pin_mode = sample.free_pin_mode
+        temp_tasks = self._create_task(sample, shape)
 
         if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
-            sc = queue_model_objects.SampleCentring('sample-centring')
-            tasks.append(sc)
 
-        temp_tasks = self._create_task(sample, shape)
+            # Check if the tasks requires centring, assumes that all
+            # the "sub tasks" has the same centring requirements.
+            if temp_tasks[0].requires_centring():
+                sc = queue_model_objects.SampleCentring('sample-centring')
+                tasks.append(sc)
 
         for task in temp_tasks:
             if sc:

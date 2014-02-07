@@ -8,14 +8,13 @@ import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.processing_widget import ProcessingWidget
-from widgets.data_path_widget_vertical_layout import DataPathWidgetVerticalLayout
 from widgets.acquisition_widget import AcquisitionWidget
 from create_task_base import CreateTaskBase
 
 
 class CreateDiscreteWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
-        CreateTaskBase.__init__(self, parent, name, fl, 'Discrete')
+        CreateTaskBase.__init__(self, parent, name, fl, 'Standard')
 
         if not name:
             self.setName("create_discrete_widget")
@@ -35,13 +34,13 @@ class CreateDiscreteWidget(CreateTaskBase):
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
-        self._data_path_gbox = qt.QVGroupBox('Data location',
-                                             self, 'data_path_gbox')
+        self._data_path_gbox = qt.QVGroupBox('Data location', self,
+                                             'data_path_gbox')        
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox,
                            'create_dc_path_widget',
                            data_model=self._path_template,
-                           layout=DataPathWidgetVerticalLayout)
+                           layout='vertical')
 
         self._processing_gbox = qt.QVGroupBox('Processing', self,
                                               'processing_gbox')
@@ -49,7 +48,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget = \
             ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
-
+        
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._processing_gbox)
@@ -59,11 +58,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.connect(self._acq_widget, qt.PYSIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
         
-        self.connect(dp_layout.prefix_ledit,
+        self.connect(dp_layout.child('prefix_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
 
-        self.connect(dp_layout.run_number_ledit,
+        self.connect(dp_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 
@@ -96,7 +95,7 @@ class CreateDiscreteWidget(CreateTaskBase):
     def mad_energy_selected(self, name, energy, state):
         item = self._current_selected_items[0]
         model = item.get_model()
-
+        
         if state:
             self._path_template.mad_prefix = name
         else:
@@ -117,8 +116,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-               isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem): 
             self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
             self._acq_widget.disable_inverse_beam(False)
@@ -127,7 +125,15 @@ class CreateDiscreteWidget(CreateTaskBase):
             dc = tree_item.get_model()
 
             if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
-                self.setDisabled(False)
+                if dc.is_executed():
+                    self.setDisabled(True)
+                else:
+                    self.setDisabled(False)
+
+                sample_data_model = self.get_sample_item(tree_item).get_model()
+                energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+                self._acq_widget.set_energies(energy_scan_result)
+
                 self._acq_widget.disable_inverse_beam(True)
                 
                 self._path_template = dc.get_path_template()
@@ -135,8 +141,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
                 self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                       self._path_template)
-                
+                                                    self._path_template)
+                self.get_acquisition_widget().use_osc_start(True)
                 if len(dc.acquisitions) == 1:
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
@@ -224,7 +230,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             acq.path_template.base_prefix = self.get_default_prefix(sample)
             acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
                                           get_next_run_number(acq.path_template)
-
+    
         if run_number:        
             acq.path_template.run_number = run_number
 
@@ -251,9 +257,5 @@ class CreateDiscreteWidget(CreateTaskBase):
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
 
         tasks.append(dc)
-
-        self._data_path_widget.update_data_model(self._path_template)
-        self._acq_widget.update_data_model(self._acquisition_parameters,
-                                           self._path_template)
 
         return tasks

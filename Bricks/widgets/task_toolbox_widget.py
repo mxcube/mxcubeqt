@@ -30,6 +30,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.method_group_box.setFont(font)
     
         self.tool_box = qt.QToolBox(self.method_group_box , "tool_box")
+        self.tool_box.setFixedWidth(475)
         font = self.tool_box.font()
         font.setPointSize(10)
         self.tool_box.setFont(font)
@@ -43,16 +44,18 @@ class TaskToolBoxWidget(qt.QWidget):
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
-        self.tool_box.addItem(self.discrete_page, "Discrete")
-        self.tool_box.addItem(self.char_page, "Characterise")
-        self.tool_box.addItem(self.helical_page, "Helical")
+        self.tool_box.addItem(self.discrete_page, "Standard Collection")
+        self.tool_box.addItem(self.char_page, "Characterisation")
+        self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         self.tool_box.addItem(self.workflow_page, "Advanced")
 
         self.add_pixmap = Icons.load("add_row.png")
         self.create_task_button = qt.QPushButton("  Add to queue", self)
         self.create_task_button.setIconSet(qt.QIconSet(self.add_pixmap))
-
+        msg = "Add the collection method to the selected sample"
+        qt.QToolTip.add(self.create_task_button, msg)
+        
         self.v_layout.addWidget(self.method_group_box)
 
         self.button_hlayout = qt.QHBoxLayout(None)
@@ -93,6 +96,13 @@ class TaskToolBoxWidget(qt.QWidget):
             self.tool_box.removeItem(self.energy_scan_page)
             self.energy_scan_page.hide()
 
+    def update_data_path_model(self):
+        for i in range(0, self.tool_box.count()):
+            item = self.tool_box.item(i)
+            item.init_data_path_model()
+            item.update_selection()
+
+            
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)
@@ -127,8 +137,12 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         Called by the parent widget when selection in the tree changes.
         """
-
         if len(items) == 1:
+            
+            if isinstance(items[0], queue_item.DataCollectionGroupQueueItem):
+                self.create_task_button.setEnabled(False)
+            else:
+                self.create_task_button.setEnabled(True)
 
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
@@ -143,8 +157,7 @@ class TaskToolBoxWidget(qt.QWidget):
             elif isinstance(items[0], queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentItem(self.energy_scan_page)
             elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
-                self.tool_box.setCurrentItem(self.worklfow_page)
-                
+                self.tool_box.setCurrentItem(self.workflow_page)
 
         current_page = self.tool_box.currentItem()
         current_page.selection_changed(items)
@@ -198,11 +211,7 @@ class TaskToolBoxWidget(qt.QWidget):
             for child_task_node in task_list:
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
 
-        # The selected item is a task
+        # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
-
-        pt = self.tool_box.currentItem()._path_template
-        pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-            get_next_run_number(pt)

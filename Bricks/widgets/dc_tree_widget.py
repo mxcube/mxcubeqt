@@ -11,9 +11,9 @@ from BlissFramework.Utils import widget_colors
 from widgets.confirm_dialog import ConfirmDialog
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
-                             ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN'])
+                             ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE'])
 
-SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2)
+SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
 
 
 class DataCollectTree(qt.QWidget):
@@ -62,23 +62,28 @@ class DataCollectTree(qt.QWidget):
                         
         self.up_button = qt.QPushButton(self, "up_button")
         self.up_button.setPixmap(self.up_pixmap)
+        self.up_button.setFixedHeight(25)
 
         self.delete_button = qt.QPushButton(self, "delete_button")
         self.delete_button.setPixmap(self.delete_pixmap)
         self.delete_button.setDisabled(True)
+        qt.QToolTip.add(self.delete_button, "Delete highlighted queue entries")
 
         self.down_button = qt.QPushButton(self, "down_button")
         self.down_button.setPixmap(self.down_pixmap)
+        self.down_button.setFixedHeight(25)
 
         self.collect_button = qt.QPushButton(self, "collect_button")
         self.collect_button.setText("Collect Queue")
-        self.collect_button.setFixedWidth(120)
+        self.collect_button.setFixedWidth(125)
         self.collect_button.setIconSet(qt.QIconSet(self.play_pixmap))
         self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
 
         self.continue_button = qt.QPushButton(self, "ok_button")
         self.continue_button.setText('Pause')
         self.continue_button.setEnabled(True)
+        self.continue_button.setFixedWidth(75)
+        qt.QToolTip.add(self.continue_button, "Pause after current data collection")
 
         self.sample_list_view = qt.QListView(self, "sample_list_view")
         self.sample_list_view.setSelectionMode(qt.QListView.Extended)
@@ -90,7 +95,7 @@ class DataCollectTree(qt.QWidget):
     
         self.sample_list_view.setSorting(-1)
         self.sample_list_view.addColumn("", 280)
-        self.sample_list_view.addColumn("", 120)
+        self.sample_list_view.addColumn("", 130)
         self.sample_list_view.header().hide()
 
         self.sample_list_view.header().hide()
@@ -145,6 +150,7 @@ class DataCollectTree(qt.QWidget):
                            self.continue_button_click)
 
         self.sample_list_view.viewport().installEventFilter(self)
+        self.setFixedWidth(415)
 
     def eventFilter(self, _object, event):
         if event.type() == qt.QEvent.MouseButtonDblClick:
@@ -171,23 +177,20 @@ class DataCollectTree(qt.QWidget):
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
                 if not item.get_model().free_pin_mode:
-                    menu.insertItem(qt.QString("Mount"), self.mount_sample)
-                    menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
+                    if self.is_mounted_sample_item(item): 
+                        menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
+                    else:
+                        menu.insertItem(qt.QString("Mount"), self.mount_sample)
+                       
                 menu.insertSeparator(3)
-                #menu.insertItem(qt.QString("Create Data Collection Group"), self.add_empty_task_node)
-                #menu.insertSeparator(5)
                 menu.insertItem(qt.QString("Details"), self.show_details) 
                 menu.popup(point);
             else:
                 menu.popup(point);
-                #menu.insertItem(qt.QString("Duplicate"), self.copy_generic_dc_list_item)
-                #menu.insertItem(qt.QString("Rename"), self.rename_list_view_item)
                 menu.insertSeparator(2)
                 menu.insertItem(qt.QString("Remove"), self.delete_click)
                 menu.insertSeparator(4)
                 menu.insertItem(qt.QString("Details"), self.show_details)
-            
-            #menu.insertItem(qt.QString("Collect"), self.context_collect_item)
             
     def item_double_click(self):
         self.show_details()
@@ -254,9 +257,9 @@ class DataCollectTree(qt.QWidget):
                     logging.getLogger("user_level_log").error(msg)
                 finally:
                     self.enable_collect(True)
-        else:
-            logging.getLogget("user_level_log").\
-                info('Its not possible to mount samples in free pin mode')
+            else:
+                logging.getLogger("user_level_log").\
+                  info('Its not possible to mount samples in free pin mode')
 
     def centring_done(self, success, centring_info):
         if success:
@@ -281,6 +284,8 @@ class DataCollectTree(qt.QWidget):
             location = items[0].get_model().location
             self.beamline_setup_hwobj.sample_changer_hwobj.\
                  unload(22, sample_location = location, wait = False)
+            items[0].setOn(False)
+            items[0].set_mounted_style(False)
 
     def sample_list_view_selection(self):
         items = self.get_selected_items()
@@ -288,10 +293,10 @@ class DataCollectTree(qt.QWidget):
         if len(items) == 1:
             item = items[0]
             
-            if item.deletable:
-                self.delete_button.setDisabled(False)
-            else:
-                self.delete_button.setDisabled(True)
+            #if item.deletable:
+            #    self.delete_button.setDisabled(False)
+            #else:
+            #    self.delete_button.setDisabled(True)
 
         if len(items) > 1:
             for item in items:
@@ -395,6 +400,8 @@ class DataCollectTree(qt.QWidget):
 
     def filter_sample_list(self, option):
         self.sample_list_view.clearSelection()
+        self.beamline_setup_hwobj.set_plate_mode(False)
+        
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('ispyb')
@@ -424,10 +431,16 @@ class DataCollectTree(qt.QWidget):
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('free-pin')
-            self.sample_list_view.firstChild().setSelected(True)
+            self.set_sample_pin_icon()
+        elif option == SC_FILTER_OPTIONS.PLATE:
+            #self.sample_list_view.clear()
+            #self.sample_list_view.setDisabled(True)
+            msg= 'In plate mode, not taking crystal snapshots'
+            logging.getLogger("user_level_log").warning(msg)
+            self.beamline_setup_hwobj.set_plate_mode(True)
 
         self.sample_list_view_selection()
-            
+        
     def set_centring_method(self, method_number):       
         self.centring_method = method_number
 
@@ -493,28 +506,27 @@ class DataCollectTree(qt.QWidget):
         self.parent().sample_changer_widget.child('filter_cbox').setEnabled(state)
 
     def is_mounted_sample_item(self, item):
+        result = False
+
         if isinstance(item, queue_item.SampleQueueItem):
-            if not self.sample_changer_hwobj.hasLoadedSample():
-                return False
-            if item.get_model().location == self.sample_changer_hwobj.getLoadedSample().getCoords():
-                return True
+            if item.get_model().free_pin_mode == True:
+                result = True
+            elif not self.sample_changer_hwobj.hasLoadedSample():
+                result = False
+            elif item.get_model().location == self.sample_changer_hwobj.getLoadedSample().getCoords():
+                result = True
+
+        return result
 
     def collect_items(self, items = [], checked_items = []):
         self.beamline_setup_hwobj.shape_history_hwobj.de_select_all()
         for item in checked_items:
             # update the run-number text incase of re-collect
-            item.setText(0, item.get_model().get_name())
+            #item.setText(0, item.get_model().get_name())
 
             #Clear status
             item.setText(1, "")
-            item.setHighlighted(False)
-
-            #if self.is_mounted_sample_item(item):
-            #    item.setPixmap(0, self.pin_pixmap)
-                # Blue background and sample pin for mounted sample.
-                #item.setBackgroundColor(widget_colors.SKY_BLUE)
-            #else:
-            item.setBackgroundColor(widget_colors.WHITE)
+            item.reset_style()
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)
@@ -550,6 +562,7 @@ class DataCollectTree(qt.QWidget):
         self.parent().enable_hutch_menu(True)
         self.parent().enable_command_menu(True)
         self.parent().enable_task_toolbox(True)
+        self.set_sample_pin_icon()
 
     def get_checked_items(self):
         res = queue_item.perform_on_children(self.sample_list_view,
@@ -558,20 +571,18 @@ class DataCollectTree(qt.QWidget):
 
         return res
  
-    def delete_click(self):
-        selected_items = self.get_selected_items()
+    def delete_click(self, selected_items = None):
+        children = []
+
+        if not isinstance(selected_items, list):
+            selected_items = self.get_selected_items()
         
         for item in selected_items:
+            parent = item.parent()
             if item.deletable:
-                if not item.parent().isSelected() or \
-                   isinstance(item.parent(), queue_item.SampleQueueItem):
-                    if isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                        self.tree_brick.show_sample_centring_tab()
+                if not parent.isSelected() or (not parent.deletable):
+                    self.tree_brick.show_sample_centring_tab()
 
-                    if isinstance(item, queue_item.DataCollectionQueueItem):
-                        self.tree_brick.show_sample_centring_tab()
-
-                    parent = item.parent()
                     self.queue_model_hwobj.del_child(parent.get_model(),
                                                      item.get_model())
                     qe = item.get_queue_entry()
@@ -580,6 +591,16 @@ class DataCollectTree(qt.QWidget):
 
                     if not parent.firstChild():
                         parent.setOn(False)
+            else:
+                item.reset_style()
+                child = item.firstChild() 
+
+                while child: 
+                    children.append(child)
+                    child = child.nextSibling()
+
+        if children:
+            self.delete_click(selected_items = children)
 
         self.check_for_path_collisions()
 
@@ -680,19 +701,13 @@ class DataCollectTree(qt.QWidget):
         it = qt.QListViewItemIterator(self.sample_list_view)
         item = it.current()
 
-        #self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
-
         while item:
             if self.is_mounted_sample_item(item):
-                item.setPixmap(0, self.pin_pixmap)
-                #item.setBackgroundColor(widget_colors.SKY_BLUE)
                 item.setSelected(True)
+                item.set_mounted_style(True)
                 self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
-                item.setPixmap(0, qt.QPixmap())
-                item.setSelected(False)
-                item.setText(1, '')
-
+                item.set_mounted_style(False)
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
                     item.setPixmap(0, self.ispyb_pixmap)

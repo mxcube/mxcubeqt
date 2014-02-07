@@ -30,8 +30,8 @@ class EnergyScanParametersWidget(qt.QWidget):
         #scan_plot_gbox = qt.QHGroupBox("Scan plot", self)
         #spec_scan_plot_brick = SpecScanPlotBrick(scan_plot_gbox)
         self.data_path_widget = DataPathWidget(self)
-        self.data_path_widget.data_path_widget_layout.file_name_label.setText('')
-        self.data_path_widget.data_path_widget_layout.file_name_value_label.hide()
+        self.data_path_widget.data_path_widget_layout.child('file_name_label').setText('')
+        self.data_path_widget.data_path_widget_layout.child('file_name_value_label').hide()
 
         col_one_vlayout.add(periodic_table_gbox)
         col_one_vlayout.add(self.data_path_widget)
@@ -40,12 +40,12 @@ class EnergyScanParametersWidget(qt.QWidget):
         qt.QObject.connect(self.periodic_table, qt.PYSIGNAL('edgeSelected'), 
                            self.element_clicked)
 
-        qt.QObject.connect(self.data_path_widget.data_path_widget_layout.prefix_ledit, 
+        qt.QObject.connect(self.data_path_widget.data_path_widget_layout.child('prefix_ledit'), 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._prefix_ledit_change)
 
 
-        qt.QObject.connect(self.data_path_widget.data_path_widget_layout.run_number_ledit, 
+        qt.QObject.connect(self.data_path_widget.data_path_widget_layout.child('run_number_ledit'), 
                            qt.SIGNAL("textChanged(const QString &)"), 
                            self._run_number_ledit_change)
         
@@ -67,12 +67,17 @@ class EnergyScanParametersWidget(qt.QWidget):
 
     def populate_widget(self, item):
         self._tree_view_item = item
-        
         self.energy_scan = item.get_model()
-        self.data_path_widget.update_data_model(self.energy_scan.path_template)
-        
-        self.periodic_table.periodicTable.\
-            tableElementChanged(self.energy_scan.element_symbol)
+
+        if self.energy_scan.is_executed():
+            self.data_path_widget.setEnabled(False)
+            self.periodic_table.setEnabled(False)
+        else:
+            self.data_path_widget.setEnabled(True)
+            self.periodic_table.setEnabled(True)
+            self.data_path_widget.update_data_model(self.energy_scan.path_template)
+            self.periodic_table.periodicTable.\
+                tableElementChanged(self.energy_scan.element_symbol)
 
     def element_clicked(self, symbol, energy):
         self.energy_scan.element_symbol = symbol
