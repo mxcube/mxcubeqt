@@ -127,7 +127,7 @@ class CreateWorkflowWidget(CreateTaskBase):
         wf = queue_model_objects.Workflow()
         wf_name = str(self._workflow_cbox.currentText())
         wf.path_template = path_template
-        wf.set_name(path_template.get_prefix())
+        wf.set_name("Workflow task")
         wf.set_type(wf_name)
         
         beamline_params = {}
