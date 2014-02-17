@@ -32,6 +32,7 @@ the repository, for the first time it has to be created by making a copy of exam
 * `Qub <http://github.com/mxcube/qub>`_
 * `PyChooch <http://github.com/mxcube/pychooch>`_
 * `PyMca <http://sourceforge.net/projects/pymca/>`_
+* `PyTango <http://www.tango-controls.org/static/PyTango/latest/doc/html>`_
 
 `SpecClient <http://github.com/mxcube/specclient>`_ is an optional dependency. If it is
 not present, the Hardware Repository Server does not work, though. In this case
@@ -48,7 +49,8 @@ Install PyTango and PyMca, make sure to be root.
    apt-get install pymca	
    apt-get install python2.6-pytango
 
-Install the other dependenices needed through the blissinstaller or by typing.
+Install the other dependenices needed through the blissinstaller or type the following as
+blissadm:
 
 .. code-block:: bash
 
