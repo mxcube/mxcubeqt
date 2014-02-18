@@ -336,6 +336,11 @@ class CreateHelicalWidget(CreateTaskBase):
 
             start_acq.path_template.suffix = self._session_hwobj.suffix
 
+            if self._beamline_setup_hwobj.in_plate_mode():
+                start_acq.acquisition_parameters.take_snapshots = False
+            else:
+                start_acq.acquisition_parameters.take_snapshots = True
+
             if '<sample_name>' in start_acq.path_template.directory:
                 name = sample.get_name().replace(':', '-')
                 start_acq.path_template.directory = start_acq.path_template.directory.\

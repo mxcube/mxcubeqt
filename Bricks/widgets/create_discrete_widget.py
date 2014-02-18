@@ -248,6 +248,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         if inverse_beam:
             acq.acquisition_parameters.inverse_beam = False
 
+        if self._beamline_setup_hwobj.in_plate_mode():
+            acq.acquisition_parameters.take_snapshots = False
+        else:
+            acq.acquisition_parameters.take_snapshots = True
+
         processing_parameters = copy.deepcopy(self._processing_parameters)
         dc = qmo.DataCollection([acq], sample.crystals[0],
                                 processing_parameters)

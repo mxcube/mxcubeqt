@@ -302,6 +302,11 @@ class CreateCharWidget(CreateTaskBase):
         acq.acquisition_parameters.centred_position = cpos
         acq.path_template = copy.deepcopy(self._path_template)
 
+        if self._beamline_setup_hwobj.in_plate_mode():
+            acq.acquisition_parameters.take_snapshots = False
+        else:
+            acq.acquisition_parameters.take_snapshots = True
+
         if '<sample_name>' in acq.path_template.directory:
             name = sample.get_name().replace(':', '-')
             acq.path_template.directory = acq.path_template.directory.\
