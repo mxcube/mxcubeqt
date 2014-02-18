@@ -545,7 +545,7 @@ class DataCollectTree(qt.QWidget):
         self.enable_sample_changer_widget(False)
         
         self.collecting = True
-        self.collect_button.setText("      Stop   ")
+        self.collect_button.setText(" Stop   ")
         self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.collect_button.setIconSet(qt.QIconSet(self.stop_pixmap))
         self.parent().enable_hutch_menu(False)
