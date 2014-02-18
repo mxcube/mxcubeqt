@@ -109,7 +109,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
             self._acquisition_parameters.osc_start = osc_start_value
     
     def update_num_images(self, index = None, num_images = None):
-        if index:
+        if index is not None:
             if index is 0:
                 self._acquisition_parameters.num_images = 1
                 self._path_template.num_files = 1
