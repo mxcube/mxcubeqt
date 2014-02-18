@@ -647,8 +647,6 @@ class DataCollectionQueueEntry(BaseQueueEntry):
 
             if self.beamline_setup.in_plate_mode():
                 acq_1.acquisition_parameters.take_snapshots = False
-            else:
-                acq_1.acquisition_parameters.take_snapshots = True
 
             sample = self.get_data_model().get_parent().get_parent()
             param_list = queue_model_objects.\
