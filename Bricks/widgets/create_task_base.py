@@ -393,21 +393,26 @@ class CreateTaskBase(qt.QWidget):
         try: 
             sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
                                 getLoadedSample().getCoords() == sample.location
+
         except AttributeError:
             sample_is_mounted = False
+
+        dm = self._beamline_setup_hwobj.diffractometer_hwobj
+        fully_automatic = (not dm.user_confirms_centring)
 
         free_pin_mode = sample.free_pin_mode
         temp_tasks = self._create_task(sample, shape)
 
-        if ((not free_pin_mode) and (not sample_is_mounted)) or (not shape):
-            # No centred positions selected, or selected sample not
-            # mounted create sample centring task.
+        if (not fully_automatic):
+            if ((not free_pin_mode) and (not sample_is_mounted) or (not shape)):
+                # No centred positions selected, or selected sample not
+                # mounted create sample centring task.
 
-            # Check if the tasks requires centring, assumes that all
-            # the "sub tasks" has the same centring requirements.
-            if temp_tasks[0].requires_centring():
-                sc = queue_model_objects.SampleCentring('sample-centring')
-                tasks.append(sc)
+                # Check if the tasks requires centring, assumes that all
+                # the "sub tasks" has the same centring requirements.
+                if temp_tasks[0].requires_centring():
+                    sc = queue_model_objects.SampleCentring('sample-centring')
+                    tasks.append(sc)
 
         for task in temp_tasks:
             if sc:
