@@ -89,7 +89,9 @@ from Qub.Objects.QubPixmapDisplay import QubPixmapZoomPlug
 from Qub.Objects.QubImage2Pixmap import QubImage2Pixmap
 from Qub.Objects.QubStdData2Image import QubStdData2Image,QubStdData2ImagePlug
 from Qub.Print.QubPrintPreview import QubPrintPreview
-from Qub.Widget.QubDialog import QubSaveImageDialog,QubMeasureListDialog,QubBrightnessContrastDialog
+from Qub.Widget.QubDialog import QubSaveImageDialog,QubMeasureListDialog,QubBrightnessContrastDialog, QubLineDialog
+from widgets.grid_dialog import GridDialog
+
 
 DISABLED_JPEG = file(os.path.join(os.path.dirname(__file__), "disabled.jpeg"), "r").read()
 DISABLED_WIDTH = 659
@@ -182,6 +184,20 @@ class CameraBrick(BlissWidget):
                                             group="Tools")
         self.__measureAction.setConnectCallBack(self._measure_dialog_new)
         self.__wholeActions.append(self.__measureAction)
+
+        # ###### POSITION TOOL ######
+        # self.__posToolAction = QubOpenDialogAction(parent=self, name='pos_tool',
+        #                                            iconName='circle', label='Position tool',
+        #                                            group="Tools")
+        # self.__posToolAction.setConnectCallBack(self._line_dialog_new)
+        # self.__wholeActions.append(self.__posToolAction)
+
+        ###### Grid TOOL ######
+        self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
+                                                    iconName='rectangle', label='Grid tool',
+                                                    group="Tools")
+        self.__gridToolAction.setConnectCallBack(self._grid_dialog_new)
+        self.__wholeActions.append(self.__gridToolAction)
 
         ####### ZOOM LIST #######
         zoomActionList = QubZoomListAction(place = "toolbar",
@@ -429,6 +445,9 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.setXPixelSize(sizex)
             self.__measureDialog.setYPixelSize(sizey)
 
+        self.__gridDialog.setXPixelSize(sizex)
+        self.__gridDialog.setYPixelSize(sizey)
+
     def getView(self,key):
         try:
             key['drawing'] = self.__mainVideo.view()
@@ -519,6 +538,22 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.connect(aQubImage, qt.PYSIGNAL("ForegroundColorChanged"),
                                          self.__measureDialog.setDefaultColor)
             openDialogAction.setDialog(self.__measureDialog)
+        except:
+            import traceback
+            traceback.print_exc()
+
+    def _grid_dialog_new(self,openDialogAction, aQubImage) :
+        try :
+            self.__gridDialog = GridDialog(self, "Grid Dialog",
+                                           canvas=aQubImage.canvas(),
+                                           matrix=aQubImage.matrix(),
+                                           event_mgr=aQubImage)
+            
+            
+            xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
+            self.__gridDialog.set_x_pixel_size(xSize)
+            self.__gridDialog.set_y_pixel_size(ySize)
+            openDialogAction.setDialog(self.__gridDialog)
         except:
             import traceback
             traceback.print_exc()
