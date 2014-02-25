@@ -5,7 +5,7 @@ import random
 
 from ShapeHistory import CanvasGrid
 from Qub.Objects.QubDrawingManager import Qub2PointSurfaceDrawingMgr
-
+from HardwareRepository.HardwareRepository import dispatcher
 
 class GridDialog(qt.QDialog):
     def __init__(self, parent = None, name = "Grid Dialog", canvas = None,
@@ -36,6 +36,8 @@ class GridDialog(qt.QDialog):
 
         qt.QObject.connect(widget.child("remove_button"), qt.SIGNAL("clicked()"),
                            self.__delete_drawing)
+
+        dispatcher.connect(self._get_grid_info, "grid")
         
     def showEvent(self, show_event):
         super(GridDialog, self).showEvent(show_event)
@@ -85,8 +87,9 @@ class GridDialog(qt.QDialog):
             data[cell] = (cell, (255, random.randint(0, 255), 0))
         
         self.__drawing_mgr._drawingObjects[0].set_data(data)
-
-        print self.__drawing_mgr._drawingObjects[0].get_cell_locations()
+        #print self.__drawing_mgr._drawingObjects[0].get_cell_locations()
+        grid_info = self.__drawing_mgr._drawingObjects[0]._get_grid()
+        print grid_info
 
         self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
         self.__start_surface_drawing()
@@ -113,3 +116,7 @@ class GridDialog(qt.QDialog):
         except:
             # Drawing manager not set when called
             pass
+
+    def _get_grid_info(self, grid_dict):
+        grid_dict = self.__drawing_mgr._drawingObjects[0]._get_grid()
+        return grid_dict
