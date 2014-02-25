@@ -23,6 +23,8 @@ class GridDialog(qt.QDialog):
         self.__event_mgr = event_mgr
         self.__drawing_object_layer = drawing_object_layer
         self.__drawing_mgr = None
+        self.__x_pixel_size = 1
+        self.__y_pixel_size = 1
 
         ui_file = 'ui_files/grid_row_widget.ui'
         current_dir = os.path.dirname(__file__)
@@ -55,6 +57,8 @@ class GridDialog(qt.QDialog):
 
     def __start_surface_drawing(self):
         self.__drawing_mgr.setAutoDisconnectEvent(False)
+        self.__cell_height = int(75e-6 / self.__y_pixel_size)
+        self.__cell_width = int(75e-6 / self.__x_pixel_size)
         beam_height = self.__cell_height
         beam_width = self.__cell_width
         drawing_object = CanvasGrid(self.__canvas, self.__cell_width,
@@ -78,6 +82,8 @@ class GridDialog(qt.QDialog):
         self.__list_view.setSelected(list_view_item, True)
         self.__list_items[list_view_item] = self.__drawing_mgr
         self.__drawing_mgr.stopDrawing()
+        self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(self.__x_pixel_size)
+        self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(self.__y_pixel_size)
 
         num_cells = self.__drawing_mgr._drawingObjects[0].get_nummer_of_cells()
         data = {}
@@ -104,19 +110,24 @@ class GridDialog(qt.QDialog):
             self.__list_view.setSelected(list_view_item, True)
 
     def set_x_pixel_size(self, x_size):
-        try:  
-            self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
+        self.__x_pixel_size = x_size
+        try:
+            for drawing_mgr in self.__list_items.itervalues():
+                drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
         except AttributeError:
             # Drawing manager not set when called
             pass
 
     def set_y_pixel_size(self, y_size):
+        self.__y_pixel_size = y_size
         try:
-            self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
+            for drawing_mgr in self.__list_items.itervalues():
+                drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
         except:
             # Drawing manager not set when called
             pass
 
     def _get_grid_info(self, grid_dict):
-        grid_dict = self.__drawing_mgr._drawingObjects[0]._get_grid()
-        return grid_dict
+        list_view_item = self.__list_view.selectedItem()
+        drawing_mgr = self.__list_items[list_view_item]
+        grid_dict.update(drawing_mgr._drawingObjects[0]._get_grid())
