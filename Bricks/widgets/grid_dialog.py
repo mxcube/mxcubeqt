@@ -23,7 +23,7 @@ class GridDialog(qt.QDialog):
         self.__event_mgr = event_mgr
         self.__drawing_object_layer = drawing_object_layer
         self.__drawing_mgr = None
-        
+
         ui_file = 'ui_files/grid_row_widget.ui'
         current_dir = os.path.dirname(__file__)
         widget = qtui.QWidgetFactory.create(os.path.join(current_dir, ui_file))
@@ -48,6 +48,8 @@ class GridDialog(qt.QDialog):
         
     def __end_surface_drawing(self, drawing_mgr = None):
         drawing_mgr._drawingObjects[0].reshape()
+        (w, h) = drawing_mgr._drawingObjects[0].get_size()
+        drawing_mgr.setSize(w, h)
 
     def __start_surface_drawing(self):
         self.__drawing_mgr.setAutoDisconnectEvent(False)
@@ -84,6 +86,8 @@ class GridDialog(qt.QDialog):
         
         self.__drawing_mgr._drawingObjects[0].set_data(data)
 
+        print self.__drawing_mgr._drawingObjects[0].get_cell_locations()
+
         self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
         self.__start_surface_drawing()
 
@@ -97,7 +101,15 @@ class GridDialog(qt.QDialog):
             self.__list_view.setSelected(list_view_item, True)
 
     def set_x_pixel_size(self, x_size):
-        pass
+        try:  
+            self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
+        except AttributeError:
+            # Drawing manager not set when called
+            pass
 
     def set_y_pixel_size(self, y_size):
-        pass
+        try:
+            self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
+        except:
+            # Drawing manager not set when called
+            pass
