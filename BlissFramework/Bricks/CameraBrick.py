@@ -89,7 +89,7 @@ from Qub.Objects.QubPixmapDisplay import QubPixmapZoomPlug
 from Qub.Objects.QubImage2Pixmap import QubImage2Pixmap
 from Qub.Objects.QubStdData2Image import QubStdData2Image,QubStdData2ImagePlug
 from Qub.Print.QubPrintPreview import QubPrintPreview
-from Qub.Widget.QubDialog import QubSaveImageDialog,QubMeasureListDialog,QubBrightnessContrastDialog, QubLineDialog
+from Qub.Widget.QubDialog import QubSaveImageDialog,QubMeasureListDialog,QubBrightnessContrastDialog
 from widgets.grid_dialog import GridDialog
 
 
