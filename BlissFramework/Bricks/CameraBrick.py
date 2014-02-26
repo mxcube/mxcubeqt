@@ -193,11 +193,11 @@ class CameraBrick(BlissWidget):
         # self.__wholeActions.append(self.__posToolAction)
 
         ###### Grid TOOL ######
-        #self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
-        #                                            iconName='rectangle', label='Grid tool',
-        #                                            group="Tools")
-        #self.__gridToolAction.setConnectCallBack(self._grid_dialog_new)
-        #self.__wholeActions.append(self.__gridToolAction)
+        self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
+                                                    iconName='rectangle', label='Grid tool',
+                                                    group="Tools")
+        self.__gridToolAction.setConnectCallBack(self._grid_dialog_new)
+        self.__wholeActions.append(self.__gridToolAction)
 
         ####### ZOOM LIST #######
         zoomActionList = QubZoomListAction(place = "toolbar",
@@ -437,7 +437,8 @@ class CameraBrick(BlissWidget):
 
     def changeBeamPosition(self, y, z):
         self.__beamAction.setBeamPosition(y, z)
-
+        self.__gridDialog.set_beam_position(y, z, w=30, h=20)
+        
     def changePixelScale(self,sizex,sizey) :
         self.__scaleAction.setXPixelSize(sizex)
         self.__scaleAction.setYPixelSize(sizey)
