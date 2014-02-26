@@ -23,9 +23,11 @@ class GridDialog(qt.QDialog):
         self.__event_mgr = event_mgr
         self.__drawing_object_layer = drawing_object_layer
         self.__drawing_mgr = None
-        self.__x_pixel_size = 1
-        self.__y_pixel_size = 1
-
+        self.__x_pixel_size = 3.69e-06
+        self.__y_pixel_size = 3.709e-06
+        self.__beam_pos = (0, 0, 30, 30)
+        self.set_beam_position(*self.__beam_pos)
+        
         ui_file = 'ui_files/grid_row_widget.ui'
         current_dir = os.path.dirname(__file__)
         widget = qtui.QWidgetFactory.create(os.path.join(current_dir, ui_file))
@@ -57,12 +59,9 @@ class GridDialog(qt.QDialog):
 
     def __start_surface_drawing(self):
         self.__drawing_mgr.setAutoDisconnectEvent(False)
-        self.__cell_height = int(75e-6 / self.__y_pixel_size)
-        self.__cell_width = int(75e-6 / self.__x_pixel_size)
-        beam_height = self.__cell_height
-        beam_width = self.__cell_width
         drawing_object = CanvasGrid(self.__canvas, self.__cell_width,
-                                    self.__cell_height, beam_width, beam_height)
+                                    self.__cell_height, self.__beam_pos[2],
+                                    self.__beam_pos[3])
         self.__drawing_mgr.addDrawingObject(drawing_object)
         self.__event_mgr.addDrawingMgr(self.__drawing_mgr)
         self.__drawing_mgr.startDrawing()
@@ -93,7 +92,6 @@ class GridDialog(qt.QDialog):
             data[cell] = (cell, (255, random.randint(0, 255), 0))
         
         self.__drawing_mgr._drawingObjects[0].set_data(data)
-        #print self.__drawing_mgr._drawingObjects[0].get_cell_locations()
         grid_info = self.__drawing_mgr._drawingObjects[0]._get_grid()
         print grid_info
 
@@ -127,7 +125,14 @@ class GridDialog(qt.QDialog):
             # Drawing manager not set when called
             pass
 
+    def set_beam_position(self, x, y, w, h):
+        self.__beam_pos = (x, y, w, h)
+        self.__cell_height = h
+        self.__cell_width = w
+  
     def _get_grid_info(self, grid_dict):
         list_view_item = self.__list_view.selectedItem()
         drawing_mgr = self.__list_items[list_view_item]
         grid_dict.update(drawing_mgr._drawingObjects[0]._get_grid())
+
+        
