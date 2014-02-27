@@ -587,7 +587,8 @@ class HutchMenuBrick(BlissWidget):
             if self.minidiff and self.minidiff.isReady():
                 beam_xc = self.minidiff.getBeamPosX()
                 beam_yc = self.minidiff.getBeamPosY()
-                self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc))
+                self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc,
+                                                            self._bx, self._by))
         elif signalName=='calibrationChanged':
             if self.minidiff and self.minidiff.isReady():
                 try:
@@ -603,13 +604,14 @@ class HutchMenuBrick(BlissWidget):
             pxmmz=self.minidiff.pixelsPerMmZ
             beam_xc = self.minidiff.getBeamPosX()
             beam_yc = self.minidiff.getBeamPosY()
-            self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc))
         except:
             pxmmy=None
             pxmmz=None 
         if pxmmy is not None and pxmmz is not None:
             self.sampleCentreBox.setEnabled(True)
             self.updateBeam()
+            self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc,
+                                                        self._bx, self._by))
         else:
             self.miniDiffNotReady()
 
