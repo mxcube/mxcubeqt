@@ -435,9 +435,9 @@ class CameraBrick(BlissWidget):
         self.emit(qt.PYSIGNAL("BeamPositionChanged"), (x,y))
         self.changeBeamPosition(x,y)
 
-    def changeBeamPosition(self, y, z):
-        self.__beamAction.setBeamPosition(y, z)
-        self.__gridDialog.set_beam_position(y, z, w=30, h=20)
+    def changeBeamPosition(self, x, y, beam_width=None, beam_height=None):
+        self.__beamAction.setBeamPosition(x, y)
+        self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
         
     def changePixelScale(self,sizex,sizey) :
         self.__scaleAction.setXPixelSize(sizex)
