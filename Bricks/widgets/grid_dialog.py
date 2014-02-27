@@ -11,13 +11,13 @@ class GridDialog(qt.QDialog):
     def __init__(self, parent = None, name = "Grid Dialog", canvas = None,
                  matrix = None, event_mgr = None, drawing_object_layer = None):
         super(GridDialog, self).__init__(parent, name)
-        self.__cell_width = 30
-        self.__cell_height = 30
+        self.__cell_width = 0
+        self.__cell_height = 0
         self.__list_items = {}
         self.__item_counter = 0
         self.__grid_list = []
         self.__main_layout = qt.QVBoxLayout(self, 10, 11, 'main_layout')
-        
+
         self.__canvas = canvas
         self.__matrix = matrix
         self.__event_mgr = event_mgr
@@ -25,9 +25,9 @@ class GridDialog(qt.QDialog):
         self.__drawing_mgr = None
         self.__x_pixel_size = 3.69e-06
         self.__y_pixel_size = 3.709e-06
-        self.__beam_pos = (0, 0, 30, 30)
+        self.__beam_pos = (0, 0, 8130081, 8130081)
         self.set_beam_position(*self.__beam_pos)
-        
+
         ui_file = 'ui_files/grid_row_widget.ui'
         current_dir = os.path.dirname(__file__)
         widget = qtui.QWidgetFactory.create(os.path.join(current_dir, ui_file))
@@ -42,7 +42,7 @@ class GridDialog(qt.QDialog):
                            self.__delete_drawing)
 
         dispatcher.connect(self._get_grid_info, "grid")
-        
+
     def showEvent(self, show_event):
         super(GridDialog, self).showEvent(show_event)
         self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
@@ -51,7 +51,7 @@ class GridDialog(qt.QDialog):
     def closeEvent(self, close_event):
         super(GridDialog, self).closeEvent(close_event)
         self.__stop_surface_drawing()
-        
+
     def __end_surface_drawing(self, drawing_mgr = None):
         drawing_mgr._drawingObjects[0].reshape()
         (w, h) = drawing_mgr._drawingObjects[0].get_size()
@@ -71,7 +71,7 @@ class GridDialog(qt.QDialog):
     def __stop_surface_drawing(self):
         self.__drawing_mgr.stopDrawing()
         self.__drawing_mgr = None
-        
+
     def __add_drawing(self):
         self.__item_counter += 1
         name = ("Grid - %i" % self.__item_counter)
@@ -86,11 +86,11 @@ class GridDialog(qt.QDialog):
 
         num_cells = self.__drawing_mgr._drawingObjects[0].get_nummer_of_cells()
         data = {}
-        
+
         for cell in range(1, num_cells + 1):
             random.seed()
             data[cell] = (cell, (255, random.randint(0, 255), 0))
-        
+
         self.__drawing_mgr._drawingObjects[0].set_data(data)
         grid_info = self.__drawing_mgr._drawingObjects[0]._get_grid()
         print grid_info
@@ -108,6 +108,7 @@ class GridDialog(qt.QDialog):
             self.__list_view.setSelected(list_view_item, True)
 
     def set_x_pixel_size(self, x_size):
+        x_size = 3.69e-06
         self.__x_pixel_size = x_size
         try:
             for drawing_mgr in self.__list_items.itervalues():
@@ -117,6 +118,7 @@ class GridDialog(qt.QDialog):
             pass
 
     def set_y_pixel_size(self, y_size):
+        y_size = 3.69e-06
         self.__y_pixel_size = y_size
         try:
             for drawing_mgr in self.__list_items.itervalues():
@@ -126,13 +128,20 @@ class GridDialog(qt.QDialog):
             pass
 
     def set_beam_position(self, x, y, w, h):
+        w = int(h * self.__y_pixel_size)
+        h = int(h * self.__y_pixel_size)
         self.__beam_pos = (x, y, w, h)
         self.__cell_height = h
         self.__cell_width = w
-  
+
+        try:
+            for drawing_mgr in self.__list_items.itervalues():
+                drawing_mgr._drawingObjects[0].set_beam_position(x, y)
+        except:
+            # Drawing manager not set when called
+            pass
+
     def _get_grid_info(self, grid_dict):
         list_view_item = self.__list_view.selectedItem()
         drawing_mgr = self.__list_items[list_view_item]
         grid_dict.update(drawing_mgr._drawingObjects[0]._get_grid())
-
-        
