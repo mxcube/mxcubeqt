@@ -279,8 +279,12 @@ class DataCollectTree(qt.QWidget):
                      "sample will be lost.")
 
             location = items[0].get_model().location
-            self.beamline_setup_hwobj.sample_changer_hwobj.\
-                 unload(22, sample_location = location, wait = False)
+            if hasattr(self.beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
+               and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
+                self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
+            else:
+                self.beamline_setup_hwobj.sample_changer_hwobj.\
+                    unload(22, sample_location = location, wait = False)
 
     def sample_list_view_selection(self):
         items = self.get_selected_items()
