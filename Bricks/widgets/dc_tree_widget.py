@@ -9,6 +9,7 @@ from collections import namedtuple
 from BlissFramework import Icons
 from BlissFramework.Utils import widget_colors
 from widgets.confirm_dialog import ConfirmDialog
+from queue_model_enumerables_v1 import CENTRING_METHOD
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
                              ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE'])
@@ -444,6 +445,17 @@ class DataCollectTree(qt.QWidget):
     def set_centring_method(self, method_number):       
         self.centring_method = method_number
 
+        try:
+            dm = self.beamline_setup_hwobj.diffractometer_hwobj
+        
+            if self.centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
+                dm.user_confirms_centring = False
+            else:
+                dm.user_confirms_centring = True
+        except AttributeError:
+            #beamline_setup_hwobj not set when method called
+            pass
+
     def continue_button_click(self):
         if self.queue_hwobj.is_executing():
             if not self.queue_hwobj.is_paused():
@@ -533,7 +545,7 @@ class DataCollectTree(qt.QWidget):
         self.enable_sample_changer_widget(False)
         
         self.collecting = True
-        self.collect_button.setText("      Stop   ")
+        self.collect_button.setText(" Stop   ")
         self.collect_button.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.collect_button.setIconSet(qt.QIconSet(self.stop_pixmap))
         self.parent().enable_hutch_menu(False)
