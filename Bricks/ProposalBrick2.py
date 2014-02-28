@@ -479,7 +479,6 @@ class ProposalBrick2(BlissWidget):
             
             return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
-
         if self.ldapConnection is None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
         if self.dbConnection is None:
