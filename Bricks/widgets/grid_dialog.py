@@ -43,6 +43,10 @@ class GridDialog(qt.QDialog):
 
         dispatcher.connect(self._get_grid_info, "grid")
 
+        qt.QObject.connect(widget.child("list_view"),
+                           qt.SIGNAL("selectionChanged(QListViewItem * )"),
+                           self.__selection_changed)
+
     def showEvent(self, show_event):
         super(GridDialog, self).showEvent(show_event)
         self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
@@ -73,30 +77,32 @@ class GridDialog(qt.QDialog):
         self.__drawing_mgr = None
 
     def __add_drawing(self):
-        self.__item_counter += 1
-        name = ("Grid - %i" % self.__item_counter)
-        width = str(self.__cell_width)
-        height = str(self.__cell_height)
-        list_view_item = qt.QListViewItem(self.__list_view, name, width, height)
-        self.__list_view.setSelected(list_view_item, True)
-        self.__list_items[list_view_item] = self.__drawing_mgr
-        self.__drawing_mgr.stopDrawing()
-        self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(self.__x_pixel_size)
-        self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(self.__y_pixel_size)
+        if self.__drawing_mgr._drawingObjects[0].isVisible():
+            self.__item_counter += 1
+            name = ("Grid - %i" % self.__item_counter)
+            width = str(self.__cell_width)
+            height = str(self.__cell_height)
+            list_view_item = qt.QListViewItem(self.__list_view, name, width, height)
+            self.__list_items[list_view_item] = self.__drawing_mgr
+            self.__drawing_mgr.stopDrawing()
+            self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(self.__x_pixel_size)
+            self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(self.__y_pixel_size)
+            self.__drawing_mgr._drawingObjects[0].set_label(name)
 
-        num_cells = self.__drawing_mgr._drawingObjects[0].get_nummer_of_cells()
-        data = {}
+            num_cells = self.__drawing_mgr._drawingObjects[0].get_nummer_of_cells()
+            data = {}
 
-        for cell in range(1, num_cells + 1):
-            random.seed()
-            data[cell] = (cell, (255, random.randint(0, 255), 0))
+            for cell in range(1, num_cells + 1):
+                random.seed()
+                data[cell] = (cell, (255, random.randint(0, 255), 0))
 
-        self.__drawing_mgr._drawingObjects[0].set_data(data)
-        grid_info = self.__drawing_mgr._drawingObjects[0]._get_grid()
-        print grid_info
+            self.__drawing_mgr._drawingObjects[0].set_data(data)
+            grid_info = self.__drawing_mgr._drawingObjects[0]._get_grid()
+            print grid_info
+            self.__list_view.setSelected(list_view_item, True)
 
-        self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
-        self.__start_surface_drawing()
+            self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
+            self.__start_surface_drawing()
 
     def __delete_drawing(self):
         if len(self.__list_items):
@@ -145,3 +151,13 @@ class GridDialog(qt.QDialog):
         list_view_item = self.__list_view.selectedItem()
         drawing_mgr = self.__list_items[list_view_item]
         grid_dict.update(drawing_mgr._drawingObjects[0]._get_grid())
+
+    def __selection_changed(self, item):
+        for current_item in self.__list_items.iterkeys():
+            drawing_mgr = self.__list_items[current_item]
+            if current_item == item:
+                drawing_mgr._drawingObjects[0].highlight(True)
+            else:
+                drawing_mgr._drawingObjects[0].highlight(False)
+
+        
