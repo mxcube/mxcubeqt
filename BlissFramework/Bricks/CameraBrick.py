@@ -450,8 +450,8 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.setXPixelSize(sizex)
             self.__measureDialog.setYPixelSize(sizey)
 
-        self.__gridDialog.set_x_pixel_size(sizex)
-        self.__gridDialog.set_y_pixel_size(sizey)
+        self.__gridDialog.set_x_pixel_size(1e-3/sizex)
+        self.__gridDialog.set_y_pixel_size(1e-3/sizey)
 
     def getView(self,key):
         try:
@@ -551,8 +551,8 @@ class CameraBrick(BlissWidget):
         try :
             self.__gridDialog.set_qub_event_mgr(aQubImage)
             xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
-            self.__gridDialog.set_x_pixel_size(xSize)
-            self.__gridDialog.set_y_pixel_size(ySize)
+            self.__gridDialog.set_x_pixel_size(1e-3/xSize)
+            self.__gridDialog.set_y_pixel_size(1e-3/ySize)
             openDialogAction.setDialog(self.__gridDialog)
         except:
             import traceback
