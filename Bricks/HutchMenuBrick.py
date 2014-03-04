@@ -611,7 +611,7 @@ class HutchMenuBrick(BlissWidget):
             self.sampleCentreBox.setEnabled(True)
             self.updateBeam()
             self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc,
-                                                        self._bx, self._by))
+                                                        int(self._bx * pxmmy), int(self._by * pxmmz)))
         else:
             self.miniDiffNotReady()
 

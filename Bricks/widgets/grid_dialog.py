@@ -23,9 +23,9 @@ class GridDialog(qt.QDialog):
         self.__event_mgr = event_mgr
         self.__drawing_object_layer = drawing_object_layer
         self.__drawing_mgr = None
-        self.__x_pixel_size = 3.69e-06
-        self.__y_pixel_size = 3.709e-06
-        self.__beam_pos = (0, 0, 8130081, 8130081)
+        self.__x_pixel_size = 1
+        self.__y_pixel_size = 1
+        self.__beam_pos = (0, 0, 0, 0)
         self.set_beam_position(*self.__beam_pos)
 
         ui_file = 'ui_files/grid_row_widget.ui'
@@ -114,7 +114,6 @@ class GridDialog(qt.QDialog):
             self.__list_view.setSelected(list_view_item, True)
 
     def set_x_pixel_size(self, x_size):
-        x_size = 3.69e-06
         self.__x_pixel_size = x_size
         try:
             for drawing_mgr in self.__list_items.itervalues():
@@ -124,9 +123,9 @@ class GridDialog(qt.QDialog):
             pass
 
     def set_y_pixel_size(self, y_size):
-        y_size = 3.69e-06
         self.__y_pixel_size = y_size
         try:
+            self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
         except:
@@ -134,13 +133,12 @@ class GridDialog(qt.QDialog):
             pass
 
     def set_beam_position(self, x, y, w, h):
-        w = int(h * self.__y_pixel_size)
-        h = int(h * self.__y_pixel_size)
         self.__beam_pos = (x, y, w, h)
         self.__cell_height = h
         self.__cell_width = w
-
+        print self.__beam_pos
         try:
+            self.__drawing_mgr._drawingObjects[0].set_beam_position(x, y, w, h)
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr._drawingObjects[0].set_beam_position(x, y)
         except:
