@@ -44,7 +44,7 @@ class HutchMenuBrick(BlissWidget):
         self.sampleChanger=None
         self.collectObj = None
         self.queue_hwobj = None
-        self._bx, self._by = (None, None)
+        self._bx, self._by = (0, 0)
         #self.allowMoveToBeamCentring = False
 
         # Define properties
@@ -587,6 +587,9 @@ class HutchMenuBrick(BlissWidget):
             if self.minidiff and self.minidiff.isReady():
                 beam_xc = self.minidiff.getBeamPosX()
                 beam_yc = self.minidiff.getBeamPosY()
+                pxmmy=self.minidiff.pixelsPerMmY
+                pxmmz=self.minidiff.pixelsPerMmZ
+
                 self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc,
                                                             self._bx, self._by))
         elif signalName=='calibrationChanged':
@@ -759,7 +762,6 @@ class HutchMenuBrick(BlissWidget):
                 if pxmmy is not None and pxmmz is not None:
                     pxsize_y = 1e-3 / pxmmy
                     pxsize_z = 1e-3 / pxmmz
-
                 try:
                     self.sx(pxsize_y)
                     self.sy(pxsize_z)
