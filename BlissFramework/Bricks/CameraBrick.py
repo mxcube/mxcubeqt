@@ -163,7 +163,8 @@ class CameraBrick(BlissWidget):
         self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
                                                     iconName='rectangle', label='Grid tool',
                                                     group="Tools")
-        self.__gridToolAction.setConnectCallBack(self._grid_dialog_new)
+        self.__gridDialog = GridDialog(self, "Grid Dialog")
+        self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
         self.__wholeActions.append(self.__gridToolAction)
 
         ####### BEAM ACTION #######
@@ -546,13 +547,9 @@ class CameraBrick(BlissWidget):
             import traceback
             traceback.print_exc()
 
-    def _grid_dialog_new(self,openDialogAction, aQubImage) :
+    def _grid_dialog_connect_hdlr(self,openDialogAction, aQubImage) :
         try :
-            self.__gridDialog = GridDialog(self, "Grid Dialog",
-                                           canvas=aQubImage.canvas(),
-                                           matrix=aQubImage.matrix(),
-                                           event_mgr=aQubImage)
-
+            self.__gridDialog.set_qub_event_mgr(aQubImage)
             xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
             self.__gridDialog.set_x_pixel_size(xSize)
             self.__gridDialog.set_y_pixel_size(ySize)
