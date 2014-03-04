@@ -46,6 +46,11 @@ class GridDialog(qt.QDialog):
         qt.QObject.connect(widget.child("list_view"),
                            qt.SIGNAL("selectionChanged(QListViewItem * )"),
                            self.__selection_changed)
+        
+    def set_qub_event_mgr(self, a_qub_image):
+        self.__canvas = a_qub_image.canvas()
+        self.__matrix = a_qub_image.matrix()
+        self.__event_mgr = a_qub_image
 
     def showEvent(self, show_event):
         super(GridDialog, self).showEvent(show_event)
@@ -115,7 +120,10 @@ class GridDialog(qt.QDialog):
 
     def set_x_pixel_size(self, x_size):
         self.__x_pixel_size = x_size
+        beam_width_mu =  self.__beam_pos[2]
+        self.__cell_width = int(beam_width_mu * self.__x_pixel_size)
         try:
+            self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
         except AttributeError:
@@ -124,6 +132,8 @@ class GridDialog(qt.QDialog):
 
     def set_y_pixel_size(self, y_size):
         self.__y_pixel_size = y_size
+        beam_height_mu =  self.__beam_pos[3]
+        self.__cell_height = int(beam_height_mu * self.__y_pixel_size)
         try:
             self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
             for drawing_mgr in self.__list_items.itervalues():
@@ -134,9 +144,8 @@ class GridDialog(qt.QDialog):
 
     def set_beam_position(self, x, y, w, h):
         self.__beam_pos = (x, y, w, h)
-        self.__cell_height = h
-        self.__cell_width = w
-        print self.__beam_pos
+        self.__cell_height = int(h * self.__y_pixel_size)
+        self.__cell_width = int(w * self.__x_pixel_size)
         try:
             self.__drawing_mgr._drawingObjects[0].set_beam_position(x, y, w, h)
             for drawing_mgr in self.__list_items.itervalues():
