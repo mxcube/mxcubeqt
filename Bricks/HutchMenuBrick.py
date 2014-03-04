@@ -44,7 +44,7 @@ class HutchMenuBrick(BlissWidget):
         self.sampleChanger=None
         self.collectObj = None
         self.queue_hwobj = None
-        self._bx, self._by = (None, None)
+        self._bx, self._by = (0, 0)
         #self.allowMoveToBeamCentring = False
 
         # Define properties
