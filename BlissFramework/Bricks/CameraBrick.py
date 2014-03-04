@@ -159,6 +159,13 @@ class CameraBrick(BlissWidget):
         self.__brightcount.setDialog(QubBrightnessContrastDialog(self))
         self.__wholeActions.append(self.__brightcount)
 
+        ###### Grid TOOL ######
+        self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
+                                                    iconName='rectangle', label='Grid tool',
+                                                    group="Tools")
+        self.__gridToolAction.setConnectCallBack(self._grid_dialog_new)
+        self.__wholeActions.append(self.__gridToolAction)
+
         ####### BEAM ACTION #######
         self.__beamAction = QubBeamAction(name="beam", group="Tools")
         self.__wholeActions.append(self.__beamAction)
@@ -191,13 +198,6 @@ class CameraBrick(BlissWidget):
         #                                            group="Tools")
         # self.__posToolAction.setConnectCallBack(self._line_dialog_new)
         # self.__wholeActions.append(self.__posToolAction)
-
-        ###### Grid TOOL ######
-        self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
-                                                    iconName='rectangle', label='Grid tool',
-                                                    group="Tools")
-        self.__gridToolAction.setConnectCallBack(self._grid_dialog_new)
-        self.__wholeActions.append(self.__gridToolAction)
 
         ####### ZOOM LIST #######
         zoomActionList = QubZoomListAction(place = "toolbar",
@@ -437,7 +437,10 @@ class CameraBrick(BlissWidget):
 
     def changeBeamPosition(self, x, y, beam_width=None, beam_height=None):
         self.__beamAction.setBeamPosition(x, y)
-        self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
+        try:
+            self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
+        except:
+            pass
         
     def changePixelScale(self,sizex,sizey) :
         self.__scaleAction.setXPixelSize(sizex)
@@ -446,8 +449,8 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.setXPixelSize(sizex)
             self.__measureDialog.setYPixelSize(sizey)
 
-        self.__gridDialog.setXPixelSize(sizex)
-        self.__gridDialog.setYPixelSize(sizey)
+        self.__gridDialog.set_x_pixel_size(sizex)
+        self.__gridDialog.set_y_pixel_size(sizey)
 
     def getView(self,key):
         try:
@@ -467,7 +470,7 @@ class CameraBrick(BlissWidget):
 
     def __creatStdActions(self) :
         actions = []
-                    ####### MOUSE POSITION #######
+        ####### MOUSE POSITION #######
         posaction = QubPositionAction(name="position", group="image",place="statusbar")
         actions.append(posaction)
 
@@ -549,8 +552,7 @@ class CameraBrick(BlissWidget):
                                            canvas=aQubImage.canvas(),
                                            matrix=aQubImage.matrix(),
                                            event_mgr=aQubImage)
-            
-            
+
             xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
             self.__gridDialog.set_x_pixel_size(xSize)
             self.__gridDialog.set_y_pixel_size(ySize)
