@@ -160,12 +160,12 @@ class CameraBrick(BlissWidget):
         self.__wholeActions.append(self.__brightcount)
 
         ###### Grid TOOL ######
-        self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
-                                                    iconName='rectangle', label='Grid tool',
-                                                    group="Tools")
-        self.__gridDialog = GridDialog(self, "Grid Dialog")
-        self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
-        self.__wholeActions.append(self.__gridToolAction)
+        #self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
+        #                                            iconName='rectangle', label='Grid tool',
+        #                                            group="Tools")
+        #self.__gridDialog = GridDialog(self, "Grid Dialog")
+        #self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
+        #self.__wholeActions.append(self.__gridToolAction)
 
         ####### BEAM ACTION #######
         self.__beamAction = QubBeamAction(name="beam", group="Tools")
@@ -438,10 +438,10 @@ class CameraBrick(BlissWidget):
 
     def changeBeamPosition(self, x, y, beam_width=None, beam_height=None):
         self.__beamAction.setBeamPosition(x, y)
-        try:
-            self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
-        except:
-            pass
+        #try:
+        #    self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
+        #except:
+        #    pass
         
     def changePixelScale(self,sizex,sizey) :
         self.__scaleAction.setXPixelSize(sizex)
@@ -450,8 +450,8 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.setXPixelSize(sizex)
             self.__measureDialog.setYPixelSize(sizey)
 
-        self.__gridDialog.set_x_pixel_size(1e-3/sizex)
-        self.__gridDialog.set_y_pixel_size(1e-3/sizey)
+        #self.__gridDialog.set_x_pixel_size(1e-3/sizex)
+        #self.__gridDialog.set_y_pixel_size(1e-3/sizey)
 
     def getView(self,key):
         try:
