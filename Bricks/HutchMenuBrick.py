@@ -732,6 +732,10 @@ class HutchMenuBrick(BlissWidget):
               beam_x = self.minidiff.getBeamPosX()
               beam_y = self.minidiff.getBeamPosY()
               try:
+                 self.__rectangularBeam.set_xMid_yMid(beam_x,beam_y)
+              except AttributeError:
+                 pass
+              try:
                 self.__beam.move(beam_x, beam_y)
                 try:
                   self.minidiff.getBeamInfo(self._updateBeam)
