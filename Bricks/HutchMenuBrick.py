@@ -762,7 +762,6 @@ class HutchMenuBrick(BlissWidget):
                 if pxmmy is not None and pxmmz is not None:
                     pxsize_y = 1e-3 / pxmmy
                     pxsize_z = 1e-3 / pxmmz
-
                 try:
                     self.sx(pxsize_y)
                     self.sy(pxsize_z)

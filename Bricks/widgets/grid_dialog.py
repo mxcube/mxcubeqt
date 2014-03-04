@@ -68,6 +68,7 @@ class GridDialog(qt.QDialog):
 
     def __start_surface_drawing(self):
         self.__drawing_mgr.setAutoDisconnectEvent(False)
+        print  self.__cell_height
         drawing_object = CanvasGrid(self.__canvas, self.__cell_width,
                                     self.__cell_height, self.__beam_pos[2],
                                     self.__beam_pos[3])
@@ -123,7 +124,8 @@ class GridDialog(qt.QDialog):
         beam_width_mu =  self.__beam_pos[2]
         self.__cell_width = int(beam_width_mu * self.__x_pixel_size)
         try:
-            self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
+            if self.__drawing_mgr:
+                self.__drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr._drawingObjects[0].set_x_pixel_size(x_size)
         except AttributeError:
@@ -135,7 +137,9 @@ class GridDialog(qt.QDialog):
         beam_height_mu =  self.__beam_pos[3]
         self.__cell_height = int(beam_height_mu * self.__y_pixel_size)
         try:
-            self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
+            if self.__drawing_mgr:
+                self.__drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
+
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr._drawingObjects[0].set_y_pixel_size(y_size)
         except:
