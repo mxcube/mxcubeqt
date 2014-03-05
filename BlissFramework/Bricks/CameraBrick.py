@@ -160,12 +160,15 @@ class CameraBrick(BlissWidget):
         self.__wholeActions.append(self.__brightcount)
 
         ###### Grid TOOL ######
-        #self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
-        #                                            iconName='rectangle', label='Grid tool',
-        #                                            group="Tools")
-        #self.__gridDialog = GridDialog(self, "Grid Dialog")
-        #self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
-        #self.__wholeActions.append(self.__gridToolAction)
+        self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
+                                                    iconName='rectangle', label='Grid tool',
+                                                    group="Tools", place="contextmenu")
+        self.__gridDialog = GridDialog(self, "Grid Dialog")
+        self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
+        self.__wholeActions.append(self.__gridToolAction)
+
+        self.__prevHorPos = 0
+        self.__prevVerPos = 0
 
         ####### BEAM ACTION #######
         self.__beamAction = QubBeamAction(name="beam", group="Tools")
@@ -287,6 +290,12 @@ class CameraBrick(BlissWidget):
         self.addProperty('action : save image (default path)',"string",'/tmp')
         self.addProperty('action : save image (show always configure)',"boolean",True)
 
+        self.addProperty("Hor. Motor", "string", "")
+        self.horMotHwo = None        
+        self.addProperty("Vert. Motor", "string", "")
+        self.verMotHwo = None
+
+
         ####### SIGNAL #######
         self.defineSignal("BeamPositionChanged", ())
 
@@ -401,6 +410,27 @@ class CameraBrick(BlissWidget):
 
         elif property == 'fix : width' : self.__fixWidth = newValue
         elif property == 'fix : height': self.__fixHeight = newValue
+        elif property == "Hor. Motor":
+            if self.horMotHwo is not None:
+                self.disconnect(self.horMotHwo, qt.PYSIGNAL('positionChanged'),
+                                self.setHorizontalPosition)
+
+            self.horMotHwo = self.getHardwareObject(newValue)
+            
+            if self.horMotHwo is not None:
+                self.connect(self.horMotHwo, qt.PYSIGNAL('positionChanged'),
+                             self.setHorizontalPosition)
+
+        elif property == "Vert. Motor":
+            if self.verMotHwo is not None:
+                self.disconnect(self.verMotHwo, qt.PYSIGNAL('positionChanged'),
+                                self.setVerticalPosition)
+
+            self.verMotHwo = self.getHardwareObject(newValue)
+            
+            if self.verMotHwo is not None:
+                self.connect(self.verMotHwo, qt.PYSIGNAL('positionChanged'),
+                             self.setVerticalPosition)
 
     def run(self) :
         chosenActions = []
@@ -438,11 +468,11 @@ class CameraBrick(BlissWidget):
 
     def changeBeamPosition(self, x, y, beam_width=None, beam_height=None):
         self.__beamAction.setBeamPosition(x, y)
-    #    try:
-    #        self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
-    #    except:
-    #        pass
-        
+        try:
+            self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
+        except:
+            pass
+
     def changePixelScale(self,sizex,sizey) :
         self.__scaleAction.setXPixelSize(sizex)
         self.__scaleAction.setYPixelSize(sizey)
@@ -450,8 +480,8 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.setXPixelSize(sizex)
             self.__measureDialog.setYPixelSize(sizey)
 
-        #self.__gridDialog.set_x_pixel_size(sizex)
-        #self.__gridDialog.set_y_pixel_size(sizey)
+        self.__gridDialog.set_x_pixel_size(sizex)
+        self.__gridDialog.set_y_pixel_size(sizey)
 
     def getView(self,key):
         try:
@@ -549,9 +579,9 @@ class CameraBrick(BlissWidget):
         try :
             self.__gridDialog.set_qub_event_mgr(aQubImage)
             xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
-            self.__gridDialog.set_x_pixel_size(3.69e-06)
-            self.__gridDialog.set_y_pixel_size(3.709e-06)
-            self.__gridDialog.set_beam_position(0, 0, 0.100, 0.100)
+            self.__gridDialog.set_x_pixel_size(xSize)
+            self.__gridDialog.set_y_pixel_size(ySize)
+            self.__gridDialog.set_beam_position(329, 246, 0.01, 0.01)
             openDialogAction.setDialog(self.__gridDialog)
         except:
             import traceback
@@ -571,6 +601,17 @@ class CameraBrick(BlissWidget):
                 self.safeConnect()
             else:
                 self.safeDisconnect()
+
+    def setHorizontalPosition(self, newPosition):
+        if self.__prevHorPos:
+            self.__gridDialog.move_grid_hor(self.__prevHorPos - newPosition)
+
+        self.__prevHorPos = newPosition
+
+    def setVerticalPosition(self, newPosition):
+        if self.__prevVerPos:
+            self.__gridDialog.move_grid_ver(self.__prevVerPos - newPosition)
+        self.__prevVerPos = newPosition
 
 
 class _MainVideoPlug(QubPixmapZoomPlug) :
