@@ -438,10 +438,10 @@ class CameraBrick(BlissWidget):
 
     def changeBeamPosition(self, x, y, beam_width=None, beam_height=None):
         self.__beamAction.setBeamPosition(x, y)
-        #try:
-        #    self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
-        #except:
-        #    pass
+    #    try:
+    #        self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
+    #    except:
+    #        pass
         
     def changePixelScale(self,sizex,sizey) :
         self.__scaleAction.setXPixelSize(sizex)
@@ -450,8 +450,8 @@ class CameraBrick(BlissWidget):
             self.__measureDialog.setXPixelSize(sizex)
             self.__measureDialog.setYPixelSize(sizey)
 
-        #self.__gridDialog.set_x_pixel_size(1e-3/sizex)
-        #self.__gridDialog.set_y_pixel_size(1e-3/sizey)
+        #self.__gridDialog.set_x_pixel_size(sizex)
+        #self.__gridDialog.set_y_pixel_size(sizey)
 
     def getView(self,key):
         try:
@@ -511,8 +511,6 @@ class CameraBrick(BlissWidget):
             else:
                 print "camera is none"
 
-
-
     def __hide_show_zoom(self,actif) :
         if actif :
             if self.__chosenActions['Zoom tools'] :
@@ -551,8 +549,9 @@ class CameraBrick(BlissWidget):
         try :
             self.__gridDialog.set_qub_event_mgr(aQubImage)
             xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
-            self.__gridDialog.set_x_pixel_size(1e-3/xSize)
-            self.__gridDialog.set_y_pixel_size(1e-3/ySize)
+            self.__gridDialog.set_x_pixel_size(3.69e-06)
+            self.__gridDialog.set_y_pixel_size(3.709e-06)
+            self.__gridDialog.set_beam_position(0, 0, 0.100, 0.100)
             openDialogAction.setDialog(self.__gridDialog)
         except:
             import traceback
