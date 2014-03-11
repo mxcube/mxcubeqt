@@ -142,9 +142,11 @@ class GridDialog(qt.QDialog):
             try:
                 if self.__drawing_mgr:
                     self.__drawing_mgr.set_y_pixel_size(y_size)
+                    self.__drawing_mgr.reshape()
 
                 for drawing_mgr in self.__list_items.itervalues():
                     drawing_mgr.set_y_pixel_size(y_size)
+                    drawing_mgr.reshape()
             except:
                 # Drawing manager not set when called
                 pass
@@ -179,6 +181,7 @@ class GridDialog(qt.QDialog):
 
     def move_grid_hor(self, displacement_mm):
         displacement_px = displacement_mm * self.__x_pixel_size
+        #print "hor: %f" % displacement_px
         beam_pos_x = self.__beam_pos[0]
         try:
             for drawing_mgr in self.__list_items.itervalues():
@@ -189,6 +192,7 @@ class GridDialog(qt.QDialog):
         
     def move_grid_ver(self, displacement_mm):
         displacement_px = displacement_mm * self.__x_pixel_size
+        #print "ver: %f" % displacement_px
         beam_pos_y = self.__beam_pos[1]
         try:
             for drawing_mgr in self.__list_items.itervalues():
