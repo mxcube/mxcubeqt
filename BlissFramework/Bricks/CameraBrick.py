@@ -167,8 +167,7 @@ class CameraBrick(BlissWidget):
         self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
         self.__wholeActions.append(self.__gridToolAction)
 
-        self.__prevHorPos = 0
-        self.__prevVerPos = 0
+        self.__previous_pos_dict = {}
 
         ####### BEAM ACTION #######
         self.__beamAction = QubBeamAction(name="beam", group="Tools")
@@ -290,10 +289,8 @@ class CameraBrick(BlissWidget):
         self.addProperty('action : save image (default path)',"string",'/tmp')
         self.addProperty('action : save image (show always configure)',"boolean",True)
 
-        self.addProperty("Hor. Motor", "string", "")
-        self.horMotHwo = None        
-        self.addProperty("Vert. Motor", "string", "")
-        self.verMotHwo = None
+        self.addProperty("diffractometer", "string", "")
+        self.diffractometerHwobj = None
 
 
         ####### SIGNAL #######
@@ -410,27 +407,10 @@ class CameraBrick(BlissWidget):
 
         elif property == 'fix : width' : self.__fixWidth = newValue
         elif property == 'fix : height': self.__fixHeight = newValue
-        elif property == "Hor. Motor":
-            if self.horMotHwo is not None:
-                self.disconnect(self.horMotHwo, qt.PYSIGNAL('positionChanged'),
-                                self.setHorizontalPosition)
-
-            self.horMotHwo = self.getHardwareObject(newValue)
-            
-            if self.horMotHwo is not None:
-                self.connect(self.horMotHwo, qt.PYSIGNAL('positionChanged'),
-                             self.setHorizontalPosition)
-
-        elif property == "Vert. Motor":
-            if self.verMotHwo is not None:
-                self.disconnect(self.verMotHwo, qt.PYSIGNAL('positionChanged'),
-                                self.setVerticalPosition)
-
-            self.verMotHwo = self.getHardwareObject(newValue)
-            
-            if self.verMotHwo is not None:
-                self.connect(self.verMotHwo, qt.PYSIGNAL('positionChanged'),
-                             self.setVerticalPosition)
+        elif property == "diffractometer":
+            self.diffractometerHwobj = self.getHardwareObject(newValue)
+            self.diffractometerHwobj.connect("minidiffStateChanged",
+                                             self.diffractometerChanged)
 
     def run(self) :
         chosenActions = []
@@ -602,16 +582,36 @@ class CameraBrick(BlissWidget):
             else:
                 self.safeDisconnect()
 
-    def setHorizontalPosition(self, newPosition):
-        if self.__prevHorPos:
-            self.__gridDialog.move_grid_hor(self.__prevHorPos - newPosition)
+    def diffractometerChanged(self, *args):
+        """
+        Handles diffractometer change events, connected to the signal 
+        minidiffStateChanged of the diffractometer hardware object.
+        """
+        sample_x = self.diffractometerHwobj.sampleXMotor.getPosition()
+        sample_y = self.diffractometerHwobj.sampleYMotor.getPosition()
+        phi_y = self.diffractometerHwobj.phiyMotor.getPosition()
+        phi_z = self.diffractometerHwobj.phizMotor.getPosition()
+        phi = self.diffractometerHwobj.phiMotor.getPosition()
+        
+        pos_dict = {'sampx': sample_x,
+                    'sampy': sample_y,
+                    'phi': phi,
+                    'phiy': phi_y,
+                    'phiz': phi_z}
 
-        self.__prevHorPos = newPosition
+        if len(self.__previous_pos_dict):
+            p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
+            p2 = self.diffractometerHwobj.motor_positions_to_screen(pos_dict)
+            dx = p2[0] - p1[0]
+            dy = p2[1] - p1[1]
 
-    def setVerticalPosition(self, newPosition):
-        if self.__prevVerPos:
-            self.__gridDialog.move_grid_ver(self.__prevVerPos - newPosition)
-        self.__prevVerPos = newPosition
+            if dy != 0:
+                self.__gridDialog.move_grid_ver(-dy)
+
+            if dx != 0:
+                self.__gridDialog.move_grid_hor(-dx)
+
+        self.__previous_pos_dict = pos_dict
 
 
 class _MainVideoPlug(QubPixmapZoomPlug) :
