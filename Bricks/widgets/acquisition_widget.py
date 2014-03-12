@@ -86,7 +86,7 @@ class AcquisitionWidget(qt.QWidget):
              bind_value_update('osc_range',
                                self.acq_widget_layout.child('osc_range_ledit'),
                                float,
-                               qt.QDoubleValidator(0.001, 1000, 2, self))
+                               qt.QDoubleValidator(0., 1000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('num_images',
