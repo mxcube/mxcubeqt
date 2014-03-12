@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_files/catsmaintwidget.ui'
 #
-# Created: Thu Jan 30 15:00:32 2014
+# Created: Tue Mar 11 15:09:01 2014
 #      by: The PyQt User Interface Compiler (pyuic) 3.18.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,6 +29,10 @@ class CatsMaintWidget(QWidget):
         self.groupBox5.layout().setMargin(11)
         groupBox5Layout = QHBoxLayout(self.groupBox5.layout())
         groupBox5Layout.setAlignment(Qt.AlignTop)
+
+        self.lblPowerState = QLabel(self.groupBox5,"lblPowerState")
+        self.lblPowerState.setAlignment(QLabel.AlignCenter)
+        groupBox5Layout.addWidget(self.lblPowerState)
 
         self.btPowerOn = QPushButton(self.groupBox5,"btPowerOn")
         self.btPowerOn.setSizePolicy(QSizePolicy(QSizePolicy.Minimum,QSizePolicy.Fixed,0,0,self.btPowerOn.sizePolicy().hasHeightForWidth()))
@@ -96,6 +100,17 @@ class CatsMaintWidget(QWidget):
         layout7.addWidget(self.groupBox2_2_2)
         CatsMaintWidgetLayout.addLayout(layout7)
 
+        self.groupBox6 = QGroupBox(self,"groupBox6")
+        self.groupBox6.setColumnLayout(0,Qt.Vertical)
+        self.groupBox6.layout().setSpacing(6)
+        self.groupBox6.layout().setMargin(11)
+        groupBox6Layout = QHBoxLayout(self.groupBox6.layout())
+        groupBox6Layout.setAlignment(Qt.AlignTop)
+
+        self.lblMessage = QLabel(self.groupBox6,"lblMessage")
+        groupBox6Layout.addWidget(self.lblMessage)
+        CatsMaintWidgetLayout.addWidget(self.groupBox6)
+
         self.groupBox13 = QGroupBox(self,"groupBox13")
         self.groupBox13.setColumnLayout(0,Qt.Vertical)
         self.groupBox13.layout().setSpacing(6)
@@ -122,9 +137,26 @@ class CatsMaintWidget(QWidget):
         groupBox13Layout.addWidget(self.btSafe)
         CatsMaintWidgetLayout.addWidget(self.groupBox13)
 
+        self.groupBox5_2 = QGroupBox(self,"groupBox5_2")
+        self.groupBox5_2.setSizePolicy(QSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred,0,0,self.groupBox5_2.sizePolicy().hasHeightForWidth()))
+        self.groupBox5_2.setColumnLayout(0,Qt.Vertical)
+        self.groupBox5_2.layout().setSpacing(6)
+        self.groupBox5_2.layout().setMargin(11)
+        groupBox5_2Layout = QHBoxLayout(self.groupBox5_2.layout())
+        groupBox5_2Layout.setAlignment(Qt.AlignTop)
+
+        self.lblRegulationState = QLabel(self.groupBox5_2,"lblRegulationState")
+        self.lblRegulationState.setAlignment(QLabel.AlignCenter)
+        groupBox5_2Layout.addWidget(self.lblRegulationState)
+
+        self.btRegulationOn = QPushButton(self.groupBox5_2,"btRegulationOn")
+        self.btRegulationOn.setSizePolicy(QSizePolicy(QSizePolicy.Minimum,QSizePolicy.Fixed,0,0,self.btRegulationOn.sizePolicy().hasHeightForWidth()))
+        groupBox5_2Layout.addWidget(self.btRegulationOn)
+        CatsMaintWidgetLayout.addWidget(self.groupBox5_2)
+
         self.languageChange()
 
-        self.resize(QSize(878,408).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(1230,726).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.setTabOrder(self.btPowerOn,self.btPowerOff)
@@ -142,6 +174,7 @@ class CatsMaintWidget(QWidget):
     def languageChange(self):
         self.setCaption(self.__tr("Form1"))
         self.groupBox5.setTitle(self.__tr("Arm Power"))
+        self.lblPowerState.setText(self.__tr("Power"))
         self.btPowerOn.setText(self.__tr("Power On"))
         self.btPowerOff.setText(self.__tr("Power Off"))
         self.groupBox2.setTitle(self.__tr("Lid 1"))
@@ -153,10 +186,15 @@ class CatsMaintWidget(QWidget):
         self.groupBox2_2_2.setTitle(self.__tr("Lid 3"))
         self.btLid3Open.setText(self.__tr("Open"))
         self.btLid3Close.setText(self.__tr("Close"))
+        self.groupBox6.setTitle(self.__tr("CATS message"))
+        self.lblMessage.setText(self.__tr("Dummy message"))
         self.groupBox13.setTitle(self.__tr("Recovery Commands"))
         self.btResetError.setText(self.__tr("Reset Error"))
         self.btBack.setText(self.__tr("Back"))
         self.btSafe.setText(self.__tr("Safe"))
+        self.groupBox5_2.setTitle(self.__tr("LN2 Regulation"))
+        self.lblRegulationState.setText(self.__tr("Regulation"))
+        self.btRegulationOn.setText(self.__tr("Regulation On"))
 
 
     def __tr(self,s,c = None):

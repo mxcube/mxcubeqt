@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>878</width>
-            <height>408</height>
+            <width>1230</width>
+            <height>726</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -46,6 +46,17 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>lblPowerState</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Power</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
                 <widget class="QPushButton">
                     <property name="name">
                         <cstring>btPowerOn</cstring>
@@ -203,6 +214,27 @@
         </widget>
         <widget class="QGroupBox">
             <property name="name">
+                <cstring>groupBox6</cstring>
+            </property>
+            <property name="title">
+                <string>CATS message</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>lblMessage</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Dummy message</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
                 <cstring>groupBox13</cstring>
             </property>
             <property name="title">
@@ -270,6 +302,54 @@
                     </property>
                     <property name="text">
                         <string>Safe</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox5_2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="title">
+                <string>LN2 Regulation</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>lblRegulationState</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Regulation</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btRegulationOn</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Regulation On</string>
                     </property>
                 </widget>
             </hbox>
