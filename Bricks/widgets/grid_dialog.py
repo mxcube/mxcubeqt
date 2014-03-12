@@ -118,6 +118,7 @@ class GridDialog(qt.QDialog):
         x_size = 1e-3/x_size
 
         if self.__x_pixel_size != x_size:
+            zoom_factor = x_size / self.__x_pixel_size
             beam_width_mm =  self.__beam_pos[2]
             self.__x_pixel_size = x_size
             self.__cell_width = int(beam_width_mm * self.__x_pixel_size)
@@ -125,8 +126,9 @@ class GridDialog(qt.QDialog):
             try:
                 if self.__drawing_mgr:
                     self.__drawing_mgr.set_x_pixel_size(x_size)
-                for drawing_mgr in self.__list_items.itervalues():
+                for drawing_mgr in self.__list_items.values():
                     drawing_mgr.set_x_pixel_size(x_size)
+                    drawing_mgr.reposition(scale_factor_x = zoom_factor)
             except AttributeError:
                 # Drawing manager not set when called
                 pass
@@ -135,6 +137,7 @@ class GridDialog(qt.QDialog):
         y_size = 1e-3/y_size
 
         if self.__y_pixel_size != y_size:
+            zoom_factor = y_size / self.__y_pixel_size
             beam_height_mm =  self.__beam_pos[3]
             self.__y_pixel_size = y_size
             self.__cell_height = int(beam_height_mm * self.__y_pixel_size)
@@ -144,9 +147,10 @@ class GridDialog(qt.QDialog):
                     self.__drawing_mgr.set_y_pixel_size(y_size)
                     self.__drawing_mgr.reshape()
 
-                for drawing_mgr in self.__list_items.itervalues():
+                for drawing_mgr in self.__list_items.values():
                     drawing_mgr.set_y_pixel_size(y_size)
                     drawing_mgr.reshape()
+                    drawing_mgr.reposition(scale_factor_y = zoom_factor)
             except:
                 # Drawing manager not set when called
                 pass
