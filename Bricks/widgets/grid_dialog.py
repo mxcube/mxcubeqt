@@ -11,6 +11,7 @@ class GridDialog(qt.QDialog):
     def __init__(self, parent = None, name = "Grid Dialog", canvas = None,
                  matrix = None, event_mgr = None, drawing_object_layer = None):
         super(GridDialog, self).__init__(parent, name)
+        self.current_motor_positions = {}
         self.__cell_width = 0
         self.__cell_height = 0
         self.__list_items = {}
@@ -183,10 +184,8 @@ class GridDialog(qt.QDialog):
             else:
                 drawing_mgr.highlight(False)
 
-    def move_grid_hor(self, displacement_mm):
-        displacement_px = displacement_mm * self.__x_pixel_size
+    def move_grid_hor(self, displacement_px):
         #print "hor: %f" % displacement_px
-        beam_pos_x = self.__beam_pos[0]
         try:
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr.moveBy(displacement_px, 0)
@@ -194,10 +193,8 @@ class GridDialog(qt.QDialog):
             # Drawing manager not set when called
             pass
         
-    def move_grid_ver(self, displacement_mm):
-        displacement_px = displacement_mm * self.__x_pixel_size
+    def move_grid_ver(self, displacement_px):
         #print "ver: %f" % displacement_px
-        beam_pos_y = self.__beam_pos[1]
         try:
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr.moveBy(0, displacement_px)
