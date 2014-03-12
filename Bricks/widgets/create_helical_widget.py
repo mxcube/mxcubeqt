@@ -268,7 +268,9 @@ class CreateHelicalWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
                                                              
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            self._processing_parameters = copy.deepcopy(self._processing_parameters)
+            sample_model = tree_item.get_model()
+            self._processing_parameters = sample_model.processing_parameters
+            #self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
 
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
