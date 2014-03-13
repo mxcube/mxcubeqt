@@ -42,6 +42,7 @@ class GridDialog(qt.QDialog):
                            self.__delete_drawing)
 
         dispatcher.connect(self._get_grid_info, "grid")
+        dispatcher.connect(self._set_grid_data, "set_grid_data") 
 
         qt.QObject.connect(widget.child("list_view"),
                            qt.SIGNAL("selectionChanged(QListViewItem * )"),
@@ -90,19 +91,7 @@ class GridDialog(qt.QDialog):
             self.__list_items[list_view_item] = self.__drawing_mgr
             self.__drawing_mgr.stopDrawing()
             self.__drawing_mgr.set_label(name)
-
-            num_cells = self.__drawing_mgr.get_nummer_of_cells()[0]
-            data = {}
-
-            for cell in range(1, num_cells + 1):
-                random.seed()
-                data[cell] = (cell, (255, random.randint(0, 255), 0))
-
-            self.__drawing_mgr.set_data(data)
-            grid_info = self.__drawing_mgr._get_grid()[0]
-            print grid_info
             self.__list_view.setSelected(list_view_item, True)
-
             self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
             self.__start_surface_drawing()
 
@@ -174,7 +163,23 @@ class GridDialog(qt.QDialog):
     def _get_grid_info(self, grid_dict):
         list_view_item = self.__list_view.selectedItem()
         drawing_mgr = self.__list_items[list_view_item]
-        grid_dict.update(drawing_mgr._get_grid()[0])
+        key = str(list_view_item.text(0))
+        grid_dict.update(drawing_mgr._get_grid(key)[0])
+
+    def _set_grid_data(self, key, result_data):
+        for list_view_item in self.__list_items.keys():
+            if key == str(list_view_item.text(0)):
+                drawing_mgr = self.__list_items[list_view_item]
+
+                num_cells = drawing_mgr.get_nummer_of_cells()[0]
+                result_data = {}
+
+                for cell in range(1, num_cells + 1):
+                    random.seed()
+                    result_data[cell] = (cell, (255, random.randint(0, 255), 0))
+
+                drawing_mgr.set_data(result_data)
+                break
 
     def __selection_changed(self, item):
         for current_item in self.__list_items.iterkeys():
