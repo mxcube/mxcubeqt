@@ -284,15 +284,13 @@ class DataCollectTree(qt.QWidget):
 
             location = items[0].get_model().location
 
-            #self.beamline_setup_hwobj.sample_changer_hwobj.\
-            #     unload(22, sample_location = location, wait = False)
-
             if hasattr(self.beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
                and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
                 self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
             else:
                 self.beamline_setup_hwobj.sample_changer_hwobj.\
                     unload(22, sample_location = location, wait = False)
+
             items[0].setOn(False)
             items[0].set_mounted_style(False)
 
