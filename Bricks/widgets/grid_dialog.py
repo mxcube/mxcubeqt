@@ -166,17 +166,17 @@ class GridDialog(qt.QDialog):
         key = str(list_view_item.text(0))
         grid_dict.update(drawing_mgr._get_grid(key)[0])
 
-    def _set_grid_data(self, key, result_data):
+    def _set_grid_data(self, key, result_data):  
         for list_view_item in self.__list_items.keys():
             if key == str(list_view_item.text(0)):
                 drawing_mgr = self.__list_items[list_view_item]
 
-                num_cells = drawing_mgr.get_nummer_of_cells()[0]
-                result_data = {}
+               #  num_cells = drawing_mgr.get_nummer_of_cells()[0]
+#                 result_data = {}
 
-                for cell in range(1, num_cells + 1):
-                    random.seed()
-                    result_data[cell] = (cell, (255, random.randint(0, 255), 0))
+#                 for cell in range(1, num_cells + 1):
+#                     random.seed()
+#                     result_data[cell] = (cell, (255, random.randint(0, 255), 0))
 
                 drawing_mgr.set_data(result_data)
                 break
@@ -186,6 +186,8 @@ class GridDialog(qt.QDialog):
             drawing_mgr = self.__list_items[current_item]
             if current_item == item:
                 drawing_mgr.highlight(True)
+                key = str(current_item.text(0))
+                print drawing_mgr._get_grid(key)[0]
             else:
                 drawing_mgr.highlight(False)
 
