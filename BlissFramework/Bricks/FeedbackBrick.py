@@ -19,7 +19,7 @@ class FeedbackBrick(BaseComponents.BlissWidget):
 
         self.addProperty('emailAddresses', 'string', '')
         self.addProperty('icons', 'string', '')
-	self.addProperty("jira_server", 'string', '')
+        self.addProperty("jira_server", 'string', '')
         self.addProperty("jira_user", 'string', '')
         self.addProperty("jira_passwd", "string", "")
         self.addProperty("jira_project","string","")
