@@ -198,7 +198,7 @@ class CreateCharWidget(CreateTaskBase):
 
             try:
                 energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-                energy = round(float(energy), 2)
+                energy = round(float(energy), 4)
             except AttributeError:
                 energy = 0
 

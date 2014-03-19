@@ -92,6 +92,7 @@ class DataPathWidget(qt.QWidget):
         file_name = self._data_model.get_image_file_name()
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
+        file_name = file_name.strip(' ')
         self.data_path_widget_layout.child('file_name_value_label').setText(file_name)
         
         self.emit(qt.PYSIGNAL('path_template_changed'),
@@ -108,7 +109,7 @@ class DataPathWidget(qt.QWidget):
     def _folder_ledit_change(self, new_value):        
         base_image_dir = self._base_image_dir
         base_proc_dir = self._base_process_dir
-        new_sub_dir = str(new_value)
+        new_sub_dir = str(new_value).strip(' ')
 
         if len(new_sub_dir) > 0:
             if new_sub_dir[0] == '/':
