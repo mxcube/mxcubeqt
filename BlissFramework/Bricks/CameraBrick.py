@@ -168,6 +168,8 @@ class CameraBrick(BlissWidget):
         self.__wholeActions.append(self.__gridToolAction)
 
         self.__previous_pos_dict = {}
+        self.__beamWidth = 0
+        self.__beamHeight = 0
 
         ####### BEAM ACTION #######
         self.__beamAction = QubBeamAction(name="beam", group="Tools")
@@ -412,6 +414,18 @@ class CameraBrick(BlissWidget):
             self.diffractometerHwobj.connect("minidiffStateChanged",
                                              self.diffractometerChanged)
 
+            zoom = self.diffractometerHwobj.zoomMotor.getPosition()
+            xSize,ySize = self.diffractometerHwobj.getCalibrationData(zoom)
+            #xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
+            self.diffractometerHwobj.getBeamInfo(self.__getBeamInfo)
+            beam_pos_x = self.diffractometerHwobj.getBeamPosX()
+            beam_pos_y = self.diffractometerHwobj.getBeamPosY()
+
+            self.__gridDialog.set_x_pixel_size(xSize)
+            self.__gridDialog.set_y_pixel_size(ySize)
+            self.__gridDialog.set_beam_position(beam_pos_x, beam_pos_y,
+                                                self.__beamWidth, self.__beamHeight)
+
     def run(self) :
         chosenActions = []
 
@@ -449,6 +463,12 @@ class CameraBrick(BlissWidget):
     def changeBeamPosition(self, x, y, beam_width=None, beam_height=None):
         self.__beamAction.setBeamPosition(x, y)
         try:
+            if not beam_width:
+                beam_width = self.__beamWidth
+
+            if not beam_height:
+                beam_height = self.__beamHeight
+
             self.__gridDialog.set_beam_position(x, y, beam_width, beam_height)
         except:
             pass
@@ -558,14 +578,15 @@ class CameraBrick(BlissWidget):
     def _grid_dialog_connect_hdlr(self,openDialogAction, aQubImage) :
         try :
             self.__gridDialog.set_qub_event_mgr(aQubImage)
-            xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
-            self.__gridDialog.set_x_pixel_size(xSize)
-            self.__gridDialog.set_y_pixel_size(ySize)
-            self.__gridDialog.set_beam_position(329, 246, 0.01, 0.01)
             openDialogAction.setDialog(self.__gridDialog)
         except:
             import traceback
             traceback.print_exc()
+
+    def __getBeamInfo(self, ret):
+        self.__beamWidth = float(ret["size_x"])
+        self.__beamHeight = float(ret["size_y"])
+        #self.__beamShape = ret["shape"]
 
     def _save_dialog_new(self,openDialogAction,aQubImage) :
         saveDialog = QubSaveImageDialog(self,matrix=aQubImage.matrix(),canvas=aQubImage.canvas())
@@ -587,19 +608,12 @@ class CameraBrick(BlissWidget):
         Handles diffractometer change events, connected to the signal 
         minidiffStateChanged of the diffractometer hardware object.
         """
-        sample_x = self.diffractometerHwobj.sampleXMotor.getPosition()
-        sample_y = self.diffractometerHwobj.sampleYMotor.getPosition()
-        phi_y = self.diffractometerHwobj.phiyMotor.getPosition()
-        phi_z = self.diffractometerHwobj.phizMotor.getPosition()
-        phi = self.diffractometerHwobj.phiMotor.getPosition()
-        
-        pos_dict = {'sampx': sample_x,
-                    'sampy': sample_y,
-                    'phi': phi,
-                    'phiy': phi_y,
-                    'phiz': phi_z}
+        pos_dict = self.diffractometerHwobj.getPositions()
 
         if len(self.__previous_pos_dict):
+            #print "GRID:"
+            #print pos_dict
+            #print self.__previous_pos_dict
             p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
             p2 = self.diffractometerHwobj.motor_positions_to_screen(pos_dict)
             dx = p2[0] - p1[0]
