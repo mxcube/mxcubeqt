@@ -234,7 +234,9 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                     new_x, new_y = self.diffractometer_hwobj.\
                         motor_positions_to_screen(cpos.as_dict())
 
-                    new_positions.append((new_x, new_y)) 
+                    new_positions.append((new_x, new_y))
+                    #print "CPOS"
+                    #print cpos.as_dict()
 
                 shape.move(new_positions)
 
