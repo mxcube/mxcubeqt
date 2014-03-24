@@ -1,3 +1,4 @@
+import re
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 from qt import *
@@ -139,7 +140,10 @@ class ProposalBrick2(BlissWidget):
     def save_group(self):
         user_group = str(self.user_group_ledit.text())
 
-        if user_group.isalnum() or user_group == "":
+        pattern = r"^[a-zA-Z0-9_-]*$"
+        valid = re.match(pattern, user_group, flags = 0).group() == user_group
+        
+        if valid:
             self.saved_group = True
             self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
             msg = 'User group set to: %s' % str(self.user_group_ledit.text())

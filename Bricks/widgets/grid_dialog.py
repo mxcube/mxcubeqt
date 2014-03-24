@@ -11,6 +11,7 @@ class GridDialog(qt.QDialog):
     def __init__(self, parent = None, name = "Grid Dialog", canvas = None,
                  matrix = None, event_mgr = None, drawing_object_layer = None):
         super(GridDialog, self).__init__(parent, name)
+        self.current_motor_positions = {}
         self.__cell_width = 0
         self.__cell_height = 0
         self.__list_items = {}
@@ -41,6 +42,7 @@ class GridDialog(qt.QDialog):
                            self.__delete_drawing)
 
         dispatcher.connect(self._get_grid_info, "grid")
+        dispatcher.connect(self._set_grid_data, "set_grid_data") 
 
         qt.QObject.connect(widget.child("list_view"),
                            qt.SIGNAL("selectionChanged(QListViewItem * )"),
@@ -89,19 +91,7 @@ class GridDialog(qt.QDialog):
             self.__list_items[list_view_item] = self.__drawing_mgr
             self.__drawing_mgr.stopDrawing()
             self.__drawing_mgr.set_label(name)
-
-            num_cells = self.__drawing_mgr.get_nummer_of_cells()[0]
-            data = {}
-
-            for cell in range(1, num_cells + 1):
-                random.seed()
-                data[cell] = (cell, (255, random.randint(0, 255), 0))
-
-            self.__drawing_mgr.set_data(data)
-            grid_info = self.__drawing_mgr._get_grid()[0]
-            print grid_info
             self.__list_view.setSelected(list_view_item, True)
-
             self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
             self.__start_surface_drawing()
 
@@ -118,6 +108,7 @@ class GridDialog(qt.QDialog):
         x_size = 1e-3/x_size
 
         if self.__x_pixel_size != x_size:
+            zoom_factor = x_size / self.__x_pixel_size
             beam_width_mm =  self.__beam_pos[2]
             self.__x_pixel_size = x_size
             self.__cell_width = int(beam_width_mm * self.__x_pixel_size)
@@ -125,8 +116,9 @@ class GridDialog(qt.QDialog):
             try:
                 if self.__drawing_mgr:
                     self.__drawing_mgr.set_x_pixel_size(x_size)
-                for drawing_mgr in self.__list_items.itervalues():
+                for drawing_mgr in self.__list_items.values():
                     drawing_mgr.set_x_pixel_size(x_size)
+                    drawing_mgr.reposition(scale_factor_x = zoom_factor)
             except AttributeError:
                 # Drawing manager not set when called
                 pass
@@ -135,6 +127,7 @@ class GridDialog(qt.QDialog):
         y_size = 1e-3/y_size
 
         if self.__y_pixel_size != y_size:
+            zoom_factor = y_size / self.__y_pixel_size
             beam_height_mm =  self.__beam_pos[3]
             self.__y_pixel_size = y_size
             self.__cell_height = int(beam_height_mm * self.__y_pixel_size)
@@ -144,9 +137,10 @@ class GridDialog(qt.QDialog):
                     self.__drawing_mgr.set_y_pixel_size(y_size)
                     self.__drawing_mgr.reshape()
 
-                for drawing_mgr in self.__list_items.itervalues():
+                for drawing_mgr in self.__list_items.values():
                     drawing_mgr.set_y_pixel_size(y_size)
                     drawing_mgr.reshape()
+                    drawing_mgr.reposition(scale_factor_y = zoom_factor)
             except:
                 # Drawing manager not set when called
                 pass
@@ -169,20 +163,36 @@ class GridDialog(qt.QDialog):
     def _get_grid_info(self, grid_dict):
         list_view_item = self.__list_view.selectedItem()
         drawing_mgr = self.__list_items[list_view_item]
-        grid_dict.update(drawing_mgr._get_grid()[0])
+        key = str(list_view_item.text(0))
+        grid_dict.update(drawing_mgr._get_grid(key)[0])
+
+    def _set_grid_data(self, key, result_data):  
+        for list_view_item in self.__list_items.keys():
+            if key == str(list_view_item.text(0)):
+                drawing_mgr = self.__list_items[list_view_item]
+
+               #  num_cells = drawing_mgr.get_nummer_of_cells()[0]
+#                 result_data = {}
+
+#                 for cell in range(1, num_cells + 1):
+#                     random.seed()
+#                     result_data[cell] = (cell, (255, random.randint(0, 255), 0))
+
+                drawing_mgr.set_data(result_data)
+                break
 
     def __selection_changed(self, item):
         for current_item in self.__list_items.iterkeys():
             drawing_mgr = self.__list_items[current_item]
             if current_item == item:
                 drawing_mgr.highlight(True)
+                key = str(current_item.text(0))
+                print drawing_mgr._get_grid(key)[0]
             else:
                 drawing_mgr.highlight(False)
 
-    def move_grid_hor(self, displacement_mm):
-        displacement_px = displacement_mm * self.__x_pixel_size
+    def move_grid_hor(self, displacement_px):
         #print "hor: %f" % displacement_px
-        beam_pos_x = self.__beam_pos[0]
         try:
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr.moveBy(displacement_px, 0)
@@ -190,10 +200,8 @@ class GridDialog(qt.QDialog):
             # Drawing manager not set when called
             pass
         
-    def move_grid_ver(self, displacement_mm):
-        displacement_px = displacement_mm * self.__x_pixel_size
+    def move_grid_ver(self, displacement_px):
         #print "ver: %f" % displacement_px
-        beam_pos_y = self.__beam_pos[1]
         try:
             for drawing_mgr in self.__list_items.itervalues():
                 drawing_mgr.moveBy(0, displacement_px)
