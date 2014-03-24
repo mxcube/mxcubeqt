@@ -1,5 +1,4 @@
 import logging, sys, traceback
-import exceptions
 import qt
 
 _handler = None
@@ -41,9 +40,12 @@ class __Handler:
 
     
     def excepthook(self, type, value, tb):
-        if type == exceptions.KeyboardInterrupt:
+        if type == KeyboardInterrupt:
           qt.qApp.quit()
           return
-        exception = traceback.format_exception(type, value, tb)
-        logging.getLogger().error('Uncaught exception : ' + '\n'.join(exception))
+        try: 
+            exception = traceback.format_exception(type, value, tb)
+            logging.getLogger().error('Uncaught exception : ' + '\n'.join(exception))
+        except:  
+            pass
                     
