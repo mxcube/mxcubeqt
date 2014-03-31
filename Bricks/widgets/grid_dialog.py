@@ -47,6 +47,8 @@ class GridDialog(qt.QDialog):
         qt.QObject.connect(widget.child("list_view"),
                            qt.SIGNAL("selectionChanged(QListViewItem * )"),
                            self.__selection_changed)
+
+        self.setCaption("Grid Tool") 
         
     def set_qub_event_mgr(self, a_qub_image):
         self.__canvas = a_qub_image.canvas()
