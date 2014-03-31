@@ -71,6 +71,7 @@ __category__ = "Camera"
 from BlissFramework.BaseComponents import BlissWidget
 import logging
 import os
+import time
 import qt
 from Qub.Widget.QubAction import QubToggleAction
 from Qub.Widget.QubActionSet import QubZoomRectangle
@@ -421,6 +422,8 @@ class CameraBrick(BlissWidget):
             beam_pos_x = self.diffractometerHwobj.getBeamPosX()
             beam_pos_y = self.diffractometerHwobj.getBeamPosY()
 
+            self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
+
             self.__gridDialog.set_x_pixel_size(xSize)
             self.__gridDialog.set_y_pixel_size(ySize)
             self.__gridDialog.set_beam_position(beam_pos_x, beam_pos_y,
@@ -608,21 +611,23 @@ class CameraBrick(BlissWidget):
         Handles diffractometer change events, connected to the signal 
         minidiffStateChanged of the diffractometer hardware object.
         """
+        
         if self.diffractometerHwobj.isReady():
             pos_dict = self.diffractometerHwobj.getPositions()
+          
+            p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
+            p2 = (self.diffractometerHwobj.getBeamPosX(), self.diffractometerHwobj.getBeamPosY())
 
-            if len(self.__previous_pos_dict):
-                p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
-                p2 = (self.diffractometerHwobj.getBeamPosX(), self.diffractometerHwobj.getBeamPosY())
+            dx = p2[0] - p1[0]
+            dy = p2[1] - p1[1]
 
-                dx = p2[0] - p1[0]
-                dy = p2[1] - p1[1]
+            if dy != 0:
+                self.__gridDialog.move_grid_ver(-dy)
 
-                if dy != 0:
-                    self.__gridDialog.move_grid_ver(-dy)
+            if dx != 0:
+                self.__gridDialog.move_grid_hor(-dx)
 
-                if dx != 0:
-                    self.__gridDialog.move_grid_hor(-dx)
+            print dx, dy
 
             self.__previous_pos_dict = pos_dict
 
