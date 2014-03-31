@@ -608,24 +608,23 @@ class CameraBrick(BlissWidget):
         Handles diffractometer change events, connected to the signal 
         minidiffStateChanged of the diffractometer hardware object.
         """
-        pos_dict = self.diffractometerHwobj.getPositions()
+        if self.diffractometerHwobj.isReady():
+            pos_dict = self.diffractometerHwobj.getPositions()
 
-        if len(self.__previous_pos_dict):
-            #print "GRID:"
-            #print pos_dict
-            #print self.__previous_pos_dict
-            p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
-            p2 = self.diffractometerHwobj.motor_positions_to_screen(pos_dict)
-            dx = p2[0] - p1[0]
-            dy = p2[1] - p1[1]
+            if len(self.__previous_pos_dict):
+                p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
+                p2 = (self.diffractometerHwobj.getBeamPosX(), self.diffractometerHwobj.getBeamPosY())
 
-            if dy != 0:
-                self.__gridDialog.move_grid_ver(-dy)
+                dx = p2[0] - p1[0]
+                dy = p2[1] - p1[1]
 
-            if dx != 0:
-                self.__gridDialog.move_grid_hor(-dx)
+                if dy != 0:
+                    self.__gridDialog.move_grid_ver(-dy)
 
-        self.__previous_pos_dict = pos_dict
+                if dx != 0:
+                    self.__gridDialog.move_grid_hor(-dx)
+
+            self.__previous_pos_dict = pos_dict
 
 
 class _MainVideoPlug(QubPixmapZoomPlug) :
