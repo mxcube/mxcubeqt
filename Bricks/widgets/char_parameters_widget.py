@@ -342,7 +342,7 @@ class CharParametersWidget(qt.QWidget):
             image = self._data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             image = image.scale(427, 320)
-            self.position_widget.svideo.setPixmap(qt.QPixmap(image))
+            self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
 
         self.toggle_permitted_range(self._char_params.use_permitted_rotation)
         self.enable_opt_parameters_widget(self._char_params.determine_rad_params)

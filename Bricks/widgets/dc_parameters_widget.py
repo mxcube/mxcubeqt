@@ -174,7 +174,7 @@ class DCParametersWidget(qt.QWidget):
                 acquisition_parameters.centred_position.snapshot_image
             
             image = image.scale(427, 320)
-            self.position_widget.svideo.setPixmap(qt.QPixmap(image))
+            self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
 
