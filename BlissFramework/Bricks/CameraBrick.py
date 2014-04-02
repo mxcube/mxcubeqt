@@ -163,7 +163,7 @@ class CameraBrick(BlissWidget):
         ###### Grid TOOL ######
         self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
                                                     iconName='rectangle', label='Grid tool',
-                                                    group="Tools", place="contextmenu")
+                                                    group="Tools") #place="contextmenu")
         self.__gridDialog = GridDialog(self, "Grid Dialog")
         self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
         self.__wholeActions.append(self.__gridToolAction)
@@ -627,7 +627,7 @@ class CameraBrick(BlissWidget):
             if dx != 0:
                 self.__gridDialog.move_grid_hor(-dx)
 
-            print dx, dy
+            #print dx, dy
 
             self.__previous_pos_dict = pos_dict
 
