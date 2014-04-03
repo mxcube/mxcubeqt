@@ -100,11 +100,11 @@ class AcquisitionWidget(qt.QWidget):
                                int,
                                qt.QIntValidator(1, 1000, self))
 
-        self._acquisition_mib.\
-             bind_value_update('overlap',
-                               self.acq_widget_layout.child('overlap_ledit'),
-                               float,
-                               qt.QDoubleValidator(-1000, 1000, 2, self))
+        #self._acquisition_mib.\
+        #     bind_value_update('overlap',
+        #                       self.acq_widget_layout.child('overlap_ledit'),
+        #                       float,
+        #                       qt.QDoubleValidator(-1000, 1000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('energy',
@@ -156,9 +156,9 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.num_images_ledit_change)
 
-        qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
-                           qt.SIGNAL("textChanged(const QString &)"),
-                           self.overlap_changed)
+        #qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
+        #                   qt.SIGNAL("textChanged(const QString &)"),
+        #                   self.overlap_changed)
 
         qt.QObject.connect(self.acq_widget_layout.child('subwedge_size_ledit'),
                            qt.SIGNAL("textChanged(const QString &)"),
@@ -227,27 +227,27 @@ class AcquisitionWidget(qt.QWidget):
             self.emit(qt.PYSIGNAL('path_template_changed'),
                       (widget, new_value))
 
-    def overlap_changed(self, new_value):
-        if self._beamline_setup:
-            has_shutter_less = self._beamline_setup.detector_has_shutterless()
-        else:
-            has_shutter_less = True
+    # def overlap_changed(self, new_value):
+    #     if self._beamline_setup:
+    #         has_shutter_less = self._beamline_setup.detector_has_shutterless()
+    #     else:
+    #         has_shutter_less = True
 
-        if has_shutter_less:
-            try:
-                new_value = float(new_value)
-            except ValueError:
-                pass
+    #     if has_shutter_less:
+    #         try:
+    #             new_value = float(new_value)
+    #         except ValueError:
+    #             pass
 
-            if new_value != 0:
-                self.acq_widget_layout.child('shutterless_cbx').\
-                     setEnabled(False)
-                self.acq_widget_layout.child('shutterless_cbx').setChecked(False)
-                self._acquisition_parameters.shutterless = False
-            else:
-                self.acq_widget_layout.child('shutterless_cbx').setEnabled(True)
-                self.acq_widget_layout.child('shutterless_cbx').setChecked(True)
-                self._acquisition_parameters.shutterless = True
+    #         if new_value != 0:
+    #             self.acq_widget_layout.child('shutterless_cbx').\
+    #                  setEnabled(False)
+    #             self.acq_widget_layout.child('shutterless_cbx').setChecked(False)
+    #             self._acquisition_parameters.shutterless = False
+    #         else:
+    #             self.acq_widget_layout.child('shutterless_cbx').setEnabled(True)
+    #             self.acq_widget_layout.child('shutterless_cbx').setChecked(True)
+    #             self._acquisition_parameters.shutterless = True
 
     def use_mad(self, state):
         self.acq_widget_layout.child('energies_combo').setEnabled(state)

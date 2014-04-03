@@ -66,16 +66,6 @@ class ProcessingWidget(qt.QWidget):
                                           float,
                                           None)
 
-        self._model_mib.bind_value_update('process_data',
-                                          self.layout_widget.child('use_processing'),
-                                          bool,
-                                          None)
-
-        self._model_mib.bind_value_update('anomalous',
-                                          self.layout_widget.child('use_anomalous'),
-                                          bool,
-                                          None)
-
         self.connect(self.layout_widget.child('space_group_ledit'),
                      qt.SIGNAL("activated(int)"),
                      self._space_group_change)    

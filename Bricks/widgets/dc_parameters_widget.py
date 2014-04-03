@@ -1,10 +1,11 @@
+import os
 import logging
 import qt
+import qtui
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.acquisition_widget import AcquisitionWidget
 from widgets.widget_utils import DataModelInputBinder
-from widgets.snapshot_widget_layout import SnapshotWidgetLayout
 from widgets.processing_widget import ProcessingWidget
 
 from BlissFramework.Utils import widget_colors
@@ -29,7 +30,11 @@ class DCParametersWidget(qt.QWidget):
 
         self.acq_widget.setFixedHeight(170)
 
-        self.position_widget = SnapshotWidgetLayout(self)
+        widget_ui = os.path.join(os.path.dirname(__file__),
+                                 'ui_files/snapshot_widget_layout.ui')
+        widget = qtui.QWidgetFactory.create(widget_ui)
+        widget.reparent(self, qt.QPoint(0, 0))
+        self.position_widget = widget
         self._processing_gbox = qt.QVGroupBox('Processing', self, 
                                            'processing_gbox')
 
@@ -169,7 +174,7 @@ class DCParametersWidget(qt.QWidget):
                 acquisition_parameters.centred_position.snapshot_image
             
             image = image.scale(427, 320)
-            self.position_widget.svideo.setPixmap(qt.QPixmap(image))
+            self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
 
