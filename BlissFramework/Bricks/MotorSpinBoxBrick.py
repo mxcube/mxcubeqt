@@ -1,5 +1,6 @@
 from BlissFramework import BaseComponents
 from BlissFramework import Icons
+import math
 from qt import *
 import logging
 from BlissFramework.Utils import widget_colors
@@ -107,7 +108,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         self.connect(self.stopButton,SIGNAL('clicked()'),self.stopMotor)
         self.connect(self.stepButton,SIGNAL('clicked()'),self.openStepEditor)
         self.connect(self.spinBox,PYSIGNAL('contextMenu'),self.openHistoryMenu)
-        self.connect(self.spinBox,SIGNAL('valueChanged(const QString &)'),self.valueChangedStr)
+        self.connect(self.spinBox.editor(),SIGNAL('returnPressed()'),self.valueChangedStr)
 
         self.connect(self.moveLeftButton,SIGNAL('pressed()'),self.moveDown)
         self.connect(self.moveLeftButton,SIGNAL('released()'),self.stopMoving)
@@ -296,10 +297,7 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
 
     # Updates the spin box when the motor moves
     def positionChanged(self,newPosition):  
-        #print "positionChanged",newPosition,type(newPosition),self.motor.getState()
-        self.spinBox.blockSignals(True)
         self.spinBox.setValue(float(newPosition))
-        self.spinBox.blockSignals(False)
 
     def setSpinBoxColor(self,state):
         color=MotorSpinBoxBrick.STATE_COLORS[state]
@@ -307,10 +305,8 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
 
     # Enables/disables the interface when the motor changes state
     def stateChanged(self,state):
-        #print "stateChanged",self.motor.userName(),state,self.demandMove
-
-        if self.demandMove==0:
-            self.setSpinBoxColor(state)
+        #if self.demandMove==0:
+        self.setSpinBoxColor(state)
 
         if state==self.motor.MOVESTARTED:
             self.updateHistory(self.motor.getPosition())
@@ -329,20 +325,18 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
                     self.reallyMoveDown()
                 return
 
-            self.spinBox.setEnabled(True)
+            self.spinBox.setMoving(False)
             self.stopButton.setEnabled(False)
             self.moveLeftButton.setEnabled(True)
             self.moveRightButton.setEnabled(True)
-        elif state==self.motor.NOTINITIALIZED or state==self.motor.UNUSABLE:
-            self.setSpinBoxColor(state)
+        elif state in (self.motor.NOTINITIALIZED, self.motor.UNUSABLE):
             self.spinBox.setEnabled(False)
             self.stopButton.setEnabled(False)
             self.moveLeftButton.setEnabled(False)
             self.moveRightButton.setEnabled(False)
-        elif state==self.motor.MOVING or state==self.motor.MOVESTARTED:
-            self.setSpinBoxColor(state)
+        elif state in (self.motor.MOVING, self.motor.MOVESTARTED):
             self.stopButton.setEnabled(True)
-            self.spinBox.setEnabled(False)
+            self.spinBox.setMoving(True)
         elif state==self.motor.ONLIMIT:
             self.spinBox.setEnabled(True)
             self.stopButton.setEnabled(False)
@@ -372,11 +366,9 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
             self.motor.move(value)
 
     # Moves the motor when the spin box text is changed
-    def valueChangedStr(self,value):
-        #print "valueChangedStr",value
-        self.updateGUI()
+    def valueChangedStr(self): #,value):
         if self.motor is not None:
-            self.motor.move(float(str(value)))
+            self.motor.move(float(str(self.spinBox.editor().text())))
 
     # Updates the tooltip in the correct widgets
     def setToolTip(self,name=None,state=None,limits=None):
@@ -563,65 +555,81 @@ class mySpinBox(QSpinBox):
     def __init__(self,parent):    
         QSpinBox.__init__(self,parent)
         self.decimalPlaces=1
+        self.__moving = False
         self.colorGroupDict={}
         self.setValidator(QDoubleValidator(self))
         self.editor().setAlignment(QWidget.AlignRight)
-        QObject.connect(self.editor(),SIGNAL('textChanged(const QString &)'),self.inputFieldChanged)
-    def inputFieldChanged(self,text):
-        self.setEditorBackgroundColor(mySpinBox.CHANGED_COLOR)
+        QObject.connect(self.editor(),SIGNAL("textChanged(const QString &)"),self.textChanged)
+        self.rangeChange()
+        self.updateDisplay()
+    def setMoving(self, moving):
+        self.setEnabled(not moving)
+        self.__moving = moving
+    def textChanged(self):
+        if self.__moving:
+          return
+        else:
+          self.setEditorBackgroundColor(mySpinBox.CHANGED_COLOR)
+    def i2d(self, v):
+        return v/math.pow(10, self.decimalPlaces)
+    def d2i(self, v):
+        d=1 if v >= 0 else -1
+        return int(d*0.5+math.pow(10, self.decimalPlaces)*v)
+    def rangeChange(self):
+        self.validator().setRange(self.minValue(), self.maxValue(), self.decimalPlaces)
+        return QSpinBox.rangeChange(self)
+    def setValue(self, value):
+        if type(value)==type(0.0):
+            return QSpinBox.setValue(self, self.d2i(value))
+        else:
+            return self.setValue(self.i2d(value)) 
+    def value(self):
+        return self.i2d(QSpinBox.value(self))
+    def stepUp(self):
+        self.emit(PYSIGNAL("stepUp"), ())
+    def stepDown(self):
+        self.emit(PYSIGNAL("stepDown"), ())
     def setDecimalPlaces(self,places):
-        current_val=float(self.value())/float(10**self.decimalPlaces)
-        current_step=self.lineStep()
-        current_min=float(self.minValue())/float(10**self.decimalPlaces)
-        current_max=float(self.maxValue())/float(10**self.decimalPlaces)
+        minval = self.minValue()
+        maxval = self.maxValue()
+        val = self.value()
+        ls = self.lineStep()
         self.decimalPlaces=places
-        self.blockSignals(True)
-        self.setMinValue(current_min)
-        self.setMaxValue(current_max)
-        self.setValue(current_val)
-        self.blockSignals(False)
-        self.setLineStep(current_step)
+        self.setMaxValue(maxval)
+        self.setMinValue(minval)
+        self.setValue(val)
+        self.setLineStep(ls)
+        self.rangeChange()
+        self.updateDisplay()
+    def setMinValue(self, value):
+        value = self.d2i(value) 
+        if math.fabs(value) > 1E8:
+          value = math.copysign(1E8, value)
+        return QSpinBox.setMinValue(self, value)
+    def setMaxValue(self, value):
+        value = self.d2i(value) 
+        if math.fabs(value) > 1E8:
+          value = math.copysign(1E8, value)
+        return QSpinBox.setMaxValue(self, self.d2i(value))
+    def minValue(self):
+        return self.i2d(QSpinBox.minValue(self))
+    def maxValue(self):
+        return self.i2d(QSpinBox.maxValue(self))
     def decimalPlaces(self):
         return self.decimalPlaces
-    def setMinValue(self,value):
-        try:
-            QSpinBox.setMinValue(self,int(value*(10**self.decimalPlaces)))
-        except (TypeError,ValueError):
-            logging.getLogger().error("MotorSpinBoxBrick: error setting minimum value (%d)" % value)
-    def setMaxValue(self,value):
-        try:
-            QSpinBox.setMaxValue(self,int(value*(10**self.decimalPlaces)))
-        except (TypeError,ValueError):
-            logging.getLogger().error("MotorSpinBoxBrick: error setting maximum value (%d)" % value)
     def mapValueToText(self,value):
-        f=float(value)/float(10**self.decimalPlaces)
-        return QString(str(f))
+        frmt="%."+"%df" % self.decimalPlaces
+        return QString(frmt % self.i2d(value))
     def mapTextToValue(self):
         t = str(self.text())
         try:
-            ret = int(float(t)*(10**self.decimalPlaces))
+          return (self.d2i(float(t)), True)
         except:
-            return (0, False)
-        else:
-            return (ret, True) 
-    def setValue(self,value):
-        if type(value)==type(0.0):
-            value=int(value*(10**self.decimalPlaces))
-        self.editor().blockSignals(True)
-        QSpinBox.setValue(self,value)
-        self.editor().blockSignals(False)
+          return (0, False)
     def lineStep(self):
-        step=float(QSpinBox.lineStep(self))/(10**self.decimalPlaces)
-        return step
+        return self.i2d(QSpinBox.lineStep(self))
     def setLineStep(self,step):
-        if type(step)==type(0.0):
-            s=int(step*(10**self.decimalPlaces))
-        else:
-            s=step
-        try:
-            QSpinBox.setLineStep(self,s)
-        except (TypeError,ValueError):
-            logging.getLogger().error("MotorSpinBoxBrick: error setting step value (%d)" % step)
+        return QSpinBox.setLineStep(self, self.d2i(step))
     def eventFilter(self,obj,ev):
         if isinstance(ev,QContextMenuEvent):
             self.emit(PYSIGNAL("contextMenu"),())
@@ -629,7 +637,6 @@ class mySpinBox(QSpinBox):
         else:
             return QSpinBox.eventFilter(self,obj,ev)
     def setEditorBackgroundColor(self,color):
-        #print "mySpinBox.setEditorBackgroundColor",color
         editor=self.editor()
         editor.setPaletteBackgroundColor(color)
         spinbox_palette=editor.palette()
