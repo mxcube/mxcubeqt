@@ -1,8 +1,6 @@
 from qt import *
 
 from widgets.acquisition_widget import AcquisitionWidget
-from widgets.acquisition_widget_horizontal_layout import \
-    AcquisitionWidgetHorizontalLayout
 from widgets.data_path_widget import DataPathWidget
 
 class ReferenceImageWidget(QWidget):
