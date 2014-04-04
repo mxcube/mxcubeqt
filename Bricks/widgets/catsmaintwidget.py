@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_files/catsmaintwidget.ui'
 #
-# Created: Tue Mar 11 15:09:01 2014
+# Created: Mon Mar 17 16:13:23 2014
 #      by: The PyQt User Interface Compiler (pyuic) 3.18.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -156,7 +156,7 @@ class CatsMaintWidget(QWidget):
 
         self.languageChange()
 
-        self.resize(QSize(1230,726).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(1230,855).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.setTabOrder(self.btPowerOn,self.btPowerOff)

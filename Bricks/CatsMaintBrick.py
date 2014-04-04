@@ -36,7 +36,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
         qt.QObject.connect(self.widget.btResetError, qt.SIGNAL('clicked()'), self._resetError)
         qt.QObject.connect(self.widget.btBack, qt.SIGNAL('clicked()'), self._backTraj)                     
         qt.QObject.connect(self.widget.btSafe, qt.SIGNAL('clicked()'), self._safeTraj)                     
-        qt.QObject.connect(self.widget.btRegulationOn, qt.SIGNAL('clicked()'), self._enableRegulation)                     
+        qt.QObject.connect(self.widget.btRegulationOn, qt.SIGNAL('clicked()'), self._regulationOn)                     
                 
         self.device=None
         self._pathRunning = None
@@ -74,17 +74,17 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
     def _updateRegulationState(self, value):
         self._regulationOn = value
         if value:
-            self.widget.lblRegulationState.setStyleSheet('QLabel {background-color: green }')
+            self.widget.lblRegulationState.setPaletteBackgroundColor(QWidget.green)
         else:
-            self.widget.lblRegulationState.setStyleSheet('QLabel {background-color: red }')
+            self.widget.lblRegulationState.setPaletteBackgroundColor(QWidget.red)
         self._updateButtons()
 
     def _updatePowerState(self, value):
         self._powerOn = value
         if value:
-            self.widget.lblPowerState.setStyleSheet('QLabel {background-color: green }')
+            self.widget.lblPowerState.setPaletteBackgroundColor(QWidget.green)
         else:
-            self.widget.lblPowerState.setStyleSheet('QLabel {background-color: red }')
+            self.widget.lblPowerState.setPaletteBackgroundColor(QWidget.red)
         self._updateButtons()
 
     def _updateMessage(self, value):
@@ -136,8 +136,6 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
             self.widget.btBack.setEnabled(False)
             self.widget.btSafe.setEnabled(False)
             self.widget.btRegulationOn.setEnabled(False)
-            self.widget.lblPowerState.setStyleSheet('QLabel {background-color: gray }')
-            self.widget.lblRegulationState.setStyleSheet('QLabel {background-color: gray }')
             self.widget.lblMessage.setText('')
         else:
             ready = not self._pathRunning
@@ -156,61 +154,99 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
 
     def _regulationOn(self):
         logging.getLogger("user_level_log").info("CATS: Regulation On")
-        if self.device is not None:
-            self.device._doEnableRegulation()
+        try:
+            if self.device is not None:
+                self.device._doEnableRegulation()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _powerOn(self):
         logging.getLogger("user_level_log").info("CATS: Power On")
-        if self.device is not None:
-            self.device._doPowerState(True)
+        try:
+            if self.device is not None:
+                self.device._doPowerState(True)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _powerOff(self):
         logging.getLogger("user_level_log").info("CATS: Power Off")
-        if self.device is not None:
-            self.device._doPowerState(False)
+        try:
+            if self.device is not None:
+                self.device._doPowerState(False)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _lid1Open(self):
         logging.getLogger("user_level_log").info("CATS: Open Lid 1")
-        if self.device is not None:
-            self.device._doLid1State(True)
+        try:
+            if self.device is not None:
+                self.device._doLid1State(True)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _lid1Close(self):
         logging.getLogger("user_level_log").info("CATS: Close  Lid 1")
-        if self.device is not None:
-            self.device._doLid1State(False)
+        try:
+            if self.device is not None:
+                self.device._doLid1State(False)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _lid2Open(self):
         logging.getLogger("user_level_log").info("CATS: Open Lid 2")
-        if self.device is not None:
-            self.device._doLid2State(True)
+        try:
+            if self.device is not None:
+                self.device._doLid2State(True)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _lid2Close(self):
         logging.getLogger("user_level_log").info("CATS: Close  Lid 2")
-        if self.device is not None:
-            self.device._doLid2State(False)
+        try:
+            if self.device is not None:
+                self.device._doLid2State(False)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _lid3Open(self):
         logging.getLogger("user_level_log").info("CATS: Open Lid 3")
-        if self.device is not None:
-            self.device._doLid3State(True)
+        try:
+            if self.device is not None:
+                self.device._doLid3State(True)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _lid3Close(self):
         logging.getLogger("user_level_log").info("CATS: Close  Lid 3")
-        if self.device is not None:
-            self.device._doLid3State(False)
+        try:
+            if self.device is not None:
+                self.device._doLid3State(False)
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _resetError(self):
         logging.getLogger("user_level_log").info("CATS: Reset")
-        if self.device is not None:
-            self.device._doReset()
+        try:
+            if self.device is not None:
+                self.device._doReset()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _backTraj(self):
         logging.getLogger("user_level_log").info("CATS: Transfer sample back to dewar.")
-        if self.device is not None:
-            self.device._doBack()
+        try:
+            if self.device is not None:
+                #self.device._doBack()
+                self.device.backTraj()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def _safeTraj(self):
         logging.getLogger("user_level_log").info("CATS: Safely move robot arm to home position.")
-        if self.device is not None:
-            self.device._doSafe()
+        try:
+            if self.device is not None:
+                #self.device._doSafe()
+                self.device.safeTraj()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
