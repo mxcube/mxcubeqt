@@ -8,14 +8,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>241</width>
-            <height>258</height>
+            <width>262</width>
+            <height>256</height>
         </rect>
     </property>
     <property name="caption">
         <string>Grid Row</string>
     </property>
-    <hbox>
+    <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
@@ -111,7 +111,7 @@
                             </property>
                             <property name="sizeHint">
                                 <size>
-                                    <width>10</width>
+                                    <width>16</width>
                                     <height>20</height>
                                 </size>
                             </property>
@@ -148,16 +148,36 @@
                             </property>
                             <property name="sizeHint">
                                 <size>
-                                    <width>51</width>
+                                    <width>100</width>
                                     <height>20</height>
                                 </size>
                             </property>
                         </spacer>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>visibility_button</cstring>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>50</width>
+                                    <height>30</height>
+                                </size>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>50</width>
+                                    <height>30</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Hide</string>
+                            </property>
+                        </widget>
                     </hbox>
                 </widget>
             </vbox>
         </widget>
-    </hbox>
+    </vbox>
 </widget>
 <tabstops>
     <tabstop>list_view</tabstop>
