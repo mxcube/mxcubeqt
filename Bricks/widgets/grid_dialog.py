@@ -34,6 +34,8 @@ class GridDialog(qt.QDialog):
         self.__main_layout.add(widget)
         self.__list_view = widget.child("list_view")
         self.__visibility_button = widget.child("visibility_button")
+        self.__vspace_ledit = widget.child("vspace_ledit")
+        self.__hspace_ledit = widget.child("hspace_ledit")
 
         qt.QObject.connect(widget.child("add_button"), qt.SIGNAL("clicked()"),
                            self.__add_drawing)
@@ -78,6 +80,9 @@ class GridDialog(qt.QDialog):
         self.__drawing_mgr.set_x_pixel_size(self.__x_pixel_size)
         self.__drawing_mgr.set_y_pixel_size(self.__y_pixel_size)
         self.__drawing_mgr.set_beam_position(*self.__beam_pos)
+        vspace, hspace = self.__get_cell_dim()
+        self.__drawing_mgr.set_cell_width(self.__beam_pos[2] + hspace)
+        self.__drawing_mgr.set_cell_height(self.__beam_pos[3] + vspace)
         self.__drawing_mgr.startDrawing()
         self.__drawing_mgr.setEndDrawCallBack(self.__end_surface_drawing)
         self.__drawing_mgr.setColor(qt.Qt.green)
@@ -109,6 +114,22 @@ class GridDialog(qt.QDialog):
             list_view_item = self.__list_view.lastItem()
             self.__list_view.setSelected(list_view_item, True)
 
+    def __get_cell_dim(self):
+        vspace = self.__vspace_ledit.text()
+        hspace = self.__hspace_ledit.text()
+
+        try:
+            float(vspace)
+        except ValueError:
+            vspace = 0
+
+        try:
+            float(hspace)
+        except ValueError:
+            hspace = 0
+
+        return (vspace*2, hspace*2)
+        
     def set_x_pixel_size(self, x_size):
         x_size = 1e-3/x_size
 
