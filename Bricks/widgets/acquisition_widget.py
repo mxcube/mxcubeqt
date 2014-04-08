@@ -159,9 +159,10 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.num_images_ledit_change)
 
-        #qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
-        #                   qt.SIGNAL("textChanged(const QString &)"),
-        #                   self.overlap_changed)
+        if overlap_ledit:
+            qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
+                               qt.SIGNAL("textChanged(const QString &)"),
+                               self.overlap_changed)
 
         qt.QObject.connect(self.acq_widget_layout.child('subwedge_size_ledit'),
                            qt.SIGNAL("textChanged(const QString &)"),
