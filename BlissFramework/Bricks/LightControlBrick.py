@@ -2,6 +2,8 @@ from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework.Bricks import MotorSpinBoxBrick
 from BlissFramework import Icons
+import logging
+
 '''
 Controls both the light on/off (wago) and intensity (motor)
 '''
