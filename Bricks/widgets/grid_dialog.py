@@ -1,7 +1,6 @@
 import os
 import qt
 import qtui
-import random
 
 from ShapeHistory import CanvasGrid
 from Qub.Objects.QubDrawingManager import Qub2PointSurfaceDrawingMgr
@@ -34,12 +33,16 @@ class GridDialog(qt.QDialog):
         widget.reparent(self, qt.QPoint(0,0))
         self.__main_layout.add(widget)
         self.__list_view = widget.child("list_view")
+        self.__visibility_button = widget.child("visibility_button")
 
         qt.QObject.connect(widget.child("add_button"), qt.SIGNAL("clicked()"),
                            self.__add_drawing)
 
         qt.QObject.connect(widget.child("remove_button"), qt.SIGNAL("clicked()"),
                            self.__delete_drawing)
+
+        qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
+                           self.__toggle_visibility_grid)
 
         dispatcher.connect(self._get_grid_info, "grid")
         dispatcher.connect(self._set_grid_data, "set_grid_data") 
@@ -190,6 +193,11 @@ class GridDialog(qt.QDialog):
                 drawing_mgr.highlight(True)
                 key = str(current_item.text(0))
                 print drawing_mgr._get_grid(key)[0]
+
+                if drawing_mgr.isVisible()[0]:
+                    self.__visibility_button.setText("Hide")
+                else:
+                    self.__visibility_button.setText("Show")
             else:
                 drawing_mgr.highlight(False)
 
@@ -210,4 +218,16 @@ class GridDialog(qt.QDialog):
         except:
             # Drawing manager not set when called
             pass
-        
+
+    def __toggle_visibility_grid(self):
+        item = self.__list_view.currentItem()
+
+        for current_item in self.__list_items.iterkeys():
+            drawing_mgr = self.__list_items[current_item]
+            if current_item == item:
+                if drawing_mgr.isVisible()[0]:
+                    drawing_mgr.hide()
+                    self.__visibility_button.setText("Show")
+                else:
+                    drawing_mgr.show()
+                    self.__visibility_button.setText("Hide")

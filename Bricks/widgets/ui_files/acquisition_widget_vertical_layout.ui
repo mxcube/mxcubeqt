@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>421</width>
-            <height>319</height>
+            <height>279</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -99,14 +99,6 @@
                                                 <string>Oscillation start:</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>num_passes_label</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Number of passes:</string>
-                                            </property>
-                                        </widget>
                                     </vbox>
                                 </widget>
                                 <widget class="QLayoutWidget">
@@ -137,23 +129,6 @@
                                         <widget class="QLineEdit">
                                             <property name="name">
                                                 <cstring>osc_start_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>32767</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>num_passes_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
@@ -207,23 +182,6 @@
                                                 <string>Number of images:</string>
                                             </property>
                                         </widget>
-                                        <spacer>
-                                            <property name="name">
-                                                <cstring>dummy_label</cstring>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Horizontal</enum>
-                                            </property>
-                                            <property name="sizeType">
-                                                <enum>Expanding</enum>
-                                            </property>
-                                            <property name="sizeHint">
-                                                <size>
-                                                    <width>120</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
                                     </vbox>
                                 </widget>
                                 <widget class="QLayoutWidget">
@@ -268,23 +226,6 @@
                                                 </size>
                                             </property>
                                         </widget>
-                                        <spacer>
-                                            <property name="name">
-                                                <cstring>dummy_ledit</cstring>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Horizontal</enum>
-                                            </property>
-                                            <property name="sizeType">
-                                                <enum>Expanding</enum>
-                                            </property>
-                                            <property name="sizeHint">
-                                                <size>
-                                                    <width>31</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
                                     </vbox>
                                 </widget>
                             </hbox>
@@ -422,6 +363,12 @@
                                                 <widget class="QComboBox">
                                                     <property name="name">
                                                         <cstring>energies_combo</cstring>
+                                                    </property>
+                                                    <property name="minimumSize">
+                                                        <size>
+                                                            <width>90</width>
+                                                            <height>0</height>
+                                                        </size>
                                                     </property>
                                                     <property name="toolTip" stdset="0">
                                                         <string>Check to use energies from energy scan</string>

@@ -32,6 +32,7 @@ class CatsBrick(BaseComponents.BlissWidget):
         self.device=None
         self.phase = "Unknown"
         self.state = "Unknown"
+        self._loadedSample = None
         
         self.list = self.widget.lvSC   
         #self.list.setSelectionMode(QListView::NoSelection)
@@ -89,6 +90,7 @@ class CatsBrick(BaseComponents.BlissWidget):
         self._updateButtons() 
 
     def onLoadedSampleChanged(self,sample):
+        self._loadedSample = sample
         self._updateButtons()
 
     def onSelectionChanged(self):
@@ -190,11 +192,7 @@ class CatsBrick(BaseComponents.BlissWidget):
             return c
 
     def _updateButtons(self):
-        sample_selected = (self._getSelectedSample() is not None)
-        item = self.list.selectedItem()
-        if item is not None:
-            element = self.device.getComponentByAddress(item.text(0))
-            element
+        selected_sample = self._getSelectedSample()
         if self.device is None or not self.device.isReady():
             self.widget.btLoadSample.setEnabled(False) 
             self.widget.btUnloadSample.setEnabled(False)
@@ -204,7 +202,7 @@ class CatsBrick(BaseComponents.BlissWidget):
             ready = (self.device.getState() == SampleChanger.SampleChangerState.Ready)
             standby = (self.device.getState() == SampleChanger.SampleChangerState.StandBy)
             moving = (self.device.getState() in [SampleChanger.SampleChangerState.Moving, SampleChanger.SampleChangerState.Loading, SampleChanger.SampleChangerState.Unloading])
-            self.widget.btLoadSample.setEnabled(ready and not charging and (self._getSelectedSample() is not None)) 
+            self.widget.btLoadSample.setEnabled(ready and not charging and (selected_sample is not None) and selected_sample.isPresent() and (selected_sample != self._loadedSample))
             self.widget.btUnloadSample.setEnabled(ready and not charging and self.device.hasLoadedSample())
         self.widget.btAbort.setEnabled(self.device is not None and not self.device.isReady())
 
@@ -214,12 +212,18 @@ class CatsBrick(BaseComponents.BlissWidget):
             self.device.abort()
             
     def _loadSample(self):
-        if self.device is not None:
-            self.device.load(wait=False)
+        try:
+            if self.device is not None:
+                self.device.load(wait=False)
+        except:
+            qt.QMessageBox.warning(self, "Error",str(sys.exc_info()[1]))
             
     def _unloadSample(self):
-        if self.device is not None:
-            self.device.unload(wait=False)
+        try:
+            if self.device is not None:
+                self.device.unload(wait=False)
+        except:
+            qt.QMessageBox.warning(self, "Error",str(sys.exc_info()[1]))
 
     def _clearTable(self):
         self.root=None
@@ -290,7 +294,7 @@ class CatsBrick(BaseComponents.BlissWidget):
             self.list.setSorting(-1)
             self.list.addColumn( "Element" , 150);
             self.list.addColumn( "Status" , 60);
-            self.list.addColumn( "ID" , 60);
+            self.list.addColumn( "ID" , 120);
             for prop in self.device.getSampleProperties():
                 self.list.addColumn(str(prop),60)
             #How can we align the header?
