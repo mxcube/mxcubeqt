@@ -119,12 +119,12 @@ class GridDialog(qt.QDialog):
         hspace = self.__hspace_ledit.text()
 
         try:
-            float(vspace)
+            vspace = float(vspace)
         except ValueError:
             vspace = 0
 
         try:
-            float(hspace)
+            hspace = float(hspace)
         except ValueError:
             hspace = 0
 
