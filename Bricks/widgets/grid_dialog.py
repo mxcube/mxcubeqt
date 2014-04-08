@@ -215,7 +215,7 @@ class GridDialog(qt.QDialog):
                 key = str(current_item.text(0))
                 print drawing_mgr._get_grid(key)[0]
 
-                if drawing_mgr.isVisible():
+                if drawing_mgr.isVisible()[0]:
                     self.__visibility_button.setText("Hide")
                 else:
                     self.__visibility_button.setText("Show")
@@ -246,7 +246,9 @@ class GridDialog(qt.QDialog):
         for current_item in self.__list_items.iterkeys():
             drawing_mgr = self.__list_items[current_item]
             if current_item == item:
-                if drawing_mgr.isVisible():
+                if drawing_mgr.isVisible()[0]:
                     drawing_mgr.hide()
+                    self.__visibility_button.setText("Show")
                 else:
                     drawing_mgr.show()
+                    self.__visibility_button.setText("Hide")
