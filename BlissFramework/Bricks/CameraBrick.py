@@ -412,6 +412,7 @@ class CameraBrick(BlissWidget):
         elif property == 'fix : height': self.__fixHeight = newValue
         elif property == "diffractometer":
             self.diffractometerHwobj = self.getHardwareObject(newValue)
+            self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
             self.diffractometerHwobj.connect("minidiffStateChanged",
                                              self.diffractometerChanged)
 
@@ -422,7 +423,6 @@ class CameraBrick(BlissWidget):
             beam_pos_x = self.diffractometerHwobj.getBeamPosX()
             beam_pos_y = self.diffractometerHwobj.getBeamPosY()
 
-            self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
 
             self.__gridDialog.set_x_pixel_size(xSize)
             self.__gridDialog.set_y_pixel_size(ySize)
@@ -614,7 +614,6 @@ class CameraBrick(BlissWidget):
         
         if self.diffractometerHwobj.isReady():
             pos_dict = self.diffractometerHwobj.getPositions()
-          
             p1 = self.diffractometerHwobj.motor_positions_to_screen(self.__previous_pos_dict)
             p2 = (self.diffractometerHwobj.getBeamPosX(), self.diffractometerHwobj.getBeamPosY())
 
