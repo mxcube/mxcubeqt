@@ -1,7 +1,6 @@
 import os
 import qt
 import qtui
-import random
 
 from ShapeHistory import CanvasGrid
 from Qub.Objects.QubDrawingManager import Qub2PointSurfaceDrawingMgr
