@@ -40,7 +40,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
                 
         self.device=None
         self._pathRunning = None
-        self._powerOn = None
+        self._poweredOn = None
         self._regulationOn = None
 
         self._lid1State = False
@@ -80,7 +80,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
         self._updateButtons()
 
     def _updatePowerState(self, value):
-        self._powerOn = value
+        self._poweredOn = value
         if value:
             self.widget.lblPowerState.setPaletteBackgroundColor(QWidget.green)
         else:
@@ -140,11 +140,11 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
         else:
             ready = not self._pathRunning
             #ready = not self.device.isDeviceReady()
-            self.widget.btPowerOn.setEnabled(ready and not self._powerOn)
-            self.widget.btPowerOff.setEnabled(ready and self._powerOn)
+            self.widget.btPowerOn.setEnabled(ready and not self._poweredOn)
+            self.widget.btPowerOff.setEnabled(ready and self._poweredOn)
             self.widget.btResetError.setEnabled(ready)
-            self.widget.btBack.setEnabled(ready and self._powerOn)
-            self.widget.btSafe.setEnabled(ready and self._powerOn)
+            self.widget.btBack.setEnabled(ready and self._poweredOn)
+            self.widget.btSafe.setEnabled(ready and self._poweredOn)
 
             self.widget.btRegulationOn.setEnabled(not self._regulationOn)
 
