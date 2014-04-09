@@ -36,8 +36,8 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         self.defineSlot("set_session", ())
         self.defineSlot("selection_changed",())
         self.defineSlot("new_centred_position", ())
-        self.defineSlot("change_pixel_calibration", ())
-        self.defineSlot("change_beam_position", ())
+        #self.defineSlot("change_pixel_calibration", ())
+        #self.defineSlot("change_beam_position", ())
         self.defineSlot("user_group_saved", ())
 
         # Layout
@@ -61,10 +61,10 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
         # helper classes for handling centred positions.
         d = {}
         self.emit(qt.PYSIGNAL("getView"), (d, ))
-        self.task_tool_box_widget.workflow_page._grid_widget.connectToView(d)
-        self.task_tool_box_widget.workflow_page._grid_widget._setColor(qt.QWidget.green)
-        self.task_tool_box_widget.workflow_page.\
-            _grid_widget._shape_history = self.shape_history
+        #self.task_tool_box_widget.workflow_page._grid_widget.connectToView(d)
+        #self.task_tool_box_widget.workflow_page._grid_widget._setColor(qt.QWidget.green)
+        #self.task_tool_box_widget.workflow_page.\
+        #    _grid_widget._shape_history = self.shape_history
         
         self.shape_history.set_drawing(d.get('drawing', None))
         self.shape_history.get_drawing_event_handler().\
@@ -152,12 +152,14 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
 
     def change_pixel_calibration(self, sizex, sizey):
-        self.task_tool_box_widget.workflow_page.\
-            _grid_widget.ChangePixelCalibration(sizex, sizey)
+        pass
+        #self.task_tool_box_widget.workflow_page.\
+        #    _grid_widget.ChangePixelCalibration(sizex, sizey)
 
     def change_beam_position(self, x, y):
-        self.task_tool_box_widget.workflow_page.\
-            _grid_widget.ChangeBeamPosition(x, y)
+        pass
+        #self.task_tool_box_widget.workflow_page.\
+        #    _grid_widget.ChangeBeamPosition(x, y)
 
     def selection_changed(self, items):
         """
@@ -235,8 +237,6 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                         motor_positions_to_screen(cpos.as_dict())
 
                     new_positions.append((new_x, new_y))
-                    #print "CPOS"
-                    #print cpos.as_dict()
 
                 shape.move(new_positions)
 

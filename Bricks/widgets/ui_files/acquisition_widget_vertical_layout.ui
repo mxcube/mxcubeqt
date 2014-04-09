@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>453</width>
-            <height>338</height>
+            <width>421</width>
+            <height>279</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -50,6 +50,9 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
                 <property name="spacing">
                     <number>15</number>
                 </property>
@@ -66,7 +69,7 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>rone_cone_container_layout</cstring>
+                                <cstring>col_one_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -74,7 +77,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rone_cone_label_layout</cstring>
+                                        <cstring>col_one_label_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -86,14 +89,6 @@
                                             </property>
                                             <property name="text">
                                                 <string>Oscillation range:</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>overlap_label</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Oscillation overlap:</string>
                                             </property>
                                         </widget>
                                         <widget class="QCheckBox">
@@ -108,7 +103,7 @@
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>rone_cone_ledit_layout</cstring>
+                                        <cstring>col_one_ledit_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -117,23 +112,6 @@
                                         <widget class="QLineEdit">
                                             <property name="name">
                                                 <cstring>osc_range_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>32767</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>overlap_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
@@ -171,7 +149,7 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>rone_ctwo_container_layout</cstring>
+                                <cstring>col_two_layout</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -179,7 +157,7 @@
                                 </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>row_one_ctwo_label_layout</cstring>
+                                        <cstring>col_two_label_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -204,19 +182,11 @@
                                                 <string>Number of images:</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>num_passes_label</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Number of passes:</string>
-                                            </property>
-                                        </widget>
                                     </vbox>
                                 </widget>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>row_one_ctwo_ledit_layout</cstring>
+                                        <cstring>col_two_ledit_layout</cstring>
                                     </property>
                                     <vbox>
                                         <property name="name">
@@ -242,23 +212,6 @@
                                         <widget class="QLineEdit">
                                             <property name="name">
                                                 <cstring>num_images_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>50</width>
-                                                    <height>32767</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>num_passes_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
@@ -410,6 +363,12 @@
                                                 <widget class="QComboBox">
                                                     <property name="name">
                                                         <cstring>energies_combo</cstring>
+                                                    </property>
+                                                    <property name="minimumSize">
+                                                        <size>
+                                                            <width>90</width>
+                                                            <height>0</height>
+                                                        </size>
                                                     </property>
                                                     <property name="toolTip" stdset="0">
                                                         <string>Check to use energies from energy scan</string>
@@ -595,23 +554,6 @@
                         </widget>
                     </hbox>
                 </widget>
-                <spacer>
-                    <property name="name">
-                        <cstring>vspacer</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Vertical</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
-                        <size>
-                            <width>20</width>
-                            <height>1</height>
-                        </size>
-                    </property>
-                </spacer>
             </vbox>
         </widget>
         <spacer>

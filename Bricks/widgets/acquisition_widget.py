@@ -94,17 +94,20 @@ class AcquisitionWidget(qt.QWidget):
                                int,
                                qt.QIntValidator(1, 9999, self))
 
-        self._acquisition_mib.\
-             bind_value_update('num_passes',
-                               self.acq_widget_layout.child('num_passes_ledit'),
-                               int,
-                               qt.QIntValidator(1, 1000, self))
 
-        self._acquisition_mib.\
-             bind_value_update('overlap',
-                               self.acq_widget_layout.child('overlap_ledit'),
-                               float,
-                               qt.QDoubleValidator(-1000, 1000, 2, self))
+        num_passes = self.acq_widget_layout.child('num_passes_ledit')
+
+        if num_passes:
+            self._acquisition_mib.\
+                bind_value_update('num_passes', num_passes, int,
+                                  qt.QIntValidator(1, 1000, self))
+
+        overlap_ledit = self.acq_widget_layout.child('overlap_ledit')
+
+        if overlap_ledit:
+            self._acquisition_mib.\
+                bind_value_update('overlap', overlap_ledit, float,
+                                  qt.QDoubleValidator(-1000, 1000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('energy',
@@ -156,9 +159,10 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.num_images_ledit_change)
 
-        qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
-                           qt.SIGNAL("textChanged(const QString &)"),
-                           self.overlap_changed)
+        if overlap_ledit:
+            qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
+                               qt.SIGNAL("textChanged(const QString &)"),
+                               self.overlap_changed)
 
         qt.QObject.connect(self.acq_widget_layout.child('subwedge_size_ledit'),
                            qt.SIGNAL("textChanged(const QString &)"),
@@ -208,7 +212,9 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('shutterless_cbx').setChecked(has_shutter_less)
 
         if self._beamline_setup.disable_num_passes():
-            self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
+            num_passes = self.acq_widget_layout.child('num_passes_ledit')
+            if num_passes:
+                self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
 
         has_aperture = self._beamline_setup.has_aperture()
         self.hide_aperture(has_aperture)    
@@ -241,7 +247,7 @@ class AcquisitionWidget(qt.QWidget):
 
             if new_value != 0:
                 self.acq_widget_layout.child('shutterless_cbx').\
-                     setEnabled(False)
+                    setEnabled(False)
                 self.acq_widget_layout.child('shutterless_cbx').setChecked(False)
                 self._acquisition_parameters.shutterless = False
             else:
@@ -372,7 +378,7 @@ class AcquisitionWidget(qt.QWidget):
         else:
             self.acq_widget_layout.child('inverse_beam_cbx').show()
             self.acq_widget_layout.child('subwedge_size_label').show()
-            self.acq_widget_layout.child('subwedge_size_ledit').show()        
+            self.acq_widget_layout.child('subwedge_size_ledit').show()
 
     def hide_aperture(self, state):
         pass

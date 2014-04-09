@@ -1,4 +1,6 @@
+import os
 import qt
+import qtui
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
@@ -8,7 +10,6 @@ from widgets.optimisation_parameters_widget_layout\
     import OptimisationParametersWidgetLayout
 from widgets.radiation_damage_model_widget_layout\
     import RadiationDamageModelWidgetLayout
-from widgets.snapshot_widget_layout import SnapshotWidgetLayout
 from widgets.widget_utils import DataModelInputBinder
 from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
@@ -38,7 +39,11 @@ class CharParametersWidget(qt.QWidget):
         self.path_widget = self.reference_img_widget.path_widget
         self.opt_parameters_widget = OptimisationParametersWidgetLayout(self)
         self.rad_dmg_widget = RadiationDamageModelWidgetLayout(self)
-        self.position_widget = SnapshotWidgetLayout(self)
+        widget_ui = os.path.join(os.path.dirname(__file__),
+                                 'ui_files/snapshot_widget_layout.ui')
+        widget = qtui.QWidgetFactory.create(widget_ui)
+        widget.reparent(self, qt.QPoint(0, 0))
+        self.position_widget = widget
         self.vertical_dimension_widget = VerticalCrystalDimensionWidgetLayout(self)
 
         # Fix the widths of the widgets to make the layout look nicer,
@@ -342,7 +347,7 @@ class CharParametersWidget(qt.QWidget):
             image = self._data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             image = image.scale(427, 320)
-            self.position_widget.svideo.setPixmap(qt.QPixmap(image))
+            self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
 
         self.toggle_permitted_range(self._char_params.use_permitted_rotation)
         self.enable_opt_parameters_widget(self._char_params.determine_rad_params)
