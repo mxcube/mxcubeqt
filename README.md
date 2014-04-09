@@ -59,6 +59,7 @@ the repository, for the first time it has to be created by making a copy of exam
 * [Qub](http://github.com/mxcube/qub)
 * [PyChooch](http://github.com/mxcube/pychooch)
 * [PyMca](http://sourceforge.net/projects/pymca/)
+* [jsonpickle](https://pypi.python.org/pypi/jsonpickle/0.7.0)
 
 [PyTango](http://www.tango-controls.org/static/PyTango/latest/doc/html/) and
 [SpecClient](http://github.com/mxcube/specclient) are optional dependencies.
