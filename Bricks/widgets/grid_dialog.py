@@ -109,7 +109,7 @@ class GridDialog(qt.QDialog):
             vspace, hspace = self.__get_cell_dim()
             vspace = vspace * 1000
             hspace = hspace * 1000
-            list_view_item = qt.QListViewItem(self.__list_view, name, beam_width, beam_height, 
+            list_view_item = qt.QListViewItem(self.__list_view, name, beam_height, beam_width,
                                               str(hspace), str(vspace))
             self.__list_items[list_view_item] = self.__drawing_mgr
             self.__drawing_mgr.stopDrawing()
