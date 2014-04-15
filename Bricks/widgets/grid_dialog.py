@@ -7,9 +7,9 @@ from Qub.Objects.QubDrawingManager import Qub2PointSurfaceDrawingMgr
 from HardwareRepository.HardwareRepository import dispatcher
 
 class GridDialog(qt.QDialog):
-    def __init__(self, parent = None, name = "Grid Dialog", canvas = None,
-                 matrix = None, event_mgr = None, drawing_object_layer = None):
-        super(GridDialog, self).__init__(parent, name)
+    def __init__(self, parent = None, name = "Grid Dialog", modal = False, flags = 0,
+                 canvas = None, matrix = None, event_mgr = None, drawing_object_layer = None):
+        super(GridDialog, self).__init__(parent, name, modal, flags)
         self.current_motor_positions = {}
         self.__cell_width = 0
         self.__cell_height = 0
@@ -34,6 +34,8 @@ class GridDialog(qt.QDialog):
         self.__main_layout.add(widget)
         self.__list_view = widget.child("list_view")
         self.__visibility_button = widget.child("visibility_button")
+        self.__vspace_ledit = widget.child("vspace_ledit")
+        self.__hspace_ledit = widget.child("hspace_ledit")
 
         qt.QObject.connect(widget.child("add_button"), qt.SIGNAL("clicked()"),
                            self.__add_drawing)
@@ -44,6 +46,15 @@ class GridDialog(qt.QDialog):
         qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
                            self.__toggle_visibility_grid)
 
+        qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
+                           self.__toggle_visibility_grid)
+
+        qt.QObject.connect(self.__vspace_ledit, qt.SIGNAL("textChanged ( const QString & )"),
+                           self.__set_vspace)
+
+        qt.QObject.connect(self.__hspace_ledit, qt.SIGNAL("textChanged ( const QString & )"),
+                           self.__set_hspace)
+        
         dispatcher.connect(self._get_grid_info, "grid")
         dispatcher.connect(self._set_grid_data, "set_grid_data") 
 
@@ -75,6 +86,9 @@ class GridDialog(qt.QDialog):
         drawing_object = CanvasGrid(self.__canvas)
         self.__drawing_mgr.addDrawingObject(drawing_object)
         self.__event_mgr.addDrawingMgr(self.__drawing_mgr)
+        vspace, hspace = self.__get_cell_dim()
+        self.__drawing_mgr.set_cell_width(self.__beam_pos[2] + hspace)
+        self.__drawing_mgr.set_cell_height(self.__beam_pos[3] + vspace)
         self.__drawing_mgr.set_x_pixel_size(self.__x_pixel_size)
         self.__drawing_mgr.set_y_pixel_size(self.__y_pixel_size)
         self.__drawing_mgr.set_beam_position(*self.__beam_pos)
@@ -90,9 +104,13 @@ class GridDialog(qt.QDialog):
         if self.__drawing_mgr.isVisible()[0]:
             self.__item_counter += 1
             name = ("Grid - %i" % self.__item_counter)
-            width = str(self.__beam_pos[2]*1000)
-            height = str(self.__beam_pos[3]*1000)
-            list_view_item = qt.QListViewItem(self.__list_view, name, width, height)
+            beam_width = str(self.__beam_pos[2]*1000)
+            beam_height = str(self.__beam_pos[3]*1000)
+            vspace, hspace = self.__get_cell_dim()
+            vspace = vspace * 1000
+            hspace = hspace * 1000
+            list_view_item = qt.QListViewItem(self.__list_view, name, beam_height, beam_width,
+                                              str(hspace), str(vspace))
             self.__list_items[list_view_item] = self.__drawing_mgr
             self.__drawing_mgr.stopDrawing()
             self.__drawing_mgr.set_label(name)
@@ -109,6 +127,30 @@ class GridDialog(qt.QDialog):
             list_view_item = self.__list_view.lastItem()
             self.__list_view.setSelected(list_view_item, True)
 
+    def __get_cell_dim(self):
+        vspace = self.__vspace_ledit.text()
+        hspace = self.__hspace_ledit.text()
+
+        try:
+            vspace = float(vspace)
+        except ValueError:
+            vspace = 0
+
+        try:
+            hspace = float(hspace)
+        except ValueError:
+            hspace = 0
+
+        return ((vspace)/1000, (hspace)/1000)
+
+    def __set_vspace(self, vspace):
+        vspace, hspace = self.__get_cell_dim()
+        self.__drawing_mgr.set_cell_height(self.__beam_pos[3] + vspace)
+
+    def __set_hspace(self, hspace):
+            vspace, hspace = self.__get_cell_dim()
+            self.__drawing_mgr.set_cell_width(self.__beam_pos[2] + hspace)
+        
     def set_x_pixel_size(self, x_size):
         x_size = 1e-3/x_size
 
@@ -153,10 +195,14 @@ class GridDialog(qt.QDialog):
     def set_beam_position(self, beam_c_x, beam_c_y, beam_width_mm,
                           beam_height_mm):
         self.__beam_pos = (beam_c_x, beam_c_y, beam_width_mm, beam_height_mm)
-        
         self.__cell_height = int(beam_height_mm * self.__y_pixel_size)
         self.__cell_width = int(beam_width_mm * self.__x_pixel_size)
+
         try:
+            vspace, hspace = self.__get_cell_dim()
+            self.__drawing_mgr.set_cell_width(self.__beam_pos[2] + hspace)
+            self.__drawing_mgr.set_cell_height(self.__beam_pos[3] + vspace)
+
             self.__drawing_mgr.set_beam_position(beam_c_x, beam_c_y,
                                                  beam_width_mm, beam_height_mm)
             for drawing_mgr in self.__list_items.itervalues():
@@ -192,7 +238,7 @@ class GridDialog(qt.QDialog):
             if current_item == item:
                 drawing_mgr.highlight(True)
                 key = str(current_item.text(0))
-                print drawing_mgr._get_grid(key)[0]
+                #print drawing_mgr._get_grid(key)[0]
 
                 if drawing_mgr.isVisible()[0]:
                     self.__visibility_button.setText("Hide")
