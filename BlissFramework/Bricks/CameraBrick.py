@@ -164,7 +164,7 @@ class CameraBrick(BlissWidget):
         self.__gridToolAction = QubOpenDialogAction(parent=self, name='grid_tool',
                                                     iconName='rectangle', label='Grid tool',
                                                     group="Tools") #place="contextmenu")
-        self.__gridDialog = GridDialog(self, "Grid Dialog")
+        self.__gridDialog = GridDialog(self, "Grid Dialog", flags = qt.Qt.WStyle_StaysOnTop)
         self.__gridToolAction.setConnectCallBack(self._grid_dialog_connect_hdlr)
         self.__wholeActions.append(self.__gridToolAction)
 
