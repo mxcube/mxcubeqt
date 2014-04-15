@@ -61,7 +61,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Hor Spacing</string>
+                    <string>Horizontal Step</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -72,7 +72,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Ver Spacing</string>
+                    <string>Vertical Step</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -106,7 +106,7 @@
                                 <cstring>h_spacing_label</cstring>
                             </property>
                             <property name="text">
-                                <string>Horizontal spacing:</string>
+                                <string>Horizontal step:</string>
                             </property>
                         </widget>
                         <widget class="QLabel">
@@ -114,7 +114,7 @@
                                 <cstring>v_spacing_label</cstring>
                             </property>
                             <property name="text">
-                                <string>Vertical spacing:</string>
+                                <string>Vertical step:</string>
                             </property>
                         </widget>
                     </vbox>
