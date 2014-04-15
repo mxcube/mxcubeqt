@@ -71,8 +71,8 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         self.box.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
         self.spinBox=mySpinBox(self.box)
         self.spinBox.setDecimalPlaces(4)
-        self.spinBox.setMinValue(-1E4)
-        self.spinBox.setMaxValue(1E4)
+        self.spinBox.setMinValue(-10000)
+        self.spinBox.setMaxValue(10000)
         self.spinBox.setMinimumSize(QSize(75,25))
         self.spinBox.setMaximumSize(QSize(75,25))
         self.spinBox.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
@@ -604,13 +604,13 @@ class mySpinBox(QSpinBox):
     def setMinValue(self, value):
         value = self.d2i(value) 
         if math.fabs(value) > 1E8:
-          value = math.copysign(1E8, value)
+          value = int(math.copysign(1E8, value))
         return QSpinBox.setMinValue(self, value)
     def setMaxValue(self, value):
         value = self.d2i(value) 
         if math.fabs(value) > 1E8:
-          value = math.copysign(1E8, value)
-        return QSpinBox.setMaxValue(self, self.d2i(value))
+          value = int(math.copysign(1E8, value))
+        return QSpinBox.setMaxValue(self, value)
     def minValue(self):
         return self.i2d(QSpinBox.minValue(self))
     def maxValue(self):
