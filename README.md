@@ -59,28 +59,14 @@ the repository, for the first time it has to be created by making a copy of exam
 * [Qub](http://github.com/mxcube/qub)
 * [PyChooch](http://github.com/mxcube/pychooch)
 * [PyMca](http://sourceforge.net/projects/pymca/)
-* [PyTango] (http://www.tango-controls.org/static/PyTango/latest/doc/html/)
+* [jsonpickle](https://pypi.python.org/pypi/jsonpickle/0.7.0)
 
-SpecClient(http://github.com/mxcube/specclient) is an optional dependency. If it is
-not present, the Hardware Repository Server does not work, though. In this case
-it is possible to specify a directory containing the Hardware Objects XML files instead
-of a "host:port" string for the --hardwareRepository command line argument.
+[PyTango](http://www.tango-controls.org/static/PyTango/latest/doc/html/) and
+[SpecClient](http://github.com/mxcube/specclient) are optional dependencies.
 
-#### Installing dpendencies for Debain 6 (ESRF)
-The ESRF install of Debian 6 is pre-installed with PyQt and PyQwt 5.
-Install PyTango and PyMca by issuing the following commands, make sure to be root.
-
-    apt-get install pymca	
-    apt-get install python2.6-pytango
-
-Install the other dependenices needed through the blissinstaller or type the following as
-blissadm:
-
-    bliss_rpm Qub	
-    bliss_rpm PyChooch
-    bliss_rpm PyDispatcher
-    bliss_rpm SpecClient-gevent
-    bliss_rpm gevent
+If SpecClient is not present, the Hardware Repository Server does not work, though.
+In this case just specify a directory containing the Hardware Objects XML
+files instead of a "host:port" string for the --hardwareRepository command line argument.
 
 ## Running mxCuBE
 
