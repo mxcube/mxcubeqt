@@ -137,6 +137,7 @@ class CreateWorkflowWidget(CreateTaskBase):
         beamline_params['run_number'] = wf.path_template.run_number
         beamline_params['collection_software'] = 'mxCuBE - 2.0'
         beamline_params['sample_node_id'] = sample._node_id
+        beamline_params['sample_lims_id'] = sample.lims_id
 
         params_list = map(str, list(itertools.chain(*beamline_params.iteritems())))
         params_list.insert(0, self.workflows[wf_name]['path'])

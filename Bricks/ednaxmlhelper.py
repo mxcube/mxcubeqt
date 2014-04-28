@@ -49,7 +49,8 @@ def get_fields(field_container):
                 if len(p) == 0:
                     continue
             #looks like the elem has the prop
-            field_dict[prop] = p[0].text.strip()
+            if p[0].text is not None:
+                field_dict[prop] = p[0].text.strip()
         
         #special case for the combo: available values
         if field_dict['type'] == 'combo':
