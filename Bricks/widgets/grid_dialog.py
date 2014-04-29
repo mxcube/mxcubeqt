@@ -46,9 +46,6 @@ class GridDialog(qt.QDialog):
         qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
                            self.__toggle_visibility_grid)
 
-        qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
-                           self.__toggle_visibility_grid)
-
         qt.QObject.connect(self.__vspace_ledit, qt.SIGNAL("textChanged ( const QString & )"),
                            self.__set_vspace)
 
@@ -255,7 +252,7 @@ class GridDialog(qt.QDialog):
         except:
             # Drawing manager not set when called
             pass
-        
+
     def move_grid_ver(self, displacement_px):
         #print "ver: %f" % displacement_px
         try:
