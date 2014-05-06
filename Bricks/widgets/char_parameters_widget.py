@@ -361,3 +361,6 @@ class CharParametersWidget(qt.QWidget):
         self.char_type_widget.toggle_time_dose()
         crystal = self._char.reference_image_collection.crystal
         self.acq_widget.set_energies(crystal.energy_scan_result)
+
+    def set_beamline_setup(self, bl_setup):
+        self.acq_widget.set_beamline_setup(bl_setup)
