@@ -35,10 +35,11 @@ def send_static_img(filename):
 def new_sample_video_frame_received(img, width, height, *args):
   global new_frame
   raw_data = img.bits().asstring(img.numBytes())  
-  data = numpy.asarray(Image.fromstring("RGBX", (width, height), raw_data).convert("RGB"))
-  image = Image.fromarray(numpy.roll(data, -1, axis=-1)) #roll converts BGR to RGB
+  im = Image.fromstring("RGBX", (width,height), raw_data)
+  b,g,r,x = im.split()
+  rgb_im = Image.merge("RGB",(r,g,b))
   jpeg_buffer = cStringIO.StringIO()
-  image.save(jpeg_buffer, "JPEG", quality=95)
+  rgb_im.save(jpeg_buffer, "JPEG") 
   new_frame.set(base64.b64encode(jpeg_buffer.getvalue()))
 
 def bl_state():
@@ -121,18 +122,6 @@ def set_light():
 
 @bottle.get("/set_zoom")
 def set_zoom():
-  zoom_level = int(bottle.request.GET["zoom_level"])
-  move_done_event = gevent.event.Event()
-  def set_move_done(position, offset, private={"ncalls":0}):
-    if private['ncalls']<2:
-      #have to escape 2 calls (one from connectNotify, other from 1st update)
-      private['ncalls']+=1
-      return
-    move_done_event.set()
-  bl_setup.diffractometer_hwobj.zoomMotor.connect('predefinedPositionChanged', set_move_done)
-  bl_setup.diffractometer_hwobj.zoomMotor.move(zoom_level)
-  move_done_event.wait()
-  bl_setup.diffractometer_hwobj.zoomMotor.disconnect('predefinedPositionChanged', set_move_done)
   return json.dumps(bl_state())
 
 @bottle.get('/sample_video_stream')
