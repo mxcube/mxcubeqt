@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+  <head> 
+    <title>mxCuBE v3 web demo</title>
+    <meta charset="utf-8"/>
+    <script language="JavaScript" type="text/javascript" src="js/jquery-1.9.1.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/bootstrap.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/main.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <div class="navbar navbar-inverse">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">mxCuBE web edition</a>
+          <div class="nav-collapse collapse">
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <!-- NAVBAR END -->
+
+    <div class="container">
+      <div class="row">
+        <div class="span8">
+          <div class="form-horizontal">
+            <input type="text" class="input-small" placeholder="Username" id="username"/>
+            <input type="password" class="input-small" placeholder="Password" id="password"/>
+            <button class="btn" id="login_button">Login</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span8">
+          <div class="input-append">
+            <label>Light</label>
+            <input type="text" class="input-small" id="light"/>
+  	    <button class="btn" id="set_light_level">Set</button>
+  	    <div class="btn-group" data-toggle="buttons-radio" data-toggle-name="light-toggle" id="light-toggle">
+  	      <button class="btn btn-primary" id="lightin">In</button>
+  	      <button class="btn btn-primary" id="lightout">Out</button>
+  	    </div>
+            <label>Zoom</label>
+      	    <select class="span1" id="zoom">
+      	      <option value="0">1</option>
+      	      <option value="1">2</option>
+      	      <option value="2">3</option>
+      	      <option value="3">4</option>
+      	      <option value="4">5</option>
+      	      <option value="5">6</option>
+      	    </select>
+            <button class="btn" id="centre_button">Start centering</button>
+    	  </div>
+        </div>
+      </div>
+    
+      <!-- canvas and associated options -->
+      <div class="row">
+        <div class="span8">
+          <!-- the sample view -->
+          <canvas width="659" height="493" id="sample_view"></canvas>
+        </div>
+        <div class="span4">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label class="control-label" for="osc_range">Oscillation range</label>
+              <div class="controls">
+                <input type="text" id="osc_range"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="first_image">First image</label>
+              <div class="controls">
+                <input type="text" id="first_image"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="overlap">Oscilation overlap</label>
+              <div class="controls">
+                <input type="text" id="overlap"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="nb_images">Number of images</label>
+              <div class="controls">
+                <input type="text" id="nb_images"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="osc_start">Oscillation start</label>
+              <div class="controls">
+                <input type="text" id="osc_start"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="nb_passes">Number of passes</label>
+              <div class="controls">
+                <input type="text" id="nb_passes"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="exp_time">Exposure time</label>
+              <div class="controls">
+                <input type="text" id="exp_time"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="energy">Energy (keV)</label>
+              <div class="controls">
+                <input type="text" id="energy"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="resolution">Resolution (&#8491;)</label>
+              <div class="controls">
+                <input type="text" id="resolution"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="transmission">Transmission (%)</label>
+              <div class="controls">
+                <input type="text" id="transmission"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <button class="btn" id="collect_button">Collect</button>
+              </div>
+  	  </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+MXCUBE_ROOT="$( cd "$(dirname "$0")/.." && pwd )"
+MXCUBE_APP="$MXCUBE_ROOT/application"
+export CUSTOM_HARDWARE_OBJECTS_PATH="$MXCUBE_ROOT/HardwareObjects"
+export PYTHONPATH="$MXCUBE_ROOT:$PYTHONPATH"
+XML_FILES_PATH="$1"
+
+if [ -z $XML_FILES_PATH ]; then
+  echo "Usage: $0 xml_files_path"
+  exit 1
+fi
+
+cd $MXCUBE_APP
+exec python -m bottle --server gevent --bind 0.0.0.0:8080 mxcube $XML_FILES_PATH
+
