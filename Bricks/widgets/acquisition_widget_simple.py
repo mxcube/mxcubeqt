@@ -42,46 +42,6 @@ class AcquisitionWidgetSimple(qt.QWidget):
         #
         # Logic
         #
-        self._acquisition_mib.\
-          bind_value_update('exp_time', 
-                            self.acq_widget_layout.child('exp_time_ledit'),
-                            float,
-                            qt.QDoubleValidator(0.001, 6000, 3, self))
-        
-        self._acquisition_mib.\
-          bind_value_update('osc_range', 
-                            self.acq_widget_layout.child('osc_range_ledit'),
-                            float,
-                            qt.QDoubleValidator(0.001, 1000, 2, self))
-
-        self._acquisition_mib.\
-             bind_value_update('osc_start',
-                               self.acq_widget_layout.child('osc_start_ledit'),
-                               float,
-                               qt.QDoubleValidator(-1000, 1000, 2, self))
-
-        self._acquisition_mib.\
-             bind_value_update('energy',
-                               self.acq_widget_layout.child('energy_ledit'),
-                               float,
-                               qt.QDoubleValidator(0, 1000, 4, self))
-
-        self._acquisition_mib.\
-             bind_value_update('transmission',
-                            self.acq_widget_layout.child('transmission_ledit'),
-                            float,
-                            qt.QDoubleValidator(0, 1000, 2, self))
-
-        self._acquisition_mib.\
-             bind_value_update('resolution',
-                               self.acq_widget_layout.child('resolution_ledit'),
-                               float,
-                               qt.QDoubleValidator(0, 1000, 3, self))
-
-        qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
-                           qt.SIGNAL("toggled(bool)"),
-                           self.osc_start_cbox_click)
-
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
 
         # Default to 2-images
@@ -150,6 +110,58 @@ class AcquisitionWidgetSimple(qt.QWidget):
 
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
+
+        limits_dict = self._beamline_setup.get_acqisition_limt_values()
+
+        if 'osc_range' in limits_dict:
+            limits = tuple(map(float, limits_dict['osc_range'].split(',')))
+            (lower, upper) = limits
+            osc_start_validator = qt.QDoubleValidator(lower, upper, 4, self)
+            osc_range_validator = qt.QDoubleValidator(lower, upper, 4, self)
+        else:
+            osc_start_validator = qt.QDoubleValidator(10000, 10000, 4, self)
+            osc_range_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
+
+        osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
+        self._acquisition_mib.bind_value_update('osc_start', osc_start_ledit,
+                                                float, osc_start_validator)
+
+        osc_range_ledit = self.acq_widget_layout.child('osc_range_ledit')
+        self._acquisition_mib.bind_value_update('osc_range', osc_range_ledit,
+                                                float, osc_range_validator)
+
+        if 'exposure_time' in limits_dict:
+            limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
+            (lower, upper) = limits
+            exp_time_valdidator = qt.QDoubleValidator(lower, upper, 5, self)
+        else:
+            exp_time_valdidator = qt.QDoubleValidator(-0.003, 6000, 5, self)
+        
+        exp_time_ledit = self.acq_widget_layout.child('exp_time_ledit')
+        self._acquisition_mib.bind_value_update('exp_time', exp_time_ledit,
+                                                float, exp_time_valdidator)
+
+        self._acquisition_mib.\
+             bind_value_update('energy',
+                               self.acq_widget_layout.child('energy_ledit'),
+                               float,
+                               qt.QDoubleValidator(0, 1000, 4, self))
+
+        self._acquisition_mib.\
+             bind_value_update('transmission',
+                            self.acq_widget_layout.child('transmission_ledit'),
+                            float,
+                            qt.QDoubleValidator(0, 1000, 2, self))
+
+        self._acquisition_mib.\
+             bind_value_update('resolution',
+                               self.acq_widget_layout.child('resolution_ledit'),
+                               float,
+                               qt.QDoubleValidator(0, 1000, 3, self))
+
+        qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.osc_start_cbox_click)
 
         te = beamline_setup.tunable_wavelength()
         self.set_tunable_energy(te)

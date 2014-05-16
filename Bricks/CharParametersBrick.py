@@ -16,6 +16,7 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         # Framwork-2 properties
         self.addProperty("tunable-energy", "boolean", "True")
         self.addProperty("session", "string", "/session")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         # Qt-Slots
         self.defineSlot("populate_edna_parameter_widget",({}))
@@ -89,3 +90,6 @@ class CharParametersBrick(BaseComponents.BlissWidget):
             self.parameters_widget.acq_widget.set_tunable_energy(new_value)            
         elif property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'beamline_setup':            
+            beamline_setup = self.getHardwareObject(new_value)
+            self.parameters_widget.set_beamline_setup(beamline_setup)

@@ -46,9 +46,6 @@ class GridDialog(qt.QDialog):
         qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
                            self.__toggle_visibility_grid)
 
-        qt.QObject.connect(self.__visibility_button, qt.SIGNAL("clicked()"),
-                           self.__toggle_visibility_grid)
-
         qt.QObject.connect(self.__vspace_ledit, qt.SIGNAL("textChanged ( const QString & )"),
                            self.__set_vspace)
 
@@ -109,7 +106,7 @@ class GridDialog(qt.QDialog):
             vspace, hspace = self.__get_cell_dim()
             vspace = vspace * 1000
             hspace = hspace * 1000
-            list_view_item = qt.QListViewItem(self.__list_view, name, beam_height, beam_width,
+            list_view_item = qt.QListViewItem(self.__list_view, name, beam_width,  beam_height,
                                               str(hspace), str(vspace))
             self.__list_items[list_view_item] = self.__drawing_mgr
             self.__drawing_mgr.stopDrawing()
@@ -255,7 +252,7 @@ class GridDialog(qt.QDialog):
         except:
             # Drawing manager not set when called
             pass
-        
+
     def move_grid_ver(self, displacement_px):
         #print "ver: %f" % displacement_px
         try:

@@ -64,6 +64,7 @@ class AcquisitionWidget(qt.QWidget):
         #
         # Logic
         #
+<<<<<<< HEAD
         self._acquisition_mib.\
              bind_value_update('osc_start',
                                self.acq_widget_layout.child('osc_start_ledit'),
@@ -139,6 +140,8 @@ class AcquisitionWidget(qt.QWidget):
                                bool,
                                None)
 
+=======
+>>>>>>> master
         qt.QObject.connect(self.acq_widget_layout.child('energies_combo'),
                         qt.SIGNAL("activated(int)"),
                         self.energy_selected)
@@ -159,6 +162,8 @@ class AcquisitionWidget(qt.QWidget):
                            qt.SIGNAL("textChanged(const QString &)"),
                            self.num_images_ledit_change)
 
+        overlap_ledit = self.acq_widget_layout.child('overlap_ledit')
+        
         if overlap_ledit:
             qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
                                qt.SIGNAL("textChanged(const QString &)"),
@@ -203,6 +208,97 @@ class AcquisitionWidget(qt.QWidget):
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
+        limits_dict = self._beamline_setup.get_acqisition_limt_values()
+
+        if 'osc_range' in limits_dict:
+            limits = tuple(map(float, limits_dict['osc_range'].split(',')))
+            (lower, upper) = limits
+            osc_start_validator = qt.QDoubleValidator(lower, upper, 4, self)
+            osc_range_validator = qt.QDoubleValidator(lower, upper, 4, self)
+        else:
+            osc_start_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
+            osc_range_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
+
+        osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
+        self._acquisition_mib.bind_value_update('osc_start', osc_start_ledit,
+                                                float, osc_start_validator)
+
+        osc_range_ledit = self.acq_widget_layout.child('osc_range_ledit')
+        self._acquisition_mib.bind_value_update('osc_range', osc_range_ledit,
+                                                float, osc_range_validator)
+
+        if 'exposure_time' in limits_dict:
+            limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
+            (lower, upper) = limits
+            exp_time_valdidator = qt.QDoubleValidator(lower, upper, 5, self)
+        else:
+            exp_time_valdidator = qt.QDoubleValidator(-0.003, 6000, 5, self)
+        
+        exp_time_ledit = self.acq_widget_layout.child('exp_time_ledit')
+        self._acquisition_mib.bind_value_update('exp_time', exp_time_ledit,
+                                                float, exp_time_valdidator)
+
+        if 'number_of_images' in limits_dict:
+            limits = tuple(map(int, limits_dict['number_of_images'].split(',')))
+            (lower, upper) = limits
+            num_img_valdidator = qt.QIntValidator(lower, upper, self)
+            first_img_valdidator = qt.QIntValidator(lower, upper, self)
+        else:
+            num_img_valdidator = qt.QIntValidator(1, 9999, self)
+            first_img_valdidator = qt.QIntValidator(1, 9999, self)
+        
+        first_img_ledit =  self.acq_widget_layout.child('first_image_ledit') 
+        self._acquisition_mib.bind_value_update('first_image', first_img_ledit,
+                                                int, first_img_valdidator)
+
+        num_img_ledit = self.acq_widget_layout.child('num_images_ledit')
+        self._acquisition_mib.bind_value_update('num_images', num_img_ledit,
+                                                int, num_img_valdidator)
+
+        num_passes = self.acq_widget_layout.child('num_passes_ledit')
+
+        if num_passes:
+            self._acquisition_mib.\
+                bind_value_update('num_passes', num_passes, int,
+                                  qt.QIntValidator(1, 1000, self))
+
+        overlap_ledit = self.acq_widget_layout.child('overlap_ledit')
+
+        if overlap_ledit:
+            self._acquisition_mib.\
+                bind_value_update('overlap', overlap_ledit, float,
+                                  qt.QDoubleValidator(-1000, 1000, 2, self))
+
+        self._acquisition_mib.\
+             bind_value_update('energy',
+                               self.acq_widget_layout.child('energy_ledit'),
+                               float,
+                               qt.QDoubleValidator(0, 1000, 4, self))
+
+        self._acquisition_mib.\
+             bind_value_update('transmission',
+                            self.acq_widget_layout.child('transmission_ledit'),
+                            float,
+                            qt.QDoubleValidator(0, 1000, 2, self))
+
+        self._acquisition_mib.\
+             bind_value_update('resolution',
+                               self.acq_widget_layout.child('resolution_ledit'),
+                               float,
+                               qt.QDoubleValidator(0, 1000, 3, self))
+
+        self._acquisition_mib.\
+             bind_value_update('inverse_beam',
+                               self.acq_widget_layout.child('inverse_beam_cbx'),
+                               bool,
+                               None)
+
+        self._acquisition_mib.\
+             bind_value_update('shutterless',
+                               self.acq_widget_layout.child('shutterless_cbx'),
+                               bool,
+                               None)
+
         te = beamline_setup.tunable_wavelength()
         self.set_tunable_energy(te)
 
@@ -217,7 +313,7 @@ class AcquisitionWidget(qt.QWidget):
                 self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
 
         has_aperture = self._beamline_setup.has_aperture()
-        self.hide_aperture(has_aperture)    
+        self.hide_aperture(has_aperture)
 
     def first_image_ledit_change(self, new_value):
         if str(new_value).isdigit():

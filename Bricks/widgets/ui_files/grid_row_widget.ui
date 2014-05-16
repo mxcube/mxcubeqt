@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>450</width>
+            <width>534</width>
             <height>311</height>
         </rect>
     </property>
@@ -39,7 +39,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Beam Height</string>
+                    <string>Beam Width (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -50,7 +50,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Beam Width</string>
+                    <string>Beam Height (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -61,7 +61,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Horizontal Step</string>
+                    <string>Hor Spacing (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -72,7 +72,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Vertical Step</string>
+                    <string>Ver Spacing (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -106,7 +106,7 @@
                                 <cstring>h_spacing_label</cstring>
                             </property>
                             <property name="text">
-                                <string>Horizontal step:</string>
+                                <string>Horizontal spacing:</string>
                             </property>
                         </widget>
                         <widget class="QLabel">
@@ -114,7 +114,7 @@
                                 <cstring>v_spacing_label</cstring>
                             </property>
                             <property name="text">
-                                <string>Vertical step:</string>
+                                <string>Vertical spacing:</string>
                             </property>
                         </widget>
                     </vbox>
