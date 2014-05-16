@@ -1,5 +1,6 @@
 var video_socket = null;
 var jpeg_frame = new Image();
+var jpeg_data = "";
 var pixelsPerMmY = 1;
 var pixelsPerMmZ = 1;
 var centring = false; 
@@ -119,7 +120,6 @@ var draw_sample_video = function() {
       }
 }
 jpeg_frame.onload=draw_sample_video;
-var jpeg_data;
 
 var ev_canvas = function(ev) {
        var img_canvas = document.getElementById('sample_view');
@@ -163,6 +163,7 @@ var get_state = function() {
            })
 }
 
+
 function setup() {
    var img_canvas = document.getElementById('sample_view')
    var img_context = img_canvas.getContext("2d");
@@ -187,14 +188,15 @@ function setup() {
       $("#centre_button").click(start_centring);
 
       var video_source = new EventSource("sample_video_stream");
+      function display_sample_video() {
+          jpeg_frame.src = "data:image/jpeg;base64,"+jpeg_data;
+      };
       video_source.addEventListener("message", function(e) {
         jpeg_data = e.data;
-        requestAnimationFrame(display_sample_video);
+        //jpeg_frame.src="data:image/jpeg;base64,"+jpeg_data;
+        mozRequestAnimationFrame(display_sample_video);
       }, false);
  
-      function display_sample_video() {
-        jpeg_frame.src = "data:image/jpeg;base64,"+jpeg_data;
-      }
     },
     dataType: "json" }) 
 };

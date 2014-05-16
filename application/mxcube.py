@@ -33,7 +33,6 @@ def send_static_img(filename):
   return bottle.static_file(filename, root=os.path.join('img', os.path.dirname(__file__)))
 
 def new_sample_video_frame_received(img, width, height, *args):
-  import pdb;pdb.set_trace()
   global new_frame
   raw_data = img.bits().asstring(img.numBytes())  
   data = numpy.asarray(Image.fromstring("RGBX", (width, height), raw_data).convert("RGB"))
@@ -41,7 +40,6 @@ def new_sample_video_frame_received(img, width, height, *args):
   jpeg_buffer = cStringIO.StringIO()
   image.save(jpeg_buffer, "JPEG", quality=95)
   new_frame.set(base64.b64encode(jpeg_buffer.getvalue()))
-  #new_frame.set(base64.b64encode(img))
 
 def bl_state():
   return {"resolution": str("%3.4f" % bl_setup.resolution_hwobj.getPosition()),
@@ -67,13 +65,8 @@ def init():
 
       new_frame = gevent.event.AsyncResult()
       bl_setup = hwr.getHardwareObject("/beamline-setup")
-      #transmission = hwr.getHardwareObject("/eh2/attenuators")
-      #resolution = hwr.getHardwareObject("/resolution")
-      #energy = hwr.getHardwareObject("/eh2/motors/energy")
-      #ldap = hwr.getHardwareObject("/ldapconnection")
-      #ispyb = hwr.getHardwareObject("/dbconnection")
-
       bl_setup.diffractometer_hwobj.camera.connect("imageReceived", new_sample_video_frame_received)
+      bl_setup.diffractometer_hwobj.camera.setLive(True)
  
   return json.dumps(bl_state())
 
