@@ -90,6 +90,7 @@ var draw_sample_video = function() {
        var img_context = img_canvas.getContext("2d");
 
        img_context.drawImage(jpeg_frame, 0, 0, 659, 493);
+       //window.URL.revokeObjectURL(jpeg_frame.src);
        img_context.strokeStyle = "#FF0000" //red
        img_context.beginPath();
        img_context.moveTo((659/2)-20,493/2);
@@ -190,6 +191,21 @@ function setup() {
       var video_source = new EventSource("sample_video_stream");
       function display_sample_video() {
           jpeg_frame.src = "data:image/jpeg;base64,"+jpeg_data;
+          /*
+          try {
+            var jpeg_blob = new Blob([pako.deflate(jpeg_data)], {type: "image/jpeg"});
+          } catch (e) {
+            // The BlobBuilder API has been deprecated in favour of Blob, but older
+            // browsers don't know about the Blob constructor
+            // IE10 also supports BlobBuilder, but since the `Blob` constructor
+            //  also works, there's no need to add `MSBlobBuilder`.
+            var BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder;
+            var b = new BlobBuilder();
+            b.append(pako.deflate(jpeg_data));
+            var jpeg_blob = bb.getBlob("image/jpeg");
+          }
+          jpeg_frame.src = window.URL.createObjectURL(jpeg_blob);
+          */
       };
       video_source.addEventListener("message", function(e) {
         jpeg_data = e.data;

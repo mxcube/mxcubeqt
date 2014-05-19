@@ -10,6 +10,7 @@ import Image
 import cStringIO
 import base64
 import numpy
+import zlib
 from HardwareRepository import HardwareRepository
 
 bl_setup = None
@@ -39,8 +40,12 @@ def new_sample_video_frame_received(img, width, height, *args):
   b,g,r,x = im.split()
   rgb_im = Image.merge("RGB",(r,g,b))
   jpeg_buffer = cStringIO.StringIO()
-  rgb_im.save(jpeg_buffer, "JPEG") 
-  new_frame.set(base64.b64encode(jpeg_buffer.getvalue()))
+  rgb_im.save(jpeg_buffer, "JPEG")  
+  t0=time.time()
+  #data = zlib.compress(base64.b64encode(jpeg_buffer.getvalue()), 9)
+  data=base64.b64encode(jpeg_buffer.getvalue())
+  print 'size=',len(data), 'encoded in', time.time()-t0, "seconds"
+  new_frame.set(data)
 
 def bl_state():
   return {"resolution": str("%3.4f" % bl_setup.resolution_hwobj.getPosition()),
