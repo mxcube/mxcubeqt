@@ -1,6 +1,7 @@
 var video_socket = null;
 var jpeg_frame = new Image();
 var jpeg_data = "";
+var frame_id = null;
 var pixelsPerMmY = 1;
 var pixelsPerMmZ = 1;
 var centring = false; 
@@ -208,9 +209,10 @@ function setup() {
           */
       };
       video_source.addEventListener("message", function(e) {
+        if (frame_id != null) { mozCancelAnimationFrame(frame_id); }
         jpeg_data = e.data;
         //jpeg_frame.src="data:image/jpeg;base64,"+jpeg_data;
-        mozRequestAnimationFrame(display_sample_video);
+        frame_id = mozRequestAnimationFrame(display_sample_video);
       }, false);
  
     },
