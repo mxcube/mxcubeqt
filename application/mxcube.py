@@ -132,8 +132,8 @@ def set_zoom():
 @bottle.get('/sample_video_stream')
 def stream_video():
   bottle.response.content_type = "text/event-stream"
-  bottle.response.connection = "keep-alive"
-  bottle.response.cache_control = "no-cache"
+  bottle.response.add_header("Connection", "keep-alive")
+  bottle.response.add_header("Cache-Control", "no-cache")
   while True:
       jpeg_data = new_frame.get()
       yield "data: %s\n\n" % jpeg_data
