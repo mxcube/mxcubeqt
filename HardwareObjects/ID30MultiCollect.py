@@ -11,7 +11,19 @@ class ID30MultiCollect(ESRFMultiCollect):
     def take_crystal_snapshots(self):
         return
     ###
-  
+
+    @task
+    def get_beam_size(self):
+        return (0.100,0.100)
+ 
+    @task
+    def get_slit_gaps(self):
+        return (0.1, 0.1)
+
+    @task
+    def get_beam_shape(self):
+        return "elliptical"
+
     @task
     def move_detector(self, detector_distance):
         det_distance = self.getObjectByRole("distance")
@@ -35,8 +47,13 @@ class ID30MultiCollect(ESRFMultiCollect):
     @task
     def move_motors(self, motors_to_move_dict):
         motion = ESRFMultiCollect.move_motors(self,motors_to_move_dict,wait=False)
+
+        cover_task = self.getObjectByRole("eh_controller").detcover.set_out(wait=False, timeout=15)
         self.getObjectByRole("beamstop").moveToPosition("in")
+        self.getObjectByRole("light").wagoOut()
+
         motion.get()
+        cover_task.get()
 
     @task
     def do_prepare_oscillation(self, *args, **kwargs):
