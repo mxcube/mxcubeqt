@@ -42,9 +42,8 @@ def new_sample_video_frame_received(img, width, height, *args):
   jpeg_buffer = cStringIO.StringIO()
   rgb_im.save(jpeg_buffer, "JPEG")  
   t0=time.time()
-  #data = zlib.compress(base64.b64encode(jpeg_buffer.getvalue()), 9)
   data=base64.b64encode(jpeg_buffer.getvalue())
-  print 'size=',len(data), 'encoded in', time.time()-t0, "seconds"
+  #print 'size=',len(data), 'encoded in', time.time()-t0, "seconds"
   new_frame.set(data)
 
 def bl_state():
@@ -131,12 +130,16 @@ def set_zoom():
 
 @bottle.get('/sample_video_stream')
 def stream_video():
+  compressor = zlib.compressobj()
   bottle.response.content_type = "text/event-stream"
   bottle.response.add_header("Connection", "keep-alive")
-  bottle.response.add_header("Cache-Control", "no-cache")
+  bottle.response.add_header("Cache-Control", "no-cache, must-revalidate")
+  bottle.response.add_header("Content-Encoding", "deflate")
+  bottle.response.add_header("Transfer-Encoding", "chunked")
   while True:
       jpeg_data = new_frame.get()
-      yield "data: %s\n\n" % jpeg_data
+      yield compressor.compress("data: %s\n\n" % jpeg_data)
+      yield compressor.flush(zlib.Z_SYNC_FLUSH)
 
 @bottle.get("/centring")
 def do_centring():
