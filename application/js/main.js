@@ -210,10 +210,10 @@ function setup() {
           */
       };
       video_source.addEventListener("message", function(e) {
-        if (frame_id != null) { mozCancelAnimationFrame(frame_id); }
+        if (frame_id != null) { cancelAnimationFrame(frame_id); }
         jpeg_data = e.data;
         //jpeg_frame.src="data:image/jpeg;base64,"+jpeg_data;
-        frame_id = mozRequestAnimationFrame(display_sample_video);
+        frame_id = requestAnimationFrame(display_sample_video);
       }, false);
  
     },
