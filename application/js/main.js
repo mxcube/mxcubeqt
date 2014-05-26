@@ -191,6 +191,7 @@ function setup() {
 
       var video_source = new EventSource("sample_video_stream");
       function display_sample_video() {
+          frame_id = null;
           jpeg_frame.src = "data:image/jpeg;base64,"+jpeg_data;
           /*
           try {
