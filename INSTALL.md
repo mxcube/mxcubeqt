@@ -20,6 +20,8 @@
       (first install system dependencies:
        apt-get install libamd2.2.0 libblas3gf libc6 libgcc1 libgfortran3 liblapack3gf libumfpack5.4.0 libstdc++6 build-essential gfortran libatlas-dev)
 
-* for production use, install gunicorn
+    PROBLEM: we still depend on Qub, which depends on Qt for Bayer to RGB conversion
 
-    pip install gunicorn
+* for production use, install uwsgi
+
+    pip install uwsgi 
