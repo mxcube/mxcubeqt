@@ -11,10 +11,11 @@
 * install packages
 
     pip install bottle
-    pip install werkzeug
-    pip install bottle-werkzeug    
     pip install gevent
     pip install PIL
     pip install numpy
     pip install louie
 
+* for production use, install gunicorn
+
+    pip install gunicorn
