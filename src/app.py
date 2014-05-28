@@ -9,7 +9,7 @@ import Image
 import cStringIO
 import base64
 import numpy
-import zlib
+#import zlib
 from HardwareRepository import HardwareRepository
 
 mxcube = bottle.Bottle()
@@ -122,16 +122,17 @@ def set_zoom():
 
 @mxcube.get('/sample_video_stream')
 def stream_video():
-  compressor = zlib.compressobj()
+  #compressor=zlib.compressobj()
   bottle.response.content_type = "text/event-stream"
   bottle.response.add_header("Connection", "keep-alive")
   bottle.response.add_header("Cache-Control", "no-cache, must-revalidate")
-  bottle.response.add_header("Content-Encoding", "deflate")
-  bottle.response.add_header("Transfer-Encoding", "chunked")
+  #bottle.response.add_header("Content-Encoding", "deflate")
+  #bottle.response.add_header("Transfer-Encoding", "chunked")
   while True:
-      jpeg_data = new_frame.get()
-      yield compressor.compress("data: %s\n\n" % jpeg_data)
-      yield compressor.flush(zlib.Z_SYNC_FLUSH)
+      jpeg_data = mxcube.new_frame.get()
+      yield "data: %s\n\n" % jpeg_data
+      #yield compressor.compress("data: %s\n\n" % jpeg_data)
+      #yield compressor.flush(zlib.Z_SYNC_FLUSH)
 
 @mxcube.get("/centring")
 def do_centring():
