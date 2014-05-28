@@ -13,6 +13,7 @@ import zlib
 from HardwareRepository import HardwareRepository
 
 mxcube = bottle.Bottle()
+
 bl_setup = None
 new_frame = None
 
@@ -61,8 +62,11 @@ def init():
   global bl_setup
   global new_frame
 
-  cmdline_args = bottle._cmd_args[1:]
-  hwr_directory = cmdline_args[0]
+  try:
+      hwr_directory = os.environ["HARDWARE_REPOSITORY"]
+  except KeyError:
+      cmdline_args = bottle._cmd_args[1:]
+      hwr_directory = cmdline_args[0]
 
   if not bl_setup:
       hwr = HardwareRepository.HardwareRepository(hwr_directory)

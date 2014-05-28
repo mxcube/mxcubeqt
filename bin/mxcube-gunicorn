@@ -1,0 +1,12 @@
+#!/bin/sh
+
+MXCUBE_ROOT="$( cd "$(dirname "$0")/.." && pwd )"
+MXCUBE_APP="$MXCUBE_ROOT/src"
+XML_FILES_PATH="$1"
+
+if [ -z $XML_FILES_PATH ]; then
+  echo "Usage: $0 xml_files_path"
+  exit 1
+fi
+
+gunicorn --chdir $MXCUBE_APP -b 0.0.0.0:8080 -k gevent -w4 app:mxcube -e HARDWARE_REPOSITORY=$XML_FILES_PATH
