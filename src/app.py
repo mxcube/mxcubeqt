@@ -14,13 +14,9 @@ from HardwareRepository import HardwareRepository
 
 mxcube = bottle.Bottle()
 
-bl_setup = None
-new_frame = None
-
 @mxcube.route('/')
-def mxcube_application():
+def index():
   return bottle.static_file("mxcube.html", root=os.path.dirname(__file__))
-
 @mxcube.route('/:filename')
 def send_static(filename):
   return bottle.static_file(filename, root=os.path.dirname(__file__))
@@ -35,7 +31,6 @@ def send_static_img(filename):
   return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'img'))
 
 def new_sample_video_frame_received(img, width, height, *args):
-  global new_frame
   raw_data = img.bits().asstring(img.numBytes())  
   im = Image.fromstring("RGBX", (width,height), raw_data)
   b,g,r,x = im.split()
@@ -45,37 +40,30 @@ def new_sample_video_frame_received(img, width, height, *args):
   t0=time.time()
   data=base64.b64encode(jpeg_buffer.getvalue())
   #print 'size=',len(data), 'encoded in', time.time()-t0, "seconds"
-  new_frame.set(data)
+  mxcube.new_frame.set(data)
 
 def bl_state():
-  return {"resolution": str("%3.4f" % bl_setup.resolution_hwobj.getPosition()),
-           "energy": str("%2.4f" % bl_setup.energy_hwobj.getCurrentEnergy()),
-           "light": str("%1.2f" % bl_setup.diffractometer_hwobj.lightMotor.getPosition()),
-           "light_state": bl_setup.diffractometer_hwobj.lightWago.getWagoState(),
-           "transmission": str("%3.2f" % bl_setup.transmission_hwobj.getAttFactor()),
+  return {"resolution": str("%3.4f" % mxcube.bl_setup.resolution_hwobj.getPosition()),
+           "energy": str("%2.4f" % mxcube.bl_setup.energy_hwobj.getCurrentEnergy()),
+           "light": str("%1.2f" % mxcube.bl_setup.diffractometer_hwobj.lightMotor.getPosition()),
+           "light_state": mxcube.bl_setup.diffractometer_hwobj.lightWago.getWagoState(),
+           "transmission": str("%3.2f" % mxcube.bl_setup.transmission_hwobj.getAttFactor()),
            "zoom": 0,
-           "pixelsPerMmY": bl_setup.diffractometer_hwobj.pixelsPerMmY,
-           "pixelsPerMmZ": bl_setup.diffractometer_hwobj.pixelsPerMmZ }
+           "pixelsPerMmY": mxcube.bl_setup.diffractometer_hwobj.pixelsPerMmY,
+           "pixelsPerMmZ": mxcube.bl_setup.diffractometer_hwobj.pixelsPerMmZ }
 
 @mxcube.get('/init')
 def init():
-  global bl_setup
-  global new_frame
-
-  try:
-      hwr_directory = os.environ["HARDWARE_REPOSITORY"]
-  except KeyError:
-      cmdline_args = bottle._cmd_args[1:]
-      hwr_directory = cmdline_args[0]
-
-  if not bl_setup:
+  hwr_directory = os.environ["XML_FILES_PATH"]
+  
+  if not hasattr(mxcube, "bl_setup"):
       hwr = HardwareRepository.HardwareRepository(hwr_directory)
       hwr.connect()
 
-      new_frame = gevent.event.AsyncResult()
-      bl_setup = hwr.getHardwareObject("/beamline-setup")
-      bl_setup.diffractometer_hwobj.camera.connect("imageReceived", new_sample_video_frame_received)
-      bl_setup.diffractometer_hwobj.camera.setLive(True)
+      mxcube.new_frame = gevent.event.AsyncResult()
+      mxcube.bl_setup = hwr.getHardwareObject("/beamline-setup")
+      mxcube.bl_setup.diffractometer_hwobj.camera.connect("imageReceived", new_sample_video_frame_received)
+      mxcube.bl_setup.diffractometer_hwobj.camera.setLive(True)
  
   return json.dumps(bl_state())
 
@@ -107,10 +95,10 @@ def set_light_level():
   light_level_changed_event = gevent.event.Event()
   def set_level_changed(*args):
     light_level_changed_event.set()
-  bl_setup.diffractometer_hwobj.lightMotor.connect("moveDone", set_level_changed)
-  bl_setup.diffractometer_hwobj.lightMotor.move(light_level)
+  mxcube.bl_setup.diffractometer_hwobj.lightMotor.connect("moveDone", set_level_changed)
+  mxcube.bl_setup.diffractometer_hwobj.lightMotor.move(light_level)
   light_level_changed_event.wait()
-  bl_setup.diffractometer_hwobj.lightMotor.disconnect("moveDone", set_level_changed)
+  mxcube.bl_setup.diffractometer_hwobj.lightMotor.disconnect("moveDone", set_level_changed)
   return json.dumps(bl_state())
 
 @mxcube.get("/set_light")
@@ -119,13 +107,13 @@ def set_light():
   state_changed_event = gevent.event.Event()
   def set_state_changed(*args):
     state_changed_event.set()
-  bl_setup.diffractometer_hwobj.lightWago.connect("wagoStateChanged", set_state_changed)
+  mxcube.bl_setup.diffractometer_hwobj.lightWago.connect("wagoStateChanged", set_state_changed)
   if put_in:
-    bl_setup.diffractometer_hwobj.lightWago.wagoIn()
+    mxcube.bl_setup.diffractometer_hwobj.lightWago.wagoIn()
   else:
-    bl_setup.diffractometer_hwobj.lightWago.wagoOut()
+    mxcube.bl_setup.diffractometer_hwobj.lightWago.wagoOut()
   state_changed_event.wait() 
-  bl_setup.diffractometer_hwobj.lightWago.disconnect("wagoStateChanged", set_state_changed)
+  mxcube.bl_setup.diffractometer_hwobj.lightWago.disconnect("wagoStateChanged", set_state_changed)
   return json.dumps(bl_state())
 
 @mxcube.get("/set_zoom")
@@ -150,15 +138,15 @@ def do_centring():
   x = int(bottle.request.GET["X"])
   y = int(bottle.request.GET["Y"])
 
-  if bl_setup.diffractometer_hwobj.currentCentringProcedure is None:
-      bl_setup.diffractometer_hwobj.startCentringMethod(bl_setup.diffractometer_hwobj.MANUAL3CLICK_MODE)
+  if mxcube.bl_setup.diffractometer_hwobj.currentCentringProcedure is None:
+      mxcube.bl_setup.diffractometer_hwobj.startCentringMethod(mxcube.bl_setup.diffractometer_hwobj.MANUAL3CLICK_MODE)
   time.sleep(0.01)
-  bl_setup.diffractometer_hwobj.imageClicked(x,y,0,0)
+  mxcube.bl_setup.diffractometer_hwobj.imageClicked(x,y,0,0)
   time.sleep(0.1)
   # wait until motors finished moving
-  while not bl_setup.diffractometer_hwobj.isReady():
+  while not mxcube.bl_setup.diffractometer_hwobj.isReady():
        time.sleep(0.05)
-  if bl_setup.diffractometer_hwobj.currentCentringProcedure is None or bl_setup.diffractometer_hwobj.currentCentringProcedure.ready():
+  if mxcube.bl_setup.diffractometer_hwobj.currentCentringProcedure is None or mxcube.bl_setup.diffractometer_hwobj.currentCentringProcedure.ready():
     return json.dumps({ "continue": False })
   else:
     return json.dumps({ "continue": True })
