@@ -2,7 +2,6 @@ import os
 import sys
 import gevent
 import gevent.event
-import gevent.queue
 import bottle
 import json
 import time
@@ -13,25 +12,26 @@ import numpy
 import zlib
 from HardwareRepository import HardwareRepository
 
+mxcube = bottle.Bottle()
 bl_setup = None
 new_frame = None
 
-@bottle.route('/')
+@mxcube.route('/')
 def mxcube_application():
   return bottle.static_file("mxcube.html", root=os.path.dirname(__file__))
 
-@bottle.route('/:filename')
+@mxcube.route('/:filename')
 def send_static(filename):
   return bottle.static_file(filename, root=os.path.dirname(__file__))
-@bottle.route('/css/:filename')
+@mxcube.route('/css/:filename')
 def send_static_css(filename):
-  return bottle.static_file(filename, root=os.path.join('css', os.path.dirname(__file__)))
-@bottle.route('/js/:filename')
+  return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'css'))
+@mxcube.route('/js/:filename')
 def send_static_js(filename):
-  return bottle.static_file(filename, root=os.path.join('js', os.path.dirname(__file__)))
-@bottle.route('/img/:filename')
+  return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'js'))
+@mxcube.route('/img/:filename')
 def send_static_img(filename):
-  return bottle.static_file(filename, root=os.path.join('img', os.path.dirname(__file__)))
+  return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'img'))
 
 def new_sample_video_frame_received(img, width, height, *args):
   global new_frame
@@ -56,7 +56,7 @@ def bl_state():
            "pixelsPerMmY": bl_setup.diffractometer_hwobj.pixelsPerMmY,
            "pixelsPerMmZ": bl_setup.diffractometer_hwobj.pixelsPerMmZ }
 
-@bottle.get('/init')
+@mxcube.get('/init')
 def init():
   global bl_setup
   global new_frame
@@ -75,11 +75,11 @@ def init():
  
   return json.dumps(bl_state())
 
-@bottle.get("/state")
+@mxcube.get("/state")
 def state():
   return json.dumps(bl_state())
 
-@bottle.get("/login")
+@mxcube.get("/login")
 def login():
   password=bottle.request.GET["password"]
   username = bottle.request.GET["username"]
@@ -97,7 +97,7 @@ def login():
   prop = ispyb.getProposal(proposal,proposal_number)
   return json.dumps({"ok":1 if prop['status']['code']=='ok' else 0, "err":"ISPyB problem"})
 
-@bottle.get("/set_light_level")
+@mxcube.get("/set_light_level")
 def set_light_level():
   light_level = float(bottle.request.GET["light_level"])
   light_level_changed_event = gevent.event.Event()
@@ -109,7 +109,7 @@ def set_light_level():
   bl_setup.diffractometer_hwobj.lightMotor.disconnect("moveDone", set_level_changed)
   return json.dumps(bl_state())
 
-@bottle.get("/set_light")
+@mxcube.get("/set_light")
 def set_light():
   put_in = int(bottle.request.GET["put_in"])
   state_changed_event = gevent.event.Event()
@@ -124,11 +124,11 @@ def set_light():
   bl_setup.diffractometer_hwobj.lightWago.disconnect("wagoStateChanged", set_state_changed)
   return json.dumps(bl_state())
 
-@bottle.get("/set_zoom")
+@mxcube.get("/set_zoom")
 def set_zoom():
   return json.dumps(bl_state())
 
-@bottle.get('/sample_video_stream')
+@mxcube.get('/sample_video_stream')
 def stream_video():
   compressor = zlib.compressobj()
   bottle.response.content_type = "text/event-stream"
@@ -141,7 +141,7 @@ def stream_video():
       yield compressor.compress("data: %s\n\n" % jpeg_data)
       yield compressor.flush(zlib.Z_SYNC_FLUSH)
 
-@bottle.get("/centring")
+@mxcube.get("/centring")
 def do_centring():
   x = int(bottle.request.GET["X"])
   y = int(bottle.request.GET["Y"])
