@@ -12,5 +12,5 @@ if [ -z $XML_FILES_PATH ]; then
 fi
 
 cd $MXCUBE_APP
-exec python -m bottle --server gevent --bind 0.0.0.0:8080 app:mxcube $XML_FILES_PATH
+exec python -m bottle --server gevent --bind 0.0.0.0:8080 --debug app:mxcube $XML_FILES_PATH
 
