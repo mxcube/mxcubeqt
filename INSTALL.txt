@@ -1,0 +1,20 @@
+# Installation notes
+
+* create a virtualenv for MXCuBE
+    
+    virtualenv -p `which python2.7` --no-site-packages mxweb
+
+* activate the environment
+
+    . ./mxweb/bin/activate
+
+* install packages
+
+    pip install bottle
+    pip install werkzeug
+    pip install bottle-werkzeug    
+    pip install gevent
+    pip install PIL
+    pip install numpy
+    pip install louie
+
