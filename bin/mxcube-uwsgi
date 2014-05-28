@@ -1,0 +1,14 @@
+#!/bin/sh
+
+MXCUBE_ROOT="$( cd "$(dirname "$0")/.." && pwd )"
+CUSTOM_HARDWARE_OBJECTS_PATH="$MXCUBE_ROOT/HardwareObjects"
+MXCUBE_APP="$MXCUBE_ROOT/src"
+XML_FILES_PATH="$1"
+
+if [ -z $XML_FILES_PATH ]; then
+  echo "Usage: $0 xml_files_path"
+  exit 1
+fi
+
+exec uwsgi --chdir $MXCUBE_APP --gevent 100 --http :8080 --pythonpath $MXCUBE_ROOT --env XML_FILES_PATH=$XML_FILES_PATH --env CUSTOM_HARDWARE_OBJECTS_PATH=$CUSTOM_HARDWARE_OBJECTS_PATH --module app:mxcube 
+
