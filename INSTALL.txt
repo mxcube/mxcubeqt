@@ -2,19 +2,23 @@
 
 * create a virtualenv for MXCuBE
     
-    virtualenv -p `which python2.7` --no-site-packages mxweb
+    virtualenv --no-site-packages venv
 
 * activate the environment
 
-    . ./mxweb/bin/activate
+    . ./venv/bin/activate
 
 * install packages
 
     pip install bottle
     pip install gevent
-    pip install PIL
+    pip install PIL 
+      (or: pip install PIL --allow-external PIL --allow-unverified PIL)
     pip install numpy
     pip install louie
+    pip install scipy 
+      (first install system dependencies:
+       apt-get install libamd2.2.0 libblas3gf libc6 libgcc1 libgfortran3 liblapack3gf libumfpack5.4.0 libstdc++6 build-essential gfortran libatlas-dev)
 
 * for production use, install gunicorn
 
