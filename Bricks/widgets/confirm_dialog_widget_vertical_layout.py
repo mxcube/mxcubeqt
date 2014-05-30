@@ -42,8 +42,19 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
         self.skip_existing_images_cbx = QCheckBox(self.summary_gbox,"skip_existing_images_cbx")
         cbx_layout.addWidget(self.skip_existing_images_cbx)
 
-        self.take_snapshosts_cbx = QCheckBox(self.summary_gbox,"take_snapshosts_cbx")
-        cbx_layout.addWidget(self.take_snapshosts_cbx)
+
+	take_snapshots_layout = QHBoxLayout(None,0,3,"snapshots_layout")
+
+	self.take_snapshots_label = QLabel(self.summary_gbox, "take_snaphots_label")
+	take_snapshots_layout.addWidget(self.take_snapshots_label)
+
+        self.take_snapshots_cbox = QComboBox(self.summary_gbox, "take_snapshosts_cbox")
+	take_snapshots_layout.addWidget(self.take_snapshots_cbox)
+
+	take_snapshots_hspacer = QSpacerItem(1,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        take_snapshots_layout.addItem(take_snapshots_hspacer)
+
+	cbx_layout.addLayout(take_snapshots_layout)
 
         self.missing_one_cbx = QCheckBox(self.summary_gbox,"missing_one_cbx")
         cbx_layout.addWidget(self.missing_one_cbx)
@@ -85,7 +96,14 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
         self.summary_label.setText(self.__tr("<summary label>"))
         self.force_dark_cbx.setText(self.__tr("Force dark current"))
         self.skip_existing_images_cbx.setText(self.__tr("Skip already collected images"))
-        self.take_snapshosts_cbx.setText(self.__tr("Take snapshots"))
+	self.take_snapshots_label.setText(self.__tr("Number of crystal snapshots:"))
+
+	self.take_snapshots_cbox.clear()
+        self.take_snapshots_cbox.insertItem(self.__tr("0"))
+        self.take_snapshots_cbox.insertItem(self.__tr("1"))
+        self.take_snapshots_cbox.insertItem(self.__tr("2"))
+	self.take_snapshots_cbox.insertItem(self.__tr("4"))
+		
         self.missing_one_cbx.setText(self.__tr("Missing box one"))
         self.missing_two_cbx.setText(self.__tr("Missing box two"))
         self.file_list_view.header().setLabel(0,self.__tr("Sample"))

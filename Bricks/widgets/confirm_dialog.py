@@ -47,7 +47,7 @@ class ConfirmDialog(qt.QDialog):
         # Layout
         qt.QVBoxLayout(self)
         self.dialog_layout_widget = ConfirmDialogWidgetVerticalLayout(self)
-        self.dialog_layout_widget.child('take_snapshosts_cbx').hide()
+        #self.dialog_layout_widget.child('take_snapshosts_cbx').hide()
         self.dialog_layout_widget.child('file_list_view').setSorting(-1)
         self.layout().addWidget(self.dialog_layout_widget)
 
@@ -59,10 +59,10 @@ class ConfirmDialog(qt.QDialog):
                            qt.SIGNAL("clicked()"),
                            self.cancel_button_click)
 
-        self.dialog_layout_widget.take_snapshosts_cbx.setOn(False)
+        #self.dialog_layout_widget.take_snapshosts_cbx.setOn(True)
         self.dialog_layout_widget.force_dark_cbx.setOn(True)
 
-        self.dialog_layout_widget.take_snapshosts_cbx.hide()
+        #self.dialog_layout_widget.take_snapshosts_cbx.hide()
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
         self.setCaption('Confirm collection')
@@ -137,8 +137,8 @@ class ConfirmDialog(qt.QDialog):
     def continue_button_click(self):
         for item in self.checked_items:
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
-                #item.get_model().acquisitions[0].acquisition_parameters.\
-                #    take_snapshots = False #self.dialog_layout_widget.take_snapshosts_cbx.isOn()
+                item.get_model().acquisitions[0].acquisition_parameters.\
+                    take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
                 item.get_model().acquisitions[0].acquisition_parameters.\
                     take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
                 item.get_model().acquisitions[0].acquisition_parameters.\
