@@ -616,25 +616,8 @@ class ProposalBrick2(BlissWidget):
                     self.refuseLogin(None,None)
                     return
 
-            current_time=time.localtime()
-            start_time=time.strftime("%Y-%m-%d 00:00:00", current_time)
-            end_time=time.mktime(current_time)+60*60*24
-            tomorrow=time.localtime(end_time)
-            end_time=time.strftime("%Y-%m-%d 07:59:59", tomorrow)
-
             # Create a session
-            new_session_dict={}
-            new_session_dict['proposalId']=prop['Proposal']['proposalId']
-            new_session_dict['startDate']=start_time
-            new_session_dict['endDate']=end_time
-            new_session_dict['beamlineName']=beamline_name
-            new_session_dict['scheduled']=0
-            new_session_dict['nbShifts']=3
-            new_session_dict['comments']="Session created by the BCM"
-            session_id=self.dbConnection.createSession(new_session_dict)
-            new_session_dict['sessionId']=session_id
-
-            todays_session=new_session_dict
+	    todays_session = self.dbConnection.createSession(prop)
             localcontact=None
         else:
             session_id=todays_session['sessionId']
