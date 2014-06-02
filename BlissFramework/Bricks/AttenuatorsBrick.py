@@ -378,6 +378,7 @@ class FiltersDialog(QDialog):
         self.attlist=[]
 
         self.attenuators=att
+        att.getAtteConfig()
         self.n_atte=self.attenuators.attno
         for filt in range(self.n_atte):
             label=self.attenuators.labels[filt]
@@ -390,12 +391,12 @@ class FiltersDialog(QDialog):
 
     def toggleFilter(self,filter_id):
     	#print "dialog.toggleFilter",filter_id
-        self.attenuators.toggle(filter_id+1)
+        self.attenuators.toggle(filter_id)
 
     def filtersChanged(self,value):
         try:
            for idx in range(self.n_atte):
-               self.attlist[idx].checkme(value & self.attenuators.bits[idx])
+               self.attlist[idx].checkme(self.attenuators.is_in(idx))
         except ValueError:
            logging.getLogger().warning('AttenuatorsBrick: error reading filter status (%d)' % value)
 
