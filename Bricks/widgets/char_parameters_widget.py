@@ -116,6 +116,11 @@ class CharParametersWidget(qt.QWidget):
                                                  bool,
                                                  None)
 
+        self._char_params_mib.bind_value_update('sad_res',
+                                                 self.sad_widget.sad_resolution_ledit,
+                                                 float,
+                                                 qt.QDoubleValidator(0.5, 20, 3, self))
+
         self._char_params_mib.bind_value_update('opt_sad',
                                                  self.sad_widget.optimal_sad_radio,
                                                  bool,
