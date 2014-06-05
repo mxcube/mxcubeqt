@@ -408,7 +408,8 @@ class DataCollectTree(qt.QWidget):
     def filter_sample_list(self, option):
         self.sample_list_view.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
-        
+        self.confirm_dialog.set_plate_mode(False)       
+ 
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('ispyb')
@@ -442,9 +443,8 @@ class DataCollectTree(qt.QWidget):
         elif option == SC_FILTER_OPTIONS.PLATE:
             #self.sample_list_view.clear()
             #self.sample_list_view.setDisabled(True)
-            msg= 'In plate mode, not taking crystal snapshots'
-            logging.getLogger("user_level_log").warning(msg)
             self.beamline_setup_hwobj.set_plate_mode(True)
+            self.confirm_dialog.set_plate_mode(True)       
 
         self.sample_list_view_selection()
         
