@@ -64,36 +64,118 @@ class AcquisitionWidget(qt.QWidget):
         #
         # Logic
         #
-        self._acquisition_mib.\
-             bind_value_update('osc_start',
-                               self.acq_widget_layout.child('osc_start_ledit'),
-                               float,
-                               qt.QDoubleValidator(-10000, 10000, 2, self))
+        qt.QObject.connect(self.acq_widget_layout.child('energies_combo'),
+                        qt.SIGNAL("activated(int)"),
+                        self.energy_selected)
 
-        self._acquisition_mib.\
-             bind_value_update('first_image',
-                              self.acq_widget_layout.child('first_image_ledit'),
-                              int,
-                              qt.QIntValidator(1, 9999, self))
+        qt.QObject.connect(self.acq_widget_layout.child('mad_cbox'),
+                        qt.SIGNAL("toggled(bool)"),
+                        self.use_mad)
 
-        self._acquisition_mib.\
-             bind_value_update('exp_time',
-                               self.acq_widget_layout.child('exp_time_ledit'),
-                               float,
-                               qt.QDoubleValidator(0.003, 6000, 3, self))
+        qt.QObject.connect(self.acq_widget_layout.child('inverse_beam_cbx'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.set_use_inverse_beam)
 
-        self._acquisition_mib.\
-             bind_value_update('osc_range',
-                               self.acq_widget_layout.child('osc_range_ledit'),
-                               float,
-                               qt.QDoubleValidator(0.001, 1000, 2, self))
+        qt.QObject.connect(self.acq_widget_layout.child('first_image_ledit'),
+                           qt.SIGNAL("textChanged(const QString &)"),
+                           self.first_image_ledit_change)
 
-        self._acquisition_mib.\
-             bind_value_update('num_images',
-                               self.acq_widget_layout.child('num_images_ledit'),
-                               int,
-                               qt.QIntValidator(1, 9999, self))
+        qt.QObject.connect(self.acq_widget_layout.child('num_images_ledit'),
+                           qt.SIGNAL("textChanged(const QString &)"),
+                           self.num_images_ledit_change)
 
+        overlap_ledit = self.acq_widget_layout.child('overlap_ledit')
+        
+        if overlap_ledit:
+            qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
+                               qt.SIGNAL("textChanged(const QString &)"),
+                               self.overlap_changed)
+
+        qt.QObject.connect(self.acq_widget_layout.child('subwedge_size_ledit'),
+                           qt.SIGNAL("textChanged(const QString &)"),
+                           self.subwedge_size_ledit_change)
+
+        qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.osc_start_cbox_click)
+
+        self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
+        self.acq_widget_layout.child('energies_combo').setDisabled(True)
+        self.acq_widget_layout.child('energies_combo').\
+            insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
+
+        self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
+
+    def osc_start_cbox_click(self, state):
+        self.update_osc_start(self._beamline_setup._get_omega_axis_position())
+        self.acq_widget_layout.child('osc_start_ledit').setEnabled(state)
+
+    def update_osc_start(self, new_value):
+        if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
+            osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
+            osc_start_value = 0
+
+            try:
+                osc_start_value = round(float(new_value),2)
+            except TypeError:
+                pass
+            
+            osc_start_ledit.setText("%.2f" % osc_start_value)
+            self._acquisition_parameters.osc_start = osc_start_value
+
+    def use_osc_start(self, state):
+        self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
+        self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
+            
+    def set_beamline_setup(self, beamline_setup):
+        self._beamline_setup = beamline_setup
+
+        limits_dict = self._beamline_setup.get_acqisition_limt_values()
+
+        if 'osc_range' in limits_dict:
+            limits = tuple(map(float, limits_dict['osc_range'].split(',')))
+            (lower, upper) = limits
+            osc_start_validator = qt.QDoubleValidator(lower, upper, 4, self)
+            osc_range_validator = qt.QDoubleValidator(lower, upper, 4, self)
+        else:
+            osc_start_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
+            osc_range_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
+
+        osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
+        self._acquisition_mib.bind_value_update('osc_start', osc_start_ledit,
+                                                float, osc_start_validator)
+
+        osc_range_ledit = self.acq_widget_layout.child('osc_range_ledit')
+        self._acquisition_mib.bind_value_update('osc_range', osc_range_ledit,
+                                                float, osc_range_validator)
+
+        if 'exposure_time' in limits_dict:
+            limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
+            (lower, upper) = limits
+            exp_time_valdidator = qt.QDoubleValidator(lower, upper, 5, self)
+        else:
+            exp_time_valdidator = qt.QDoubleValidator(-0.003, 6000, 5, self)
+        
+        exp_time_ledit = self.acq_widget_layout.child('exp_time_ledit')
+        self._acquisition_mib.bind_value_update('exp_time', exp_time_ledit,
+                                                float, exp_time_valdidator)
+
+        if 'number_of_images' in limits_dict:
+            limits = tuple(map(int, limits_dict['number_of_images'].split(',')))
+            (lower, upper) = limits
+            num_img_valdidator = qt.QIntValidator(lower, upper, self)
+            first_img_valdidator = qt.QIntValidator(lower, upper, self)
+        else:
+            num_img_valdidator = qt.QIntValidator(1, 9999, self)
+            first_img_valdidator = qt.QIntValidator(1, 9999, self)
+        
+        first_img_ledit =  self.acq_widget_layout.child('first_image_ledit') 
+        self._acquisition_mib.bind_value_update('first_image', first_img_ledit,
+                                                int, first_img_valdidator)
+
+        num_img_ledit = self.acq_widget_layout.child('num_images_ledit')
+        self._acquisition_mib.bind_value_update('num_images', num_img_ledit,
+                                                int, num_img_valdidator)
 
         num_passes = self.acq_widget_layout.child('num_passes_ledit')
 
@@ -139,70 +221,6 @@ class AcquisitionWidget(qt.QWidget):
                                bool,
                                None)
 
-        qt.QObject.connect(self.acq_widget_layout.child('energies_combo'),
-                        qt.SIGNAL("activated(int)"),
-                        self.energy_selected)
-
-        qt.QObject.connect(self.acq_widget_layout.child('mad_cbox'),
-                        qt.SIGNAL("toggled(bool)"),
-                        self.use_mad)
-
-        qt.QObject.connect(self.acq_widget_layout.child('inverse_beam_cbx'),
-                           qt.SIGNAL("toggled(bool)"),
-                           self.set_use_inverse_beam)
-
-        qt.QObject.connect(self.acq_widget_layout.child('first_image_ledit'),
-                           qt.SIGNAL("textChanged(const QString &)"),
-                           self.first_image_ledit_change)
-
-        qt.QObject.connect(self.acq_widget_layout.child('num_images_ledit'),
-                           qt.SIGNAL("textChanged(const QString &)"),
-                           self.num_images_ledit_change)
-
-        if overlap_ledit:
-            qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
-                               qt.SIGNAL("textChanged(const QString &)"),
-                               self.overlap_changed)
-
-        qt.QObject.connect(self.acq_widget_layout.child('subwedge_size_ledit'),
-                           qt.SIGNAL("textChanged(const QString &)"),
-                           self.subwedge_size_ledit_change)
-
-        qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
-                           qt.SIGNAL("toggled(bool)"),
-                           self.osc_start_cbox_click)
-
-        self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
-        self.acq_widget_layout.child('energies_combo').setDisabled(True)
-        self.acq_widget_layout.child('energies_combo').\
-            insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
-
-        self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
-
-    def osc_start_cbox_click(self, state):
-        self.update_osc_start(self._beamline_setup._get_omega_axis_position())
-        self.acq_widget_layout.child('osc_start_ledit').setEnabled(state)
-
-    def update_osc_start(self, new_value):
-        if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
-            osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
-            osc_start_value = 0
-
-            try:
-                osc_start_value = round(float(new_value),2)
-            except TypeError:
-                pass
-            
-            osc_start_ledit.setText("%.2f" % osc_start_value)
-            self._acquisition_parameters.osc_start = osc_start_value
-
-    def use_osc_start(self, state):
-        self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
-        self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
-            
-    def set_beamline_setup(self, beamline_setup):
-        self._beamline_setup = beamline_setup
-
         te = beamline_setup.tunable_wavelength()
         self.set_tunable_energy(te)
 
@@ -217,7 +235,7 @@ class AcquisitionWidget(qt.QWidget):
                 self.acq_widget_layout.child('num_passes_ledit').setDisabled(True)
 
         has_aperture = self._beamline_setup.has_aperture()
-        self.hide_aperture(has_aperture)    
+        self.hide_aperture(has_aperture)
 
     def first_image_ledit_change(self, new_value):
         if str(new_value).isdigit():

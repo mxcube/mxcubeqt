@@ -229,7 +229,10 @@ class ProposalBrick2(BlissWidget):
         self.user_group_label.hide()
         self.user_group_ledit.hide()
         self.user_group_save_button.hide()
-        
+       
+	#resets active proposal
+	self.resetProposal()
+ 
         #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
        
@@ -237,6 +240,12 @@ class ProposalBrick2(BlissWidget):
         self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
         self.emit(PYSIGNAL("sessionSelected"),(None, ))
         self.emit(PYSIGNAL("loggedIn"), (False, ))
+
+    def resetProposal(self):
+        self.session_hwobj.proposal_code = None
+        self.session_hwobj.session_id = None
+        self.session_hwobj.proposal_id = None
+        self.session_hwobj.proposal_number = None 	
 
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self,proposal,person,laboratory,session,localcontact):
@@ -607,25 +616,8 @@ class ProposalBrick2(BlissWidget):
                     self.refuseLogin(None,None)
                     return
 
-            current_time=time.localtime()
-            start_time=time.strftime("%Y-%m-%d 00:00:00", current_time)
-            end_time=time.mktime(current_time)+60*60*24
-            tomorrow=time.localtime(end_time)
-            end_time=time.strftime("%Y-%m-%d 07:59:59", tomorrow)
-
             # Create a session
-            new_session_dict={}
-            new_session_dict['proposalId']=prop['Proposal']['proposalId']
-            new_session_dict['startDate']=start_time
-            new_session_dict['endDate']=end_time
-            new_session_dict['beamlineName']=beamline_name
-            new_session_dict['scheduled']=0
-            new_session_dict['nbShifts']=3
-            new_session_dict['comments']="Session created by the BCM"
-            session_id=self.dbConnection.createSession(new_session_dict)
-            new_session_dict['sessionId']=session_id
-
-            todays_session=new_session_dict
+	    todays_session = self.dbConnection.createSession(prop)
             localcontact=None
         else:
             session_id=todays_session['sessionId']
