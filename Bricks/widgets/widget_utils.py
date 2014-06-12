@@ -15,11 +15,11 @@ class DataModelInputBinder(object):
                 
     def __checkbox_update_value(self, field_name, new_value):
         setattr(self.__model, field_name, new_value)
-        dispatcher.send("model_update", self.__model, field_name)
+        dispatcher.send("model_update", self.__model, field_name, self)
         
     def __combobox_update_value(self, field_name, new_value):
         setattr(self.__model, field_name, new_value)
-        dispatcher.send("model_update", self.__model, field_name)
+        dispatcher.send("model_update", self.__model, field_name, self)
 
     def __ledit_update_value(self, field_name, new_value, type_fn, validator):
         if self.__validated(validator, self.bindings[field_name][0], 
@@ -30,7 +30,7 @@ class DataModelInputBinder(object):
                 if new_value != '':
                     raise
             else:
-                dispatcher.send("model_update", self.__model, field_name)
+                dispatcher.send("model_update", self.__model, field_name, self)
 
     def __validated(self, validator, widget, new_value):
         if validator:
@@ -54,9 +54,11 @@ class DataModelInputBinder(object):
    
     def init_bindings(self):
         for field_name in self.bindings.iterkeys():
-            self._update_widget(field_name)
+            self._update_widget(field_name, None)
 
-    def _update_widget(self, field_name):
+    def _update_widget(self, field_name, data_binder):
+	if data_binder == self:
+	    return
         try:
             widget, validator, type_fn = self.bindings[field_name]
         except KeyError:
