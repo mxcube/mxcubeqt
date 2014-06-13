@@ -149,8 +149,6 @@ class CreateHelicalWidget(CreateTaskBase):
             p1 = selected_shapes[1]
             p2 = selected_shapes[0]
     
-	    print p1, p2
-     
             line = shape_history.\
                    Line(self._shape_history.get_drawing(),
                         p1.qub_point, p2.qub_point,
