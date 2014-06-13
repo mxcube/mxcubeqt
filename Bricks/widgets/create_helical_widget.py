@@ -38,12 +38,13 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_gbox.setColumnLayout(0, qt.Qt.Vertical)
         self._lines_gbox.layout().setSpacing(6)
         self._lines_gbox.layout().setMargin(11)
+	self._lines_gbox.setSizePolicy(qt.QSizePolicy.Minimum, qt.QSizePolicy.Fixed)
         lines_gbox_layout = qt.QHBoxLayout(self._lines_gbox.layout())
         lines_gbox_layout.setAlignment(qt.Qt.AlignTop)
 
         self._list_box = qt.QListBox(self._lines_gbox, "helical_page")
         self._list_box.setSelectionMode(qt.QListBox.Extended)
-        self._list_box.setFixedWidth(175)
+        self._list_box.setFixedWidth(300)
         self._list_box.setFixedHeight(50)
         list_box_tool_tip = "Select the line(s) to perfrom helical scan on"
         qt.QToolTip.add(self._list_box, list_box_tool_tip)
@@ -95,6 +96,8 @@ class CreateHelicalWidget(CreateTaskBase):
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._processing_gbox)
+	v_layout.addStretch()
+	
 
         qt.QObject.connect(add_button, qt.SIGNAL("clicked()"),
                         self.add_clicked)
@@ -145,7 +148,7 @@ class CreateHelicalWidget(CreateTaskBase):
         if len(selected_shapes) == 2:
             p1 = selected_shapes[1]
             p2 = selected_shapes[0]
-            
+    
             line = shape_history.\
                    Line(self._shape_history.get_drawing(),
                         p1.qub_point, p2.qub_point,
@@ -153,7 +156,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
             line.show()
             self._shape_history.add_shape(line)
-            list_box_item = qt.QListBoxText(self._list_box, 'Line')
+            list_box_item = qt.QListBoxText(self._list_box, 'Line no. %i' %(self._list_box.count() +1))
             self._list_item_map[list_box_item] = line
 
             # De select previous items

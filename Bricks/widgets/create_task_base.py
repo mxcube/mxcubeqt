@@ -5,7 +5,7 @@ import queue_model_objects_v1 as queue_model_objects
 import abc
 import copy
 import ShapeHistory as shape_history
-
+import os
 #from BlissFramework.Utils import widget_colors
 
 
@@ -217,15 +217,14 @@ class CreateTaskBase(qt.QWidget):
         group_name = self._session_hwobj.get_group_name()
 
         if group_name:
-            sub_dir = group_name + '/' + sub_dir
+            sub_dir = group_name + os.path.sep + sub_dir
 
         if tree_item:
-            item = self.get_sample_item(tree_item)            
-            sub_dir += item.get_model().get_name()
-
-            if isinstance(item, queue_item.SampleQueueItem):
-                if item.get_model().lims_id == -1:
-                    sub_dir += ''
+            item = self.get_sample_item(tree_item)
+            sub_dir += os.path.sep.join((item.get_model().get_display_name(return_tuple=True)))
+            #if isinstance(item, queue_item.SampleQueueItem):
+            #    if item.get_model().lims_id == -1:
+            #        sub_dir += ''
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
