@@ -511,7 +511,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.populate_energy_scan_tab(item)
 
     def show_xrf_scan_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show SC-det")
+        self.sample_changer_widget.child('details_button').setText("Show SC-details")
         self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
