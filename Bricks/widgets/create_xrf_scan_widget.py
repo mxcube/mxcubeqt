@@ -95,26 +95,17 @@ class CreateXRFScanWidget(CreateTaskBase):
         data_collections = []
 
 	if self.count_time is not None:
-            path_template = copy.deepcopy(self._path_template)
-            if '<sample_name>' in path_template.directory:
-                name = sample.get_name().replace(':', '-')
-                path_template.directory = path_template.directory.\
-                                          replace('<sample_name>', name)
-
-                path_template.process_directory = path_template.process_directory.\
-                                                  replace('<sample_name>', name)
-                
-            if '<acronym>-<name>' in path_template.base_prefix:
-                path_template.base_prefix = self.get_default_prefix(sample)
-                path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                          get_next_run_number(path_template)
-
-        xrf_scan = queue_model_objects.XRFScan(sample, path_template)
-        xrf_scan.set_name(path_template.get_prefix())
-        xrf_scan.set_number(path_template.run_number)
-	xrf_scan.count_time = self.count_time
-
-        data_collections.append(xrf_scan)
+            path_template = self._create_path_template(sample, self._path_template)
+           
+            xrf_scan = queue_model_objects.XRFScan(sample, path_template)
+            xrf_scan.set_name(path_template.get_prefix())
+            xrf_scan.set_number(path_template.run_number)
+            xrf_scan.count_time = self.count_time
+            
+            data_collections.append(xrf_scan)
+        else:
+            logging.getLogger("user_level_log").\
+                info("No count time specified.") 
 
         return data_collections
 
