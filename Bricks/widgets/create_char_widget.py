@@ -294,7 +294,6 @@ class CreateCharWidget(CreateTaskBase):
                 cpos.snapshot_image = snapshot
 
         char_params = copy.deepcopy(self._char_params)
-        else:
 
         acq = self._create_acq(sample)
 

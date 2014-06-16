@@ -126,7 +126,7 @@ class HutchMenuBrick(BlissWidget):
         self.buttonToogleMDPhase.setTextLabel("MD phase")
         self.buttonToogleMDPhase.setMinimumSize(QSize(75,50))
         self.buttonToogleMDPhase.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        QObject.connect(self.buttonToogleMDPhase,SIGNAL('clicked()'),self.toogleMDPhase)
+        QObject.connect(self.buttonToogleMDPhase,SIGNAL('clicked()'),self.toggleMDPhase)
 	self.buttonToogleMDPhase.hide()
 
         #HorizontalSpacer3(self.sampleCentreBox)
@@ -798,9 +798,9 @@ class HutchMenuBrick(BlissWidget):
                     self.updateBeam(True)
                     self.__scale.show()
             
-    def toogleMDPhase(self):
+    def toggleMDPhase(self):
 	if self.minidiff is not None:
-	    self.minidiff.tooglePhase()
+	    self.minidiff.togglePhase()
 
 class MenuButton(QToolButton):
     def __init__(self, parent, caption):
