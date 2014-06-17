@@ -299,7 +299,7 @@ class CreateCharWidget(CreateTaskBase):
 
         dc = queue_model_objects.\
                 DataCollection([acq], sample.crystals[0],
-                               processing_parameters)
+                               self._processing_parameters)
 
         # Reference images for characterisations should be taken 90 deg apart
         # this is achived by setting overap to -89
