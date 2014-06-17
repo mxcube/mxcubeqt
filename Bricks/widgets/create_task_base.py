@@ -2,6 +2,7 @@ import qt
 import logging
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 import abc
 import copy
 import ShapeHistory as shape_history
@@ -467,7 +468,6 @@ class CreateTaskBase(qt.QWidget):
             copy.deepcopy(parameters)
         acq.acquisition_parameters.collect_agent = \
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
-        acq.acquisition_parameters.centred_position = cpos
         
         acq.path_template = self._create_path_template(sample, path_template)
 
@@ -476,4 +476,4 @@ class CreateTaskBase(qt.QWidget):
         else:
             acq.acquisition_parameters.take_snapshots = True
 
-        return acq, dc
+        return acq
