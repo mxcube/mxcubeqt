@@ -3,7 +3,7 @@ import qt
 import ShapeHistory as shape_history
 import queue_item
 
-import queue_model_objects_v1 as qmo
+import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
@@ -76,8 +76,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self._energy_scan_result = qmo.EnergyScanResult()
-        self._processing_parameters = qmo.ProcessingParameters()
+        self._energy_scan_result = queue_model_objects.EnergyScanResult()
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -172,7 +172,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if not shape:
-            cpos = qmo.CentredPosition()
+            cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._shape_history.get_snapshot([])
         else:
             # Shapes selected and sample is mounted, get the
@@ -191,7 +191,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             osc_start = self._acquisition_parameters.osc_start
             run_number = self._path_template.run_number
 
-            subwedges = qmo.create_inverse_beam_sw(total_num_images,
+            subwedges = queue_model_objects.create_inverse_beam_sw(total_num_images,
                         subwedge_size, osc_range, osc_start, run_number)
 
             self._acq_widget.set_use_inverse_beam(False)
