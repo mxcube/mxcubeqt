@@ -110,20 +110,8 @@ class CreateWorkflowWidget(CreateTaskBase):
     def _create_task(self, sample, shape):
         tasks = []
 
-        path_template = copy.deepcopy(self._path_template)
+        path_template = self._create_path_template(sample, self._path_template)
         path_template.num_files = 0
-
-        if '<sample_name>' in path_template.directory:
-            name = sample.get_name().replace(':', '-')
-            path_template.directory = path_template.directory.\
-                                      replace('<sample_name>', name)
-            path_template.process_directory = path_template.process_directory.\
-                                              replace('<sample_name>', name)
-                
-        if '<acronym>-<name>' in path_template.base_prefix:
-            path_template.base_prefix = self.get_default_prefix(sample)
-            path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                      get_next_run_number(path_template)
 
         wf = queue_model_objects.Workflow()
         wf_name = str(self._workflow_cbox.currentText())
