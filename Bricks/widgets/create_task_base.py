@@ -277,7 +277,7 @@ class CreateTaskBase(qt.QWidget):
             # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
                 prefix = self.get_default_prefix(sample_data_model)
-                (data_directory, proc_directory) = self.get_default_directory(tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep)
+                (data_directory, proc_directory) = self.get_default_directory(tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
