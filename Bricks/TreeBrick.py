@@ -16,7 +16,6 @@ __category__ = 'mxCuBE_v3'
 #ViewType = namedtuple('ViewType', ['ISPYB', 'MANUAL', 'SC'])
 #TREE_VIEW_TYPE = ViewType(0, 1, 2)
 
-
 class TreeBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
         BaseComponents.BlissWidget.__init__(self, *args)
@@ -260,17 +259,22 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         self.enable_collect(logged_in)
         
+        sc_content = self.get_sc_content()
+        
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
-            sc_content = self.get_sc_content()
             if sc_content:
               sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
               self.dc_tree_widget.populate_list_view(sc_sample_list)
-            self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+              self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+        else:
+            if sc_content:
+              self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+            else:
+              self.sample_changer_widget.child('filter_cbox').setCurrentItem(2) 
 
-        if not self.sample_changer_hwobj.hasLoadedSample():
-            self.dc_tree_widget.filter_sample_list(2)
-            self.sample_changer_widget.child('filter_cbox').setCurrentItem(2)
+        #if self.sample_changer_hwobj:
+        #  if not self.sample_changer_hwobj.hasLoadedSample():
 
         self.dc_tree_widget.sample_list_view_selection()
 
@@ -395,7 +399,6 @@ class TreeBrick(BaseComponents.BlissWidget):
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
                      " the sample changer is turned on. Using free pin mode")
-            sc_content = [('', -1, -1, '', 1)]
 
         return sc_content
 
@@ -549,7 +552,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("populate_workflow_tab"), (item, running))
         
     def toggle_sample_changer_tab(self): 
-        if self.current_view is self.sample_changer_widget:
+        if self.current_view == self.sample_changer_widget:
             self.current_view = None
             self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
             self.dc_tree_widget.sample_list_view_selection()
