@@ -227,21 +227,14 @@ class Sample(TaskNode):
     def get_name(self):
         return self._name
 
-    def get_display_name(self, return_tuple=False):
+    def get_display_name(self):
         name = self.name
         acronym = self.crystals[0].protein_acronym
 
         if self.name is not '' and acronym is not '':
-            display_name = acronym + '-' + name
-            if return_tuple:
-              return (acronym, display_name)
-            else:
-              return display_name
+            return acronym + '-' + name
         else:
-            if return_tuple:
-              return ()
-            else:
-              return ''
+            return ''
 
     def init_from_sc_sample(self, sc_sample):
         self.loc_str = str(sc_sample[1]) + ':' + str(sc_sample[2])
@@ -706,6 +699,11 @@ class Acquisition(object):
 
 
 class PathTemplate(object):
+    @staticmethod
+    def set_archive_path(archive_base_directory, archive_folder):
+        PathTemplate.archive_base_directory = archive_base_directory
+        PathTemplate.archive_folder = archive_folder
+
     def __init__(self):
         object.__init__(self)
 
@@ -765,17 +763,16 @@ class PathTemplate(object):
         
         if 'visitor' in folders:
             endstation_name = folders[4]
-            folders[2] = 'pyarch'
+            folders[2] = PathTemplate.archive_folder
             temp = folders[3]
             folders[3] = folders[4]
             folders[4] = temp
         else:
             endstation_name = folders[2]
-            folders[2] = 'pyarch'
+            folders[2] = PathTemplate.archive_folder
             folders[3] = endstation_name
 
-
-        archive_directory = '/' + os.path.join(*folders[1:])
+        archive_directory = os.path.join(os.path.join(PathTemplate.archive_base_directory, *folders[2:]))
 
         return archive_directory
 

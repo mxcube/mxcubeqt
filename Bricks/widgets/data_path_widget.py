@@ -112,7 +112,7 @@ class DataPathWidget(qt.QWidget):
         new_sub_dir = str(new_value).strip(' ')
 
         if len(new_sub_dir) > 0:
-            if new_sub_dir[0] == '/':
+            if new_sub_dir[0] == os.path.sep:
                 new_sub_dir = new_sub_dir[1:]
             new_image_directory = os.path.join(base_image_dir, str(new_sub_dir))
             new_proc_dir = os.path.join(base_proc_dir, str(new_sub_dir))

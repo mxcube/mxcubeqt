@@ -3,7 +3,7 @@ import qt
 import ShapeHistory as shape_history
 import queue_item
 
-import queue_model_objects_v1 as qmo
+import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
@@ -76,8 +76,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self._energy_scan_result = qmo.EnergyScanResult()
-        self._processing_parameters = qmo.ProcessingParameters()
+        self._energy_scan_result = queue_model_objects.EnergyScanResult()
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -172,7 +172,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if not shape:
-            cpos = qmo.CentredPosition()
+            cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._shape_history.get_snapshot([])
         else:
             # Shapes selected and sample is mounted, get the
@@ -191,7 +191,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             osc_start = self._acquisition_parameters.osc_start
             run_number = self._path_template.run_number
 
-            subwedges = qmo.create_inverse_beam_sw(total_num_images,
+            subwedges = queue_model_objects.create_inverse_beam_sw(total_num_images,
                         subwedge_size, osc_range, osc_start, run_number)
 
             self._acq_widget.set_use_inverse_beam(False)
@@ -213,26 +213,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         # Acquisition for start position
-        acq = qmo.Acquisition()
-        acq.acquisition_parameters = \
-            copy.deepcopy(self._acquisition_parameters)
-        acq.acquisition_parameters.collect_agent = \
-            queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
-        acq.path_template = copy.deepcopy(self._path_template)
-        acq.acquisition_parameters.centred_position = cpos
-
-        if '<sample_name>' in acq.path_template.directory:
-            name = sample.get_name().replace(':', '-')
-            acq.path_template.directory = acq.path_template.directory.\
-                                          replace('<sample_name>', name)
-            acq.path_template.process_directory = acq.path_template.process_directory.\
-                                                  replace('<sample_name>', name)
-
-        if '<acronym>-<name>' in acq.path_template.base_prefix:
-            acq.path_template.base_prefix = self.get_default_prefix(sample)
-            acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                          get_next_run_number(acq.path_template)
-    
+        acq = self._create_acq(sample)
+       
         if run_number:        
             acq.path_template.run_number = run_number
 
@@ -250,15 +232,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         if inverse_beam:
             acq.acquisition_parameters.inverse_beam = False
 
-        if self._beamline_setup_hwobj.in_plate_mode():
-            acq.acquisition_parameters.take_snapshots = False
-        else:
-            acq.acquisition_parameters.take_snapshots = True
+        acq.acquisition_parameters.centred_position = cpos
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
-        dc = qmo.DataCollection([acq], sample.crystals[0],
-                                processing_parameters)
-
+        dc = queue_model_objects.DataCollection([acq], sample.crystals[0],
+                                                processing_parameters)
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE

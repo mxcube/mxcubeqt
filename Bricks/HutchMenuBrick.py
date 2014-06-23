@@ -778,8 +778,6 @@ class HutchMenuBrick(BlissWidget):
                     #self._drawBeam()
                     self.__scale.show()
             
-               
-
     # Slits changed: update beam size
     def slitsPositionChanged(self, *args):
         if self.minidiff is None or self.slitbox is None or self.minidiff.pixelsPerMmY is None or self.minidiff.pixelsPerMmZ is None:
