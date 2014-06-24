@@ -229,7 +229,10 @@ class ProposalBrick2(BlissWidget):
         self.user_group_label.hide()
         self.user_group_ledit.hide()
         self.user_group_save_button.hide()
-        
+       
+	#resets active proposal
+	self.resetProposal()
+ 
         #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
        
@@ -237,6 +240,12 @@ class ProposalBrick2(BlissWidget):
         self.emit(PYSIGNAL("setWindowTitle"),(self["titlePrefix"],))
         self.emit(PYSIGNAL("sessionSelected"),(None, ))
         self.emit(PYSIGNAL("loggedIn"), (False, ))
+
+    def resetProposal(self):
+        self.session_hwobj.proposal_code = None
+        self.session_hwobj.session_id = None
+        self.session_hwobj.proposal_id = None
+        self.session_hwobj.proposal_number = None 	
 
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self,proposal,person,laboratory,session,localcontact):

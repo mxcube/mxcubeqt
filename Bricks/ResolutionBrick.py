@@ -66,13 +66,11 @@ class ResolutionBrick(BlissWidget):
         label1=QLabel("Current:",self.paramsBox)
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
-        box1=QHBox(self.paramsBox)
+        box1=QVBox(self.paramsBox)
         self.currentResolution=QLineEdit(box1)
         self.currentResolution.setReadOnly(True)
         self.currentDetectorDistance=QLineEdit(box1)
         self.currentDetectorDistance.setReadOnly(True)
-        self.currentResolution.setFixedWidth(60)
-        self.currentDetectorDistance.setFixedWidth(80)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)

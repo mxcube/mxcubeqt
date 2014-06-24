@@ -48,19 +48,20 @@ class EnergyBrick(BlissWidget):
 
         self.paramsBox = QWidget(self.topBox)
         QGridLayout(self.paramsBox, 2, 5, 0, 2)
+        self.paramsBox.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
 
         label1=QLabel("Current:",self.paramsBox)
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
-        box1=QHBox(self.paramsBox)
+        box1=QVBox(self.paramsBox)
         self.currentEnergy=QLineEdit(box1)
         self.currentEnergy.setReadOnly(True)
-        self.currentEnergy.setAlignment(QWidget.AlignRight)
-        self.currentEnergy.setFixedWidth(90)
+        #self.currentEnergy.setAlignment(QWidget.AlignRight)
+        #self.currentEnergy.setFixedWidth(60)
         self.currentWavelength=QLineEdit(box1)
         self.currentWavelength.setReadOnly(True)
-        self.currentWavelength.setAlignment(QWidget.AlignRight)
-        self.currentWavelength.setFixedWidth(60)
+        #self.currentWavelength.setAlignment(QWidget.AlignRight)
+        #self.currentWavelength.setFixedWidth(90)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)
@@ -117,7 +118,7 @@ class EnergyBrick(BlissWidget):
 
         QVBoxLayout(self)
         self.layout().addWidget(self.topBox)
-        self.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
 
     def propertyChanged(self, propertyName, oldValue, newValue):
         if propertyName == 'mnemonic':

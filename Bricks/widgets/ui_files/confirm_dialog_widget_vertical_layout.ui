@@ -76,13 +76,77 @@
                                         <string>Skip already collected images</string>
                                     </property>
                                 </widget>
-                                <widget class="QCheckBox">
-                                    <property name="name">
-                                        <cstring>take_snapshosts_cbx</cstring>
+				<widget class="QLayoutWidget">
+				    <property name="name">
+                                	<cstring>snapshots_layout</cstring>
                                     </property>
-                                    <property name="text">
-                                        <string>Take snapshots</string>
-                                    </property>
+                                    <hbox>
+                                	<property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+				        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>take_snaphots_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Number of crystal snapshots:</string>
+                                            </property>
+                                        </widget>
+                                        <property name="spacing">
+                                            <number>10</number>
+                                        </property>
+ 	    	                       	<widget class="QComboBox">
+                                    	    <property name="name">
+                                                <cstring>take_snapshots_cbox</cstring>
+                                            </property>
+					    <property name="minimumSize">
+                                                <size>
+                                            	    <width>90</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="toolTip" stdset="0">
+                                                <string>Number of crystal snapshots</string>
+                                            </property>
+					    <item>
+	                                        <property name="text">
+        	                 	            <string>0</string>
+                    		                </property>
+        	                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>1</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>2</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>4</string>
+                                                </property>
+                                            </item>
+                                        </widget>
+					<spacer>
+                                            <property name="name">
+                                                <cstring>sn_hspacer</cstring>
+                            		    </property>
+                            		    <property name="orientation">
+                                  	        <enum>Horizontal</enum>
+                            		    </property>
+                            		    <property name="sizeType">
+                                		<enum>Expanding</enum>
+                            		    </property>
+                            		    <property name="sizeHint">
+                                		<size>
+                                    		    <width>1</width>
+                                    		    <height>20</height>
+                                		</size>
+                            		   </property>
+                      			</spacer>
+				    </hbox>
                                 </widget>
                                 <widget class="QCheckBox">
                                     <property name="name">
@@ -158,7 +222,7 @@
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
-                        <spacer>
+			<spacer>
                             <property name="name">
                                 <cstring>hspacer</cstring>
                             </property>

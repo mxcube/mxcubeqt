@@ -2,9 +2,11 @@ import qt
 import logging
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
 import abc
 import copy
 import ShapeHistory as shape_history
+import os
 
 #from BlissFramework.Utils import widget_colors
 
@@ -275,10 +277,11 @@ class CreateTaskBase(qt.QWidget):
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
-                (data_directory, proc_directory) = self.get_default_directory(tree_item)
+                prefix = self.get_default_prefix(sample_data_model)
+                (data_directory, proc_directory) = self.get_default_directory(tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
-                self._path_template.base_prefix = self.get_default_prefix(sample_data_model)
+                self._path_template.base_prefix = prefix
             elif self._session_hwobj.get_group_name() != '':
                 base_dir = self._session_hwobj.get_base_image_directory()
                 # Update with group name as long as user didn't specify
@@ -330,7 +333,7 @@ class CreateTaskBase(qt.QWidget):
 
             # Sample with lims information, use values from lims
             # to set the data path.
-            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<sample_name>')    
+            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
@@ -424,3 +427,53 @@ class CreateTaskBase(qt.QWidget):
     @abc.abstractmethod
     def _create_task(self, task_node, shape):
         pass
+
+    def _create_path_template(self, sample, path_template):
+        bl_setup = self._beamline_setup_hwobj
+
+        acq_path_template = copy.deepcopy(path_template)
+
+        if '<sample_name>' in acq_path_template.directory:
+            name = sample.get_name().replace(':', '-')
+            acq_path_template.directory = acq_path_template.directory.\
+                                          replace('<sample_name>', name)
+            acq_path_template.process_directory = acq_path_template.process_directory.\
+                                                  replace('<sample_name>', name)
+
+        if '<acronym>-<name>' in acq_path_template.base_prefix:
+            acq_path_template.base_prefix = self.get_default_prefix(sample)
+            acq_path_template.run_number = bl_setup.queue_model_hwobj.get_next_run_number(acq_path_template)
+
+        if '<acronym>' in acq_path_template.directory:
+            prefix = self.get_default_prefix(sample)
+            acronym = prefix.split("-")[0]
+            acq_path_template.directory = acq_path_template.directory.\
+                                          replace('<acronym>', acronym)
+            acq_path_template.process_directory = acq_path_template.process_directory.\
+                                                  replace('<acronym>', acronym)
+
+        #acq_path_template.suffix = bl_setup.suffix
+
+        return acq_path_template
+
+    def _create_acq(self, sample):
+        parameters = self._acquisition_parameters
+        path_template = self._path_template
+        shape_history = self._shape_history
+        processing_parameters = self._processing_parameters
+        bl_setup = self._beamline_setup_hwobj
+
+        acq = queue_model_objects.Acquisition()
+        acq.acquisition_parameters = \
+            copy.deepcopy(parameters)
+        acq.acquisition_parameters.collect_agent = \
+            queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
+        
+        acq.path_template = self._create_path_template(sample, path_template)
+
+        if bl_setup.in_plate_mode():
+            acq.acquisition_parameters.take_snapshots = False
+        else:
+            acq.acquisition_parameters.take_snapshots = True
+
+        return acq

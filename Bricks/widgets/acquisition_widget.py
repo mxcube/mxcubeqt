@@ -357,12 +357,12 @@ class AcquisitionWidget(qt.QWidget):
     def update_transmission(self, transmission):
         self.acq_widget_layout.child('transmission_ledit').\
              setText("%.2f" % float(transmission))
-        self._acquisition_parameters.transmission = float(transmission)
+        #self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
         self.acq_widget_layout.child('resolution_ledit').\
              setText("%.3f" % float(resolution))
-        self._acquisition_parameters.resolution = float(resolution)
+        #self._acquisition_parameters.resolution = float(resolution)
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters
