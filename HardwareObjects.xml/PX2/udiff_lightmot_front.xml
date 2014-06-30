@@ -1,0 +1,14 @@
+<!-- device class="MicrodiffLight">
+  <username>Front light</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <motor_name>FrontLight</motor_name>
+</device -->
+<device class="TangoDCMotor">
+  <username>Front Light</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <motor_name>FrontLight</motor_name>
+  <channel type="tango" polling="1000" name="position">FrontLightLevel</channel>
+  <channel type="tango" polling="1000" name="state">State</channel>
+  <interval>1000</interval>
+</device>
+

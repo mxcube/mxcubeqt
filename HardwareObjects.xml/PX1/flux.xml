@@ -1,0 +1,4 @@
+<device class="TangoChannel">
+  <tangoname>i10-c-cx1/ex/flux</tangoname>
+  <!-- hannel type="tango" polling="1000" name="channel">flux</channel -->
+</device>

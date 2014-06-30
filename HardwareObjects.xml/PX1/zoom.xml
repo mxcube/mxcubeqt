@@ -1,0 +1,75 @@
+<!-- md2-zoomlevel has zoomlevel, backlightlevel and the frontlinelevel but not pixelsize and beamposition -->
+<!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
+<!-- device class="TangoMotorWPositionsPX2" -->
+<device class="TangoDCMotorWPositions">
+    <username>Zoom</username>
+       <tangoname>i10-c-cx1/ex/zoom.1-mt_tz</tangoname> 
+    <focus>PhiTableXAxisPosition</focus>
+    <channel type="tango" polling="1000" name="state">State</channel>
+    <channel type="tango" polling="1000" name="position">position</channel>
+    <datatype>int</datatype>
+    <delta>0.1</delta>
+    <interval>1000</interval>
+  <positions>
+    <position>
+      <username>Zoom 1</username>
+      <offset>0</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>28</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>647</pixelsPerMmY>
+        <pixelsPerMmZ>647</pixelsPerMmZ>
+        <beamPositionX>795</beamPositionX>
+        <beamPositionY>469</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 2</username>
+      <offset>3700</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>35</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>1240</pixelsPerMmY>
+        <pixelsPerMmZ>1240</pixelsPerMmZ>
+        <beamPositionX>901</beamPositionX>
+        <beamPositionY>425</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 3</username>
+      <offset>5900</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>50</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>1855</pixelsPerMmY>
+        <pixelsPerMmZ>1855</pixelsPerMmZ>
+        <beamPositionX>1006</beamPositionX>
+        <beamPositionY>377</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 4</username>
+      <offset>7700</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>60</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>2550</pixelsPerMmY>
+        <pixelsPerMmZ>2550</pixelsPerMmZ>
+        <beamPositionX>1126</beamPositionX>
+        <beamPositionY>333</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 5</username>
+      <offset>9000</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>60</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>3155</pixelsPerMmY>
+        <pixelsPerMmZ>3155</pixelsPerMmZ>
+        <beamPositionX>1245</beamPositionX>
+        <beamPositionY>278</beamPositionY>
+      </calibrationData>
+    </position>
+    </positions>
+</device>

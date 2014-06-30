@@ -1,0 +1,12 @@
+#! /bin/bash
+# Startup script for HardwareRepositoryServer for Proxima beamlines
+
+INSTITUTE=SOLEIL
+BEAMLINE=PX1
+MXCUBE_ROOT=/data/local/mxcube_v2/mxcube
+
+GUIFILE=$MXCUBE_ROOT/local/${INSTITUTE}/escan.gui
+
+exec $MXCUBE_ROOT/local/${INSTITUTE}/startGUI $* ${GUIFILE}
+
+

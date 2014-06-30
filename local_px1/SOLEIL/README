@@ -1,0 +1,15 @@
+#
+#
+These are executables and GUI files for SOLEIL PX1 and PX2 beamlines
+
+To run mxCuBE:
+  place the files "mxCuBE" and "startGUI" in your path ( "/users/blissadm/bin" )
+  copy and modify "mxCuBE" in "/users/blissadm/bin" to point to the right .gui file
+    ( you should just need to set the BEAMLINE to either PX1 or PX2 )
+
+In "startGUI" the paths are set for a SOLEIL installation. Be aware that you may need
+  to adapt it when installing it at your beamline.
+
+These scripts are set to run mxCuBE without need for an external hardwareRepository server
+
+

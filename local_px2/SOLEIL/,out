@@ -1,0 +1,342 @@
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,082 GUI started (/home/blissadm/mxcube/local/SOLEIL/mxcube29.gui), HWRSERVER=/home/blissadm/mxcube/HardwareObjects.xml/PX2, HODIRS=/home/blissadm/mxcube/HardwareObjects:/home/blissadm/mxcube/HardwareObjects/sample_changer:/home/blissadm/mxcube/HardwareObjects/SOLEIL:/home/blissadm/mxcube/HardwareRepository/HardwareObjects, BRICKSDIRS=/home/blissadm/mxcube/Bricks:/home/blissadm/mxcube/Bricks/SOLEIL:/home/blissadm/mxcube/Bricks/widgets
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,101 Connected to Hardware Repository server ['/home/blissadm/mxcube/HardwareObjects.xml/PX2']
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:05,213 Cannot parse Hardware Repository file /dbconnection
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareRepository.py", line 259, in parseXML
+    ho = HardwareObjectFileParser.parseString(XMLString, hoName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 37, in parseString
+    xml.sax.parseString(XMLHardwareObject, curHandler)
+  File "/usr/lib/python2.6/xml/sax/__init__.py", line 49, in parseString
+    parser.parse(inpsrc)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 107, in parse
+    xmlreader.IncrementalParser.parse(self, source)
+  File "/usr/lib/python2.6/xml/sax/xmlreader.py", line 123, in parse
+    self.feed(buffer)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 207, in feed
+    self._parser.Parse(data, isFinal)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 301, in start_element
+    self._cont_handler.startElement(name, AttributesImpl(attrs))
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 186, in startElement
+    newObject = instanciateClass(moduleName, className, objectName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 47, in instanciateClass
+    module = loadModule(moduleName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 43, in loadModule
+    return __import__(hardwareObjectName, globals(), locals(), [""])
+ImportError: No module named ISPyBClient
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:05,214 Failed to load Hardware Object /dbconnection
+* [mxcube29.gui, HWR] DEBUG 2014-03-13 10:14:05,221 LdapLogin: connecting to LDAP server 195.221.10.1:389
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:05,263 Enabling collect True 
+* [mxcube29.gui, HWR] DEBUG 2014-03-13 10:14:05,338 /BLEnergy: BLEnergy.sConnected
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,444 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:05,469 Starting __timer_task(<CatsPX1.CatsPX1 object at 0x2a53d50>,)
+* [mxcube29.gui, HWR] DEBUG 2014-03-13 10:14:05,486 /resolution: TangoResolution.positionChanged: 3.999
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,567 HOS Attenuator: passe dans attStateChanged
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,568 HOS Attenuator: passe dans getAttState
+State hslit :  ready
+State vslit :  ready
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:05,571 Attenuator state read from the device ready
+Dans attFactorChanged channelValue = 79.979433
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,691 HOS Attenuator: passe dans getAttFactor
+* [mxcube29.gui, root] WARNING 2014-03-13 10:14:05,791 lucid cannot load: automatic centring is disabled
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:05,808 /gc655c: No BPM defined
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,809 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,810 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,811 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,812 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,813 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,814 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,815 TangoDCMotor dataType found in config, it is None
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,820 __ initializing hw TangoDCMotorWPositions /zoom
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,821 TangoDCMotor dataType found in config, it is int
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,821 initializing hw TangoDCMotorWPositions /zoom
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:05,939 no attribute FlipVertical in Tango device i11-ma-cx1/ex/imag.1
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:05,942 no attribute FlipHorizontal in Tango device i11-ma-cx1/ex/imag.1
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:05,969 <b>Tue Mar 11 15:34 :</b>
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:05,985 MiniDiff: sample changer is not defined in minidiff equipment /minidiff
+TangoShutter.py: __init__ print name /fastshutter
+<TangoShutter.TangoShutter instance at 0x2cf4248>
+TangoShutter.py: __init__ print name /obx
+<TangoShutter.TangoShutter instance at 0x2cf4c20>
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:05,989 headername is i11-ma-cx1/ex/header
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:06,019 connectNotify matrixCodesUpdate
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:06,019 connectNotify stateChanged
+* [mxcube29.gui, queue_exec] INFO 2014-03-13 10:14:06,021 Module load, probably application start
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:06,023 Enabling collect True 
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,027 XML-RPC server listening on: :8000
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,027 Registering functions in module Native with XML-RPC server
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_add_child as XML-RPC function queue_add_child
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_add_node as XML-RPC function queue_add_node
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_get_available_serialisations as XML-RPC function queue_get_available_serialisations
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_get_model_code as XML-RPC function queue_get_model_code
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_get_node as XML-RPC function queue_get_node
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_get_serialisation as XML-RPC function queue_get_serialisation
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_set_serialisation as XML-RPC function queue_set_serialisation
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:06,028 Registering function Native.queue_update_result as XML-RPC function queue_update_result
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,035 Cannot load Hardware Object "/udiff_omega" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,041 Cannot load Hardware Object "/udiff_kappa" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,049 Cannot load Hardware Object "/udiff_kappaphi" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,054 Cannot load Hardware Object "/udiff_holderlength" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,058 Cannot load Hardware Object "/udiff" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,058 /sc: XML file does not match the SampleChanger class template
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,058 Failed to load Hardware Object /sc
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,059 Cannot load Hardware Object "/slitbox" : file not found.
+* [mxcube29.gui, root] WARNING 2014-03-13 10:14:06,062 CommandMenuBrick: safety shutter not configured
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,078 Cannot load Hardware Object "/udiff_phix" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,085 Cannot load Hardware Object "/udiff_flightmot" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,114 Cannot parse Hardware Repository file /udiff_zoom
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareRepository.py", line 259, in parseXML
+    ho = HardwareObjectFileParser.parseString(XMLString, hoName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 37, in parseString
+    xml.sax.parseString(XMLHardwareObject, curHandler)
+  File "/usr/lib/python2.6/xml/sax/__init__.py", line 49, in parseString
+    parser.parse(inpsrc)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 107, in parse
+    xmlreader.IncrementalParser.parse(self, source)
+  File "/usr/lib/python2.6/xml/sax/xmlreader.py", line 123, in parse
+    self.feed(buffer)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 207, in feed
+    self._parser.Parse(data, isFinal)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 301, in start_element
+    self._cont_handler.startElement(name, AttributesImpl(attrs))
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 186, in startElement
+    newObject = instanciateClass(moduleName, className, objectName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 47, in instanciateClass
+    module = loadModule(moduleName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 43, in loadModule
+    return __import__(hardwareObjectName, globals(), locals(), [""])
+ImportError: No module named MicrodiffZoomPX2
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,115 Failed to load Hardware Object /udiff_zoom
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,160 Cannot load Hardware Object "/udiff_sample_horizontal" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,160 Cannot load Hardware Object "/udiff_sample_vertical" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,160 Cannot load Hardware Object "/ccd/prosilica_md2" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,174 Cannot load Hardware Object "/udiff_aperturemot" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,174 Cannot load Hardware Object "/udiff_phiy" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,175 Cannot load Hardware Object "/udiff_phiz" : file not found.
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:06,288 TaskToolBoxBrick / setting property beamline_setup
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:06,289 TaskToolBoxBrick / got a shape history here <ShapeHistory.ShapeHistory instance at 0x2cff518> 
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,292 Could not connect to one or more hardware objects'NoneType' object has no attribute 'connect'
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,292 Could not connect to one or more hardware objects'NoneType' object has no attribute 'connect'
+Warning! Non-optional attribute imageFile of type XSDataFile is None!
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,320 Could not connect to one or more hardware objects'NoneType' object has no attribute 'connect'
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,320 Could not connect to one or more hardware objects'NoneType' object has no attribute 'connect'
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,320 Could not connect to one or more hardware objects'NoneType' object has no attribute 'connect'
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,562 /sc: XML file does not match the SampleChanger class template
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,563 Failed to load Hardware Object /sc
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,923 EnergyScan: error initializing energy scan arguments (missing channel)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,923 EnergyScan: energy messages will not appear (missing channel)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,923 EnergyScan: error initializing energy scan (doEnergyScan)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,923 EnergyScan: you should specify the database hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,923 EnergyScan: you should specify the transmission hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,924 EnergyScan: you should specify the cryo stream hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,924 EnergyScan: you should specify the machine current hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,924 EnergyScan: you should specify the fluorescence detector hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,924 EnergyScan: error initializing move energy (moveEnergy)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,924 EnergyScan: no resolution motor (unable to restore it after moving the energy)
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,924 EnergyScan: error initializing energy-wavelength constant (missing channel)
+setAutoLegend: Not available in QWT5, use setDisplayPolicy)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,952 EnergyScan: error initializing energy scan arguments (missing channel)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,952 EnergyScan: energy messages will not appear (missing channel)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,952 EnergyScan: error initializing energy scan (doEnergyScan)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,952 EnergyScan: you should specify the database hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,953 EnergyScan: you should specify the transmission hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,953 EnergyScan: you should specify the cryo stream hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,953 EnergyScan: you should specify the machine current hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,953 EnergyScan: you should specify the fluorescence detector hardware object
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,953 EnergyScan: error initializing move energy (moveEnergy)
+* [mxcube29.gui, HWR] WARNING 2014-03-13 10:14:06,953 EnergyScan: no resolution motor (unable to restore it after moving the energy)
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,954 EnergyScan: error initializing energy-wavelength constant (missing channel)
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:06,954 EnergyScanBrick0: could not get spec version from Energy Scan Hardware Object
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/Bricks/EnergyScanBrick.py", line 332, in propertyChanged
+    specversion = self.energyScan.getCommandObject("doEnergyScan").specVersion
+  File "/home/blissadm/mxcube/HardwareRepository/CommandContainer.py", line 274, in getCommandObject
+    return self.__commands[cmdName]
+KeyError: 'doEnergyScan'
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,965 Cannot load Hardware Object "/edna_config" : file not found.
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:06,965 "<<class 'EDNAParameters.EDNAParameters'>: EDNAParameters0>": Edna object is now /edna_config (None)
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:06,965 Cannot load Hardware Object "/ednaparams" : file not found.
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:06,983 I am the XfeSpectrumPX2
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:06,984 XfeSpectrumPX2, canSpectrum, self.doSpectrum is <bound method XfeSpectrumPX2.doSpectrum of <XfeSpectrumPX2.XfeSpectrumPX2 instance at 0x48b17e8>>
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,402 Cannot initialize Hardware Object "/flux"
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareRepository.py", line 203, in loadHardwareObject
+    ho.init()
+  File "/home/blissadm/mxcube/HardwareObjects/PhotonFlux.py", line 10, in init
+    self.read_counts_chan = self.getChannelObject("counts")
+  File "/home/blissadm/mxcube/HardwareRepository/CommandContainer.py", line 157, in getChannelObject
+    return self.__channels[channelName]
+KeyError: 'counts'
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,409 Cannot load Hardware Object "/exp/xtod" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,410 Cannot load Hardware Object "/exp/res" : file not found.
+self.chanAttState :  <HardwareRepository.Command.Tango.TangoChannel instance at 0x54fda28>
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,424 HOS Attenuator: passe dans getAtteConfig
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,424 AttenuatorsPX2: self.labels, self.bits, self.attno, ['00 None', '01 Carbon 200um', '02 Carbon 250um', '03 Carbon 300um', '04 Carbon 500um', '05 Carbon 1mm', '06 Carbon 2mm', '07 Carbon 3mm', '10 Ref Fe 5um', '11 Ref Pt 5um'], [1, 2, 4, 8, 16, 32, 64, 128, 256, 512], 10
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,425 HOS Attenuator: passe dans getAttFactor
+self.Attenuatordevice.Status() 00 None: EXTRACT
+i11-ma-c05/ex/att.1-mt_rs is STANDBY
+status 00 None
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,455 Error while setting property mnemonic for AttenuatorsBrick0 (details in log file).
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/BlissFramework/BaseComponents.py", line 843, in _propertyChanged
+    self.propertyChanged(propertyName, oldValue, newValue)
+  File "/home/blissadm/mxcube/BlissFramework/Bricks/AttenuatorsBrick.py", line 207, in propertyChanged
+    self.attFactorChanged(self.attenuators.getAttFactor())
+  File "/home/blissadm/mxcube/BlissFramework/Bricks/AttenuatorsBrick.py", line 318, in attFactorChanged
+    att_str=self['formatString'] % value
+TypeError: float argument required, not str
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,462 Cannot parse Hardware Repository file /cryospy
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareRepository.py", line 259, in parseXML
+    ho = HardwareObjectFileParser.parseString(XMLString, hoName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 37, in parseString
+    xml.sax.parseString(XMLHardwareObject, curHandler)
+  File "/usr/lib/python2.6/xml/sax/__init__.py", line 49, in parseString
+    parser.parse(inpsrc)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 107, in parse
+    xmlreader.IncrementalParser.parse(self, source)
+  File "/usr/lib/python2.6/xml/sax/xmlreader.py", line 123, in parse
+    self.feed(buffer)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 207, in feed
+    self._parser.Parse(data, isFinal)
+  File "/usr/lib/python2.6/xml/sax/expatreader.py", line 301, in start_element
+    self._cont_handler.startElement(name, AttributesImpl(attrs))
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 186, in startElement
+    newObject = instanciateClass(moduleName, className, objectName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 47, in instanciateClass
+    module = loadModule(moduleName)
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjectFileParser.py", line 43, in loadModule
+    return __import__(hardwareObjectName, globals(), locals(), [""])
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjects/Cryo.py", line 1, in <module>
+    import TacoDevice
+  File "/home/blissadm/mxcube/HardwareRepository/HardwareObjects/TacoDevice.py", line 5, in <module>
+    from HardwareRepository import TacoDevice_MTSafe
+  File "/home/blissadm/mxcube/HardwareRepository/TacoDevice_MTSafe.py", line 2, in <module>
+    from Taco import *
+ImportError: No module named Taco
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,463 Failed to load Hardware Object /cryospy
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,473 Cannot load Hardware Object "/safshut" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,475 Cannot load Hardware Object "/udiff_fastshut" : file not found.
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,489 Error while setting property mnemonic for beam_stop (details in log file).
+Traceback (most recent call last):
+  File "/home/blissadm/mxcube/BlissFramework/BaseComponents.py", line 843, in _propertyChanged
+    self.propertyChanged(propertyName, oldValue, newValue)
+  File "/home/blissadm/mxcube/Bricks/BeamstopBrick.py", line 136, in propertyChanged
+    if not "in" in self.beamstop.positions or not "out" in self.beamstop.positions:
+  File "/home/blissadm/mxcube/HardwareRepository/BaseHardwareObjects.py", line 306, in __getattr__
+    raise AttributeError, attr
+AttributeError: positions
+QLayout: Adding QHBox/unnamed (child of QWidget/unnamed) to layout for QDialog/unnamed
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,497 Cannot load Hardware Object "/hutchtrigger" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,500 Cannot load Hardware Object "/udiff_aperture" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,500 Cannot load Hardware Object "/udiff_cryo" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,501 Cannot load Hardware Object "/udiff_rontec" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,501 Cannot load Hardware Object "/hutchtrigger" : file not found.
+* [mxcube29.gui, HWR] ERROR 2014-03-13 10:14:07,501 Cannot load Hardware Object "/udiff_scint" : file not found.
+* [mxcube29.gui, user_level_log] INFO 2014-03-13 10:14:07,504 Ready
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,573 Could not find receiver widget instance_list
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,595 Traceback (most recent call last):
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,601   File "/home/blissadm/libs/lib/python2.6/site-packages/Qub/Objects/QubDrawingManager.py", line 400, in addLinkEventMgr
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,601     nObject = drawing.__class__(None)
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,602   File "/home/blissadm/libs/lib/python2.6/site-packages/Qub/Objects/QubDrawingCanvasTools.py", line 487, in __init__
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,604     self.xMid = self.__canvas.width() / 2
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,604 AttributeError: 'NoneType' object has no attribute 'width'
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,610 Traceback (most recent call last):
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,610   File "/home/blissadm/mxcube/BlissFramework/Bricks/CameraBrick.py", line 582, in _grid_dialog_connect_hdlr
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,610     self.__gridDialog.set_x_pixel_size(xSize)
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,610   File "/home/blissadm/mxcube/Bricks/widgets/grid_dialog.py", line 118, in set_x_pixel_size
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,610     x_size = 1e-3/x_size
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,611 ZeroDivisionError: float division
+
+********************************************************Set the camera ON
+camera is none
+No Calibration
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,612 setting measure mode
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,612 adding action
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,615 running TaskToolBrick . Shape history is:  <ShapeHistory.ShapeHistory instance at 0x2cff518>
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,616 running TaskToolBrick . Got a view:  {'hwname': '/ccd/prosilica_md2', 'drawing': <Qub.Objects.QubPixmapDisplay.QubPixmapDisplay object at 0x3178320>, 'view': <Qub.Objects.QubPixmapDisplayView.QubPixmapDisplayView object at 0x3178200>}
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,621 Anonmalous Scattering Factors determination based on Chooch 5.0.6 by Gwyndaf Evans
+Copyright (C) 1994--2007
+gwyndaf@gwyndafevans.co.uk
+G. Evans & R. F. Pettifer (2001)
+J. Appl. Cryst. 34, 82-86.
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,622 XfeSpectrumPX2, canSpectrum, self.doSpectrum is <bound method XfeSpectrumPX2.doSpectrum of <XfeSpectrumPX2.XfeSpectrumPX2 instance at 0x48b17e8>>
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,630 view is not connected to MeshScanBrick
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,643 Logged in in TreeBrick is False
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,643 Enabling collect False 
+* [mxcube29.gui, user_level_log] INFO 2014-03-13 10:14:07,643 Could not connect to sample changer, unable to list contents. Make sure that the sample changer is turned on. Using free pin mode
+Warning! Non-optional attribute imageFile of type XSDataFile is None!
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,654 Logged in in TreeBrick is True
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,654 Enabling collect True 
+* [mxcube29.gui, user_level_log] INFO 2014-03-13 10:14:07,654 Could not connect to sample changer, unable to list contents. Make sure that the sample changer is turned on. Using free pin mode
+Warning! Non-optional attribute imageFile of type XSDataFile is None!
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,665 Instance user identification is user
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,717 Instance running in local
+* [mxcube29.gui, HWR] DEBUG 2014-03-13 10:14:07,719 InstanceServer: listening to connections on proxima2a-5:14001
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,732 Instance role is acting as server
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,748 Instance mode set to master
+* [mxcube29.gui, HWR] DEBUG 2014-03-13 10:14:07,909 /attenuators: AttenuatorsPX2.attStateChanged: EXTRACT
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,910 Uncaught exception : Traceback (most recent call last):
+
+  File "/home/blissadm/mxcube/HardwareRepository/dispatcher.py", line 22, in __my_robust_apply
+    return robustapply._robust_apply(*args, **kwargs)
+
+  File "/usr/lib/python2.6/dist-packages/louie/robustapply.py", line 56, in robust_apply
+    return receiver(*arguments, **named)
+
+  File "/home/blissadm/mxcube/BlissFramework/Bricks/AttenuatorsBrick.py", line 306, in attStateChanged
+    self.filtersDialog.filtersChanged(value)
+
+  File "/home/blissadm/mxcube/BlissFramework/Bricks/AttenuatorsBrick.py", line 398, in filtersChanged
+    self.attlist[idx].checkme(value & self.attenuators.bits[idx])
+
+TypeError: unsupported operand type(s) for &: 'str' and 'int'
+
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,911 HOS Attenuator: passe dans attToggleChanged
+* [mxcube29.gui, root] INFO 2014-03-13 10:14:07,912 checkPredefinedPosition (MY) 1. 1
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:07,933 TangoBeamStop : stateChanged - new state = MOVING
+attFactorChanged 00 None: EXTRACT
+i11-ma-c05/ex/att.1-mt_rs is STANDBY
+self.Attenuatordevice.Status() 00 None: EXTRACT
+i11-ma-c05/ex/att.1-mt_rs is STANDBY
+status 00 None
+* [mxcube29.gui, HWR] INFO 2014-03-13 10:14:07,977 /attenuators: AttenuatorsPX2, received value on channel
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:07,978 Uncaught exception : Traceback (most recent call last):
+
+  File "/home/blissadm/mxcube/HardwareRepository/dispatcher.py", line 22, in __my_robust_apply
+    return robustapply._robust_apply(*args, **kwargs)
+
+  File "/usr/lib/python2.6/dist-packages/louie/robustapply.py", line 56, in robust_apply
+    return receiver(*arguments, **named)
+
+  File "/home/blissadm/mxcube/BlissFramework/Bricks/AttenuatorsBrick.py", line 318, in attFactorChanged
+    att_str=self['formatString'] % value
+
+TypeError: float argument required, not str
+
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:09,574 Uncaught exception : Traceback (most recent call last):
+
+  File "/home/blissadm/mxcube/HardwareRepository/dispatcher.py", line 22, in __my_robust_apply
+    return robustapply._robust_apply(*args, **kwargs)
+
+  File "/usr/lib/python2.6/dist-packages/louie/robustapply.py", line 56, in robust_apply
+    return receiver(*arguments, **named)
+
+  File "/home/blissadm/mxcube/BlissFramework/Bricks/MachCurrentBrick.py", line 116, in setValue
+    refill_secs=int(refill)
+
+ValueError: invalid literal for int() with base 10: 'Flux: 0.241 uA'
+
+* [mxcube29.gui, root] DEBUG 2014-03-13 10:14:11,961 saving configuration file to keep windows pos. and sizes
+* [mxcube29.gui, root] ERROR 2014-03-13 10:14:11,972 Problem removing the lock file

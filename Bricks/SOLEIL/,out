@@ -1,0 +1,693 @@
+1a2
+> from BlissFramework.BaseComponents import BlissWidget
+5d5
+< import HutchMenuBrick
+7a8
+> import time
+24c25,31
+< __category__ = 'SOLEIL'
+---
+> __category__ = 'mxCuBE'
+> 
+> class CentringMethod:
+>   def __init__(self, method):
+>     self.method = method
+>   def text(self):
+>     return self.method
+29c36,37
+< class SoleilHutchMenuBrick(HutchMenuBrick.HutchMenuBrick):
+---
+> class HutchMenuBrick(BlissWidget):
+>     SNAPSHOT_FORMATS = ('png', 'jpeg')
+32c40
+<         HutchMenuBrick.HutchMenuBrick.__init__(self, *args)
+---
+>         BlissWidget.__init__(self, *args)
+39,40c47
+<         #self._bx, self._by = (10., 5)
+<         self._bx, self._by = (None, None)
+---
+>         self._bx, self._by = (0, 0)
+90c97
+<         self.buttonCentre=HutchMenuBrick.MenuButton(self.buttonsBox,"Centre")
+---
+>         self.buttonCentre=MenuButton(self.buttonsBox,"Centre")
+125,130d131
+<         self.buttonBeamPosition = QToolButton(self.sampleCentreBox)
+<         self.buttonBeamPosition.setUsesTextLabel(True)
+<         self.buttonBeamPosition.setTextLabel("CheckBeam")
+<         self.buttonBeamPosition.setMinimumSize(QSize(75,50))
+<         self.buttonBeamPosition.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+<         QObject.connect(self.buttonBeamPosition, SIGNAL('clicked()'), self.beamPositionCheck)
+161,163c162,595
+<     def beamPositionCheck(self):
+<         self.minidiff.beamPositionCheck()
+<         
+---
+>     def enableAutoStartLoopCentring(self, enable):
+>         if self.minidiff is not None:
+>            self.minidiff.enableAutoStartLoopCentring(enable)
+> 
+>     def propertyChanged(self,propertyName,oldValue,newValue):
+>         #print "HutchMenuBrick.propertyChanged",property,newValue
+>         if propertyName=='minidiff':
+>             if self.minidiff is not None:
+>                 self.disconnect(self.minidiff,PYSIGNAL('zoomMotorPredefinedPositionChanged'), self.zoomPositionChanged)
+>                 self.disconnect(self.minidiff,PYSIGNAL('minidiffReady'),self.miniDiffReady)
+>                 self.disconnect(self.minidiff,PYSIGNAL('minidiffNotReady'),self.miniDiffNotReady)
+>                 self.disconnect(self.minidiff,PYSIGNAL('minidiffStateChanged'),self.miniDiffStateChanged)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringStarted'),self.centringStarted)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringSuccessful'),self.centringSuccessful)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringFailed'),self.centringFailed)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringMoving'),self.centringMoving)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringInvalid'),self.centringInvalid)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringSnapshots'),self.centringSnapshots)
+>                 self.disconnect(self.minidiff,PYSIGNAL('progressMessage'),self.miniDiffMessage)
+>                 self.disconnect(self.minidiff,PYSIGNAL('centringAccepted'),self.centringAccepted)
+>             self.minidiff=self.getHardwareObject(newValue)
+>           
+>             if self.minidiff is not None:
+>                 self.connect(self.minidiff,PYSIGNAL('zoomMotorPredefinedPositionChanged'),self.zoomPositionChanged)
+>                 self.connect(self.minidiff,PYSIGNAL('minidiffReady'),self.miniDiffReady)
+>                 self.connect(self.minidiff,PYSIGNAL('minidiffNotReady'),self.miniDiffNotReady)
+>                 self.connect(self.minidiff,PYSIGNAL('minidiffStateChanged'),self.miniDiffStateChanged)
+>                 self.connect(self.minidiff,PYSIGNAL('centringStarted'),self.centringStarted)
+>                 self.connect(self.minidiff,PYSIGNAL('centringSuccessful'),self.centringSuccessful)
+>                 self.connect(self.minidiff,PYSIGNAL('centringFailed'),self.centringFailed)
+>                 self.connect(self.minidiff,PYSIGNAL('centringMoving'),self.centringMoving)
+>                 self.connect(self.minidiff,PYSIGNAL('centringInvalid'),self.centringInvalid)
+>                 self.connect(self.minidiff,PYSIGNAL('centringSnapshots'),self.centringSnapshots)
+>                 self.connect(self.minidiff,PYSIGNAL('progressMessage'),self.miniDiffMessage)
+>                 self.connect(self.minidiff,PYSIGNAL('centringAccepted'),self.centringAccepted)
+>                 self.connect(self.minidiff, "newAutomaticCentringPoint", self.drawAutoCentringPoint)
+> 
+>                 if self.minidiff.isReady():
+>                     self.miniDiffReady()
+>                 else:
+>                     self.miniDiffNotReady()
+>             else:
+>                 self.miniDiffNotReady()
+>         elif propertyName=='slitbox':
+>             if self.slitbox is not None:
+>                 for role in ('s1v', 's2v', 's1h', 's2h'):
+>                   m = self.slitbox.getDeviceByRole(role)
+>                   m.disconnect('stateChanged', self.slitsPositionChanged)
+>             self.slitbox=self.getHardwareObject(newValue)
+>             if self.slitbox is not None:
+>                 for role in ('s1v', 's2v', 's1h', 's2h'):
+>                   m = self.slitbox.getDeviceByRole(role)
+>                   m.connect("stateChanged", self.slitsPositionChanged)
+>             #self.slitsPositionChanged()
+>         elif propertyName=="samplechanger":
+>             self.sampleChanger=self.getHardwareObject(newValue)
+>         elif propertyName=="dataCollect":
+>             self.collectObj=self.getHardwareObject(newValue)
+>         elif propertyName == 'icons':
+>             self.setIcons(newValue)
+>         elif propertyName=='label':
+>           pass #self.sampleCentreBox.setTitle(newValue)
+>         elif propertyName=='extraCommands':
+>             self.extraCommands['mnemonic']=newValue
+>         elif propertyName=='extraCommandsIcons':
+>             self.extraCommands['icons']=newValue
+>         elif propertyName=='queue':
+>             self.queue_hwobj = self.getHardwareObject(newValue)
+>         else:
+>             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
+> 
+>     def setIcons(self,icons):
+>         icons_list=icons.split()
+>         try:
+>             self.buttonCentre.setIcons(icons_list[0],icons_list[1])
+>         except IndexError:
+>             pass
+>         try:
+>             self.buttonAccept.setPixmap(Icons.load(icons_list[2]))
+>         except IndexError:
+>             pass
+>         try:
+>             self.buttonSnapshot.setPixmap(Icons.load(icons_list[3]))
+>         except IndexError:
+>             pass
+>         try:
+>             self.buttonReject.setPixmap(Icons.load(icons_list[4]))
+>         except IndexError:
+>             pass
+> 
+>     def setDirectory(self,directory):
+>         self.directory=str(directory)
+>         self.fileIndex=1
+> 
+>     def setPrefix(self,prefix):
+>         self.prefix=str(prefix)
+>         self.fileIndex=1
+> 
+>     def setSample(self,samples_list):
+>         self.selectedSamples = samples_list
+>         try:
+>           blsampleid=int(self.selectedSamples[0][0])
+>         except:
+>           blsampleid=None
+>         try:
+>           self.minidiff.setSampleInfo({"blsampleid":blsampleid})
+>         except:
+>           pass
+> 
+>     def emitWidgetSynchronize(self):
+>         #mode=self.modeBox.selectedId()
+>         points=self.clickedPoints
+>         #self.emit(PYSIGNAL("widgetSynchronize"),( (mode,points), ))
+>         self.emit(PYSIGNAL("widgetSynchronize"),( (points), ))
+> 
+>     def widgetSynchronize(self,state):
+>         #centring_method=state[0]
+>         #clicked_points=state[1]
+>         clicked_points=state[0]
+>         #self.modeBox.setButton(centring_method)
+>         if len(clicked_points):
+>             point=clicked_points[-1]
+>             self.__point.startDrawing()
+>             self.__point.show()
+>             self.__point.setPoint(point[0],point[1])
+>             self.__point.stopDrawing()
+>         else:
+>             self.__point.hide()
+> 
+>     def startCentring(self):
+>         # this is called from another brick, not by user
+>         self.insideDataCollection=True
+>         self.centreSampleClicked()
+> 
+>     def rejectCentring(self):
+>         self.cancelCentringClicked(reject=True)
+> 
+>     def acceptCentring(self):
+>         self.acceptClicked()
+> 
+>     def centreSampleClicked(self):
+>         self.minidiff.startCentringMethod(self.minidiff.MANUAL3CLICK_MODE)
+> 
+>     def saveSnapshot(self):
+>         formats=""
+>         for format in HutchMenuBrick.SNAPSHOT_FORMATS:
+>             formats+="*.%s " % format
+>         formats=formats.strip()
+> 
+>         current_filename=os.path.join(self.directory, self.prefix)
+>         current_filename=current_filename + '_%d%s%s' % (self.fileIndex, os.path.extsep, self.formatType)
+>         filename=str(QFileDialog.getSaveFileName(current_filename,"Images (%s)" % formats,\
+>             self,None,"Choose a filename to save under",None,False))
+>         if len(filename):
+>             image_type=os.path.splitext(filename)[1].strip('.').upper()
+>             try:
+>                 matrix = self.__drawing.matrix()
+>                 zoom = 1
+>                 if matrix is not None:
+>                     zoom = matrix.m11()
+>                 img = self.__drawing.getPPP()
+>                 logging.getLogger().info("Saving snapshot : %s", filename)
+>                 QubImageSave.save(filename, img, self.__drawing.canvas(), zoom, image_type)
+>             except:
+>                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
+>                 logging.getLogger().error("HutchMenuBrick: error saving snapshot!")
+>             else:
+>                 self.formatType=image_type.lower()
+>                 self.fileIndex+=1
+> 
+> 
+>     def centredPositionSnapshot(self):
+>         matrix = self.__drawing.matrix()
+> 
+>         zoom = 1
+>         if matrix is not None:
+>             zoom = matrix.m11()
+> 
+>         img = self.__drawing.getPPP()
+>         fd, name = tempfile.mkstemp()
+>         os.close(fd)
+> 
+>         QubImageSave.save(name, img, self.__drawing.canvas(), zoom, "JPEG")
+> 
+>         f = open(name, "r")
+>         imgcopy = f.read()
+>         f.close()
+>         os.unlink(name)
+> 
+>         return imgcopy
+> 
+> 
+>     def getSnapshot(self, img):
+>         logging.getLogger().debug("Taking snapshot for centred position")
+>         img['data'] = self.centredPositionSnapshot()
+>     
+> 
+>     def cancelCentringClicked(self,reject=False):
+>         #print "CANCELCENTRINGCLICKED",reject
+>         self.minidiff.cancelCentringMethod(reject=reject)
+> 
+>     def acceptClicked(self):
+>         if self.standardColor is not None:
+>             self.buttonAccept.setPaletteBackgroundColor(self.standardColor)
+>         logging.info("disabling accept because accept was clicked")  
+>         self.buttonAccept.setEnabled(False)
+>         self.buttonReject.setEnabled(False)
+>         self.minidiff.acceptCentring()
+> 
+>     def rejectClicked(self):
+>         if self.standardColor is not None:
+>             self.buttonReject.setPaletteBackgroundColor(self.standardColor)
+>         logging.info("disabling accept because reject was clicked")  
+>         self.buttonReject.setEnabled(False)
+>         self.buttonAccept.setEnabled(False)
+>         self.minidiff.rejectCentring()
+>         self.insideDataCollection=False
+> 
+>     def centringMoving(self):
+>         self.isMoving=True
+>         logging.info("disabling accept because centring is moving ")  
+>         self.buttonAccept.setEnabled(False)
+>         self.buttonReject.setEnabled(False)
+> 
+>     def centringInvalid(self):
+>         if self.collectObj is not None:
+>             self.collectObj.setCentringStatus(None)
+>         logging.info("disabling accept because centring is invalid ")  
+>         self.buttonAccept.setEnabled(False)
+>         self.buttonReject.setEnabled(False)
+> 
+>     def centringAccepted(self,state,centring_status):
+>         logging.info("Centring has been accepted")
+>         if self.collectObj is not None:
+>             self.collectObj.setCentringStatus(centring_status)
+>         logging.info("disabling accept because centring has been accepted ")  
+>         self.buttonAccept.setEnabled(False)
+>         self.buttonReject.setEnabled(False)
+>         if self.insideDataCollection:
+>           self.insideDataCollection = False
+>           self.emit(PYSIGNAL("centringAccepted"), (state,centring_status))
+> 
+>         self.emit(PYSIGNAL("newCentredPos"), (state, centring_status))
+> 
+>         if self.queue_hwobj.is_executing():
+>             self.setEnabled(False)
+> 
+>     def centringSnapshots(self,state):
+>         if state is None:
+>             self.isShooting=True
+>             self.sampleCentreBox.setEnabled(False)
+>         else:
+>             self.isShooting=False
+>             self.sampleCentreBox.setEnabled(True)
+> 
+>     def centringStarted(self,method,flexible):
+>         self.setEnabled(True)
+>         self.emit(PYSIGNAL("enableMinidiff"), (False,))
+>         if self.insideDataCollection:
+>           self.emit(PYSIGNAL("centringStarted"), ())
+> 
+>         self.isCentring=True
+>         self.isMoving=False
+>         self.isShooting=False
+>         """
+>         for but in self.centringButtons:
+>             if str(but.text())==method:
+>                 if self.defaultBackgroundColor is None:
+>                     self.defaultBackgroundColor=but.paletteBackgroundColor()
+>                 but.setPaletteBackgroundColor(QWidget.yellow)
+>                 self.currentCentring=but
+>                 break
+>         """
+>         self.currentCentring = CentringMethod(method)
+>         self.buttonCentre.commandStarted()
+>         logging.info("disabling accept because centring has been started ")  
+>         self.buttonAccept.setEnabled(False)
+>         self.buttonReject.setEnabled(False)
+> 
+>         if method==MiniDiff.MiniDiff.MANUAL3CLICK_MODE:
+>             self.__point.startDrawing()
+>             self.__helpLine.startDrawing()
+>             self.__pointer.startDrawing()
+> 
+>     def drawAutoCentringPoint(self, x,y):
+>       if -1 in (x,y):
+>         self.__autoCentringPoint.hide()
+>         return
+>       self.__autoCentringPoint.startDrawing()
+>       self.__autoCentringPoint.setPoint(x,y)
+>       self.__autoCentringPoint.stopDrawing()
+>       self.__autoCentringPoint.show()
+>       
+>     def centringSuccessful(self,method,centring_status):
+>         self.__point.stopDrawing()
+>         self.__point.hide()
+>         self.__helpLine.hide()
+>         self.__helpLine.stopDrawing()
+>         self.__pointer.stopDrawing()
+>         self.__pointer.hide()
+> 
+>         logging.info("HutchMenuBrick:  centringSuccesful received")
+> 
+>         self.clickedPoints=[]
+>         self.emitWidgetSynchronize()
+> 
+>         self.buttonCentre.commandDone()
+>         if self.currentCentring is not None:
+>             #    self.currentCentring.setPaletteBackgroundColor(self.defaultBackgroundColor)
+>             self.currentCentring=None
+> 
+>         logging.info("HutchMenuBrick:  enabling buttons")
+>         self.buttonAccept.setEnabled(True)
+>         self.buttonReject.setEnabled(True)
+>         if self.insideDataCollection:
+>             if self.standardColor is None:
+>                 self.standardColor=self.buttonAccept.paletteBackgroundColor()
+>             self.buttonAccept.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
+>             self.buttonReject.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+> 
+>         if self.collectObj is not None:
+>             self.collectObj.setCentringStatus(centring_status)
+> 
+>         self.isMoving=False
+>         self.sampleCentreBox.setEnabled(True)
+>         self.emit(PYSIGNAL("enableMinidiff"), (True,))
+> 
+>         try:
+>             successful_method=self.successfulMethods[method]
+>         except KeyError,diag:
+>             pass
+>         else:
+>             try:
+>                 successful_method()
+>             except:
+>                 pass
+> 
+>     def centringFailed(self,method,centring_status):
+>         self.__point.stopDrawing()
+>         self.__point.hide()
+>         self.__helpLine.hide()
+>         self.__helpLine.stopDrawing()
+>         self.__pointer.stopDrawing()
+>         self.__pointer.hide()
+>        
+>         self.clickedPoints=[]
+>         self.emitWidgetSynchronize()
+> 
+> 
+>         self.buttonCentre.commandFailed()
+>         if self.currentCentring is not None:
+>             #    self.currentCentring.setPaletteBackgroundColor(self.defaultBackgroundColor)
+>             self.currentCentring=None
+> 
+>         logging.info("disabling accept because centing failed")  
+>         self.buttonAccept.setEnabled(False)
+>         if self.insideDataCollection:
+>             if self.standardColor is None:
+>                 self.standardColor=self.buttonAccept.paletteBackgroundColor()
+>             self.buttonReject.setEnabled(True)
+>             self.buttonReject.setPaletteBackgroundColor(QWidget.red)
+>         else:
+>             self.buttonReject.setEnabled(False)
+> 
+>         if self.collectObj is not None:
+>             self.collectObj.setCentringStatus(centring_status)
+> 
+>         self.emit(PYSIGNAL("enableMinidiff"), (True,))
+> 
+>         try:
+>             reset_method=self.resetMethods[method]
+>         except KeyError,diag:
+>             pass
+>         else:
+>             try:
+>                 reset_method()
+>             except:
+>                 pass
+> 
+>     #def movedToBeam(self,x,y):
+>     #    pass
+> 
+>     def manualCentreReset(self):
+>         self.resetPoints()
+> 
+>     def automaticCentreReset(self):
+>         if not self.userConfirmsButton.isChecked():
+>            self.rejectCentring()
+> 
+>     def automaticCentreSuccessful(self):
+>         if not self.userConfirmsButton.isChecked():
+>            self.acceptCentring()
+> 
+>     #def moveToBeamSuccessful(self):
+>         #self.emit(PYSIGNAL("setMoveToBeamState"), (False,))
+>     #    pass
+> 
+>     #def moveToBeamReset(self):
+>         #self.emit(PYSIGNAL("setMoveToBeamState"), (False,))
+>     #    pass
+> 
+>     def __endDrawingPoint(self,drawingManager) :
+>         x,y = drawingManager.point()
+>         self.imageClicked(x,y,x,y)
+> 
+>     # Handler for clicking the video when doing the 3-click centring
+>     def imageClicked(self,x,y,xi,yi):
+>         #print "HutchMenuBrick.imageClicked",self.minidiff,self.manualCentering
+>         if self.currentCentring is not None and str(self.currentCentring.text())==MiniDiff.MiniDiff.MANUAL3CLICK_MODE and self.minidiff.isReady():
+>             try:
+>                 points=self.minidiff.imageClicked(x,y,xi,yi)
+>             except StopIteration:
+>                 pass
+>             else:
+>                 self.addPoint(x,y,xi,yi)
+>  
+>     # Signals a new point in the 3-click centering
+>     def addPoint(self,x,y,xi,yi):
+>         self.clickedPoints.append((x,y,xi,yi))
+>         self.emitWidgetSynchronize()
+> 
+>     # Resets the points in the 3-click centering
+>     def resetPoints(self):
+>         self.clickedPoints=[]
+>         self.emitWidgetSynchronize()
+> 
+>     # Displays a message
+>     def showMessageToUser(self,message=None):
+>         #print "showMessage",message
+>         try:
+>             self.__drawing.setInfo(message)
+>         except:
+>             pass
+> 
+167c599,605
+<                 self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.getBeamPosX, self.minidiff.getBeamPosY))
+---
+>                 beam_xc = self.minidiff.getBeamPosX()
+>                 beam_yc = self.minidiff.getBeamPosY()
+>                 pxmmy=self.minidiff.pixelsPerMmY
+>                 pxmmz=self.minidiff.pixelsPerMmZ
+> 
+>                 self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc,
+>                                                             self._bx, self._by))
+171c609
+<                     self.emit(PYSIGNAL("calibrationChanged"), (1e3/self.minidiff.pixelsPerMmY, 1e3/self.minidiff.pixelsPerMmZ))
+---
+>                     self.emit(PYSIGNAL("calibrationChanged"), (1e3/self.minidiff.pixelsPerMmY, 1e3/self.minidiff.pixelsPerMmZ))      			
+181c619,620
+<             self.emit(PYSIGNAL("beamPositionChanged"), (self.minidiff.getBeamPosX, self.minidiff.getBeamPosY))
+---
+>             beam_xc = self.minidiff.getBeamPosX()
+>             beam_yc = self.minidiff.getBeamPosY()
+187a627,628
+>             self.emit(PYSIGNAL("beamPositionChanged"), (beam_xc, beam_yc,
+>                                                         self._bx, self._by))
+190a632,655
+>     # Event when the minidiff is in notready state
+>     def miniDiffNotReady(self):
+>         #import pdb; pdb.set_trace()
+>         try:
+>           self.__beam.hide()
+>         except AttributeError:
+>           pass
+>         if not self.buttonCentre.executing:
+>            self.sampleCentreBox.setEnabled(False)
+> 
+>     def miniDiffStateChanged(self,state):
+>         if self.buttonCentre.executing or self.isMoving or self.isShooting:
+>             return
+>         try:
+>             self.sampleCentreBox.setEnabled(state==self.minidiff.phiMotor.READY)
+>         except:
+>             pass
+> 
+>     # Displays a message (signaled from the minidiff hardware object)
+>     def miniDiffMessage(self,msg=None):
+>         #print "MINIDIFF MESSAGE!!!",msg
+>         self.showMessageToUser(msg)
+> 
+>     # Update both zoom and slits when started
+219,223c684,685
+<             #self.__rectangularBeam.show()
+<             #self.__rectangularBeam.setSlitboxSize(0,0)
+<             xsize, ysize = self.minidiff.getBeamSize()
+<             self.__rectangularBeam.setSlitboxSize( xsize *self.minidiff.pixelsPerMmY/1e3, ysize*self.minidiff.pixelsPerMmZ/1e3) 
+<             self.__rectangularBeam.set_xMid_yMid(self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY())
+---
+>             self.__rectangularBeam.show()
+>             self.__rectangularBeam.setSlitboxSize(0,0)
+226,227c688
+<             self.__rectangularBeam.show()
+<             
+---
+> 
+230c691
+<             self.__beam.show()
+---
+>             self.__beam.hide()
+248c709
+<                 self.emit(PYSIGNAL("calibrationChanged"), (self.__scaleX, self.__scaleY))
+---
+> 		self.emit(PYSIGNAL("calibrationChanged"), (self.__scaleX, self.__scaleY))
+254,258c715
+<     def updateBeam(self,force=False):
+<         logging.info("updateBeam")
+<         #if self["displayBeam"]:
+<         beam_x, beam_y = (self.minidiff.getBeamPosX, self.minidiff.getBeamPosY)
+<         self.__rectangularBeam.set_xMid_yMid(self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY())
+---
+>     def _drawBeam(self):
+260,271c717,757
+<             self.__beam.move(beam_x, beam_y)
+<             try:
+<                 #get_beam_info = self.minidiff.getCommandObject("getBeamInfo")
+<                 if force or get_beam_info.isSpecReady():
+<                     self.minidiff.getBeamInfo(callback= self._updateBeam, error_callback=None)
+<                     
+<                 #get_beam_info(callback=self._updateBeam, error_callback=None)
+<             except:
+<                 logging.getLogger().exception("Could not get beam size: cannot display beam")
+<                 self.__beam.hide()
+<         except AttributeError:
+<             pass
+---
+>           self.__rectangularBeam.show()
+>           if None in (self._by, self._bx):
+>             return
+>           bx = self._bx
+>           by = self._by
+>           pxmmy=self.minidiff.pixelsPerMmY
+>           pxmmz=self.minidiff.pixelsPerMmZ
+>           if self._bshape == "rectangular":
+>             self.__rectangularBeam.setSlitboxSize(bx*pxmmy, by*pxmmz)
+>           else:
+>             self.__rectangularBeam.setSlitboxSize(0,0)
+>             self.__beam.setSize(bx*pxmmy, by*pxmmz)
+>             self.__beam.show()
+>         except:
+>           pass
+>     
+>     def _updateBeam(self, ret):
+>         #logging.info("UPDATE BEAM %s", ret)
+>         self._bx = float(ret["size_x"])
+>         self._bshape = ret["shape"]
+>         self._by = float(ret["size_y"])
+>         self._drawBeam()
+> 
+>     def updateBeam(self,force=False):
+>         if self["displayBeam"]:
+>               if not self.minidiff.isReady(): time.sleep(0.2)
+>               beam_x = self.minidiff.getBeamPosX()
+>               beam_y = self.minidiff.getBeamPosY()
+>               try:
+>                  self.__rectangularBeam.set_xMid_yMid(beam_x,beam_y)
+>               except AttributeError:
+>                  pass
+>               try:
+>                 self.__beam.move(beam_x, beam_y)
+>                 try:
+>                   self.minidiff.getBeamInfo(self._updateBeam)
+>                 except:
+>                   logging.getLogger().exception("Could not get beam size: cannot display beam")
+>                   self.__beam.hide()
+>               except AttributeError:
+>                 pass
+294d779
+< 
+303,307c788,789
+<                     self.__beam.move(self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY())
+<                     xsize, ysize = self.minidiff.getBeamSize()
+<                     self.__rectangularBeam.setSlitboxSize(xsize*pxmmy/1e3, ysize*pxmmz/1e3)
+<                     self.__rectangularBeam.set_xMid_yMid(self.minidiff.getBeamPosX(), self.minidiff.getBeamPosY())
+<                     self._drawBeam()
+---
+>                     self.updateBeam(True)
+>                     #self._drawBeam()
+308a791
+>             
+309a793,859
+> 
+>     # Slits changed: update beam size
+>     def slitsPositionChanged(self, *args):
+>         if self.minidiff is None or self.slitbox is None or self.minidiff.pixelsPerMmY is None or self.minidiff.pixelsPerMmZ is None:
+>             pass
+>         else:
+>             self.updateBeam(force=True)
+> 
+> class MenuButton(QToolButton):
+>     def __init__(self, parent, caption):
+>         QToolButton.__init__(self,parent)
+>         self.executing=None
+>         self.runIcon=None
+>         self.stopIcon=None
+>         self.standardColor=None
+>         self.setUsesTextLabel(True)
+>         self.setTextLabel(caption)
+>         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+>         QObject.connect(self, SIGNAL('clicked()'), self.buttonClicked)
+>     def setIcons(self,icon_run,icon_stop):
+>         self.runIcon=Icons.load(icon_run)
+>         self.stopIcon=Icons.load(icon_stop)
+>         if self.executing:
+>             self.setPixmap(self.stopIcon)
+>         else:
+>             self.setPixmap(self.runIcon)
+>     def buttonClicked(self):
+>         if self.executing:
+>             self.emit(PYSIGNAL('cancelCommand'), ())
+>         else:
+>             self.setEnabled(False)
+>             self.emit(PYSIGNAL('executeCommand'), ())
+>     def commandStarted(self):
+>         if self.standardColor is None:
+>             self.standardColor=self.paletteBackgroundColor()
+>         self.setPaletteBackgroundColor(QWidget.yellow)
+>         if self.stopIcon is not None:
+>             self.setPixmap(self.stopIcon)
+>         self.executing=True
+>         self.setEnabled(True)
+>     def isExecuting(self):
+>         return self.executing
+>     def commandDone(self):
+>         self.executing=False
+>         if self.standardColor is not None:
+>             self.setPaletteBackgroundColor(self.standardColor)
+>         if self.runIcon is not None:
+>             self.setPixmap(self.runIcon)
+>         self.setEnabled(True)
+>     def commandFailed(self):
+>         self.commandDone()
+> 
+> 
+> class HorizontalSpacer3(QWidget):
+>     def __init__(self,*args):
+>         QWidget.__init__(self,*args)
+>         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+>     def sizeHint(self):
+>         return QSize(5,0)
+> 
+> 
+> class HorizontalSpacer4(QWidget):
+>     def __init__(self,*args):
+>         QWidget.__init__(self,*args)
+>         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+>     def sizeHint(self):
+>         return QSize(5,0)

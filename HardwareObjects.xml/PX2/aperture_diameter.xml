@@ -1,0 +1,31 @@
+<device class="TangoDCMotorWPositions">
+    <username>Aperture Diameter</username>
+    <tangoname>i11-ma-cx1/ex/md2</tangoname>
+    <channel type="tango" polling="1000" name="state">State</channel>
+    <datatype>int</datatype>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">CurrentApertureDiameterIndex</channel>
+    <delta>0.1</delta>
+    <interval>1000</interval>
+    <positions>
+        <position>
+            <username>100 um</username>
+            <offset>1</offset>
+        </position>
+        <position>
+            <username>50 um</username>
+            <offset>2</offset>
+        </position>
+        <position>
+            <username>20 um</username>
+            <offset>3</offset>
+        </position>
+        <position>
+            <username>10 um</username>
+            <offset>4</offset>
+        </position>
+        <position>
+            <username>5 um</username>
+            <offset>5</offset>
+        </position>
+    </positions>
+</device>
