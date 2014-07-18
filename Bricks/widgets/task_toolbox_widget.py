@@ -8,7 +8,6 @@ from widgets.create_helical_widget import CreateHelicalWidget
 from widgets.create_discrete_widget import CreateDiscreteWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
-from widgets.create_xrf_scan_widget import CreateXRFScanWidget
 from widgets.create_workflow_widget import CreateWorkflowWidget
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 
@@ -43,14 +42,12 @@ class TaskToolBoxWidget(qt.QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.helical_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
-	self.xrf_scan_page = CreateXRFScanWidget(self.tool_box, "xrf_scan")
         self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-	self.tool_box.addItem(self.xrf_scan_page, "XRF Scan")
         self.tool_box.addItem(self.workflow_page, "Advanced")
 
         self.add_pixmap = Icons.load("add_row.png")
@@ -159,8 +156,6 @@ class TaskToolBoxWidget(qt.QWidget):
                 self.tool_box.setCurrentItem(self.char_page)
             elif isinstance(items[0], queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentItem(self.energy_scan_page)
-	    elif isinstance(items[0], queue_item.XRFScanQueueItem):
-                self.tool_box.setCurrentItem(self.xrf_scan_page)
             elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentItem(self.workflow_page)
 
@@ -205,15 +200,12 @@ class TaskToolBoxWidget(qt.QWidget):
                     else:
                         self.create_task(task_model)
 
-	    #IK this sometimes takes some time. Needs a fix	
             self.tool_box.currentItem().update_selection()
 
     def create_task(self, task_node, shape = None):
-
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-
             task_list = self.tool_box.currentItem().create_task(sample, shape)
 
             for child_task_node in task_list:
