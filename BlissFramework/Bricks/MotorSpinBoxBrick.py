@@ -127,7 +127,6 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         self.defineSlot('toggle_enabled',())
 
     def setExpertMode(self,mode):
-        #print "MotorSpinBoxBrick.setExpertMode",mode,self['hideInUser']
         self.inExpert=mode
         if self['hideInUser']:
             if mode:
@@ -346,14 +345,12 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
 
     # Move the motor one step up
     def stepUp(self):
-        #print "stepUp"
         if self.motor is not None:
             if self.motor.isReady():
                 self.motor.moveRelative(self.spinBox.lineStep())
 
     # Move the motor one step down
     def stepDown(self):
-        #print "stepDown"
         if self.motor is not None:
             if self.motor.isReady():
                 self.motor.moveRelative(-self.spinBox.lineStep())
@@ -361,7 +358,6 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
     # Moves the motor when the spin box text is changed
     def valueChangedInt(self,value):
         self.updateGUI()
-        #print "valueChangedInt",value
         if self.motor is not None:
             self.motor.move(value)
 
@@ -466,7 +462,6 @@ class MotorSpinBoxBrick(BaseComponents.BlissWidget):
         #self['defaultStep']=self['defaultStep']
 
     def propertyChanged(self,propertyName,oldValue,newValue):
-        #print "MotorSpinBoxBrick.propertyChanged",propertyName,oldValue,newValue
         if propertyName=='mnemonic':
             self.setMotor(self.motor,newValue)
         elif propertyName=='formatString':
@@ -690,8 +685,6 @@ class StepEditorDialog(QDialog):
         self.layout().addWidget(box2)
 
     def setMotor(self,motor,brick,name,default_step):
-        #print "StepEditorDialog",motor,spinbox,name,default_step
-    
         self.motor=motor
         self.brick=brick
 
