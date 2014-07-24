@@ -378,12 +378,13 @@ class TreeBrick(BaseComponents.BlissWidget):
       
         try: 
             for sample in self.sample_changer_hwobj.getSampleList():
+                coords = sample.getCoords()
                 matrix = sample.getID() or ""
-                basket_index = sample.getContainer().getIndex()
-                vial_index = sample.getIndex()
+                basket_index = str(coords[0])
+                vial_index = ":".join(map(str, coords[1:]))
                 basket_code = sample.getContainer().getID() or ""
             
-                sc_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
+                sc_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
         except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
