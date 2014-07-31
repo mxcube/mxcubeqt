@@ -227,6 +227,7 @@ class SOLEILEnergyScan(Equipment):
         return True
     
     def cancelEnergyScan(self, *args):
+        logging.info('SOLEILEnergyScan: canceling the scan')
         if self.scanning:
             #self.doEnergyScan.abort()
             self.xanes.abort()
