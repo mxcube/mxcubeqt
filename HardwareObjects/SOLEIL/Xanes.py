@@ -491,7 +491,8 @@ class xanes(object):
                                             'diode5': self.diode5.intensity,
                                             'cvd': self.cvd.intensity}
         #logging.info('self.results[\'observations\'][en] %s' % self.results['observations'][en])
-        self.results['observations'][en]['point'] = self.results['observations'][en]['roiCounts'] / -self.results['observations'][en]['diode5']
+        self.results['observations'][en]['point'] = float(self.results['observations'][en]['roiCounts']) / self.results['observations'][en]['diode1']
+        self.parent.newPoint(float(en), float(self.results['observations'][en]['point']))
             
     def updateRunningScan(self, en):
         self.runningScan['ens'].append(float(en))
