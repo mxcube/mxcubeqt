@@ -15,6 +15,8 @@ import copy
 import sample_centring
 import numpy
 import PyTango
+import calibrator
+import scan_and_align
 
 class myimage:
     def __init__(self, drawing):
@@ -137,7 +139,11 @@ class MiniDiffPX2(Equipment):
             logging.error("MiniDiffPX2 / Cannot connect to tango device: %s ", self.tangoname )
         else:
             self.md2_ready = True
-            
+        
+        # some defaults
+        self.anticipation  = 1
+        self.collect_phaseposition = 4
+        
         sc_prop=self.getProperty("samplechanger")
         if sc_prop is not None:
             try:
@@ -264,7 +270,7 @@ class MiniDiffPX2(Equipment):
 
 
     def getCalibrationData(self, offset):
-        return 
+        return self.get_pixels_per_mm()
         if self.zoomMotor is not None:
             if self.zoomMotor.hasObject('positions'):
                 for position in self.zoomMotor['positions']:
@@ -334,6 +340,9 @@ class MiniDiffPX2(Equipment):
     def getBeamPosY(self):
         return self.md2.BeamPositionVertical
     
+    def getState(self):
+        return str(self.md2.state())
+        
     def get_pixels_per_mm(self):
         return 1000./self.md2.CoaxCamScaleX, 1000./self.md2.CoaxCamScaleY
         
@@ -348,7 +357,61 @@ class MiniDiffPX2(Equipment):
         self.beamSizeY = 0.005
         self.beamShape = "rectangular"
         return d
-        
+       
+    def goniometerReady(self, oscrange, npass, exptime):
+       logging.info("MiniDiffPX2 / programming gonio oscrange=%s npass=%s exptime=%s" % (oscrange,npass, exptime) )
+
+       if self.md2_ready:
+
+          diffstate = self.getState()
+          logging.info("SOLEILCollect - setting gonio ready (state: %s)" % diffstate)
+
+          self.md2.write_attribute('ScanAnticipation', self.anticipation)
+          self.md2.write_attribute('ScanNumberOfPasses', npass)
+          self.md2.write_attribute('ScanRange', oscrange)
+          self.md2.write_attribute('ScanExposureTime', exptime)
+          self.md2.write_attribute('PhasePosition', self.collect_phaseposition)
+          
+    def wait(self, device):
+        while device.state().name in ['MOVING', 'RUNNING']:
+            time.sleep(.1)
+            
+    def setScanStartAngle(self, sangle):
+        logging.info("MiniDiffPX2 / setting start angle to %s ", sangle )
+        #if self.md2_ready:
+
+        executed = False
+        while executed is False:
+            try:
+                self.wait(self.md2)
+                self.md2.write_attribute("ScanStartAngle", sangle )
+                executed = True
+            except Exception, e:
+                print e
+                logging.info('Problem writing ScanStartAngle command')
+                logging.info('Exception ' + str(e))
+    
+    def startScan(self, wait=True):
+        logging.info("MiniDiffPX2 / starting scan " )
+        if self.md2_ready:
+            diffstate = self.getState()
+            logging.info("SOLEILCollect - diffractometer scan started  (state: %s)" % diffstate)
+            
+        executed = False
+        while executed is False:
+            try:
+                self.wait(self.md2)
+                self.md2.command_inout('StartScan')
+                self.wait(self.md2)
+                executed = True
+                logging.info('Successfully executing StartScan command')
+            except Exception, e:
+                print e
+                os.system('echo $(date) error executing StartScan command >> /927bis/ccd/collectErrors.log')
+                logging.info('Problem executing StartScan command')
+                logging.info('Exception ' + str(e))
+        return
+    
     def moveToBeam(self, x, y):
         try:
             beam_xc = self.getBeamPosX()
@@ -656,17 +719,24 @@ class MiniDiffPX2(Equipment):
         pass
     
     def beamPositionCheck(self):
-        os.system('calibrator.py')
-        #import calibrator
-        #calib = calibrator.calibrator(fresh=True, save=True)
-        #calib.prepare()
-        #for zoom in calib.zooms:
-            #calibrator.main(calib, zoom)
-        #calib.tidy()
-        #calib.updateMD2BeamPositions()
-        #calib.updateDatabase()
-        #calib.writeTxt()
+        logging.getLogger("HWR").info("Going to check the beam position at all zooms")
+        gevent.spawn(self.bpc)
     
-    def apertureAlign(self):
-        os.system('scan_and_align.py')
+    def bpc(self):
         
+        calib = calibrator.calibrator(fresh=True, save=True)
+        calib.prepare()
+        for zoom in calib.zooms:
+            calibrator.main(calib, zoom)
+        calib.tidy()
+        calib.updateMD2BeamPositions()
+        
+    def apertureAlign(self):
+        logging.getLogger("HWR").info("Going to realign the current aperture")
+        gevent.spawn(self.aa)
+        
+    def aa(self):
+        a = scan_and_align.scan_and_align('aperture')
+        a.scan()
+        a.align(optimum='com')
+        a.saveScan()
