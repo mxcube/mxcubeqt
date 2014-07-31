@@ -113,12 +113,12 @@ class BeamInfoPX2(Equipment):
 
     def beamPosXChanged(self, value):
         logging.getLogger().info('beamPosX changed. It is %s ' % value)
-        #self.beam_position[0] = value
+        self.beam_position[0] = value
         self.positionUpdated() 
 
     def beamPosYChanged(self, value):
         logging.getLogger().info('beamPosY changed. It is %s ' % value)
-        #self.beam_position[1] = value
+        self.beam_position[1] = value
         self.positionUpdated() 
 
     def zoomPositionChanged(self, name, offset):
