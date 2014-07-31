@@ -30,9 +30,14 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self._detector.prepareHeader = self.prepareHeader
         SOLEILMultiCollect.init(self)
        
-    def prepareHeader(self):
+    def prepareHeader(self, X=None, Y=None, D=None):
         '''Will set up header given the actual values of beamline energy, mono and detector distance'''
-        X, Y = self.beamCenter()
+        if X is None or Y is None:
+            X, Y = self.beamCenter2()
+        if D is None:
+            D = self.distance2()
+            
+        #X, Y = self.beamCenter()
 
         BeamCenterX = str(round(X, 3))
         BeamCenterY = str(round(Y, 3))
@@ -62,6 +67,43 @@ class PX2MultiCollect(SOLEILMultiCollect):
             logging.getLogger("HWR").info("Waiting for end of motors motion")
             time.sleep(0.1)  
 
+    def distance2(self):
+        logging.info('distance2 calculation')
+        '''
+        [-0.53371889  0.99843296]
+        [ 0.33265006  0.00132375]
+                                    OLS Regression Results                            
+        ==============================================================================
+        Dep. Variable:               distance   R-squared:                       1.000
+        Model:                            OLS   Adj. R-squared:                  1.000
+        Method:                 Least Squares   F-statistic:                 5.689e+05
+        Date:                Wed, 16 Jul 2014   Prob (F-statistic):          3.99e-232
+        Time:                        10:36:26   Log-Likelihood:                -255.97
+        No. Observations:                 128   AIC:                             515.9
+        Df Residuals:                     126   BIC:                             521.6
+        Df Model:                           1                                         
+        ==============================================================================
+                        coef    std err          t      P>|t|      [95.0% Conf. Int.]
+        ------------------------------------------------------------------------------
+        const         -0.5337      0.333     -1.604      0.111        -1.192     0.125
+        distance       0.9984      0.001    754.247      0.000         0.996     1.001
+        ==============================================================================
+        Omnibus:                      173.471   Durbin-Watson:                   1.902
+        Prob(Omnibus):                  0.000   Jarque-Bera (JB):            11943.491
+        Skew:                           4.863   Prob(JB):                         0.00
+        Kurtosis:                      49.312   Cond. No.                         525.
+        ==============================================================================
+        '''
+        #distance    = self.detector_mt_ts.read_attribute('position').value
+        distance   = self.det_mt_ts_dev.read_attribute('position').value
+        
+        X = numpy.matrix([1., distance])
+        theta = numpy.matrix([-0.53371889,  0.99843296])
+        
+        d = X * theta.T
+        
+        return float(d)
+
     def beamCenter(self):
         '''Will calculate beam center coordinates'''
 
@@ -89,12 +131,112 @@ class PX2MultiCollect(SOLEILMultiCollect):
 
         return Origin[1] + zcor, Origin[0] + xcor
         
+    def get_beam_center_x(self, X):
+        logging.info('beam_center_x calculation')
+        # values from 2014-07-01
+        '''
+        [  1.72620674e+03  -8.43965198e-02  -6.16352910e-01   9.74625808e+00]
+        [ 0.10650521  0.00025538  0.09303154  0.00250652]
+                                    OLS Regression Results                            
+        ==============================================================================
+        Dep. Variable:                   ORGX   R-squared:                       1.000
+        Model:                            OLS   Adj. R-squared:                  1.000
+        Method:                 Least Squares   F-statistic:                 8.059e+06
+        Date:                Wed, 16 Jul 2014   Prob (F-statistic):               0.00
+        Time:                        09:54:55   Log-Likelihood:                -22.630
+        No. Observations:                 128   AIC:                             53.26
+        Df Residuals:                     124   BIC:                             64.67
+        Df Model:                           3                                         
+        ==============================================================================
+                        coef    std err          t      P>|t|      [95.0% Conf. Int.]
+        ------------------------------------------------------------------------------
+        const       1726.2067      0.107   1.62e+04      0.000      1725.996  1726.418
+        distance      -0.0844      0.000   -330.478      0.000        -0.085    -0.084
+        wavelength    -0.6164      0.093     -6.625      0.000        -0.800    -0.432
+        mt_z           9.7463      0.003   3888.361      0.000         9.741     9.751
+        ==============================================================================
+        Omnibus:                       33.658   Durbin-Watson:                   1.310
+        Prob(Omnibus):                  0.000   Jarque-Bera (JB):              118.590
+        Skew:                          -0.869   Prob(JB):                     1.77e-26
+        Kurtosis:                       7.383   Cond. No.                     1.32e+03
+        ==============================================================================
+
+        Warnings:
+        [1] The condition number is large, 1.32e+03. This might indicate that there are
+        strong multicollinearity or other numerical problems.
+        '''
+        theta = numpy.matrix([  1.50045368e+03,   1.60241789e-04,  3.87663239e+00,   9.77188997e+00])
+        orgy = X * theta.T
+        return float(orgy)
+    
+    def get_beam_center_y(self, X):
+        logging.info('beam_center_y calculation')
+        '''
+        [  1.50045368e+03   1.60241789e-04   3.87663239e+00   9.77188997e+00]
+        [ 0.09210914  0.00020683  0.08156218  0.00343946]
+                                    OLS Regression Results                            
+        ==============================================================================
+        Dep. Variable:                   ORGY   R-squared:                       1.000
+        Model:                            OLS   Adj. R-squared:                  1.000
+        Method:                 Least Squares   F-statistic:                 2.852e+06
+        Date:                Wed, 16 Jul 2014   Prob (F-statistic):          8.84e-300
+        Time:                        09:54:55   Log-Likelihood:                -9.2162
+        No. Observations:                 128   AIC:                             26.43
+        Df Residuals:                     124   BIC:                             37.84
+        Df Model:                           3                                         
+        ==============================================================================
+                        coef    std err          t      P>|t|      [95.0% Conf. Int.]
+        ------------------------------------------------------------------------------
+        const       1500.4537      0.092   1.63e+04      0.000      1500.271  1500.636
+        distance       0.0002      0.000      0.775      0.440        -0.000     0.001
+        wavelength     3.8766      0.082     47.530      0.000         3.715     4.038
+        mt_x           9.7719      0.003   2841.110      0.000         9.765     9.779
+        ==============================================================================
+        Omnibus:                       22.231   Durbin-Watson:                   0.878
+        Prob(Omnibus):                  0.000   Jarque-Bera (JB):               52.355
+        Skew:                          -0.662   Prob(JB):                     4.28e-12
+        Kurtosis:                       5.840   Cond. No.                     1.27e+03
+        ==============================================================================
+
+        Warnings:
+        [1] The condition number is large, 1.27e+03. This might indicate that there are
+        strong multicollinearity or other numerical problems.
+        '''
+        # values from 2014-07-01
+        theta = numpy.matrix([  1.72620674e+03,  -8.43965198e-02,  -6.16352910e-01,   9.74625808e+00])
+        orgx = X * theta.T
+        return float(orgx)
+    
+    def beamCenter2(self):
+        logging.info('beamCenter calculation')
+        q = 0.102592
+        
+        wavelength = self.mono1dev.read_attribute('lambda').value
+        distance   = self.det_mt_ts_dev.read_attribute('position').value
+        tx         = self.det_mt_tx_dev.read_attribute('position').value
+        tz         = self.det_mt_tz_dev.read_attribute('position').value
+        
+        #wavelength  = self.mono1.read_attribute('lambda').value
+        #distance    = self.detector_mt_ts.read_attribute('position').value
+        #tx          = self.detector_mt_tx.position
+        #tz          = self.detector_mt_tz.position
+        
+        X = numpy.matrix([1., distance, wavelength, tx, tz])
+        
+        beam_center_x = self.get_beam_center_x(X[:, [0, 1, 2, 4]])
+        beam_center_y = self.get_beam_center_y(X[:, [0, 1, 2, 3]])
+        beam_center_y *= q
+        beam_center_x *= q
+        print 'beamCenter2', beam_center_y, beam_center_x
+        return beam_center_x, beam_center_y
+    
     def set_helical(self, onmode, positions=None):
         logging.info("<PX2 MultiCollect> set helical")
         self.helical = onmode
-        logging.info("<PX2 MultiCollect> set helical pos1 %s pos2 %s" % (positions['1'], positions['2']))
-        self.helicalStart = positions['1']
-        self.helicalFinal = positions['2']
+        if onmode:
+            logging.info("<PX2 MultiCollect> set helical pos1 %s pos2 %s" % (positions['1'], positions['2']))
+            self.helicalStart = positions['1']
+            self.helicalFinal = positions['2']
         
     def set_translational(self, onmode, positions=None, step=None):
         logging.info("<PX2 MultiCollect> set translational")
@@ -138,14 +280,15 @@ class PX2MultiCollect(SOLEILMultiCollect):
     def calculateTranslationalCollectPositions(self, start, final, nImages):
         '''take into account the beam size and spread the positions optimally between start and final positions.'''
         logging.info("<PX2 MultiCollect> calculateTranslationalCollectPositions")
+        logging.info("<PX2 MultiCollect> start %s, final %s, nImages %s" %(start, final, nImages))
         positions = []
-        horizontal_beam_size = self.get_horizontal_beam_size()
+        horizontal_beam_size = 0.015 #self.get_horizontal_beam_size()
         totalHorizontalDistance = abs(final['phiy'] - start['phiy'])
         freeHorizontalSpace = totalHorizontalDistance - horizontal_beam_size
         # Due to our rotational axis being horizontal we take the horizontal beam size as the basic step size
         nPositions = int(freeHorizontalSpace // horizontal_beam_size) + 2
         nImagesPerPosition, remainder = divmod(nImages, nPositions)
-        
+        logging.info("<PX2 MultiCollect> nImagesPerPosition %s, remainder %s" %(nImagesPerPosition,remainder))
         positions = self.getPoints(start, final, nPositions)
         explicit_positions = []
         k = 0
@@ -456,7 +599,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         elif 'detdistance' in oscillation_parameters:
           self.move_detector(oscillation_parameters["detdistance"])
           
-        self.close_fast_shutter()
+        #self.close_fast_shutter()
 
         self.move_motors(motors_to_move_before_collect)
 
@@ -560,7 +703,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                        self.do_oscillation(osc_start, osc_end, exptime, npass)
                     self.stop_acquisition()
                     last_frame = start_image_number + nframes - 1
-                    self.write_image(frame == last_frame)
+                    self.write_image(last_frame)
                     
                     # Store image in lims
                     if self.bl_control.lims:
