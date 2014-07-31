@@ -216,6 +216,7 @@ class LimaAdscDetector:
         self.xformstatusfile   = None
 
     def initDetector(self, adscname, limaadscname, xformstatusfile):
+        logging.info("<SOLEIL MultiCollect> Initializing LIMA detector")
         try: 
            self.adscdev           = PyTango.DeviceProxy(adscname) 
            self.limaadscdev       = PyTango.DeviceProxy(limaadscname) 
@@ -292,7 +293,7 @@ class LimaAdscDetector:
     @task
     def write_image(self, last_frame):
         #if last_frame:
-        self.lastImage(integer=self.imageNumber, imagePath=self.imagePath, fileName=self.fileName)
+        self.lastImage(integer=last_frame, imagePath=self.imagePath, fileName=self.fileName)
         #else:
         #    pass
 
@@ -482,7 +483,6 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                sample_changer    = self.getObjectByRole("sample_changer"),
                                lims              = self.getObjectByRole("dbserver"),
                                safety_shutter    = self.getObjectByRole("safety_shutter"),
-                               fast_shutter      = self.getObjectByRole("fast_shutter"),
                                machine_current   = self.getObjectByRole("machine_current"),
                                cryo_stream       = self.getObjectByRole("cryo_stream"),
                                energy            = self.getObjectByRole("energy"),
@@ -491,7 +491,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                transmission      = self.getObjectByRole("transmission"),
                                undulators        = self.getObjectByRole("undulators"),
                                flux              = self.getObjectByRole("flux"))
-
+        #fast_shutter      = self.getObjectByRole("fast_shutter"),
         mxlocalHO = self.getObjectByRole("beamline_configuration")
         bcm_pars = mxlocalHO["BCM_PARS"]
         spec_pars = mxlocalHO["SPEC_PARS"]
@@ -525,10 +525,10 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                       beam_divergence_vertical = bcm_pars.getProperty('beam_divergence_vertical'),
                                       beam_divergence_horizontal = bcm_pars.getProperty('beam_divergence_horizontal'),     
                                       polarisation = bcm_pars.getProperty('polarisation'),
-                                      auto_processing_server = self.getProperty("auto_processing_server"),
+                                      #auto_processing_server = self.getProperty("auto_processing_server"),
                                       input_files_server = self.getProperty("input_files_server"))
   
-        #self._detector.initDetector( self.adscname, self.limaadscname, self.xformstatusfile )
+        self._detector.initDetector( self.adscname, self.limaadscname, self.xformstatusfile )
         self._tunable_bl.bl_control = self.bl_control
 
         self.emit("collectConnected", (True,))
@@ -547,6 +547,8 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
     @task
     def data_collection_cleanup(self):
+        logging.info("<SOLEIL MultiCollect> TODO - close fast shutter")
+        return
         self.close_fast_shutter()
 
     @task
@@ -640,6 +642,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def close_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - close safety shutter" )
+        return
         self.bl_control.safety_shutter.closeShutter()
         t0 = time.time()
         while self.bl_control.safety_shutter.getShutterState() == 'opened':
