@@ -288,8 +288,12 @@ class DataCollectTree(qt.QWidget):
                and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
                 self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
             else:
-                self.beamline_setup_hwobj.sample_changer_hwobj.\
-                    unload(22, sample_location = location, wait = False)
+                if 'SC3' in self.beamline_setup_hwobj.sample_changer_hwobj.__class__.__name__:
+                  self.beamline_setup_hwobj.sample_changer_hwobj.\
+                      unload(22, sample_location = location, wait = False)
+                else:
+                  self.beamline_setup_hwobj.sample_changer_hwobj.\
+                      unload_sample(22, sample_location = location, wait = False)
 
             items[0].setOn(False)
             items[0].set_mounted_style(False)
