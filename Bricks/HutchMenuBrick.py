@@ -709,7 +709,6 @@ class HutchMenuBrick(BlissWidget):
                 pass
             else:
 		self.emit(PYSIGNAL("calibrationChanged"), (self.__scaleX, self.__scaleY))
-                #self.slitsPositionChanged()
                 self.updateBeam(force=True)
         except:
             logging.getLogger().exception("HutchMenuBrick: problem starting up display")
@@ -730,11 +729,6 @@ class HutchMenuBrick(BlissWidget):
             self.__beam.show()
         except:
           pass
-    
-    #def _updateBeam(self, ret):
-    #    self.beam_size = (int(ret["size_x"]), int(ret["size_y"]))
-    #    self._bshape = ret["shape"]
-    #    self._drawBeam()
 
     def updateBeam(self,force=False):
         if self["displayBeam"]:
