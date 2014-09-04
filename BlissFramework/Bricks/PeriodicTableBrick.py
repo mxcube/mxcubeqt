@@ -23,17 +23,42 @@ class PeriodicTableBrick(BlissWidget):
         self.defineSlot('setEnabled',())
         self.defineSlot('setSession',())
 
-        self.topBox = QHBox(self)
+        #test if better vertical box.
+        #self.topBox = QHBox(self)
+        self.topBox = QVBox(self)
         #self.topBox.setInsideMargin(4)
         #self.topBox.setInsideSpacing(2)
+
+        self.holeBox = QWidget(self.topBox)
+        QGridLayout(self.holeBox)
 
         self.periodicTable=myPeriodicTable(self.topBox)
         self.connect(self.periodicTable,PYSIGNAL('edgeSelected'),self.edgeSelected)
 
         self.instanceSynchronize("periodicTable")
+        HOLE = ["L1","L2","L3"]
+        self.hole_label = QLabel("Hole:", self.holeBox)
+        self.holeBox.layout().addWidget(self.hole_label , 1, 0)
+        self.hole = QComboBox(self.holeBox)
+        self.holeBox.layout().addWidget(self.hole, 1, 1)
+        for item_name in HOLE:
+            self.hole.insertItem(item_name)
+        QObject.connect(self.hole, SIGNAL('activated(int)'), self.hole_activated)
+        self.hole_label.setEnabled(False)
+        self.hole.setEnabled(False)
+        #self.hole_label.hide()
+        #self.hole.hide()
 
         QHBoxLayout(self)
         self.layout().addWidget(self.topBox)
+
+    def hole_activated(self, value):
+        if value == 0:
+            self.current_edge = "L1"
+        elif value == 1:
+            self.current_edge = "L2"
+        else:
+            self.current_edge = "L3"
 
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
@@ -55,8 +80,20 @@ class PeriodicTableBrick(BlissWidget):
 
     def edgeSelected(self, symbol, energy):
         self.emit(PYSIGNAL('edgeSelected'), (symbol, energy))
+        #import pdb; pdb.set_trace()
         self.current_element = symbol
-        self.current_edge = energy
+        if energy != "K":
+            self.hole_label.setEnabled(True)
+            self.hole.setEnabled(True)
+            #self.hole_label.show()
+            #self.hole.show()
+        else:
+            self.hole_label.setEnabled(False)
+            self.hole.setEnabled(False)
+            #self.hole_label.hide()
+            #self.hole.hide()
+            self.current_edge = energy
+        
 
     def setSession(self,session_id):
         if session_id is None:
