@@ -35,6 +35,7 @@ def run(GUIConfigFile=None):
 
     parser = OptionParser(usage = 'usage: %prog <GUI definition file> [options]')
     parser.add_option('', '--logFile', action = 'store', type = 'string', help = 'Log file', dest = 'logFile', metavar = 'FILE', default = '')
+    parser.add_option('', '--logLevel', action = 'store', type = 'string', help = 'Log level', dest = 'logLevel', default = 'INFO')
     parser.add_option('', '--bricksDirs', action = 'store', type = 'string', help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
     parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
     parser.add_option('', '--hardwareObjectsDirs', action = 'store', type = 'string', help = 'Additional directories for Hardware Objects search path (you can also use the CUSTOM_HARDWARE_OBJECTS_PATH environment variable)', dest = 'hardwareObjectsDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
@@ -181,6 +182,8 @@ def run(GUIConfigFile=None):
     #
     # log startup details
     #
+    logLevel = getattr(logging, opts.logLevel)
+    logging.getLogger().setLevel(logLevel)
     logInfo = 'GUI started (%s)' % (GUIConfigFile or "unnamed")
     logInfo += ', HWRSERVER=%s' % hwrServer
     if len(hoDirs) > 0:
