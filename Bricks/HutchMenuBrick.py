@@ -2,7 +2,6 @@ from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 import logging
-#import MiniDiff
 import CommandMenuBrick
 import os
 import time
@@ -227,6 +226,8 @@ class HutchMenuBrick(BlissWidget):
             self.extraCommands['icons']=newValue
         elif propertyName=='queue':
             self.queue_hwobj = self.getHardwareObject(newValue)
+            self.queue_hwobj.connect("queue_execution_finished", self.enable)
+            self.queue_hwobj.connect("queue_stopped", self.enable)
 	elif propertyName=='useMDPhases':
 	    if newValue:
 	        self.buttonToogleMDPhase.show()
@@ -234,6 +235,12 @@ class HutchMenuBrick(BlissWidget):
 		self.buttonToogleMDPhase.hide()
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
+
+    def enable(self, *args):
+        self.setEnabled(True)
+
+    def disable(self, *args):
+        self.setEnabled(False)
 
     def setIcons(self,icons):
         icons_list=icons.split()
@@ -412,7 +419,7 @@ class HutchMenuBrick(BlissWidget):
         self.emit(PYSIGNAL("newCentredPos"), (state, centring_status, beam_info))
 
         if self.queue_hwobj.is_executing():
-            self.setEnabled(False)
+            self.disable()
 
     def centringSnapshots(self,state):
         if state is None:
