@@ -6,3 +6,4 @@ build
 \#*#
 .*
 venv
+src/data/container_file*
