@@ -1,136 +1,151 @@
-<!doctype html>
 <html>
-  <head> 
-    <title>mxCuBE v3 web demo</title>
-    <meta charset="utf-8"/>
-    <script language="JavaScript" type="text/javascript" src="js/jquery-1.9.1.js"></script>
-    <script language="JavaScript" type="text/javascript" src="js/bootstrap.js"></script>
-    <script language="JavaScript" type="text/javascript" src="js/main.js"></script>
-    <link rel="stylesheet" href="css/bootstrap.css"/>
-  </head>
-  <body>
-    <!-- NAVBAR -->
-    <div class="navbar navbar-inverse">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">mxCuBE web edition</a>
-          <div class="nav-collapse collapse">
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-    <!-- NAVBAR END -->
+<head>
+<title>MXCuBE 3</title>
+<meta charset="UTF-8" />
+<script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fuelux/2.6.1/all.min.js"></script>
+<script src="//fb.me/react-with-addons-0.11.1.js"></script>
+<script src="//fb.me/JSXTransformer-0.11.1.js"></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+<script src="http://underscorejs.org/underscore-min.js"></script>
+<script src="http://backbonejs.org/backbone-min.js"></script>
 
-    <div class="container">
-      <div class="row">
-        <div class="span8">
-          <div class="form-horizontal">
-            <input type="text" class="input-small" placeholder="Username" id="username"/>
-            <input type="password" class="input-small" placeholder="Password" id="password"/>
-            <button class="btn" id="login_button">Login</button>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="span8">
-          <div class="input-append">
-            <label>Light</label>
-            <input type="text" class="input-small" id="light"/>
-  	    <button class="btn" id="set_light_level">Set</button>
-  	    <div class="btn-group" data-toggle="buttons-radio" data-toggle-name="light-toggle" id="light-toggle">
-  	      <button class="btn btn-primary" id="lightin">In</button>
-  	      <button class="btn btn-primary" id="lightout">Out</button>
-  	    </div>
-            <label>Zoom</label>
-      	    <select class="span1" id="zoom">
-      	      <option value="0">1</option>
-      	      <option value="1">2</option>
-      	      <option value="2">3</option>
-      	      <option value="3">4</option>
-      	      <option value="4">5</option>
-      	      <option value="5">6</option>
-      	    </select>
-            <button class="btn" id="centre_button">Start centering</button>
-    	  </div>
-        </div>
-      </div>
-    
-      <!-- canvas and associated options -->
-      <div class="row">
-        <div class="span8">
-          <!-- the sample view -->
-          <canvas width="659" height="493" id="sample_view"></canvas>
-        </div>
-        <div class="span4">
-          <form class="form-horizontal">
-            <div class="control-group">
-              <label class="control-label" for="osc_range">Oscillation range</label>
-              <div class="controls">
-                <input type="text" id="osc_range"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="first_image">First image</label>
-              <div class="controls">
-                <input type="text" id="first_image"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="overlap">Oscilation overlap</label>
-              <div class="controls">
-                <input type="text" id="overlap"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="nb_images">Number of images</label>
-              <div class="controls">
-                <input type="text" id="nb_images"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="osc_start">Oscillation start</label>
-              <div class="controls">
-                <input type="text" id="osc_start"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="nb_passes">Number of passes</label>
-              <div class="controls">
-                <input type="text" id="nb_passes"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="exp_time">Exposure time</label>
-              <div class="controls">
-                <input type="text" id="exp_time"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="energy">Energy (keV)</label>
-              <div class="controls">
-                <input type="text" id="energy"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="resolution">Resolution (&#8491;)</label>
-              <div class="controls">
-                <input type="text" id="resolution"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="transmission">Transmission (%)</label>
-              <div class="controls">
-                <input type="text" id="transmission"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <div class="controls">
-                <button class="btn" id="collect_button">Collect</button>
-              </div>
-  	  </div>
-          </form>
-        </div>
-      </div>
+<script type="text/jsx" src="/js/sample.jsx"></script>
+<script type="text/jsx" src="/js/queue.jsx"></script>
+<script type="text/jsx" src="/js/dc_methods.jsx"></script>
+<script type="text/jsx" src="/js/motor.jsx"></script>
+
+<style type="text/css">
+.top5 { margin-top:5px; }
+.top7 { margin-top:7px; }
+.top10 { margin-top:10px; }
+.top15 { margin-top:15px; }
+.top17 { margin-top:17px; }
+.top30 { margin-top:30px; }
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
+.sample_video1 {
+   z-index: 10;
+}
+
+.sample_video_canvas1 {
+   z-index: 20;
+}
+
+.sample_video {
+   position:absolute;
+   top: 0px;
+   left: 0px;
+   z-index: 10;
+}
+
+.sample_video_canvas {
+   position:absolute;
+   z-index: 20;
+   top: 0px;
+   left: 0px;
+   border:1px solid #000000;
+}
+</style>
+
+<script type="text/jsx">
+
+/** @jsx React.DOM */
+
+function drawSomething() {
+   var cvs = document.getElementById("video_canvas");
+   var ctx = cvs.getContext("2d");
+
+   ctx.rect(20,20,150,150);
+   ctx.stroke();
+}
+
+function createSampleList() {
+   $.get("samples", {}, function(data) {
+        var sample_list = SampleList({ samples: data.loaded_sample }); 
+        React.renderComponent(sample_list, $('#samples_list')[0] );
+   }, "json");
+}
+
+function getSessionInfo() {
+   $.get("mxcube/proposal", {}, function(data) {
+      if (data.proposal == "") {
+          window.location.replace("/login");
+      } else {
+          $("#loggedin").html(data.proposal);
+      }
+   }); //, "json");
+}
+
+function logout() {
+   window.location.replace("/logout");
+}
+
+$( document ).ready(function() {
+   window.app_dispatcher = _.extend({}, Backbone.Events);
+
+   $.fn.editable.defaults.mode = 'popup';
+   $.get("/init");
+   getSessionInfo();
+   createSampleList();
+   
+   React.renderComponent(<Queue/>, $("#queue")[0]);
+   React.renderComponent(<DCMethods/>, $("#dc_method")[0]);
+
+   drawSomething();
+});
+
+</script>
+</head>
+
+<body>
+
+<header>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">MXCuBE</a>
     </div>
-  </body>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <p class="navbar-text" id="loggedin"></p>
+      <ul class="nav navbar-nav navbar-right">
+         <button type="button" class="btn btn-default navbar-btn" onClick="logout();">Logout</button>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+</header>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+     <div class="col-md-3" id="samples_list"></div>
+     <div class="col-md-3">
+       <div id="dc_method"></div>
+       <div id="queue"></div>
+     </div>
+     <div class="col-md-6">
+       <div class="col-centered text-center">
+         <video class="sample_video" poster="/sample_video_stream" width="650" height="485"></video>
+         <canvas class="sample_video_canvas" id="video_canvas" width="650" height="485"></canvas>
+       </div>
+     </div>
+  </div>
+</div>
+
+</body>
 </html>

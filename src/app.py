@@ -1,48 +1,63 @@
+"""
+   Sample list
+  
+   Image 
+"""
+
+import time
 import os
 import sys
+import json
+import socket
+
 import gevent
 import gevent.event
-import bottle
-import json
-import time
-import Image
+from gevent import monkey; monkey.patch_all()
+from gevent import sleep
+ 
+from PIL import Image
 import cStringIO
 import base64
 import numpy
-#import zlib
+
 from HardwareRepository import HardwareRepository
 
-mxcube = bottle.Bottle()
+import bottle
+from bottle import get, post, request, response, route, static_file, redirect
+from bottle import GeventServer, run
 
-@mxcube.route('/')
-def index():
-  return bottle.static_file("mxcube.html", root=os.path.dirname(__file__))
-@mxcube.route('/:filename')
-def send_static(filename):
-  return bottle.static_file(filename, root=os.path.dirname(__file__))
-@mxcube.route('/css/:filename')
-def send_static_css(filename):
-  return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'css'))
-@mxcube.route('/js/:filename')
-def send_static_js(filename):
-  return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'js'))
-@mxcube.route('/img/:filename')
-def send_static_img(filename):
-  return bottle.static_file(filename, root=os.path.join(os.path.dirname(__file__), 'img'))
+from beaker.middleware import SessionMiddleware
+
+samples_info= open(os.path.join(os.path.dirname(__file__), "sample_list.txt")).read()
+
+session_opts = {
+    'session.type': 'file',
+    'session.cookie_expires': 300,
+    'session.data_dir': './data',
+    'session.auto': True
+}
+
+mxcube = bottle.Bottle()
+mxcube_app = SessionMiddleware(mxcube, session_opts)
 
 def new_sample_video_frame_received(img, width, height, *args):
-  raw_data = img.bits().asstring(img.numBytes())  
-  im = Image.fromstring("RGBX", (width,height), raw_data)
-  b,g,r,x = im.split()
-  rgb_im = Image.merge("RGB",(r,g,b))
-  jpeg_buffer = cStringIO.StringIO()
-  rgb_im.save(jpeg_buffer, "JPEG")  
-  t0=time.time()
-  data=base64.b64encode(jpeg_buffer.getvalue())
-  #print 'size=',len(data), 'encoded in', time.time()-t0, "seconds"
-  mxcube.new_frame.set(data)
+  if type(img) == str:
+      jpeg_buffer = cStringIO.StringIO()
+      jpeg_buffer.write(img)
+  elif type(img) == cStringIO.OutputType:
+      jpeg_buffer = img
+  else:
+      raw_data = img.bits().asstring(img.numBytes())  
+      im = Image.fromstring("RGBX", (width,height), raw_data)
+      b,g,r,x = im.split()
+      rgb_im = Image.merge("RGB",(r,g,b))
+      jpeg_buffer = cStringIO.StringIO()
+      rgb_im.save(jpeg_buffer, "JPEG")  
+
+  mxcube.new_frame.set(jpeg_buffer.getvalue())
 
 def bl_state():
+  return {}
   return {"resolution": str("%3.4f" % mxcube.bl_setup.resolution_hwobj.getPosition()),
            "energy": str("%2.4f" % mxcube.bl_setup.energy_hwobj.getCurrentEnergy()),
            "light": str("%1.2f" % mxcube.bl_setup.diffractometer_hwobj.lightMotor.getPosition()),
@@ -52,42 +67,32 @@ def bl_state():
            "pixelsPerMmY": mxcube.bl_setup.diffractometer_hwobj.pixelsPerMmY,
            "pixelsPerMmZ": mxcube.bl_setup.diffractometer_hwobj.pixelsPerMmZ }
 
+def successful_login( getdict ):
+    sess = request.environ.get('beaker.session')
+    sess['proposal'] = getdict['proposal']
+    sess.save()
+
+
 @mxcube.get('/init')
 def init():
   hwr_directory = os.environ["XML_FILES_PATH"]
   
   if not hasattr(mxcube, "bl_setup"):
-      hwr = HardwareRepository.HardwareRepository(hwr_directory)
+      print "Loading hardware repository from ", os.path.abspath(hwr_directory)
+      hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
       hwr.connect()
 
       mxcube.new_frame = gevent.event.AsyncResult()
       mxcube.bl_setup = hwr.getHardwareObject("/beamline-setup")
-      mxcube.bl_setup.diffractometer_hwobj.camera.connect("imageReceived", new_sample_video_frame_received)
-      mxcube.bl_setup.diffractometer_hwobj.camera.setLive(True)
+
+      mxcube.video = hwr.getHardwareObject("/camera")
+      mxcube.video.connect("imageReceived", new_sample_video_frame_received)
  
   return json.dumps(bl_state())
 
 @mxcube.get("/state")
 def state():
   return json.dumps(bl_state())
-
-@mxcube.get("/login")
-def login():
-  password=bottle.request.GET["password"]
-  username = bottle.request.GET["username"]
-  i=0
-  for c in username:
-    if c.isdigit():
-      proposal=username[:i]
-      proposal_number=username[i:]
-      break
-    i+=1
-  login_name = ispyb.translate(proposal,"ldap")+proposal_number 
-  ok, msg=ldap.login(login_name,password)
-  if not ok:
-    return json.dumps({"ok":0,"err":msg.capitalize()})
-  prop = ispyb.getProposal(proposal,proposal_number)
-  return json.dumps({"ok":1 if prop['status']['code']=='ok' else 0, "err":"ISPyB problem"})
 
 @mxcube.get("/set_light_level")
 def set_light_level():
@@ -122,17 +127,13 @@ def set_zoom():
 
 @mxcube.get('/sample_video_stream')
 def stream_video():
-  #compressor=zlib.compressobj()
-  bottle.response.content_type = "text/event-stream"
-  bottle.response.add_header("Connection", "keep-alive")
-  bottle.response.add_header("Cache-Control", "no-cache, must-revalidate")
-  #bottle.response.add_header("Content-Encoding", "deflate")
-  #bottle.response.add_header("Transfer-Encoding", "chunked")
-  while True:
-      jpeg_data = mxcube.new_frame.get()
-      yield "data: %s\n\n" % jpeg_data
-      #yield compressor.compress("data: %s\n\n" % jpeg_data)
-      #yield compressor.flush(zlib.Z_SYNC_FLUSH)
+    #import pdb;pdb.set_trace()
+    mxcube.video.setLive(True)
+    bottle.response.content_type = 'multipart/x-mixed-replace; boundary="!>"'
+    while True:
+        mxcube.new_frame.wait()
+        frame = mxcube.new_frame.get()
+        yield 'Content-type: image/jpg\n\n'+frame+"\n--!>" 
 
 @mxcube.get("/centring")
 def do_centring():
@@ -151,3 +152,89 @@ def do_centring():
     return json.dumps({ "continue": False })
   else:
     return json.dumps({ "continue": True })
+
+@mxcube.get('/samples')
+def return_samples():
+    return json.dumps(eval(samples_info))
+
+@mxcube.post('/sample_field_update')
+def sample_field_update():
+    print "Sample field updated"
+    print request.POST.items()
+    return 
+
+@mxcube.get("/")
+@mxcube.get("/login")
+def login():
+    if 'proposal' in request.GET.keys() and request.GET['proposal'] != "":
+        if True: #remhost  in ['localhost', localhost]:
+             successful_login(request.GET)
+             response.status=303
+             response.set_header("location","/mxcube")
+             return
+
+        remaddr = request.environ['REMOTE_ADDR']
+        try:
+          remhost = socket.gethostbyaddr( remaddr )[0]
+          localhost = socket.gethostname() 
+          if True: #remhost  in ['localhost', localhost]:
+             successful_login(request.GET)
+             response.status=303
+             response.set_header("location","/mxcube")
+             return
+        except:
+          sys.excepthook(*sys.exc_info())
+        
+        # exception or remote
+        redirect('http://www.google.com')
+    else:
+        return static_file("login.html", os.path.dirname(__file__))
+
+@mxcube.get("/login_ispyb")
+def login_ispyb():
+  """
+  """
+  password=bottle.request.GET["password"]
+  username = bottle.request.GET["username"]
+  i=0
+  for c in username:
+    if c.isdigit():
+      proposal=username[:i]
+      proposal_number=username[i:]
+      break
+    i+=1
+  login_name = ispyb.translate(proposal,"ldap")+proposal_number 
+  ok, msg=ldap.login(login_name,password)
+  if not ok:
+    return json.dumps({"ok":0,"err":msg.capitalize()})
+  prop = ispyb.getProposal(proposal,proposal_number)
+  return json.dumps({"ok":1 if prop['status']['code']=='ok' else 0, "err":"ISPyB problem"})
+
+@mxcube.get("/logout")
+def logout():
+    sess = request.environ.get('beaker.session')
+    sess.delete()
+    response.status=303
+    response.set_header("location","/login")
+
+
+@mxcube.route("/mxcube/proposal")
+def mxcube_proposal():
+    sess = request.environ.get('beaker.session')
+    return { "proposal": sess.get("proposal", "") }
+
+@mxcube.route("/mxcube")
+def mxcube_html():
+    sess = request.environ.get('beaker.session')
+    return static_file("mxcube.html", os.path.dirname(__file__))
+
+@mxcube.route("/sample_list")
+def sample_list():
+   return static_file("samples_test.html", os.path.dirname(__file__))
+
+@mxcube.route("/<url:path>")
+def serve_static_file(url):
+   return static_file(url, os.path.dirname(__file__))
+
+if __name__ == '__main__':
+   run(app=mxcube_app, host="", port="8080",server=GeventServer)
