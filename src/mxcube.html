@@ -99,6 +99,9 @@ $( document ).ready(function() {
    React.renderComponent(<DCMethods/>, $("#dc_method")[0]);
 
    drawSomething();
+
+   $("#sample_video").attr("poster","/sample_video_stream");
+
 });
 
 </script>
@@ -140,7 +143,8 @@ $( document ).ready(function() {
      </div>
      <div class="col-md-6">
        <div class="col-centered text-center">
-         <video class="sample_video" poster="/sample_video_stream" width="650" height="485"></video>
+         <!-- video class="sample_video" poster="/sample_video_stream" width="650" height="485"></video -->
+         <video class="sample_video" id="sample_video" width="650" height="485"></video>
          <canvas class="sample_video_canvas" id="video_canvas" width="650" height="485"></canvas>
        </div>
      </div>

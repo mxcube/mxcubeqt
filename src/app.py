@@ -169,8 +169,9 @@ def login():
     if 'proposal' in request.GET.keys() and request.GET['proposal'] != "":
         if True: #remhost  in ['localhost', localhost]:
              successful_login(request.GET)
-             response.status=303
-             response.set_header("location","/mxcube")
+             redirect("/mxcube")
+             #response.status=303
+             #response.set_header("location","/mxcube")
              return
 
         remaddr = request.environ['REMOTE_ADDR']
