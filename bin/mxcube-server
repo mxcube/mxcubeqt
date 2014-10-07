@@ -2,9 +2,10 @@
 
 MXCUBE_ROOT="$( cd "$(dirname "$0")/.." && pwd )"
 MXCUBE_APP="$MXCUBE_ROOT/src"
+
 export CUSTOM_HARDWARE_OBJECTS_PATH="$MXCUBE_ROOT/HardwareObjects"
 export PYTHONPATH="$MXCUBE_ROOT:$PYTHONPATH"
-export XML_FILES_PATH="$1"
+export XML_FILES_PATH="$PWD/$1"
 
 if [ -z $XML_FILES_PATH ]; then
   echo "Usage: $0 xml_files_path"
