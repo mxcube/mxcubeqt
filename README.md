@@ -59,13 +59,11 @@ And you're done !
 
 *disclaimer: code will only work with Firefox >= 19 and Chrome. Safari is not tested. IE is **not supported.***
 
-Once branch is checked out and additional dependencies are satisfied (see above):
+Once branch is checked out and additional dependencies are satisfied (see above), you can
+immediately start the MXCuBE server using some defaults XML files and mockup objects that
+are shipped with the code:
 
-    ./bin/mxcube-server <path to Hardware Repository XML files>
-    
-As an example, some default XML files and mockup objects are shipped with the code, you can try:
-
-   ./bin/mxcube-server ExampleFiles/HardwareObjects.xml
+    ./bin/mxcube-server ExampleFiles/HardwareObjects.xml
     
 Then, go to the [http://localhost:8080](http://localhost:8080) URL within your web browser.
 
