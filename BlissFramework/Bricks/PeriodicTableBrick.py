@@ -3,7 +3,6 @@ from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from PyMca import QPeriodicTable
 
-
 __category__ = 'mxCuBE'
 
 class PeriodicTableBrick(BlissWidget):
@@ -23,7 +22,6 @@ class PeriodicTableBrick(BlissWidget):
         self.defineSlot('setEnabled',())
         self.defineSlot('setSession',())
 
-        #test if better vertical box.
         #self.topBox = QHBox(self)
         self.topBox = QVBox(self)
         #self.topBox.setInsideMargin(4)
@@ -32,11 +30,7 @@ class PeriodicTableBrick(BlissWidget):
         self.holeBox = QWidget(self.topBox)
         QGridLayout(self.holeBox)
 
-        self.periodicTable=myPeriodicTable(self.topBox)
-        self.connect(self.periodicTable,PYSIGNAL('edgeSelected'),self.edgeSelected)
-
-        self.instanceSynchronize("periodicTable")
-        HOLE = ["L1","L2","L3"]
+        HOLE = ["Not selected", "L3","L2","L1"]
         self.hole_label = QLabel("Hole:", self.holeBox)
         self.holeBox.layout().addWidget(self.hole_label , 1, 0)
         self.hole = QComboBox(self.holeBox)
@@ -44,21 +38,26 @@ class PeriodicTableBrick(BlissWidget):
         for item_name in HOLE:
             self.hole.insertItem(item_name)
         QObject.connect(self.hole, SIGNAL('activated(int)'), self.hole_activated)
-        self.hole_label.setEnabled(False)
-        self.hole.setEnabled(False)
-        #self.hole_label.hide()
-        #self.hole.hide()
+        #self.hole_label.setEnabled(False)
+        #self.hole.setEnabled(False)
+        self.hole_label.hide()
+        self.hole.hide()
+
+        self.periodicTable=myPeriodicTable(self.topBox)
+        self.connect(self.periodicTable,PYSIGNAL('edgeSelected'),self.edgeSelected)
+        self.instanceSynchronize("periodicTable")
 
         QHBoxLayout(self)
         self.layout().addWidget(self.topBox)
 
     def hole_activated(self, value):
-        if value == 0:
+        if value == 3:
             self.current_edge = "L1"
-        elif value == 1:
+        elif value == 2:
             self.current_edge = "L2"
         else:
             self.current_edge = "L3"
+        self.periodicTable.tableElementChanged(self.current_element, self.current_edge)
 
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
@@ -80,20 +79,19 @@ class PeriodicTableBrick(BlissWidget):
 
     def edgeSelected(self, symbol, energy):
         self.emit(PYSIGNAL('edgeSelected'), (symbol, energy))
-        #import pdb; pdb.set_trace()
         self.current_element = symbol
+
         if energy != "K":
-            self.hole_label.setEnabled(True)
-            self.hole.setEnabled(True)
-            #self.hole_label.show()
-            #self.hole.show()
+            #self.hole_label.setEnabled(True)
+            #self.hole.setEnabled(True)
+            self.hole_label.show()
+            self.hole.show()
         else:
-            self.hole_label.setEnabled(False)
-            self.hole.setEnabled(False)
-            #self.hole_label.hide()
-            #self.hole.hide()
+            #self.hole_label.setEnabled(False)
+            #self.hole.setEnabled(False)
+            self.hole_label.hide()
+            self.hole.hide()
             self.current_edge = energy
-        
 
     def setSession(self,session_id):
         if session_id is None:
@@ -128,21 +126,20 @@ class myPeriodicTable(QPeriodicTable.QPeriodicTable):
         if b.isEnabled():
             b.setCurrent(False)
 
-    def tableElementChanged(self,symbol):
-        energy=self.energiesDict[symbol]
+    def tableElementChanged(self,symbol,energy=None):
+        if energy is None:
+            energy=self.energiesDict[symbol]
         self.setSelection((symbol,))
 
-        try:
+        if energy is None:
             energy=self.energiesDict[symbol]
-        except KeyError:
-            pass
         else:
             index=self.elementsDict[symbol][1]
             name=self.elementsDict[symbol][4]
             txt="<large>%s - %s </large>(%s,%s)" % (symbol,energy,index,name)
             self.eltLabel.setText(txt)
             self.emit(PYSIGNAL('edgeSelected'), (symbol,energy))
-            self.emit(PYSIGNAL("widgetSynchronize"),((symbol,),))
+            self.emit(PYSIGNAL("widgetSynchronize"),((symbol,energy),))
             
     def setElements(self,elements):
         self.energiesDict={}
@@ -161,4 +158,4 @@ class myPeriodicTable(QPeriodicTable.QPeriodicTable):
 
     def widgetSynchronize(self,state):
         symbol=state[0]
-        self.tableElementChanged(symbol)
+        self.tableElementChanged(symbol,energy)
