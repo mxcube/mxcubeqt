@@ -1,8 +1,8 @@
 # MXCuBE web application - preliminary study
 
 This branch contains an embryo MXCuBE web server, embedding
-a mxCuBE application. The code was first demonstrated at the
-3rd mxCuBE meeting in April, 2013. It has been updated on
+a MXCuBE application. The code was first demonstrated at the
+3rd MXCuBE meeting in April, 2013. It has been updated on
 the 7th October 2014 after the MXCuBE 3 study meeting at
 ALBA.
 
