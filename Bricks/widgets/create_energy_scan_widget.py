@@ -60,9 +60,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.suffix = 'raw'
 
 
-    def set_energy_scan_hwobj(self, energy_hwobj):
+    def set_energy_scan_hwobj(self, energy_scan_hwobj):
         self.periodic_table.periodicTable.\
-            setElements(energy_hwobj.getElements())
+            setElements(energy_scan_hwobj.getElements())
 
 
     def single_item_selection(self, tree_item):

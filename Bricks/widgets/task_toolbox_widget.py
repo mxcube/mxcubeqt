@@ -89,7 +89,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.shape_history = beamline_setup_hwobj.shape_history_hwobj
         self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
         self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
-        self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energy_hwobj)
+        self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
 
         # Remove energy scan page from non tunable wavelentgh beamlines
         if not beamline_setup_hwobj.tunable_wavelength():
