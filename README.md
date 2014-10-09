@@ -14,6 +14,8 @@ The easiest way is to use the "requirements.txt" file with
 
     pip install -r requirements.txt
 
+---
+
 If your Linux distribution doesn't allow you to have those
 dependencies installed, use [pythonbrew](https://github.com/utahta/pythonbrew) to make your own
 Python environment. Follow instructions on this [page](https://pypi.python.org/pypi/pythonbrew/),
@@ -27,7 +29,8 @@ Also install pip for this Python 2.7.7 install:
     
     curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
     python get-pip.py
-    
+
+---    
 
 Once Python environment is ready, let's clone the repository:
     
