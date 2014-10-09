@@ -8,11 +8,15 @@ ALBA.
 
 ## Installing
 
+### 1. Requirements
+
 First you need to make sure requirements are satisfied.
 The easiest way is to use the "requirements.txt" file with
 [pip](https://pip.readthedocs.org/en/latest/):
 
     pip install -r requirements.txt
+
+---
 
 If your Linux distribution doesn't allow you to have those
 dependencies installed, use [pythonbrew](https://github.com/utahta/pythonbrew) to make your own
@@ -27,7 +31,10 @@ Also install pip for this Python 2.7.7 install:
     
     curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
     python get-pip.py
-    
+
+---    
+
+### 2. Cloning
 
 Once Python environment is ready, let's clone the repository:
     
