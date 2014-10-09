@@ -8,6 +8,8 @@ ALBA.
 
 ## Installing
 
+### 1. Requirements
+
 First you need to make sure requirements are satisfied.
 The easiest way is to use the "requirements.txt" file with
 [pip](https://pip.readthedocs.org/en/latest/):
@@ -31,6 +33,8 @@ Also install pip for this Python 2.7.7 install:
     python get-pip.py
 
 ---    
+
+### 2. Cloning
 
 Once Python environment is ready, let's clone the repository:
     
