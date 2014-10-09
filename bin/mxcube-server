@@ -4,11 +4,23 @@ MXCUBE_ROOT="$( cd "$(dirname "$0")/.." && pwd )"
 MXCUBE_APP="$MXCUBE_ROOT/src"
 
 export CUSTOM_HARDWARE_OBJECTS_PATH="$MXCUBE_ROOT/HardwareObjects"
-export PYTHONPATH="$MXCUBE_ROOT:$PYTHONPATH"
-export XML_FILES_PATH="$PWD/$1"
+PYTHONPATH="$MXCUBE_ROOT:$PYTHONPATH" export PYTHONPATH
+
+if [ -d $1 ]; then
+  export XML_FILES_PATH="$1"
+else
+  export XML_FILES_PATH="$PWD/$1"
+fi
 
 if [ -z $XML_FILES_PATH ]; then
   echo "Usage: $0 xml_files_path"
+  exit 1
+fi
+
+if [ -d $XML_FILES_PATH ]; then
+  echo
+else
+  echo "Invalid directory: $XML_FILES_PATH"
   exit 1
 fi
 
