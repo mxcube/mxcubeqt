@@ -84,8 +84,11 @@ def init():
 
       mxcube.new_frame = gevent.event.AsyncResult()
       mxcube.bl_setup = hwr.getHardwareObject("/beamline-setup")
-
-      mxcube.video = hwr.getHardwareObject("/camera")
+      try:
+        mxcube.diffractometer = mxcube.bl_setup.diffractometer_hwobj
+        mxcube.video = mxcube.diffractometer.getObjectByRole("camera")
+      except:
+        mxcube.video = hwr.getHardwareObject("/camera")
       mxcube.video.connect("imageReceived", new_sample_video_frame_received)
  
   return json.dumps(bl_state())
@@ -128,7 +131,10 @@ def set_zoom():
 @mxcube.get('/sample_video_stream')
 def stream_video():
     #import pdb;pdb.set_trace()
-    mxcube.video.setLive(True)
+    try:
+        mxcube.video.setLive(True)
+    except:
+        pass
     bottle.response.content_type = 'multipart/x-mixed-replace; boundary="!>"'
     while True:
         mxcube.new_frame.wait()
@@ -217,7 +223,6 @@ def logout():
     sess.delete()
     response.status=303
     response.set_header("location","/login")
-
 
 @mxcube.route("/mxcube/proposal")
 def mxcube_proposal():
