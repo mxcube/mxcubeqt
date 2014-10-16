@@ -60,9 +60,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.suffix = 'raw'
 
 
-    def set_energy_scan_hwobj(self, energy_hwobj):
+    def set_energy_scan_hwobj(self, energy_scan_hwobj):
         self.periodic_table.periodicTable.\
-            setElements(energy_hwobj.getElements())
+            setElements(energy_scan_hwobj.getElements())
 
 
     def single_item_selection(self, tree_item):
@@ -104,21 +104,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         data_collections = []
 
         if self.periodic_table.current_edge:
-            path_template = copy.deepcopy(self._path_template)
-
-            if '<sample_name>' in path_template.directory:
-                name = sample.get_name().replace(':', '-')
-                path_template.directory = path_template.directory.\
-                                          replace('<sample_name>', name)
-
-                path_template.process_directory = path_template.process_directory.\
-                                                  replace('<sample_name>', name)
-                
-            if '<acronym>-<name>' in path_template.base_prefix:
-                path_template.base_prefix = self.get_default_prefix(sample)
-                path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                          get_next_run_number(path_template)
-
+            path_template = self._create_path_template(sample, self._path_template)
+           
             energy_scan = queue_model_objects.EnergyScan(sample,
                                                          path_template)
             energy_scan.set_name(path_template.get_prefix())

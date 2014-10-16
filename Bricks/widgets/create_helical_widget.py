@@ -38,13 +38,12 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_gbox.setColumnLayout(0, qt.Qt.Vertical)
         self._lines_gbox.layout().setSpacing(6)
         self._lines_gbox.layout().setMargin(11)
-	self._lines_gbox.setSizePolicy(qt.QSizePolicy.Minimum, qt.QSizePolicy.Fixed)
         lines_gbox_layout = qt.QHBoxLayout(self._lines_gbox.layout())
         lines_gbox_layout.setAlignment(qt.Qt.AlignTop)
 
         self._list_box = qt.QListBox(self._lines_gbox, "helical_page")
         self._list_box.setSelectionMode(qt.QListBox.Extended)
-        self._list_box.setFixedWidth(300)
+        self._list_box.setFixedWidth(175)
         self._list_box.setFixedHeight(50)
         list_box_tool_tip = "Select the line(s) to perfrom helical scan on"
         qt.QToolTip.add(self._list_box, list_box_tool_tip)
@@ -96,8 +95,6 @@ class CreateHelicalWidget(CreateTaskBase):
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)
         v_layout.addWidget(self._processing_gbox)
-	v_layout.addStretch()
-	
 
         qt.QObject.connect(add_button, qt.SIGNAL("clicked()"),
                         self.add_clicked)
@@ -148,9 +145,7 @@ class CreateHelicalWidget(CreateTaskBase):
         if len(selected_shapes) == 2:
             p1 = selected_shapes[1]
             p2 = selected_shapes[0]
-    
-	    print p1, p2
-     
+            
             line = shape_history.\
                    Line(self._shape_history.get_drawing(),
                         p1.qub_point, p2.qub_point,
@@ -158,7 +153,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
             line.show()
             self._shape_history.add_shape(line)
-            list_box_item = qt.QListBoxText(self._list_box, 'Line no. %i' %(self._list_box.count() +1))
+            list_box_item = qt.QListBoxText(self._list_box, 'Line')
             self._list_item_map[list_box_item] = line
 
             # De select previous items
@@ -330,46 +325,20 @@ class CreateHelicalWidget(CreateTaskBase):
                 snapshot = self._shape_history.get_snapshot([])
 
             # Acquisition for start position
-            start_acq = qmo.Acquisition()
-            start_acq.acquisition_parameters = \
-                copy.deepcopy(self._acquisition_parameters)
-            start_acq.acquisition_parameters.collect_agent = \
-                COLLECTION_ORIGIN.MXCUBE
+            start_acq = self._create_acq(sample) 
+            
             start_acq.acquisition_parameters.\
                 centred_position = copy.deepcopy(shape.start_cpos)
-            start_acq.path_template = copy.deepcopy(self._path_template)
             start_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
 
             start_acq.path_template.suffix = self._session_hwobj.suffix
 
-            if self._beamline_setup_hwobj.in_plate_mode():
-                start_acq.acquisition_parameters.take_snapshots = False
-            else:
-                start_acq.acquisition_parameters.take_snapshots = True
-
-            if '<sample_name>' in start_acq.path_template.directory:
-                name = sample.get_name().replace(':', '-')
-                start_acq.path_template.directory = start_acq.path_template.directory.\
-                                                    replace('<sample_name>', name)
-
-                start_acq.path_template.process_directory = start_acq.path_template.process_directory.\
-                                                            replace('<sample_name>', name)
-
-            if '<acronym>-<name>' in start_acq.path_template.base_prefix:
-                start_acq.path_template.base_prefix = self.get_default_prefix(sample)
-                start_acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                              get_next_run_number(start_acq.path_template)
-
             # Add another acquisition for the end position
-            end_acq = qmo.Acquisition()
-            end_acq.acquisition_parameters = \
-                copy.deepcopy(self._acquisition_parameters)
-            end_acq.acquisition_parameters.collect_agent = \
-                COLLECTION_ORIGIN.MXCUBE
+            end_acq = self._create_acq(sample)
+
             end_acq.acquisition_parameters.\
                 centred_position = shape.end_cpos
-            end_acq.path_template = copy.deepcopy(self._path_template)
             end_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
 
@@ -383,8 +352,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
             dc.set_name(start_acq.path_template.get_prefix())
             dc.set_number(start_acq.path_template.run_number)
-
-
             dc.experiment_type = EXPERIMENT_TYPE.HELICAL
 
             data_collections.append(dc)

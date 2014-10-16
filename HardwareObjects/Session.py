@@ -8,7 +8,7 @@ import os
 import time
 
 from HardwareRepository.BaseHardwareObjects import HardwareObject
-
+import queue_model_objects_v1 as queue_model_objects
 
 class Session(HardwareObject):
     def __init__(self, name):
@@ -32,7 +32,6 @@ class Session(HardwareObject):
     # Framework-2 method, inherited from HardwareObject and called
     # by the framework after the object has been initialized.
     def init(self):
-	self.synchrotron_name = self.getProperty('synchrotron_name').lower()
         self.endstation_name = self.getProperty('endstation_name').lower()
         self.suffix = self["file_info"].getProperty('file_suffix')
         self.base_directory = self["file_info"].\
@@ -53,6 +52,10 @@ class Session(HardwareObject):
             self.in_house_users.append((prop.getProperty('code'),
                 str(prop.getProperty('number'))))
 
+        queue_model_objects.PathTemplate.set_archive_path(self['file_info'].getProperty('archive_base_directory'),
+                                                          self['file_info'].getProperty('archive_folder'))
+
+
     def get_base_data_directory(self):
         """
         Returns the base data directory taking the 'contextual'
@@ -65,27 +68,21 @@ class Session(HardwareObject):
         user_category = ''
         directory = ''
 
-	#IK
-	if self.synchrotron_name == 'esrf':
-            if self.session_start_date:
-                start_time = self.session_start_date.split(' ')[0].replace('-', '')
-            else:
-                start_time = time.strftime("%Y%m%d")
+        if self.session_start_date:
+            start_time = self.session_start_date.split(' ')[0].replace('-', '')
+        else:
+            start_time = time.strftime("%Y%m%d")
 
-	    if self.is_inhouse():
-                user_category = 'inhouse'
-                directory = os.path.join(self.base_directory, self.endstation_name,
-                                         user_category, self.get_proposal(),
-                                         start_time)
-            else:
-                user_category = 'visitor'
-                directory = os.path.join(self.base_directory, user_category,
-                                         self.get_proposal(), self.endstation_name,
-                                         start_time)
-	elif self.synchrotron_name == 'petra':
-	    start_time = time.strftime("%Y%m%d")	
-	    directory = os.path.join(self.base_directory, str(os.getuid()) + '_'\
-				     + str(os.getgid()), str(os.getlogin()), start_time)	
+        if self.is_inhouse():
+            user_category = 'inhouse'
+            directory = os.path.join(self.base_directory, self.endstation_name,
+                                     user_category, self.get_proposal(),
+                                     start_time)
+        else:
+            user_category = 'visitor'
+            directory = os.path.join(self.base_directory, user_category,
+                                     self.get_proposal(), self.endstation_name,
+                                     start_time)
 
         return directory
 
@@ -105,7 +102,7 @@ class Session(HardwareObject):
         return os.path.join(self.get_base_data_directory(),
                             self.processed_data_folder_name)
 
-    def get_image_directory(self, sub_dir):
+    def get_image_directory(self, sub_dir=None):
         """
         Returns the full path to images, using the name of each of
         data_nodes parents as sub directories.
@@ -122,8 +119,8 @@ class Session(HardwareObject):
 
         if sub_dir:
             sub_dir = sub_dir.replace(' ', '').replace(':', '-')
-            directory = os.path.join(directory, sub_dir) + '/'
-
+            directory = os.path.join(directory, sub_dir) + os.path.sep
+            
         return directory
 
     def get_process_directory(self, sub_dir=None):

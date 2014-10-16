@@ -686,8 +686,8 @@ class Point(Shape):
 
 
 class CanvasGrid(qtcanvas.QCanvasRectangle) :
-    def __init__(self, canvas, cell_width = 0, cell_height = 0,
-                 beam_width = 0, beam_height = 0) :
+    def __init__(self, canvas, cell_width = 1, cell_height = 1,
+                 beam_width = 1, beam_height = 1) :
         qtcanvas.QCanvasRectangle.__init__(self, canvas)
         self.__painter = None
 
@@ -733,13 +733,9 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
         self.__painter = painter
         rect = self.rect()
 
-	num_rows = 0
-	num_colls = 0
         self.__num_cells = 0
-	if self.__cell_height <> 0:
-            num_rows = (rect.bottom() - rect.top()) / self.__cell_height
-        if self.__cell_width <> 0:
-            num_colls = (rect.right() - rect.left()) / self.__cell_width
+        num_rows = (rect.bottom() - rect.top()) / self.__cell_height
+        num_colls = (rect.right() - rect.left()) / self.__cell_width
 
         if self.__highlighted:
             painter.setPen(qt.QPen(qt.Qt.green, 0, qt.Qt.SolidLine))
@@ -929,6 +925,8 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
                 'steps_y': number of rows,
                 'x1': top left cell center x coord,
                 'y1': top left cell center y coord,
+                'beam_width': beam width in mm
+                'beam_height': beam height in mm
                 'angle': 0}
         """
         rect = self.rect()
@@ -952,6 +950,8 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
                 'steps_y': num_rows,
                 'x1': first_cell_center_x,
                 'y1': first_cell_center_y,
+                'beam_width': self.__beam_width / self.__x_pixel_size,
+                'beam_height': self.__beam_height / self.__y_pixel_size,
                 'angle': 0}
 
         #print "Beam: " + str(self.__beam_pos)
@@ -965,13 +965,18 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
         """
         beam_height_mm = self.__beam_pos[3]
         beam_width_mm = self.__beam_pos[2]
-        self.__cell_height = int(self.__cell_height * self.__y_pixel_size)
+        self.__cell_height = int(self.__cell_height_mm * self.__y_pixel_size)
         self.__beam_height = int(beam_height_mm * self.__y_pixel_size)
-        self.__cell_width = int(self.__cell_width * self.__x_pixel_size)
+        self.__cell_width = int(self.__cell_width_mm * self.__x_pixel_size)
         self.__beam_width = int(beam_width_mm * self.__x_pixel_size)
+        self.reshape()
 
     def set_cell_width(self, cell_width_mm):
-        self.__cell_width = (cell_width_mm * self.__x_pixel_size)
+        self.__cell_width_mm = cell_width_mm
+        self.__cell_width = int(self.__cell_width_mm * self.__x_pixel_size)
+        self.reshape()
 
     def set_cell_height(self, cell_height_mm):
-        self.__cell_height = (cell_height_mm * self.__y_pixel_size)
+        self.__cell_height_mm = cell_height_mm
+        self.__cell_height = int(self.__cell_height_mm * self.__y_pixel_size)
+        self.reshape()

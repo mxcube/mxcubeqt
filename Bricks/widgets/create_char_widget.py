@@ -89,7 +89,7 @@ class CreateCharWidget(CreateTaskBase):
 
         space_group_ledit = self._vertical_dimension_widget.\
                             child('space_group_ledit')
-        
+       
         self._char_params_mib.bind_value_update('opt_sad',
                                                 optimised_sad_cbx,
                                                 bool, None)
@@ -245,6 +245,8 @@ class CreateCharWidget(CreateTaskBase):
             data_collection = self._char.reference_image_collection
 
             self._char_params = self._char.characterisation_parameters
+            self._char_params_mib.set_model(self._char_params)
+
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
 
@@ -293,49 +295,25 @@ class CreateCharWidget(CreateTaskBase):
 
         char_params = copy.deepcopy(self._char_params)
 
-        # Acquisition for start position
-        acq = queue_model_objects.Acquisition()
-        acq.acquisition_parameters = \
-            copy.deepcopy(self._acquisition_parameters)
-        acq.acquisition_parameters.collect_agent = \
-                    queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
-        acq.acquisition_parameters.centred_position = cpos
-        acq.path_template = copy.deepcopy(self._path_template)
+        acq = self._create_acq(sample)
 
-        if self._beamline_setup_hwobj.in_plate_mode():
-            acq.acquisition_parameters.take_snapshots = False
-        else:
-            acq.acquisition_parameters.take_snapshots = True
+        dc = queue_model_objects.\
+                DataCollection([acq], sample.crystals[0],
+                               self._processing_parameters)
 
-        if '<sample_name>' in acq.path_template.directory:
-            name = sample.get_name().replace(':', '-')
-            acq.path_template.directory = acq.path_template.directory.\
-                                          replace('<sample_name>', name)
-            acq.path_template.process_directory = acq.path_template.process_directory.\
-                                                  replace('<sample_name>', name)
-
-        if '<acronym>-<name>' in acq.path_template.base_prefix:
-            acq.path_template.base_prefix = self.get_default_prefix(sample)
-            acq.path_template.run_numer = self._beamline_setup_hwobj.queue_model_hwobj.\
-                                          get_next_run_number(acq.path_template)
-
-        processing_parameters = copy.deepcopy(self._processing_parameters)
-
-        data_collection = queue_model_objects.\
-                          DataCollection([acq], sample.crystals[0],
-                                         processing_parameters)
-
-        # Referance images for characterisations should be taken 90 deg apart
+        # Reference images for characterisations should be taken 90 deg apart
         # this is achived by setting overap to -89
         acq.acquisition_parameters.overlap = -89
-        data_collection.acquisitions[0] = acq               
-        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
+        
+        
+        dc.acquisitions[0] = acq
+        dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
 
-        char = queue_model_objects.Characterisation(data_collection, 
+        char = queue_model_objects.Characterisation(dc, 
                                                     char_params)
-        char.set_name(data_collection.acquisitions[0].\
+        char.set_name(dc.acquisitions[0].\
                       path_template.get_prefix())
-        char.set_number(data_collection.acquisitions[0].\
+        char.set_number(dc.acquisitions[0].\
                         path_template.run_number)
 
         tasks.append(char)

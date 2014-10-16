@@ -116,8 +116,13 @@ class CharParametersWidget(qt.QWidget):
                                                  bool,
                                                  None)
 
+        self._char_params_mib.bind_value_update('sad_res',
+                                                 self.sad_widget.sad_resolution_ledit,
+                                                 float,
+                                                 qt.QDoubleValidator(0.5, 20, 3, self))
+
         self._char_params_mib.bind_value_update('opt_sad',
-                                                 self.sad_widget.optimal_sad_radio,
+                                                 self.sad_widget.optimised_sad_cbx,
                                                  bool,
                                                  None)
 
@@ -225,7 +230,6 @@ class CharParametersWidget(qt.QWidget):
                                             self.vertical_dimension_widget.max_vphi_ledit,
                                             float,
                                             qt.QDoubleValidator(0.0, 1000, 2, self))
-
 
         #self._char_params_mib.bind_value_update('space_group',
         #                                        self.vertical_dimension_widget.space_group_ledit,
@@ -361,3 +365,6 @@ class CharParametersWidget(qt.QWidget):
         self.char_type_widget.toggle_time_dose()
         crystal = self._char.reference_image_collection.crystal
         self.acq_widget.set_energies(crystal.energy_scan_result)
+
+    def set_beamline_setup(self, bl_setup):
+        self.acq_widget.set_beamline_setup(bl_setup)

@@ -20,7 +20,7 @@ class BeamlineSetup(HardwareObject):
         self._role_list = ['transmission', 'diffractometer', 'sample_changer',
                            'resolution', 'shape_history', 'session',
                            'data_analysis', 'workflow', 'lims_client',
-                           'collect', 'energy', 'omega_axis', 'beam_info', 'xrf']
+                           'collect', 'energy', 'omega_axis','energyscan']
 
     def init(self):
         """
@@ -237,8 +237,9 @@ class BeamlineSetup(HardwareObject):
         char_params.min_dose = 30.0
         char_params.min_time = 0.0
         char_params.account_rad_damage = True
-        char_params.auto_res = False
+        char_params.auto_res = True
         char_params.opt_sad = False
+        char_params.sad_res = 0.5
         char_params.determine_rad_params = False
         char_params.burn_osc_start = 0.0
         char_params.burn_osc_interval = 3
@@ -287,6 +288,31 @@ class BeamlineSetup(HardwareObject):
 
         return acq_parameters
 
+    def get_acqisition_limt_values(self):
+        parent_key = "acquisition_limit_values"
+
+        limits = {}
+
+        try:
+            exp_time_limit = self[parent_key].getProperty('exposure_time')
+            limits['exposure_time'] = exp_time_limit
+        except:
+            pass
+
+        try:
+            range_limit = self[parent_key].getProperty('osc_range')
+            limits['osc_range'] = range_limit
+        except:
+            pass
+
+        try:
+            num_images_limit = self[parent_key].getProperty('number_of_images')
+            limits['number_of_images'] = num_images_limit
+        except:
+            pass
+
+        return limits
+        
     def get_default_path_template(self):
         """
         :returns: A PathTemplate object with default parameters.

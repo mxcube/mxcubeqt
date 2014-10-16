@@ -492,9 +492,9 @@ class ProposalBrick2(BlissWidget):
             
             return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
-        if self.ldapConnection is None:
+        if self.ldapConnection == None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
-        if self.dbConnection is None:
+        if self.dbConnection == None:
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
 
         self._do_login(prop_type,prop_number,prop_password, self.dbConnection.beamline_name)
