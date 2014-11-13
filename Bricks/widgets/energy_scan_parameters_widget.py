@@ -77,7 +77,7 @@ class EnergyScanParametersWidget(qt.QWidget):
             self.periodic_table.setEnabled(True)
             self.data_path_widget.update_data_model(self.energy_scan.path_template)
             self.periodic_table.periodicTable.\
-                tableElementChanged(self.energy_scan.element_symbol)
+                tableElementChanged(self.energy_scan.element_symbol, self.energy_scan.edge)
 
     def element_clicked(self, symbol, energy):
         self.energy_scan.element_symbol = symbol
