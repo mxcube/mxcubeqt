@@ -408,12 +408,7 @@ class ResolutionBrick(BlissWidget):
                     resolution_ready=self.resolutionMotor.isReady()
                     
         if resolution_ready:
-            try:
-              self.resolutionMotor.getLimits(callback=self.resolutionLimitsChanged)
-            except TypeError:
-              self.resolutionMotor.getLimits()
-            #self.resolutionThread=ResolutionLimitsThread(self,self.resolutionMotor)
-            #self.resolutionThread.start()
+            self.resolutionLimitsChanged(self.resolutionMotor.getLimits())
         else:
             self.resolutionLimits=None
 
@@ -438,6 +433,7 @@ class ResolutionBrick(BlissWidget):
           resolution_str=self['angFormatString'] % float(resolution)
         except:
           return
+        print '*'*10, resolution
         self.currentResolutionValue=self['angFormatString'] % resolution
         self.currentResolution.setText("%s %s" % (resolution_str,chr(197)))
 

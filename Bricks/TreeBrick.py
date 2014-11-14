@@ -301,6 +301,26 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         tree_brick['tree_brick'] = self
 
+    def samples_from_lims(self, samples):
+        barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(samples)
+        l_samples = dict()            
+   
+        # TODO: add test for sample changer type, here code is for Robodiff only
+        for location, l_sample in location_samples.iteritems():
+          if l_sample.lims_location != (None, None):
+            basket, sample = l_sample.lims_location
+            cell = int(round((basket+0.5)/3.0))
+            puck = basket-3*(cell-1)
+            new_location = (cell, puck, sample)
+            l_sample.lims_location = new_location
+            l_samples[new_location] = l_sample
+            name = l_sample.get_name()
+            l_sample.init_from_sc_sample([new_location])
+            l_sample.set_name(name)
+
+        #import pdb;pdb.set_trace()
+        return barcode_samples, l_samples
+
     def refresh_sample_list(self):
         """
         Retrives sample information from ISPyB and populates the sample list
@@ -313,12 +333,12 @@ class TreeBrick(BaseComponents.BlissWidget):
         
         if samples:
             (barcode_samples, location_samples) = \
-                self.dc_tree_widget.samples_from_lims(samples)
+                self.samples_from_lims(samples) #self.dc_tree_widget.samples_from_lims(samples)
 
             sc_content = self.get_sc_content()
             sc_sample_list = self.dc_tree_widget.\
                              samples_from_sc_content(sc_content)
-            
+           
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -354,7 +374,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                             sample_list.append(lims_sample)
                     else:
                         if lims_sample:
-                            if lims_sample.lims_location != (None, None):
+                            if lims_sample.lims_location != None:
                                 logging.getLogger("user_level_log").\
                                     warning("No barcode was provided in ISPyB "+\
                                             "which makes it impossible to verify if"+\
@@ -378,12 +398,13 @@ class TreeBrick(BaseComponents.BlissWidget):
       
         try: 
             for sample in self.sample_changer_hwobj.getSampleList():
+                coords = sample.getCoords()
                 matrix = sample.getID() or ""
-                basket_index = sample.getContainer().getIndex()
-                vial_index = sample.getIndex()
+                basket_index = str(coords[0])
+                vial_index = ":".join(map(str, coords[1:]))
                 basket_code = sample.getContainer().getID() or ""
             
-                sc_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
+                sc_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
         except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
