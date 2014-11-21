@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './ui_files/sad_char_widget_layout.ui'
+# Form implementation generated from reading ui file 'ui_files/sad_char_widget_layout.ui'
 #
-# Created: Fri Jun 21 15:28:22 2013
+# Created: Thu Jun 12 11:29:38 2014
 #      by: The PyQt User Interface Compiler (pyuic) 3.18.1
 #
 # WARNING! All changes made in this file will be lost!
 
 
-import sys
 from qt import *
 
 
@@ -32,6 +31,9 @@ class SADWidgetLayout(QWidget):
         sad_bgroupLayout.setAlignment(Qt.AlignTop)
 
         main_vlayout = QVBoxLayout(None,0,6,"main_vlayout")
+
+        self.optimised_sad_cbx = QCheckBox(self.sad_bgroup,"optimised_sad_cbx")
+        main_vlayout.addWidget(self.optimised_sad_cbx)
 
         self.automatic_resolution_radio = QRadioButton(self.sad_bgroup,"automatic_resolution_radio")
         main_vlayout.addWidget(self.automatic_resolution_radio)
@@ -62,6 +64,7 @@ class SADWidgetLayout(QWidget):
     def languageChange(self):
         self.setCaption(self.__tr("SADWidget"))
         self.sad_bgroup.setTitle(QString.null)
+        self.optimised_sad_cbx.setText(self.__tr("Optimised SAD"))
         self.automatic_resolution_radio.setText(self.__trUtf8("\x52\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x20\x73\x65\x6c\x65\x63\x74\x65\x64\x20\x61\x75\x74\x6f\x6d\x61\x74\x69\x63\x61\x6c\x6c\x79\x2c\x20\x72\x6f\x74\x61\x74\x69\x6f\x6e\x20\x69\x6e\x74\x65\x72\x76\x61\x6c\x3a\x20\x33\x36\x30\xc2\xb0"))
         self.optimal_sad_radio.setText(self.__tr("Optimal SAD for given resolution:"))
 
@@ -71,11 +74,3 @@ class SADWidgetLayout(QWidget):
 
     def __trUtf8(self,s,c = None):
         return qApp.translate("SADWidgetLayout",s,c,QApplication.UnicodeUTF8)
-
-if __name__ == "__main__":
-    a = QApplication(sys.argv)
-    QObject.connect(a,SIGNAL("lastWindowClosed()"),a,SLOT("quit()"))
-    w = SADWidgetLayout()
-    a.setMainWidget(w)
-    w.show()
-    a.exec_loop()

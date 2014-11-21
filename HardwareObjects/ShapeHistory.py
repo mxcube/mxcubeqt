@@ -160,6 +160,18 @@ class ShapeHistory(HardwareObject):
         """
         return self.shapes.values()
 
+    def get_points(self):
+        """
+        :returns: All points currently handled
+        """
+        current_points = []
+
+        for shape in self.get_shapes():
+            if isinstance(shape, Point):
+                current_points.append(shape)
+
+        return current_points
+        
     def add_shape(self, shape):
         """
         Adds the shape <shape> to the list of handled objects.
@@ -686,8 +698,8 @@ class Point(Shape):
 
 
 class CanvasGrid(qtcanvas.QCanvasRectangle) :
-    def __init__(self, canvas, cell_width = 0, cell_height = 0,
-                 beam_width = 0, beam_height = 0) :
+    def __init__(self, canvas, cell_width = 1, cell_height = 1,
+                 beam_width = 1, beam_height = 1) :
         qtcanvas.QCanvasRectangle.__init__(self, canvas)
         self.__painter = None
 
@@ -925,6 +937,8 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
                 'steps_y': number of rows,
                 'x1': top left cell center x coord,
                 'y1': top left cell center y coord,
+                'beam_width': beam width in mm
+                'beam_height': beam height in mm
                 'angle': 0}
         """
         rect = self.rect()
@@ -948,6 +962,8 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
                 'steps_y': num_rows,
                 'x1': first_cell_center_x,
                 'y1': first_cell_center_y,
+                'beam_width': self.__beam_width / self.__x_pixel_size,
+                'beam_height': self.__beam_height / self.__y_pixel_size,
                 'angle': 0}
 
         #print "Beam: " + str(self.__beam_pos)
@@ -961,15 +977,18 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
         """
         beam_height_mm = self.__beam_pos[3]
         beam_width_mm = self.__beam_pos[2]
-        self.__cell_height = int(self.__cell_height * self.__y_pixel_size)
+        self.__cell_height = int(self.__cell_height_mm * self.__y_pixel_size)
         self.__beam_height = int(beam_height_mm * self.__y_pixel_size)
-        self.__cell_width = int(self.__cell_width * self.__x_pixel_size)
+        self.__cell_width = int(self.__cell_width_mm * self.__x_pixel_size)
         self.__beam_width = int(beam_width_mm * self.__x_pixel_size)
-
-        print self.__cell_height
+        self.reshape()
 
     def set_cell_width(self, cell_width_mm):
-        self.__cell_width = (cell_width_mm * self.__x_pixel_size)
+        self.__cell_width_mm = cell_width_mm
+        self.__cell_width = int(self.__cell_width_mm * self.__x_pixel_size)
+        self.reshape()
 
     def set_cell_height(self, cell_height_mm):
-        self.__cell_height = (cell_height_mm * self.__y_pixel_size)
+        self.__cell_height_mm = cell_height_mm
+        self.__cell_height = int(self.__cell_height_mm * self.__y_pixel_size)
+        self.reshape()

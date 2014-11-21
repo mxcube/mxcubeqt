@@ -26,15 +26,6 @@ from XSDataCommon import XSDataInteger
 from XSDataCommon import XSDataSize
 from XSDataCommon import XSDataString
 
-#from XSDataCommon import XSDataFloat
-#from XSDataCommon import XSDataInput
-#from XSDataCommon import XSDataMatrixDouble
-#from XSDataCommon import XSDataResult
-#from XSDataCommon import XSDataImage
-#from XSDataCommon import XSDataAbsorbedDoseRate
-#from XSDataCommon import XSDataAngularSpeed
-#from XSDataCommon import XSData
-
 #from edna_test_data import EDNA_DEFAULT_INPUT
 #from edna_test_data import EDNA_TEST_DATA
 
@@ -94,8 +85,8 @@ class DataAnalysis(AbstractDataAnalysis.AbstractDataAnalysis, HardwareObject):
         return cmd_obj(*args, wait=wait)
 
     def get_beam_size(self):
-        return (self.execute_command("get_beam_size_x"),
-                self.execute_command("get_beam_size_y"))
+        beam_info = self.getObjectByRole("beam")
+        return beam_info.get_beam_size()
 
     def from_params(self, data_collection, char_params):
         edna_input = XSDataInputMXCuBE.parseString(self.edna_default_input)
@@ -190,7 +181,12 @@ class DataAnalysis(AbstractDataAnalysis.AbstractDataAnalysis, HardwareObject):
 
         # Characterisation type - SAD
         if char_params.opt_sad:
+          if char_params.auto_res: 
             diff_plan.setAnomalousData(XSDataBoolean(True))
+          else:
+            diff_plan.setAnomalousData(XSDataBoolean(False))
+            diff_plan.setStrategyOption(XSDataString("-SAD yes"))
+            diff_plan.setAimedResolution(XSDataDouble(char_params.sad_res))
         else:
             diff_plan.setAnomalousData(XSDataBoolean(False))
 

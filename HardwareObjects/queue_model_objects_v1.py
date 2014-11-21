@@ -237,8 +237,8 @@ class Sample(TaskNode):
             return ''
 
     def init_from_sc_sample(self, sc_sample):
-        self.loc_str = str(sc_sample[1]) + ':' + str(sc_sample[2])
-        self.location = (sc_sample[1], sc_sample[2])
+        self.loc_str = ":".join(map(str,sc_sample[-1]))
+        self.location = sc_sample[-1]
         self.set_name(self.loc_str)
 
     def init_from_lims_object(self, lims_sample):
@@ -557,6 +557,7 @@ class CharacterisationParameters(object):
         self.account_rad_damage = bool()
         self.auto_res = bool()
         self.opt_sad = bool()
+        self.sad_res = float()
         self.determine_rad_params = bool()
         self.burn_osc_start = float()
         self.burn_osc_interval = int()
@@ -591,6 +592,7 @@ class CharacterisationParameters(object):
                 "account_rad_damage": self.account_rad_damage,
                 "auto_res": self.auto_res,
                 "opt_sad": self.opt_sad,
+                "sad_res": self.sad_res,
                 "determine_rad_params": self.determine_rad_params,
                 "burn_osc_start": self.burn_osc_start,
                 "burn_osc_interval": self.burn_osc_interval,
@@ -697,6 +699,11 @@ class Acquisition(object):
 
 
 class PathTemplate(object):
+    @staticmethod
+    def set_archive_path(archive_base_directory, archive_folder):
+        PathTemplate.archive_base_directory = archive_base_directory
+        PathTemplate.archive_folder = archive_folder
+
     def __init__(self):
         object.__init__(self)
 
@@ -756,17 +763,16 @@ class PathTemplate(object):
         
         if 'visitor' in folders:
             endstation_name = folders[4]
-            folders[2] = 'pyarch'
+            folders[2] = PathTemplate.archive_folder
             temp = folders[3]
             folders[3] = folders[4]
             folders[4] = temp
         else:
             endstation_name = folders[2]
-            folders[2] = 'pyarch'
+            folders[2] = PathTemplate.archive_folder
             folders[3] = endstation_name
 
-
-        archive_directory = '/' + os.path.join(*folders[1:])
+        archive_directory = os.path.join(os.path.join(PathTemplate.archive_base_directory, *folders[2:]))
 
         return archive_directory
 
@@ -854,96 +860,31 @@ class CentredPosition(object):
     which simply is a dictonary with the motornames and
     their corresponding values.
     """
-
+    MOTOR_POS_DELTA = 1E-4
+    DIFFRACTOMETER_MOTOR_NAMES = []
+    @staticmethod
+    def set_diffractometer_motor_names(*names):
+        CentredPosition.DIFFRACTOMETER_MOTOR_NAMES = names[:]
+        
     def __init__(self, motor_dict=None):
-        object.__init__(self)
-
-        self.sampx = int()
-        self.sampy = int()
-        self.phi = int()
-        self.phix = int()
-        self.phiz = int()
-        self.phiy = int()
-        self.kappa = int()
-        self.kappa_phi = int()
-        self.zoom = int()
         self.snapshot_image = None
         self.centring_method = True
+        for motor_name in CentredPosition.DIFFRACTOMETER_MOTOR_NAMES:
+           setattr(self, motor_name, 0)
 
-        if motor_dict:
-            try:
-                self.sampx = motor_dict['sampx']
-            except KeyError:
-                pass
-
-            try:
-                self.sampy = motor_dict['sampy']
-            except KeyError:
-                pass
-
-            try:
-                self.phi = motor_dict['phi']
-            except KeyError:
-                pass
-            
-            try:
-                self.phix = motor_dict['focus']
-            except KeyError:
-                pass
-
-            try:
-                self.phiy = motor_dict['phiy']
-            except KeyError:
-                pass
-
-            try:
-                self.phiz = motor_dict['phiz']
-            except KeyError:
-                pass
-
-            try:
-                self.kappa = motor_dict['kappa']
-            except KeyError:
-                pass
-
-            try:
-                self.kappa_phi = motor_dict['kappa_phi']
-            except KeyError:
-                pass
-
-            try:
-                self.zoom = motor_dict['zoom']
-            except KeyError:
-                pass
+        if motor_dict is not None:
+          for motor_name, position in motor_dict.iteritems():
+            setattr(self, motor_name, position)
 
     def as_dict(self):
-        return {'sampx': self.sampx,
-                'sampy': self.sampy,
-                'phi': self.phi,
-                'phix': self.phix,
-                'phiy': self.phiy,
-                'phiz': self.phiz,
-                'kappa': self.kappa,
-                'kappa_phi': self.kappa_phi,
-                'zoom': self.zoom}
+        return dict(zip(CentredPosition.DIFFRACTOMETER_MOTOR_NAMES,
+                    [getattr(self, motor_name) for motor_name in CentredPosition.DIFFRACTOMETER_MOTOR_NAMES]))
 
     def __repr__(self):
-        return str({'sampx': str(self.sampx),
-                    'sampy': str(self.sampy),
-                    'omega': str(self.phi),
-                    'phiz': str(self.phiz),
-                    'phiy': str(self.phiy),
-                    'kappa': str(self.kappa),
-                    'kappa_phi': str(self.kappa_phi),
-                    'zoom': str(self.zoom)})
+        return str(self.as_dict())
 
     def __eq__(self, cpos):
-        result = (self.sampx == cpos.sampx) and (self.sampy == cpos.sampy) and \
-                 (self.phi == cpos.phi) and (self.phiz == cpos.phiz) and \
-                 (self.phiy == cpos.phiy) and (self.zoom == cpos.zoom)
-
-        return result
-
+        return all([abs(getattr(self, motor_name) - getattr(cpos, motor_name))<=CentredPosition.MOTOR_POS_DELTA for motor_name in CentredPosition.DIFFRACTOMETER_MOTOR_NAMES])
 
     def __ne__(self, cpos):
         return not (self == cpos)

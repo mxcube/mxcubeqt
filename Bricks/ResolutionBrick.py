@@ -66,13 +66,11 @@ class ResolutionBrick(BlissWidget):
         label1=QLabel("Current:",self.paramsBox)
         self.paramsBox.layout().addWidget(label1, 0, 0)
 
-        box1=QHBox(self.paramsBox)
+        box1=QVBox(self.paramsBox)
         self.currentResolution=QLineEdit(box1)
         self.currentResolution.setReadOnly(True)
         self.currentDetectorDistance=QLineEdit(box1)
         self.currentDetectorDistance.setReadOnly(True)
-        self.currentResolution.setFixedWidth(60)
-        self.currentDetectorDistance.setFixedWidth(80)
         self.paramsBox.layout().addMultiCellWidget(box1, 0, 0, 1, 3)
 
         label2=QLabel("Move to:",self.paramsBox)
@@ -410,12 +408,7 @@ class ResolutionBrick(BlissWidget):
                     resolution_ready=self.resolutionMotor.isReady()
                     
         if resolution_ready:
-            try:
-              self.resolutionMotor.getLimits(callback=self.resolutionLimitsChanged)
-            except TypeError:
-              self.resolutionMotor.getLimits()
-            #self.resolutionThread=ResolutionLimitsThread(self,self.resolutionMotor)
-            #self.resolutionThread.start()
+            self.resolutionLimitsChanged(self.resolutionMotor.getLimits())
         else:
             self.resolutionLimits=None
 
@@ -440,6 +433,7 @@ class ResolutionBrick(BlissWidget):
           resolution_str=self['angFormatString'] % float(resolution)
         except:
           return
+        print '*'*10, resolution
         self.currentResolutionValue=self['angFormatString'] % resolution
         self.currentResolution.setText("%s %s" % (resolution_str,chr(197)))
 

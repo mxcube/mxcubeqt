@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>450</width>
+            <width>534</width>
             <height>311</height>
         </rect>
     </property>
@@ -39,7 +39,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Beam Height</string>
+                    <string>Beam Width (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -50,7 +50,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Beam Width</string>
+                    <string>Beam Height (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -61,7 +61,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Hor Spacing</string>
+                    <string>Hor Spacing (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>
@@ -72,7 +72,7 @@
             </column>
             <column>
                 <property name="text">
-                    <string>Ver Spacing</string>
+                    <string>Ver Spacing (μ)</string>
                 </property>
                 <property name="clickable">
                     <bool>false</bool>

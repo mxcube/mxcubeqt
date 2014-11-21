@@ -16,6 +16,8 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
     def __init__(self,parent = None,name = None,fl = 0):
         QWidget.__init__(self,parent,name,fl)
 
+        self.snapshots_list = [4,1,2,0]
+
         if not name:
             self.setName("ConfirmDialogWidgetVerticalLayout")
 
@@ -91,7 +93,7 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
 
 
     def languageChange(self):
-        self.setCaption(self.__tr("Confrim collect"))
+        self.setCaption(self.__tr("Confirm collect"))
         self.summary_gbox.setTitle(self.__tr("Summary"))
         self.summary_label.setText(self.__tr("<summary label>"))
         self.force_dark_cbx.setText(self.__tr("Force dark current"))
@@ -99,10 +101,8 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
 	self.take_snapshots_label.setText(self.__tr("Number of crystal snapshots:"))
 
 	self.take_snapshots_cbox.clear()
-        self.take_snapshots_cbox.insertItem(self.__tr("0"))
-        self.take_snapshots_cbox.insertItem(self.__tr("1"))
-        self.take_snapshots_cbox.insertItem(self.__tr("2"))
-	self.take_snapshots_cbox.insertItem(self.__tr("4"))
+        for i in self.snapshots_list:
+          self.take_snapshots_cbox.insertItem(self.__tr(str(i)))
 		
         self.missing_one_cbx.setText(self.__tr("Missing box one"))
         self.missing_two_cbx.setText(self.__tr("Missing box two"))

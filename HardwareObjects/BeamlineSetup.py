@@ -20,7 +20,7 @@ class BeamlineSetup(HardwareObject):
         self._role_list = ['transmission', 'diffractometer', 'sample_changer',
                            'resolution', 'shape_history', 'session',
                            'data_analysis', 'workflow', 'lims_client',
-                           'collect', 'energy', 'omega_axis']
+                           'collect', 'energy', 'omega_axis', "detector"]
 
     def init(self):
         """
@@ -97,18 +97,10 @@ class BeamlineSetup(HardwareObject):
         :returns: True if the detector is capable of shuterless.
         :rtype: bool
         """
-        shutter_less = False
-
         try:
-            shutter_less = self['detector'].getProperty('has_shutterless')
-
-            if shutter_less is None:
-                shutter_less = False
-
+          return self.detector_hwobj.getProperty('type').lower()=='pilatus'
         except:
-            shutter_less = False
-
-        return shutter_less
+          return False
 
     def tunable_wavelength(self):
         """
@@ -169,8 +161,8 @@ class BeamlineSetup(HardwareObject):
         overlap = round(float(self[parent_key].getProperty('overlap')), 2)
         exp_time = round(float(self[parent_key].getProperty('exposure_time')), 4)
         num_passes = int(self[parent_key].getProperty('number_of_passes'))
-        shutterless = bool(self['detector'].getProperty('has_shutterless'))
-        detector_mode = int(self[parent_key].getProperty('detector_mode'))
+        shutterless = self.detector_has_shutterless()
+        detector_mode = 1 #unbinned...
 
         acq_parameters.first_image = int(img_start_num)
         acq_parameters.num_images = int(num_images)
@@ -237,8 +229,9 @@ class BeamlineSetup(HardwareObject):
         char_params.min_dose = 30.0
         char_params.min_time = 0.0
         char_params.account_rad_damage = True
-        char_params.auto_res = False
+        char_params.auto_res = True
         char_params.opt_sad = False
+        char_params.sad_res = 0.5
         char_params.determine_rad_params = False
         char_params.burn_osc_start = 0.0
         char_params.burn_osc_interval = 3
@@ -263,8 +256,8 @@ class BeamlineSetup(HardwareObject):
         overlap = round(float(self[parent_key].getProperty('overlap')), 2)
         exp_time = round(float(self[parent_key].getProperty('exposure_time')), 4)
         num_passes = int(self[parent_key].getProperty('number_of_passes'))
-        shutterless = bool(self['detector'].getProperty('has_shutterless'))
-        detector_mode = int(self[parent_key].getProperty('detector_mode'))
+        shutterless = self.detector_has_shutterless()
+        detector_mode = 1 #unbinned
 
         acq_parameters.first_image = img_start_num
         acq_parameters.num_images = num_images
@@ -287,6 +280,31 @@ class BeamlineSetup(HardwareObject):
 
         return acq_parameters
 
+    def get_acqisition_limt_values(self):
+        parent_key = "acquisition_limit_values"
+
+        limits = {}
+
+        try:
+            exp_time_limit = self[parent_key].getProperty('exposure_time')
+            limits['exposure_time'] = exp_time_limit
+        except:
+            pass
+
+        try:
+            range_limit = self[parent_key].getProperty('osc_range')
+            limits['osc_range'] = range_limit
+        except:
+            pass
+
+        try:
+            num_images_limit = self[parent_key].getProperty('number_of_images')
+            limits['number_of_images'] = num_images_limit
+        except:
+            pass
+
+        return limits
+        
     def get_default_path_template(self):
         """
         :returns: A PathTemplate object with default parameters.

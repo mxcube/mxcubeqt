@@ -1,3 +1,8 @@
 *.pyc
 *~
-mxcube.gui
+*.gui
+*.old
+build
+*.swp
+\#*#
+.*

@@ -649,7 +649,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
             try:
                 if dc.experiment_type is EXPERIMENT_TYPE.HELICAL:
                     acq_1, acq_2 = (dc.acquisitions[0], dc.acquisitions[1])
-                    self.collect_hwobj.getChannelObject("helical").setValue(1)
+                    self.collect_hwobj.set_helical(True)
 
                     start_cpos = acq_1.acquisition_parameters.centred_position
                     end_cpos = acq_2.acquisition_parameters.centred_position
@@ -657,24 +657,24 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                     dc.lims_end_pos_id = self.lims_client_hwobj.\
                                          store_centred_position(end_cpos)
 
-                    helical_oscil_pos = {'1': start_cpos.as_dict(), '2': end_cpos.as_dict()}
-                    self.collect_hwobj.getChannelObject('helical_pos').setValue(helical_oscil_pos)
+                    helical_oscil_pos = {'1': start_cpos.as_dict(), '2': end_cpos.as_dict() }
+                    self.collect_hwobj.set_helical_pos(helical_oscil_pos)
 
-                    msg = "Helical data collection, moving to start position"
-                    log.info(msg)
-                    log.info("Moving sample to given position ...")
-                    list_item.setText(1, "Moving sample")
+                    #msg = "Helical data collection, moving to start position"
+                    #log.info(msg)
+                    #list_item.setText(1, "Moving sample")
                 else:
-                    self.collect_hwobj.getChannelObject("helical").setValue(0)
+                    self.collect_hwobj.set_helical(False)
 
-                empty_cpos = queue_model_objects.CentredPosition()
-
+                """empty_cpos = queue_model_objects.CentredPosition()
+                
                 if cpos != empty_cpos:
                     log.info("Moving sample to given position ...")
                     list_item.setText(1, "Moving sample")
                     self.shape_history.select_shape_with_cpos(cpos)
+                    
                     self.centring_task = self.diffractometer_hwobj.\
-                                         moveToCentredPosition(cpos)
+                                         moveToCentredPosition(cpos, wait=False)
                     self.centring_task.get()
                 else:
                     pos_dict = self.diffractometer_hwobj.getPositions()
@@ -682,7 +682,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                     snapshot = self.shape_history.get_snapshot([])
                     acq_1.acquisition_parameters.centred_position = cpos
                     acq_1.acquisition_parameters.centred_position.snapshot_image = snapshot
-
+                """
                 dc.lims_start_pos_id = self.lims_client_hwobj.store_centred_position(cpos)
                 param_list = queue_model_objects.to_collect_dict(dc, self.session, sample)
                 self.collect_task = self.collect_hwobj.\
@@ -710,7 +710,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
             raise QueueExecutionException(msg, self)
 
     def collect_started(self, owner, num_oscillations):
-        pass
+        logging.getLogger("user_level_log").info('Collection started')
 
     def collect_number_of_frames(self, number_of_images=0):
         pass
@@ -718,16 +718,11 @@ class DataCollectionQueueEntry(BaseQueueEntry):
     def image_taken(self, image_number):
         # this is to work around the remote access problem
         dispatcher.send("collect_started")
-        num_images = str(self.get_data_model().acquisitions[0].\
-                     acquisition_parameters.num_images)
-
-        first_image = self.get_data_model().acquisitions[0].\
-                      acquisition_parameters.first_image
-
-        if first_image != 0:
-            image_number = image_number - first_image + 1
-
-        self.get_view().setText(1, str(image_number) + "/" + num_images)
+        num_images = self.get_data_model().acquisitions[0].\
+                     acquisition_parameters.num_images
+        num_images += self.get_data_model().acquisitions[0].\
+                      acquisition_parameters.first_image - 1
+        self.get_view().setText(1, str(image_number) + "/" + str(num_images))
 
     def preparing_collect(self, number_images=0):
         self.get_view().setText(1, "Collecting")
@@ -984,7 +979,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
         self._failed = False
-        self.energy_scan_hwobj = self.beamline_setup.energy_hwobj
+        self.energy_scan_hwobj = self.beamline_setup.energyscan_hwobj
         self.session_hwobj = self.beamline_setup.session_hwobj
 
         qc = self.get_queue_controller()
@@ -1029,8 +1024,9 @@ class EnergyScanQueueEntry(BaseQueueEntry):
 
     def energy_scan_finished(self, scan_info):
         energy_scan = self.get_data_model()
+        fname = "_".join((energy_scan.path_template.get_prefix(),str(energy_scan.path_template.run_number)))
         scan_file_path = os.path.join(energy_scan.path_template.directory,
-                                      energy_scan.path_template.get_prefix())
+                                      fname)
 
         scan_file_archive_path = os.path.join(energy_scan.path_template.\
                                               get_archive_directory(),
@@ -1038,7 +1034,7 @@ class EnergyScanQueueEntry(BaseQueueEntry):
 
         (pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm,
          chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title) = \
-         self.energy_scan_hwobj.doChooch(None, energy_scan.element_symbol,
+         self.energy_scan_hwobj.doChooch(energy_scan.element_symbol,
                                          energy_scan.edge,
                                          scan_file_archive_path,
                                          scan_file_path)
@@ -1143,7 +1139,6 @@ class GenericWorkflowQueueEntry(BaseQueueEntry):
         # reset state
         self.workflow_started = False
         self.workflow_running = False
-
 
     def stop(self):
         BaseQueueEntry.stop(self)

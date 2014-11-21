@@ -59,15 +59,18 @@ class ConfirmDialog(qt.QDialog):
                            qt.SIGNAL("clicked()"),
                            self.cancel_button_click)
 
-        #self.dialog_layout_widget.take_snapshosts_cbx.setOn(True)
         self.dialog_layout_widget.force_dark_cbx.setOn(True)
 
-        #self.dialog_layout_widget.take_snapshosts_cbx.hide()
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
         self.setCaption('Confirm collection')
 
 
+    def set_plate_mode(self, plate_mode):
+        self.dialog_layout_widget.snapshots_list = [1,0] if plate_mode else [4,1,2,0]
+        self.dialog_layout_widget.languageChange()
+ 
+ 
     def disable_dark_current_cbx(self):
         self.dialog_layout_widget.force_dark_cbx.setEnabled(False)
         self.dialog_layout_widget.force_dark_cbx.setOn(False)

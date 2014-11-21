@@ -207,5 +207,5 @@ class PositionHistoryBrickWidget(QWidget):
             points = self.selected_points()
             
             if len(points) == 1:
-                self.diffractometer_hwobj.moveToCentredPosition(points[0][0])
+                self.diffractometer_hwobj.moveToCentredPosition(points[0][0],wait=False)
         
