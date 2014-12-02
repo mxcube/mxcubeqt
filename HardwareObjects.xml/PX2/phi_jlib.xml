@@ -1,0 +1,8 @@
+<device class="TangoDCMotor">
+  <username>Phi</username>
+  <tangoname>tango://G030910-938.proxima2a.rcl:9999/i11-ma-cx1/ex/md2jlib#dbase=no</tangoname>
+  <motor_name>Phi</motor_name>
+  <channel type="tango" polling="1000" name="position">PhiPosition</channel>
+  <channel type="tango" polling="1000" name="state">State</channel>
+  <interval>1000</interval>
+</device>
