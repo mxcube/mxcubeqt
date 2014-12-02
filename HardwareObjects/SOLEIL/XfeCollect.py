@@ -225,6 +225,8 @@ class XfeCollect(object):
         if self.optimize != True:
             self.insertDetector()
             self.obx.Open()
+        self.transmission(1)
+        time.sleep(1)
         self.set_collect_phase()
         self.open_fast_shutter()
         self.fluodet.Start()
