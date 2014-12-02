@@ -97,7 +97,7 @@ class xanes(object):
         self.fluodet = dp('i11-ma-cx1/dt/dtc-mca_xmap.1')
         logging.info('initializing fluodet %s ' % self.fluodet)
         self.mono = dp('i11-ma-c03/op/mono1')
-        self.monoFine = dp('i11-ma-c03/op/mono1-mt_rx_fine')
+        self.monoFine = dp('i11-ma-c03/op/mono1-mt_rx')
         self.undulator = dp('ans-c11/ei/m-u24_energy')
         self.ble = dp('i11-ma-c00/ex/beamlineenergy')
         self.safetyShutter = dp('i11-ma-c04/ex/obx.1')
@@ -130,8 +130,9 @@ class xanes(object):
         self.getAbsEm()
         self.setROI()
         
-        self.MD2Phase(phase=4)
-            
+        #self.MD2Phase(phase='DataCollection')
+        self.set_md2_phase()
+        
         self.moveBeamlineEnergy(self.e_edge)
         
         self.optimizeTransmission()
@@ -198,28 +199,48 @@ class xanes(object):
         while device.state().name == 'RUNNING':
             time.sleep(.1)
 
-    def MD2Phase(self, phase=4):
+    def MD2Phase(self, phase='DataCollection'):
         if self.test: return
-        self.md2.write_attribute('PhasePosition', phase)  # Collect phase
+        self.md2.startSetPhase(phase)  # Collect phase
         self.wait(self.md2)
 
+    def get_state(self):
+        for state in self.md2.motorstates:
+            if 'Moving' in state:
+                return 'Moving'
+        return 'Ready'
+        
+    def set_md2_phase(self, phase_name='DataCollection'):
+        self.md2.startSetPhase(phase_name)
+        while self.md2.currentPhase != phase_name or self.get_state() != 'Ready':
+            time.sleep(0.1)
+            
     def insertFluoDet(self):
         if self.test: return
-        self.md2.write_attribute('FluoDetectorBack', 0)  # Move detector In
+        self.md2.write_attribute('FluoDetectorIsBack', 0)  # Move detector In
         time.sleep(4)
 
     def extractFluodet(self):
         if self.test: return
-        self.md2.write_attribute('FluoDetectorBack', 1)  # Move detector Out
+        self.md2.write_attribute('FluoDetectorIsBack', 1)  # Move detector Out
+        
+    def get_calibration(self):
+        A = -0.0161723871876
+        C = 0.0
+        B = 0.00993475667754
+        return A, B, C
         
     def setROI(self):
         if self.test: return
+        A, B, C = self.get_calibration()
+        self.roi_center += A # A + B*self.roi_center + C*self.roi_center**2
+        
         roi_debut = 1000.0 * \
             (self.roi_center - self.roiwidth / 2.0)  # values set in eV
         roi_fin   = 1000.0 * \
             (self.roi_center + self.roiwidth / 2.0)  # values set in eV
-        channel_debut = int(roi_debut / self.channelToeV)
-        channel_fin = int(roi_fin / self.channelToeV)
+        channel_debut = int(roi_debut / (B*1e3)) # self.channelToeV)
+        channel_fin = int(roi_fin / (B*1.e3)) #self.channelToeV)
         self.roi_debut = roi_debut
         self.roi_fin = roi_fin
         self.fluodet.setROIs(numpy.array((channel_debut, channel_fin)))
@@ -379,7 +400,7 @@ class xanes(object):
         self.Abort = True
         self.stt = 'Abort'
         if self.test: return
-        self.md2.CloseFastShutter()
+        self.md2.FastShutterIsOpen = False #CloseFastShutter()
     
     def start(self):
         logging.info('scan thread')
@@ -456,7 +477,7 @@ class xanes(object):
                 self.newPoint = True
                 self.plotNewPoint()
             
-        self.closeSafetyShutter()
+        #self.closeSafetyShutter()
         self.results['duration'] = time.time() - self.results['timestamp']
         self.cleanUp()
         if self.plot:
@@ -468,10 +489,10 @@ class xanes(object):
         if self.test:
             time.sleep(self.integrationTime)
             return
-        self.md2.OpenFastShutter()
+        self.md2.FastShutterIsOpen = True #OpenFastShutter()
         self.fluodet.Start()
         self.wait(self.fluodet)
-        self.md2.CloseFastShutter()
+        self.md2.FastShutterIsOpen = False #CloseFastShutter()
         
     def takePoint(self, en):
         logging.info('takePoint %s' % en)
@@ -491,7 +512,7 @@ class xanes(object):
                                             'diode5': self.diode5.intensity,
                                             'cvd': self.cvd.intensity}
         #logging.info('self.results[\'observations\'][en] %s' % self.results['observations'][en])
-        self.results['observations'][en]['point'] = float(self.results['observations'][en]['roiCounts']) / self.results['observations'][en]['diode1']
+        self.results['observations'][en]['point'] = float(self.results['observations'][en]['roiCounts']) / self.results['observations'][en]['cvd']
         self.parent.newPoint(float(en), float(self.results['observations'][en]['point']))
             
     def updateRunningScan(self, en):
@@ -517,12 +538,12 @@ class xanes(object):
             '# Counts on the fluorescence detector: channels up to end of ROI\n')
         for en in self.results['ens_strings']:
             normalized_intensity=self.results['observations'][en][
-                'roiCounts'] / self.results['observations'][en]['diode1']
+                'roiCounts'] / self.results['observations'][en]['cvd']
             f.write(
                 ' {en} {normalized_intensity} {roiCounts} {diode1} {eventsInRun}\n'.format(**{'en': en,
                                                                                               'normalized_intensity': normalized_intensity,
                                                                                               'roiCounts': self.results['observations'][en]['roiCounts'],
-                                                                                              'diode1': self.results['observations'][en]['diode1'],
+                                                                                              'diode1': self.results['observations'][en]['cvd'],
                                                                                               'eventsInRun': self.results['observations'][en]['eventsInRun']}))
         f.write('# Duration: {duration}\n'.format(**self.results))
         f.close()
@@ -542,9 +563,11 @@ class xanes(object):
             f.write('{en} {point}\n'.format(**{'en': x, 'point': point}))
             self.raw.append((x, point))
         f.close()
+        time.sleep(3)
 
     def saveResults(self):
         logging.info('saveResults')
+        f = open(os.path.join(self.directory, '{prefix}_{element}_{edge}_results.pck'.format(**self.results)), 'w')
         f = open('{prefix}_{element}_{edge}.pck'.format(**self.results), 'w')
         pickle.dump(self.results, f)
         f.close()
@@ -571,8 +594,10 @@ class xanes(object):
                              'raw_file': os.path.join(self.directory, '{prefix}_{element}_{edge}.raw'.format(**self.results)),
                              'output_ps': os.path.join(self.directory, '{prefix}_{element}_{edge}.ps'.format(**self.results)),
                              'output_efs':os.path.join(self.directory, '{prefix}_{element}_{edge}.efs'.format(**self.results))}
-                     
-        chooch_output = commands.getoutput('chooch -p {output_ps} -o {output_efs} -e {element} -a {edge} {raw_file}'.format(**chooch_parameters))
+        chooch_cmd = 'chooch -p {output_ps} -o {output_efs} -e {element} -a {edge} {raw_file}'.format(**chooch_parameters)
+        logging.info('chooch command %s' % chooch_cmd)
+        
+        chooch_output = commands.getoutput(chooch_cmd)
         self.results['chooch_output'] = chooch_output
         print 'chooch_output', chooch_output
         chooch_results = self.parse_chooch_output(chooch_output)
