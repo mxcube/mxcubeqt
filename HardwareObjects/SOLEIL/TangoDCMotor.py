@@ -44,9 +44,13 @@ class TangoDCMotor(Device):
 
         self.old_value = 0.
         self.tangoname = self.getProperty("tangoname")
-
+        self.motor_name = self.getProperty("motor_name")
+        self.ho = DeviceProxy(self.tangoname)
+        
         try:
             self.dataType    = self.getProperty("datatype")
+            if self.dataType is None:
+                self.dataType    = "float"
             logging.getLogger("HWR").info("TangoDCMotor dataType found in config, it is %s", self.dataType)
         except:
             self.dataType    = "float"
@@ -58,7 +62,10 @@ class TangoDCMotor(Device):
                pass
 
         self.setIsReady(True)
-
+        try:
+            self.limitsCommand = self.getCommandObject("limits")
+        except KeyError:
+            self.limitsCommand = None
         self.positionChan = self.getChannelObject("position") # utile seulement si positionchan n'est pas defini dans le code
         self.stateChan    = self.getChannelObject("state")    # utile seulement si statechan n'est pas defini dans le code
 
@@ -67,7 +74,7 @@ class TangoDCMotor(Device):
 
     def positionChanged(self, value):
         self.positionValue = value
-        if abs(value - self.old_value ) > self.threshold:
+        if abs(float(value) - self.old_value ) > self.threshold:
             try:
                 logging.getLogger("HWR").error("%s: TangoDCMotor new position  , %s", self.name(), value)
                 self.emit('positionChanged', (value,))
@@ -103,14 +110,30 @@ class TangoDCMotor(Device):
     
     def getLimits(self):
         try:
-            info = self.positionChan.getInfo() 
-            max = float(info.max_value)
-            min = float(info.min_value)
-            logging.getLogger("HWR").info("TangoDCMotor.getLimits: %.4f %.4f" % (min,max))
-            return [min,max]
+            limits = self.getProperty('min'), self.getProperty('max')
+            #info = self.positionChan.getInfo() 
+            #max = float(info.max_value)
+            #min = float(info.min_value)
+            logging.getLogger("HWR").info("TangoDCMotor.getLimits: %.4f %.4f" % limits)
+            return limits
+            #return [min,max]
         except:
             logging.getLogger("HWR").info("TangoDCMotor.getLimits: Cannot get limits for %s" % self.name())
-            return [-1,1]
+            retval = [-1, 1]
+            if self.name() == '/phi':
+                retval = [-10000, 10000]
+            return retval
+            
+        try:
+            limits = self.ho.getMotorLimits(self.motor_name) #limitsCommand() # self.ho.getMotorLimits(self.motor_name)
+            logging.getLogger("HWR").info("TangoDCMotor.getLimits: Getting limits for %s -- %s " % (self.motor_name, str(limits)))
+            import numpy
+            if numpy.inf in limits:
+                limits = numpy.array([-10000, 10000])
+            return limits
+        except:
+            import traceback
+            logging.getLogger("HWR").info("TangoDCMotor.getLimits: Cannot get limits for %s.\nException %s " % (self.motor_name, traceback.print_exc()))
         
     def motorLimitsChanged(self):
         self.emit('limitsChanged', (self.getLimits(), )) 
@@ -158,7 +181,7 @@ class TangoDCMotor(Device):
         retvalue = value
         if self.dataType in [ "short", "int", "long"]:
             retvalue = int(value)
-        return(retvalue)
+        return retvalue
 
     def syncMoveRelative(self, position):
         old_pos = self.positionValue
@@ -187,7 +210,7 @@ class TangoDCMotor(Device):
         Arguments:
         absolutePosition -- position to move to
         """
-        logging.getLogger("TangoClient").info("TangoDCMotor move. Trying to go to %s: type '%s'", absolutePosition, type(absolutePosition))
+        logging.getLogger("TangoClient").info("TangoDCMotor move (%s). Trying to go to %s: type '%s'", self.motor_name, absolutePosition, type(absolutePosition))
         absolutePosition = float(absolutePosition)
         if type(absolutePosition) != float and type(absolutePosition) != int:
             logging.getLogger("TangoClient").error("Cannot move %s: position '%s' is not a number. It is a %s", self.tangoname, absolutePosition, type(absolutePosition))
@@ -195,8 +218,13 @@ class TangoDCMotor(Device):
         logging.getLogger("HWR").info("TangoDCMotor.move to absolute position: %.3f" % absolutePosition)
         logging.getLogger("TangoClient").info("TangoDCMotor move. Trying to go to %s: that is a '%s'", absolutePosition, type(absolutePosition))
         if abs(self.getPosition() - absolutePosition) > epsilon:
+            logging.info("TangoDCMotor: difference larger then epsilon (%s), executing the move " % str(epsilon))
             self.positionChan.setValue( self.convertValue(absolutePosition) )
-
+        else:
+            logging.info("TangoDCMotor: not moving really as epsilon is large %s " % str(epsilon))
+            logging.info("TangoDCMotor: self.getPosition() %s " % str(self.getPosition()))
+            logging.info("TangoDCMotor: absolutePosition %s " % str(absolutePosition))
+            
     def stop(self):
         logging.getLogger("HWR").info("TangoDCMotor.stop")
         stopcmd = self.getCommandObject("Stop")()
