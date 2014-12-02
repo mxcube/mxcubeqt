@@ -117,7 +117,6 @@ class MiniDiffPX2(Equipment):
           phiz_ref = self["centringReferencePosition"].getProperty("phiz")
         except:
           phiz_ref = None
-        
         self.phiMotor = self.getDeviceByRole('phi')
         self.phizMotor = self.getDeviceByRole('phiz')
         self.phiyMotor = self.getDeviceByRole("phiy")
@@ -127,7 +126,14 @@ class MiniDiffPX2(Equipment):
         self.sampleXMotor = self.getDeviceByRole("sampx")
         self.sampleYMotor = self.getDeviceByRole("sampy")
         self.camera = self.getDeviceByRole('camera')
-        self.centringPhi=sample_centring.CentringMotor(self.phiMotor, direction=-1)
+        try:
+            phiDirection = self.phiMotor.getProperty("direction")
+            if phiDirection == None:
+                 phiDirection = 1
+        except:
+            phiDirection=1
+
+        self.centringPhi=sample_centring.CentringMotor(self.phiMotor, direction=phiDirection)
         self.centringPhiz=sample_centring.CentringMotor(self.phizMotor, reference_position=phiz_ref)
         self.centringPhiy=sample_centring.CentringMotor(self.phiyMotor, direction=-1)
         self.centringSamplex=sample_centring.CentringMotor(self.sampleXMotor)
@@ -142,7 +148,7 @@ class MiniDiffPX2(Equipment):
         
         # some defaults
         self.anticipation  = 1
-        self.collect_phaseposition = 4
+        self.collect_phaseposition = 'DataCollection'
         
         sc_prop=self.getProperty("samplechanger")
         if sc_prop is not None:
@@ -341,10 +347,21 @@ class MiniDiffPX2(Equipment):
         return self.md2.BeamPositionVertical
     
     def getState(self):
-        return str(self.md2.state())
+        motors = ['Omega', 'AlignmentX', 'AlignmentY', 'AlignmentZ', 'CentringX', 'CentringY', 'ApertureHorizontal', 'ApertureVertical', 'CapillaryHorizontal', 'CapillaryVertical', 'ScintillatorHorizontal', 'ScintillatorVertical']
+        state = set([self.getMotorState(m) for m in motors])
+        if len(state) == 1 and 'STANDBY' in state:
+            return 'STANDBY'
+        else:
+            return 'MOVING'
+        
+    def getOmegaState(self):
+        return self.md2.getMotorState('Omega').name
+        
+    def getMotorState(self, motor_name):
+        return self.md2.getMotorState(motor_name).name
         
     def get_pixels_per_mm(self):
-        return 1000./self.md2.CoaxCamScaleX, 1000./self.md2.CoaxCamScaleY
+        return 1.0/self.md2.CoaxCamScaleX, 1.0/self.md2.CoaxCamScaleY
         
     def getBeamInfo(self, update_beam_callback):
         #get_beam_info = self.getCommandObject("getBeamInfo")
@@ -366,14 +383,25 @@ class MiniDiffPX2(Equipment):
           diffstate = self.getState()
           logging.info("SOLEILCollect - setting gonio ready (state: %s)" % diffstate)
 
-          self.md2.write_attribute('ScanAnticipation', self.anticipation)
+          #self.md2.write_attribute('ScanAnticipation', self.anticipation)
           self.md2.write_attribute('ScanNumberOfPasses', npass)
           self.md2.write_attribute('ScanRange', oscrange)
           self.md2.write_attribute('ScanExposureTime', exptime)
-          self.md2.write_attribute('PhasePosition', self.collect_phaseposition)
+          logging.info("SOLEILCollect - setting the collect phase position %s" % self.collect_phaseposition)
+          logging.info("SOLEILCollect - current phase %s" % self.md2.currentphase)
+          logging.info("SOLEILCollect - current phase index %s" % self.md2.currentphaseindex)
+          if self.md2.currentphase != self.collect_phaseposition:
+             self.md2.startsetphase(self.collect_phaseposition)
+             while self.md2.currentphase != self.collect_phaseposition:
+                 time.sleep(0.1)
+          else:
+              self.md2.backlightison=False
           
-    def wait(self, device):
-        while device.state().name in ['MOVING', 'RUNNING']:
+    def wait(self):
+        logging.info("MiniDiffPX2 wait" )
+        #while device.state().name in ['MOVING', 'RUNNING']:
+        while self.getState() in ['MOVING', 'RUNNING'] or self.getOmegaState() in ['MOVING']:
+            logging.info("MiniDiffPX2 wait" )
             time.sleep(.1)
             
     def setScanStartAngle(self, sangle):
@@ -383,7 +411,8 @@ class MiniDiffPX2(Equipment):
         executed = False
         while executed is False:
             try:
-                self.wait(self.md2)
+                self.wait()
+                logging.info("MiniDiffPX2 state %s " % self.md2.State() )
                 self.md2.write_attribute("ScanStartAngle", sangle )
                 executed = True
             except Exception, e:
@@ -393,6 +422,7 @@ class MiniDiffPX2(Equipment):
     
     def startScan(self, wait=True):
         logging.info("MiniDiffPX2 / starting scan " )
+        start = time.time()
         if self.md2_ready:
             diffstate = self.getState()
             logging.info("SOLEILCollect - diffractometer scan started  (state: %s)" % diffstate)
@@ -400,9 +430,9 @@ class MiniDiffPX2(Equipment):
         executed = False
         while executed is False:
             try:
-                self.wait(self.md2)
-                self.md2.command_inout('StartScan')
-                self.wait(self.md2)
+                self.wait()
+                self.md2.command_inout('startScan')
+                self.wait()
                 executed = True
                 logging.info('Successfully executing StartScan command')
             except Exception, e:
@@ -410,6 +440,13 @@ class MiniDiffPX2(Equipment):
                 os.system('echo $(date) error executing StartScan command >> /927bis/ccd/collectErrors.log')
                 logging.info('Problem executing StartScan command')
                 logging.info('Exception ' + str(e))
+        while self.md2.fastshutterisopen is False:
+            time.sleep(0.01)
+        #time.sleep(self.md2.scanexposuretime)
+        while self.md2.fastshutterisopen is True:
+            logging.info('Successfully executing StartScan command, waiting for fast shutter to close')
+            time.sleep(0.01)
+        logging.info("MiniDiffPX2 Scan took %s seconds "  % str(time.time() - start))
         return
     
     def moveToBeam(self, x, y):
@@ -486,7 +523,7 @@ class MiniDiffPX2(Equipment):
                                                                "sampy": self.centringSampley,
                                                                "phiz": self.centringPhiz }, 
                                                               self.pixelsPerMmY, self.pixelsPerMmZ, 
-                                                              self.getBeamPosX(), self.getBeamPosY())
+                                                              self.getBeamPosX(), self.getBeamPosY(), chi_angle=0.0)
                                                                          
         self.currentCentringProcedure.link(self.manualCentringDone)
 
@@ -723,20 +760,21 @@ class MiniDiffPX2(Equipment):
         gevent.spawn(self.bpc)
     
     def bpc(self):
-        
         calib = calibrator.calibrator(fresh=True, save=True)
         calib.prepare()
         for zoom in calib.zooms:
             calibrator.main(calib, zoom)
         calib.tidy()
         calib.updateMD2BeamPositions()
+        calib.saveSnap()
         
     def apertureAlign(self):
         logging.getLogger("HWR").info("Going to realign the current aperture")
         gevent.spawn(self.aa)
         
     def aa(self):
-        a = scan_and_align.scan_and_align('aperture')
+        a = scan_and_align.scan_and_align('aperture', display=False)
         a.scan()
         a.align(optimum='com')
-        a.saveScan()
+        a.save_scan()
+        a.predict()
