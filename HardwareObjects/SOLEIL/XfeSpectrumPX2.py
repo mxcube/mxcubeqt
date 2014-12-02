@@ -59,7 +59,7 @@ class XfeSpectrumPX2(Equipment):
     def doSpectrum(self): #, ct, filename):
         self.xfeCollect.measureSpectrum()
         self.spectrumCommandFinished(0)
-        return self.xfeCollect.getXvals(), self.xfeCollect.getSpectrum()
+        return self.xfeCollect.get_calibrated_energies(), self.xfeCollect.getSpectrum()
     
     def isConnected(self):
         return True
@@ -202,7 +202,7 @@ class XfeSpectrumPX2(Equipment):
             #mcaData = self.getChannelObject('mca_data').getValue()
             mcaData = self.xfeCollect.getXvals(), self.xfeCollect.getSpectrum()
             #mcaCalib = self.getChannelObject('calib_data').getValue()
-            mcaCalib = None
+            mcaCalib = self.xfeCollect.get_calibration() #None
             #mcaConfig = self.getChannelObject('config_data').getValue()
             mcaConfig = self.xfeCollect.getMcaConfig()
             self.spectrumInfo["beamTransmission"] = mcaConfig['att']
