@@ -182,7 +182,7 @@ class BLEnergy (Device) :
             return None    
             
     def startMoveEnergy(self, value, wait=False):   
-        logging.getLogger("HWR").debug("%s: BLEnergy.startMoveEnergy: %.3f", self.name(), value)
+        logging.getLogger("HWR").debug("%s: BLEnergy.startMoveEnergy: %.3f", self.name(), float(value))
     
         # MODIFICATION DE CETTE FONCTION POUR COMPENSER LE PROBLEME D'HYSTERESIS DE L"ONDULEUR
         # PAR CETTE METHODE ON APPLIQUE TOUJOURS UN GAP CROISSANT
