@@ -84,6 +84,8 @@ class EnergyScanPX2(Equipment):
             self.sConnected()
             
     def connectTangoDevices(self):
+        self.fast_shutter_hwo = self.getObjectByRole("fast_shutter")
+
         try :
             self.BLEnergydevice = DeviceProxy(self.getProperty("blenergy")) #, verbose=False)
             self.BLEnergydevice.waitMoves = True
@@ -1053,6 +1055,9 @@ class EnergyScanThread(QThread):
             # self.parent.fastshutterdevice.Open()
             self.wait(self.parent.md2device)
             self.parent.md2device.OpenFastShutter() #write_attribute('FastShutterIsOpen', 1)
+
+            self.parent.fast_shutter_hwo.openShutter()
+
             #while self.parent.md2device.read_attribute('FastShutterIsOpen') != 1:
                 #time.nsleep(0.05)  
                 
@@ -1101,7 +1106,8 @@ class EnergyScanThread(QThread):
             # closing the fastshutter
             #self.parent.fastshutterdevice.Close() 
             self.wait(self.parent.md2device)
-            self.parent.md2device.CloseFastShutter() #write_attribute('FastShutterIsOpen', 0)
+            #self.parent.md2device.CloseFastShutter() #write_attribute('FastShutterIsOpen', 0)
+            self.parent.fast_shutter_hwo.closeShutter()
             #while self.parent.md2device.read_attribute('FastShutterIsOpen') != 0:
                 #time.sleep(0.05)
                
@@ -1130,7 +1136,8 @@ class EnergyScanThread(QThread):
         #self.parent.fastshutterdevice.Close()
         #while self.parent.fastshutterdevice.State != "CLOSE":
             #time.sleep(0.1)
-        self.parent.md2device.CloseFastShutter() 
+        #self.parent.md2device.CloseFastShutter() 
+        self.parent.fast_shutter_hwo.closeShutter()
         #while self.parent.md2device.read_attribute('FastShutterIsOpen') != 0:
             #time.sleep(0.05)
         
