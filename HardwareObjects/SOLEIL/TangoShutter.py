@@ -18,6 +18,8 @@ class TangoShutter(BaseHardwareObjects.Device):
     shutterState = {
         #0:  'ON',
         #1:  'OFF',
+        'False':    'CLOSED',
+        'True':     'OPENED',
         '0':        'CLOSED',
         '1':        'OPENED',
         '4':        'INSERT',
@@ -93,8 +95,8 @@ class TangoShutter(BaseHardwareObjects.Device):
         self.shutterStateValue = 'UNKNOWN'
 
         try:
-            chanStatus = self.getChannelObject('State')
-            chanStatus.connectSignal('update', self.shutterStateChanged)
+            self.shutChannel = self.getChannelObject('State')
+            self.shutChannel.connectSignal('update', self.shutterStateChanged)
         except KeyError:
             logging.getLogger().warning('%s: cannot report State', self.name())
 
@@ -122,8 +124,28 @@ class TangoShutter(BaseHardwareObjects.Device):
                                               'INIT', 'DISABLED', 'ERROR', 'ALARM', 'STANDBY')
 
     def openShutter(self):
-        self.getCommandObject("Open")()
+        # Try getting open command configured in xml
+        # If command is not defined or new MD2 (has no CloseFastShutter command. 
+        # then try writing the channel
+        try:
+            opencmd = self.getCommandObject("Open")
+            if opencmd is None:
+                self.shutChannel.setValue(True)
+            else:
+                opencmd()
+        except:
+            self.shutChannel.setValue(True)
 
     def closeShutter(self):
-        self.getCommandObject("Close")()
+        # Try getting close command configured in xml
+        # If command is not defined or new MD2 (has no CloseFastShutter command. 
+        # then try writing the channel
+        try:
+            closecmd = self.getCommandObject("Close")
+            if closecmd is None:
+                self.shutChannel.setValue(False)
+            else:
+                closecmd()
+        except:
+            self.shutChannel.setValue(False)
 
