@@ -237,10 +237,10 @@ class LimaAdscDetector:
         logging.info('Preparing LIMA Detector')
         if self.limaadscdev.state().name != 'STANDBY':
             self.limaadscdev.Stop()
-            time.sleep(0.5)
+            time.sleep(0.1)
 
         if self.adscdev.state().name != 'STANDBY':
-            time.sleep(0.5)
+            time.sleep(0.1)
 
         self.limaadscdev.write_attribute('nbFrames', number_of_images)
 
@@ -266,9 +266,14 @@ class LimaAdscDetector:
        
     @task
     def prepare_oscillation(self, start, osc_range, exptime, npass):
+        logging.info("<SOLEIL MultiCollect> prepare_acquisition")
         if self.ready:
            head = self.prepareHeader()
            self.adscdev.SetHeaderParameters( head )
+           self.limaadscdev.exposureTime = (exptime + 0.5) * 1e3
+           #if self.limaadscdev.exposureTime > 2500:
+               #logging.info("<SOLEIL MultiCollect> prepare_acquisition setting timeout to %s " % (self.limaadscdev.exposureTime + 1500))
+               #self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposureTime + 1500))
            self.waitReady(self.adscdev)
 
         return (start, start+osc_range)
@@ -279,24 +284,33 @@ class LimaAdscDetector:
 
     @task
     def start_acquisition(self, exptime, npass, first_frame):
+        logging.info("<SOLEIL MultiCollect> start_acquisition")
         # Comes from   self.limaadscSnap() in original Martin's thread program
         if not self.ready:
             return
-
+        logging.info("<SOLEIL MultiCollect> start_acquisition limaadscdev timeout %s" % self.limaadscdev.get_timeout_millis())
         self.limaadscdev.Snap()
-        time.sleep(0.001)
-        while self.limaadscdev.log[-1].find('yat::DEVICE_SNAP_MSG') == -1:
-            time.sleep(0.05)
-            self.limaadscdev.Snap()
+        time.sleep(0.05)
+        #while self.limaadscdev.log[-1].find('yat::DEVICE_SNAP_MSG') == -1:
+            #time.sleep(0.05)
+            #self.limaadscdev.Snap()
         return
       
     @task
-    def write_image(self, last_frame):
-        #if last_frame:
+    def write_image(self, last_frame, jpeg_full_path='/tmp/jfp.jpeg', jpeg_thumbnail_full_path='/tmp/jtfp.jpeg'):
+        start = time.time()
+        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs")
+        logging.info("jpeg_full_path %s" % jpeg_full_path)
+        logging.info("jpeg_thumbnail_full_path %s" % jpeg_thumbnail_full_path)
         self.lastImage(integer=last_frame, imagePath=self.imagePath, fileName=self.fileName)
-        #else:
-        #    pass
-
+        img_full_path = os.path.join(self.imagePath, self.fileName)
+        
+        #while not os.path.exists(img_full_path):
+            #time.sleep(0.1)
+        #os.system('ssh p10 "adxv -sa -jpeg_scale 0.08 %s %s"' % (img_full_path, jpeg_full_path))
+        #os.system('ssh p10 "adxv -sa -jpeg_scale 0.016 %s %s"' % (img_full_path, jpeg_thumbnail_full_path))
+        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        
     @task
     def stop_acquisition(self):
         # Comes from   self.limaadscStop() in original Martin's thread program
@@ -304,12 +318,16 @@ class LimaAdscDetector:
            return
 
         k = 0
-        while self.limaadscdev.log[-1].find('Acquisition is Stopped.') == -1:
-            k += 1
-            self.limaadscdev.Stop()
-            if k > 1:
-                logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it.' % k)
-            time.sleep(0.05)
+        while self.limaadscdev.log[-1].find('Acquisition is Stopped.') == -1 and self.limaadscdev.state().name == 'RUNNING':
+            try:
+                k += 1
+                self.limaadscdev.Stop()
+                if k > 1:
+                    logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it.' % k)
+                time.sleep(0.1)
+            except:
+                import traceback
+                logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it. Exception %s' % (k, traceback.format_exc()))
         return
 
     @task
@@ -317,9 +335,13 @@ class LimaAdscDetector:
         return
 
     def lastImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
+        logging.info("<SOLEIL MultiCollect> lastImage, xformstatusfile %s " % self.xformstatusfile)
         line = str(integer) + ' ' + os.path.join(imagePath, fileName)
         f = open( self.xformstatusfile, 'w')
-        f.write(line)
+        f.write('%s\n' % line)
+        f.close()
+        f = open('/927bis/ccd/log/.goimg/goimg.db', 'w')
+        f.write('%s' % os.path.join(imagePath, 'process'))
         f.close()
 
     def waitReady(self, device):
@@ -547,17 +569,19 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
     @task
     def data_collection_cleanup(self):
-        logging.info("<SOLEIL MultiCollect> TODO - close fast shutter")
+        logging.info("<SOLEIL MultiCollect> data_collection_cleanup - close fast shutter")
+        self.mono_turnon()
         return
-        self.close_fast_shutter()
+        #self.close_fast_shutter()
 
     @task
     def set_transmission(self, transmission_percent):
+        logging.info("<SOLEIL MultiCollect> set transmission")
         self.bl_control.transmission.setTransmission(transmission_percent)
 
 
     def set_wavelength(self, wavelength):
-        logging.info("<SOLEIL MultiCollect> TODO - set wavelength")
+        logging.info("<SOLEIL MultiCollect> set wavelength")
         return self._tunable_bl.set_wavelength(wavelength)
 
 
@@ -607,6 +631,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         
     @task
     def move_motors(self, motor_position_dict):
+        logging.info("<SOLEIL MultiCollect> move_motors ")
         for motor in motor_position_dict.keys(): #iteritems():
             position = motor_position_dict[motor]
             if isinstance(motor, str) or isinstance(motor, unicode):
@@ -629,6 +654,11 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def open_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - open safety shutter" )
+        #self.test = True
+        #if self.test:
+            #logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
+            #return
+
         self.bl_control.safety_shutter.openShutter()
 
         t0 = time.time()
@@ -642,6 +672,11 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def close_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - close safety shutter" )
+        #self.test = True
+        #if self.test:
+            #logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
+            #return
+
         return
         self.bl_control.safety_shutter.closeShutter()
         t0 = time.time()
@@ -682,63 +717,50 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def prepare_oscillation(self, start, osc_range, exptime, npass):
         # Program things for one wedge
-
-        # TOFILL  from here
-        #
-        # self.wait(self.adsc)
-        # self.adsc.write_attribute('fileName', fileName)
-        # self.wait(self.adsc)
-        # head = self.setupHeader()
-        # self.adsc.command_inout('SetHeaderParameters', head)
-        # self.wait(self.adsc)
-        # self.wait(self.md2)
-
-        while self.bl_control.diffractometer.getState() in [ 'MOVING', 'RUNNING' ]:
-          time.sleep(0.1)
+        #while self.bl_control.diffractometer.getState() in [ 'MOVING', 'RUNNING' ]:
+          #time.sleep(0.1)
+        self.bl_control.diffractometer.wait()
         self.bl_control.diffractometer.setScanStartAngle(start)
-
-        # TOFILL  to here
-
+        self.bl_control.diffractometer.md2.OmegaPosition = start - 0.1
+        self.bl_control.diffractometer.wait()
+        
         return self._detector.prepare_oscillation(start, osc_range, exptime, npass)
     
     @task
     def diffr_wait_ready(self, timeout=None):
-       wtime = time.time()
-       while True:
-          diffstate = self.bl_control.diffractometer.getState()
-          if diffstate in [ 'MOVING', 'RUNNING' ]:
-             continue
-          else:
-             break
-          if (timeout is not None) and (time.time() - wtime) > timeout:
-              logging.warning("SOLEILCollect - diffractometer ended wait due to timeout " )
-          time.time(0.02)
+        logging.info("<SOLEIL MultiCollect> diffr_wait_ready " )
+        wtime = time.time()
+        while True:
+            diffstate = self.bl_control.diffractometer.getState()
+            if diffstate in [ 'MOVING', 'RUNNING' ]:
+                logging.info("<SOLEIL MultiCollect> diffr_wait_ready diff state in [ 'MOVING', 'RUNNING' ] " )
+                continue
+            else:
+                logging.info("<SOLEIL MultiCollect> diffr_wait_ready diff state not in [ 'MOVING', 'RUNNING' ] " )
+                break
+            if (timeout is not None) and (time.time() - wtime) > timeout:
+                logging.warning("SOLEILCollect - diffractometer ended wait due to timeout " )
+            time.time(0.02)
 
     @task
     def do_oscillation(self, start, end, exptime, npass):
         self.bl_control.diffractometer.startScan()
-        while self.bl_control.diffractometer.getState() in [ 'MOVING', 'RUNNING' ]:
-            time.sleep(0.1)
+        #while self.bl_control.diffractometer.getMotorState('Omega') in [ 'MOVING', 'RUNNING' ]:
+            #time.sleep(0.1)
         return 
     
     def start_acquisition(self, exptime, npass, first_frame):
         return self._detector.start_acquisition(exptime, npass, first_frame)
       
-    def write_image(self, last_frame):
-        return self._detector.write_image(last_frame)
+    def write_image(self, last_frame, jpeg_full_path='/tmp/jfp.jpeg', jpeg_thumbnail_full_path='/tmp/jtfp.jpeg'):
+        return self._detector.write_image(last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
 
     def stop_acquisition(self):
         return self._detector.stop_acquisition()
         
-      
     def reset_detector(self):
         return self._detector.reset_detector()
         
-
-    def create_directories(self, *args):
-        logging.info("<SOLEIL MultiCollect> DELETE THIS - create_directories - we are overwriting the real one !!!! " )
-        return 
-
     def get_wavelength(self):
         logging.info("<SOLEIL MultiCollect> get wavelength " )
         return self._tunable_bl.get_wavelength()
@@ -781,7 +803,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         logging.info("<SOLEIL MultiCollect> TODO - get beam size " )
         #return (0.010, 0.005) #valid only for PX2, should either go to PX2MultiCollect or call general method in BeamInfo for instance
         #return (self.execute_command("get_beam_size_x"), self.execute_command("get_beam_size_y"))
-        return (None,None)
+        return (0.010, 0.005)
 
     def get_horizontal_beam_size(self):
         return self.get_beam_size()[0]
@@ -789,6 +811,12 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     def get_vertical_beam_size(self):
         return self.get_beam_size()[-1]
         
+    def get_beam_size_x(self):
+        return self.get_beam_size()[0]
+
+    def get_beam_size_y(self):
+        return self.get_beam_size()[-1]
+
     def get_slit_gaps(self):
         logging.info("<SOLEIL MultiCollect> TODO - get slit gaps" )
         return
@@ -883,7 +911,13 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
     def get_archive_directory(self, directory):
         logging.info("<SOLEIL MultiCollect> TODO - get archive directory")
-        return "/tmp"
+        ad = directory.replace('RAW_DATA', 'ARCHIVE')
+        try:
+            os.makedirs(ad)
+        except:
+            import traceback
+            logging.info('problem creating archive %s ' % traceback.format_exc)
+        return ad
  
         res = None
        
