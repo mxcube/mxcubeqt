@@ -1,4 +1,4 @@
-. blissrc
+:. blissrc
 #echo "Sleeping 30s in order to allow images to be written to disk, please wait..."
 #sleep 30
 echo "Running edna plugin launcher EDPluginControlInterfaceToMXCuBEv1_3 --inputFile $1 --outputFile $2 --basedir $3"
@@ -12,6 +12,9 @@ chmod a+x $ednaStartScriptFileName
 # Recuperate the name of the MX processing computer...
 ednanormalhost=mxedna
 case $EDNA_SITE in
+  SOLEIL)
+      ednasafemodehost=localhost
+      ;;
   ESRF_ID14EH1)
       ednasafemodehost=pc141data
       ;;
