@@ -1,4 +1,6 @@
 <equipment class="EnergyScanPX2">
+    <object href="/fastshutter" role="fast_shutter" />
+
     <tangoname>/BLEnergy</tangoname> 
     <blenergy>i11-ma-c00/ex/beamlineenergy</blenergy>
     <mono>i11-ma-c03/op/mono1</mono>
