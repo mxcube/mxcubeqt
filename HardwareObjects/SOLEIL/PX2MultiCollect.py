@@ -18,6 +18,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
 
         self.headerdev     = DeviceProxy( self.headername )
         self.mono1dev      = DeviceProxy( self.mono1name )
+        self.mono1_mt_rx   = DeviceProxy( self.mono1mtrxname )
         self.det_mt_ts_dev = DeviceProxy( self.detmttsname )
         self.det_mt_tx_dev = DeviceProxy( self.detmttxname )
         self.det_mt_tz_dev = DeviceProxy( self.detmttzname )
@@ -26,6 +27,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self.linear = False
         self.grid = False
         self.translational = False
+        self.standard_collect = False
         
         self._detector.prepareHeader = self.prepareHeader
         SOLEILMultiCollect.init(self)
@@ -215,7 +217,10 @@ class PX2MultiCollect(SOLEILMultiCollect):
         distance   = self.det_mt_ts_dev.read_attribute('position').value
         tx         = self.det_mt_tx_dev.read_attribute('position').value
         tz         = self.det_mt_tz_dev.read_attribute('position').value
-        
+        logging.info('wavelength %s' % wavelength)
+        logging.info('mt_ts %s' % distance)
+        logging.info('mt_tx %s' % tx)
+        logging.info('mt_tz %s' % tz)
         #wavelength  = self.mono1.read_attribute('lambda').value
         #distance    = self.detector_mt_ts.read_attribute('position').value
         #tx          = self.detector_mt_tx.position
@@ -225,11 +230,40 @@ class PX2MultiCollect(SOLEILMultiCollect):
         
         beam_center_x = self.get_beam_center_x(X[:, [0, 1, 2, 4]])
         beam_center_y = self.get_beam_center_y(X[:, [0, 1, 2, 3]])
+        
+        #dirty fix for drift between Run3 and Run4 2014
+        beam_center_x -= 3.08
+        beam_center_y -= 1.45
+        
         beam_center_y *= q
         beam_center_x *= q
+        
+        # The following two lines fixes the loss of offsets from 2014-09-12 (apparently an init on translation stage device servers)
+        beam_center_y += -17.2 #3.5
+        beam_center_x += 3.5 #17.2
+        
         print 'beamCenter2', beam_center_y, beam_center_x
         return beam_center_x, beam_center_y
+                
+    def set_collect_position(self, position):
+        logging.info("<PX2 MultiCollect> set collect position %s" % position)
+        logging.info("<PX2 MultiCollect> set collect position type %s" % type(position))
+        self.standard_collect = True
+        #pos = dict(position)
+        #collect_position = {} 
+        #for motor in self.motors:
+            #collect_position[motor] = pos[motor]
+            
+        self.collect_position = self.bl_control.diffractometer.getPositions()
     
+    def are_positions_equal(self, position1, position2, epsilon = 1.e-4):
+        equal = True
+        for key in position1:
+            if key in position2:
+                if abs(position1[key] - position2[key]) > epsilon:
+                    return False
+        return True
+        
     def set_helical(self, onmode, positions=None):
         logging.info("<PX2 MultiCollect> set helical")
         self.helical = onmode
@@ -300,6 +334,37 @@ class PX2MultiCollect(SOLEILMultiCollect):
             explicit_positions += to_add
         return explicit_positions
     
+    def calculateGridPositions(self, grid_description):
+        """
+        The grid description dictionary has the following format:
+
+        grid = {'id': 'grid-n',
+                'dx_mm': total width in mm,
+                'dy_mm': total height in mm,
+                'steps_x': number of colls,
+                'steps_y': number of rows,
+                'x1': top left cell center x coord,
+                'y1': top left cell center y coord,
+                'beam_width': beam width in mm
+                'beam_height': beam height in mm
+                'angle': 0}
+        """
+    def safe_mono_turnoff(self):
+        logging.info("<PX2 MultiCollect> truning off the mono1-mt_rx motor before collect")
+        k=0
+        while self.mono1_mt_rx.state().name != 'OFF':
+            k+=1
+            logging.info("<PX2 MultiCollect> truning off the mono1-mt_rx motor before collect -- attempt %s" % k)
+            if self.mono1_mt_rx.state().name == 'STANDBY':
+                self.mono1_mt_rx.Off()
+            else:
+                time.sleep(0.1)
+                
+    def mono_turnon(self):
+        logging.info("<PX2 MultiCollect> turning on the mono1-mt_rx motor")
+        if self.mono1_mt_rx.state().name == 'OFF':
+            self.mono1_mt_rx.On()
+
     def getCollectPositions(self, nImages):
         logging.info("<PX2 MultiCollect> get collect positions")
         logging.info("getCollectPositions nImages %s" % nImages)
@@ -317,10 +382,11 @@ class PX2MultiCollect(SOLEILMultiCollect):
             positions = self.getPoints(start, final, nImages)
             self.linear = False
         elif self.grid:
-            positions = self.calculateGridPositions(self.grid_start, self.grid_nbsteps, self.grid_lengths)
+            positions = self.calculateGridPositions(grid_description)
             self.grid = False
         else:
-            positions = [{} for k in range(nImages)]
+            self.collect_position = {}
+            positions = [ self.collect_position for k in range(nImages)]
         return positions
         
     def newWedge(self, imageNums, ScanStartAngle, template, positions):
@@ -398,7 +464,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
             jpeg_file_template = None
             jpeg_thumbnail_file_template = None
         # database filling
-        logging.info("<AbstractMultiCollect> - LIMS is %s" % str(self.bl_control.lims))
+        logging.info("<PX2MultiCollect> - LIMS is %s" % str(self.bl_control.lims))
         if self.bl_control.lims:
             data_collect_parameters["collection_start_time"] = time.strftime("%Y-%m-%d %H:%M:%S")
             if self.bl_control.machine_current is not None:
@@ -414,7 +480,8 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 data_collect_parameters['detector_id'] = detector_id
               
         # Creating the directory for images and processing information
-        self.create_directories(file_parameters['directory'],  file_parameters['process_directory'])
+        logging.info("<PX2MultiCollect> - Creating directories for images and processing %s %s" % (file_parameters['directory'],file_parameters['process_directory'] ) )
+        self.create_directories(file_parameters['directory'], file_parameters['process_directory'], os.path.join(file_parameters['directory'], 'process'))
         self.xds_directory, self.mosflm_directory = self.prepare_input_files(file_parameters["directory"], file_parameters["prefix"], file_parameters["run_number"], file_parameters['process_directory'])
         data_collect_parameters['xds_dir'] = self.xds_directory
 
@@ -601,11 +668,9 @@ class PX2MultiCollect(SOLEILMultiCollect):
           
         #self.close_fast_shutter()
 
-        self.move_motors(motors_to_move_before_collect)
-
         with cleanup(self.data_collection_cleanup):
             self.open_safety_shutter(timeout=10)
-
+            
             self.prepare_intensity_monitors()
            
             frame = start_image_number
@@ -672,6 +737,15 @@ class PX2MultiCollect(SOLEILMultiCollect):
             
             k = 0
             reference_position = positions[0]
+            #if self.standard_collect is True:
+                #if self.are_positions_equal(self.collect_position, self.bl_control.diffractometer.getPositions()):
+                    #logging.info("PX2MultiCollect moving into collect position %s " % self.collect_position)
+                    #self.bl_control.diffractometer.moveMotors(self.collect_position)
+               
+            logging.info('moving motors before collect %s' % motors_to_move_before_collect)
+            self.move_motors(motors_to_move_before_collect)
+            self.bl_control.diffractometer.wait()
+            self.safe_mono_turnoff()
             for start, wedge_size in wedges_to_collect:
                 k += 1
                 end = start + osc_range
@@ -694,7 +768,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 
                 with error_cleanup(self.reset_detector):
                     self.move_motors(collect_position, epsilon=0.0002)
-                    self.start_acquisition(exptime, npass, frame==start_image_number)
+                    self.start_acquisition(exptime, npass, start_image_number)
                     if osc_end - osc_start < 1E-4:
                        self.open_fast_shutter()
                        time.sleep(exptime)
@@ -703,7 +777,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                        self.do_oscillation(osc_start, osc_end, exptime, npass)
                     self.stop_acquisition()
                     last_frame = start_image_number + nframes - 1
-                    self.write_image(last_frame)
+                    self.write_image(last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
                     
                     # Store image in lims
                     if self.bl_control.lims:
