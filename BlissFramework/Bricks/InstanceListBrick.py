@@ -221,7 +221,7 @@ class InstanceListBrick(BlissWidget):
                 try:
                     proposal_dict={ "code":orig_prop_code,\
                         "alias": prop_code,\
-                        "number":int(prop_number),\
+                        "number":prop_number,\
                         "session":int(session_id),\
                         "inhouse":is_inhouse }
                 except:

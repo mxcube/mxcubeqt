@@ -96,7 +96,7 @@ from BlissFramework.Utils import widget_colors
 
 class AtteFilter(QCheckBox):
     def __init__(self,label,parent,idx):
-        QCheckBox.__init__(self,label,parent)
+        QCheckBox.__init__(self,str(label),parent)
 	self.idx=idx
         self.connect(self,SIGNAL("toggled(bool)"),self.toggleme)
 
@@ -192,7 +192,7 @@ class AttenuatorsBrick(BlissWidget):
                 self.disconnect(self.attenuators, PYSIGNAL('attFactorChanged'), self.attFactorChanged)
 
             self.transHistory=[]
-
+ 
             self.attenuators = self.getHardwareObject(newValue)
             if self.attenuators is not None:
                 self.filtersDialog.setAttenuators(self.attenuators)
@@ -201,7 +201,6 @@ class AttenuatorsBrick(BlissWidget):
                 self.connect(self.attenuators, PYSIGNAL('deviceNotReady'), self.disconnected)
                 self.connect(self.attenuators, PYSIGNAL('attStateChanged'), self.attStateChanged)
                 self.connect(self.attenuators, PYSIGNAL('attFactorChanged'), self.attFactorChanged)
-
                 if self.attenuators.isReady():
                     self.connected()
                     self.attFactorChanged(self.attenuators.getAttFactor())
