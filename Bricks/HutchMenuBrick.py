@@ -212,6 +212,7 @@ class HutchMenuBrick(BlissWidget):
 	    if self.beamInfo is not None:
                 self.connect(self.beamInfo,PYSIGNAL('beamInfoChanged'), self.beamInfoChanged)
 		self.connect(self.beamInfo,PYSIGNAL('beamPosChanged'), self.beamPosChanged)
+                self.beamInfo.evaluate_beam_info()
         elif propertyName=="samplechanger":
             self.sampleChanger=self.getHardwareObject(newValue)
         elif propertyName=="dataCollect":
@@ -716,6 +717,7 @@ class HutchMenuBrick(BlissWidget):
                 pass
             else:
 		self.emit(PYSIGNAL("calibrationChanged"), (self.__scaleX, self.__scaleY))
+                self.beamInfo.emit_beam_info_change()
                 self.updateBeam(force=True)
         except:
             logging.getLogger().exception("HutchMenuBrick: problem starting up display")
