@@ -149,8 +149,7 @@ class ComboProperty(Property):
                 self.oldValue = self.value
                 self.value = strValue
                 return
-
-        raise ValueError, "%s is not a valid choice for combo" % repr(propertyValue)
+        raise ValueError, "%s is not a valid choice for combo" % repr(str(propertyValue))
 
 
 class FloatProperty(Property):
@@ -365,7 +364,9 @@ class PropertyBag:
 
 
     def __getitem__(self, propertyKey):
-        return self.properties[propertyKey].getValue()
+        item = self.properties.get(propertyKey)
+        if item is not None: 
+            return self.properties[propertyKey].getValue()
                 
 
     def __setitem__(self, propertyName, property):

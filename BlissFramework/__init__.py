@@ -29,8 +29,8 @@ logging.getLogger().addHandler(_hdlr)
 #
 # add the GUI Handler
 #
-from Utils import GUILogHandler
-_GUIhdlr = GUILogHandler.GUILogHandler()
+from Utils import Qt4_GUILogHandler
+_GUIhdlr =Qt4_GUILogHandler.GUILogHandler()
 _logger.addHandler(_GUIhdlr)
 
 
