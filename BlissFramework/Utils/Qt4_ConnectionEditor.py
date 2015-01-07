@@ -24,34 +24,10 @@ from BlissFramework import Qt4_Icons
 from BlissFramework import Qt4_Configuration
 
 
-class CustomListWidget(QtGui.QListWidget):
-    def __init__(self, *args):
-        QtGui.QListWidget.__init__(self, *args)
-
-        self.itemChanged = False
-
-        QtCore.QObject.connect(self, QtCore.SIGNAL('itemClicked(QListWidgetItem *)'), self.item_clicked)
-        QtCore.QObject.connect(self, QtCore.SIGNAL('currentItemChanged(QListWidgetItem *)'), self.current_item_changed)
-
-
-    def current_item_changed(self, item):
-        self.itemChanged = True
-        self.emit(QtCore.SIGNAL('itemSelected'), item)
-        
-
-    def item_clicked(self, item):
-        if not self.itemChanged:
-            self.clearSelection()
-            self.emit(QtCore.SIGNAL('itemSelected'), None)
-
-        self.itemChanged = False
-   
-        
 class Qt4_ConnectionEditor(QtGui.QDialog):   
     """
     Descript. :
     """ 
-
     def __init__(self, configuration):
         """
         Descript. :
@@ -74,12 +50,12 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
 
         emitter_panel = QtGui.QWidget(top_panel)
         self.emitter_windows_listwidget = QtGui.QListWidget(emitter_panel)
-        self.emitter_objects_listwidget = CustomListWidget(emitter_panel)
+        self.emitter_objects_listwidget = QtGui.QListWidget(emitter_panel)
         self.emitter_signals_listwidget = QtGui.QListWidget(emitter_panel)
 
         receiver_panel = QtGui.QWidget(top_panel)
         self.receiver_windows_listwidget = QtGui.QListWidget(emitter_panel)
-        self.receiver_objects_listwidget = CustomListWidget(emitter_panel)
+        self.receiver_objects_listwidget = QtGui.QListWidget(emitter_panel)
         self.receiver_slots_listwidget = QtGui.QListWidget(emitter_panel)
 
         self.add_connection_button = QtGui.QPushButton('Add connection', self)
@@ -158,37 +134,26 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         #             self.emitter_window_changed)
 
         self.emitter_windows_listwidget.currentItemChanged.connect(self.emitter_window_changed)
+        self.emitter_objects_listwidget.currentItemChanged.connect(self.emitter_object_changed) 
         self.receiver_windows_listwidget.currentItemChanged.connect(self.receiver_window_changed)
-
-        self.connect(self.emitter_objects_listwidget, QtCore.SIGNAL('itemSelected'), self.emitter_object_changed)
-        #self.connect(self.receiver_windows_listwidget, QtCore.SIGNAL('currentItemChanged(QListWidgetItem *)'), 
-        #             self.receiver_window_changed)
-        self.connect(self.receiver_objects_listwidget, QtCore.SIGNAL('itemSelected'), self.receiver_object_changed)
-        self.connect(self.remove_connection_button, QtCore.SIGNAL('clicked()'), self.remove_connection_button_clicked)
+        self.receiver_objects_listwidget.currentItemChanged.connect(self.receiver_object_changed)
         self.connect(self.add_connection_button, QtCore.SIGNAL('clicked()'), self.add_connection_button_clicked)
+        self.connect(self.remove_connection_button, QtCore.SIGNAL('clicked()'), self.remove_connection_button_clicked)
         self.connect(self.ok_button, QtCore.SIGNAL('clicked()'), self.ok_button_clicked)
         self.connect(self.cancel_button, QtCore.SIGNAL('clicked()'), self.cancel_button_clicked)
         self.connect(self.connections_treewidget, QtCore.SIGNAL('itemSelectionChanged()'), 
                     self.connections_treewidget_selection_changed)
-
 
         # Other ---------------------------------------------------------------
         self.connections_treewidget.setColumnCount(7)
         self.connections_treewidget.setHeaderLabels(['', 'Emitter window', 'Emitter object', 
                                                      'Signal', 'Receiver window', 
                                                      'Receiver object', 'Slot'])
-         
-
         self.setWindowTitle('Connection Editor')
-        #
-        # add each window in the corresponding lists
-        # 
         for senderWindow in self.configuration.windows_list:
             window_name = senderWindow["name"]
             self.emitter_windows_listwidget.addItem(window_name)
             self.receiver_windows_listwidget.addItem(window_name)
-
-        # force geometry updating on listbox
         self.emitter_windows_listwidget.setFont(self.emitter_windows_listwidget.font())
         self.receiver_windows_listwidget.setFont(self.receiver_windows_listwidget.font())
         self.showConnections()
@@ -471,19 +436,18 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                                 connectionDict['signal'],
                                 connectionDict['receiverWindow'],
                                 connectionDict['receiverObject'],
-                                connectionDict['slot']])
-        newItem.setPixmap(0, Qt4_Icons.load('button_ok_small'))
-        
-        self.connections_treewidget.insertItem(newItem)
-
+                                connectionDict['slot']]))
+        newItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_ok_small')))
+        self.connections_treewidget.addTopLevelItem(newItem)
     
-    def connections_treewidget_selection_changed(self, item):
-        self.cmdRemoveConnection.setEnabled(True)
+    def connections_treewidget_selection_changed(self):
+        self.remove_connection_button.setEnabled(True)
 
         
     def remove_connection_button_clicked(self):
-        self.connections_treewidget.takeItem(self.lstConnections.currentItem())
-        self.cmdRemoveConnection.setEnabled(False)
+      	#item = self.connections_treewidget.currentItem();
+        self.connections_treewidget.takeTopLevelItem(self.connections_treewidget.currentIndex().row())
+        self.remove_connection_button.setEnabled(False)
         
 
     def ok_button_clicked(self):
