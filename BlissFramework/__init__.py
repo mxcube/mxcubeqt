@@ -31,6 +31,7 @@ logging.getLogger().addHandler(_hdlr)
 #
 from Utils import Qt4_GUILogHandler
 _GUIhdlr =Qt4_GUILogHandler.GUILogHandler()
+
 _logger.addHandler(_GUIhdlr)
 
 
