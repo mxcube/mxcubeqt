@@ -120,7 +120,7 @@ class GUISupervisor(QtGui.QWidget):
                     f = open(GUIConfigFile)
                 except:
                     logging.getLogger().exception("Cannot open file %s", GUIConfigFile)
-                    qt.QMessageBox.warning(self, "Error", "Could not open file %s !" % GUIConfigFile, qt.QMessageBox.Ok)
+                    QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % GUIConfigFile, qt.QMessageBox.Ok)
                 else:
                     #
                     # find mnemonics to speed up loading
@@ -185,7 +185,8 @@ class GUISupervisor(QtGui.QWidget):
                         self.framework.filename = GUIConfigFile
                         self.framework.configuration = config
                         self.framework.setWindowTitle("GUI Builder - %s" % GUIConfigFile)
-                        self.framework.guiEditorWindow.setQt4_Configuration(config)
+                        self.framework.guiEditorWindow.set_configuration(config)
+                        self.framework.guiEditorWindow.draw_window_preview()  
                
                         self.framework.show()
                         return self.framework
@@ -247,7 +248,6 @@ class GUISupervisor(QtGui.QWidget):
         # start in execution mode
         #
         self.windows = Qt4_GUIDisplay.display(config, noBorder=self.noBorder)
-
         main_window = None
         if len(self.windows) > 0:
             main_window = self.windows[0]
@@ -265,7 +265,7 @@ class GUISupervisor(QtGui.QWidget):
             #        
             widgets_dict = dict([(callable(w.objectName) and str(w.objectName()) or None, w) for w in QtGui.QApplication.allWidgets()])
 
-            def make_connections(items_list):
+            def make_connections(items_list): 
                 for item in items_list:
                     try:
                         sender = widgets_dict[item["name"]]
@@ -284,7 +284,7 @@ class GUISupervisor(QtGui.QWidget):
                                 except AttributeError:
                                     logging.getLogger().error("No slot '%s' in receiver %s", connection["slot"], _receiver)
                                 else:
-                                    sender.connect(sender, QtCore.PYSIGNAL(connection["signal"]), slot)
+                                    sender.connect(sender, QtCore.SIGNAL(connection["signal"]), slot)
                     make_connections(item["children"])
                                         
             make_connections(config.windows_list)

@@ -221,7 +221,7 @@ def run(GUIConfigFile=None):
     logging.getLogger().info(logInfo)
 
     QtGui.QApplication.setDesktopSettingsAware(False) #use default settings
-    QtCore.QObject.connect(app, QtCore.SIGNAL("lastWindowClosed()"), app, QtCore.SLOT("quit()"))
+    QtCore.QObject.connect(app, QtCore.SIGNAL("lastWindowClosed()"), app.quit)
    
     supervisor = Qt4_GUISupervisor.GUISupervisor(designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
 

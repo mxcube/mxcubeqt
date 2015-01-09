@@ -189,19 +189,16 @@ class Configuration:
         
 
     def findItem(self, item_name, nodeset=None):
-        print "saak --- : ", item_name 
         if nodeset is None:
             nodeset = self.windows_list
 
         for item in nodeset:
-            print "1. item: ", item["name"], type(item)
             if item["name"] == item_name:
                 return item
             else:
                 _item = self.findItem(item_name, item["children"])
                 
                 if _item is not None:
-                    print "item 2: ", type(_item)
                     return _item
         
 
@@ -239,13 +236,14 @@ class Configuration:
         if new_item_name == old_item_name:
             return None
 
-        print item
-        print type(item)
         if self.findItem(new_item_name):
             # new name conflicts with existing item !
             return old_item_name
         else:
-            item.rename(new_item_name)
+            if isinstance(item, dict):
+                item["name"] = new_item_name
+            else:
+                item.rename(new_item_name)
 
             recv = "receiver"
             if old_item_name in self.items:
@@ -265,7 +263,11 @@ class Configuration:
             all_items.update(self.items)
 
             for item in all_items.itervalues():
-                for c in item.connections:
+                if isinstance(item, dict):
+                    connections = item["connections"]
+                else:
+                    connections = item.connections
+                for c in connections:
                     if c[recv]==old_item_name:
                         print "receiver item %s in %s has been changed to %s" % (old_item_name, item.name, new_item_name)
                         c[recv]=new_item_name

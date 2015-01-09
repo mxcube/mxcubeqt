@@ -119,6 +119,8 @@ class GUITreeWidget(QtGui.QTreeWidget):
         #self.addColumn("Element")
         #self.addColumn("Type")
         self.setColumnCount(2)
+        self.setColumnWidth(0, 200)
+        self.setColumnWidth(1, 200)
         self.setHeaderLabels(["Element", "Type"])
         self.setAcceptDrops(True)
         self.viewport().setAcceptDrops(True)
@@ -169,11 +171,8 @@ class ToolboxWindow(QtGui.QWidget):
         newBricksList = MyListView(self.bricksToolbox)
         #newBricksList.addColumn("")
         #newBricksList.header().hide()
-        
         QtCore.QObject.connect(newBricksList, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"), self.brickSelected)
-
         self.bricksToolbox.addItem(newBricksList, name)
-        
         self.bricksTab[name] = newBricksList
 
         return newBricksList
@@ -418,11 +417,11 @@ class GUIEditorWindow(QtGui.QWidget):
         
         self.tree_widget = GUITreeWidget(self)
 
-        self.rootElement = QtGui.QTreeWidgetItem(self.tree_widget)
-        self.rootElement.setText(0, QtCore.QString("GUI tree")) 
-        self.rootElement.setExpanded(True)
+        self.root_element = QtGui.QTreeWidgetItem(self.tree_widget)
+        self.root_element.setText(0, QtCore.QString("GUI tree")) 
+        self.root_element.setExpanded(True)
 
-        self.connect(self.tree_widget, QtCore.SIGNAL('itemSelectionChanged()'), self.itemSelected)
+        self.connect(self.tree_widget, QtCore.SIGNAL('itemSelectionChanged()'), self.item_selected)
         self.connect(self.tree_widget, QtCore.SIGNAL('itemDoubleClicked(QTreeWidgetItem *, int)'), self.item_double_clicked)
         self.connect(self.tree_widget, QtCore.SIGNAL('itemChanged(QTreeWidgetItem *, int)'), self.item_changed)
         self.connect(self.tree_widget, QtCore.SIGNAL('dragdrop'), self.item_drag_dropped)
@@ -460,16 +459,16 @@ class GUIEditorWindow(QtGui.QWidget):
             else:
                 target.addAction(action)
 
-    def setQt4_Configuration(self, configuration):
+    def set_configuration(self, configuration):
         self.configuration = configuration
 
         self.tree_widget.blockSignals(True)
         #self.tree_widget.takeTopLevelItem(0)
-        #self.tree_widget.takeItem(self.rootElement)
+        #self.tree_widget.takeItem(self.root_element)
         #self.tree_widget.itemAt(0,0)
-        #self.rootElement = QtGui.QTreeWidgetItem(self.tree_widget)
-        #self.rootElement.setText(0, QtCore.QString("GUI tree"))
-        #self.rootElement.setOpen(True)
+        #self.root_element = QtGui.QTreeWidgetItem(self.tree_widget)
+        #self.root_element.setText(0, QtCore.QString("GUI tree"))
+        #self.root_element.setOpen(True)
         
         self.emit(QtCore.SIGNAL('hideProperties'), ())
 
@@ -491,7 +490,7 @@ class GUIEditorWindow(QtGui.QWidget):
                 self.connectItem(parent, child, new_list_item)
 
         for window in self.configuration.windows_list:
-            parentWindowItem = self.appendItem(self.rootElement, window.name, "window", icon="window_small")
+            parentWindowItem = self.appendItem(self.root_element, window.name, "window", icon="window_small")
             self.connectItem(None, window, parentWindowItem)
             
             addChildren(window["children"], parentWindowItem)
@@ -500,10 +499,9 @@ class GUIEditorWindow(QtGui.QWidget):
         #self.tree_widget.triggerUpdate()
         self.tree_widget.update()        
 
-        self.tree_widget.setCurrentItem(self.rootElement.child(0))
+        self.tree_widget.setCurrentItem(self.root_element.child(0))
         self.emit(QtCore.SIGNAL('showProperties'), ())
-        
-        
+
     def showConnections(self):
         self.connection_editor_window = Qt4_ConnectionEditor.Qt4_ConnectionEditor(self.configuration)
         width = QtGui.QApplication.desktop().width()
@@ -532,93 +530,89 @@ class GUIEditorWindow(QtGui.QWidget):
         newListItem.setExpanded(True)
         self.tree_widget.setDragEnabled(True)
         self.tree_widget.setAcceptDrops(True)
+ 
         if isinstance(icon, str):
             newListItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load(icon)))
         self.tree_widget.setCurrentItem(newListItem)
+        self.tree_widget.scrollToItem(newListItem, QtGui.QAbstractItemView.EnsureVisible)
+
         return newListItem
         
     def removeItem(self):
         currentItem = self.tree_widget.currentItem()
-
         if currentItem:
             item_parent_name = str(currentItem.parent().text(0))
-            
             item_name = str(currentItem.text(0))
             children = currentItem.childCount()
-
             if children > 0:
                 if QtGui.QMessageBox.warning(self, "Please confirm",
                                           "Are you sure you want to remove %s ?\nRemoving item will remove its %d children." % (item_name, children),
                                            QtGui.QMessageBox.Yes, QtGui.QMessageBox.No) == QtGui.QMessageBox.No:
                     return
-            
+
+            item_cfg = self.configuration.findItem(item_name)
+
+            children_name_list = []
+            for child in item_cfg['children']:  
+                 children_name_list.append(child['name'])
+
+            self.emit(QtCore.SIGNAL("removeWidget"), item_name, children_name_list)
+
             if self.configuration.remove(item_name):
                 root = self.tree_widget.invisibleRootItem()
                 for item in self.tree_widget.selectedItems():
                     (item.parent() or root).removeChild(item)               
- 
-
-                #self.tree_widget.takeTopLevelItem(self.treeLayout.indexOfTopLevelItem(currentItem))
-                self.updateWindowPreview(item_parent_name)
             
+    def draw_window_preview(self):
+        container_name = self.root_element.child(0).text(0)
+        container_cfg, window_id, container_ids, selected_item = \
+             self.prepare_window_preview(container_name, None, "")
+        self.emit(QtCore.SIGNAL("drawPreview"), container_cfg, window_id, container_ids, selected_item)
 
-    def updateWindowPreview(self, container_name, container_cfg=None, selected_item=""): 
-        container_item_list = self.tree_widget.findItems(QtCore.QString(container_name), QtCore.Qt.MatchRecursive, 0)
-        container_item = container_item_list[0]
-        container_type = str(container_item.text(1))
+    def update_window_preview(self, container_name, container_cfg=None, selected_item=""): 
+        upd_container_cfg, upd_window_id, upd_container_ids, upd_selected_item = \
+             self.prepare_window_preview(container_name, container_cfg, selected_item)
+        self.emit(QtCore.SIGNAL("updatePreview"), upd_container_cfg, upd_window_id, upd_container_ids, selected_item)
+
+    def prepare_window_preview(self, item_name, item_cfg = None, selected_item = ""):
+        item_list = self.tree_widget.findItems(QtCore.QString(item_name), QtCore.Qt.MatchRecursive, 0)
+        item = item_list[0]
+        item_type = str(item.text(1))
 
         window_id = None
-        if container_type == "window":
-            window_id = id(container_item)
+        if item_type == "window":
+            window_id = str(item.text(0))
         else:
             # find parent window
-            parent = container_item.parent()
+            parent = item.parent()
             while (parent):
                 if str(parent.text(1)) == "window":
-                    window_id = id(parent)
+                    window_id = str(parent.text(0))
                     break
                 parent = parent.parent()
          
-        if container_type != "window" and container_item.childCount() == 0:
-            container_item = container_item.parent()
-            container_name = str(container_item.text(0))
-            container_cfg = None
+        if item_type != "window" and item.childCount() == 0:
+            item = item.parent()
+            item_name = str(item.text(0))
+            item_cfg = None
 
-        if container_cfg is None:
-            container_cfg = self.configuration.findItem(container_name)
-            
-        def getContainerIds(item):
-            containerIds = [id(item)]
-
-            item = item.child(0)
-            
-            while item:
-                item_type = str(item.text(1))
+        if item_cfg is None:
+            item_cfg = self.configuration.findItem(item_name)
+      
+        item_ids = [] 
+        current_item = self.root_element
+        while self.tree_widget.itemBelow(current_item):
+               current_item = self.tree_widget.itemBelow(current_item)
+               item_ids.append(str(current_item.text(0)))
                 
-                try:
-                    klass = Qt4_Configuration.Configuration.classes[item_type]
-                except KeyError:
-                    pass
-                else:
-                    if issubclass(klass, ContainerCfg):
-                        containerIds += getContainerIds(item)
-                        
-                #item = item.nextSibling()
-                item = item.child(0)
-
-            return containerIds
-
-        container_ids = getContainerIds(container_item)
-
-        self.emit(QtCore.SIGNAL("updatePreview"), container_cfg, window_id, container_ids, selected_item)
- 
+        return item_cfg, window_id, item_ids, selected_item
 
     def connectItem(self, parent, new_item, new_list_item):
         if self.configuration.isBrick(new_item):
             self.emit(QtCore.SIGNAL("newItem"), new_item["brick"].propertyBag, new_item["brick"]._propertyChanged)
         else:
             if parent is not None:
-                parentref=weakref.ref(parent)
+                parentref = weakref.ref(parent)
             else:
                 parentref=None
             
@@ -633,7 +627,7 @@ class GUIEditorWindow(QtGui.QWidget):
                 try:
                     klass = Qt4_Configuration.Configuration.classes[item_type]
                 except KeyError:
-                    self.updateWindowPreview(item_name)
+                    self.update_window_preview(item_name)
                 else:
                     if issubclass(klass, ContainerCfg):
                         # we should update the container itself,
@@ -642,9 +636,9 @@ class GUIEditorWindow(QtGui.QWidget):
                         if parentref is not None:
                             parent = parentref()
                             if parent is not None:
-                                self.updateWindowPreview(parent["name"], parent)
+                                self.update_window_preview(parent["name"], parent)
                     else:
-                        self.updateWindowPreview(item_name)
+                        self.update_window_preview(item_name)
 
                 if parentref is not None:
                     parent = parentref()
@@ -655,7 +649,7 @@ class GUIEditorWindow(QtGui.QWidget):
                   
 
     def addWindow(self):
-        self._addItem(self.rootElement, "window")
+        self._addItem(self.root_element, "window")
 
     def _addItem(self, parentListItem, item_type, *args):
         parent_name = str(parentListItem.text(0))
@@ -663,7 +657,9 @@ class GUIEditorWindow(QtGui.QWidget):
         parent = self.configuration.findContainer(parent_name)
         new_item = None
         new_list_item = None
-        
+       
+
+     
         try:
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
 
@@ -671,7 +667,7 @@ class GUIEditorWindow(QtGui.QWidget):
                 new_item = self.configuration.addWindow()
 
                 if type(new_item) == types.StringType:
-                    QtGui.QMessageBox.warning(self, "Cannot add", new_item, qt.QMessageBox.Ok)
+                    QtGui.QMessageBox.warning(self, "Cannot add", new_item, QtGui.QMessageBox.Ok)
                 else:
                     new_item["properties"].getProperty("w").setValue(QtGui.QApplication.desktop().width())
                     new_item["properties"].getProperty("h").setValue(QtGui.QApplication.desktop().height())
@@ -708,6 +704,7 @@ class GUIEditorWindow(QtGui.QWidget):
                         
             if type(new_item) != types.StringType and new_item is not None:
                 self.connectItem(parent, new_item, new_list_item)
+                self.emit(QtCore.SIGNAL("addWidget"), new_item, parent)
         finally:
             QtGui.QApplication.restoreOverrideCursor()
 
@@ -715,14 +712,12 @@ class GUIEditorWindow(QtGui.QWidget):
     def addBrick(self, brick_type):
         self.addItem("brick", brick_type)
 
-
     def addContainer(self, container_type, container_subtype=None):
         self.addItem(container_type, container_subtype)
 
     
     def addItem(self, item_type, item_subtype):
         currentItem = self.tree_widget.currentItem()
-
         if currentItem:
             item_cfg = self.configuration.findItem(str(currentItem.text(0)))
 
@@ -737,8 +732,6 @@ class GUIEditorWindow(QtGui.QWidget):
             except:
                 QtGui.QMessageBox.warning(self, "Cannot add %s" % item_type, "Please select a suitable parent container", QtGui.QMessageBox.Ok)
     
-    
-                    
     def addHBox(self):
         self.addContainer("hbox", "hbox")
        
@@ -787,7 +780,7 @@ class GUIEditorWindow(QtGui.QWidget):
         item = self.tree_widget.findItems(QtCore.QString(item_name), QtCore.Qt.MatchRecursive, 0)
         if item is not None:
             self.tree_widget.setCurrentItem(item[0])
-            self.tree_widget.scrollToItem(item[0])
+            self.tree_widget.scrollToItem(item[0], QtGui.QAbstractItemView.EnsureVisible)
             
     def item_double_clicked(self, item, column):
         if item and column == 0:
@@ -802,13 +795,13 @@ class GUIEditorWindow(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsSelectable |
                               QtCore.Qt.ItemIsEnabled)
 
-    def itemSelected(self):
+    def item_selected(self):
         self.item_rename_started = None
         item = self.tree_widget.currentItem()      
-        if not item == self.rootElement:
+        if not item == self.root_element:
             item_name = str(item.text(0))
-            item_cfg = self.configuration.findItem(item_name)
-            self.updateWindowPreview(item_name, item_cfg, selected_item=item_name)
+            item_cfg = self.configuration.findItem(item_name) 
+            self.update_window_preview(item_name, item_cfg, selected_item=item_name)
             self.updateProperties(item_cfg)
             self.emit(QtCore.SIGNAL('showProperties'), ())
        
@@ -821,7 +814,6 @@ class GUIEditorWindow(QtGui.QWidget):
         if self.item_rename_started:
             item_parent_name = str(item.parent().text(0))
             new_item_name = str(item.text(0))
-            print item.parent().indexOfChild(item)
             old_name = self.configuration.rename(item_parent_name, item.parent().indexOfChild(item), new_item_name)
             if old_name is not None:
                 item.setText(0, old_name)
@@ -839,7 +831,7 @@ class GUIEditorWindow(QtGui.QWidget):
                 item_cfg=self.configuration.reload_brick(item_name)
                 item = self.tree_widget.findItem(item_name, 0)
                 self.emit(QtCore.SIGNAL("newItem"), (item_cfg["brick"].propertyBag, item_cfg["brick"]._propertyChanged))
-                self.itemSelected(item)
+                self.item_selected(item)
                 
             QtCore.QObject.connect(popup_menu, QtCore.SIGNAL("activated(int)"), _itemRightClicked)
                 
@@ -864,7 +856,7 @@ class GUIEditorWindow(QtGui.QWidget):
         while source_item_ancestors[0]:
             source_item_ancestors.insert(0, source_item_ancestors[0].parent()) 
         common_ancestor = zip(target_item_ancestors, source_item_ancestors)[-1][0]
-        if common_ancestor != self.rootElement:
+        if common_ancestor != self.root_element:
             common_ancestor_name = str(common_ancestor.text(0))
         else:
             common_ancestor_name = ""
@@ -876,7 +868,7 @@ class GUIEditorWindow(QtGui.QWidget):
             return
 
         # move item in the GUI tree
-
+ 
         #source_item.parent().takeItem(source_item)
         source_item.parent().takeChild(source_item.parent().indexOfChild(source_item)) 
         
@@ -891,13 +883,15 @@ class GUIEditorWindow(QtGui.QWidget):
             #source_item.moveItem(target_item)
 
         #if source_item_parent_name != target_item_parent_name:
-        #    self.updateWindowPreview(source_item_parent_name)
+        #    self.update_window_preview(source_item_parent_name)
         if len(common_ancestor_name):
-            self.updateWindowPreview(common_ancestor_name)
+            self.update_window_preview(common_ancestor_name)
 
         #source_item.setSelected(True)
         source_item.setSelected(True)
         self.tree_widget.setCurrentItem(source_item)
+        self.tree_widget.scrollToItem(source_item, QtGui.QAbstractItemView.EnsureVisible)
+ 
 
     def moveItem(self, direction):
         item = self.tree_widget.currentItem()
@@ -910,35 +904,45 @@ class GUIEditorWindow(QtGui.QWidget):
                 newParent = self.configuration.moveUp(item_name)
 
                 if newParent is not None:
-                    newParentItem = self.tree_widget.findItem(newParent, 0)
+                    new_parent_item_list = self.tree_widget.findItems(QtCore.QString(newParent), QtCore.Qt.MatchRecursive, 0)
+                    new_parent_item = new_parent_item_list[0]
 
-                    if newParentItem == oldParentItem:
-                        itemAbove = item.itemAbove()
-                        while (itemAbove.parent() != newParentItem):
+                    item_index = oldParentItem.indexOfChild(item)
+                    oldParentItem.takeChild(item_index)
+                    if new_parent_item == oldParentItem:
+                        oldParentItem.insertChild(item_index - 1, item)
+                        """itemAbove = self.tree_widget.itemAbove(item)
+                        while (itemAbove.parent() != new_parent_item):
                             itemAbove=itemAbove.itemAbove()
-                        itemAbove.moveItem(item)
+                        itemAbove.moveItem(item)"""
                     else:
-                        oldParentItem.takeItem(item)
-                        newParentItem.insertItem(item)
-                        item.moveItem(oldParentItem.itemAbove())
+                        new_parent_item.insertChild(0, item)
+                        """oldParentItem.takeItem(item)
+                        new_parent_item.insertItem(item)
+                        item.moveItem(oldParentItem.itemAbove())"""
             else:
                 newParent = self.configuration.moveDown(item_name)
             
                 if newParent is not None:
-                    newParentItem = self.tree_widget.findItem(newParent, 0)
+                    new_parent_item_list = self.tree_widget.findItems(QtCore.QString(newParent), QtCore.Qt.MatchRecursive, 0)
+                    new_parent_item = new_parent_item_list[0]
 
-                    if newParentItem == oldParentItem:
-                        item.moveItem(item.nextSibling())
+                    item_index = oldParentItem.indexOfChild(item) 
+                    oldParentItem.takeChild(item_index)
+                    if new_parent_item == oldParentItem:
+                        oldParentItem.insertChild(item_index + 1, item)
+                        #item.moveItem(item.nextSibling())
                     else:
-                        oldParentItem.takeItem(item)
-                        newParentItem.insertItem(item)
+                        #oldParentItem.takeItem(item)
+                        new_parent_item.addChild(item)
 
             if newParent is not None:
-                 self.updateWindowPreview(newParent)
+                 self.update_window_preview(newParent)
                  
-            self.tree_widget.ensureItemVisible(item)
-            item.setSelected(True)
-            #self.itemSelected(item)
+            #item.setSelected(True)
+            self.tree_widget.setCurrentItem(item)
+            self.tree_widget.scrollToItem(item, QtGui.QAbstractItemView.EnsureVisible)
+            #self.item_selected(item)
                 
 
     def moveUp(self):
@@ -957,6 +961,7 @@ class GUIPreviewWindow(QtGui.QWidget):
 
         self.window_preview_box = QtGui.QGroupBox("Preview window", self)
         self.window_preview = Qt4_GUIDisplay.WindowDisplayWidget(self.window_preview_box)
+        
 
         self.window_preview_box_layout = QtGui.QVBoxLayout()
         self.window_preview_box_layout.addWidget(self.window_preview)
@@ -971,6 +976,7 @@ class GUIPreviewWindow(QtGui.QWidget):
         self.resize(630,480)
 
    def renew(self):
+       return
        self.window_preview_box.close()
        self.window_preview_box = QtGui.QGroupBox("Preview window", self)
        self.window_preview = Qt4_GUIDisplay.WindowDisplayWidget(self.window_preview_box)
@@ -995,8 +1001,23 @@ class GUIPreviewWindow(QtGui.QWidget):
            caption = container_cfg["properties"]["caption"]
            s = caption and " - %s" % caption or ""
            self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
+       self.window_preview.drawPreview(container_cfg, window_id, container_ids, selected_item)
+
+   def updateWindow(self, container_cfg, window_id, container_ids, selected_item):
+       if container_cfg["type"] == "window":
+           caption = container_cfg["properties"]["caption"]
+           s = caption and " - %s" % caption or ""
+           self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
        self.window_preview.updatePreview(container_cfg, window_id, container_ids, selected_item)
 
+   def add_window_widget(self, window_cfg):
+       self.window_preview.add_window(window_cfg)
+
+   def remove_item_widget(self, item_widget, children_name_list):
+       self.window_preview.remove_widget(item_widget, children_name_list)
+
+   def add_item_widget(self, item_widget, parent_widget):
+       self.window_preview.add_widget(item_widget, parent_widget)
 
 class HWRWindow(QtGui.QWidget):
     def __init__(self, *args, **kwargs):
@@ -1133,14 +1154,17 @@ class GUIBuilder(QtGui.QMainWindow):
         #
         # connections
         #
-        QtCore.QObject.connect(self.toolboxWindow, QtCore.SIGNAL("addBrick"), self.guiEditorWindow.addBrick)
-        QtCore.QObject.connect(self.guiEditorWindow, QtCore.SIGNAL("editProperties"), self.propertyEditorWindow.editProperties)
-        QtCore.QObject.connect(self.guiEditorWindow, QtCore.SIGNAL("newItem"), self.propertyEditorWindow.addProperties)
-        QtCore.QObject.connect(self.guiEditorWindow, QtCore.SIGNAL("updatePreview"), self.guiPreviewWindow.drawWindow)
-        QtCore.QObject.connect(self.guiPreviewWindow, QtCore.SIGNAL("previewItemClicked"), self.guiEditorWindow.selectItem)
-        QtCore.QObject.connect(self.guiEditorWindow, QtCore.SIGNAL("showProperties"), self.showProperties)
-        QtCore.QObject.connect(self.guiEditorWindow, QtCore.SIGNAL("hideProperties"), self.hideProperties)
-        QtCore.QObject.connect(self.guiEditorWindow, QtCore.SIGNAL("showPreview"), self.showGuiPreview)
+        self.connect(self.toolboxWindow, QtCore.SIGNAL("addBrick"), self.guiEditorWindow.addBrick)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("editProperties"), self.propertyEditorWindow.editProperties)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("newItem"), self.propertyEditorWindow.addProperties)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("drawPreview"), self.guiPreviewWindow.drawWindow)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("updatePreview"), self.guiPreviewWindow.updateWindow)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("addWidget"), self.guiPreviewWindow.add_item_widget)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("removeWidget"), self.guiPreviewWindow.remove_item_widget)
+        self.connect(self.guiPreviewWindow, QtCore.SIGNAL("previewItemClicked"), self.guiEditorWindow.selectItem)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("showProperties"), self.showProperties)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("hideProperties"), self.hideProperties)
+        self.connect(self.guiEditorWindow, QtCore.SIGNAL("showPreview"), self.showGuiPreview)
 
         #
         # finish GUI
@@ -1183,7 +1207,7 @@ class GUIBuilder(QtGui.QMainWindow):
             self.setWindowTitle("GUI Builder")
 
         self.guiPreviewWindow.renew()
-        self.guiEditorWindow.setQt4_Configuration(self.configuration)
+        self.guiEditorWindow.set_configuration(self.configuration)
         
 
     def openClicked(self):
@@ -1198,7 +1222,7 @@ class GUIBuilder(QtGui.QMainWindow):
                 f = open(filename)
             except:
                 logging.getLogger().exception("Cannot open file %s", filename)
-                qt.QMessageBox.warning(self, "Error", "Could not open file %s !" % filename, qt.QMessageBox.Ok)
+                QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % filename, QtGui.QMessageBox.Ok)
             else:
                 try:
                     raw_config = eval(f.read())
@@ -1213,7 +1237,7 @@ class GUIBuilder(QtGui.QMainWindow):
                         self.configuration = new_config
                         self.setCaption("GUI Builder - %s" % filename)
                         self.guiPreviewWindow.renew()
-                        self.guiEditorWindow.setQt4_Configuration(new_config)
+                        self.guiEditorWindow.set_configuration(new_config)
                 finally:
                     f.close()
                 
@@ -1331,13 +1355,9 @@ class GUIBuilder(QtGui.QMainWindow):
         
 if __name__ == '__main__':
     app = GtGui.QApplication([])
-
     mainwin = GUIBuilder()
-
     app.setMainWidget(mainwin)
-
     mainwin.show()
-
     app.exec_loop()
 
 
