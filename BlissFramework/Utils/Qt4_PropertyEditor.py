@@ -168,10 +168,11 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 
 
     def OnCellChanged(self, row, col):
+        print col, row
+        col += 1
+        print str(self.item(row, 0).text()) 
         item_property = self.propertyBag.getProperty(str(self.item(row, 0).text()))
-       
         oldValue = item_property.getUserValue()
-
         if item_property.getType() == 'boolean':
             item_property.setValue(self.item(row, 1).checkState())
         elif item_property.getType() == 'combo':
@@ -179,19 +180,23 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         elif item_property.getType() == 'file':
             item_property.setValue(self.cellWidget(row, 1).get_filename())
         elif item_property.getType() == 'color':
-            item_property.setValue(self.cellWidget(row,1).color)
+            item_property.setValue(self.cellWidget(row, 1).color)
         else: 
             try:
+                print 1
+                print str(self.item(row, 1).text())
                 item_property.setValue(str(self.item(row, 1).text()))
             except:
                 logging.getLogger().error('Cannot assign value %s to property %s' % \
                         (str(self.item(row, 1).text()), item_property.getName()))
 
+            print item_property.getUserValue()
             if item_property.getUserValue() is None:
                 self.item(row, 1).setText('')
             else:
                 self.item(row, 1).setText(str(item_property.getUserValue()))
         if not oldValue == item_property.getUserValue():
+            print "emit: "
             self.emit(QtCore.SIGNAL('propertyChanged'), item_property.getName(), 
                       oldValue, item_property.getUserValue())
 

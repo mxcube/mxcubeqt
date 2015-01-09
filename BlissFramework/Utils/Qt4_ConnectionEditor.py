@@ -118,7 +118,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         main_layout.addWidget(bottom_panel)
         main_layout.addWidget(self.remove_connection_button, QtCore.Qt.AlignHCenter) 
         main_layout.addWidget(button_panel)
-        main_layout.setSpacing(3)
+        main_layout.setSpacing(5)
         main_layout.setContentsMargins(2, 2, 2, 2) 
         main_layout.addStretch(0)
         self.setLayout(main_layout)
@@ -234,7 +234,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             return ok
 
         def addConnection(senderWindow, sender, connection):
-            newItem = QListViewItem(self.connections_treewidget)
+            newItem = QtGui.QTreeWidgetItem(self.connections_treewidget)
 
             windowName = senderWindow["name"]
             
@@ -261,13 +261,13 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                 ok = ok and receiverInWindow(connection["receiver"], receiverWindow)
 
             if ok:
-                newItem.setPixmap(0, Qt4_Icons.load('button_ok_small'))
+                newItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_ok_small')))
             else:
-                newItem.setPixmap(0, Qt4_Icons.load('button_cancel_small'))
+                newItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_cancel_small')))
 
             newItem.setText(3, connection['signal'])
             newItem.setText(6, connection['slot'])
-            self.connections_treewidget.insertItem(newItem)
+            #self.connections_treewidget.addItem(newItem)
 
         for window in self.configuration.windows.itervalues():
             for connection in window["connections"]:
@@ -465,52 +465,28 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             for child in children:
                 child["connections"] = []
 
-        #
-        # rewrite connections
-        #
-        connection = self.connections_treewidget.firstChild()
+        connection_count = self.connections_treewidget.topLevelItemCount()
+        if connection_count > 0:
+            for connection_index in range(connection_count):
+                connection = self.connections_treewidget.topLevelItem(connection_index)
+                senderWindow = str(connection.text(1))
+                senderObject = str(connection.text(2))
+                newConnection = {'receiverWindow': str(connection.text(4)),
+                                 'receiver': str(connection.text(5)),
+                                 'signal': str(connection.text(3)),
+                                 'slot': str(connection.text(6))}
 
-        while connection is not None:    
-            senderWindow = str(connection.text(1))
-            senderObject = str(connection.text(2))
-            signal = str(connection.text(3))
-            receiverWindow = str(connection.text(4))
-            receiverObject = str(connection.text(5))
-            slot = str(connection.text(6))
-
-            newConnection = { 'receiverWindow': receiverWindow,
-                              'receiver': receiverObject,
-                              'signal': signal,
-                              'slot': slot }
-
-            #
-            # create connection
-            #
-            if len(senderObject) == 0:
-                #
-                # sender is a window
-                #
-                window = self.configuration.windows[senderWindow]
-
-                window["connections"].append(newConnection)
-            else:
-                #
-                # find sender object
-                #
-                objects = self.signalling_child_dict[senderWindow]
-
-                for object in objects:
-                    if object["name"] == senderObject:
-                        break
-
-                object["connections"].append(newConnection)
-
-            connection = connection.nextSibling()              
-
-        #self.configuration.dump()
-        
+                if len(senderObject) == 0:
+                     #sender is a window
+                     window = self.configuration.windows[senderWindow]
+                     window["connections"].append(newConnection)
+                else:
+                     con_objects = self.signalling_child_dict[senderWindow]
+                     for con_object in con_objects:
+                         if con_object["name"] == senderObject:
+                             break
+                     con_object["connections"].append(newConnection)
         self.done(True)
-
 
     def cancel_button_clicked(self):
         self.done(False)

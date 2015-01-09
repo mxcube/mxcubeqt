@@ -301,12 +301,16 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             tab_bar=tabBar(self)
             tab_bar.palette()
             self.setTabBar(tab_bar)
-
             self.countChanged={}
 
-            QtCore.QObject.connect(self, QtCore.SIGNAL('currentChanged( QWidget * )'), self._pageChanged)
+            main_layout = QtGui.QVBoxLayout()
+            main_layout.setSpacing(0)
+            main_layout.setContentsMargins(0,0,0,0)
+            self.setLayout(main_layout)
 
             self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+            QtCore.QObject.connect(self, QtCore.SIGNAL('currentChanged( QWidget * )'), self._pageChanged)
         
         def _pageChanged(self, page):
             index=self.indexOf(page)
@@ -348,6 +352,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
         def addTab(self, page_widget, label, icon=""):
+            print "addTab: ", page_widget, label, icon
             scroll_area = QtGui.QScrollArea(self)
             scroll_area.setFrameStyle(QtGui.QFrame.NoFrame)
           
@@ -372,8 +377,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             #page_widget.setParent(scroll_area.viewport())
 
             #scroll_area.widget().layout().addWidget(page_widget) 
-            print "addTab: ", page_widget
-            print page_widget.size()
             #page_widget.reparent(scrollview.widget())
             #page_widget.show()
             
@@ -547,16 +550,17 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.additionalWindows = {}
         self.__putBackColors = None
         self.executionMode=kwargs.get('executionMode', False)
-        self.previewItems = {}
+        self.preview_items = []
         self.currentWindow = None
         self.setWindowTitle("GUI preview")
-        
+       
         self.centralWidget = QtGui.QWidget(self.widget())
+        #self.centralWidget.setObjectName("deee")
         self.centralWidget_layout = QtGui.QVBoxLayout() 
         self.centralWidget.setLayout(self.centralWidget_layout)
 
         self.centralWidget.show()
- 
+
         main_layout = QtGui.QVBoxLayout()
         main_layout.addWidget(self.centralWidget)
         self.setLayout(main_layout)
@@ -592,7 +596,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             klass = WindowDisplayWidget.items[item_type]
         except KeyError:
             newItem = item_cfg["brick"]
-            newItem.reparent(parent)
+          
+            #newItem.reparent(parent)
         else:
             newItem = klass(parent, item_cfg["name"], executionMode=self.executionMode)
             
@@ -657,15 +662,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                                                                              
         return newItem
  
-    def makeItem(self, item_cfg, parent, containerIds):
+    def makeItem(self, item_cfg, parent):
+        previewItemsList = []
         if isinstance(item_cfg, ContainerCfg):
             self.containerNum += 1
-            previewItemsList = [parent]
-            try:
-                self.previewItems[self.currentWindow][containerIds[self.containerNum]] = previewItemsList
-            except:
-                pass
-
         for child in item_cfg["children"]:
             try:
                 newItem = self.addItem(child, parent)
@@ -675,16 +675,24 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 if not self.executionMode:
                     # install event filter to react on left mouse button released
                     newItem.installEventFilter(self)
-                previewItemsList.append(newItem)
+                #previewItemsList.append(newItem)
 
+            print "m"
             if parent.__class__ == WindowDisplayWidget.items["tab"]:
+                print 1
                 # adding to tab widget
                 parent.hide()
+                print newItem
+                newItem.setFixedWidth(300)
+                print newItem.sizePolicy()
                 newTab = parent.addTab(newItem, child["properties"]["label"], child["properties"]["icon"])
+                newTab2 = parent.addTab(QtGui.QLabel("demmmoo"), "2", child["properties"]["icon"])
+
                 newTab.item_cfg = child
                 previewItemsList.append(newTab)
                 parent.show()
             else:
+               
                 if isinstance(child, ContainerCfg):
                     newItem.setSizePolicy(self.getSizePolicy(child["properties"]["hsizepolicy"], child["properties"]["vsizepolicy"]))                 
                 # handles fontSize, except for bricks
@@ -701,6 +709,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     layout = parent._preferred_layout
                 else:
                     layout = parent.layout()
+
                 if layout is not None:
                     # layout can be none if parent is a Splitter for example
                     if not isinstance(child, BrickCfg):
@@ -714,16 +723,18 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                             newItem.setFixedSize(child["properties"]["size"])
                     else:
                         stretch = 0
+
+                    
+                    self.preview_items.append(newItem)
                     if alignment_flags is not None:
                         layout.addWidget(newItem, stretch, QtCore.Qt.Alignment(alignment_flags))
                     else:
                         layout.addWidget(newItem, stretch)
+           
+            self.makeItem(child, newItem)
 
-            self.makeItem(child, newItem, containerIds)
 
-
-    def updatePreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
-        # remove additional windows
+    def drawPreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
         for (w, m) in self.additionalWindows.itervalues():
             w.close()
 
@@ -734,64 +745,33 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         if self.currentWindow is not None and self.currentWindow != window_id:
             # remove all bricks and destroy all other items
-            previewItems = self.previewItems[self.currentWindow]
-            
-            for container_id, itemsList in previewItems.iteritems():
-                for widget in itemsList:
-                    if isinstance(widget, BlissWidget):
-                        i = itemsList.index(widget)
-                        
-                        widget.hide()
-                        widget.reparent(None)
-
-            self.previewItems = {}
-            
-            self.centralWidget.close(True)
+            previewItems = self.preview_items[self.currentWindow]
+            self.preview_items = []
+            self.centralWidget.close()
             self.centralWidget = QtGui.QWidget(self.viewport())
             self.central_widget_layout = QtGui.QVBoxLayout()
             self.centralWidget.setLayout(self.central_widget_layout)
-            self.addChild(self.centralWidget)
             self.centralWidget.show()
 
         self.currentWindow = window_id
         self.containerNum = -1
         
         try:
-            previewItems = self.previewItems[window_id]
-        except KeyError:
-            # new window
-            previewItems = {}
-            self.previewItems[window_id] = previewItems
-
-        try:
             parent = previewItems[container_ids[0]][0]
         except:
             parent = self.centralWidget
         else:
             pass
+
+        #self.preview_items.append(self.centralWidget)
         
         # reparent bricks to prevent them from being deleted,
         # and remove them from the previewItems list 
-       
-        for container_id in container_ids:
-            for widget in previewItems.get(container_id, ()):
-                if isinstance(widget, BlissWidget):
-                    i = previewItems[container_id].index(widget)
-                    widget.hide()
-                    widget.reparent(None)
-                    previewItems[container_id][i] = None
-        try:
-            for w in filter(None, previewItems[container_ids[0]][1:]):
-                w.close(True)
-        except Exception:
-            pass
-
         self.setObjectName(container_cfg["name"])
+        self.preview_items.append(self)
 
         if isinstance(container_cfg, WindowCfg):
             previewItems = {}
-
-            
             self.setObjectName(container_cfg["name"])
             # update menubar ?
             if container_cfg.properties["menubar"]:
@@ -818,20 +798,54 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             except KeyError:
                 # preview items does not exist, no need to delete it
                 pass
-       
-        self.makeItem(container_cfg, parent, container_ids)
 
-        if len(selected_item):
-            for item_list in previewItems.itervalues():
-                for item in item_list:
-                    if item.objectName() == selected_item:
-                        self.selectWidget(item)
-                        return
+        self.makeItem(container_cfg, parent)
 
         if isinstance(container_cfg, WindowCfg):
             if container_cfg.properties["statusbar"]:
                 StatusBar(self)
 
+    def remove_widget(self, item_name, child_name_list):
+        remove_item_list = child_name_list
+        remove_item_list.append(item_name)
+
+        for name in remove_item_list:
+            for item_widget in self.preview_items:
+                if item_widget.objectName() == name:
+                    self.preview_items.remove(item_widget) 
+                    item_widget.setParent(None)
+        #item_widget.deleteLater()
+
+    def add_widget(self, child, parent):
+        #main window
+        if parent is None:
+            self.drawPreview(child, 0, [])
+            
+            #newItem = self.addItem(child, self)
+            #self.preview_items.append(newItem)
+            #self.layout.addWidget(newItem) 
+        else:
+            for item in self.preview_items:
+                if item.objectName() == parent.name:
+                    parent_item = item
+            newItem = self.addItem(child, parent_item)
+            if isinstance(parent, TabCfg):
+                newTab = parent_item.addTab(newItem, child["properties"]["label"], child["properties"]["icon"])
+                newTab.item_cfg = child
+            else:   
+                parent_item.layout().addWidget(newItem)
+            self.preview_items.append(newItem)
+  
+    def updatePreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
+        if callable(self.__putBackColors):
+            self.__putBackColors()
+            self.__putBackColors = None
+        if (len(selected_item) and 
+            len(self.preview_items) > 0):
+            for item in self.preview_items:
+                if item.objectName() == selected_item:
+                    self.selectWidget(item)
+                    return
 
     def selectWidget(self, widget):
         """
@@ -841,7 +855,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         if callable(self.__putBackColors):
             self.__putBackColors()
-
         widget_palette = widget.palette()
         orig_bkgd_color = widget_palette.color(QtGui.QPalette.Window)
         r = orig_bkgd_color.red()
@@ -932,26 +945,17 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 def display(configuration, noBorder=False):
     windows = []
-    
     for window in configuration.windows_list:
-
-        
         display = WindowDisplayWidget(None, window["name"], executionMode=True, noBorder=noBorder)
         windows.append(display)
-        
         display.setCaption(window["properties"]["caption"])
-        
-        display.updatePreview(window, id(display))
-
+        display.drawPreview(window, id(display))
         if window["properties"]["show"]:
             display._show=True
         else:
             display._show=False
-
         display.hide()
-
         restoreSizes(configuration, window, display)
-
     return windows
 
 def restoreSizes(configuration, window, display, configurationSuffix="",moveWindowFlag = True):
