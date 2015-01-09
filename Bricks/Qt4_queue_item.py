@@ -47,10 +47,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
         controller = kwargs.pop('controller', None)
         args = args + (controller, )
 
-        #qt.QCheckListItem.__init__(self, *args, **kwargs)
-        #IK Python version
-        qt.QCheckListItem.__init__(self, *args)
-
+        QtGui.QTreeWidgetItem.__init__(self, args[0], args[2])
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
@@ -70,7 +67,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
 
     def stateChange(self, state):
         if self._checkable:
-            qt.QCheckListItem.stateChange(self, state)
+            QtGui.QCheckListItem.stateChange(self, state)
             # The QCheckListItem is somewhat tricky:
             # state = 0     The item is unchecked.
             #
@@ -106,11 +103,13 @@ class QueueItem(QtGui.QTreeWidgetItem):
         The qt3 documentation has more information about this method that
         can be worth reading.
         """
-        try:
+        #try:
+        if True:
             painter.save()
             f = painter.font()
             f.setBold(self._font_is_bold)
             painter.setFont(f)
+             
             color_group = qt.QColorGroup(color_group)
             color_group.setColor(qt.QColorGroup.Text, self.brush.color())
             color_group.setBrush(qt.QColorGroup.Text, self.brush)
@@ -118,8 +117,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
 
             qt.QCheckListItem.paintCell(self, painter, color_group, 
                                      column, width, align)
-        finally:
-            painter.restore()
+        #finally:
+        #    painter.restore()
 
     def paintFocus(self, painter, color_group, rect):
         """
@@ -190,8 +189,12 @@ class QueueItem(QtGui.QTreeWidgetItem):
         return last_child
 
     def setOn(self, state):
-        if self._checkable:
-            qt.QCheckListItem.setOn(self, state)
+        if self._checkable: 
+            if state:
+                check_state = QtCore.Qt.Checked
+            else:
+                check_state = QtCore.Qt.Unchecked
+            QtGui.QTreeWidgetItem.setCheckState(self, 0, check_state)
 
             if self._queue_entry:
                 self._queue_entry.set_enabled(state)
@@ -199,7 +202,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
             if self._data_model:
                 self._data_model.set_enabled(state)
         else:
-            qt.QCheckListItem.setOn(self, False)
+            QtGui.QTreeWidgetItem.setCheckState(self, 0, QtCore.Qt.Unchecked)
 
     def set_checkable(self, state):
         self._checkable = state
@@ -216,8 +219,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
-        kwargs['deletable'] = False
+        #kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
+        #kwargs['deletable'] = False
         self.mounted_style = False
 
         QueueItem.__init__(self, *args, **kwargs)
@@ -235,12 +238,14 @@ class SampleQueueItem(QueueItem):
         self.mounted_style = state
 
         if state:
-            self.setPixmap(0, PIN_PIXMAP)
-            self.setBackgroundColor(Qt4_widget_colors.SKY_BLUE)
+            self.setIcon(0, QtGui.QIcon(PIN_PIXMAP))
+            self.setBackground(1, QtGui.QBrush(Qt4_widget_colors.SKY_BLUE)) 
             self.setSelected(True)
-            self.setFontBold(True)
+            bold_fond = self.font(1)
+            bold_fond.setBold(True)
+            self.setFont(1, bold_fond)
         else:
-            self.setPixmap(0, qt.QPixmap())
+            self.setIcon(0, QtGui.QIcon())
 
             if clear_background:
                self.setBackgroundColor(Qt4_widget_colors.WHITE)  
@@ -258,6 +263,14 @@ class SampleQueueItem(QueueItem):
         QueueItem.reset_style(self)
         self.set_mounted_style(self.mounted_style, clear_background = True)
             
+class BasketQueueItem(QueueItem):
+    """
+    In principle is just a group of samples (for example puck)
+    """
+    def __init__(self, *args, **kwargs):
+        #kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
+        #kwargs['deletable'] = False
+        QueueItem.__init__(self, *args, **kwargs)
 
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
@@ -306,7 +319,10 @@ class SampleCentringQueueItem(TaskQueueItem):
 # Functional API for QListItems
 #
 def perform_on_children(node, cond, fun):
-    child = node.firstChild()
+    if isinstance(node, QtGui.QTreeWidget): 
+        child = node.takeTopLevelItem(0) 
+    else:
+        child = node.child(0)
     result = []
 
     while child:
@@ -318,7 +334,12 @@ def perform_on_children(node, cond, fun):
 
             result.extend(perform_on_children(child, cond, fun))
 
-        child = child.nextSibling()
+        if child.parent():
+            parent = child.parent()
+            child_index = parent.indexOfChild(child)
+            child = parent.child(child_index + 1)
+        else:
+            child = None
 
     return result    
 
@@ -362,6 +383,7 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.Basket: BasketQueueItem, 
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

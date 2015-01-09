@@ -60,8 +60,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
        
         # Signals ------------------------------------------------------------  
-        self.defineSignal("getView", ())
-        self.defineSignal("getTreeBrick",())
 
         # Slots ---------------------------------------------------------------
         self.defineSlot("logged_in", ())
@@ -81,6 +79,8 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                           QtGui.QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
         #self.setEnabled(self.ispyb_logged_in)

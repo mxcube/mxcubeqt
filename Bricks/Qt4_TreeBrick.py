@@ -29,8 +29,8 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from HardwareRepository.HardwareRepository import dispatcher
-from Qt4_sample_changer_helper import *
 from widgets.Qt4_dc_tree_widget import Qt4_DataCollectTree
+from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
 
 
 __category__ = 'Qt4_General'
@@ -43,47 +43,26 @@ class Qt4_TreeBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
-        # Internal members
+        # Hardware objects ----------------------------------------------------
+        self.beamline_config_hwobj = None
+        self.lims_hwobj = None
+        self.sample_changer_hwobj = None
+        self.queue_hwobj = None
+
+        # Internal values -----------------------------------------------------
+
         self.current_cpos = None
         self.__collection_stopped = False 
         self.current_view = None
 
-        # Framework 2 hardware objects
-        self.beamline_config_hwobj = None
-        self._lims_hwobj = None
-        self.sample_changer = None
-        self.queue_hwobj = None
-
-        # Properties
+        # Properties ---------------------------------------------------------- 
         self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("queue", "string", "/queue")
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
 
-        # Qt - Slots
-        # From ProposalBrick2
-        self.defineSlot("logged_in", ())
-
-        # Used from TaskToolBoxBrick
-        self.defineSlot("get_tree_brick",())
-        self.defineSlot("get_selected_samples", ())
-
-        # From SampleChangerBrick3, signal emitted when
-        # the status of the hwobj changes.
-        self.defineSlot("status_msg_changed", ())
-
-        # From sample changer hwobj, emitted when the
-        # load state changes.
-        self.defineSlot("sample_load_state_changed", ())
-        
-        #self.defineSlot("get_mounted_sample", ())
-        #self.defineSlot("new_centred_position", ())
-        #self.defineSlot("add_dcg", ())
-        #self.defineSlot("add_data_collection", ())
-        #self.defineSlot("set_session", ())
-
-        # Qt - Signals
+        # Signals ------------------------------------------------------------
         self.defineSignal("enable_hutch_menu", ())
         self.defineSignal("enable_command_menu", ())
         self.defineSignal("enable_task_toolbox", ())
@@ -111,20 +90,26 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("set_prefix", ())
         self.defineSignal("set_sample", ())
 
-        #self.defineSignal("clear_centred_positions", ())
+        # Slots ---------------------------------------------------------------
+        self.defineSlot("logged_in", ())
+        self.defineSlot("status_msg_changed", ())
+        self.defineSlot("sample_load_state_changed", ())
+        
+        #self.defineSlot("get_mounted_sample", ())
+        #self.defineSlot("new_centred_position", ())
+        #self.defineSlot("add_dcg", ())
+        #self.defineSlot("add_data_collection", ())
+        #self.defineSlot("set_session", ())
 
-        # Layout
-        #self.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Fixed,
-        #                                  qt.QSizePolicy.Expanding))
-
+        # Graphic elements ----------------------------------------------------
         self.sample_changer_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                     'widgets/ui_files/Qt4_sample_changer_widget_layout.ui'))
+                                     "widgets/ui_files/Qt4_sample_changer_widget_layout.ui"))
 
         self.refresh_pixmap = Qt4_Icons.load("Refresh2.png")
-        """self.sample_changer_widget.child('synch_button').\
-            setIconSet(qt.QIconSet(self.refresh_pixmap))
-        self.sample_changer_widget.child('synch_button').setText("Synch ISPyB")"""
-        
+        self.sample_changer_widget.findChild(QtGui.QPushButton, 
+            'synch_button').setIcon(QtGui.QIcon(self.refresh_pixmap))
+        self.sample_changer_widget.findChild(QtGui.QPushButton, 
+            'synch_button').setText("Synch ISPyB")
 
         self.dc_tree_widget = Qt4_DataCollectTree(self)
         self.dc_tree_widget.selection_changed_cb = self.selection_changed
@@ -132,30 +117,40 @@ class Qt4_TreeBrick(BlissWidget):
         #self.dc_tree_widget.clear_centred_positions_cb = \
         #    self.clear_centred_positions
 
-        """self.connect(self.sample_changer_widget.child('details_button'), 
-                     QtCore.SIGNAL("clicked()"),
+        # Layout --------------------------------------------------------------
+        main_layout = QtGui.QVBoxLayout(self)
+        main_layout.addWidget(self.sample_changer_widget)
+        main_layout.addWidget(self.dc_tree_widget)
+        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(0, 0, 0, 0) 
+        self.setLayout(main_layout)
+
+        # SizePolicies --------------------------------------------------------
+        self.sample_changer_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                                                 QtGui.QSizePolicy.Fixed)
+  
+
+        # Qt signal/slot connections ------------------------------------------
+        self.connect(self.sample_changer_widget.findChild(QtGui.QPushButton, 
+                     'details_button'),QtCore.SIGNAL("clicked()"),
                      self.toggle_sample_changer_tab)
 
-        self.connect(self.sample_changer_widget.child('filter_cbox'),
-                     QtCore.SIGNAL("activated(int)"),
+        self.connect(self.sample_changer_widget.findChild(QtGui.QComboBox,
+                     'filter_cbox'), QtCore.SIGNAL("activated(int)"),
                      self.dc_tree_widget.filter_sample_list)
         
-        self.connect(self.sample_changer_widget.child('centring_cbox'),
-                     QtCore.SIGNAL("activated(int)"),
+        self.connect(self.sample_changer_widget.findChild(QtGui.QComboBox,
+                     'centring_cbox'), QtCore.SIGNAL("activated(int)"),
                      self.dc_tree_widget.set_centring_method)
 
-        self.connect(self.sample_changer_widget.child('synch_button'),
-                     QtCore.SIGNAL("clicked()"),
-                     self.refresh_sample_list)"""
+        self.connect(self.sample_changer_widget.findChild(QtGui.QPushButton,
+                     'synch_button'), QtCore.SIGNAL("clicked()"),
+                     self.refresh_sample_list)
 
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self.sample_changer_widget)
-        self.main_layout.addWidget(self.dc_tree_widget)
-        self.setLayout(self.main_layout)
-
+        # Other --------------------------------------------------------------- 
         self.enable_collect(False)
-
-        """self.sample_changer_widget.child('centring_cbox').setCurrentItem(1)"""
+        self.setFixedWidth(315) 
+        #self.sample_changer_widget.child('centring_cbox').setCurrentItem(1)
         self.dc_tree_widget.set_centring_method(1)
 
     # Framework 2 method
@@ -169,35 +164,6 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
 
-        camera_brick = None
-
-        for w in QtGui.QApplication.allWidgets():
-            if isinstance(w, BlissWidget):
-                if "CameraBrick" in str(w.__class__):
-                    camera_brick = w
-                    camera_brick.installEventFilter(self)
-                    break
-
-        # workaround for the remote access problem 
-        # (have to disable video display when DC is running)
-        if BlissWidget.isInstanceRoleClient():
-            # find the video brick, make sure it is hidden when collecting data
-            # and that it is shown again when DC is finished 
-            def disable_video(w=camera_brick):
-              w.disable_update()
-            self.__disable_video=disable_video
-            def enable_video(w=camera_brick):
-              w.enable_update()
-            self.__enable_video=enable_video
-            dispatcher.connect(self.__disable_video, "collect_started")
-            dispatcher.connect(self.__enable_video, "collect_finished")
-
-    def eventFilter(self, _object, event):
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-            if event.state() & QtCore.Qt.ShiftButton:
-                return True
-        return False
-
     # Framework 2 method
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'holder_length_motor':
@@ -206,7 +172,6 @@ class Qt4_TreeBrick(BlissWidget):
         elif property_name == 'queue':            
             self.queue_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
-            
             self.connect(self.queue_hwobj, 'show_workflow_tab',
                          self.show_workflow_tab_from_model)
 
@@ -218,8 +183,6 @@ class Qt4_TreeBrick(BlissWidget):
 
             self.connect(self.queue_hwobj, 'queue_stopped', 
                          self.dc_tree_widget.queue_stop_handler)
-
-
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
@@ -230,15 +193,15 @@ class Qt4_TreeBrick(BlissWidget):
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
-            self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
-            self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
+            self.sample_changer_hwobj_hwobj = bl_setup.sample_changer_hwobj
+            self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj_hwobj
             self.session_hwobj = bl_setup.session_hwobj
-            self._lims_hwobj = bl_setup.lims_client_hwobj
+            self.lims_hwobj = bl_setup.lims_client_hwobj
 
-            if self.sample_changer_hwobj is not None:
-                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+            if self.sample_changer_hwobj_hwobj is not None:
+                self.connect(self.sample_changer_hwobj_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
+                self.connect(self.sample_changer_hwobj_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
@@ -269,24 +232,29 @@ class Qt4_TreeBrick(BlissWidget):
         """
         self.enable_collect(logged_in)
         
-        sc_content = self.get_sc_content()
-        
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
-            if sc_content:
-              sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
-              self.dc_tree_widget.populate_list_view(sc_sample_list)
-              self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+            sc_basket_content, sc_sample_content = self.get_sc_content()
+            if sc_basket_content and sc_sample_content:
+                sc_basket_list, sc_sample_list = \
+                 self.dc_tree_widget.samples_from_sc_content(\
+                 sc_basket_content, sc_sample_content)
+                self.dc_tree_widget.populate_list_view(sc_basket_list, \
+                 sc_sample_list)
+            self.sample_changer_widget.findChild(QtGui.QComboBox, 
+                 'filter_cbox').setCurrentIndex(0)
         else:
             if sc_content:
-              self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+              self.sample_changer_widget.findChild(QtGui.QComboBox, 
+                   'filter_cbox').setCurrentIndex(0)
             else:
-              self.sample_changer_widget.child('filter_cbox').setCurrentItem(2) 
+              self.sample_changer_widget.findChild(QtGui.QComboBox,
+                   'filter_cbox').setCurrentIndex(2) 
 
-        #if self.sample_changer_hwobj:
-        #  if not self.sample_changer_hwobj.hasLoadedSample():
+        #if self.sample_changer_hwobj_hwobj:
+        #  if not self.sample_changer_hwobj_hwobj.hasLoadedSample():
 
-        self.dc_tree_widget.sample_list_view_selection()
+        self.dc_tree_widget.sample_tree_widget_selection()
 
     def enable_collect(self, state):
         """
@@ -346,7 +314,7 @@ class Qt4_TreeBrick(BlissWidget):
         Retrives sample information from ISPyB and populates the sample list
         accordingly.
         """
-        lims_client = self._lims_hwobj
+        lims_client = self.lims_hwobj
         samples = lims_client.get_samples(self.session_hwobj.proposal_id,
                                           self.session_hwobj.session_id)
         sample_list = []
@@ -414,24 +382,34 @@ class Qt4_TreeBrick(BlissWidget):
         
         :returns: A list with tuples, containing the sample information.
         """
-        sc_content = []
-      
-        try: 
+        sc_basket_content = []
+        sc_sample_content = []
+
+        try:
+            for basket in self.sample_changer_hwobj.getBasketList():
+                basket_index = basket.getIndex()
+                basket_code = basket.getID() or ""
+                is_present = basket.isPresent()
+                sc_basket_content.append((basket_index+1, basket_code, is_present))
+
             for sample in self.sample_changer_hwobj.getSampleList():
-                coords = sample.getCoords()
                 matrix = sample.getID() or ""
-                basket_index = str(coords[0])
-                vial_index = ":".join(map(str, coords[1:]))
+                basket_index = sample.getContainer().getIndex()
+                vial_index = sample.getIndex()
                 basket_code = sample.getContainer().getID() or ""
-            
-                sc_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
+
+                sc_sample_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
         except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
                      " the sample changer is turned on. Using free pin mode")
+            sc_basket_content = [(0, '', False)]
+            sc_sample_content = [('', -1, -1, '', 1)]
 
-        return sc_content
+
+        return sc_basket_content, sc_sample_content
+
 
     def status_msg_changed(self, msg, color):
         """
@@ -564,7 +542,7 @@ class Qt4_TreeBrick(BlissWidget):
         if self.current_view == self.sample_changer_widget:
             self.current_view = None
             self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-            self.dc_tree_widget.sample_list_view_selection()
+            self.dc_tree_widget.sample_tree_widget_selection()
             self.sample_changer_widget.child('details_button').setText("Show SC-details")
 
         else:

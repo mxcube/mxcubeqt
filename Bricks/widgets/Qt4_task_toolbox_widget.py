@@ -30,7 +30,7 @@ from BlissFramework import Qt4_Icons
 from widgets.Qt4_create_discrete_widget import Qt4_CreateDiscreteWidget
 from widgets.Qt4_create_helical_widget import Qt4_CreateHelicalWidget
 #from widgets.Qt4_create_char_widget import Qt4_CreateCharWidget
-#from widgets.Qt4_create_energy_scan_widget import Qt4_CreateEnergyScanWidget
+from widgets.Qt4_create_energy_scan_widget import Qt4_CreateEnergyScanWidget
 #from widgets.Qt4_create_workflow_widget import Qt4_CreateWorkflowWidget
 
 
@@ -64,14 +64,14 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         """self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)"""
         self.helical_page = Qt4_CreateHelicalWidget(self.tool_box, "helical_page")
-        #self.energy_scan_page = Qt4_CreateEnergyScanWidget(self.tool_box, "energy_scan")
+        self.energy_scan_page = Qt4_CreateEnergyScanWidget(self.tool_box, "energy_scan")
         #self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         #self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
-        """self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-        self.tool_box.addItem(self.workflow_page, "Advanced")"""
+        self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
+        #self.tool_box.addItem(self.workflow_page, "Advanced")
 
         self.button_box = QtGui.QWidget(self)
         self.create_task_button = QtGui.QPushButton("  Add to queue", self.button_box)
@@ -89,6 +89,8 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         self.button_box_layout = QtGui.QHBoxLayout(self)
         self.button_box_layout.addStretch(0)
         self.button_box_layout.addWidget(self.create_task_button)
+        self.button_box_layout.setSpacing(0)
+        self.button_box_layout.setContentsMargins(0, 0, 0, 0)
         self.button_box.setLayout(self.button_box_layout)
 
         self.main_layout = QtGui.QVBoxLayout(self)
