@@ -31,19 +31,24 @@ from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 from Qt4_create_task_base import Qt4_CreateTaskBase
 from Qt4_data_path_widget import Qt4_DataPathWidget
-from Qt4_acquisition_widget import Qt4_AcquisitionWidget
-from Qt4_processing_widget import Qt4_ProcessingWidget
+from Qt4_periodic_table_widget import Qt4_PeriodicTableWidget
 
 
-class Qt4_CreateHelicalWidget(Qt4_CreateTaskBase):
+class Qt4_CreateEnergyScanWidget(Qt4_CreateTaskBase):
     def __init__(self, parent = None,name = None, fl = 0):
-        Qt4_CreateTaskBase.__init__(self, parent, name, fl, 'Helical')
+        Qt4_CreateTaskBase.__init__(self, parent, name, fl, 'Energy scan')
 
         if not name:
-            self.setObjectName("create_helical_widget")
-         
-
-         
+            self.setObjectName("create_energy_scan_widget")
+        
+        self.periodic_table = Qt4_PeriodicTableWidget(self)
+        
+        self.main_layout = QtGui.QVBoxLayout(self)
+        self.main_layout.addWidget(self.periodic_table)
+        self.main_layout.addStretch(0)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout) 
 
         """self.init_models()
         self._prev_pos = None

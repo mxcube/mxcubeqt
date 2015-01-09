@@ -57,7 +57,7 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
 
         if layout == "horizontal":
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                "ui_files/Qt4_acquisition_widget_horizontal_layout_qt4.ui"))
+                                "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
             self.acq_widget.child('inverse_beam_cbx').hide()
             self.acq_widget.child('subwedge_size_label').hide()
             self.acq_widget.child('subwedge_size_ledit').hide()
