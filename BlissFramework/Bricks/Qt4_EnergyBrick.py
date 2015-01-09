@@ -107,7 +107,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
+        self.setSizePolicy(QtGui.QSizePolicy.Fixed, 
                            QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
@@ -246,4 +246,3 @@ class Qt4_EnergyBrick(BlissWidget):
         Return.   : 
         """
         print "stoped clicked"
-

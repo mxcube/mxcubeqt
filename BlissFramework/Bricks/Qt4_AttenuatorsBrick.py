@@ -48,6 +48,12 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         self.addProperty('filtersMode', 'combo', ('Expert', 'Enabled', 
                          'Disabled'), 'Expert')
 
+        # Signals ------------------------------------------------------------
+
+        # Slots ---------------------------------------------------------------
+
+        # Graphic elements ----------------------------------------------------
+
         self.main_frame = QtGui.QFrame(self)
         self.main_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
         self.group_box = QtGui.QGroupBox("Transmission", self.main_frame)
