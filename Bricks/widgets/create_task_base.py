@@ -122,7 +122,8 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.base_prefix = str(new_value)
                 name = self._path_template.get_prefix()
                 model.set_name(name)
-                item.setText(0, model.get_name())
+                #item.setText(0, model.get_name())
+                item.setText(0, model.get_display_name())
         
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -133,7 +134,8 @@ class CreateTaskBase(qt.QWidget):
                    not isinstance(item, queue_item.DataCollectionGroupQueueItem):
                 if str(new_value).isdigit():
                     model.set_number(int(new_value))
-                    item.setText(0, model.get_name())
+                    #item.setText(0, model.get_name())
+                    item.setText(0, model.get_display_name())
 
     def handle_path_conflict(self, widget, new_value):
         self._tree_brick.dc_tree_widget.check_for_path_collisions()

@@ -218,6 +218,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                 if point:
                     #self.shape_history.add_point(cpos, qub_point)
                     self.shape_history.add_shape(point)
+                    cpos.set_index(point.get_index())
             except:
                 logging.getLogger('HWR').\
                     exception('Could not get screen positons for %s' % cpos)
