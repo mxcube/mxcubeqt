@@ -412,22 +412,21 @@ class CameraBrick(BlissWidget):
         elif property == 'fix : height': self.__fixHeight = newValue
         elif property == "diffractometer":
             self.diffractometerHwobj = self.getHardwareObject(newValue)
-            self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
-            self.diffractometerHwobj.connect("minidiffStateChanged",
-                                             self.diffractometerChanged)
-
-            zoom = self.diffractometerHwobj.zoomMotor.getPosition()
-            xSize,ySize = self.diffractometerHwobj.getCalibrationData(zoom)
-            #xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
-            self.diffractometerHwobj.getBeamInfo(self.__getBeamInfo)
-            beam_pos_x = self.diffractometerHwobj.getBeamPosX()
-            beam_pos_y = self.diffractometerHwobj.getBeamPosY()
-
-
-            self.__gridDialog.set_x_pixel_size(xSize)
-            self.__gridDialog.set_y_pixel_size(ySize)
-            self.__gridDialog.set_beam_position(beam_pos_x, beam_pos_y,
-                                                self.__beamWidth, self.__beamHeight)
+            if self.diffractometerHwobj is not None:
+                self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
+                self.diffractometerHwobj.connect("minidiffStateChanged",
+                                                 self.diffractometerChanged)
+                if self.diffractometerHwobj.zoomMotor is not None:
+                    zoom = self.diffractometerHwobj.zoomMotor.getPosition()
+                    xSize, ySize = self.diffractometerHwobj.getCalibrationData(zoom)
+                    self.diffractometerHwobj.getBeamInfo(self.__getBeamInfo)
+                    beam_pos_x = self.diffractometerHwobj.getBeamPosX()
+                    beam_pos_y = self.diffractometerHwobj.getBeamPosY()
+ 
+                    self.__gridDialog.set_x_pixel_size(xSize)
+                    self.__gridDialog.set_y_pixel_size(ySize)
+                    self.__gridDialog.set_beam_position(beam_pos_x, beam_pos_y,
+                                                        self.__beamWidth, self.__beamHeight)
 
     def run(self) :
         chosenActions = []
