@@ -52,6 +52,7 @@ class Session(HardwareObject):
             self.in_house_users.append((prop.getProperty('code'),
                 str(prop.getProperty('number'))))
 
+        # TODO How to handle if no archive dir set
         queue_model_objects.PathTemplate.set_archive_path(self['file_info'].getProperty('archive_base_directory'),
                                                           self['file_info'].getProperty('archive_folder'))
 

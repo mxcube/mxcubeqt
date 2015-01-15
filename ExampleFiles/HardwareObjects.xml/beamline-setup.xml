@@ -18,6 +18,7 @@
   <!-- Procedures and routines -->
   <object href="/energyscan-mockup" role="energyscan"/>
   <object href="/collect-mockup" role="collect"/>
+  <object href="/xrfscan-mockup" role="xrfscan"/>
 
   <!-- Is it possible to change the beam wavelentgh.
        Should perhaps be associated with the diffractometer -->

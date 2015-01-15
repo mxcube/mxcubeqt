@@ -179,6 +179,11 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             centred_position_selection(selected_positions)
         self.task_tool_box_widget.\
             char_page.centred_position_selection(selected_positions)
+        self.task_tool_box_widget.energy_scan_page.\
+            centred_position_selection(selected_positions)
+        self.task_tool_box_widget.xrf_scan_page.\
+            centred_position_selection(selected_positions)
+
 
     def shape_deleted(self, shape):
         """

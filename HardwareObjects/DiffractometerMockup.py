@@ -9,10 +9,14 @@ import tempfile
 import gevent
 import random
 from gevent.event import AsyncResult
-from Qub.Tools import QubImageSave
+
+import queue_model_objects_v1 as qmo
+
 from HardwareRepository import HardwareRepository
 from HardwareRepository.TaskUtils import *
 from HardwareRepository.BaseHardwareObjects import Equipment
+
+from Qub.Tools import QubImageSave
 
 class myimage:
     """
@@ -56,6 +60,16 @@ class DiffractometerMockup(Equipment):
         Descript. :
         """
         Equipment.__init__(self, *args)
+
+        qmo.CentredPosition.set_diffractometer_motor_names("phi",
+                                                           "focus",
+                                                           "phiz",
+                                                           "phiy",
+                                                           "zoom",
+                                                           "sampx",
+                                                           "sampy",
+                                                           "kappa",
+                                                           "kappa_phi")
 
         self.phiMotor = None
         self.phizMotor = None
@@ -472,6 +486,8 @@ class DiffractometerMockup(Equipment):
         if self.beam_info_hwobj: 
             self.beam_info_hwobj.beam_pos_hor_changed(300) 
             self.beam_info_hwobj.beam_pos_ver_changed(200)
+        self.emit("phiMoved", 10.2)
+        self.emit("kappaMoved", 11.2)
 
     def start_auto_focus(self): 
         """

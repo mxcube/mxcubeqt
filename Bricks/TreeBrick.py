@@ -73,6 +73,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("hide_sample_changer_tab", ())
         self.defineSignal("hide_edna_tab", ())
         self.defineSignal("hide_energy_scan_tab",())
+        self.defineSignal("hide_xrf_scan_tab",())
         self.defineSignal("hide_workflow_tab", ())
 
         # Populating the tabs with data
@@ -80,6 +81,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("populate_edna_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("populate_energy_scan_widget", ())
+        self.defineSignal("populate_xrf_scan_widget", ())
         self.defineSignal("populate_workflow_tab", ())
 
         # Handle selection
@@ -147,6 +149,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
         camera_brick = None
@@ -453,6 +456,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_sample_tab(self, item):
@@ -465,6 +469,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_dcg_tab(self):
@@ -475,6 +480,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def populate_parameters_tab(self, item = None):
@@ -489,6 +495,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_parameters_tab(item)
 
@@ -500,6 +507,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (False,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_edna_parameters_tab(item)
 
@@ -515,11 +523,27 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
         self.emit(qt.PYSIGNAL("populate_energy_scan_widget"), (item,))
+
+    def show_xrf_scan_tab(self, item):
+        self.sample_changer_widget.child('details_button').setText("Show SC")
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.populate_xrf_scan_tab(item)
+
+    def populate_xrf_scan_tab(self, item):
+        self.emit(qt.PYSIGNAL("populate_xrf_scan_widget"), (item,))
 
     def show_workflow_tab_from_model(self):
         self.show_workflow_tab(None)
@@ -532,6 +556,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
 
         running = self.queue_hwobj.is_executing() 
@@ -570,6 +595,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.populate_edna_parameters_tab(item)
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.populate_energy_scan_tab(item)
+            elif isinstance(item, queue_item.XRFScanQueueItem):
+                self.populate_xrf_scan_tab(item)
             elif isinstance(item, queue_item.GenericWorkflowQueueItem):
                 self.populate_workflow_tab(item)
 
