@@ -60,6 +60,9 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
        
         # Signals ------------------------------------------------------------  
+        self.defineSignal("getView", ())
+        self.defineSignal("getTreeBrick",())
+
 
         # Slots ---------------------------------------------------------------
         self.defineSlot("logged_in", ())
@@ -83,7 +86,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
                            QtGui.QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
-        #self.setEnabled(self.ispyb_logged_in)
+        self.setEnabled(self.ispyb_logged_in)
 
 
     def run(self):
@@ -95,7 +98,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         """
         # Get a reference to the TreeBrick.
         tree_brick = {}
-        self.emit(QtCore.SIGNAL("getTreeBrick"), (tree_brick,))
+        self.emit(QtCore.SIGNAL("getTreeBrick"), tree_brick)
         self.tree_brick = tree_brick.get('tree_brick', None)
         self.task_tool_box_widget.set_tree_brick(self.tree_brick)
 
@@ -166,9 +169,9 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         
         if self.session_hwobj is not None:
             self.session_hwobj.set_user_group('')
-            
+
         self.setEnabled(logged_in)
-        self.task_tool_box_widget.ispyb_logged_in(logged_in)
+        #self.task_tool_box_widget.ispyb_logged_in(logged_in)
         
     
     def propertyChanged(self, property_name, old_value, new_value):
@@ -198,7 +201,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
                                                           'check configuration !.')
         elif property_name == 'queue_model':
 
-            return
             self.queue_model_hwobj = self.getHardwareObject(new_value)
 
             if self.beamline_setup_hwobj:

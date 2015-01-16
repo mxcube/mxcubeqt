@@ -343,6 +343,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
         if method == self.diffractometer_hwobj.MANUAL3CLICK_MODE:
             self.graphics_manager_hwobj.set_centring_lines_enable(True)
+            #self.graphics_manager_hwobj.set_centring_state(True)
 
     def centring_successful(self,method,centring_status):
         self.button_centre.command_done()
@@ -444,7 +445,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             pass
 
     def minidiff_message(self, msg = None):
-        print "minidiff_message: ", msg
+        logging.getLogger().info(msg)
 
     def beam_position_changed(self, position):
         if (self.diffractometer_hwobj is not None and 

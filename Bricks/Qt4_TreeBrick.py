@@ -94,6 +94,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSlot("logged_in", ())
         self.defineSlot("status_msg_changed", ())
         self.defineSlot("sample_load_state_changed", ())
+        self.defineSlot("set_session", ())
+
+        self.defineSlot("get_tree_brick",())
+        self.defineSlot("get_selected_samples", ())
+
         
         #self.defineSlot("get_mounted_sample", ())
         #self.defineSlot("new_centred_position", ())
@@ -185,6 +190,7 @@ class Qt4_TreeBrick(BlissWidget):
                          self.dc_tree_widget.queue_stop_handler)
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
+
             self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
             self.dc_tree_widget.confirm_dialog.queue_model_hwobj = self.queue_model_hwobj
             self.connect(self.queue_model_hwobj, 'child_added',
@@ -193,15 +199,15 @@ class Qt4_TreeBrick(BlissWidget):
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
-            self.sample_changer_hwobj_hwobj = bl_setup.sample_changer_hwobj
-            self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj_hwobj
+            self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
+            self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
             self.session_hwobj = bl_setup.session_hwobj
             self.lims_hwobj = bl_setup.lims_client_hwobj
 
-            if self.sample_changer_hwobj_hwobj is not None:
-                self.connect(self.sample_changer_hwobj_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+            if self.sample_changer_hwobj is not None:
+                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sample_changer_hwobj_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
+                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
@@ -239,20 +245,15 @@ class Qt4_TreeBrick(BlissWidget):
                 sc_basket_list, sc_sample_list = \
                  self.dc_tree_widget.samples_from_sc_content(\
                  sc_basket_content, sc_sample_content)
-                self.dc_tree_widget.populate_list_view(sc_basket_list, \
+                self.dc_tree_widget.populate_tree_widget(sc_basket_list, \
                  sc_sample_list)
             self.sample_changer_widget.findChild(QtGui.QComboBox, 
                  'filter_cbox').setCurrentIndex(0)
-        else:
-            if sc_content:
-              self.sample_changer_widget.findChild(QtGui.QComboBox, 
-                   'filter_cbox').setCurrentIndex(0)
-            else:
-              self.sample_changer_widget.findChild(QtGui.QComboBox,
-                   'filter_cbox').setCurrentIndex(2) 
 
-        #if self.sample_changer_hwobj_hwobj:
-        #  if not self.sample_changer_hwobj_hwobj.hasLoadedSample():
+        if not self.sample_changer_hwobj.hasLoadedSample():
+            self.dc_tree_widget.filter_sample_list(2)
+            self.sample_changer_widget.findChild(QtGui.QComboBox,
+                   'filter_cbox').setCurrentIndex(2)
 
         self.dc_tree_widget.sample_tree_widget_selection()
 
@@ -321,11 +322,17 @@ class Qt4_TreeBrick(BlissWidget):
         
         if samples:
             (barcode_samples, location_samples) = \
-                self.samples_from_lims(samples) #self.dc_tree_widget.samples_from_lims(samples)
+                self.dc_tree_widget.samples_from_lims(samples)
 
-            sc_content = self.get_sc_content()
+            """sc_content = self.get_sc_content()
             sc_sample_list = self.dc_tree_widget.\
-                             samples_from_sc_content(sc_content)
+                             samples_from_sc_content(sc_content)"""
+            sc_basket_content, sc_sample_content = self.get_sc_content()
+            sc_basket_list, sc_sample_list = self.dc_tree_widget.\
+             samples_from_sc_content(sc_basket_content, sc_sample_content)
+
+            #IK TODO
+            basket_list = sc_basket_list
            
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
@@ -374,7 +381,7 @@ class Qt4_TreeBrick(BlissWidget):
                                 warning("No sample in ISPyB for location %s" % str(sc_sample.location))
                             sample_list.append(sc_sample)
 
-            self.dc_tree_widget.populate_list_view(sample_list)
+            self.dc_tree_widget.populate_tree_widget(basket_list, sample_list)
 
     def get_sc_content(self):
         """

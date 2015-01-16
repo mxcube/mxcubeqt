@@ -160,8 +160,9 @@ class QueueItem(QtGui.QTreeWidgetItem):
             self.listView().triggerUpdate()
 
     def setBackgroundColor(self, color):
+        color = QtCore.Qt.white
         self.previous_bg_brush = self.bg_brush
-        self.bg_brush = qt.QBrush(color)
+        self.bg_brush = QtGui.QBrush(color)
 
     def restoreBackgroundColor(self):
         self.bg_brush = self.previous_bg_brush
@@ -179,14 +180,16 @@ class QueueItem(QtGui.QTreeWidgetItem):
         :returns: The last item of this child.
         :rtype: QueueItem
         """
-        sibling = self.firstChild()
+        """sibling = self.child(0)
         last_child = None
 
         while(sibling):
             last_child = sibling
-            sibling = sibling.nextSibling()
-            
-        return last_child
+            sibling = sibling.treeWidget().itemBelow(sibling)
+            #sibling = sibling.nextSibling()
+        return last_child"""
+        if self.childCount() > 0: 
+            return self.child(self.childCount())
 
     def setOn(self, state):
         if self._checkable: 

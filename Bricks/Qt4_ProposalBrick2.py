@@ -29,7 +29,9 @@ from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+
 __category__ = 'Qt4_General'
+
 
 PROPOSAL_GUI_EVENT = QtCore.QEvent.User
 class ProposalGUIEvent(QtCore.QEvent):
@@ -38,9 +40,6 @@ class ProposalGUIEvent(QtCore.QEvent):
         self.method = method
         self.arguments = arguments
 
-###
-### Brick to show the current proposal & session (and login/out the user)
-###
 class Qt4_ProposalBrick2(BlissWidget):
     NOBODY_STR="<nobr><b>Login is required for collecting data!</b>"
 
@@ -183,7 +182,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
             msg = 'User group set to: %s' % str(self.user_group_ledit.text())
             logging.getLogger("user_level_log").info(msg)
-            self.emit(QtCore.SIGNAL("user_group_saved"), (self.user_group_ledit.text(),))
+            self.emit(QtCore.SIGNAL("user_group_saved"), self.user_group_ledit.text())
         else:
             msg = 'User group not valid, please enter a valid user group'
             logging.getLogger("user_level_log").info(msg)
@@ -237,15 +236,17 @@ class Qt4_ProposalBrick2(BlissWidget):
 
     # Opens the logout dialog (modal); if the answer is OK then logout the user
     def openLogoutDialog(self):
-        logout_dialog=QMessageBox("Confirm logout","Press OK to logout.",\
-            QMessageBox.Question,QMessageBox.Ok,QMessageBox.Cancel,\
-            QMessageBox.NoButton,self)
+        logout_dialog = QtGui.QMessageBox("Confirm logout","Press OK to logout.",\
+            				  QtGui.QMessageBox.Question,
+                                          QtGui.QMessageBox.Ok,
+                                          QtGui.QMessageBox.Cancel,
+			                  QtGui.QMessageBox.NoButton,self)
         s=self.font().pointSize()
         f = logout_dialog.font()
         f.setPointSize(s)
         logout_dialog.setFont(f)
         logout_dialog.updateGeometry()
-        if logout_dialog.exec_loop()==QMessageBox.Ok:
+        if logout_dialog.show() == QtGui.QMessageBox.Ok:
             self.logout()
 
     # Logout the user; reset the brick; changes from logout mode to login mode
@@ -340,7 +341,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             if comments:
                 tooltip+='\n'
                 tooltip+='Comments: '+comments 
-            QToolTip.add(self.title_label, tooltip)
+            self.title_label.setToolTip(tooltip)
             self.title_label.show()
             self.user_group_label.show()
             self.user_group_ledit.show()
@@ -363,14 +364,15 @@ class Qt4_ProposalBrick2(BlissWidget):
         win_title="%s (%s-%s)" % (self["titlePrefix"],\
             self.lims_hwobj.translate(proposal["code"],'gui'),\
             proposal["number"])
-        self.emit(QtCore.SIGNAL("setWindowTitle"),(win_title,))
-        self.emit(QtCore.SIGNAL("sessionSelected"),\
-            (session_id,self.lims_hwobj.translate(proposal["code"],'gui'),\
-            str(proposal["number"]),\
-            proposal["proposalId"],\
-            session["startDate"],\
-            proposal["code"],\
-            is_inhouse))
+        self.emit(QtCore.SIGNAL("setWindowTitle"), win_title)
+        self.emit(QtCore.SIGNAL("sessionSelected"),
+                  session_id, 
+                  self.lims_hwobj.translate(proposal["code"],'gui'),
+                  str(proposal["number"]),
+                  proposal["proposalId"],
+                  session["startDate"],
+                  proposal["code"],
+                  is_inhouse)
         self.emit(QtCore.SIGNAL("loggedIn"), True)
 
     def setCodes(self,codes):
@@ -396,20 +398,20 @@ class Qt4_ProposalBrick2(BlissWidget):
           self.session_hwobj.proposal_id = ""
           self.session_hwobj.proposal_number = "" 
 
-          self.emit(QtCore.SIGNAL("setWindowTitle"), (self["titlePrefix"],))
-          self.emit(QtCore.SIGNAL("loggedIn"), (False, ))
-          self.emit(QtCore.SIGNAL("sessionSelected"),(None, ))
+          self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
+          self.emit(QtCore.SIGNAL("loggedIn"), False)
+          self.emit(QtCore.SIGNAL("sessionSelected"), None)
           self.emit(QtCore.SIGNAL("loggedIn"), True)
-          self.emit(QtCore.SIGNAL("sessionSelected"), (self.session_hwobj.session_id,
+          self.emit(QtCore.SIGNAL("sessionSelected"), self.session_hwobj.session_id,
                                                   str(os.environ["USER"]),
                                                   0,
                                                   '',
                                                   '',
                                                   self.session_hwobj.session_id, 
-                                                  False))
+                                                  False)
         else: 
-          self.emit(QtCore.SIGNAL("setWindowTitle"),(self["titlePrefix"],))
-          self.emit(QtCore.SIGNAL("sessionSelected"),(None, ))
+          self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
+          self.emit(QtCore.SIGNAL("sessionSelected"), None)
           self.emit(QtCore.SIGNAL("loggedIn"), False)
 
         start_server_event=ProposalGUIEvent(self.startServers,())
@@ -453,16 +455,18 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.setEnabled(True)
 
     def ispybDown(self):
-        msg_dialog=QMessageBox("Register user",\
+        msg_dialog = QtGui.QMessageBox("Register user",\
             "Couldn't contact the ISPyB database server: you've been logged as the local user.\nYour experiments' information will not be stored in ISPyB!",\
-            QMessageBox.Warning,QMessageBox.Ok,QMessageBox.NoButton,\
-            QMessageBox.NoButton,self)
+            QtGui.QMessageBox.Warning, 
+            QtGui.QMessageBox.Ok, 
+            QtGui.QMessageBox.NoButton,
+            QtGui.QMessageBox.NoButton,self)
         s=self.font().pointSize()
         f=msg_dialog.font()
         f.setPointSize(s)
         msg_dialog.setFont(f)
         msg_dialog.updateGeometry()
-        msg_dialog.exec_loop()
+        msg_dialog.show()
 
         now=time.strftime("%Y-%m-%d %H:%M:S")
         prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
@@ -477,22 +481,23 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
     def askForNewSession(self):
-        create_session_dialog=QMessageBox("Create session",\
+        create_session_dialog=QtGui.QMessageBox("Create session",\
             "Unable to find an appropriate session.\nPress OK to create one for today.",\
-            QMessageBox.Question,QMessageBox.Ok,QMessageBox.Cancel,\
-            QMessageBox.NoButton,self)
+            QtGui.QMessageBox.Question, 
+            QtGui.QMessageBox.Ok,QMessageBox.Cancel,
+            QtGui.QMessageBox.NoButton,self)
         s=self.font().pointSize()
         f = create_session_dialog.font()
         f.setPointSize(s)
         create_session_dialog.setFont(f)
         create_session_dialog.updateGeometry()
-        answer=create_session_dialog.exec_loop()
-        return answer==QMessageBox.Ok
+        answer=create_session_dialog.show()
+        return answer == QtGui.QMessageBox.Ok
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
         self.saved_group = False
-        Qt4_widget_color.set_widget_color(self.user_group_ledit, Qt4_widget_colors.WHITE)
+        Qt4_widget_colors.set_widget_color(self.user_group_ledit, Qt4_widget_colors.WHITE)
         self.user_group_ledit.setText('')
         self.setEnabled(False)
 
