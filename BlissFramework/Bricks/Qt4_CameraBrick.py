@@ -55,7 +55,7 @@ class Qt4_CameraBrick(BlissWidget):
 
         # Graphic elements-----------------------------------------------------
         self.graphics_view = QtGui.QGraphicsView(self)
-        self.graphics_scene = QtGui.QGraphicsScene(self)
+        #self.graphics_scene = QtGui.QGraphicsScene(self)
         self.graphics_scene = Qt4_GraphicsManager.GraphicsScene(self)
         self.graphics_view.setScene(self.graphics_scene)
 
@@ -75,6 +75,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_camera_frame = QtGui.QGraphicsPixmapItem()
         self.graphics_scene.clearSelection()
         self.graphics_scene.addItem(self.graphics_camera_frame)
+        self.graphics_camera_frame.grabMouse()
         self.graphics_scene_centring_points = []
 
     def propertyChanged(self, property_name, old_value, new_value):

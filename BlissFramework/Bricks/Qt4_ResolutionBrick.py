@@ -167,7 +167,7 @@ class Qt4_ResolutionBrick(BlissWidget):
         Args.     : 
         Return    : None
         """
-        print state
+        return
 
     def resolution_value_changed(self, value):
         """
@@ -175,5 +175,4 @@ class Qt4_ResolutionBrick(BlissWidget):
         Args.     : 
         Return    : None
         """
-        print value
         self.resolution_ledit.setText(str(value))

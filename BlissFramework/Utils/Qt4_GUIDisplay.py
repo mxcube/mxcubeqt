@@ -352,7 +352,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
         def addTab(self, page_widget, label, icon=""):
-            print "addTab: ", page_widget, label, icon
             scroll_area = QtGui.QScrollArea(self)
             scroll_area.setFrameStyle(QtGui.QFrame.NoFrame)
           
@@ -677,14 +676,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     newItem.installEventFilter(self)
                 #previewItemsList.append(newItem)
 
-            print "m"
             if parent.__class__ == WindowDisplayWidget.items["tab"]:
-                print 1
                 # adding to tab widget
                 parent.hide()
-                print newItem
                 newItem.setFixedWidth(300)
-                print newItem.sizePolicy()
                 newTab = parent.addTab(newItem, child["properties"]["label"], child["properties"]["icon"])
                 newTab2 = parent.addTab(QtGui.QLabel("demmmoo"), "2", child["properties"]["icon"])
 
