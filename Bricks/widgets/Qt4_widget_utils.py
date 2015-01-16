@@ -115,7 +115,7 @@ class Qt4_DataModelInputBinder(object):
                                 self.__combobox_update_value(field_name,
                                                              new_value))
 
-            widget.setCurrentItem(int(getattr(self.__model, field_name)))
+            widget.setCurrentIndex(int(getattr(self.__model, field_name)))
 
         elif isinstance(widget, QtGui.QCheckBox) or \
                 isinstance(widget, QtGui.QRadioButton):

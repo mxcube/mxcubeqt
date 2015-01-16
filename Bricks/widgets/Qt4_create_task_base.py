@@ -68,9 +68,9 @@ class Qt4_CreateTaskBase(QtGui.QWidget):
          self._session_hwobj = None
          self._beamline_setup_hwobj = None
          
-         print "QtCore.QObject.connect(QtGui.QApplication,  - implement"
          #QtCore.QObject.connect(QtGui.QApplication, QtCore.SIGNAL('tab_changed'),
          #                       self.tab_changed)
+
 
     def init_models(self):
         self.init_acq_model()

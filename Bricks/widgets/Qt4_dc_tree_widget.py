@@ -319,13 +319,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             items[0].set_mounted_style(False)
 
     def sample_tree_widget_selection(self):
-
-        print "sample_tree_widget_selection: "
-
         items = self.get_selected_items()
-
-        print items
- 
         if len(items) == 1:
             item = items[0]
             
@@ -342,9 +336,9 @@ class Qt4_DataCollectTree(QtGui.QWidget):
                     break
 
         self.selection_changed_cb(items)        
-        checked_items = self.get_checked_items()
-        self.collect_button.setDisabled(len(checked_items) == 0)
-        self.set_first_element()
+        #checked_items = self.get_checked_items()
+        #self.collect_button.setDisabled(len(checked_items) == 0)
+        #self.set_first_element()
 
     def add_empty_task_node(self):
         samples = self.get_selected_samples()
@@ -398,7 +392,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             #                task.get_display_name())
         #else:
         #    view_item = cls(parent_tree_item, task.get_display_name())
-        
+
         if isinstance (task, queue_model_objects.Basket):
             view_item.setExpanded(task.get_is_present())
         else:
@@ -664,12 +658,10 @@ class Qt4_DataCollectTree(QtGui.QWidget):
 
     def set_first_element(self):
         selected_items = self.get_selected_items()
-        print selected_items
         if len(selected_items) == 0:        
             it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
             #item = it.current()
             item = it.value()
-            print item 
             if item.get_model().free_pin_mode:
                 self.sample_tree_widget.setSelected(self.sample_list_view.firstChild(), True)
 
@@ -758,7 +750,6 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             self.add_to_queue([sample], self.sample_tree_widget, False)
 
     def populate_free_pin(self):
-        print "populate_free_pin: "
         self.queue_model_hwobj.clear_model('free-pin')
         self.queue_model_hwobj.select_model('free-pin')
         sample = queue_model_objects.Sample()
@@ -779,7 +770,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
                                              get_model_root(), sample)
         self.set_sample_pin_icon()"""
 
-    def populate_list_view(self, basket_list, sample_list):   
+    def populate_tree_widget(self, basket_list, sample_list):   
         self.queue_hwobj.clear()
         self.queue_model_hwobj.clear_model('ispyb')
         self.sample_tree_widget.clear()
@@ -804,12 +795,13 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             if self.is_mounted_sample_item(item):
                 item.setSelected(True)
                 item.set_mounted_style(True)
+                self.sample_tree_widget_selection()
                 #self.sample_tree_widget_selection()
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 item.set_mounted_style(False)
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
-                    item.setPixmap(0, self.ispyb_pixmap)
+                    item.setIcon(0, QtGui.QIcon(self.ispyb_pixmap))
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
             elif isinstance(item, Qt4_queue_item.BasketQueueItem):
@@ -827,10 +819,10 @@ class Qt4_DataCollectTree(QtGui.QWidget):
     def check_for_path_collisions(self):
         conflict = False
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
-        item = it.current()
+        item = it.value()
 
         while item:
-            if item.isOn():
+            if item.checkState(0) == QtCore.Qt.Checked:
                 pt = item.get_model().get_path_template()
                 
                 if pt:
@@ -844,7 +836,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
                          item.setIcon(QtGui.QIcon())
                          
             it += 1
-            item = it.current()
+            item = it.value()
 
         return conflict
         

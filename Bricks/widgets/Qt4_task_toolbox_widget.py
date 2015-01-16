@@ -29,7 +29,7 @@ from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 from BlissFramework import Qt4_Icons
 from widgets.Qt4_create_discrete_widget import Qt4_CreateDiscreteWidget
 from widgets.Qt4_create_helical_widget import Qt4_CreateHelicalWidget
-#from widgets.Qt4_create_char_widget import Qt4_CreateCharWidget
+from widgets.Qt4_create_char_widget import Qt4_CreateCharWidget
 from widgets.Qt4_create_energy_scan_widget import Qt4_CreateEnergyScanWidget
 #from widgets.Qt4_create_workflow_widget import Qt4_CreateWorkflowWidget
 
@@ -61,14 +61,14 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         
         self.discrete_page = Qt4_CreateDiscreteWidget(self.tool_box, "Discrete",)
         #self.discrete_page.setBackgroundMode(QtGui.QWidget.PaletteBackground)
-        """self.char_page = CreateCharWidget(self.tool_box, "Characterise")
-        self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)"""
+        self.char_page = Qt4_CreateCharWidget(self.tool_box, "Characterise")
+        #self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.helical_page = Qt4_CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = Qt4_CreateEnergyScanWidget(self.tool_box, "energy_scan")
         #self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
-        #self.tool_box.addItem(self.char_page, "Characterisation")
+        self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         #self.tool_box.addItem(self.workflow_page, "Advanced")
@@ -143,13 +143,11 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
 
         # Remove energy scan page from non tunable wavelentgh beamlines
 
-        return       
-
-        if not beamline_setup_hwobj.tunable_wavelength():
+        """if not beamline_setup_hwobj.tunable_wavelength():
             self.tool_box.removeItem(self.energy_scan_page)
             self.energy_scan_page.hide()
         else:
-            self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
+            self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)"""
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
@@ -166,7 +164,7 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         """
         #import pdb;pdb.set_trace()
         for i in range(0, self.tool_box.count()):
-            self.tool_box.item(i).ispyb_logged_in(logged_in)
+            self.tool_box.widget(i).ispyb_logged_in(logged_in)
             
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
@@ -184,6 +182,29 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
                 new_pt.directory = previous_pt.directory
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
+            elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
+                data_collection = tree_item.get_model()
+                if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
+                    if self.tool_box.currentItem() == self.helical_page:
+                        self.create_task_button.setEnabled(True)
+                elif data_collection.experiment_type == EXPERIMENT_TYPE.MESH:
+                    if self.tool_box.currentItem() == self.advanced_scan_page:
+                        self.create_task_button.setEnabled(True)
+                elif self.tool_box.currentItem() == self.discrete_page:
+                    self.create_task_button.setEnabled(True)
+            elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+                if self.tool_box.currentItem() == self.char_page:
+                    self.create_task_button.setEnabled(True)
+            elif isinstance(tree_item, queue_item.EnergyScanQueueItem):
+                if self.tool_box.currentItem() == self.energy_scan_page:
+                    self.create_task_button.setEnabled(True)
+            elif isinstance(tree_item, queue_item.XRFScanQueueItem):
+                if self.tool_box.currentItem() == self.xrf_scan_page:
+                    self.create_task_button.setEnabled(True)
+            elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
+                if self.tool_box.currentItem() == self.workflow_page:
+                    self.create_task_button.setEnabled(True)
+
 
             self.tool_box.item(page_index).selection_changed(tree_items)
             self.previous_page_index = page_index
@@ -214,7 +235,7 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentItem(self.workflow_page)
 
-        current_page = self.tool_box.currentItem()
+        current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)
 
     def create_task_button_click(self):

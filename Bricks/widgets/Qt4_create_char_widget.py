@@ -20,6 +20,9 @@
 import os
 import copy
 
+from PyQt4 import QtCore
+from PyQt4 import QtGui
+
 import Qt4_queue_item
 import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
@@ -44,13 +47,37 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
         #
         self._current_selected_item = None
         self.init_models()
-        self._char_params_mib = DataModelInputBinder(self._char_params)
+        self._char_params_mib = Qt4_DataModelInputBinder(self._char_params)
    
         #
         # Layout
         #
-        v_layout = qt.QVBoxLayout(self, 2, 6, "v_layout")
-        
+        _acq_frame = QtGui.QFrame(self)
+        _acq_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
+
+        self._acq_widget = \
+            Qt4_AcquisitionWidgetSimple(_acq_frame, acq_params = self._acquisition_parameters,
+                                    path_template = self._path_template)
+        self._acq_widget.setFixedHeight(170)
+
+        # Layout --------------------------------------------------------------
+        _acq_frame_layout = QtGui.QVBoxLayout(self)
+        _acq_frame_layout.addWidget(self._acq_widget)
+        _acq_frame_layout.setSpacing(0)
+        _acq_frame_layout.setContentsMargins(0,0,0,0)
+        _acq_frame.setLayout(_acq_frame_layout)
+
+        main_layout = QtGui.QVBoxLayout(self)
+        main_layout.addWidget(_acq_frame)
+        #self.main_layout.addWidget(self._data_path_frame)
+        #self.main_layout.addWidget(self._processing_frame)
+        main_layout.addStretch(0)
+        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(main_layout)
+
+        return
+
         self._acq_widget = \
             Qt4_AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
                                     path_template = self._path_template)
@@ -224,7 +251,10 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
             self._acquisition_parameters.transmission = transmission
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            
+        
+          
+        return 
+    
         self._path_template.reference_image_prefix = 'ref'
         # The num images drop down default value is 1
         # we would like it to be 2

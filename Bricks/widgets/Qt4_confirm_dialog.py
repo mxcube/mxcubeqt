@@ -63,7 +63,6 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
         if name is not None:
             self.setObjectName(name) 
 
-        print "Qt4_ConfirmDialog--- 1"
         # Attributes
         self.ready_event = False
         self.checked_items = []
@@ -94,7 +93,6 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
         self.setWindowTitle('Confirm collection')
-        print "Qt4_ConfirmDialog--- 1 end"
 
 
     def set_plate_mode(self, plate_mode):
