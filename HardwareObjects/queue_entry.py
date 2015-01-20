@@ -501,6 +501,9 @@ class SampleQueueEntry(BaseQueueEntry):
     def _set_background_color(self):
         BaseQueueEntry._set_background_color(self)
 
+class BasketQueueEntry(BaseQueueEntry):
+    def __init__(self, view=None, data_model=None):
+        BaseQueueEntry.__init__(self, view, data_model)
 
 class SampleCentringQueueEntry(BaseQueueEntry):
     """
@@ -1337,5 +1340,6 @@ MODEL_QUEUE_ENTRY_MAPPINGS = \
      queue_model_objects.XRFScan: XRFScanQueueEntry,
      queue_model_objects.SampleCentring: SampleCentringQueueEntry,
      queue_model_objects.Sample: SampleQueueEntry,
+     queue_model_objects.Basket: BasketQueueEntry,
      queue_model_objects.TaskGroup: TaskGroupQueueEntry,
      queue_model_objects.Workflow: GenericWorkflowQueueEntry}

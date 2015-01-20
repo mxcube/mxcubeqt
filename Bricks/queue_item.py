@@ -235,6 +235,12 @@ class SampleQueueItem(QueueItem):
     def reset_style(self):
         QueueItem.reset_style(self)
         self.set_mounted_style(self.mounted_style, clear_background = True)
+
+class BasketQueueItem(QueueItem):
+    def __init__(self, *args, **kwargs):
+        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
+        kwargs['deletable'] = False
+        QueueItem.__init__(self, *args, **kwargs)
             
 
 class TaskQueueItem(QueueItem):
@@ -346,6 +352,7 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.XRFScan: XRFScanQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.Basket: BasketQueueItem,
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 
