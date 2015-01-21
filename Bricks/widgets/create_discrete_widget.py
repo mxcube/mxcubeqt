@@ -161,7 +161,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         selected_shapes = self._shape_history.selected_shapes
 
         for shape in selected_shapes:
-            if isinstance(shape, shape_history.Line):
+            if (isinstance(shape, shape_history.Line) or
+                isinstance(shape, shape_history.CanvasGrid)):
                 result = False
 
         return result

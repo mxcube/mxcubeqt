@@ -137,3 +137,12 @@ class CreateXRFScanWidget(CreateTaskBase):
                     snapshot = self._shape_history.get_snapshot([pos.qub_point])
                     cpos.snapshot_image = snapshot
                     item.get_model().centred_position = cpos
+
+if __name__ == "__main__":
+    app = qt.QApplication(sys.argv)
+    qt.QObject.connect(app, qt.SIGNAL("lastWindowClosed()"), app, qt.SLOT("quit()"))
+    widget = CreateXRFScanWidget()
+    app.setMainWidget(widget)
+    widget.show()
+    app.exec_loop()
+

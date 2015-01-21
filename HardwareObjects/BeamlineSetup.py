@@ -20,7 +20,8 @@ class BeamlineSetup(HardwareObject):
         self._role_list = ['transmission', 'diffractometer', 'sample_changer',
                            'resolution', 'shape_history', 'session', 'beam_info',
                            'data_analysis', 'workflow', 'lims_client',
-                           'collect', 'energy', 'energyscan', 'xrfscan', 'omega_axis', "detector"]
+                           'omega_axis', 'kappa_axis', 'kappa_phi_axis',
+                           'collect', 'energy', 'xrf', 'detector', 'energyscan']
 
     def init(self):
         """
@@ -61,7 +62,7 @@ class BeamlineSetup(HardwareObject):
         value = None
 
         if path == '/beamline/default-acquisition-parameters/':
-            value = jsonpickle.encode(self.get_default_acquisition_parameters())
+            value = jsonpickle.encode(self.get_default_acquisition_parameters("default-acquisition-parameters"))
         elif path == '/beamline/default-path-template/':
             value = jsonpickle.encode(self.get_default_path_template())
         else:
@@ -168,6 +169,8 @@ class BeamlineSetup(HardwareObject):
         acq_parameters.num_images = int(num_images)
         acq_parameters.osc_start = self._get_omega_axis_position()
         acq_parameters.osc_range = osc_range
+        acq_parameters.kappa = self._get_kappa_axis_position()
+        acq_parameters.kappa_phi = self._get_kappa_phi_axis_position()
         acq_parameters.overlap = overlap
         acq_parameters.exp_time = exp_time
         acq_parameters.num_passes = num_passes
@@ -243,12 +246,12 @@ class BeamlineSetup(HardwareObject):
 
         return char_params
 
-    def get_default_acquisition_parameters(self):
+    def get_default_acquisition_parameters(self, parent_key):
         """
         :returns: A AcquisitionParameters object with all default parameters.
         """
         acq_parameters = queue_model_objects.AcquisitionParameters()
-        parent_key = "default_acquisition_values"
+        #parent_key = "default_acquisition_values"
 
         img_start_num = self[parent_key].getProperty('start_image_number')
         num_images = self[parent_key].getProperty('number_of_images')
@@ -263,6 +266,8 @@ class BeamlineSetup(HardwareObject):
         acq_parameters.num_images = num_images
         acq_parameters.osc_start = self._get_omega_axis_position()
         acq_parameters.osc_range = osc_range
+        acq_parameters.kappa = self._get_kappa_axis_position()
+        acq_parameters.kappa_phi = self._get_kappa_phi_axis_position()
         acq_parameters.overlap = overlap
         acq_parameters.exp_time = exp_time
         acq_parameters.num_passes = num_passes
@@ -371,4 +376,26 @@ class BeamlineSetup(HardwareObject):
             parent_key = "default_acquisition_values"
             result = round(float(self[parent_key].getProperty('start_angle')), 2)
 
+        return result
+
+    def _get_kappa_axis_position(self):
+        """
+        Descript. :
+        """
+        result = 0
+        try:
+            result = round(float(self.kappa_axis_hwobj.getPosition()), 2)
+        except:
+            pass
+        return result
+
+    def _get_kappa_phi_axis_position(self):
+        """
+        Descript. :
+        """
+        result = 0
+        try:
+            result = round(float(self.kappa_phi_axis_hwobj.getPosition()), 2)
+        except:
+            pass
         return result

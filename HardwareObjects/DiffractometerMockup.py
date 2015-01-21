@@ -78,6 +78,8 @@ class DiffractometerMockup(Equipment):
         self.zoomMotor = None
         self.sampleXMotor = None
         self.sampleYMotor = None
+        self.kappaMotor = None
+        self.kappaPhiMotor = None
         self.camera = None
         self.beam_info_hwobj = None
 
@@ -131,12 +133,23 @@ class DiffractometerMockup(Equipment):
         self.centring_time = 0
         self.user_confirms_centring = True
         self.user_clicked_event = AsyncResult()
-
         self.image_width = 400
         self.image_height = 400
-
         self.equipmentReady()
         self.user_clicked_event = AsyncResult()
+
+        self.kappaMotor = self.getDeviceByRole('kappa')
+        self.kappaPhiMotor = self.getDeviceByRole('kappa_phi')
+
+        if self.kappaMotor is not None:
+            self.connect(self.kappaMotor, "positionChanged", self.kappa_motor_moved)
+        else:
+            logging.getLogger("HWR").error('EMBLMiniDiff: kappa motor is not defined')
+
+        if self.kappaPhiMotor is not None:
+            self.connect(self.kappaPhiMotor, 'positionChanged', self.kappa_phi_motor_moved)
+        else:
+            logging.getLogger("HWR").error('EMBLMiniDiff: kappa phi motor is not defined')
 
         self.beam_info_hwobj = HardwareRepository.HardwareRepository().\
                                 getHardwareObject(self.getProperty("beam_info"))
@@ -144,6 +157,24 @@ class DiffractometerMockup(Equipment):
             self.connect(self.beam_info_hwobj, 'beamPosChanged', self.beam_position_changed)
         else:
             logging.getLogger("HWR").debug('Minidiff: Beaminfo is not defined')
+
+        try:
+            self.zoom_centre = eval(self.getProperty("zoomCentre"))
+        except:
+            if self.image_width is not None and self.image_height is not None:
+                self.zoom_centre = {'x': self.image_width / 2,'y' : self.image_height / 2}
+                self.beam_position = [self.image_width / 2, self.image_height / 2]
+                logging.getLogger("HWR").warning('EMBLMiniDiff: Zoom center is ' +\
+                       'not defined continuing with the middle: %s' % self.zoom_centre)
+            else:
+                logging.getLogger("HWR").warning('EMBLMiniDiff: Neither zoom centre nor camera size iz defined')
+
+        try:
+            self.omega_reference_par = eval(self.getProperty("omegaReference"))
+            self.omega_reference_motor = self.getDeviceByRole(self.omega_reference_par["motor_name"])
+            self.connect(self.omega_reference_motor, 'positionChanged', self.omega_reference_motor_moved)
+        except:
+            logging.getLogger("HWR").warning('EMBLMiniDiff: Omega axis is not defined')
 
     def getStatus(self):
         """
@@ -210,6 +241,20 @@ class DiffractometerMockup(Equipment):
             self.centring_status = {"valid":False}
             self.emitProgressMessage("")
             self.emit('centringInvalid', ())
+
+    def kappa_motor_moved(self, pos):
+        """
+        Descript. :
+        """
+        self.emit_diffractometer_moved()
+        self.emit('kappaMotorMoved', pos)
+
+    def kappa_phi_motor_moved(self, pos):
+        """
+        Descript. :
+        """
+        self.emit_diffractometer_moved()
+        self.emit('phiMotorMoved', pos)
 
     def get_available_centring_methods(self):
         """
@@ -560,3 +605,12 @@ class DiffractometerMockup(Equipment):
             self.emit('centringSnapshots', (True,))
             self.emit_progress_message("")
         self.emit_progress_message("Sample is centred!")
+
+    def move_kappa_phi(self, kappa, kappa_phi, wait = False):
+        """
+        Descript. :
+        """
+        if self.kappaMotor is not None:
+            self.kappaMotor.move(kappa)
+        if self.kappaPhiMotor is not None:
+            self.kappaPhiMotor.move(kappa_phi)
