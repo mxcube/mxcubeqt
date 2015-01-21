@@ -450,7 +450,8 @@ class Qt4_TreeBrick(BlissWidget):
             setPaletteBackgroundColor(qt.QColor(s_color))
 
     def show_sample_centring_tab(self):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton, 
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), (False,))
@@ -461,7 +462,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
 
     def show_sample_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton,
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(QtCore.SIGNAL("populate_sample_details"), (item.get_model(),))
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
@@ -473,7 +475,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
 
     def show_dcg_tab(self):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton,
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (False,))
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
@@ -487,7 +490,8 @@ class Qt4_TreeBrick(BlissWidget):
                   (item,))
         
     def show_datacollection_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton,
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (False,))
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
@@ -498,7 +502,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_parameters_tab(item)
 
     def show_edna_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton,
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
@@ -513,7 +518,8 @@ class Qt4_TreeBrick(BlissWidget):
                   (item,))
 
     def show_energy_scan_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton,
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
@@ -530,7 +536,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.show_workflow_tab(None)
         
     def show_workflow_tab(self, item):
-        self.sample_changer_widget.child('details_button').setText("Show SC-details")
+        self.sample_changer_widget.findChild(QtGui.QPushButton,
+             'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
@@ -550,14 +557,15 @@ class Qt4_TreeBrick(BlissWidget):
             self.current_view = None
             self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
             self.dc_tree_widget.sample_tree_widget_selection()
-            self.sample_changer_widget.child('details_button').setText("Show SC-details")
-
+            self.sample_changer_widget.findChild(QtGui.QPushButton,
+                 'details_button').setText("Show SC-details")
         else:
             self.current_view = self.sample_changer_widget
             self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
             self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
             self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (False,))
-            self.sample_changer_widget.child('details_button').setText("Hide SC-details")
+            self.sample_changer_widget.findChild(QtGui.QPushButton,
+                 'details_button').setText("Hide SC-details")
             self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
         
     def selection_changed(self, items):

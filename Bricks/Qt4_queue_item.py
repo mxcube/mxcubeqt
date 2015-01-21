@@ -323,7 +323,7 @@ class SampleCentringQueueItem(TaskQueueItem):
 #
 def perform_on_children(node, cond, fun):
     if isinstance(node, QtGui.QTreeWidget): 
-        child = node.takeTopLevelItem(0) 
+        child = node.topLevelItem(0) 
     else:
         child = node.child(0)
     result = []
@@ -336,6 +336,8 @@ def perform_on_children(node, cond, fun):
                     result.append(res)
 
             result.extend(perform_on_children(child, cond, fun))
+
+        #child = child.treeWidget().itemBelow(child) 
 
         if child.parent():
             parent = child.parent()

@@ -19,11 +19,15 @@
 
 import os
 import time
-import tempfile
 import logging
+import tempfile
+import traceback
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
+
+import queue_model_objects_v1 as queue_model_objects
+import Qt4_GraphicsManager as graphics_manager
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -50,6 +54,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 	self.beam_info_hwobj = None
         self.graphics_manager_hwobj = None
         self.collect_hwobj = None
+        self.queue_hwobj = None
 
         # Internal values -----------------------------------------------------
 	self.beam_position = [0, 0]
@@ -70,6 +75,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.addProperty('label','string','Sample centring')
 
         # Signals ------------------------------------------------------------
+        self.defineSignal('newCentredPos', ())
         
         # Slots ---------------------------------------------------------------
        
@@ -126,11 +132,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.main_frame_layout.setContentsMargins(0,0,0,0)
         self.main_frame.setLayout(self.main_frame_layout)
 
-        self.main_layout = QtGui.QVBoxLayout()
-        self.main_layout.addWidget(self.main_frame)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0,0,0,0)
-        self.setLayout(self.main_layout)
+        main_layout = QtGui.QVBoxLayout()
+        main_layout.addWidget(self.main_frame)
+        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(main_layout)
 
         # Qt signal/slot connections ------------------------------------------
         self.connect(self.button_centre, QtCore.SIGNAL("executeCommand"), self.centring_started_clicked)
@@ -200,7 +206,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), self.beam_info_changed)
 		self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed)
         elif property_name == "graphicsManager":
+            if self.graphics_manager_hwobj is not None:
+                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
+            if self.graphics_manager_hwobj is not None:
+                self.connect(self.graphics_manager_hwobj , QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
         elif property_name == "collection":
             self.collect_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'icons':
@@ -302,24 +312,45 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
 
-    def centring_accepted(self,state,centring_status):
+    def centring_accepted(self, state, centring_status):
+        self.graphics_manager_hwobj.set_centring_state(False) 
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(centring_status)
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
         if self.inside_data_collection:
           self.inside_data_collection = False
-          self.emit(QtCore.SIGNAL("centringAccepted"), (state,centring_status))
-
 	beam_info = self.beam_info_hwobj.get_beam_info()	
-        self.graphics_manager_hwobj.add_new_centring_point(state, centring_status, beam_info)
 	#if beam_info is not None:
 	#    beam_info['size_x'] = beam_info['size_x'] * self.pixels_per_mm[0]
 	#    beam_info['size_y'] = beam_info['size_y'] * self.pixels_per_mm[1]
-        #self.emit(QtCore.SIGNAL("newCentredPos"), (state, centring_status, beam_info))
 
-        if self.queue_hwobj.is_executing():
-            self.setEnabled(False)
+        p_dict = {}
+        if 'motors' in centring_status and \
+                'extraMotors' in centring_status:
+            p_dict = dict(centring_status['motors'],
+                          **centring_status['extraMotors'])
+        elif 'motors' in centring_status:
+            p_dict = dict(centring_status['motors'])
+
+        if p_dict:
+            cpos = queue_model_objects.CentredPosition(p_dict)
+            try:
+                screen_pos = self.diffractometer_hwobj.\
+                             motor_positions_to_screen(cpos.as_dict())
+
+                point = graphics_manager.GraphicsItemCentredPoint(\
+                        cpos, True, screen_pos[0], screen_pos[1])
+                if point:
+                    self.graphics_manager_hwobj.add_shape(point)
+            except:
+                logging.getLogger('HWR').\
+                    exception('Could not get screen positons for %s' % cpos)
+                traceback.print_exc()
+
+        if self.queue_hwobj is not None:
+           if self.queue_hwobj.is_executing():
+               self.setEnabled(False)
 
     def centring_snapshots(self,state):
         if state is None:
@@ -329,7 +360,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.is_shooting=False
             self.main_frame.setEnabled(True)
 
-    def centring_started(self,method,flexible):
+    def centring_started(self, method, flexible):
         self.setEnabled(True)
         self.emit(QtCore.SIGNAL("enableMinidiff"), (False,))
         if self.inside_data_collection:
@@ -342,7 +373,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.button_reject.setEnabled(False)
 
         if method == self.diffractometer_hwobj.MANUAL3CLICK_MODE:
-            self.graphics_manager_hwobj.set_centring_lines_enable(True)
+            self.graphics_manager_hwobj.set_centring_state(True)
             #self.graphics_manager_hwobj.set_centring_state(True)
 
     def centring_successful(self,method,centring_status):
@@ -378,7 +409,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
         self.button_centre.command_failed()
         if self.current_centring is not None:
-            #    self.currentCentring.setPaletteBackgroundColor(self.defaultBackgroundColor)
+            #    self.current_centring.setPaletteBackgroundColor(self.defaultBackgroundColor)
             self.current_centring = None
 
         self.button_accept.setEnabled(False)
@@ -408,16 +439,16 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.resetPoints()
 
     # Handler for clicking the video when doing the 3-click centring
-    def imageClicked(self,x,y,xi,yi):
-        if self.currentCentring is not None\
-	and str(self.currentCentring.text()) == self.diffractometer_hwobj.MANUAL3CLICK_MODE\
-	and self.diffractometer_hwobj.isReady():
-            try:
-                points = self.diffractometer_hwobj.imageClicked(x,y,xi,yi)
-            except StopIteration:
-                pass
-            else:
-                self.addPoint(x,y,xi,yi)
+    def image_clicked(self, x, y):
+        print "clicked: ",x , y
+        print self.current_centring
+        if self.current_centring is not None:
+            print self.current_centring
+            print self.diffractometer_hwobj.MANUAL3CLICK_MODE
+            if (self.current_centring == self.diffractometer_hwobj.MANUAL3CLICK_MODE and
+                self.diffractometer_hwobj.isReady()):
+                points = self.diffractometer_hwobj.image_clicked(x,y)
+                #    self.addPoint(x,y)
  
     # Signals a new point in the 3-click centering
     def addPoint(self,x,y,xi,yi):

@@ -105,23 +105,14 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
                            QtGui.QSizePolicy.Expanding)
 
 
-        #self.main_layout.addWidget(self.method_group_box)
-
-        """self.button_hlayout = QtGui.QHBoxLayout(None)
-        self.spacer = QtGui.QSpacerItem(1, 20, QtGui.QSizePolicy.Expanding,
-                                      QtGui.QSizePolicy.Minimum)
-        self.button_hlayout.addItem(self.spacer)
-        self.button_hlayout.addWidget(self.create_task_button)
-
-
-        self.method_group_box.layout().setSpacing(10)
-        self.method_group_box.layout().addLayout(self.button_hlayout)
-
+        # Qt signal/slot connections ------------------------------------------
         self.connect(self.create_task_button, QtCore.SIGNAL("clicked()"),
                      self.create_task_button_click)
 
         self.connect(self.tool_box, QtCore.SIGNAL("currentChanged( int )"),
-                     self.current_page_changed)"""
+                     self.current_page_changed)
+
+        # Other ---------------------------------------------------------------   
 
     def set_tree_brick(self, brick):
         """
@@ -177,36 +168,36 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
             # IFF sample or group selected.
             if isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem) or\
                     isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-                new_pt = self.tool_box.item(page_index)._path_template
-                previous_pt = self.tool_box.item(self.previous_page_index)._path_template
+                new_pt = self.tool_box.widget(page_index)._path_template
+                previous_pt = self.tool_box.widget(self.previous_page_index)._path_template
                 new_pt.directory = previous_pt.directory
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
             elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
                 data_collection = tree_item.get_model()
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
-                    if self.tool_box.currentItem() == self.helical_page:
+                    if self.tool_box.currentWidget() == self.helical_page:
                         self.create_task_button.setEnabled(True)
                 elif data_collection.experiment_type == EXPERIMENT_TYPE.MESH:
-                    if self.tool_box.currentItem() == self.advanced_scan_page:
+                    if self.tool_box.currentWidget() == self.advanced_scan_page:
                         self.create_task_button.setEnabled(True)
-                elif self.tool_box.currentItem() == self.discrete_page:
+                elif self.tool_box.currentWidget() == self.discrete_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
-                if self.tool_box.currentItem() == self.char_page:
+                if self.tool_box.currentWidget() == self.char_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, queue_item.EnergyScanQueueItem):
-                if self.tool_box.currentItem() == self.energy_scan_page:
+                if self.tool_box.currentWidget() == self.energy_scan_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, queue_item.XRFScanQueueItem):
-                if self.tool_box.currentItem() == self.xrf_scan_page:
+                if self.tool_box.currentWidget() == self.xrf_scan_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
-                if self.tool_box.currentItem() == self.workflow_page:
+                if self.tool_box.currentWidget() == self.workflow_page:
                     self.create_task_button.setEnabled(True)
 
 
-            self.tool_box.item(page_index).selection_changed(tree_items)
+            self.tool_box.widget(page_index).selection_changed(tree_items)
             self.previous_page_index = page_index
 
     def selection_changed(self, items):
@@ -239,22 +230,25 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         current_page.selection_changed(items)
 
     def create_task_button_click(self):
-        if self.tool_box.currentItem().approve_creation():
+        if self.tool_box.currentWidget().approve_creation():
             items = self.tree_brick.get_selected_items()
 
+	    print 1	
             if not items:
                 logging.getLogger("user_level_log").\
                     warning("Select the sample or group you "\
                             "would like to add to.")
             else:
                 for item in items:
+                    print 2
+                    print item
                     shapes = self.shape_history.selected_shapes
                     task_model = item.get_model()
 
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
                         group_task_node = queue_model_objects.TaskGroup()
-                        current_item = self.tool_box.currentItem()
+                        current_item = self.tool_box.currentWidget()
 
                         if current_item is self.workflow_page:
                             group_name = current_item._workflow_cbox.currentText()
@@ -276,7 +270,7 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
                     else:
                         self.create_task(task_model)
 
-            self.tool_box.currentItem().update_selection()
+            self.tool_box.currentWidget().update_selection()
 
     def create_task(self, task_node, shape = None):
         # Selected item is a task group

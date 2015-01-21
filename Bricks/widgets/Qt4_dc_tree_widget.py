@@ -165,6 +165,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
 
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(2)
+        self.sample_tree_widget.setColumnWidth(0, 200)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
@@ -398,6 +399,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
         else:
             view_item.setExpanded(True)
         self.queue_model_hwobj.view_created(view_item, task)
+        self.sample_tree_widget.resizeColumnToContents(0)
 
     def get_selected_items(self):
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
@@ -812,6 +814,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
                     item.setDisabled(True)
                     item.setExpanded(False)
                     #item.setOn(False)
+            #self.sample_tree_widget.resizeColumnToContents(1) 
         
             it += 1
             item = it.value()
