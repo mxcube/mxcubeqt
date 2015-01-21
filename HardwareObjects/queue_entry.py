@@ -501,6 +501,9 @@ class SampleQueueEntry(BaseQueueEntry):
     def _set_background_color(self):
         BaseQueueEntry._set_background_color(self)
 
+class BasketQueueEntry(BaseQueueEntry):
+    def __init__(self, view=None, data_model=None):
+        BaseQueueEntry.__init__(self, view, data_model)
 
 class SampleCentringQueueEntry(BaseQueueEntry):
     """
@@ -1024,9 +1027,11 @@ class EnergyScanQueueEntry(BaseQueueEntry):
 
     def energy_scan_finished(self, scan_info):
         energy_scan = self.get_data_model()
-        fname = "_".join((energy_scan.path_template.get_prefix(),str(energy_scan.path_template.run_number)))
+        #fname = "_".join((energy_scan.path_template.get_prefix(),str(energy_scan.path_template.run_number)))
+        #scan_file_path = os.path.join(energy_scan.path_template.directory,
+        #                              fname)
         scan_file_path = os.path.join(energy_scan.path_template.directory,
-                                      fname)
+                                      energy_scan.path_template.get_prefix())
 
         scan_file_archive_path = os.path.join(energy_scan.path_template.\
                                               get_archive_directory(),
@@ -1048,9 +1053,22 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         sample.crystals[0].energy_scan_result.peak = pk
         sample.crystals[0].energy_scan_result.inflection = ip
         sample.crystals[0].energy_scan_result.first_remote = rm
-        sample.crystals[0].second_remote = None
+        sample.crystals[0].energy_scan_result.second_remote = None
 
-        energy_scan.result = sample.crystals[0].energy_scan_result
+        energy_scan.result.pk = pk
+        energy_scan.result.fppPeak = fppPeak
+        energy_scan.result.fpPeak = fpPeak
+        energy_scan.result.ip = ip
+        energy_scan.result.fppInfl = fppInfl
+        energy_scan.result.fpInfl = fpInfl
+        energy_scan.result.rm = rm
+        energy_scan.result.chooch_graph_x = chooch_graph_x
+        energy_scan.result.chooch_graph_y1 = chooch_graph_y1
+        energy_scan.result.chooch_graph_y2 = chooch_graph_y2
+        energy_scan.result.title = title
+        energy_scan.result.data = self.energy_scan_hwobj.get_scan_data()
+
+        #energy_scan.result = sample.crystals[0].energy_scan_result
 
         logging.getLogger("user_level_log").\
             info("Energy scan, result: peak: %.4f, inflection: %.4f" %
@@ -1061,7 +1079,130 @@ class EnergyScanQueueEntry(BaseQueueEntry):
 
     def energy_scan_failed(self):
         self._failed = True
+        self.get_view().setText(1, "Failed")
+        self.status = QUEUE_ENTRY_STATUS.FAILED
+        logging.getLogger("user_level_log").error(message.replace('\n', ' '))
+        raise QueueExecutionException(message.replace('\n', ' '), self)
 
+    def stop(self):
+        BaseQueueEntry.stop(self)
+
+        try:
+            #self.get_view().setText(1, 'Stopping ...')
+            self.energy_scan_hwobj.cancelEnergyScan()
+
+            if self.centring_task:
+                self.centring_task.kill(block=False)
+        except gevent.GreenletExit:
+            raise
+
+        self.get_view().setText(1, 'Stopped')
+        logging.getLogger('queue_exec').info('Calling stop on: ' + str(self))
+        # this is to work around the remote access problem
+        dispatcher.send("collect_finished")
+        raise QueueAbortedException('Queue stopped', self)
+
+class XRFScanQueueEntry(BaseQueueEntry):
+    def __init__(self, view=None, data_model=None):
+        BaseQueueEntry.__init__(self, view, data_model)
+        self.xrf_scan_hwobj = None
+        self.session_hwobj = None
+        self.xrf_scan_task = None
+        self._failed = False
+
+    def execute(self):
+        BaseQueueEntry.execute(self)
+
+        if self.xrf_scan_hwobj is not None:
+            xrf_scan = self.get_data_model()
+            self.get_view().setText(1, "Starting xrf scan")
+
+            sample_model = self.get_data_model().\
+                           get_parent().get_parent()
+
+            sample_lims_id = sample_model.lims_id
+            # No sample id, pass None to startEnergyScan
+            if sample_lims_id == -1:
+                sample_lims_id = None
+
+            self.xrf_scan_task = \
+                gevent.spawn(self.xrf_scan_hwobj.startXrfSpectrum,
+                             xrf_scan.count_time,
+                             xrf_scan.path_template.directory,
+                             xrf_scan.path_template.get_prefix(),
+                             self.session_hwobj.session_id,
+                             sample_lims_id)
+       
+            self.xrf_scan_task.get()
+            self.xrf_scan_hwobj.ready_event.wait()
+            self.xrf_scan_hwobj.ready_event.clear()
+        else:
+            self.xrf_scan_failed ()
+
+    def pre_execute(self):
+        BaseQueueEntry.pre_execute(self)
+        self._failed = False
+        self.xrf_scan_hwobj = self.beamline_setup.xrfscan_hwobj
+        self.session_hwobj = self.beamline_setup.session_hwobj
+
+        qc = self.get_queue_controller()
+
+        qc.connect(self.xrf_scan_hwobj, 'xrfScanStatusChanged',
+                   self.xrf_scan_status_changed)
+
+        qc.connect(self.xrf_scan_hwobj, 'xrfScanStarted',
+                   self.xrf_scan_started)
+
+        qc.connect(self.xrf_scan_hwobj, 'xrfScanFinished',
+                   self.xrf_scan_finished)
+
+        qc.connect(self.xrf_scan_hwobj, 'xrfScanFailed',
+                   self.xrf_scan_failed)
+
+    def post_execute(self):
+        BaseQueueEntry.post_execute(self)
+        qc = self.get_queue_controller()
+        qc.disconnect(self.xrf_scan_hwobj, 'xrfScanStatusChanged',
+                      self.xrf_scan_status_changed)
+
+        qc.disconnect(self.xrf_scan_hwobj, 'xrfScanStarted',
+                      self.xrf_scan_started)
+
+        qc.disconnect(self.xrf_scan_hwobj, 'xrfScanFinished',
+                      self.xrf_scan_finished)
+
+        qc.disconnect(self.xrf_scan_hwobj, 'xrfScanFailed',
+                      self.xrf_scan_failed)
+        if self._failed:
+            raise QueueAbortedException('Queue stopped', self)
+
+    def xrf_scan_status_changed(self, msg):
+        logging.getLogger("user_level_log").info(msg)
+
+    def xrf_scan_started(self):
+        logging.getLogger("user_level_log").info("XRF scan started.")
+        self.get_view().setText(1, "In progress")
+
+    def xrf_scan_finished(self, mcaData, mcaCalib, mcaConfig):
+        xrf_scan = self.get_data_model()
+        scan_file_path = os.path.join(xrf_scan.path_template.directory,
+                                      xrf_scan.path_template.get_prefix())
+        scan_file_archive_path = os.path.join(xrf_scan.path_template.\
+                                              get_archive_directory(),
+                                              xrf_scan.path_template.get_prefix())
+
+        xrf_scan.result.mca_data = mcaData
+        xrf_scan.result.mca_calib = mcaCalib
+        xrf_scan.result.mca_config = mcaConfig
+
+        self.get_view().setText(1, "Done")
+
+    def xrf_scan_failed(self):
+        self._failed = True
+        self.get_view().setText(1, "Failed")
+        self.status = QUEUE_ENTRY_STATUS.FAILED
+        logging.getLogger("user_level_log").error(message.replace('\n', ' '))
+        raise QueueExecutionException(message.replace('\n', ' '), self)
 
 class GenericWorkflowQueueEntry(BaseQueueEntry):
     def __init__(self, view=None, data_model=None):
@@ -1196,7 +1337,9 @@ MODEL_QUEUE_ENTRY_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueEntry,
      queue_model_objects.Characterisation: CharacterisationGroupQueueEntry,
      queue_model_objects.EnergyScan: EnergyScanQueueEntry,
+     queue_model_objects.XRFScan: XRFScanQueueEntry,
      queue_model_objects.SampleCentring: SampleCentringQueueEntry,
      queue_model_objects.Sample: SampleQueueEntry,
+     queue_model_objects.Basket: BasketQueueEntry,
      queue_model_objects.TaskGroup: TaskGroupQueueEntry,
      queue_model_objects.Workflow: GenericWorkflowQueueEntry}
