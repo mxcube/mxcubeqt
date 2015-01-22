@@ -61,16 +61,29 @@ def run(GUIConfigFile=None):
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
 
     parser = OptionParser(usage = 'usage: %prog <GUI definition file> [options]')
-    parser.add_option('', '--logFile', action = 'store', type = 'string', help = 'Log file', dest = 'logFile', metavar = 'FILE', default = '')
-    parser.add_option('', '--logLevel', action = 'store', type = 'string', help = 'Log level', dest = 'logLevel', default = 'INFO')
-    parser.add_option('', '--bricksDirs', action = 'store', type = 'string', help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
-    parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
-    parser.add_option('', '--hardwareObjectsDirs', action = 'store', type = 'string', help = 'Additional directories for Hardware Objects search path (you can also use the CUSTOM_HARDWARE_OBJECTS_PATH environment variable)', dest = 'hardwareObjectsDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
-    parser.add_option('-d', '', action='store_true', dest="designMode", default=False, help="start GUI in Design mode")
-    parser.add_option('-m', '', action='store_true', dest="showMaximized", default=False, help="maximize main window")	
-    parser.add_option('', '--no-border', action='store_true', dest='noBorder', default=False, help="does not show borders on main window")
+    parser.add_option('', '--logFile', action = 'store', type = 'string', 
+                      help = 'Log file', dest = 'logFile', metavar = 'FILE', default = '')
+    parser.add_option('', '--logLevel', action = 'store', type = 'string', 
+                      help = 'Log level', dest = 'logLevel', default = 'INFO')
+    parser.add_option('', '--bricksDirs', action = 'store', type = 'string', 
+                      help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', 
+                      dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
+    parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', 
+                      help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, 
+                      metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
+    parser.add_option('', '--hardwareObjectsDirs', action = 'store', type = 'string', 
+                      help = 'Additional directories for Hardware Objects search path (you can also use the CUSTOM_HARDWARE_OBJECTS_PATH environment variable)', 
+                      dest = 'hardwareObjectsDirs', metavar = 'dir1' + os.path.pathsep + 'dir2...dirN', 
+                      default = '')
+    parser.add_option('-d', '', action='store_true', dest="designMode", 
+                      default=False, help="start GUI in Design mode")
+    parser.add_option('-m', '', action='store_true', dest="showMaximized", 
+                      default=False, help="maximize main window")	
+    parser.add_option('', '--no-border', action='store_true', dest='noBorder', 
+                      default=False, help="does not show borders on main window")
     #parser.add_option('-s', '--syle', action='store', type="string", dest='style', default=0, help="GUI style")
-    parser.add_option('-w', '--web-server-port', action='store', type="int", dest='webServerPort', default=0, help="port number for the remote interpreter web application server")
+    parser.add_option('-w', '--web-server-port', action='store', type="int", 
+                      dest='webServerPort', default=0, help="port number for the remote interpreter web application server")
     #parser.add_option('', '--widgetcount', action='store_true', dest='widgetCount', default=False, help="prints debug message at the end about number of widgets left undestroyed")
 
     (opts, args) = parser.parse_args()

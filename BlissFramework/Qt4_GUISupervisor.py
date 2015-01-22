@@ -185,10 +185,10 @@ class GUISupervisor(QtGui.QWidget):
                         self.framework.filename = GUIConfigFile
                         self.framework.configuration = config
                         self.framework.setWindowTitle("GUI Builder - %s" % GUIConfigFile)
-                        self.framework.guiEditorWindow.set_configuration(config)
-                        self.framework.guiEditorWindow.draw_window_preview()  
-               
+                        self.framework.gui_editor_window.set_configuration(config)
+                        self.framework.gui_editor_window.draw_window_preview()  
                         self.framework.show()
+
                         return self.framework
                     else:
                         main_window = self.execute(self.configuration)

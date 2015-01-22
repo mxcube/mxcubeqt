@@ -36,9 +36,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         self.setObjectName("configurationTable")
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Sunken)
-        #elf.setResizePolicy(QtGui.QTableWidget.Default)
         self.setContentsMargins(0, 3, 0, 3)
-        #self.setLeftMargin(0)
         self.setColumnCount(3)
         self.setSelectionMode(QtGui.QTableWidget.NoSelection)
 
@@ -47,26 +45,10 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                                         self.trUtf8('Values'), 
                                         self.trUtf8('')])
         
-        """self.horizontalHeader().setWindowTitle(0, self.trUtf8('Properties'))
-        self.horizontalHeader().setl(1, self.trUtf8('Values'))
-        self.horizontalHeader().setLabel(2, self.trUtf8(''))"""
-       
-        #lf.horizontalHeader().setResizeEnabled(False)
-        #elf.horizontalHeader().setClickEnabled(False)
-        #elf.horizontalHeader().setMovingEnabled(False)
- 
-        """self.setColumnReadOnly(0, 1) # column 0 is read-only
-        self.setColumnReadOnly(0, 2)
-        self.setColumnStretchable(0, 0)
-        self.setColumnStretchable(1, 1)
-        self.setColumnStretchable(2, 0)"""
-
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.propertyBag = None
 
         QtCore.QObject.connect(self, QtCore.SIGNAL('cellChanged(int, int)'), self.OnCellChanged)
-        #QtCore.QObject.connect(self, QtCore.SIGNAL('itemChanged(QTableWidgetItem*)'), self.OnItemChanged)
-
         
     def clear(self):
         for i in range(self.rowCount()):
@@ -88,9 +70,6 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         if self.propertyBag is not None:
             self.setRowCount(len(self.propertyBag))
            
-            #
-            # add properties
-            #
             i = 0
             for prop in self.propertyBag:
                 prop._editor = weakref.ref(self)
@@ -102,36 +81,22 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 self.blockSignals(True) 
                
                 self.setItem(i, 0, tempTableItem)
-                
-                #self.blockSignals(True) # block signals to prevent valueChanged events
                 self.setWidgetFromProperty(i, prop)
                 self.blockSignals(False)
                 
                 validationPanel = ValidationTableItem(self)
                 self.setCellWidget(i, 2, validationPanel)
-                #self.setItem(i, 2, validationPanel)
                 self.connect(validationPanel.OK, QtCore.SIGNAL('clicked()'), self.OnValidateClick)
                 self.connect(validationPanel.Cancel, QtCore.SIGNAL('clicked()'), self.OnInvalidateClick)
                 self.connect(validationPanel.Reset, QtCore.SIGNAL('clicked()'), self.OnResetClick)
-                                
                 i += 1
-
             self.setRowCount(i)
-            
-        #
-        # finish layout
-        #
-        #self.adjustColumn(0)
-        #self.adjustColumn(1)
-        #self.adjustColumn(2)
-        
+        self.resizeColumnsToContents()    
         
     def setWidgetFromProperty(self, row, prop):
         if prop.getType() == 'boolean':
             newPropertyItem = QtGui.QTableWidgetItem(QtCore.QString(""))
-            
             self.setItem(row, 1, newPropertyItem)
-
             if prop.getUserValue():
                 self.item(row, 1).setCheckState(QtCore.Qt.Checked)
             else:
@@ -141,17 +106,9 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             choices = prop.getChoices()
             for choice in choices:
                 choicesList.append(choice)
-            #newPropertyItem = QComboTableItem(self, choicesList, 0)
-            #newPropertyItem = QtGui.QComboBox(self)
             newPropertyItem = ComboBoxTableItem(self, row, 1, choicesList)
-            #newPropertyItem.addItems(choicesList)
             newPropertyItem.setCurrentIndex(newPropertyItem.findText(prop.getUserValue()))
-            #newPropertyItem.setCurrentIndex(newPropertyItem.findChild(QtCore.QString(prop.getUserValue())))
-            #newPropertyItem.setEditText(str(prop.getUserValue()))
-            #self.setItem(row, 1, newPropertyItem)
             self.setCellWidget(row, 1, newPropertyItem)
-            
-            #self.item(row, 1).setCurrentItem(str(prop.getUserValue()))
         elif prop.getType() == 'file':
             newPropertyItem = FileTableItem(self, row, 1, prop.getUserValue(), prop.getFilter())
             self.setCellWidget(row, 1, newPropertyItem)
@@ -164,8 +121,6 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             else:
                 tempTableItem = QtGui.QTableWidgetItem(str(prop.getUserValue()))  
             self.setItem(row, 1, tempTableItem)
-               
-                
 
     def OnCellChanged(self, row, col):
         col += 1

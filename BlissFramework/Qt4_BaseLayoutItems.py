@@ -37,16 +37,18 @@ class _CfgItem:
         self.connections = []
 
         self.properties = PropertyBag.PropertyBag()
-        self.properties.addProperty("alignment", "combo", ("none", "top center", "top left", "top right", "bottom center", "bottom left", "bottom right", "center", "hcenter", "vcenter", "left", "right"), "none")
-
+        self.properties.addProperty("alignment", "combo", ("none", 
+                                    "top center", "top left", "top right", 
+                                    "bottom center", "bottom left", 
+                                    "bottom right", "center", "hcenter", 
+                                    "vcenter", "left", "right"), "none")
         self.signals = {}
         self.slots = {}
 
-
     def setProperties(self, properties):
-        """Set properties
-
-        Add new properties (if any) and remove odd ones (if any)
+        """
+        Descript. : Set properties
+                    Add new properties (if any) and remove odd ones (if any)
         """
         for item_property in properties:
             #
@@ -113,10 +115,13 @@ class MenuEditor(QtGui.QDialog):
 
         self.window_name = window_name
         self.setModal(False)
-        self.setCaption("Menu editor - %s" % window_name)
+        self.setWindowTitle("Menu editor - %s" % window_name)
 
-        QtGui.QVBoxLayout(self)
-        self.layout().addWidget(QtGui.QLabel("<h2>feature to be implemented, sorry for the inconvenience</h2>", self))
+        print "MenuEditor"
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(QtGui.QLabel("<h2>feature to be implemented, sorry for the inconvenience</h2>", self))
+        self.setLayout(_main_vlayout)
         
 
     def __repr__(self):
