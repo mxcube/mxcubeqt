@@ -107,7 +107,8 @@ class Qt4_EnergyBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+        self.setMaximumWidth(250)
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------

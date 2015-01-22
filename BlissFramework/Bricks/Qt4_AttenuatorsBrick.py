@@ -38,7 +38,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         # Hardware objects ----------------------------------------------------
         self.attenuators_hwobj = None
 
-        # Internal values -----------------------------------------------------
+        # Internal variables --------------------------------------------------
         self.transmission_limits = None
 
         # Properties ---------------------------------------------------------- 
@@ -87,12 +87,16 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
+        self.setMaximumWidth(250)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                            QtGui.QSizePolicy.Fixed)
 
+
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.new_value_ledit, QtCore.SIGNAL('returnPressed()'), self.current_value_changed)
-        self.connect(self.new_value_ledit, QtCore.SIGNAL('textChanged(const QString &)'), self.input_field_changed)
+        self.connect(self.new_value_ledit, QtCore.SIGNAL('returnPressed()'), 
+                     self.current_value_changed)
+        self.connect(self.new_value_ledit, QtCore.SIGNAL('textChanged(const QString &)'), 
+                     self.input_field_changed)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)

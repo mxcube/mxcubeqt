@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-LogViewBrick
+Qt4_LogViewBrick
 
 [Description]
 
@@ -197,7 +197,7 @@ class SubmitFeedback(QtGui.QWidget):
 ### In tab mode it is possible to send a feedback mail.
 ### The debug messages might me switched off (in either modes).
 ###
-class LogViewBrick(Qt4_BaseComponents.BlissWidget):
+class Qt4_LogViewBrick(Qt4_BaseComponents.BlissWidget):
     LOGS = ("Info", "Details", "Feedback","Debug")
     TITLES = {"Info":"Information messages", "Feedback":"Submit feedback", "Details":"Details", "Debug":"Debug"}
     TOOLTIPS = {"Info":"Displays the progress of the requested operations",\
@@ -230,14 +230,14 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.hide()
 
-        for l in LogViewBrick.LOGS:
+        for l in Qt4_LogViewBrick.LOGS:
             if l=="Feedback":
-                self.FeedbackLog=SubmitFeedback(self,LogViewBrick.TITLES["Feedback"],self['emailAddresses'])
+                self.FeedbackLog=SubmitFeedback(self,Qt4_LogViewBrick.TITLES["Feedback"],self['emailAddresses'])
             else:
-                list_view=LogView(self,LogViewBrick.TITLES[l])
+                list_view = LogView(self, Qt4_LogViewBrick.TITLES[l])
                 exec("self.%sLog = list_view" % l)
                 
-        for l in LogViewBrick.LOGS[1:]:
+        for l in Qt4_LogViewBrick.LOGS[1:]:
             exec("self.%sLog.hide()" % l)
 
         self.tabLevels = { logging.NOTSET: self.InfoLog, logging.DEBUG: self.InfoLog, logging.INFO: self.InfoLog, logging.WARNING: self.InfoLog, logging.ERROR: self.InfoLog, logging.CRITICAL: self.InfoLog }
@@ -259,7 +259,7 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
 
 
     def clearLog(self):
-        for l in LogViewBrick.LOGS:
+        for l in Qt4_LogViewBrick.LOGS:
             exec("self.%sLog.clear()" % l)
             exec("self.%sLog.unreadMessages=0" % l)
             exec("self.tabs.setTabLabel(self.%sLog,self.%sLog.tabLabel)" % (l,l))
@@ -313,7 +313,7 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
         pass
         
     def propertyChanged(self, propertyName, oldValue, newValue):
-        #print "LogViewBrick.propertyChanged",propertyName,oldValue,newValue
+        #print "Qt4_LogViewBrick.propertyChanged",propertyName,oldValue,newValue
         if propertyName == 'level':
             self.filterLevel = logging.NOTSET
 
@@ -329,7 +329,7 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
                 if newValue:
                     if self.tabs.indexOf(self.DebugLog)==-1:
                         self.tabs.insertTab(self.DebugLog, self.DebugLog.tabLabel, 9)
-                        self.tabs.setTabToolTip(self.DebugLog,LogViewBrick.TOOLTIPS["Debug"])
+                        self.tabs.setTabToolTip(self.DebugLog, Qt4_LogViewBrick.TOOLTIPS["Debug"])
                 else:
                     if self.tabs.indexOf(self.DebugLog)!=-1:
                         self.tabs.removePage(self.DebugLog)
@@ -342,7 +342,7 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
                 if newValue:
                     if self.tabs.indexOf(self.FeedbackLog)==-1:
                         self.tabs.insertTab(self.FeedbackLog, self.FeedbackLog.tabLabel, 2)
-                        self.tabs.setTabToolTip(self.FeedbackLog,LogViewBrick.TOOLTIPS["Feedback"])
+                        self.tabs.setTabToolTip(self.FeedbackLog, Qt4_LogViewBrick.TOOLTIPS["Feedback"])
                 else:
                    if self.tabs.indexOf(self.FeedbackLog)!=-1:
                         self.tabs.removePage(self.FeedbackLog)
@@ -351,13 +351,13 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
             if oldValue=="list":
                 self.layout().remove(self.InfoLog)
             elif oldValue=="tabs":
-                for l in LogViewBrick.LOGS:
+                for l in Qt4_LogViewBrick.LOGS:
                     exec("self.tabs.removePage(self.%sLog)" % l)
                     exec("self.%sLog.reparent(self,0,QPoint(0,0),True)" % l)
 
                 self.layout().remove(self.tabs)
 
-                for l in LogViewBrick.LOGS[1:]:
+                for l in Qt4_LogViewBrick.LOGS[1:]:
                     exec("self.%sLog.hide()" % l)
                 self.tabs.hide()
             elif oldValue is None:
@@ -369,14 +369,14 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
             elif newValue=="tabs":
                 self.tabLevels = { logging.NOTSET: self.DetailsLog, logging.DEBUG: self.DebugLog, logging.INFO: self.InfoLog, logging.WARNING: self.DetailsLog, logging.ERROR: self.DetailsLog, logging.CRITICAL: self.DetailsLog }
                 
-                for l in LogViewBrick.LOGS:
+                for l in Qt4_LogViewBrick.LOGS:
                     if l=="Debug" and not self['showDebug']:
                         pass
                     elif l=="Feedback" and not self['enableFeedback']:
                         pass
                     else:
-                        exec("self.tabs.addTab(self.%sLog,'%s')" % (l,LogViewBrick.TITLES[l]))
-                        exec("self.tabs.setTabToolTip(self.%sLog,'%s')" % (l,LogViewBrick.TOOLTIPS[l]))
+                        exec("self.tabs.addTab(self.%sLog,'%s')" % (l, Qt4_LogViewBrick.TITLES[l]))
+                        exec("self.tabs.setTabToolTip(self.%sLog,'%s')" % (l,Qt4_LogViewBrick.TOOLTIPS[l]))
                 self.layout().addWidget(self.tabs)
                 self.tabs.show()
 
@@ -399,14 +399,14 @@ class LogViewBrick(Qt4_BaseComponents.BlissWidget):
                 pass
 
         elif propertyName == 'maxLogLines':
-            for l in LogViewBrick.LOGS:
+            for l in Qt4_LogViewBrick.LOGS:
                 exec("self.%sLog.set_max_log_lines(%d)" % (l,newValue))
 
         else:
             Qt4_BaseComponents.BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)        
 
         # Refresh log
-        #for l in LogViewBrick.LOGS:
+        #for l in Qt4_LogViewBrick.LOGS:
         #    exec("self.%sLog.clear()" % l)
         #    exec("self.%sLog.unreadMessages=0" % l)
         #    exec("self.tabs.setTabLabel(self.%sLog,self.%sLog.tabLabel)" % (l,l))

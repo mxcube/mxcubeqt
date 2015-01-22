@@ -44,26 +44,25 @@ class Qt4_CameraBrick(BlissWidget):
         self.image_size = []
         self.graphics_items_initialized = None
         self.graphics_scene_size = None
+        self.graphics_view = None
 
         # Properties ----------------------------------------------------------       
+        self.addProperty("graphicsManager", "string", "/graphics-manager")
         self.addProperty("camera", "string", "")
-        self.addProperty("graphicsManager", "string", "")
         self.addProperty("fixedSize", "string", "")
         self.addProperty('displayBeam', 'boolean', True)
         self.addProperty('displayScale', 'boolean', True)
         self.addProperty('displayOmegaAxis', 'boolean', True)
 
         # Graphic elements-----------------------------------------------------
-        self.graphics_view = QtGui.QGraphicsView(self)
-        #self.graphics_scene = QtGui.QGraphicsScene(self)
-        self.graphics_scene = Qt4_GraphicsManager.GraphicsScene(self)
-        self.graphics_view.setScene(self.graphics_scene)
+        #self.graphics_view = Qt4_GraphicsManager.GraphicsView(self)
+        #self.graphics_scene = Qt4_GraphicsManager.GraphicsScene(self)
+        #self.graphics_view.setScene(self.graphics_scene)
 
         # Layout --------------------------------------------------------------
         self.main_layout = QtGui.QVBoxLayout() 
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.addWidget(self.graphics_view)
         self.setLayout(self.main_layout)   
 
         # Qt signal/slot connections -----------------------------------------
@@ -72,11 +71,13 @@ class Qt4_CameraBrick(BlissWidget):
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
 
         # Scene elements ------------------------------------------------------
-        self.graphics_camera_frame = QtGui.QGraphicsPixmapItem()
-        self.graphics_scene.clearSelection()
-        self.graphics_scene.addItem(self.graphics_camera_frame)
-        self.graphics_camera_frame.grabMouse()
+        ##self.graphics_camera_frame = QtGui.QGraphicsPixmapItem()
+        #self.graphics_scene.clearSelection()
+        ##self.graphics_view.add_item(self.graphics_camera_frame)
+        #self.graphics_scene.addItem(self.graphics_camera_frame)
         self.graphics_scene_centring_points = []
+        self.setMouseTracking(True)
+        
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -84,7 +85,12 @@ class Qt4_CameraBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if property_name == 'camera':
+        if property_name == "graphicsManager":
+            self.graphics_manager_hwobj = self.getHardwareObject(new_value)
+            self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
+            self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 
+            self.main_layout.addWidget(self.graphics_view) 
+        elif property_name == 'camera':
             if self.camera_hwobj is not None:
                 self.disconnect(self.camera_hwobj, QtCore.SIGNAL('imageReceived'), self.image_received)
             self.camera_hwobj = self.getHardwareObject(new_value)
@@ -92,8 +98,6 @@ class Qt4_CameraBrick(BlissWidget):
                 self.graphics_scene_size = self.camera_hwobj.get_image_dimensions()
                 self.camera_hwobj.start_camera()
                 self.connect(self.camera_hwobj, QtCore.SIGNAL('imageReceived'), self.image_received)
-        elif property_name == "graphicsManager":
-            self.graphics_manager_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'fixedSize':
             try:
                 self.use_fixed_size = True
@@ -135,7 +139,3 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_scene_beam_item = self.graphics_manager_hwobj.get_graphics_beam_item()
         self.graphics_scene_scale_item = self.graphics_manager_hwobj.get_scale_item()
         self.graphics_scene_omega_reference_item = self.graphics_manager_hwobj.get_omega_reference_item()
-        #self.graphics_scene_centring_lines_item = self.graphics_manager_hwobj.get_centring_lines_item()
-        self.graphics_scene.addItem(self.graphics_scene_beam_item)
-        self.graphics_scene.addItem(self.graphics_scene_scale_item)
-        self.graphics_scene.addItem(self.graphics_scene_omega_reference_item)
