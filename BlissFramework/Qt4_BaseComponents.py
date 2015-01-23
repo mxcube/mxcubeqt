@@ -164,7 +164,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 if isinstance(w, BlissWidget):
                     w.__run()
                     try:
-                        w.setExpertMode(False)
+                        w.set_expert_mode(False)
                     except:
                         logging.getLogger().exception("Could not set %s to user mode", w.name())
 
@@ -174,7 +174,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 if isinstance(w, BlissWidget):
                     w.__stop()
                     try:
-                        w.setExpertMode(True)
+                        w.set_expert_mode(True)
                     except:
                         logging.getLogger().exception("Could not set %s to expert mode", w.name())
 
@@ -851,7 +851,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         pass
 
 
-    def setExpertMode(self, expert):
+    def set_expert_mode(self, expert):
         pass
     
     def enable_widget(self, state):

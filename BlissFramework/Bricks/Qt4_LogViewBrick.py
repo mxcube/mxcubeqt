@@ -144,7 +144,7 @@ class SubmitFeedback(QtGui.QWidget):
     def clear(self):
         self.message.clear()
 
-    def set_max_log_lines(self,lines):
+    def setMaxLogLines(self,lines):
         pass
 
     def submitMessage(self):
@@ -349,19 +349,19 @@ class Qt4_LogViewBrick(Qt4_BaseComponents.BlissWidget):
 
         elif propertyName == 'appearance':
             if oldValue=="list":
-                self.layout().remove(self.InfoLog)
+                self.layout().removeWidget(self.InfoLog)
             elif oldValue=="tabs":
                 for l in Qt4_LogViewBrick.LOGS:
                     exec("self.tabs.removePage(self.%sLog)" % l)
                     exec("self.%sLog.reparent(self,0,QPoint(0,0),True)" % l)
 
-                self.layout().remove(self.tabs)
+                self.layout().removeWidget(self.tabs)
 
                 for l in Qt4_LogViewBrick.LOGS[1:]:
                     exec("self.%sLog.hide()" % l)
                 self.tabs.hide()
             elif oldValue is None:
-                self.layout().remove(self.InfoLog)
+                self.layout().removeWidget(self.InfoLog)
 
             if newValue=="list":
                 self.tabLevels = { logging.NOTSET: self.InfoLog, logging.DEBUG: self.InfoLog, logging.INFO: self.InfoLog, logging.WARNING: self.InfoLog, logging.ERROR: self.InfoLog, logging.CRITICAL: self.InfoLog }
@@ -394,13 +394,15 @@ class Qt4_LogViewBrick(Qt4_BaseComponents.BlissWidget):
                     pass
 
             try:
-                self.FeedbackLog.submitButton.setPixmap(Qt4_Icons.load(icons_list[-1]))
+                self.FeedbackLog.submitButton.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[-1])))
             except IndexError:
                 pass
 
         elif propertyName == 'maxLogLines':
-            for l in Qt4_LogViewBrick.LOGS:
-                exec("self.%sLog.set_max_log_lines(%d)" % (l,newValue))
+            print "maxLogLines - implement"
+           
+            """for l in Qt4_LogViewBrick.LOGS:
+                exec("self.%sLog.setMaxLogLines(%d)" % (l,newValue))"""
 
         else:
             Qt4_BaseComponents.BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)        

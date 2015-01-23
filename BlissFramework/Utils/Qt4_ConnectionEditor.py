@@ -124,10 +124,16 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.add_connection_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        self.remove_connection_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        self.ok_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        self.cancel_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed) 
+        self.add_connection_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                                 QtGui.QSizePolicy.Fixed)
+        self.remove_connection_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                                    QtGui.QSizePolicy.Fixed)
+        self.ok_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                     QtGui.QSizePolicy.Fixed)
+        self.cancel_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                         QtGui.QSizePolicy.Fixed) 
+        self.connections_treewidget.setSizePolicy(QtGui.QSizePolicy.Expanding, 
+                                                  QtGui.QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         #self.connect(self.emitter_windows_listwidget, QtCore.SIGNAL('itemChanged (QListWidgetItem * item )'), 

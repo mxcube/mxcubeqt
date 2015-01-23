@@ -825,7 +825,8 @@ class GUIEditorWindow(QtGui.QWidget):
 
         # move item in configuration
         if not self.configuration.moveItem(dragged_item_name, dropped_on_item_name):
-            self.tree_widget.setSelected(source_item, True)
+            #self.tree_widget.setSelected(source_item, True)
+            source_item.setSelected(True)
             self.tree_widget.setCurrentItem(source_item)
             return
 

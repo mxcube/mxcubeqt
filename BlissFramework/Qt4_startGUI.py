@@ -250,12 +250,14 @@ def run(GUIConfigFile=None):
     #
     Qt4_ErrorHandler.enableStdErrRedirection()
 
-    timer = QtCore.QTimer()
-    timer.connect(timer, QtCore.SIGNAL("timeout()"), do_gevent)
-    timer.start(0)
+    gevent_timer = QtCore.QTimer()
+    gevent_timer.connect(gevent_timer, QtCore.SIGNAL("timeout()"), do_gevent)
+    gevent_timer.start(0)
 
-   
     app.exec_()
+
+
+
     """
     def process_qt_events():
       while True:

@@ -62,6 +62,7 @@ def GUILogHandler():
 
         _timer = QtCore.QTimer()
         QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
+        print "timer - fix"
         _timer.start(10)
 
     return _logHandler

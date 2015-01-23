@@ -33,79 +33,84 @@ from BlissFramework import Qt4_Icons
 
 class CustomMenuBar(QtGui.QWidget):
     # parent *must* be the window ; it contains a centralWidget in its viewport
-    def __init__(self, parent, data, expert_pwd, executionMode=False):
+    def __init__(self, parent):
         QtGui.QWidget.__init__(self)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
 
         # Internal values -----------------------------------------------------        
-        self.data = data
-        self.expertPwd = expert_pwd
-        self.topParent = parent
-        self.executionMode = executionMode
+        self.parent = parent
+        self.menu_data = None
+        self.expert_pwd = None
+        self.execution_mode = None
 
         # Graphic elements ----------------------------------------------------
         self.menu_bar = QtGui.QMenuBar(self) 
-        self.menu_bar.addMenu("File")
-        self.expertMode = QtGui.QCheckBox("Expert mode",self)
+        self.menu_bar.addMenu("File") 
+        #self.menu_bar.setStyleSheet("QMenuBar::item { color: rgb(255, 255, 255); }")
 
         # Layout --------------------------------------------------------------
         _main_hlayout = QtGui.QHBoxLayout()
         _main_hlayout.addWidget(self.menu_bar)
-        _main_hlayout.addStretch(0)
-        _main_hlayout.addWidget(self.expertMode)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_hlayout) 
 
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(self.expertMode, QtCore.SIGNAL('clicked()'), self.expertModeClicked)
+        """QtCore.QObject.connect(self.expert_mode_checkbox, 
+                               QtCore.SIGNAL('clicked()'), 
+                               self.expert_mode_clicked)"""
 
         # Other ---------------------------------------------------------------
-        self.expertModeStdColor=None
+        self.expert_mode_checkboxStdColor=None
+
+    def configure(self, menu_data, expert_pwd, execution_mode):
+        self.menu_data = menu_data
+        self.expert_pwd = expert_pwd
+        self.execution_mode = execution_mode
 
 
-    def expertModeClicked(self):
-        if self.expertMode.isChecked():
+    def expert_mode_clicked(self):
+        if self.expert_mode_checkbox.isChecked():
             res = QtGui.QInputDialog.getText(self, 
                                              "Switch to expert mode",
                                              "Please enter the password:", 
                                              QtGui.QLineEdit.Password)
             if res[1]:
-                if str(res[0])==self.expertPwd:
-                    Qt4_widget_colors.set_widget_color(self.expertMode, 
+                if str(res[0])==self.expert_pwd:
+                    Qt4_widget_colors.set_widget_color(self.expert_mode_checkbox, 
                                                        Qt4_widget_colors.LIGHT_YELLOW)
-                    self.setExpertMode(True)
+                    self.set_expert_mode(True)
                 else:
-                    self.expertMode.setChecked(False)
+                    self.expert_mode_checkbox.setChecked(False)
                     QtGui.QMessageBox.critical(self, 
                                                "Switch to expert mode", 
                                                "Wrong password!",
                                                QtGui.QMessageBox.Ok)
             else:
-                self.expertMode.setChecked(False)
+                self.expert_mode_checkbox.setChecked(False)
         else:
-            Qt4_widget_colors.set_widget_color(self.expertMode, Qt4_widget_colors.LINE_EDIT_ORIGINAL)
-            #self.expertMode.setPaletteBackgroundColor(self.expertMode.parent().paletteBackgroundColor())
-            self.setExpertMode(False)
+            Qt4_widget_colors.set_widget_color(self.expert_mode_checkbox, Qt4_widget_colors.LINE_EDIT_ORIGINAL)
+            #self.expert_mode_checkbox.setPaletteBackgroundColor(self.expertMode.parent().paletteBackgroundColor())
+            self.set_expert_mode(False)
 
-    def setExpertMode(self,state):
-        if not self.executionMode:
+    def set_expert_mode(self,state):
+        if not self.execution_mode:
             return
         
         if state:
             # switch to expert mode
-            QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("enableExpertMode"), (True, ))
+            QtCore.QObject.emit(self.parent, QtCore.SIGNAL("enableExpertMode"), True)
 
             # go through all bricks and execute the method
             for w in QtGui.QApplication.allWidgets():
                 if isinstance(w, BlissWidget):
                     try:
-                        w.setExpertMode(True)
+                        w.set_expert_mode(True)
                     except:
-                        logging.getLogger().exception("Could not set %s to expert mode", w.name())
+                        logging.getLogger().exception("Could not set %s to expert mode", w.objectName())
         else:
             # switch to user mode
-            QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("enableExpertMode"), (False, ))
+            QtCore.QObject.emit(self.parent, QtCore.SIGNAL("enableExpertMode"), False)
 
             # go through all bricks and execute the method
             for w in QtGui.QApplication.allWidgets():
@@ -113,28 +118,20 @@ class CustomMenuBar(QtGui.QWidget):
                     w.setWhatsThis("")
                     #QtGui.QWhatsThis.remove(w)
                     try:
-                        w.setExpertMode(False)
+                        w.set_expert_mode(False)
                     except:
-                        logging.getLogger().exception("Could not set %s to user mode", w.name())
+                        logging.getLogger().exception("Could not set %s to user mode", w.objectName())
 
 
     def whatsthis(self):
-        if self.executionMode:
+        if self.execution_mode:
             BlissWidget.updateWhatsThis()
 
 
     def quit(self):
-        if self.executionMode:
+        if self.execution_mode:
             QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("quit"), ())
             QtGui.QApplication.quit()
-
-
-class StatusBar(QtGui.QStatusBar):
-    # parent *must* be the window ; it contains a centralWidget in its viewport
-    def __init__(self, parent, *args):
-        QtGui.QStatusBar.__init__(self, parent.centralWidget, *args)
-        parent.centralWidget.layout().addWidget(self)
-
 
 class CustomTabBar(QtGui.QTabBar):
     def paintLabel(self,p,br,t,has_focus):
@@ -164,7 +161,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             self.setObjectName(args[1])
 
             self.orientation = kwargs.get("orientation", "horizontal")
-            self.executionMode = kwargs.get("executionMode", False)
+            self.execution_mode = kwargs.get("executionMode", False)
 
             self.setFixedSize(-1)
 
@@ -199,7 +196,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         def paintEvent(self, event):
             QtGui.QFrame.paintEvent(self, event)
 
-            if self.executionMode:
+            if self.execution_mode:
                 return
 
             p = QtGui.QPainter(self)
@@ -245,7 +242,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         frame = QtGui.QFrame(args[0])
         frame.setObjectName(args[1])
-        frame.setFrameStyle(QtGui.QFrame.Box)
+        #frame.setFrameStyle(QtGui.QFrame.Box)
         if not executionMode:
             frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
         frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -264,7 +261,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         frame = QtGui.QFrame(args[0])
         frame.setObjectName(args[1])
 
-        frame.setFrameStyle(QtGui.QFrame.Box)
+        #frame.setFrameStyle(QtGui.QFrame.Box)
         if not executionMode:
             frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
         frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -313,7 +310,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
             self.close_button = None
 
-            self.countChanged={}
+            #self.tab_widgets = []
+            self.countChanged = {}
 
             self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -329,10 +327,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         def close_current_tab(self):
             slotName = "hidePage_%s" % self.tabText(self.currentIndex())
             slotName = slotName.replace(" ", "_")
-            getattr(self.currentWidget(), slotName)()
-            QtGUI.QApplication.emit(QtCore.SIGNAL('tab_closed'), self.currentWidget(), slotName)
-            return
-         
+            getattr(self, slotName)()
+            #QtGui.QApplication.emit(QtCore.SIGNAL('tab_closed'), self.currentWidget(), slotName)
         
         def _pageChanged(self, index):
             page = self.widget(index)
@@ -377,15 +373,17 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             #TODO add scroll area 
             scroll_area = page_widget
             self.addTab(scroll_area, label) 
+            #self.tab_widgets.append(scroll_area)
+
             #self.set_close_button()
 
             slotName = "showPage_%s" % label
-            def tab_slot(self, page_index=self.indexOf(scroll_area)):
-                self.setCurrentWidget(self.page(page_index))
+            def tab_slot(self, page_index = self.indexOf(scroll_area)):
+                self.setCurrentIndex(page_index)
             try:
                 self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
             except:
-                logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.name()))
+                logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
             # add 'hide page' slot
             slotName = "hidePage_%s" % label
@@ -403,7 +401,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                       pixmap = Qt4_Icons.load(icon)
                       self.insertTab(page["widget"], QtGui.QIcon(pixmap,pixmap), label, page["index"])
                     else:
-                      self.insertTab(page["widget"], page["label"], page["index"])
+                      self.insertTab(page["index"], page["widget"], page["label"])
                     self.showPage(page["widget"])
                     page["hidden"] = False
                   else:
@@ -413,7 +411,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 #  page_info+="PAGE %d: %s, %s "% (i, self.tabLabel(self.page(i)), self.page(i))
                 #logging.info(page_info)
             try:
-              self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+              self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
             except: 
               logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName())) 
         
@@ -544,7 +542,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         self.additionalWindows = {}
         self.__putBackColors = None
-        self.executionMode=kwargs.get('executionMode', False)
+        self.execution_mode=kwargs.get('executionMode', False)
         self.preview_items = []
         self.currentWindow = None
         self.setWindowTitle("GUI preview")
@@ -553,23 +551,38 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.centralWidget = QtGui.QWidget(self.widget())
         #self.centralWidget.setObjectName("deee")
         self.centralWidget_layout = QtGui.QVBoxLayout() 
+        self.centralWidget_layout.setSpacing(0)
+        self.centralWidget_layout.setContentsMargins(0, 0, 0, 0)
         self.centralWidget.setLayout(self.centralWidget_layout)
         self.centralWidget.show()
 
-        #self.menu_bar = CustomMenuBar()
+        self.menu_bar = CustomMenuBar(self)
+        self.menu_bar.hide()
+        self.status_bar = QtGui.QStatusBar(self)
+        self.status_bar.hide()
 
         _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout.addWidget(self.menu_bar)
         _main_vlayout.addWidget(self.centralWidget)
+        _main_vlayout.addWidget(self.status_bar) 
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
+
+        #self.setWidget(self.centralWidget)
 
         #main_layout.addWidget(self.menu_bar) 
         #main_layout.addWidget(self.centralWidget)
         self.setLayout(_main_vlayout)
 
     def set_menu_bar(self, menu_data, exp_pwd, execution_mode):
-        self.menu_bar = CustomMenuBar(menu_data, exp_pwd, execution_mode)
-        self.layout().addWidget(self.menu_bar)
+        self.menu_bar.configure(menu_data, exp_pwd, execution_mode)
+        self.menu_bar.show()
+          
+        #self.menu_bar = CustomMenuBar(menu_data, exp_pwd, execution_mode)
+        #self.layout().addWidget(self.menu_bar)
+
+    def set_status_bar(self):
+        self.status_bar.show()	
 
     def show(self, *args):
         ret = QtGui.QWidget.show(self)
@@ -590,8 +603,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if len(args) > 0:
           if args[0]:
             return
-        BlissWidget._menuBar.setExpertMode(False)
-        BlissWidget._menuBar.expertMode.setChecked(False)
+        BlissWidget.menu_bar.set_expert_mode(False)
+        BlissWidget.menu_bar.expert_mode_checkbox.setChecked(False)
 
     def add_item(self, item_cfg, parent):
         item_type = item_cfg["type"]
@@ -605,7 +618,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
           
             #newItem.reparent(parent)
         else:
-            newItem = klass(parent, item_cfg["name"], executionMode=self.executionMode)
+            newItem = klass(parent, item_cfg["name"], executionMode=self.execution_mode)
             if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox"):
                 if item_cfg["properties"]["color"] is not None:
                     try:
@@ -680,7 +693,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             except:
                 logging.getLogger().exception("Cannot add item %s", child["name"])
             else:
-                if not self.executionMode:
+                if not self.execution_mode:
                     newItem.installEventFilter(self)
             if parent.__class__ == WindowDisplayWidget.items["tab"]:
                 newTab = parent.add_tab(newItem, child["properties"]["label"], 
@@ -770,12 +783,12 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
                 self.set_menu_bar(container_cfg.properties["menudata"],
                                   container_cfg.properties["expertPwd"],
-                                  self.executionMode)  
+                                  self.execution_mode)  
 
                 """if not window_id in self.additionalWindows:
                     menubar = MenuBar(self, container_cfg.properties["menudata"],\
                                       container_cfg.properties["expertPwd"],\
-                                      executionMode = self.executionMode)
+                                      executionMode = self.execution_mode)
                     BlissWidget._menuBar = menubar
                     self.additionalWindows[window_id] = (container_cfg.menuEditor(), menubar)"""
 
@@ -795,8 +808,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         if isinstance(container_cfg, WindowCfg):
             if container_cfg.properties["statusbar"]:
-                print "create statusbar"
-                #StatusBar(self)
+                self.set_status_bar()
 
     def remove_widget(self, item_name, child_name_list):
         remove_item_list = child_name_list

@@ -26,7 +26,7 @@ LIGHT_BLUE = QtGui.QColor(10,170,255)
 LIGHT_GRAY = QtGui.QColor(240, 240, 240)
 SKY_BLUE = QtGui.QColor(122,175,220)
 DARK_GRAY = QtGui.QColor(4)
-WHITE = QtGui.QColor(3)
+WHITE = QtGui.QColor(255, 255, 255)
 GRAY =  QtGui.QColor(5)
 GREEN = QtGui.QColor(8)
 
@@ -34,6 +34,10 @@ LINE_EDIT_ORIGINAL = QtGui.QColor(0, 0, 12)
 LINE_EDIT_ACTIVE = QtGui.QColor(204,255,204)
 LINE_EDIT_CHANGED =  QtGui.QColor(255,165,0)
 LINE_EDIT_ERROR = QtGui.QColor(255,204,204)
+
+BUTTON_ORIGINAL = QtGui.QColor(242, 241, 240)
+
+QUEUE_ENTRY_COLORS = [WHITE, LIGHT_GREEN, LIGHT_YELLOW, LIGHT_RED]
 
 
 def set_widget_color(widget, color, color_role =None):
