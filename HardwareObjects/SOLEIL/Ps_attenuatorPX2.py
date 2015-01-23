@@ -17,7 +17,7 @@ class Ps_attenuatorPX2(Device):
         self.labels  = []
         self.attno   = 0
         self.deviceOk = True
-        
+        self.set_value = None
 
     def init(self):
 #         cmdToggle = self.getCommandObject('toggle')
@@ -96,9 +96,15 @@ class Ps_attenuatorPX2(Device):
         
         try:
             if self.Attenuatordevice.TrueTrans_FP <= 100.0 : #self.Attenuatordevice.Trans_FP  <= 100.0 :
-                value = float(self.Attenuatordevice.TrueTrans_FP)
+                if self.set_value is not None:
+                    value = self.set_value
+                else:
+                    value = float(self.Attenuatordevice.TrueTrans_FP) * 1.3587
             else :    
-                value = float(self.Attenuatordevice.I_Trans)
+                if self.set_value is not None:
+                    value = self.set_value
+                else:
+                    value = float(self.Attenuatordevice.I_Trans) * 1.4646
             # Mettre une limite superieure car a une certaine ouverture de fentes on ne gagne plus rien en transmission
             # Trouver la valeur de transmission par mesure sur QBPM1 doit etre autour de 120%
         except:
@@ -137,6 +143,7 @@ class Ps_attenuatorPX2(Device):
             
     def setTransmission(self,value) :
         logging.getLogger().debug("HOS Attenuator: passe dans setTransmission")       
+        self.set_value = float(value)
         try:
             if self.Constdevice.FP_Area_FWHM <= 0.1 : # Cas ou il n'y a pas de valeur dans le publisher PASSERELLE/CO/Primary_Slits
                 logging.getLogger("HWR").error('Primary slits not correctly aligned', str(self.name()))

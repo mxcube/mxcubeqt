@@ -1,23 +1,17 @@
-<device class="TangoDCMotorWPositions">
-    <username></username>
-    <tangoname>i11-ma-cx1/ex/md2</tangoname>
-    <channel type="tango" polling="1000" name="state">State</channel>
-    <datatype>int</datatype>
-    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">AperturePredefinedPosition</channel>
-    <delta>0.1</delta>
-    <interval>1000</interval>
-    <positions>
-        <position>
-            <username>Beam</username>
-            <offset>1</offset>
-        </position>
-        <position>
-            <username>Off</username>
-            <offset>2</offset>
-        </position>
-        <position>
-            <username>Cover</username>
-            <offset>3</offset>
-        </position>
-    </positions>
+<device class="MD2_NamedState">
+    <username>Position</username>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="state">AperturePosition</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="hardware_state">State</channel>
+
+    <states>
+       <state>
+          <name>PARK</name>
+       </state>
+       <state>
+          <name>BEAM</name>
+       </state>
+       <state>
+          <name>OFF</name>
+       </state>
+    </states>
 </device>

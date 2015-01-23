@@ -1,7 +1,8 @@
-<device class="PhotonFlux">
+<device class="PX2PhotonFlux">
   <username>Photon flux</username>
   <tangoname>i11-ma-c04/dt/xbpm_diode.1</tangoname>
-  <channel type="tango" polling="1000" name="Intensity">Intensity</channel>
+  <channel type="tango" polling="1000" name="intensity">Intensity</channel>
+  <object href="/obx" role="shutter" />
   <!--<cnt>i0</cnt>
   <channel type="taco" name="counts" taconame="id23/wct_231/1" polling="5000">DevCntReadAll</channel>
   <channel type="spec" name="calibration" version="SPEC_HOST:SPEC_VERSION">CALIBRATED_DIODE</channel>

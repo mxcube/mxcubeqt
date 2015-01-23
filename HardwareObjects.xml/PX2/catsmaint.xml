@@ -1,4 +1,4 @@
-<equipment class = "sample_changer.CatsMaint">
+<equipment class = "CatsMaintSoleil">
   <username>CatsMaint</username>
   <tangoname>test/cats/robot</tangoname>    
   
@@ -9,7 +9,10 @@
   <command type="tango" name="_cmdHome">home</command>
   <command type="tango" name="_cmdDry">dry</command>
   <command type="tango" name="_cmdSoak">soak</command>
-  
+  <command type="tango" name="_cmdClearMemory">clear_memory</command>
+  <command type="tango" name="_cmdOpenTool">opentool</command>
+  <command type="tango" name="_cmdToolCal">toolcal</command>
+
   <command type="tango" name="_cmdPowerOn">powerOn</command>
   <command type="tango" name="_cmdPowerOff">powerOff</command>
   

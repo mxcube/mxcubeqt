@@ -1,7 +1,0 @@
-<device class = "TangoMotor">
-  <username>SampleSlit_V_Gap</username>
-  <tangoname>i11-ma-c04/ex/fent_v.2</tangoname>  <!-- provisional tango name --> 
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <channel type="tango" polling="1000" name="position">position</channel>
-  <interval>1000</interval>
-</device>

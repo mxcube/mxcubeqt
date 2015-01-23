@@ -1,8 +1,0 @@
-<device class="TangoShutterPX1">
-  <username>OBX</username>
-  <tangoname>i11-ma-c04/ex/obx.1</tangoname>
-  <tangoname2>i11-ma-ce/pss/db_data-parser</tangoname2>
-  <channel type="tango" tangoname="i11-ma-c04/ex/obx.1" polling="500" name="state">State</channel>
-  <command type="tango" tangoname="i11-ma-c04/ex/obx.1" name="open">Open</command>
-  <command type="tango" tangoname="i11-ma-c04/ex/obx.1" name="close">Close</command>
-</device>

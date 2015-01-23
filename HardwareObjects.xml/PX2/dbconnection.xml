@@ -1,16 +1,31 @@
-<procedure class="ISPyBClient">
-  <host>HOST</host>
-  <port>2224</port>
-  <dbhost>DB_HOST</dbhost>
-  <dbuser>pxuser</dbuser>
-  <dbpass>ispyuser</dbpass>
-  <db>pydb</db>
-  <proposals>
-    <proposal>
-      <code>ifx</code>
-      <ispyb>fx</ispyb>
-      <gui>fx</gui>
-    </proposal>
-  </proposals>
-  <admin_email>EMAIL</admin_email>
-</procedure>
+<object class="ISPyBClient2">
+  <ws_root>
+    <!-- http://160.103.210.1:8080/ispyb-ejb3/ispybWS/ -->
+    <!-- http://sundemo.synchrotron-soleil.fr/ispyb-ejb3/ispybWS/ -->
+    http://195.221.0.141/ispyb-ejb3/ispybWS/
+  </ws_root>
+  <object role="session" href="/session"/>
+
+  <!-- all this should be removed from here (information
+       is in session now), but we need it as long as
+       mxCuBE 1.0 is running - or we need to make sure
+       mxCuBE 1.0 works with the new xml files (ie. cherry picking
+       commits from master to 1.0 or merging)
+  -->
+  <beamline_name>PX2</beamline_name>
+   <proposals>
+     <proposal>
+       <code>ifx</code>
+       <ispyb>fx</ispyb>
+       <gui>fx</gui>
+     </proposal>
+   </proposals>
+
+   <inhouse>
+     <proposal>
+       <code>opid</code>
+       <number>291</number>
+     </proposal>
+   </inhouse>
+
+</object>

@@ -1,4 +1,6 @@
+from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import Procedure
+import os
 import logging
 import ldap
 
@@ -117,3 +119,18 @@ class SOLEILLdapLogin(Procedure):
         logging.getLogger("HWR").debug("LdapLogin: searching for %s" % username)
 
         return (True,username)
+
+def test():
+    hwr_directory = os.environ["XML_FILES_PATH"] 
+
+    print hwr_directory
+    hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    conn = hwr.getHardwareObject("/ldapconnection")
+    #print conn.login("20141015","4dBM0lx3pw") 
+    print conn.login("99140198", "5u4Twf70K5")
+
+
+if __name__ == '__main__':
+   test()

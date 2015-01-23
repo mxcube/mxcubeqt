@@ -22,11 +22,11 @@ class xanes(object):
                  prefix='x5',
                  session_id=None,
                  blsample_id=None,
-                 nbSteps=95,
-                 roiwidth=0.30,
-                 beforeEdge=0.030,
-                 afterEdge=0.050,
-                 integrationTime=0.64,
+                 nbSteps=100,
+                 roiwidth=0.25,
+                 beforeEdge=0.025,
+                 afterEdge=0.075,
+                 integrationTime=1,
                  peakingTime=2.5,
                  dynamicRange=20000, #47200
                  presettype=1,
@@ -124,7 +124,7 @@ class xanes(object):
             logging.info('prepare fluodet is %s ' % self.fluodet)
             self.fluodet.presettype = self.presettype
             self.fluodet.peakingtime = self.peakingTime
-            self.fluodet.presetvalue = self.integrationTime
+            
             self.monoFine.On()
 
         self.getAbsEm()
@@ -136,6 +136,8 @@ class xanes(object):
         self.moveBeamlineEnergy(self.e_edge)
         
         self.optimizeTransmission()
+        
+        self.fluodet.presetvalue = self.integrationTime
         
         self.insertFluoDet()
         
@@ -241,6 +243,8 @@ class xanes(object):
             (self.roi_center + self.roiwidth / 2.0)  # values set in eV
         channel_debut = int(roi_debut / (B*1e3)) # self.channelToeV)
         channel_fin = int(roi_fin / (B*1.e3)) #self.channelToeV)
+        self.channel_fin = channel_fin
+        self.channel_debut = channel_debut
         self.roi_debut = roi_debut
         self.roi_fin = roi_fin
         self.fluodet.setROIs(numpy.array((channel_debut, channel_fin)))
@@ -326,7 +330,7 @@ class xanes(object):
     def getBLEPoints(self):
         s = int(self.bleSteps)
         if self.bleSteps == 1:
-            return [self.e_edge]
+            return [self.e_edge + 0.01]
         if self.bleMode == 'c':
             points = numpy.arange(0., 1., 1. / (2*s))[1::2]
         elif self.bleMode == 'a':
@@ -511,8 +515,14 @@ class xanes(object):
                                             'diode3': self.diode3.intensity,
                                             'diode5': self.diode5.intensity,
                                             'cvd': self.cvd.intensity}
+        uptoendroi = self.results['observations'][en]['spectrum'][50: self.channel_fin]
+        uptostartroi = self.results['observations'][en]['spectrum'][50: self.channel_debut]
+        self.results['observations'][en]['uptoendroi'] = sum(uptoendroi)
+        self.results['observations'][en]['uptostartroi'] = sum(uptostartroi)
         #logging.info('self.results[\'observations\'][en] %s' % self.results['observations'][en])
         self.results['observations'][en]['point'] = float(self.results['observations'][en]['roiCounts']) / self.results['observations'][en]['cvd']
+        #self.results['observations'][en]['point'] = float(self.results['observations'][en]['roiCounts']) / self.results['observations'][en]['eventsInRun']
+        #self.results['observations'][en]['point'] = float(self.results['observations'][en]['roiCounts']) / self.results['observations'][en]['uptostartroi']
         self.parent.newPoint(float(en), float(self.results['observations'][en]['point']))
             
     def updateRunningScan(self, en):
@@ -568,7 +578,7 @@ class xanes(object):
     def saveResults(self):
         logging.info('saveResults')
         f = open(os.path.join(self.directory, '{prefix}_{element}_{edge}_results.pck'.format(**self.results)), 'w')
-        f = open('{prefix}_{element}_{edge}.pck'.format(**self.results), 'w')
+        #f = open('{prefix}_{element}_{edge}.pck'.format(**self.results), 'w')
         pickle.dump(self.results, f)
         f.close()
 

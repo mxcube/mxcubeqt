@@ -700,7 +700,7 @@ class Acquisition(object):
 
 class PathTemplate(object):
     @staticmethod
-    def set_archive_path(archive_base_directory, archive_folder):
+    def set_archive_path(archive_base_directory='/927bis/ccd/Database', archive_folder='Archive'):
         PathTemplate.archive_base_directory = archive_base_directory
         PathTemplate.archive_folder = archive_folder
 
@@ -719,7 +719,9 @@ class PathTemplate(object):
         self.precision = str()
         self.start_num = int()
         self.num_files = int()
-
+        self.archive_base_directory='/927bis/ccd/Database'
+        self.archive_folder='Archive'
+        
     def get_prefix(self):
         prefix = self.base_prefix
 
@@ -763,16 +765,16 @@ class PathTemplate(object):
         
         if 'visitor' in folders:
             endstation_name = folders[4]
-            folders[2] = PathTemplate.archive_folder
+            folders[2] = self.archive_folder #PathTemplate.archive_folder
             temp = folders[3]
             folders[3] = folders[4]
             folders[4] = temp
         else:
             endstation_name = folders[2]
-            folders[2] = PathTemplate.archive_folder
+            folders[2] = self.archive_folder #PathTemplate.archive_folder
             folders[3] = endstation_name
 
-        archive_directory = os.path.join(os.path.join(PathTemplate.archive_base_directory, *folders[2:]))
+        archive_directory = os.path.join(os.path.join(self.archive_base_directory, *folders[2:]))
 
         return archive_directory
 

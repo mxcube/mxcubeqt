@@ -38,6 +38,7 @@ class myimage:
 
 
 def take_snapshots(light, light_motor, phi, zoom, drawing):
+  logging.getLogger("HWR").info("MiniDiffPX2: take_snapshots")
   centredImages = []
 
   if light is not None:
@@ -391,9 +392,11 @@ class MiniDiffPX2(Equipment):
           logging.info("SOLEILCollect - current phase %s" % self.md2.currentphase)
           logging.info("SOLEILCollect - current phase index %s" % self.md2.currentphaseindex)
           if self.md2.currentphase != self.collect_phaseposition:
-             self.md2.startsetphase(self.collect_phaseposition)
-             while self.md2.currentphase != self.collect_phaseposition:
-                 time.sleep(0.1)
+              logging.getLogger("user_level_log").info("Setting gonio to data collection phase.")
+              logging.getLogger("user_level_log").info("Moving capillary beamstop to the beam path, collect will start in 25 seconds.")
+              self.md2.startsetphase(self.collect_phaseposition)
+              while self.md2.currentphase != self.collect_phaseposition:
+                time.sleep(0.1)
           else:
               self.md2.backlightison=False
           
@@ -432,20 +435,34 @@ class MiniDiffPX2(Equipment):
             try:
                 self.wait()
                 self.md2.command_inout('startScan')
-                self.wait()
+                #self.wait()
                 executed = True
                 logging.info('Successfully executing StartScan command')
             except Exception, e:
+                executed = False
                 print e
                 os.system('echo $(date) error executing StartScan command >> /927bis/ccd/collectErrors.log')
                 logging.info('Problem executing StartScan command')
                 logging.info('Exception ' + str(e))
-        while self.md2.fastshutterisopen is False:
-            time.sleep(0.01)
-        #time.sleep(self.md2.scanexposuretime)
-        while self.md2.fastshutterisopen is True:
-            logging.info('Successfully executing StartScan command, waiting for fast shutter to close')
-            time.sleep(0.01)
+                
+        
+        while self.md2.fastshutterisopen is False and self.md2.lasttaskinfo[3] == 'null':
+            logging.info('Successfully executing StartScan command, waiting for fast shutter to open or scan to finish')
+            time.sleep(0.05)
+        
+        while self.md2.fastshutterisopen is True and self.md2.lasttaskinfo[3] == 'null':
+            logging.info('Successfully executing StartScan command, waiting for fast shutter to close or scan to finish')
+            time.sleep(0.05)
+            
+        #while self.md2.lasttaskinfo[3] is 'null':
+            #logging.info('Successfully executing StartScan command, waiting for scan to finish')
+            #time.sleep(0.05)
+        #while self.md2.fastshutterisopen is False and time.time() - start < self.md2.scanexposuretime:
+            #time.sleep(0.02)
+        ##time.sleep(self.md2.scanexposuretime)
+        #while self.md2.fastshutterisopen is True:
+            #logging.info('Successfully executing StartScan command, waiting for fast shutter to close')
+            #time.sleep(0.02)
         logging.info("MiniDiffPX2 Scan took %s seconds "  % str(time.time() - start))
         return
     

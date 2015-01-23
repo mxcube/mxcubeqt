@@ -2,6 +2,4 @@
   <username>FastShutter</username>
   <tangoname>i11-ma-cx1/ex/md2</tangoname>
   <channel type="tango" polling="1000" name="State">FastShutterIsOpen</channel>
-  <command type="tango" name="Open">OpenFastShutter</command>
-  <command type="tango" name="Close">CloseFastShutter</command>
 </device>

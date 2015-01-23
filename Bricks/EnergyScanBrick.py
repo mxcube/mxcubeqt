@@ -192,7 +192,7 @@ class EnergyScanBrick(BlissWidget):
         self.layout().addWidget(self.scanBox)
         self.layout().addWidget(self.choochGraphs)
 
-        self.setEnabled(False)
+        self.setEnabled(True) # was False MS 2014-12-16
 
     def setIcons(self,icons):
         icons_list=icons.split()

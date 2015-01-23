@@ -4,7 +4,7 @@
     <username></username>
     <tangoname>i11-ma-cx1/ex/md2</tangoname> <!--check!-->
     <channel type="tango" polling="1000" name="state">State</channel>
-    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">PhasePosition</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">CurrentPhaseIndex</channel>
     <delta>0.1</delta>
     <interval>1000</interval>
     <positions>

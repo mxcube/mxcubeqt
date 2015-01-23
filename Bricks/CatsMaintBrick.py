@@ -50,7 +50,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
         self._updateButtons()
 
     def propertyChanged(self, property, oldValue, newValue):
-        logging.getLogger("user_level_log").info("Property Changed: " + str(property) + " = " + str(newValue))
+        logging.getLogger("user_level_log").info("CatsMaint property Changed: " + str(property) + " = " + str(newValue))
         if property == 'hwobj':
             if self.device is not None:
                 self.disconnect(self.device, PYSIGNAL('lid1StateChanged'), self._updateLid1State)
@@ -61,7 +61,9 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
                 self.disconnect(self.device, PYSIGNAL('messageChanged'), self._updateMessage)
                 self.disconnect(self.device, PYSIGNAL('regulationStateChanged'), self._updateRegulationState)
             # load the new hardware object
+
             self.device = self.getHardwareObject(newValue)                                    
+            logging.info('CatsMaintBrick self.device %s newvalue %s' % (self.device, newValue))
             if self.device is not None:
                 self.connect(self.device, PYSIGNAL('regulationStateChanged'), self._updateRegulationState)
                 self.connect(self.device, PYSIGNAL('messageChanged'), self._updateMessage)
@@ -70,8 +72,10 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
                 self.connect(self.device, PYSIGNAL('lid1StateChanged'), self._updateLid1State)
                 self.connect(self.device, PYSIGNAL('lid2StateChanged'), self._updateLid2State)
                 self.connect(self.device, PYSIGNAL('lid3StateChanged'), self._updateLid3State)
+            self._updateButtons()
 
     def _updateRegulationState(self, value):
+        logging.info('CatsMaintBrick: _updateRegulationState %s' % value)
         self._regulationOn = value
         if value:
             self.widget.lblRegulationState.setPaletteBackgroundColor(QWidget.green)
@@ -80,6 +84,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
         self._updateButtons()
 
     def _updatePowerState(self, value):
+        logging.info('CatsMaintBrick: _updatePowerState %s' % value)
         self._poweredOn = value
         if value:
             self.widget.lblPowerState.setPaletteBackgroundColor(QWidget.green)
@@ -88,13 +93,16 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
         self._updateButtons()
 
     def _updateMessage(self, value):
+        logging.info('CatsMaintBrick: _updateMessage %s' % value)
         self.widget.lblMessage.setText(str(value))
 
     def _updatePathRunningFlag(self, value):
+        logging.info('CatsMaintBrick: _updatePathRunningFlag %s' % value)
         self._pathRunning = value
         self._updateButtons()
 
     def _updateLid1State(self, value):
+        logging.info('CatsMaintBrick: _updateLid1State %s' % value)
         self._lid1State = value
         if self.device is not None and not self._pathRunning:
             self.widget.btLid1Open.setEnabled(not value)
@@ -104,6 +112,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
             self.widget.btLid1Close.setEnabled(False)
 
     def _updateLid2State(self, value):
+        logging.info('CatsMaintBrick: _updateLid2State %s' % value)
         self._lid2State = value
         if self.device is not None and not self._pathRunning:
             self.widget.btLid2Open.setEnabled(not value)
@@ -113,6 +122,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
             self.widget.btLid2Close.setEnabled(False)
 
     def _updateLid3State(self, value):
+        logging.info('CatsMaintBrick: _updateLid3State %s' % value)
         self._lid3State = value
         if self.device is not None and not self._pathRunning:
             self.widget.btLid3Open.setEnabled(not value)
@@ -124,6 +134,7 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
     def _updateButtons(self):
         if self.device is None:
             # disable all buttons
+            logging.info('CatsMaintBrick, disabling all the buttons because self.device is None')
             self.widget.btPowerOn.setEnabled(False)
             self.widget.btPowerOff.setEnabled(False)
             self.widget.btLid1Open.setEnabled(False)
@@ -138,13 +149,28 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
             self.widget.btRegulationOn.setEnabled(False)
             self.widget.lblMessage.setText('')
         else:
+            logging.info('CatsMaintBrick, going to enable some of the buttons as appropriate')
+            logging.info('self.device is %s' % self.device)
             ready = not self._pathRunning
+            logging.info('ready? %s' % ready)
             #ready = not self.device.isDeviceReady()
-            self.widget.btPowerOn.setEnabled(ready and not self._poweredOn)
-            self.widget.btPowerOff.setEnabled(ready and self._poweredOn)
-            self.widget.btResetError.setEnabled(ready)
-            self.widget.btBack.setEnabled(ready and self._poweredOn)
-            self.widget.btSafe.setEnabled(ready and self._poweredOn)
+            logging.info('powered on? %s' % self._poweredOn)
+            logging.info('type(self._poweredOn) %s' % type(self._poweredOn))
+            if self._poweredOn is not None:
+              logging.info('self._poweredOn is %s' % self._poweredOn)
+              self.widget.btPowerOn.setEnabled(ready and not self._poweredOn)
+              self.widget.btPowerOff.setEnabled(ready and self._poweredOn)
+              self.widget.btResetError.setEnabled(ready)
+              self.widget.btBack.setEnabled(ready and self._poweredOn)
+              self.widget.btSafe.setEnabled(ready and self._poweredOn)
+            
+            else:
+              logging.info('self._poweredOn is %s' % self._poweredOn)
+              self.widget.btPowerOn.setEnabled(ready) # and not self._poweredOn)
+              self.widget.btPowerOff.setEnabled(ready) # and self._poweredOn)
+              self.widget.btResetError.setEnabled(ready)
+              self.widget.btBack.setEnabled(ready) # and self._poweredOn)
+              self.widget.btSafe.setEnabled(ready) #and self._poweredOn)
 
             self.widget.btRegulationOn.setEnabled(not self._regulationOn)
 

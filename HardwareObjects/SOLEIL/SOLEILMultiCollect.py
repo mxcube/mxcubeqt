@@ -7,6 +7,7 @@ import time
 import os
 import httplib
 import PyTango
+import threading
 
 class FixedEnergy:
     def __init__(self, wavelength, energy):
@@ -44,6 +45,7 @@ class TunableEnergy:
     @task
     def set_energy(self, energy):
         logging.info("<SOLEIL MultiCollect TUNABLE ENERGY> VERIFY - set energy")
+        logging.getLogger("user_level_log").info("Setting energy before collect")
         logging.info("self.bl_control.energy %s" % self.bl_control.energy)
         energy_obj = self.bl_control.energy
         energy_obj.startMoveEnergy(energy)
@@ -233,15 +235,24 @@ class LimaAdscDetector:
     def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
         if not self.ready:
             return
-
+        lima_exposure_offset = 0.7 # 0.7
+        #lima_exposure_offset = 1.0
         logging.info('Preparing LIMA Detector')
-        if self.limaadscdev.state().name != 'STANDBY':
-            self.limaadscdev.Stop()
-            time.sleep(0.1)
+        #if self.limaadscdev.state().name != 'STANDBY':
+            #self.limaadscdev.Stop()
+            #time.sleep(0.1)
 
-        if self.adscdev.state().name != 'STANDBY':
-            time.sleep(0.1)
-
+        #if self.adscdev.state().name != 'STANDBY':
+            #time.sleep(0.1)
+        
+        self.wait(self.adscdev)
+        self.wait(self.limaadscdev)
+        
+        self.limaadscdev.exposuretime = (exptime + lima_exposure_offset) * 1e3
+        if (self.limaadscdev.get_timeout_millis() - self.limaadscdev.exposuretime) < 2000:
+            self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposuretime) + 2000)
+        
+        self.wait(self.limaadscdev)
         self.limaadscdev.write_attribute('nbFrames', number_of_images)
 
     @task
@@ -260,7 +271,7 @@ class LimaAdscDetector:
         if not self.imagePath.endswith('/'):
             self.imagePath += '/'
         
-        self.waitReady (self.adscdev)
+        self.wait(self.adscdev)
         self.adscdev.write_attribute('imagePath', self.imagePath)
         self.adscdev.write_attribute('fileName',  os.path.basename(self.fileName))
        
@@ -270,11 +281,11 @@ class LimaAdscDetector:
         if self.ready:
            head = self.prepareHeader()
            self.adscdev.SetHeaderParameters( head )
-           self.limaadscdev.exposureTime = (exptime + 0.5) * 1e3
+           #self.limaadscdev.exposureTime = (exptime + 0.6) * 1e3
            #if self.limaadscdev.exposureTime > 2500:
                #logging.info("<SOLEIL MultiCollect> prepare_acquisition setting timeout to %s " % (self.limaadscdev.exposureTime + 1500))
                #self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposureTime + 1500))
-           self.waitReady(self.adscdev)
+           self.wait(self.adscdev)
 
         return (start, start+osc_range)
         
@@ -305,11 +316,23 @@ class LimaAdscDetector:
         self.lastImage(integer=last_frame, imagePath=self.imagePath, fileName=self.fileName)
         img_full_path = os.path.join(self.imagePath, self.fileName)
         
-        #while not os.path.exists(img_full_path):
-            #time.sleep(0.1)
+        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        
+    def analyze_thread(self, filename):
+        logging.info.info('Starting Analyze Thread')
+        logging.info.info('filename %s ' % filename)
+        self.athread = threading.Thread(target=self.analyze_image, args=(filename,))
+        self.athread.daemon = True
+        self.athread.start()
+
+    def analyze_image(self, filename):
+        logging.info.info('Analyzing image %s' % filename)
+        while not os.path.exists(filename):
+            time.sleep(0.1)
+        os.system('ssh p10 "rsync -av %s /ramdisk/"' % img_full_path)
         #os.system('ssh p10 "adxv -sa -jpeg_scale 0.08 %s %s"' % (img_full_path, jpeg_full_path))
         #os.system('ssh p10 "adxv -sa -jpeg_scale 0.016 %s %s"' % (img_full_path, jpeg_thumbnail_full_path))
-        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        os.system('ssh p10 "ola.py -f %s"' % filename)
         
     @task
     def stop_acquisition(self):
@@ -318,7 +341,7 @@ class LimaAdscDetector:
            return
 
         k = 0
-        while self.limaadscdev.log[-1].find('Acquisition is Stopped.') == -1 and self.limaadscdev.state().name == 'RUNNING':
+        while self.limaadscdev.log[-1].find('Acquisition is Stopped.') == -1 and self.limaadscdev.state().name == 'RUNNING' and k < 3:
             try:
                 k += 1
                 self.limaadscdev.Stop()
@@ -337,13 +360,39 @@ class LimaAdscDetector:
     def lastImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
         logging.info("<SOLEIL MultiCollect> lastImage, xformstatusfile %s " % self.xformstatusfile)
         line = str(integer) + ' ' + os.path.join(imagePath, fileName)
-        f = open( self.xformstatusfile, 'w')
-        f.write('%s\n' % line)
-        f.close()
-        f = open('/927bis/ccd/log/.goimg/goimg.db', 'w')
-        f.write('%s' % os.path.join(imagePath, 'process'))
-        f.close()
-
+        try:
+            f = open( self.xformstatusfile, 'w')
+            f.write('%s\n' % line)
+            f.close()
+        except IOError:
+            import traceback
+            logging.info('Problem writing the last image %s' % (traceback.format_exc()))
+        try:
+            f = open('/927bis/ccd/log/.goimg/goimg.db', 'w')
+            f.write('%s' % os.path.join(imagePath, 'process'))
+            f.close()
+        except IOError:
+            import traceback
+            logging.info('Problem writing goimg.db %s' % (traceback.format_exc()))
+    
+    def wait(self, device):
+        green_light = False
+        k = 0
+        while green_light is False:
+            try:
+                if device.state().name not in ['STANDBY']:
+                    logging.info("Device %s wait" % device)
+                else:
+                    green_light = True
+                    return
+            except:
+                k += 1
+                import traceback
+                traceback.print_exc()
+                logging.info('Problem occured in wait %s, attempt %s ' % (device, k))
+                logging.info(traceback.print_exc())
+            time.sleep(.1)
+        
     def waitReady(self, device):
         while device.state().name in [ 'MOVING', 'RUNNING'] :
             time.sleep(.1)
@@ -493,7 +542,11 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self._tunable_bl = tunable_bl
         self._centring_status = None
 
-
+    def stopCollect(self, owner):
+        self.stop_acquisition()
+        if self.data_collect_task is not None:
+            self.data_collect_task.kill(block = False)
+            
     def execute_command(self, command_name, *args, **kwargs): 
       wait = kwargs.get("wait", True)
       cmd_obj = self.getCommandObject(command_name)
@@ -592,6 +645,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def set_resolution(self, new_resolution):
         logging.info("<SOLEIL MultiCollect> set resolution to %s" % new_resolution)
+        logging.getLogger("user_level_log").info("Setting resolution -- moving the detector.")
         self.bl_control.resolution.move(new_resolution)
         logging.info("<SOLEIL MultiCollect set resolution> motor stateValue is %s" % self.bl_control.resolution.motorIsMoving())
         while self.bl_control.resolution.motorIsMoving():
@@ -601,6 +655,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def move_detector(self, detector_distance):
         logging.info("<SOLEIL MultiCollect> move detector to %s" % detector_distance)
+        logging.getLogger("user_level_log").info("Moving the detector -- it may take a few seconds.")
         self.bl_control.detector_distance.move(detector_distance)
         while self.bl_control.detector_distance.motorIsMoving():
             time.sleep(0.5)

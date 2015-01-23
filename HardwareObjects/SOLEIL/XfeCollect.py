@@ -13,7 +13,7 @@ import math
 from xabs_lib import *
 
 class XfeCollect(object):
-    def __init__(self, integrationTime = 1., directory = '/tmp', prefix = 'test', sessionId = None, sampleId = None, test=False, optimize=False):
+    def __init__(self, integrationTime = .64, directory = '/tmp', prefix = 'test', sessionId = None, sampleId = None, test=False, optimize=False):
         self.integrationTime = integrationTime
         self.directory = directory
         self.prefix = prefix
@@ -153,10 +153,10 @@ class XfeCollect(object):
     def canSpectrum(self):
         return True
         
-    def setIntegrationTime(self, integrationTime = 1.):
+    def setIntegrationTime(self, integrationTime = 0.64):
         if self.test == True: return 0
         #self.counter.integrationTime = integrationTime
-        self.fluodet.presetvalue = int(integrationTime)
+        self.fluodet.presetvalue = float(integrationTime)
         
     def setROI(self, roi_debut = 0., roi_fin = 2048.):
         if self.test == True: return 0
@@ -225,7 +225,7 @@ class XfeCollect(object):
         if self.optimize != True:
             self.insertDetector()
             self.obx.Open()
-        self.transmission(1)
+        #self.transmission(1)
         time.sleep(1)
         self.set_collect_phase()
         self.open_fast_shutter()

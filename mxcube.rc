@@ -1,0 +1,3 @@
+export MXCUBE_ROOT=/home/experiences/proxima2a/com-proxima2a/mxcube_v2
+export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT:$MXCUBE_ROOT/HardwareObjects:$MXCUBE_ROOT/HardwareObjects/SOLEIL
+export XML_FILES_PATH=$MXCUBE_ROOT/HardwareObjects.xml/PX2

@@ -6,7 +6,7 @@ import time
 import os
 from BlissFramework.Utils import widget_colors
 
-__category__ = 'mxCuBE'
+__category__ = 'SOLEIL'
 
 PROPOSAL_GUI_EVENT = QEvent.User
 class ProposalGUIEvent(QCustomEvent):
@@ -221,7 +221,7 @@ class SoleilLoginBrick(BlissWidget):
     def logout(self):
         # Reset brick info
         #self.propNumber.setText("")
-        self.username.setText("")
+        self.userName.setText("")
         self.proposal=None
         self.session=None
         #self.sessionId=None
@@ -463,31 +463,38 @@ class SoleilLoginBrick(BlissWidget):
         prop_password=str(self.propPassword.text())
         self.propPassword.setText("")
 
-        if username=="" and prop_password=="":
-            if self.localLogin is None:
-                return self.refuseLogin(False,"Local login not configured.")
-            try:
-                locallogin_password=self.localLogin.password
-            except AttributeError:
-                return self.refuseLogin(False,"Local login not configured.")
-
-            if prop_password!=locallogin_password:
-                return self.refuseLogin(None,"Invalid local login password.")
-
-            now=time.strftime("%Y-%m-%d %H:%M:S")
-            prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
-            ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
-            try:
-                locallogin_person=self.localLogin.person
-            except AttributeError:
-                locallogin_person="local user"
-            pers_dict={'familyName':locallogin_person}
-            lab_dict={'name':'ESRF'}
-            cont_dict={'familyName':'local contact'}
-
-            logging.getLogger().debug("ProposalBrick: local login password validated")
+        if username=="" and prop_password == "":
+           # try:
+           #     locallogin_person=self.localLogin.person
+           #     locallogin_password=self.localLogin.password
+           # except AttributeError:
+           #     return self.refuseLogin(False,"Local login not configured.")
+   # 
+   #         if username==locallogin_person:
+                #if self.localLogin is None:
+                    #return self.refuseLogin(False,"Local login not configured.")
+                try:
+                    locallogin_password=self.localLogin.password
+                except AttributeError:
+                    return self.refuseLogin(False,"Local login not configured.")
+    
+                #if prop_password!=locallogin_password:
+                    #return self.refuseLogin(None,"Invalid local login password.")
+    
+                now=time.strftime("%Y-%m-%d %H:%M:S")
+                prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
+                ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
+                try:
+                    locallogin_person=self.localLogin.person
+                except AttributeError:
+                    locallogin_person="local user"
+                pers_dict={'familyName':locallogin_person}
+                lab_dict={'name':'ESRF'}
+                cont_dict={'familyName':'local contact'}
+    
+                logging.getLogger().debug("ProposalBrick: local login password validated")
             
-            return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
+                return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
         if self.ldapConnection is None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
@@ -548,11 +555,11 @@ class SoleilLoginBrick(BlissWidget):
                 self.refuseLogin(None,msg)
                 return
 
-            logging.getLogger().debug("ProposalBrick: password for %s-%s validated" % (proposal_code,proposal_number))
+            logging.getLogger().debug("ProposalBrick: password for %s validated" % (username,))
 
         # Get proposal and sessions
         logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
-        prop=self.dbConnection.getProposal(proposal_code,proposal_number)
+        prop=self.dbConnection.getProposal("toto","is a mockup")
 
         # Check if everything went ok
         prop_ok=True

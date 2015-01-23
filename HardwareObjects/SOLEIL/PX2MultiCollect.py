@@ -436,8 +436,45 @@ class PX2MultiCollect(SOLEILMultiCollect):
         print wedges
         logging.info('Wedges to collect %s' % wedges)
         return wedges
-           
-
+    
+    def get_sync_destination(self, directory, reference = '/home/experiences/proxima2a/com-proxima2a'):
+        logging.info('get_sync_destination')
+        self.sync_destination = os.path.join(reference, directory[1:])
+        sync_process = os.path.join(self.sync_destination, 'process')
+        logging.info('get_sync_destination %s ' %self.sync_destination )
+        os.system('ssh p10 "mkdir -p %s"' % sync_process)
+        
+    def synchronize_thread(self, directory, filename):
+        logging.info('Starting Synchronize Thread')
+        logging.info('filename %s ' % filename)
+        self.sthread = threading.Thread(target=self.synchronize_image, args=(directory, filename))
+        self.sthread.daemon = True
+        self.sthread.start()
+        
+    def synchronize_image(self, directory, filename):
+        logging.info('Synchronizing image %s' % filename)
+        filename = os.path.join(directory, filename)
+        while not os.path.exists(filename):
+            time.sleep(0.05)
+        logging.info('Size of the image after it came to existence %s' % os.path.getsize(filename))
+        time.sleep(0.2)
+        while os.path.getsize(filename) != 18874880:
+            time.sleep(0.05)
+        logging.info('Size of the image before sync %s' % os.path.getsize(filename))
+        print 'sync command %s' % ('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination))
+        os.system('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination))
+    
+    def sync_collect(self, file_location, last_file, image_file_template):
+        logging.info('sync_last_collect')
+        last_file = os.path.join(file_location, last_file)
+        start = time.time()
+        while (not os.path.exists(last_file)) and time.time() - start < 5.:
+            time.sleep(0.1)
+        source = os.path.join(file_location, image_file_template.replace('%04d', '*'))
+        print 'sync_collect'
+        print 'excuting command', 'ssh p10 "rsync -av %s %s"' % (source, self.sync_destination)
+        os.system('ssh p10 "rsync -av %s %s"' % (source, self.sync_destination))
+        
     @task
     def do_collect(self, owner, data_collect_parameters, in_multicollect=False):
         # reset collection id on each data collect
@@ -508,7 +545,8 @@ class PX2MultiCollect(SOLEILMultiCollect):
             # why .get() is not working as expected?
             # got KeyError anyway!
             if data_collect_parameters["take_snapshots"]:
-              self.take_crystal_snapshots()
+                pass
+                #self.take_crystal_snapshots()
         except KeyError:
             pass
 
@@ -640,7 +678,9 @@ class PX2MultiCollect(SOLEILMultiCollect):
               else:
                 # images have to be consecutive
                 break
-
+        
+        
+        
         if nframes == 0:
             return
             
@@ -746,6 +786,10 @@ class PX2MultiCollect(SOLEILMultiCollect):
             self.move_motors(motors_to_move_before_collect)
             self.bl_control.diffractometer.wait()
             self.safe_mono_turnoff()
+            
+            file_location = file_parameters["directory"]
+            self.get_sync_destination(file_location)
+            
             for start, wedge_size in wedges_to_collect:
                 k += 1
                 end = start + osc_range
@@ -758,6 +802,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                   jpeg_full_path = None
                   jpeg_thumbnail_full_path = None
                 file_location = file_parameters["directory"]
+                self.get_sync_destination(file_location)
                 file_path  = os.path.join(file_location, filename)
                 
                 logging.info("Frame %d, %7.3f to %7.3f degrees", frame, start, end)
@@ -814,7 +859,10 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                                    in_multicollect,
                                                    data_collect_parameters.get("sample_reference", {}).get("spacegroup", ""),
                                                    data_collect_parameters.get("sample_reference", {}).get("cell", ""))
+                
+                self.synchronize_thread(file_location, filename)
                 frame += 1
 
+            self.sync_collect(file_location, filename, image_file_template)
             self.finalize_acquisition()
 

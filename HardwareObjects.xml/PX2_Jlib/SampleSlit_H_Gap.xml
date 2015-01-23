@@ -1,7 +1,0 @@
-<device class = "TangoMotor">
-  <username>SampleSlit_H_Gap</username>
-  <tangoname>i11-ma-c04/ex/fent_h.2</tangoname> <!-- provisional tango name. Might not be necessary. The apperture on MD2 could do the job. --> 
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <channel type="tango" polling="1000" name="position">position</channel>
-  <interval>1000</interval>
-</device>

@@ -736,7 +736,11 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
         self.__num_cells = 0
         num_rows = (rect.bottom() - rect.top()) / self.__cell_height
         num_colls = (rect.right() - rect.left()) / self.__cell_width
-
+        logging.getLogger('HWR').info('drawShape')
+        logging.getLogger('HWR').info('rect: %s' % rect)
+        logging.getLogger('HWR').info('rect.bottom(), rect.top(), rect.right(), rect.left(): %s %s %s %s' % (rect.bottom(), rect.top(), rect.right(), rect.left()))
+        logging.getLogger('HWR').info('self.__cell_height, self.__cell_width : %s %s ' % (self.__cell_height, self.__cell_width))
+        
         if self.__highlighted:
             painter.setPen(qt.QPen(qt.Qt.green, 0, qt.Qt.SolidLine))
         else:
@@ -796,7 +800,8 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
 
         self.__num_rows = num_rows
         self.__num_colls = num_colls
-
+        logging.getLogger('HWR').info('grid num_rows, num_colls: %s %s' % (num_rows, num_colls))
+        
     def reshape(self):
         """
         Reshapes the grid, mostly used after it has been drawn or resized to
@@ -930,7 +935,10 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
                 'angle': 0}
         """
         rect = self.rect()
-
+        logging.getLogger('HWR').info('_get_grid')
+        logging.getLogger('HWR').info('rect: %s' % rect)
+        logging.getLogger('HWR').info('rect.bottom(), rect.top(), rect.right(), rect.left(): %s %s %s %s' % (rect.bottom(), rect.top(), rect.right(), rect.left()))
+        logging.getLogger('HWR').info('self.__cell_height, self.__cell_width : %s %s ' % (self.__cell_height, self.__cell_width))
         num_rows = (rect.bottom() - rect.top()) / self.__cell_height
         num_colls = (rect.right() - rect.left()) / self.__cell_width
         
@@ -954,9 +962,10 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
                 'beam_height': self.__beam_height / self.__y_pixel_size,
                 'angle': 0}
 
-        #print "Beam: " + str(self.__beam_pos)
-        #print "Grid: (%i, %i, %i, %i):" % (x, y, self.__cell_width, self.__cell_height)
-
+        print "Beam: " + str(self.__beam_pos)
+        print "Grid: (%i, %i, %i, %i):" % (x, y, self.__cell_width, self.__cell_height)
+        print 'grid: %s' % grid
+        logging.getLogger('HWR').info('grid: %s' % grid)
         return grid
 
     def __recalculate_beam_dim(self):
@@ -970,6 +979,8 @@ class CanvasGrid(qtcanvas.QCanvasRectangle) :
         self.__cell_width = int(self.__cell_width_mm * self.__x_pixel_size)
         self.__beam_width = int(beam_width_mm * self.__x_pixel_size)
         self.reshape()
+        grid = self._get_grid(1)
+        logging.getLogger('HWR').info('grid: %s' % grid)
 
     def set_cell_width(self, cell_width_mm):
         self.__cell_width_mm = cell_width_mm

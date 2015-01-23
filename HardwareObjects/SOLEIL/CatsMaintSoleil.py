@@ -16,7 +16,7 @@ __credits__ = ["The MxCuBE collaboration"]
 __email__ = "michael.hellmig@helmholtz-berlin.de"
 __status__ = "Beta"
 
-class CatsMaint(Equipment):
+class CatsMaintSoleil(Equipment):
     __TYPE__ = "CATS"    
     NO_OF_LIDS = 3
 
@@ -39,12 +39,13 @@ class CatsMaint(Equipment):
         self._chnLN2Regulation = self.getChannelObject("_chnLN2RegulationDewar1")
         self._chnLN2Regulation.connectSignal("update", self._updateRegulationState)
         logging.info('self._chnPathRunning %s' % self._chnPathRunning)
-        for command_name in ("_cmdReset", "_cmdBack", "_cmdSafe", "_cmdHome", "_cmdDry", "_cmdSoak", "_cmdPowerOn", "_cmdPowerOff", \
+        for command_name in ("_cmdReset", "_cmdBack", "_cmdSafe", "_cmdHome", "_cmdDry", "_cmdSoak", "_cmdClearMemory",\
+                             "_cmdOpenTool", "_cmdToolCal", "_cmdPowerOn", "_cmdPowerOff", \
                              "_cmdOpenLid1", "_cmdCloseLid1", "_cmdOpenLid2", "_cmdCloseLid2", "_cmdOpenLid3", "_cmdCloseLid3", \
                              "_cmdRegulOn"):
             setattr(self, command_name, self.getCommandObject(command_name))
 
-        for lid_index in range(CatsMaint.NO_OF_LIDS):            
+        for lid_index in range(self.NO_OF_LIDS):            
             channel_name = "_chnLid%dState" % (lid_index + 1)
             setattr(self, channel_name, self.getChannelObject(channel_name))
             if getattr(self, channel_name) is not None:
@@ -82,6 +83,24 @@ class CatsMaint(Equipment):
         Soaking the gripper
         """    
         return self._executeTask(False,self._doSoak)  
+        
+    def clearMemory(self):    
+        """
+        Moves the robot arm to the home position
+        """    
+        return self._executeTask(False,self._doClearMemory)  
+        
+    def opentool(self):    
+        """
+        Drying the gripper
+        """    
+        return self._executeTask(False,self._doOpentool)  
+        
+    def toolcalTraj(self):    
+        """
+        Soaking the gripper
+        """    
+        return self._executeTask(False,self._doToolCal)  
     ###
     
     def _doAbort(self):
@@ -150,9 +169,38 @@ class CatsMaint(Equipment):
         :returns: None
         :rtype: None
         """
-        argin = 1
+        argin = ('1', '2')
         self._executeServerTask(self._cmdSoak, argin)
+        
+    def _doClearMemory(self):
+        """
+        Execute "clear_memory" command on the CATS Tango DS
+
+        :returns: None
+        :rtype: None
+        """
+        #argin = 1
+        self._executeServerTask(self._cmdClearMemory)
     
+    def _doOpentool(self):
+        """
+        Open tool via the CATS Tango DS
+
+        :returns: None
+        :rtype: None
+        """
+        #argin = 1
+        self._executeServerTask(self._cmdOpenTool) #, argin)
+        
+    def _doToolCal(self):
+        """
+        Launch the "toolcal" trajectory on the CATS Tango DS
+
+        :returns: None
+        :rtype: None
+        """
+        #argin = 1
+        self._executeServerTask(self._cmdToolCal)     
     ###
     
     def _doPowerState(self, state=False):

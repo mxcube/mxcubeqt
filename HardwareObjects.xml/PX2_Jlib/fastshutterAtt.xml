@@ -1,8 +1,0 @@
-<device class="TangoShutterPX1">
-    <username>FastShutter</username>
-    <tangoname>i11-ma-cx1/ex/md2</tangoname>
-    <command type="tango" tangoname="i11-ma-cx1/ex/md2" name="open">OpenFastShutter</command>
-    <command type="tango" tangoname="i11-ma-cx1/ex/md2" name="close">CloseFastShutter</command>
-    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="state">State</channel>
-</device>
-

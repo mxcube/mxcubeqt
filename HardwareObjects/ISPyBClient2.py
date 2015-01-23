@@ -11,6 +11,7 @@ from suds.client import Client
 from suds import WebFault
 from suds.sudsobject import asdict
 from urllib2 import URLError
+from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from datetime import datetime
 from collections import namedtuple
@@ -25,8 +26,8 @@ _WSDL_ROOT = ''
 _WS_BL_SAMPLE_URL = _WSDL_ROOT + 'ToolsForBLSampleWebService?wsdl'
 _WS_SHIPPING_URL = _WSDL_ROOT + 'ToolsForShippingWebService?wsdl'
 _WS_COLLECTION_URL = _WSDL_ROOT + 'ToolsForCollectionWebService?wsdl'
-_WS_USERNAME = 'ispybws1'
-_WS_PASSWORD = '!5pybws1'
+_WS_USERNAME = 'ab361'
+_WS_PASSWORD = '1Spy6@Sun0'
 
 _CONNECTION_ERROR_MSG = "Could not connect to ISPyB, please verify that " + \
                         "the server is running and that your " + \
@@ -146,6 +147,7 @@ class ISPyBClient2(HardwareObject):
                 _WS_COLLECTION_URL = _WSDL_ROOT + \
                     'ToolsForCollectionWebService?wsdl'
 
+                print "Warming up"
                 t1 = HttpAuthenticated(username = _WS_USERNAME, 
                                       password = _WS_PASSWORD)
                 
@@ -156,14 +158,20 @@ class ISPyBClient2(HardwareObject):
                                       password = _WS_PASSWORD)
                 
                 try: 
+                    print "Connecting to shipping ", _WS_SHIPPING_URL
+                    print "  t1 is ", str(t1)
                     self.__shipping = Client(_WS_SHIPPING_URL, timeout = 3,
                                              transport = t1, cache = None)
                     self.__collection = Client(_WS_COLLECTION_URL, timeout = 3,
                                                transport = t2, cache = None)
                     self.__tools_ws = Client(_WS_BL_SAMPLE_URL, timeout = 3,
                                              transport = t3, cache = None)
+                    print "Got all things ready"
                     
                 except URLError:
+                    import traceback
+                    traceback.print_exc()
+                    print str(_CONNECTION_ERROR_MSG)
                     logging.getLogger("ispyb_client")\
                         .exception(_CONNECTION_ERROR_MSG)
                     return
@@ -1656,3 +1664,25 @@ class ISPyBArgumentError(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+def test():
+    import os
+
+    class NullHandler(logging.Handler):
+        def emit(self,record):
+            pass
+    h = NullHandler()
+    logging.getLogger("ispyb_client").addHandler(h)
+
+    hwr_directory = os.environ["XML_FILES_PATH"]
+
+    print hwr_directory
+    hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    conn = hwr.getHardwareObject("/dbconnection")
+
+if __name__ == '__main__':
+   test()
+

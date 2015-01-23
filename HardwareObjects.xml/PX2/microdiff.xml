@@ -1,6 +1,6 @@
 <!-- Q: redundant? -->
 <!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
-<equipment class="MicrodiffPX2"> <!-- "MicrodiffPX2" -->
+<equipment class="Microdiff"> <!-- "MicrodiffPX2" -->
     <username>Goniometer</username>
     <referencePosition>
         <phi delta="0.1">0.0</phi>

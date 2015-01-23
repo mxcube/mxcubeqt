@@ -649,7 +649,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
             try:
                 if dc.experiment_type is EXPERIMENT_TYPE.HELICAL:
                     acq_1, acq_2 = (dc.acquisitions[0], dc.acquisitions[1])
-                    self.collect_hwobj.getChannelObject("helical").setValue(1)
+                    #self.collect_hwobj.getChannelObject("helical").setValue(1)
 
                     start_cpos = acq_1.acquisition_parameters.centred_position
                     end_cpos = acq_2.acquisition_parameters.centred_position
@@ -658,15 +658,19 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                                          store_centred_position(end_cpos)
 
                     helical_oscil_pos = {'1': start_cpos.as_dict(), '2': end_cpos.as_dict()}
-                    self.collect_hwobj.getChannelObject('helical_pos').setValue(helical_oscil_pos)
-
+                    #self.collect_hwobj.getChannelObject('helical_pos').setValue(helical_oscil_pos)
+                    self.collect_hwobj.set_helical(True, helical_oscil_pos)
+                    
                     msg = "Helical data collection, moving to start position"
                     log.info(msg)
                     log.info("Moving sample to given position ...")
                     list_item.setText(1, "Moving sample")
                 else:
-                    self.collect_hwobj.getChannelObject("helical").setValue(0)
-
+                    #self.collect_hwobj.getChannelObject("helical").setValue(0)
+                    self.collect_hwobj.set_helical(False)
+                    #log.info('queue_entry, dc.acquisitions[0].acquisition_parameters.centred_position %s' % dc.acquisitions[0].acquisition_parameters.centred_position)
+                    self.collect_hwobj.set_collect_position(dc.acquisitions[0].acquisition_parameters.centred_position)
+                    
                 empty_cpos = queue_model_objects.CentredPosition()
 
                 if cpos != empty_cpos:
@@ -710,7 +714,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
             raise QueueExecutionException(msg, self)
 
     def collect_started(self, owner, num_oscillations):
-        logging.getLogger("user_level_log").info('Collection started')
+        logging.getLogger("user_level_log").info('Starting collection')
 
     def collect_number_of_frames(self, number_of_images=0):
         pass
@@ -1031,17 +1035,26 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         energy_scan = self.get_data_model()
         scan_file_path = os.path.join(energy_scan.path_template.directory,
                                       energy_scan.path_template.get_prefix())
-
+        logging.info('self.energy_scan_hwobj %s type %s' % (self.energy_scan_hwobj, type(self.energy_scan_hwobj)))
+        logging.info('energy_scan %s type %s' % (energy_scan, type(energy_scan)))
         scan_file_archive_path = os.path.join(energy_scan.path_template.\
                                               get_archive_directory(),
                                               energy_scan.path_template.get_prefix())
+        logging.info('energy_scan.element_symbol %s, energy_scan.edge %s, scan_file_archive_path %s, scan_file_path %s' %(energy_scan.element_symbol, energy_scan.edge, scan_file_archive_path, scan_file_path))
 
-        (pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm,
-         chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title) = \
-         self.energy_scan_hwobj.doChooch(None, energy_scan.element_symbol,
-                                         energy_scan.edge,
-                                         scan_file_archive_path,
-                                         scan_file_path)
+        egy_result = self.energy_scan_hwobj.doChooch(energy_scan.element_symbol, energy_scan.edge, scan_file_archive_path, scan_file_path)
+        
+        if egy_result is None:
+             logging.info('energy_scan. failed. ')
+             return None
+        
+        (pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title) = egy_result
+        #(pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm,
+         #chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title) = \
+         #self.energy_scan_hwobj.doChooch(None, energy_scan.element_symbol,
+                                         #energy_scan.edge,
+                                         #scan_file_archive_path,
+                                         #scan_file_path)
 
         #scan_info = self.energy_scan_hwobj.scanInfo
 

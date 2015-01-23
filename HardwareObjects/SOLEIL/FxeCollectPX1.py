@@ -9,7 +9,7 @@ import pylab
 import numpy
 import os
 import pickle
-import math
+
 
 #sys.exit()
 
@@ -23,10 +23,15 @@ class XfeCollector(object):
         self.integrationTime = integrationTime
         self.filename = filename
         
-        self.md2 = PyTango.DeviceProxy('i11-ma-cx1/ex/md2')
-        self.ketek = PyTango.DeviceProxy('i11-ma-cx1/dt/dtc-mca_xmap.1')
+        
+        self.ketek_ins = PyTango.DeviceProxy('i10-c-cx1/dt/dtc_sdd.1-pos')
+        self.fastshutter = PyTango.DeviceProxy('i10-c-cx1/ex/spishutter-pos')
+        self.ketek = PyTango.DeviceProxy('i10-c-cx1/dt/ketek.1')
         #self.counter = PyTango.DeviceProxy('i11-ma-c00/ca/cpt.2')
-        self.obx     = PyTango.DeviceProxy('i11-ma-c04/ex/obx.1')
+        self.obx     = PyTango.DeviceProxy('i10-c-c03/ex/obx.1')
+
+        print self.ketek.dynamicRange
+        print self.ketek.channel00
         
         self.channelToeV = self.ketek.dynamicRange / len(self.ketek.channel00)
         
@@ -35,7 +40,7 @@ class XfeCollector(object):
         except OSError, e:
             print e
         
-    def setIntegrationTime(self, integrationTime=.64):
+    def setIntegrationTime(self, integrationTime = 1.):
         #self.counter.integrationTime = integrationTime
         self.ketek.presetvalue = integrationTime
         
@@ -44,28 +49,28 @@ class XfeCollector(object):
         #self.ketek.SetROIs(numpy.array((roi_debut, roi_fin)))
         
     def insertDetector(self):
-        self.md2.write_attribute('FluoDetectorIsBack', 0)
+        self.ketek_ins.Insert()
         time.sleep(5)
     
     def extractDetector(self):
-        self.md2.write_attribute('FluoDetectorIsBack', 1)
+        self.ketek_ins.Extract()
         time.sleep(5)
         
     def measureSpectrum(self):
         #self.insert
         self.setIntegrationTime(self.integrationTime)
-        self.insertDetector()
-        self.obx.Open()
-        self.md2.FastShutterIsOpen = True #OpenFastShutter()
+#        self.insertDetector()
+#        self.obx.Open()
+        self.fastshutter.Open()
         self.ketek.Start()
         #self.counter.Start()
-        #time.sleep(self.integrationTime)
+        time.sleep(self.integrationTime)
         #while self.counter.State().name != 'STANDBY':
             #pass
-        #self.ketek.Abort()
-        self.md2.FastShutterIsOpen = False #CloseFastShutter()
-        self.obx.Close()
-        self.extractDetector()
+        self.ketek.Abort()
+        self.fastshutter.Close()
+#        self.obx.Close()
+#        self.extractDetector()
         
     def getSpectrum(self):
         return self.ketek.channel00
@@ -104,7 +109,7 @@ if __name__ == '__main__':
 
     parser.add_option('-e', '--exposure', default = 2.0, type = float, help = 'integration time (default: %default)')
     parser.add_option('-x', '--prefix', default = 'test', type = str, help = 'prefix (default = %default)')
-    parser.add_option('-d', '--directory', default = '/tmp/fxetests2', type = str, help = 'where to store spectrum collected (default: %default)')
+    parser.add_option('-d', '--directory', default = '.', type = str, help = 'where to store spectrum collected (default: %default)')
 
     (options, args) = parser.parse_args()
     print options

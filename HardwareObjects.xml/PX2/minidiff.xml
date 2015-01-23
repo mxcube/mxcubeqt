@@ -1,13 +1,9 @@
-<!-- Q: redundant? -->
-<!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
 <equipment class="MiniDiffPX2">
     <username>Goniometer</username>
     <tangoname>i11-ma-cx1/ex/md2</tangoname>
     <phiy_direction>-1</phiy_direction>
-    
-    <!-- command type="tango" name="start_scan">StartScan</command -->
-    <!-- channel type="tango" name="scan_start_angle">ScanStartAngle</command-->
-
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="beam_position_y">BeamPositionHorizontal</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="beam_position_y">BeamPositionVertical</channel>
     <referencePosition>
         <phi delta="0.1">0.0</phi>
         <phiz delta="0.01">0.0</phiz>
@@ -43,8 +39,6 @@
         <phi-shutter>
             <device role="phi" hwrid="/phi"></device>
             <device role="phiz" hwrid="/vertical"></device>  
-            <!-- device role="omega" hwrid="/tangoOmega"></device -->
-            <!-- device role="kappa" hwrid="/tangoKappa"></device -->
         </phi-shutter>
         <sample>
             <device role="zoom" hwrid="/zoom"></device>
@@ -53,8 +47,6 @@
             <device role="phiy" hwrid="/horizontal"></device>  
             <device role="sampx" hwrid="/sampx"></device>
             <device role="sampy" hwrid="/sampy"></device>
-            <!-- device role="beamcenterx" hwrid="/beamcenterX"></device -->
-            <!-- device role="beamcenterz" hwrid="/beamcenterZ"></device -->
         </sample>
     </motors>
     <wagolight>/udiff_light</wagolight>

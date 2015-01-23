@@ -1,4 +1,5 @@
 <equipment class="EnergyScanPX2">
+
     <object href="/fastshutter" role="fast_shutter" />
 
     <tangoname>/BLEnergy</tangoname> 
