@@ -834,9 +834,9 @@ class Qt4_DataCollectTree(QtGui.QWidget):
 
                      if path_conflict:
                          conflict = True
-                         item.setIcon(QtGui.QIcon(self.caution_pixmap))
-                     else:
-                         item.setIcon(QtGui.QIcon())
+                         item.setIcon(0, QtGui.QIcon(self.caution_pixmap))
+                     #else:
+                     #    item.setIcon(QtGui.QIcon())
                          
             it += 1
             item = it.value()

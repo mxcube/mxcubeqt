@@ -96,12 +96,12 @@ class Qt4_DataPathWidget(QtGui.QWidget):
                      self._folder_ledit_change)
 
     def _browse_clicked(self):
-        get_dir = qt.QFileDialog(self)
+        get_dir = QtGui.QFileDialog(self)
         given_dir = self._base_image_dir
 
-        d = str(get_dir.getExistingDirectory(given_dir, self, "",
+        d = str(get_dir.getExistingDirectory(self, given_dir,
                                              "Select a directory", 
-                                             True, False))
+                                             QtGui.QFileDialog.ShowDirsOnly))
         d = os.path.dirname(d)
 
         if d is not None and len(d) > 0:
@@ -113,18 +113,18 @@ class Qt4_DataPathWidget(QtGui.QWidget):
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
         file_name = file_name.strip(' ')
-        self.data_path_widget.child('file_name_value_label').setText(file_name)
+        self.data_path_widget.findChild(QtGui.QLineEdit, 'file_name_value_label').setText(file_name)
         
-        self.emit(qt.PYSIGNAL('path_template_changed'),
-                  (self.data_path_widget.child('prefix_ledit'),
-                   new_value))
+        self.emit(QtCore.SIGNAL('path_template_changed'),
+                  self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
+                  new_value)
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.set_run_number(new_value)
-            self.emit(qt.PYSIGNAL('path_template_changed'),
-                      (self.data_path_widget.child('run_number_ledit'),
-                       new_value))
+            self.emit(QtCore.SIGNAL('path_template_changed'),
+                      self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
+                      new_value)
 
     def _folder_ledit_change(self, new_value):        
         base_image_dir = self._base_image_dir
@@ -142,19 +142,19 @@ class Qt4_DataPathWidget(QtGui.QWidget):
             
         self._data_model.directory = new_image_directory
         self._data_model.process_directory = new_proc_dir 
-        self.data_path_widget.child('folder_ledit').\
-            setPaletteBackgroundColor(Qt4_widget_colors.WHITE)
+        Qt4_widget_colors.set_widget_color(self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit'), 
+                                           Qt4_widget_colors.WHITE)
 
-        self.emit(qt.PYSIGNAL('path_template_changed'),
-                  (self.data_path_widget.child('folder_ledit'),
-                   new_value))
+        self.emit(QtCore.SIGNAL('path_template_changed'),
+                  self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit'),
+                  new_value)
 
     def set_data_path(self, path):
         (dir_name, file_name) = os.path.split(path)
         self.set_directory(dir_name)
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
-        self.data_path_widget.child('file_name_value_label').setText(file_name)
+        self.data_path_widget.findChild(QtGui.QLabel, 'file_name_value_label').setText(file_name)
     
     def set_directory(self, directory):
         base_image_dir = self._base_image_dir
@@ -163,25 +163,25 @@ class Qt4_DataPathWidget(QtGui.QWidget):
         if len(dir_parts) > 1:
             sub_dir = dir_parts[1]        
             self._data_model.directory = directory
-            self.data_path_widget.child('folder_ledit').setText(sub_dir)
+            self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit').setText(sub_dir)
         else:
-            self.data_path_widget.child('folder_ledit').setText('')
+            self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit').setText('')
             self._data_model.directory = base_image_dir
 
-        self.data_path_widget.child('base_path_label').setText(base_image_dir)
+        self.data_path_widget.findChild(QtGui.QLineEdit, 'base_path_label').setText(base_image_dir)
 
     def set_run_number(self, run_number):
         self._data_model.run_number = int(run_number)
-        self.data_path_widget.child('run_number_ledit').\
+        self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit').\
             setText(str(run_number))
 
     def set_prefix(self, base_prefix):
         self._data_model.base_prefix = str(base_prefix)
-        self.data_path_widget.child('prefix_ledit').setText(str(base_prefix))
+        self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit').setText(str(base_prefix))
         file_name = self._data_model.get_image_file_name()
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
-        self.data_path_widget.child('file_name_value_label').setText(file_name)
+        self.data_path_widget.findChild(QtGui.QLabel, 'file_name_value_label').setText(file_name)
 
     def update_data_model(self, data_model):
         self._data_model = data_model
@@ -190,13 +190,13 @@ class Qt4_DataPathWidget(QtGui.QWidget):
 
     def indicate_path_conflict(self, conflict):
         if conflict:
-            self.data_path_widget.child('prefix_ledit').\
+            self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit').\
                 setPaletteBackgroundColor(Qt4_widget_colors.LIGHT_RED)
             
-            self.data_path_widget.child('run_number_ledit').\
+            self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit').\
                 setPaletteBackgroundColor(Qt4_widget_colors.LIGHT_RED)
 
-            self.data_path_widget.child('folder_ledit').\
+            self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit').\
                 setPaletteBackgroundColor(Qt4_widget_colors.LIGHT_RED)
 
             logging.getLogger("user_level_log").\
@@ -207,14 +207,12 @@ class Qt4_DataPathWidget(QtGui.QWidget):
             if self.path_conflict_state:
                 logging.getLogger("user_level_log").info('Path valid')
 
-            self.data_path_widget.child('prefix_ledit').\
-                setPaletteBackgroundColor(Qt4_widget_colors.WHITE)
-            
-            self.data_path_widget.child('run_number_ledit').\
-                setPaletteBackgroundColor(Qt4_widget_colors.WHITE)
-
-            self.data_path_widget.child('folder_ledit').\
-                setPaletteBackgroundColor(Qt4_widget_colors.WHITE)
+            Qt4_widget_colors.set_widget_color(self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
+                                               Qt4_widget_colors.WHITE)
+            Qt4_widget_colors.set_widget_color(self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
+                                               Qt4_widget_colors.WHITE)
+            Qt4_widget_colors.set_widget_color(self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit'),
+                                               Qt4_widget_colors.WHITE)
 
         self.path_conflict_state = conflict
             

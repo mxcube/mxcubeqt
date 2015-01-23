@@ -79,7 +79,7 @@ class Qt4_DataModelInputBinder(object):
             elif isinstance(widget, QtGui.QLabel):        
                 widget.setText(str(getattr(self.__model, field_name)))
             elif isinstance(widget, QtGui.QComboBox):
-                widget.setCurrentItem(int(getattr(self.__model, field_name)))
+                widget.setCurrentIndex(int(getattr(self.__model, field_name)))
             elif isinstance(widget, QtGui.QCheckBox) or \
                     isinstance(widget, QtGui.QRadioButton):
                 widget.setChecked(bool(getattr(self.__model, field_name)))       

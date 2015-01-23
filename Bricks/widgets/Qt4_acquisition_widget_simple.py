@@ -108,7 +108,7 @@ class Qt4_AcquisitionWidgetSimple(QtGui.QWidget):
         self.acq_widget.findChild(QtGui.QLineEdit, 'kappa_ledit').setDisabled(state)
 
     def use_kappa_phi(self, state):
-        self.acq_widget.findChild('kappa_phi_ledit').setDisabled(state)
+        self.acq_widget.findChild(QtGui.QLineEdit, 'kappa_phi_ledit').setDisabled(state)
     
     def update_num_images(self, index = None, num_images = None):
         if index is not None:
@@ -123,18 +123,18 @@ class Qt4_AcquisitionWidgetSimple(QtGui.QWidget):
                 self._path_template.num_files = 4
 
         if num_images:
-            if self.acq_widget.findChild('num_images_cbox').count() > 3:
-                self.acq_widget.findChild('num_images_cbox').removeItem(4)
+            if self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').count() > 3:
+                self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').removeItem(4)
         
             if num_images is 1:
-                self.acq_widget.findChild('num_images_cbox').setCurrentItem(0)    
+                self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').setCurrentIndex(0)    
             elif num_images is 2:
-                self.acq_widget.findChild('num_images_cbox').setCurrentItem(1)
+                self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').setCurrentIndex(1)
             elif num_images is 4:
-                self.acq_widget.findChild('num_images_cbox').setCurrentItem(2)
+                self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').setCurrentIndex(2)
             else:
-                self.acq_widget.findChild('num_images_cbox').insertItem(str(num_images))
-                self.acq_widget.findChild('num_images_cbox').setCurrentItem(3)
+                self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').addItem(str(num_images))
+                self.acq_widget.findChild(QtGui.QComboBox, 'num_images_cbox').setCurrenIndex(3)
 
             self._path_template.num_files = num_images
 

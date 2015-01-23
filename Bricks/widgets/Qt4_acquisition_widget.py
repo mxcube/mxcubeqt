@@ -58,9 +58,9 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
         if layout == "horizontal":
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
-            self.acq_widget.child('inverse_beam_cbx').hide()
-            self.acq_widget.child('subwedge_size_label').hide()
-            self.acq_widget.child('subwedge_size_ledit').hide()
+            self.acq_widget.findChild(QtGui.QCheckBox, 'inverse_beam_cbx').hide()
+            self.acq_widget.findChild(QtGui.QLabel, 'subwedge_size_label').hide()
+            self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').hide()
         else:
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
@@ -112,7 +112,7 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
 
     def osc_start_cbox_click(self, state):
         self.update_osc_start(self._beamline_setup._get_omega_axis_position())
-        self.acq_widget.child('osc_start_ledit').setEnabled(state)
+        self.acq_widget.findChild(QtGui.QLineEdit, 'osc_start_ledit').setEnabled(state)
 
     def update_osc_start(self, new_value):
         if not self.acq_widget.findChild(QtGui.QCheckBox, 'osc_start_cbox').isChecked():
@@ -128,8 +128,8 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
             self._acquisition_parameters.osc_start = osc_start_value
 
     def use_osc_start(self, state):
-        self.acq_widget.child('osc_start_cbox').setChecked(state)
-        self.acq_widget.child('osc_start_cbox').setDisabled(state)
+        self.acq_widget.findChild(QtGui.QCheckBox, 'osc_start_cbox').setChecked(state)
+        self.acq_widget.findChild(QtGui.QCheckBox, 'osc_start_cbox').setDisabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
@@ -264,13 +264,13 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
                 pass
 
             if new_value != 0:
-                self.acq_widget.child('shutterless_cbx').\
+                self.acq_widget.findChild(QtGui.QCheckBox, 'shutterless_cbx').\
                     setEnabled(False)
-                self.acq_widget.child('shutterless_cbx').setChecked(False)
+                self.acq_widget.findChild(QtGui.QCheckBox, 'shutterless_cbx').setChecked(False)
                 self._acquisition_parameters.shutterless = False
             else:
-                self.acq_widget.child('shutterless_cbx').setEnabled(True)
-                self.acq_widget.child('shutterless_cbx').setChecked(True)
+                self.acq_widget.findChild(QtGui.QCheckBox, 'shutterless_cbx').setEnabled(True)
+                self.acq_widget.findChild(QtGui.QCheckBox, 'shutterless_cbx').setChecked(True)
                 self._acquisition_parameters.shutterless = True
 
     def use_mad(self, state):
@@ -291,24 +291,24 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
 
     def set_use_inverse_beam(self, state):
         if state:
-            self.acq_widget.child('subwedge_size_ledit').setEnabled(True)
+            self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').setEnabled(True)
         else:
-            self.acq_widget.child('subwedge_size_ledit').\
+            self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').\
                  setDisabled(True)
 
     def use_inverse_beam(self):
-        return self.acq_widget.child('inverse_beam_cbx').isOn()
+        return self.acq_widget.findChild(QtGui.QCheckBox, 'inverse_beam_cbx').checkState == QtCore.Qt.Checked
 
     def get_num_subwedges(self):
-        return int(self.acq_widget.child('subwedge_size_ledit').text())
+        return int(self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').text())
 
     def subwedge_size_ledit_change(self, new_value):
-        widget = self.acq_widget.child('subwedge_size_ledit')
+        widget = self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit')
 
         if int(new_value) > self._acquisition_parameters.num_images:
-            widget.setPaletteBackgroundColor(Qt4_widget_colors.LIGHT_RED)
+            Qt4_widget_colors.set_widget_color(widget, Qt4_widget_colors.LIGHT_RED)
         else:
-            widget.setPaletteBackgroundColor(Qt4_widget_colors.WHITE)
+            Qt4_widget_colors.set_widget_color(widget, Qt4_widget_colors.WHITE)
 
     def get_mad_energy(self):
         energy_str = str(self.acq_widget.\
@@ -322,7 +322,8 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
         return (name, value)
 
     def set_energies(self, energy_scan_result):
-        self.acq_widget.child('energies_combo').clear()
+        self.acq_widget.findChild(QtGui.QComboBox,
+                                  'energies_combo').clear()
 
         inflection = ('ip: %.4f' % energy_scan_result.inflection) if \
                      energy_scan_result.inflection else 'ip: -'
@@ -336,11 +337,8 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
         second_remote = ('rm2: %.4f' % energy_scan_result.second_remote) if \
                         energy_scan_result.second_remote else 'rm2: -'
 
-        self.acq_widget.child('energies_combo').\
-            insertStrList([inflection,
-                           peak,
-                           first_remote,
-                           second_remote])
+        self.acq_widget.findChild(QtGui.QComboBox, 'energies_combo').\
+             addItems([inflection, peak, first_remote, second_remote])
 
     def energy_selected(self, index):
         if self.acq_widget.findChild(QtGui.QCheckBox, 'mad_cbox').isChecked():
@@ -376,13 +374,13 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
         if mad:
             mad_prefix = self._path_template.mad_prefix
             index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
-            self.acq_widget.child('energies_combo').setCurrentItem(index)
-            self.acq_widget.child('mad_cbox').setChecked(True)
-            self.acq_widget.child('energies_combo').setEnabled(True)
+            self.acq_widget.findChild(QtGui.QComboBox, 'energies_combo').setCurrentIndex(index)
+            self.acq_widget.findChild(QtGui.QCheckBox, 'mad_cbox').setChecked(True)
+            self.acq_widget.findChild(QtGui.QComboBox, 'energies_combo').setEnabled(True)
         else:
-            self.acq_widget.child('mad_cbox').setChecked(False)
-            self.acq_widget.child('energies_combo').setEnabled(False)
-            self.acq_widget.child('energies_combo').setCurrentItem(0)
+            self.acq_widget.findChild(QtGui.QCheckBox, 'mad_cbox').setChecked(False)
+            self.acq_widget.findChild(QtGui.QComboBox, 'energies_combo').setEnabled(False)
+            self.acq_widget.findChild(QtGui.QComboBox, 'energies_combo').setCurrentIndex(0)
 
     def set_tunable_energy(self, state):
         self.acq_widget.findChild(QtGui.QLineEdit, 'energy_ledit').setEnabled(state)
@@ -391,19 +389,19 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
 
     def disable_inverse_beam(self, state):
         if state:
-            self.acq_widget.child('inverse_beam_cbx').hide()
-            self.acq_widget.child('subwedge_size_label').hide()
-            self.acq_widget.child('subwedge_size_ledit').hide()
+            self.acq_widget.findChild(QtGui.QCheckBox, 'inverse_beam_cbx').hide()
+            self.acq_widget.findChild(QtGui.QLabel, 'subwedge_size_label').hide()
+            self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').hide()
         else:
-            self.acq_widget.child('inverse_beam_cbx').show()
-            self.acq_widget.child('subwedge_size_label').show()
-            self.acq_widget.child('subwedge_size_ledit').show()
+            self.acq_widget.findChild(QtGui.QCheckBox, 'inverse_beam_cbx').show()
+            self.acq_widget.findChild(QtGui.QLabel, 'subwedge_size_label').show()
+            self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').show()
 
     def hide_aperture(self, state):
         pass
         #if state:
-        #    self.acq_widget.child('aperture_ledit').show()
-        #    self.acq_widget.child('aperture_cbox').show()
+        #    self.acq_widget.findChild('aperture_ledit').show()
+        #    self.acq_widget.findChild('aperture_cbox').show()
         #else:
-        #    self.acq_widget.child('aperture_ledit').hide()
-        #    self.acq_widget.child('aperture_cbox').hide()
+        #    self.acq_widget.findChild('aperture_ledit').hide()
+        #    self.acq_widget.findChild('aperture_cbox').hide()

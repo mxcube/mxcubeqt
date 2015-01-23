@@ -22,6 +22,7 @@ import copy
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import uic
 
 import Qt4_queue_item
 import Qt4_GraphicsManager as graphics_manager
@@ -60,9 +61,38 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
                                     path_template = self._path_template)
         self._acq_widget.setFixedHeight(170)
 
+        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
+        self._data_path_widget = Qt4_DataPathWidget(
+                               self._data_path_gbox,
+                               data_model = self._path_template,
+                               layout = 'vertical')
+
+
+        self._vertical_dimension_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+             'ui_files/Qt4_vertical_crystal_dimension_widget_layout.ui'))
+        
+        self._char_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+             'ui_files/Qt4_characterise_simple_widget_vertical_layout.ui')) 
+
+        gbox =  self._char_widget.findChild(QtGui.QGroupBox, "characterisation_gbox")
+        p = gbox.palette();
+        p.setColor(QtGui.QPalette.Window, QtCore.Qt.red);
+        p.setColor(QtGui.QPalette.Highlight, QtCore.Qt.red);
+        gbox.setPalette(p);
+
         # Layout --------------------------------------------------------------
+        _data_path_gbox_layout = QtGui.QVBoxLayout(self)
+        _data_path_gbox_layout.addWidget(self._data_path_widget)
+        _data_path_gbox_layout.setSpacing(0)
+        _data_path_gbox_layout.setContentsMargins(0,0,0,0)
+        self._data_path_gbox.setLayout(_data_path_gbox_layout)
+
+
         _acq_frame_layout = QtGui.QVBoxLayout(self)
         _acq_frame_layout.addWidget(self._acq_widget)
+        _acq_frame_layout.addWidget(self._data_path_gbox)
+        _acq_frame_layout.addWidget(self._char_widget)
+        _acq_frame_layout.addWidget(self._vertical_dimension_widget)
         _acq_frame_layout.setSpacing(0)
         _acq_frame_layout.setContentsMargins(0,0,0,0)
         _acq_frame.setLayout(_acq_frame_layout)
@@ -77,40 +107,6 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
         self.setLayout(main_layout)
 
         return
-
-        self._acq_widget = \
-            Qt4_AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
-                                    path_template = self._path_template)
-        self._acq_widget.setFixedHeight(170)
-
-        current_dir = os.path.dirname(__file__)
-        ui_file = 'ui_files/vertical_crystal_dimension_widget_layout.ui'
-        widget = qtui.QWidgetFactory.create(os.path.join(current_dir, ui_file))
-
-        widget.reparent(self, qt.QPoint(0,0))
-        self._vertical_dimension_widget = widget
-
-        ui_file = 'ui_files/characterise_simple_widget_vertical_layout.ui'
-        widget = qtui.QWidgetFactory.\
-                 create(os.path.join(current_dir, ui_file))
-
-        widget.reparent(self, qt.QPoint(0,0))
-        self._char_widget = widget
-
-        self._data_path_gbox = \
-            qt.QVGroupBox('Data location', self, 'data_path_gbox')
-        
-        self._data_path_widget = \
-            Qt4_DataPathWidget(self._data_path_gbox, 
-                           data_model = self._path_template,
-                           layout = 'vertical')
-
-        v_layout.addWidget(self._acq_widget)
-        v_layout.addWidget(self._data_path_gbox)
-        v_layout.addWidget(self._char_widget)
-        v_layout.addWidget(self._vertical_dimension_widget)
-        v_layout.addStretch(100)
-
         #
         # Logic
         #
@@ -211,7 +207,7 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
 
         self._space_group_change(index)
         self._vertical_dimension_widget.\
-            child('space_group_ledit').setCurrentItem(index)
+            findChild(QtGui.QComboBox, 'space_group_ledit').setCurrentIndex(index)
 
     def init_models(self):
         Qt4_CreateTaskBase.init_models(self)
@@ -329,7 +325,7 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
 
         if not shape:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager.get_snapshot([])
+            cpos.snapshot_image = self._graphics_manager.get_snapshot(shape)
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes

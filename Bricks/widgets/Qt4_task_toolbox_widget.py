@@ -233,15 +233,12 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         if self.tool_box.currentWidget().approve_creation():
             items = self.tree_brick.get_selected_items()
 
-	    print 1	
             if not items:
                 logging.getLogger("user_level_log").\
                     warning("Select the sample or group you "\
                             "would like to add to.")
             else:
                 for item in items:
-                    print 2
-                    print item
                     shapes = self.shape_history.selected_shapes
                     task_model = item.get_model()
 
@@ -250,10 +247,11 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
                         group_task_node = queue_model_objects.TaskGroup()
                         current_item = self.tool_box.currentWidget()
 
-                        if current_item is self.workflow_page:
+                        """if current_item is self.workflow_page:
                             group_name = current_item._workflow_cbox.currentText()
                         else:
-                            group_name = current_item._task_node_name
+                            group_name = current_item._task_node_name"""
+                        group_name = current_item._task_node_name
 
                         group_task_node.set_name(group_name)
                         num = task_model.get_next_number_for_name(group_name)
@@ -276,7 +274,7 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-            task_list = self.tool_box.currentItem().create_task(sample, shape)
+            task_list = self.tool_box.currentWidget().create_task(sample, shape)
 
             for child_task_node in task_list:
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)

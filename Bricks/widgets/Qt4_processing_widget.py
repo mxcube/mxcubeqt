@@ -105,7 +105,7 @@ class Qt4_ProcessingWidget(QtGui.QWidget):
             index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
         
         self._space_group_change(index)
-        self.processing_widget.findChild(QtGui.QComboBox, 'space_group_cbox').setCurrentItem(index)
+        self.processing_widget.findChild(QtGui.QComboBox, 'space_group_cbox').setCurrentIndex(index)
 
     def update_data_model(self, model):
         self._model = model
