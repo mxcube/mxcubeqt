@@ -57,9 +57,9 @@ class Qt4_TreeBrick(BlissWidget):
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("holderLengthMotor", "string", "")
-        self.addProperty("queue", "string", "/queue")
-        self.addProperty("queue_model", "string", "/queue-model")
-        self.addProperty("beamline_setup", "string", "/beamline-setup")
+        self.addProperty("queue", "string", "/Qt4_queue")
+        self.addProperty("queue_model", "string", "/Qt4_queue-model")
+        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
 
         # Signals ------------------------------------------------------------

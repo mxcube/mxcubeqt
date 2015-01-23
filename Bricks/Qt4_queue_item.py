@@ -56,6 +56,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
         self._data_model = None
         self._checkable = True
         self._font_is_bold = False
+        self.setText(1, '')         
 
     def activate(self):
          """
@@ -227,22 +228,23 @@ class SampleQueueItem(QueueItem):
         self.mounted_style = False
 
         QueueItem.__init__(self, *args, **kwargs)
+        
 
     def update_pin_icon(self):
         dc_tree_widget = self.listView().parent()
 
         if  dc_tree_widget._loaded_sample_item:
-            dc_tree_widget._loaded_sample_item.setPixmap(0, qt.QPixmap())
+            dc_tree_widget._loaded_sample_item.setIcon(0, qt.QPixmap())
             
         dc_tree_widget._loaded_sample_item = self
-        self.setPixmap(0, dc_tree_widget.pin_pixmap)
+        self.setIcon(0, QtGui.QIcon(dc_tree_widget.pin_pixmap))
 
     def set_mounted_style(self, state, clear_background = False):
         self.mounted_style = state
 
         if state:
             self.setIcon(0, QtGui.QIcon(PIN_PIXMAP))
-            self.setBackground(1, QtGui.QBrush(Qt4_widget_colors.SKY_BLUE)) 
+            self.setBackground(0, QtGui.QBrush(Qt4_widget_colors.SKY_BLUE)) 
             self.setSelected(True)
             bold_fond = self.font(1)
             bold_fond.setBold(True)
@@ -251,7 +253,7 @@ class SampleQueueItem(QueueItem):
             self.setIcon(0, QtGui.QIcon())
 
             if clear_background:
-               self.setBackgroundColor(Qt4_widget_colors.WHITE)  
+               self.setBackgroundColor(0, Qt4_widget_colors.WHITE)  
             else:
                 queue_entry = self.get_queue_entry()
 
@@ -277,7 +279,7 @@ class BasketQueueItem(QueueItem):
 
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
+        #kwargs['controller'] = qt.QCheckListItem.CheckBoxController
         kwargs['deletable'] = True
         
         QueueItem.__init__(self, *args, **kwargs)

@@ -433,14 +433,14 @@ class Qt4_ProposalBrick2(BlissWidget):
     def refuseLogin(self,stat,message=None):
         if message is not None:
             if stat is False:
-                icon=QMessageBox.Critical
+                icon = QtGui.QMessageBox.Critical
             elif stat is None:
-                icon=QMessageBox.Warning
+                icon = QtGui.QMessageBox.Warning
             elif stat is True:
-                icon=QMessageBox.Information
-            msg_dialog=QMessageBox("Register user",message,\
-                icon,QMessageBox.Ok,QMessageBox.NoButton,\
-                QMessageBox.NoButton,self)
+                icon = QtGui.QMessageBox.Information
+            msg_dialog = QtGui.QMessageBox("Register user",message,\
+                icon, QtGui.QMessageBox.Ok, QtGui.QMessageBox.NoButton,\
+                QtGui.QMessageBox.NoButton,self)
             s=self.font().pointSize()
             f = msg_dialog.font()
             f.setPointSize(s)
