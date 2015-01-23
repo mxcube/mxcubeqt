@@ -15,8 +15,8 @@ SC_STATE_COLOR = { SampleChangerState.Fault: widget_colors.LIGHT_RED,
                    SampleChangerState.Closing: widget_colors.LIGHT_YELLOW,
                    SampleChangerState.Charging: widget_colors.LIGHT_GREEN,
                    SampleChangerState.Alarm: widget_colors.LIGHT_RED,
-                   SampleChangerState.Disabled: None,
-                   SampleChangerState.Unknown: None}
+                   SampleChangerState.Disabled: widget_colors.LIGHT_RED,
+                   SampleChangerState.Unknown: widget_colors.LIGHT_RED}
 
 SC_STATE_GENERAL = { SampleChangerState.Ready: True,
                      SampleChangerState.Alarm: True }
