@@ -1,3 +1,4 @@
+from HardwareRepository import HardwareRepository
 
 import logging
 import time
@@ -51,7 +52,6 @@ class TangoDCMotor(Device):
             self.dataType    = self.getProperty("datatype")
             if self.dataType is None:
                 self.dataType    = "float"
-            logging.getLogger("HWR").info("TangoDCMotor dataType found in config, it is %s", self.dataType)
         except:
             self.dataType    = "float"
 
@@ -236,3 +236,16 @@ class TangoDCMotor(Device):
         logging.getLogger().debug("%s: TangoDCMotor.isSpecConnected()" % self.name())
         return TruehardwareObjectName,
     
+def test():
+    import os
+    hwr_directory = os.environ["XML_FILES_PATH"]
+
+    hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    motor = hwr.getHardwareObject("/phi")
+    print motor.getPosition()
+
+if __name__ == '__main__':
+    test()
+
