@@ -29,7 +29,7 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from HardwareRepository.HardwareRepository import dispatcher
-from widgets.Qt4_dc_tree_widget import Qt4_DataCollectTree
+from widgets.Qt4_dc_tree_widget import DataCollectTree
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
 
 
@@ -49,8 +49,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_hwobj = None
         self.queue_hwobj = None
 
-        # Internal values -----------------------------------------------------
-
+        # Internal variables --------------------------------------------------
         self.current_cpos = None
         self.__collection_stopped = False 
         self.current_view = None
@@ -116,7 +115,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_widget.findChild(QtGui.QPushButton, 
             'synch_button').setText("Synch ISPyB")
 
-        self.dc_tree_widget = Qt4_DataCollectTree(self)
+        self.dc_tree_widget = DataCollectTree(self)
         self.dc_tree_widget.selection_changed_cb = self.selection_changed
         self.dc_tree_widget.run_cb = self.run
         #self.dc_tree_widget.clear_centred_positions_cb = \
@@ -160,14 +159,14 @@ class Qt4_TreeBrick(BlissWidget):
 
     # Framework 2 method
     def run(self):
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     # Framework 2 method
     def propertyChanged(self, property_name, old_value, new_value):
@@ -269,13 +268,13 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.enable_collect(state)
 
     def enable_hutch_menu(self, state):
-        self.emit(QtCore.SIGNAL("enable_hutch_menu"), (state,))
+        self.emit(QtCore.SIGNAL("enable_hutch_menu"), state)
 
     def enable_command_menu(self, state):
-        self.emit(QtCore.SIGNAL("enable_command_menu"), (state,))
+        self.emit(QtCore.SIGNAL("enable_command_menu"), state)
 
     def enable_task_toolbox(self, state):
-        self.emit(QtCore.SIGNAL("enable_task_toolbox"), (state,))
+        self.emit(QtCore.SIGNAL("enable_task_toolbox"), state)
 
     def get_tree_brick(self, tree_brick):
         """
@@ -452,38 +451,38 @@ class Qt4_TreeBrick(BlissWidget):
     def show_sample_centring_tab(self):
         self.sample_changer_widget.findChild(QtGui.QPushButton, 
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     def show_sample_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("populate_sample_details"), (item.get_model(),))
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("populate_sample_details"), item.get_model())
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     def show_dcg_tab(self):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     def populate_parameters_tab(self, item = None):
         self.emit(QtCore.SIGNAL("populate_parameter_widget"),
@@ -492,25 +491,25 @@ class Qt4_TreeBrick(BlissWidget):
     def show_datacollection_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_parameters_tab(item)
 
     def show_edna_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_edna_parameters_tab(item)
 
     def populate_edna_parameters_tab(self, item):
@@ -520,13 +519,13 @@ class Qt4_TreeBrick(BlissWidget):
     def show_energy_scan_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,)) 
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (False,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (True,))
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True) 
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
@@ -538,13 +537,13 @@ class Qt4_TreeBrick(BlissWidget):
     def show_workflow_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
-        self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,)) 
-        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), (True,))
-        self.emit(QtCore.SIGNAL("hide_workflow_tab"), (False,))
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True) 
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), False)
 
         running = self.queue_hwobj.is_executing() 
         self.populate_workflow_tab(item, running=running)
@@ -555,24 +554,24 @@ class Qt4_TreeBrick(BlissWidget):
     def toggle_sample_changer_tab(self): 
         if self.current_view == self.sample_changer_widget:
             self.current_view = None
-            self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (True,))
+            self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
             self.dc_tree_widget.sample_tree_widget_selection()
             self.sample_changer_widget.findChild(QtGui.QPushButton,
                  'details_button').setText("Show SC-details")
         else:
             self.current_view = self.sample_changer_widget
-            self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), (True,))
-            self.emit(QtCore.SIGNAL("hide_dcg_tab"), (True,))
-            self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), (False,))
+            self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+            self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+            self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), False)
             self.sample_changer_widget.findChild(QtGui.QPushButton,
                  'details_button').setText("Hide SC-details")
-            self.emit(QtCore.SIGNAL("hide_sample_tab"), (True,))
+            self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         
     def selection_changed(self, items):
         if len(items) == 1:
             item = items[0]
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
-                self.emit(QtCore.SIGNAL("populate_sample_details"), (item.get_model(),))
+                self.emit(QtCore.SIGNAL("populate_sample_details"), item.get_model())
                 self.emit_set_sample(item)
                 self.emit_set_directory()
                 self.emit_set_prefix(item)

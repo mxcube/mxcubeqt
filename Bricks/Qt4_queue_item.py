@@ -83,20 +83,20 @@ class QueueItem(QtGui.QTreeWidgetItem):
             # Great !
 
             if self._queue_entry:
-                if self.state() > 0:
+                if self.checkState() > 0:
                     self._queue_entry.set_enabled(True)                
                 else:
                     self._queue_entry.set_enabled(False)
 
             if self._data_model:
-                if self.state() > 0:
+                if self.checkState() > 0:
                     self._data_model.set_enabled(True)                
                 else:
                     self._data_model.set_enabled(False)
         else:
             self.setOn(False)
             
-    def paintCell(self, painter, color_group, column, width, align):
+    def paintEvent(self, painter, color_group, column, width, align):
         """
         Inherited from QCheckListItem, called before this item is drawn
         on the screen.
@@ -137,8 +137,10 @@ class QueueItem(QtGui.QTreeWidgetItem):
         color_group.setColor(qt.QColorGroup.Text, self.normal_brush.color())
         color_group.setBrush(qt.QColorGroup.Text, self.normal_brush)
 
-    def moveItem(self, after):
-        qt.QCheckListItem.moveItem(self, after)
+    def move_item(self, after):
+        self.parent().takeChild(self.parent().indexOfChild(self))
+        after.parent().insertChild(after.parent().indexOfChild(after), self)
+
         container_qe = self.get_queue_entry().get_container()
         after_qe = after.get_queue_entry()
         container_qe.swap(after_qe, self.get_queue_entry())
@@ -157,22 +159,28 @@ class QueueItem(QtGui.QTreeWidgetItem):
             self.pen = QueueItem.normal_pen
             self.brush = QueueItem.normal_brush
 
-        if self.listView():
-            self.listView().triggerUpdate()
+        if self.treeWidget():
+            self.treeWidget().updateGeometry()
+        #if self.listView():
+        #    self.listView().triggerUpdate()
 
-    def setBackgroundColor(self, color):
-        color = QtCore.Qt.white
-        self.previous_bg_brush = self.bg_brush
+    def set_background_color(self, color_index):
+        self.previous_bg_brush = self.background(0)
+        color = Qt4_widget_colors.QUEUE_ENTRY_COLORS[color_index]
         self.bg_brush = QtGui.QBrush(color)
+        self.setBackground(0, self.bg_brush)
+        self.setBackground(1, self.bg_brush)
 
     def restoreBackgroundColor(self):
         self.bg_brush = self.previous_bg_brush
+        self.setBackground(0, self.bg_brush)
+        self.setBackground(1, self.bg_brush)
 
     def setFontBold(self, state):
         self._font_is_bold = state
 
     def reset_style(self):
-        self.setBackgroundColor(Qt4_widget_colors.WHITE)
+        self.set_background_color(0)
         self.setFontBold(False)
         self.setHighlighted(False)
 
@@ -253,7 +261,7 @@ class SampleQueueItem(QueueItem):
             self.setIcon(0, QtGui.QIcon())
 
             if clear_background:
-               self.setBackgroundColor(0, Qt4_widget_colors.WHITE)  
+               self.set_background_color(0)  
             else:
                 queue_entry = self.get_queue_entry()
 
@@ -265,7 +273,10 @@ class SampleQueueItem(QueueItem):
             self.setText(1, '')
 
     def reset_style(self):
-        QueueItem.reset_style(self)
+        #QueueItem.reset_style(self)
+        self.set_background_color(0)
+        self.setFontBold(False)
+        self.setHighlighted(False)
         self.set_mounted_style(self.mounted_style, clear_background = True)
             
 class BasketQueueItem(QueueItem):
@@ -306,6 +317,11 @@ class CharacterisationQueueItem(TaskQueueItem):
 
 
 class EnergyScanQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
+
+class XRFScanQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
@@ -375,10 +391,10 @@ def get_item(node):
     return node
 
 def is_child_on(node):
-    return node.state() > 0
+    return node.checkState(0) > 0
 
 def is_checked(node):
-    return node.state() > 0
+    return node.checkState(0) > 0
 
 def print_text(node):
     print "Executing node: " + node.text()
@@ -388,6 +404,7 @@ MODEL_VIEW_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueItem,
      queue_model_objects.Characterisation: CharacterisationQueueItem,
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
+     queue_model_objects.XRFScan: XRFScanQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
      queue_model_objects.Basket: BasketQueueItem, 

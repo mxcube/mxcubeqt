@@ -27,7 +27,7 @@ from PyQt4 import QtCore
 import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
 
-from widgets.Qt4_task_toolbox_widget import Qt4_TaskToolBoxWidget
+from widgets.Qt4_task_toolbox_widget import TaskToolBoxWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -72,7 +72,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.defineSlot("user_group_saved", ())
 
         # Graphic elements ----------------------------------------------------
-        self.task_tool_box_widget = Qt4_TaskToolBoxWidget(self)
+        self.task_tool_box_widget = TaskToolBoxWidget(self)
 
         # Layout --------------------------------------------------------------
         self.main_layout = QtGui.QVBoxLayout(self)
