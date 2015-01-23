@@ -1,9 +1,16 @@
-<object class="ISPyBClient2">
+<object class="SOLEILISPyBClient">
+
   <ws_root>
-    <!-- http://160.103.210.1:8080/ispyb-ejb3/ispybWS/ -->
-    <!-- http://sundemo.synchrotron-soleil.fr/ispyb-ejb3/ispybWS/ -->
-    http://195.221.0.141/ispyb-ejb3/ispybWS/
+    http://suntest.synchrotron-soleil.fr/ispyb-ejb3/ispybWS/
   </ws_root>
+
+  <ws_username>ab361</ws_username>
+  <ws_password>1Spy6@Sun0</ws_password>
+
+  <ws_collection>ToolsForCollectionWebService</ws_collection>
+  <ws_shipping>ToolsForShippingWebService</ws_shipping>
+  <ws_tools>ToolsForBLSampleWebService</ws_tools>
+
   <object role="session" href="/session"/>
 
   <!-- all this should be removed from here (information

@@ -22,6 +22,10 @@ class Session(HardwareObject):
         self.session_start_date = None
         self.user_group = ''
 
+        self.username = None
+        self.group_id = None
+        self.user_id = None 
+
         self.default_precision = '04'
         self.suffix = None
         self.base_directory = None
@@ -52,8 +56,8 @@ class Session(HardwareObject):
             self.in_house_users.append((prop.getProperty('code'),
                 str(prop.getProperty('number'))))
 
-        queue_model_objects.PathTemplate.set_archive_path(self['file_info'].getProperty('archive_base_directory'),
-                                                          self['file_info'].getProperty('archive_folder'))
+        #queue_model_objects.PathTemplate.set_archive_path(self['file_info'].getProperty('archive_base_directory'),
+                                                          #self['file_info'].getProperty('archive_folder'))
 
 
     def get_base_data_directory(self):
@@ -74,17 +78,21 @@ class Session(HardwareObject):
             start_time = time.strftime("%Y%m%d")
 
         if self.is_inhouse():
-            user_category = 'inhouse'
             directory = os.path.join(self.base_directory, self.endstation_name,
-                                     user_category, self.get_proposal(),
+                                     self.get_user_category(), self.get_proposal(),
                                      start_time)
         else:
-            user_category = 'visitor'
-            directory = os.path.join(self.base_directory, user_category,
+            directory = os.path.join(self.base_directory, self.get_user_category(),
                                      self.get_proposal(), self.endstation_name,
                                      start_time)
 
         return directory
+
+    def get_user_category(self):
+        if self.is_inhouse():
+            return 'inhouse'
+        else:
+            return 'visitor'
 
     def get_base_image_directory(self):
         """

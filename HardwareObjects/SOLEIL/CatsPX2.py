@@ -75,8 +75,8 @@ class CatsPX2(SampleChanger):
         self._propHolderLength   = self.getProperty('holder_length')
 
         self.currentBasketDataMatrix = "this-is-not-a-matrix"
-        self.currentSample = "this-is-not-a-sample"
-        self.currentBasket = "this-is-not-a-basket"
+        self.currentSample = -1 
+        self.currentBasket = -1
 
         if self._propNoOfLids is not None:
             try:

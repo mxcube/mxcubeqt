@@ -5,9 +5,12 @@ from gevent.event import AsyncResult
 import logging
 import time
 import os
+import math
 import httplib
 import PyTango
 import threading
+from collections import namedtuple
+
 
 class FixedEnergy:
     def __init__(self, wavelength, energy):
@@ -533,6 +536,7 @@ class PixelDetector:
           self.oscillation_task.kill()
       self.execute_command("reset_detector")
 
+SOLEILBeamlineConfig = namedtuple('SOLEILBeamlineConfig', BeamlineConfig._fields+('detector_radius', 'synchrotron_name',))
 
 class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     def __init__(self, name, detector, tunable_bl):
@@ -541,6 +545,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self._detector = detector
         self._tunable_bl = tunable_bl
         self._centring_status = None
+        self.test = True
 
     def stopCollect(self, owner):
         self.stop_acquisition()
@@ -566,10 +571,13 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                transmission      = self.getObjectByRole("transmission"),
                                undulators        = self.getObjectByRole("undulators"),
                                flux              = self.getObjectByRole("flux"))
+
         #fast_shutter      = self.getObjectByRole("fast_shutter"),
         mxlocalHO = self.getObjectByRole("beamline_configuration")
         bcm_pars = mxlocalHO["BCM_PARS"]
         spec_pars = mxlocalHO["SPEC_PARS"]
+        bl_pars = mxlocalHO["BEAMLINE_PARS"]
+
         try:
           undulators = bcm_pars["undulator"]
         except IndexError:
@@ -590,6 +598,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                       detector_model = bcm_pars["detector"].getProperty("model"),
                                       detector_px = bcm_pars["detector"].getProperty("px"),
                                       detector_py = bcm_pars["detector"].getProperty("py"),
+                                      detector_radius = bcm_pars.getProperty('detector_radius'),     
                                       beam_ax = spec_pars["beam"].getProperty("ax"),
                                       beam_ay = spec_pars["beam"].getProperty("ay"),
                                       beam_bx = spec_pars["beam"].getProperty("bx"),
@@ -599,6 +608,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                       monochromator_type = bcm_pars.getProperty('monochromator'),
                                       beam_divergence_vertical = bcm_pars.getProperty('beam_divergence_vertical'),
                                       beam_divergence_horizontal = bcm_pars.getProperty('beam_divergence_horizontal'),     
+                                      synchrotron_name = bl_pars.getProperty('synchrotron_name'),     
                                       polarisation = bcm_pars.getProperty('polarisation'),
                                       #auto_processing_server = self.getProperty("auto_processing_server"),
                                       input_files_server = self.getProperty("input_files_server"))
@@ -609,6 +619,9 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self.emit("collectConnected", (True,))
         self.emit("collectReady", (True, ))
 
+
+    def setBeamlineConfiguration(self, **configuration_parameters):
+        self.bl_config = SOLEILBeamlineConfig(**configuration_parameters)
 
     @task
     def take_crystal_snapshots(self):
@@ -709,10 +722,10 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def open_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - open safety shutter" )
-        #self.test = True
-        #if self.test:
-            #logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
-            #return
+        self.test = True
+        if self.test == True:
+            logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
+            return
 
         self.bl_control.safety_shutter.openShutter()
 
@@ -727,10 +740,10 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def close_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - close safety shutter" )
-        #self.test = True
-        #if self.test:
-            #logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
-            #return
+        self.test = True
+        if self.test == True:
+            logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
+            return
 
         return
         self.bl_control.safety_shutter.closeShutter()
@@ -835,8 +848,8 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
     def get_undulators_gaps(self):
         logging.info("<SOLEIL MultiCollect> TODO - get undulators gaps " )
-        return
         und_gaps = [None]*3
+        return und_gaps
         i = 0
         try:
             for undulator_cfg in self.bl_config.undulators:
@@ -849,9 +862,16 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
 
     def get_resolution_at_corner(self):
-        logging.info("<SOLEIL MultiCollect> TODO - get resolution at corner" )
-        return
-        return self.execute_command("get_resolution_at_corner")
+
+        logging.info("<PX1 MultiCollect> get resolution at corner" )
+
+        radius = self.bl_config.detector_radius  / 1000.0 # meters
+        detdist =  self.get_detector_distance() / 1000.0 # meters
+        wavelength = self.get_wavelength() # amstrongs
+
+        angle = math.atan( math.sqrt(2)*radius/detdist)
+        resatcorner = wavelength / (2*math.sin(0.5*angle))
+        return resatcorner
 
 
     def get_beam_size(self):
@@ -874,12 +894,15 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
     def get_slit_gaps(self):
         logging.info("<SOLEIL MultiCollect> TODO - get slit gaps" )
-        return
+        return [-999,-999]
 
+    def get_beam_centre(self):
+        logging.info("<PX2 MultiCollect> TODO - get beam centre" )
+        return [-99,-99]
 
     def get_beam_shape(self):
         logging.info("<SOLEIL MultiCollect> TODO - get beam shape" )
-        return "ellipse"
+        return "rectangular"
         #return self.execute_command("get_beam_shape")
     
     def get_measured_intensity(self):
@@ -965,13 +988,14 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
 
     def get_archive_directory(self, directory):
-        logging.info("<SOLEIL MultiCollect> TODO - get archive directory")
+        logging.info("<SOLEIL MultiCollect> get archive directory")
         ad = directory.replace('RAW_DATA', 'ARCHIVE')
         try:
-            os.makedirs(ad)
+            if not os.path.exists(ad):
+                os.makedirs(ad)
         except:
             import traceback
-            logging.info('problem creating archive %s ' % traceback.format_exc)
+            logging.info('problem creating archive %s ' % traceback.format_exc())
         return ad
  
         res = None
@@ -1002,13 +1026,24 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         pass
 
     def get_machine_current(self):
-        logging.info("<SOLEIL MultiCollect> TODO - get machine current")
-        pass
-    
-    def get_machine_fill_mode(self):
-        logging.info("<SOLEIL MultiCollect> TODO - get fill mode")
-        pass
-    
+        if self.bl_control.machine_current is not None:
+            return self.bl_control.machine_current.getCurrent()
+        else:
+            return -1
+
     def get_machine_message(self):
-        logging.info("<SOLEIL MultiCollect> TODO - get machine message")
-        pass
+        logging.info("<PX1 MultiCollect> getting machine message" )
+        if  self.bl_control.machine_current is not None:
+            return self.bl_control.machine_current.getMessage()
+        else:
+            return 'Not implemented yet'
+
+    def get_machine_fill_mode(self):
+        logging.info("<PX1 MultiCollect> getting machine fill mode" )
+        logging.info( self.bl_control.machine_current.getFillMode() )
+
+        if self.bl_control.machine_current is not None:
+            return self.bl_control.machine_current.getFillMode()
+        else:
+            'Not implemented yet'
+

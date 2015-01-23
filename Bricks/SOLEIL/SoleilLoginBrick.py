@@ -6,7 +6,7 @@ import time
 import os
 from BlissFramework.Utils import widget_colors
 
-__category__ = 'SOLEIL'
+__category__ = 'mxCuBE'
 
 PROPOSAL_GUI_EVENT = QEvent.User
 class ProposalGUIEvent(QCustomEvent):
@@ -234,6 +234,8 @@ class SoleilLoginBrick(BlissWidget):
         self.user_group_label.hide()
         self.user_group_ledit.hide()
         self.user_group_save_button.hide()
+
+        self.session_hwobj.set_user_info( '','','' )
         
         #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
@@ -265,7 +267,7 @@ class SoleilLoginBrick(BlissWidget):
         if code=="":
             #self.proposalLabel.setText("<nobr><i>%s</i>" % personFullName(person))
             session_id=""
-            logging.getLogger().warning("Using local login: the data collected won't be stored in the database")
+            logging.getLogger("user_level_log").warning("Using local login: the data collected won't be stored in the database")
             self.dbConnection.disable()
             expiration_time=0
         else:
@@ -433,7 +435,7 @@ class SoleilLoginBrick(BlissWidget):
         except AttributeError:
             locallogin_person="local user"
         pers_dict={'familyName':locallogin_person}
-        lab_dict={'name':'ESRF'}
+        lab_dict={'name':'SOLEIL'}
         cont_dict={'familyName':'local contact'}
         self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
@@ -463,38 +465,32 @@ class SoleilLoginBrick(BlissWidget):
         prop_password=str(self.propPassword.text())
         self.propPassword.setText("")
 
-        if username=="" and prop_password == "":
-           # try:
-           #     locallogin_person=self.localLogin.person
-           #     locallogin_password=self.localLogin.password
-           # except AttributeError:
-           #     return self.refuseLogin(False,"Local login not configured.")
-   # 
-   #         if username==locallogin_person:
-                #if self.localLogin is None:
-                    #return self.refuseLogin(False,"Local login not configured.")
-                try:
-                    locallogin_password=self.localLogin.password
-                except AttributeError:
-                    return self.refuseLogin(False,"Local login not configured.")
-    
-                #if prop_password!=locallogin_password:
-                    #return self.refuseLogin(None,"Invalid local login password.")
-    
-                now=time.strftime("%Y-%m-%d %H:%M:S")
-                prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
-                ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
-                try:
-                    locallogin_person=self.localLogin.person
-                except AttributeError:
-                    locallogin_person="local user"
-                pers_dict={'familyName':locallogin_person}
-                lab_dict={'name':'ESRF'}
-                cont_dict={'familyName':'local contact'}
-    
-                logging.getLogger().debug("ProposalBrick: local login password validated")
+        #if username=="" and prop_password=="":
+        if username=="":
+            if self.localLogin is None:
+                return self.refuseLogin(False,"Local login not configured.")
+            try:
+                locallogin_password=self.localLogin.password
+            except AttributeError:
+                return self.refuseLogin(False,"Local login not configured.")
+
+            if prop_password!=locallogin_password:
+                return self.refuseLogin(None,"Invalid local login password.")
+
+            now=time.strftime("%Y-%m-%d %H:%M:S")
+            prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
+            ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
+            try:
+                locallogin_person=self.localLogin.person
+            except AttributeError:
+                locallogin_person="local user"
+            pers_dict={'familyName':locallogin_person}
+            lab_dict={'name':'ESRF'}
+            cont_dict={'familyName':'local contact'}
+
+            logging.getLogger().debug("ProposalBrick: local login password validated")
             
-                return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
+            return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
         if self.ldapConnection is None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
@@ -550,16 +546,26 @@ class SoleilLoginBrick(BlissWidget):
             login_name=username
             logging.getLogger().debug('ProposalBrick: querying LDAP...')
             ok, msg=self.ldapConnection.login(login_name,proposal_password)
+
             if not ok:
                 msg="%s." % msg.capitalize()
                 self.refuseLogin(None,msg)
                 return
 
+            userinfo = self.ldapConnection.getinfo(login_name)
+
+            gid = userinfo.get('gidNumber','')
+            uid = userinfo.get('uidNumber','')
+
+            self.session_hwobj.set_user_info( login_name, uid, gid )
+
             logging.getLogger().debug("ProposalBrick: password for %s validated" % (username,))
 
         # Get proposal and sessions
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
-        prop=self.dbConnection.getProposal("toto","is a mockup")
+        logging.getLogger().debug('ProposalBrick: querying ISPyB database)...')
+        proposal_code = "mx"
+        proposal_number = "2014"
+        prop=self.dbConnection.getProposal(proposal_code,proposal_number)
 
         # Check if everything went ok
         prop_ok=True

@@ -11,6 +11,8 @@
    <object href="/detectordistance" role="detector_distance" />
    <object href="/mach" role="machine_current" />
    <object href="/resolution" role="resolution" />
+   <object href="/dbconnection" role="dbserver" />
+   <object href="/flux" role="flux" />
    
    <!-- Following devices are used during datacollection -->
    <adscname>i11-ma-cx1/dt/adsc</adscname>

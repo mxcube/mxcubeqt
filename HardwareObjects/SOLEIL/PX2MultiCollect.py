@@ -1,9 +1,11 @@
+from HardwareRepository import HardwareRepository
 from SOLEILMultiCollect import *
 import shutil
 import logging
 from PyTango import DeviceProxy
 import numpy
 import re
+import math
 
 class PX2MultiCollect(SOLEILMultiCollect):
     def __init__(self, name):
@@ -545,8 +547,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
             # why .get() is not working as expected?
             # got KeyError anyway!
             if data_collect_parameters["take_snapshots"]:
-                pass
-                #self.take_crystal_snapshots()
+                self.take_crystal_snapshots()
         except KeyError:
             pass
 
@@ -865,4 +866,21 @@ class PX2MultiCollect(SOLEILMultiCollect):
 
             self.sync_collect(file_location, filename, image_file_template)
             self.finalize_acquisition()
+
+def test():
+    import os
+    hwr_directory = os.environ["XML_FILES_PATH"]
+
+    hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    coll = hwr.getHardwareObject("/mxcollect")
+
+    print "Machine current is ", coll.get_machine_current()
+    print "Synchrotron name is ", coll.bl_config.synchrotron_name
+    res_corner = coll.get_resolution_at_corner()
+    print "Resolution corner is ", res_corner
+
+if __name__ == '__main__':
+   test()
 

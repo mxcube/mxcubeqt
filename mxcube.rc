@@ -1,3 +1,4 @@
 export MXCUBE_ROOT=/home/experiences/proxima2a/com-proxima2a/mxcube_v2
-export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT:$MXCUBE_ROOT/HardwareObjects:$MXCUBE_ROOT/HardwareObjects/SOLEIL
+export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT:$MXCUBE_ROOT/HardwareObjects:$MXCUBE_ROOT/HardwareObjects/SOLEIL:$MXCUBE_ROOT/HardwareObjects/sample_changer
+export PYTHONPATH=/home/experiences/proxima2a/com-proxima2a/python_modules/lib/python2.6/site-packages:/home/experiences/proxima2a/com-proxima2a/MxCuBE/libs/lib/python2.6/site-packages:/home/experiences/proxima2a/com-proxima2a/bin:$PYTHONPATH
 export XML_FILES_PATH=$MXCUBE_ROOT/HardwareObjects.xml/PX2

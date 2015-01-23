@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-#$Id: MachCurrent.py,v 1.3 2004/11/23 08:54:06 guijarro Exp guijarro $
+from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import Device
-#from SimpleDevice import SimpleDevice
+
 import PyTango
 import logging
 
@@ -24,17 +23,30 @@ class TangoMachCurrent(Device):
 
     def updatedValue(self):
         try:
-           machstat   = self.device.read_attribute('State')
-           if machstat.value.name == 'FAULT':
-               return -1,"","",0
-           else:
-               mach   = self.device.read_attribute("current").value
-               lifetime = self.device.read_attribute("lifetime").value
-               fillmode = self.device.read_attribute("fillingMode").value + " filling"
-               opmsg  = self.device.read_attribute("operatorMessage").value
-               return mach, opmsg, fillmode, lifetime
+            machstat = self.device.read_attribute('State')
+            if machstat.value.name == 'FAULT':
+                return -1,"","",0
+            else:
+                mach   = self.getCurrent()
+                lifetime = self.getLifeTime()
+                fillmode = self.getFillMode() + " filling"
+                opmsg  = self.getMessage()
+                return mach, opmsg, fillmode, lifetime
         except:
            return None
+
+    def getCurrent(self):
+        mach = self.device.read_attribute("current").value
+        return mach
+    def getLifeTime(self):
+        lifetime = self.device.read_attribute("lifetime").value
+        return lifetime
+    def getMessage(self):
+        opmsg  = self.device.read_attribute("operatorMessage").value
+        return opmsg
+    def getFillMode(self):
+        fillmode = self.device.read_attribute("fillingMode").value 
+        return fillmode
 
     def valueChanged(self, value):
         mach = value
@@ -47,9 +59,7 @@ class TangoMachCurrent(Device):
             #opmsg = self.device.read_attribute("message").value
             opmsg = self.device.read_attribute("operatorMessage").value
             opmsg = opmsg.strip()
-            i1 =  opmsg.index(':', 2)
-            i2 = opmsg.index(':', 3)
-            opmsg = opmsg[: i1 + 3]
+            opmsg = opmsg.replace(': Faisceau disponible', ':\nFaisceau disponible')
             #' ' #On Gavin's request ;-)
             #fillmode = self.device.DevReadFillMode()
             fillmode = self.device.read_attribute("fillingMode").value + " filling"
@@ -76,4 +86,22 @@ class TangoMachCurrent(Device):
         #opmsg = 'Flux: ' + str(round(self.flux.intensity, 3)) + ' uA' #MS. 29.01.13 ugly hack to have flux in the output instead of opmsg
         #logging.getLogger("HWR").info("%s: CCC machinestatus emitting info to listener, %s, %s, %s, %s", self.name(), value, opmsg, fillmode, lifetime)
         self.emit('valueChanged', (mach, str(opmsg), str(fillmode), str(lifetime)))
+
+def test():
+    import os
+    hwr_directory = os.environ["XML_FILES_PATH"]
+
+    hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    conn = hwr.getHardwareObject("/mach")
+
+    print "Machine current is ", conn.getCurrent()
+    print "Life time is ", conn.getLifeTime()
+    print "Fill mode is ", conn.getFillMode()
+    print "Message is ", conn.getMessage()
+
+
+if __name__ == '__main__':
+   test()
 

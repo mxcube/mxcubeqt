@@ -61,8 +61,10 @@ class Ps_attenuatorPX2(Device):
             self.chanAttFactor.connectSignal('update', self.attFactorChanged)
                          
 
+    def getAtteConfig(self):
+        return
+
     def getAttState(self):
-        logging.getLogger().info("HOS Attenuator: passe dans getAttState")
         try:
             value1= Ps_attenuatorPX2.stateAttenuator[self.Ps_hdevice.State().name]
             print 'State hslit : ' , Ps_attenuatorPX2.stateAttenuator[self.Ps_hdevice.State().name]
@@ -86,13 +88,11 @@ class Ps_attenuatorPX2(Device):
         return value
     
     def attStateChanged(self, channelValue):
-        logging.getLogger().info("HOS Attenuator: passe dans attStateChanged")
         value = self.getAttState()
         self.emit('attStateChanged', (value, ))
 
 
     def getAttFactor(self):
-        logging.getLogger().info("HOS Attenuator: passe dans getAttFactor")
         
         try:
             if self.Attenuatordevice.TrueTrans_FP <= 100.0 : #self.Attenuatordevice.Trans_FP  <= 100.0 :
@@ -133,7 +133,6 @@ class Ps_attenuatorPX2(Device):
     
     def attToggleChanged(self, channelValue):
         #        print "Dans attToggleChanged  channelValue = %s" %channelValue
-        logging.getLogger().debug("HOS Attenuator: passe dans attToggleChanged")
         try:
             value = int(channelValue)
         except:
@@ -142,7 +141,6 @@ class Ps_attenuatorPX2(Device):
             self.emit('toggleFilter', (value, )) 
             
     def setTransmission(self,value) :
-        logging.getLogger().debug("HOS Attenuator: passe dans setTransmission")       
         self.set_value = float(value)
         try:
             if self.Constdevice.FP_Area_FWHM <= 0.1 : # Cas ou il n'y a pas de valeur dans le publisher PASSERELLE/CO/Primary_Slits
@@ -165,7 +163,6 @@ class Ps_attenuatorPX2(Device):
         return value
         
     def toggle(self,value) :
-        logging.getLogger().debug("HOS Attenuator: passe dans toggle")
         return value
                           
             

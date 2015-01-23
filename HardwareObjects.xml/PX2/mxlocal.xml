@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <beamline_pars>
+    <BEAMLINE_PARS>
+        <synchrotron_name>Soleil</synchrotron_name>
+        <beamline_name>Proxima1</beamline_name>
+        <undulator>
+            <type>u20</type>
+        </undulator> 
+    </BEAMLINE_PARS>
     <COLLECT_PARS>
         <escan_dir>/tmp/Escans</escan_dir> <!--  /data/proxima1-soleil/temp/Escans</escan_dir> change! -->
         <escan_prefix>eprefix</escan_prefix> <!-- change! -->
