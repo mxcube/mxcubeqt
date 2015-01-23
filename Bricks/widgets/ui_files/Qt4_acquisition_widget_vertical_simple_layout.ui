@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>287</height>
+    <height>242</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -238,22 +238,6 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <spacer name="v_spacer_2">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Expanding</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>1</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
              </layout>
             </item>
            </layout>
@@ -283,6 +267,18 @@
              <layout class="QVBoxLayout">
               <item>
                <widget class="QLabel" name="detector_mode_label">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Detector mode:</string>
                 </property>
@@ -293,6 +289,12 @@
               </item>
               <item>
                <widget class="QLabel" name="resolution_label">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Resolution (Å):</string>
                 </property>
@@ -303,6 +305,12 @@
               </item>
               <item>
                <widget class="QLabel" name="energy_label">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Energy (KeV):</string>
                 </property>
@@ -313,6 +321,18 @@
               </item>
               <item>
                <widget class="QLabel" name="transmission_label">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Transmission (%):</string>
                 </property>
@@ -320,6 +340,19 @@
                  <bool>false</bool>
                 </property>
                </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -389,6 +422,19 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </item>
            </layout>
@@ -407,26 +453,6 @@
            <size>
             <width>1</width>
             <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout">
-        <item>
-         <spacer name="rthree_spacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>65</width>
-            <height>1</height>
            </size>
           </property>
          </spacer>
