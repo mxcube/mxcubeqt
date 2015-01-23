@@ -39,7 +39,7 @@ PERIODIC_ELEMENTS = [['H', '', '', '', '', '', '', '', '', '', '', '', '',
                       'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn'], 
                      ['Fr', 'Ra', 'Lr', 'Rf', 'Db', 'Sg','Bh', 'Hs', 'Mt']]
 
-class Qt4_PeriodicTableWidget(QtGui.QWidget):
+class PeriodicTableWidget(QtGui.QWidget):
     """
     Descript. :
     """ 

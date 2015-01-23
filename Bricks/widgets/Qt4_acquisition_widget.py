@@ -25,14 +25,14 @@ from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 
-from widgets.Qt4_widget_utils import Qt4_DataModelInputBinder
+from widgets.Qt4_widget_utils import DataModelInputBinder
 from BlissFramework.Utils import Qt4_widget_colors
 
 
 MAD_ENERGY_COMBO_NAMES = {'ip': 0, 'pk': 1, 'rm1': 2, 'rm2': 3}
 
 
-class Qt4_AcquisitionWidget(QtGui.QWidget):
+class AcquisitionWidget(QtGui.QWidget):
     def __init__(self, parent=None, name=None, fl=0, acq_params=None,
                  path_template=None, layout='horizontal'):
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -53,7 +53,7 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
         else:
             self._path_template = path_template
 
-        self._acquisition_mib = Qt4_DataModelInputBinder(self._acquisition_parameters)
+        self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         if layout == "horizontal":
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
@@ -242,14 +242,14 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
             self._path_template.start_num = int(new_value)
             widget = self.acq_widget.findChild(QtGui.QLineEdit, 'first_image_ledit')
             self.emit(QtCore.SIGNAL('path_template_changed'),
-                      (widget, new_value))
+                      widget, new_value)
 
     def num_images_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self._path_template.num_files = int(new_value)
             widget = self.acq_widget.findChild(QtGui.QLineEdit, 'num_images_ledit')
             self.emit(QtCore.SIGNAL('path_template_changed'),
-                      (widget, new_value))
+                      widget, new_value)
 
     def overlap_changed(self, new_value):
         if self._beamline_setup:
@@ -282,12 +282,12 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
                 self.set_energy(energy, 0)
 
             self.emit(QtCore.SIGNAL('mad_energy_selected'),
-                      (name, energy, state))
+                      name, energy, state)
         else:
             self.set_energy(self.previous_energy, 0)
             energy = self._beamline_setup.energy_hwobj.getCurrentEnergy()
             self.emit(QtCore.SIGNAL('mad_energy_selected'),
-                      ('', self.previous_energy, state))
+                      '', self.previous_energy, state)
 
     def set_use_inverse_beam(self, state):
         if state:
@@ -346,7 +346,7 @@ class Qt4_AcquisitionWidget(QtGui.QWidget):
             if energy != 0:
                 self.set_energy(energy, 0)
 
-            self.emit(QtCore.SIGNAL('mad_energy_selected'), (name, energy, True))
+            self.emit(QtCore.SIGNAL('mad_energy_selected'), name, energy, True)
 
     def set_energy(self, energy, wav):
         self._acquisition_parameters.energy = energy

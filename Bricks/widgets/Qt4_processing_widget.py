@@ -25,10 +25,10 @@ from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
-from widgets.Qt4_widget_utils import Qt4_DataModelInputBinder
+from widgets.Qt4_widget_utils import DataModelInputBinder
 
 
-class Qt4_ProcessingWidget(QtGui.QWidget):
+class ProcessingWidget(QtGui.QWidget):
     def __init__(self, parent = None, name = None, fl = 0, data_model = None):
 
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -40,7 +40,7 @@ class Qt4_ProcessingWidget(QtGui.QWidget):
         else:
             self._model = data_model
 
-        self._model_mib = Qt4_DataModelInputBinder(self._model)
+        self._model_mib = DataModelInputBinder(self._model)
 
         self.processing_widget = self.acq_widget_layout = uic.loadUi(
                            os.path.join(os.path.dirname(__file__),

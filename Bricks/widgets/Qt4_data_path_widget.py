@@ -26,11 +26,11 @@ from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 
-from widgets.Qt4_widget_utils import Qt4_DataModelInputBinder
+from widgets.Qt4_widget_utils import DataModelInputBinder
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class Qt4_DataPathWidget(QtGui.QWidget):
+class DataPathWidget(QtGui.QWidget):
     def __init__(self, parent = None, name = '', fl = 0, data_model = None, 
                  layout = None):
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -49,7 +49,7 @@ class Qt4_DataPathWidget(QtGui.QWidget):
         else:
             self._data_model = data_model
         
-        self._data_model_pm = Qt4_DataModelInputBinder(self._data_model)
+        self._data_model_pm = DataModelInputBinder(self._data_model)
 
         #
         # Layout
@@ -58,7 +58,7 @@ class Qt4_DataPathWidget(QtGui.QWidget):
             self.data_path_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_data_path_widget_vertical_layout.ui"))
         else:
-            self.data_path_widget = uic.LoadUi(os.path.join(os.path.dirname(__file__),
+            self.data_path_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_data_path_widget_horizontal_layout.ui"))
 
         self.main_layout = QtGui.QVBoxLayout(self)

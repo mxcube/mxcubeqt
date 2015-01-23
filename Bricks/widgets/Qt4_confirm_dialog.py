@@ -26,26 +26,28 @@ import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
 
 from widgets.Qt4_confirm_dialog_widget_vertical_layout \
-     import Qt4_ConfirmDialogWidgetVerticalLayout
+     import ConfirmDialogWidgetVerticalLayout
 
 
-class Qt4_FileListViewItem(QtGui.QTreeWidgetItem):
+class FileTreeWidgetItem(QtGui.QTreeWidgetItem):
 
     def __init__(self, *args, **kwargs):
-        QtGui.QListViewItem.__init__(self, *args)
-        self.brush = QtGui.QBrush(qt.Qt.black)
+        QtGui.QTreeWidgetItem.__init__(self, args[0])
+        self.setText(0, args[2])
+        self.setText(1, args[3])
+        self.setText(2, args[4]) 
+        self.brush = QtGui.QBrush(QtCore.Qt.black)
         self.__normal_brush = QtGui.QBrush(QtCore.Qt.black)
-        
         
     def paintCell(self, painter, color_group, column, width, align):
         try:
             painter.save()
             
-            color_group = qt.QColorGroup(color_group)
-            color_group.setColor(qt.QColorGroup.Text, self.brush.color())
-            color_group.setBrush(qt.QColorGroup.Text, self.brush)
+            color_group = QtGui.QColorGroup(color_group)
+            color_group.setColor(QtGui.QColorGroup.Text, self.brush.color())
+            color_group.setBrush(QtGui.QColorGroup.Text, self.brush)
         
-            qt.QListViewItem.paintCell(self, painter, color_group, 
+            QtGui.QTreeWidgetItem.paintCell(self, painter, color_group, 
                                        column, width, align)
         finally:
             painter.restore()
@@ -55,7 +57,7 @@ class Qt4_FileListViewItem(QtGui.QTreeWidgetItem):
         self.brush = qt_brush
 
 
-class Qt4_ConfirmDialog(QtGui.QDialog):
+class ConfirmDialog(QtGui.QDialog):
     def __init__(self, parent = None, name = None, fl = 0):
         QtGui.QWidget.__init__(self, parent, 
               QtCore.Qt.WindowFlags(fl | QtCore.Qt.WindowStaysOnTopHint))
@@ -63,23 +65,23 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
         if name is not None:
             self.setObjectName(name) 
 
-        # Attributes
+        # Internal variab;es --------------------------------------------------
         self.ready_event = False
         self.checked_items = []
         self.sample_items = []
         self.files_to_be_written = []
         self.item_run_number_list = []
         self.queue_model_hwobj = None
-        
-        # Layout
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.dialog_layout_widget = Qt4_ConfirmDialogWidgetVerticalLayout(self)
-        #self.dialog_layout_widget.child('take_snapshosts_cbx').hide()
-        """self.dialog_layout_widget.child('file_list_view').setSorting(-1)"""
+       
+        # Graphic elements ---------------------------------------------------- 
+        self.dialog_layout_widget = ConfirmDialogWidgetVerticalLayout(self)
 
-        self.main_layout.addWidget(self.dialog_layout_widget)
-        self.setLayout(self.main_layout)
+        # Layout --------------------------------------------------------------
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.dialog_layout_widget)
+        self.setLayout(_main_vlayout)
 
+        # Qt signal/slot connections ------------------------------------------
         QtCore.QObject.connect(self.dialog_layout_widget.continue_button,
                                QtCore.SIGNAL("clicked()"),
                                self.continue_button_click)
@@ -88,12 +90,13 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
                                QtCore.SIGNAL("clicked()"),
                                self.cancel_button_click)
 
-        self.dialog_layout_widget.force_dark_cbx.setOn(True)
+        # SizePolicies --------------------------------------------------------
 
+        # Other --------------------------------------------------------------- 
+        self.dialog_layout_widget.force_dark_cbx.setChecked(True)
         self.dialog_layout_widget.missing_one_cbx.hide()
         self.dialog_layout_widget.missing_two_cbx.hide()
         self.setWindowTitle('Confirm collection')
-
 
     def set_plate_mode(self, plate_mode):
         self.dialog_layout_widget.snapshots_list = [0,1] if plate_mode else [0,1,2,4]
@@ -118,7 +121,7 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
         current_sample_item = None
         num_images = 0
 
-        self.dialog_layout_widget.file_list_view.clear()
+        self.dialog_layout_widget.file_tree_widget.clear()
 
         for item in checked_items:
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
@@ -149,8 +152,11 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
                     if sample_name is '':
                         sample_name = current_sample_item.get_model().loc_str
 
-                    last_item =  self.dialog_layout_widget.child('file_list_view').lastItem()
-                    fl = FileListViewItem(self.dialog_layout_widget.file_list_view,
+                    #last_item =  self.dialog_layout_widget.file_tree_widget.lastItem()
+                    last_item = self.dialog_layout_widget.file_tree_widget.topLevelItem(\
+                                (self.dialog_layout_widget.file_tree_widget.topLevelItemCount() - 1)) 
+
+                    fl = FileTreeWidgetItem(self.dialog_layout_widget.file_tree_widget,
                                           last_item, sample_name, dir_name, f_name)
 
                     if os.path.isfile(fp):
@@ -172,11 +178,11 @@ class Qt4_ConfirmDialog(QtGui.QDialog):
                 item.get_model().acquisitions[0].acquisition_parameters.\
                     take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
                 item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
+                    take_dark_current = self.dialog_layout_widget.force_dark_cbx.isChecked()
                 item.get_model().acquisitions[0].acquisition_parameters.\
-                    skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
+                    skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isChecked()
         
-        self.emit(qt.PYSIGNAL("continue_clicked"), (self.sample_items, self.checked_items))
+        self.emit(QtCore.SIGNAL("continue_clicked"), self.sample_items, self.checked_items)
         self.accept()
 
 

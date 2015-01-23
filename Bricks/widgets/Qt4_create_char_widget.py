@@ -29,26 +29,26 @@ import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
-from widgets.Qt4_widget_utils import Qt4_DataModelInputBinder
-from Qt4_create_task_base import Qt4_CreateTaskBase
-from Qt4_data_path_widget import Qt4_DataPathWidget
-from Qt4_acquisition_widget_simple import Qt4_AcquisitionWidgetSimple
+from widgets.Qt4_widget_utils import DataModelInputBinder
+from Qt4_create_task_base import CreateTaskBase
+from Qt4_data_path_widget import DataPathWidget
+from Qt4_acquisition_widget_simple import AcquisitionWidgetSimple
 from queue_model_enumerables_v1 import XTAL_SPACEGROUPS
 
 
-class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
+class CreateCharWidget(CreateTaskBase):
     def __init__(self,parent = None,name = None, fl = 0):
-        Qt4_CreateTaskBase.__init__(self, parent, name, fl, 'Characterisation')
+        CreateTaskBase.__init__(self, parent, name, fl, 'Characterisation')
 
         if not name:
-            self.setName("Qt4_create_char_widget")
+            self.setName("create_char_widget")
 
         #
         # Data attributes
         #
         self._current_selected_item = None
         self.init_models()
-        self._char_params_mib = Qt4_DataModelInputBinder(self._char_params)
+        self._char_params_mib = DataModelInputBinder(self._char_params)
    
         #
         # Layout
@@ -57,12 +57,12 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
         _acq_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
 
         self._acq_widget = \
-            Qt4_AcquisitionWidgetSimple(_acq_frame, acq_params = self._acquisition_parameters,
+            AcquisitionWidgetSimple(_acq_frame, acq_params = self._acquisition_parameters,
                                     path_template = self._path_template)
         self._acq_widget.setFixedHeight(170)
 
         self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_widget = Qt4_DataPathWidget(
+        self._data_path_widget = DataPathWidget(
                                self._data_path_gbox,
                                data_model = self._path_template,
                                layout = 'vertical')
@@ -210,7 +210,7 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
             findChild(QtGui.QComboBox, 'space_group_ledit').setCurrentIndex(index)
 
     def init_models(self):
-        Qt4_CreateTaskBase.init_models(self)
+        CreateTaskBase.init_models(self)
         self._init_models()
 
     def _init_models(self):
@@ -261,7 +261,7 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
         self._acquisition_parameters.shutterless = False
 
     def single_item_selection(self, tree_item):
-        Qt4_CreateTaskBase.single_item_selection(self, tree_item)
+        CreateTaskBase.single_item_selection(self, tree_item)
         
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             self._init_models()
@@ -316,7 +316,7 @@ class Qt4_CreateCharWidget(Qt4_CreateTaskBase):
         self._processing_parameters.cell_gamma = crystal.cell_gamma
 
     def approve_creation(self):
-        return Qt4_CreateTaskBase.approve_creation(self)
+        return CreateTaskBase.approve_creation(self)
         
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.

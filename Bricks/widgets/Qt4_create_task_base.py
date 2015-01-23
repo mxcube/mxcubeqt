@@ -33,7 +33,7 @@ import queue_model_enumerables_v1 as queue_model_enumerables
 #from BlissFramework.Utils import widget_colors
 
 
-class Qt4_CreateTaskBase(QtGui.QWidget):
+class CreateTaskBase(QtGui.QWidget):
     """
     Base class for widgets that are used to create tasks.
     Contains methods for handling the PathTemplate,

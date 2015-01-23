@@ -27,14 +27,14 @@ import queue_model_objects_v1 as queue_model_objects
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 
 from BlissFramework import Qt4_Icons
-from widgets.Qt4_create_discrete_widget import Qt4_CreateDiscreteWidget
-from widgets.Qt4_create_helical_widget import Qt4_CreateHelicalWidget
-from widgets.Qt4_create_char_widget import Qt4_CreateCharWidget
-from widgets.Qt4_create_energy_scan_widget import Qt4_CreateEnergyScanWidget
+from widgets.Qt4_create_discrete_widget import CreateDiscreteWidget
+from widgets.Qt4_create_helical_widget import CreateHelicalWidget
+from widgets.Qt4_create_char_widget import CreateCharWidget
+from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
 #from widgets.Qt4_create_workflow_widget import Qt4_CreateWorkflowWidget
 
 
-class Qt4_TaskToolBoxWidget(QtGui.QWidget):
+class TaskToolBoxWidget(QtGui.QWidget):
     def __init__(self, parent = None, name = "task_toolbox"):
         QtGui.QWidget.__init__(self, parent)
         self.setObjectName = name
@@ -59,12 +59,12 @@ class Qt4_TaskToolBoxWidget(QtGui.QWidget):
         self.tool_box.setFixedWidth(475)
         self.tool_box.setFont(font)
         
-        self.discrete_page = Qt4_CreateDiscreteWidget(self.tool_box, "Discrete",)
+        self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         #self.discrete_page.setBackgroundMode(QtGui.QWidget.PaletteBackground)
-        self.char_page = Qt4_CreateCharWidget(self.tool_box, "Characterise")
+        self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         #self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)
-        self.helical_page = Qt4_CreateHelicalWidget(self.tool_box, "helical_page")
-        self.energy_scan_page = Qt4_CreateEnergyScanWidget(self.tool_box, "energy_scan")
+        self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
+        self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         #self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")

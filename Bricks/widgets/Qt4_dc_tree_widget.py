@@ -31,7 +31,7 @@ import queue_model_objects_v1 as queue_model_objects
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
-from widgets.Qt4_confirm_dialog import Qt4_ConfirmDialog
+from widgets.Qt4_confirm_dialog import ConfirmDialog
 from queue_model_enumerables_v1 import CENTRING_METHOD
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
@@ -40,7 +40,7 @@ SCFilterOptions = namedtuple('SCFilterOptions',
 SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
 
 
-class Qt4_DataCollectTree(QtGui.QWidget):
+class DataCollectTree(QtGui.QWidget):
     def __init__(self, parent = None, name = "data_collect", 
                  selection_changed = None):
         QtGui.QWidget.__init__(self, parent)
@@ -73,7 +73,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.confirm_dialog = Qt4_ConfirmDialog(self, 'Confirm Dialog')
+        self.confirm_dialog = ConfirmDialog(self, 'Confirm Dialog')
         self.confirm_dialog.setModal(True)
 
         self.pin_pixmap = Qt4_Icons.load("sample_axis.png")
@@ -511,14 +511,19 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             self.parent().enable_command_menu(True)
             self.parent().enable_task_toolbox(True)
             self.continue_button.setText('Continue')
-            self.continue_button.setPaletteBackgroundColor(Qt4_widget_colors.LIGHT_YELLOW)
+            Qt4_widget_colors.set_widget_color(
+                              self.continue_button, 
+                              Qt4_widget_colors.LIGHT_YELLOW, 
+                              QtGui.QPalette.Button)
         else:
             self.parent().enable_hutch_menu(False)
             self.parent().enable_command_menu(False)
             self.parent().enable_task_toolbox(False)
             self.continue_button.setText('Pause')
-            color = self.paletteBackgroundColor()
-            self.continue_button.setPaletteBackgroundColor(color)
+            Qt4_widget_colors.set_widget_color(
+                              self.continue_button, 
+                              Qt4_widget_colors.BUTTON_ORIGINAL, 
+                              QtGui.QPalette.Button)
 
     def collect_stop_toggle(self):
         checked_items = self.get_checked_items()
@@ -538,7 +543,8 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             # Unselect selected items.
             selected_items = self.get_selected_items()
             for item in selected_items:
-                self.sample_tree_widget.setSelected(item, False)
+                item.setSelected(False)
+                #self.sample_tree_widget.setSelected(item, False)
             
             if len(checked_items):
                 self.confirm_dialog.set_items(checked_items)
@@ -553,9 +559,9 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             self.stop_collection()
 
     def enable_sample_changer_widget(self, state):
-        self.parent().sample_changer_widget.child('synch_button').setEnabled(state)
-        self.parent().sample_changer_widget.child('centring_cbox').setEnabled(state)
-        self.parent().sample_changer_widget.child('filter_cbox').setEnabled(state)
+        self.parent().sample_changer_widget.findChild(QtGui.QPushButton, 'synch_button').setEnabled(state)
+        self.parent().sample_changer_widget.findChild(QtGui.QComboBox, 'centring_cbox').setEnabled(state)
+        self.parent().sample_changer_widget.findChild(QtGui.QComboBox, 'filter_cbox').setEnabled(state)
 
     def is_mounted_sample_item(self, item):
         result = False
@@ -586,8 +592,11 @@ class Qt4_DataCollectTree(QtGui.QWidget):
         
         self.collecting = True
         self.collect_button.setText(" Stop   ")
-        Qt4_widget_colors.set_widget_colors(self.collect_button, Qt4_widget_colors.LIGHT_RED)
-        self.collect_button.setIconSet(QtGui.QIcon(self.stop_pixmap))
+        Qt4_widget_colors.set_widget_color(
+                          self.collect_button, 
+                          Qt4_widget_colors.LIGHT_RED,
+                          QtGui.QPalette.Button)
+        self.collect_button.setIcon(QtGui.QIcon(self.stop_pixmap))
         self.parent().enable_hutch_menu(False)
         self.run_cb()
         
@@ -607,8 +616,11 @@ class Qt4_DataCollectTree(QtGui.QWidget):
     def queue_execution_completed(self, status):
         self.collecting = False
         self.collect_button.setText("Collect Queue")
-        self.collect_button.setIconSet(QtGui.QIcon(self.play_pixmap))
-        self.collect_button.setPaletteBackgroundColor(Qt4_widget_colors.LIGHT_GREEN)
+        self.collect_button.setIcon(QtGui.QIcon(self.play_pixmap))
+        Qt4_widget_colors.set_widget_color(
+                          self.collect_button,
+                          Qt4_widget_colors.LIGHT_GREEN,
+                          QtGui.QPalette.Button)
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
         self.parent().enable_hutch_menu(True)
@@ -639,17 +651,19 @@ class Qt4_DataCollectTree(QtGui.QWidget):
                                                      item.get_model())
                     qe = item.get_queue_entry()
                     parent.get_queue_entry().dequeue(qe)
-                    parent.takeItem(item)
+                    parent.takeChild(parent.indexOfChild(item))
 
-                    if not parent.firstChild():
+                    if not parent.child(0):
                         parent.setOn(False)
             else:
                 item.reset_style()
-                child = item.firstChild() 
+                #child = item.firstChild() 
+                child = item.child(0)
 
                 while child: 
                     children.append(child)
-                    child = child.nextSibling()
+                    #child = child.nextSibling()
+                    child = child.treeWidget().itemBelow(child)
 
         if children:
             self.delete_click(selected_items = children)
@@ -665,7 +679,8 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             #item = it.current()
             item = it.value()
             if item.get_model().free_pin_mode:
-                self.sample_tree_widget.setSelected(self.sample_list_view.firstChild(), True)
+                self.sample_list_view.topLevelItem(0).setSelected(True)
+                #self.sample_tree_widget.setSelected(self.sample_list_view.firstChild(), True)
 
     def down_click(self):
         selected_items = self.get_selected_items()
@@ -674,25 +689,28 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             item = selected_items[0]
 
             if isinstance(item, Qt4_queue_item.QueueItem):
-                if item.nextSibling() is not None:
-                    item.moveItem(item.nextSibling())
+                if item.treeWidget().itemBelow(item) is not None:
+                    item.move_item(item.treeWidget().itemBelow(item))
 
     def previous_sibling(self, item):
         if item.parent():
-            first_child = item.parent().firstChild()
+            first_child = item.parent().child(0)
         else:
-            first_child = item.listView().firstChild() 
+            first_child = item.treeWidget().topLevelItem(0) 
 
         if first_child is not item :
-            sibling = first_child.nextSibling()   
+            sibling = first_child.treeWidget().itemBelow(first_child) 
+            #sibling = first_child.nextSibling()   
         
             while sibling:           
                 if sibling is item :
                     return first_child
-                elif sibling.nextSibling() is item:
+                #elif sibling.nextSibling() is item:
+                elif first_child.treeWidget().itemBelow(first_child) is item:
                     return sibling
                 else:
-                    sibling = sibling.nextSibling()
+                    sibling = first_child.treeWidget().itemBelow(first_child)
+                    #sibling = sibling.nextSibling()
         else :
             return None
         
@@ -705,7 +723,7 @@ class Qt4_DataCollectTree(QtGui.QWidget):
             if isinstance(item, Qt4_queue_item.QueueItem): 
                 older_sibling = self.previous_sibling(item)
                 if older_sibling :
-                    older_sibling.moveItem(item)
+                    older_sibling.move_item(item)
 
     def samples_from_sc_content(self, sc_basket_content, sc_sample_content):
         """sample_list = []

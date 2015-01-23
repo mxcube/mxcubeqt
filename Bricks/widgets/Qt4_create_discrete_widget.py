@@ -27,15 +27,15 @@ import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
-from Qt4_data_path_widget import Qt4_DataPathWidget
-from Qt4_processing_widget import Qt4_ProcessingWidget
-from Qt4_acquisition_widget import Qt4_AcquisitionWidget
-from Qt4_create_task_base import Qt4_CreateTaskBase
+from Qt4_data_path_widget import DataPathWidget
+from Qt4_processing_widget import ProcessingWidget
+from Qt4_acquisition_widget import AcquisitionWidget
+from Qt4_create_task_base import CreateTaskBase
 
 
-class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
+class CreateDiscreteWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
-        Qt4_CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), "Standart")
+        CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), "Standart")
 
         if not name:
             self.setObjectName("Qt4_create_discrete_widget")
@@ -52,7 +52,7 @@ class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
         self._acq_gbox = QtGui.QGroupBox('Acquisition', self._acq_frame)
         self._acq_gbox.setObjectName('acq_gbox')
         self._acq_widget = \
-            Qt4_AcquisitionWidget(self._acq_gbox,
+            AcquisitionWidget(self._acq_gbox,
                               "acquisition_widget",
                               layout='vertical',
                               acq_params=self._acquisition_parameters,
@@ -64,7 +64,7 @@ class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
         self._data_path_gbox = QtGui.QGroupBox('Data location', self._data_path_frame)
         self._data_path_gbox.setObjectName('data_path_gbox')        
         self._data_path_widget = \
-            Qt4_DataPathWidget(self._data_path_gbox,
+            DataPathWidget(self._data_path_gbox,
                            'create_dc_path_widget',
                            data_model=self._path_template,
                            layout='vertical')
@@ -76,7 +76,7 @@ class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
         self._processing_gbox.setObjectName('processing_gbox')
 
         self._processing_widget = \
-            Qt4_ProcessingWidget(self._processing_gbox,
+            ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
@@ -149,7 +149,7 @@ class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
                      self.handle_path_conflict)"""
 
     def init_models(self):
-        Qt4_CreateTaskBase.init_models(self)
+        CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
@@ -189,7 +189,7 @@ class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
                 item.setText(0, model.get_name())
 
     def single_item_selection(self, tree_item):
-        Qt4_CreateTaskBase.single_item_selection(self, tree_item)
+        CreateTaskBase.single_item_selection(self, tree_item)
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
             #self._processing_parameters = copy.deepcopy(self._processing_parameters)
@@ -231,7 +231,7 @@ class Qt4_CreateDiscreteWidget(Qt4_CreateTaskBase):
             self.setDisabled(True)
 
     def approve_creation(self):
-        result = Qt4_CreateTaskBase.approve_creation(self)
+        result = CreateTaskBase.approve_creation(self)
         selected_shapes = self._graphics_manager.selected_shapes
 
         for shape in selected_shapes:

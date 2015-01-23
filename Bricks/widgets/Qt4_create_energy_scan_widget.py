@@ -29,19 +29,19 @@ import queue_model_objects_v1 as queue_model_objects
 
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 from queue_model_enumerables_v1 import COLLECTION_ORIGIN
-from Qt4_create_task_base import Qt4_CreateTaskBase
-from Qt4_data_path_widget import Qt4_DataPathWidget
-from Qt4_periodic_table_widget import Qt4_PeriodicTableWidget
+from Qt4_create_task_base import CreateTaskBase
+from Qt4_data_path_widget import DataPathWidget
+from Qt4_periodic_table_widget import PeriodicTableWidget
 
 
-class Qt4_CreateEnergyScanWidget(Qt4_CreateTaskBase):
+class CreateEnergyScanWidget(CreateTaskBase):
     def __init__(self, parent = None,name = None, fl = 0):
-        Qt4_CreateTaskBase.__init__(self, parent, name, fl, 'Energy scan')
+        CreateTaskBase.__init__(self, parent, name, fl, 'Energy scan')
 
         if not name:
             self.setObjectName("create_energy_scan_widget")
         
-        self.periodic_table = Qt4_PeriodicTableWidget(self)
+        self.periodic_table = PeriodicTableWidget(self)
         
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self.periodic_table)
@@ -103,7 +103,7 @@ class Qt4_CreateEnergyScanWidget(Qt4_CreateTaskBase):
         self._data_path_gbox = qt.QVGroupBox('Data location', self,
                                              'data_path_gbox')
         self._data_path_widget = \
-            Qt4_DataPathWidget(self._data_path_gbox, 
+            DataPathWidget(self._data_path_gbox, 
                            data_model = self._path_template,
                            layout = 'vertical')
 
@@ -147,7 +147,7 @@ class Qt4_CreateEnergyScanWidget(Qt4_CreateTaskBase):
                      self.handle_path_conflict)"""
 
     def init_models(self):
-        Qt4_CreateTaskBase.init_models(self)
+        CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
   
@@ -245,7 +245,7 @@ class Qt4_CreateEnergyScanWidget(Qt4_CreateTaskBase):
                 self._graphics_manager.de_select_shape(line)
 
     def approve_creation(self):
-        base_result = Qt4_CreateTaskBase.approve_creation(self)
+        base_result = CreateTaskBase.approve_creation(self)
     
         selected_lines = False
         
@@ -288,7 +288,7 @@ class Qt4_CreateEnergyScanWidget(Qt4_CreateTaskBase):
                 self._list_box.setSelected(list_item, False)
 
     def single_item_selection(self, tree_item):
-        Qt4_CreateTaskBase.single_item_selection(self, tree_item)
+        CreateTaskBase.single_item_selection(self, tree_item)
                                                              
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()

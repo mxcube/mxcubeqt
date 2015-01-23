@@ -22,16 +22,16 @@ from PyQt4 import QtGui
 
 import sys
 
-class Qt4_ConfirmDialogWidgetVerticalLayout(QtGui.QWidget):
+class ConfirmDialogWidgetVerticalLayout(QtGui.QWidget):
     def __init__(self, parent = None, name = None, fl = 0):
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
 
         if not name:
-            self.setObjectName("Qt4_ConfirmDialogWidgetVerticalLayout")
+            self.setObjectName("ConfirmDialogWidgetVerticalLayout")
 
         # Hardware objects ----------------------------------------------------
 
-        # Internal values -----------------------------------------------------
+        # Internal variables --------------------------------------------------
         self.snapshots_list = [0, 1, 2, 4]
 
         # Graphic elements ----------------------------------------------------

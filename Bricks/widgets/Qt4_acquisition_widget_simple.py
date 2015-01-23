@@ -24,10 +24,10 @@ from PyQt4 import QtCore
 from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
-from widgets.Qt4_widget_utils import Qt4_DataModelInputBinder
+from widgets.Qt4_widget_utils import DataModelInputBinder
 
 
-class Qt4_AcquisitionWidgetSimple(QtGui.QWidget):
+class AcquisitionWidgetSimple(QtGui.QWidget):
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None, 
                  path_template = None, layout = None):
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -50,7 +50,7 @@ class Qt4_AcquisitionWidgetSimple(QtGui.QWidget):
         else:
             self._path_template = path_template
 
-        self._acquisition_mib = Qt4_DataModelInputBinder(self._acquisition_parameters)
+        self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_vertical_simple_layout.ui"))

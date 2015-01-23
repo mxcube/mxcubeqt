@@ -4,7 +4,7 @@ from PyQt4 import QtGui
 from BlissFramework.Utils import Qt4_widget_colors
 from HardwareRepository.dispatcher import dispatcher
 
-class Qt4_DataModelInputBinder(object):
+class DataModelInputBinder(object):
     def __init__(self,  obj):
         object.__init__(self)
         self.__model = obj
