@@ -45,12 +45,20 @@ class CustomMenuBar(QtGui.QWidget):
 
         # Graphic elements ----------------------------------------------------
         self.menu_bar = QtGui.QMenuBar(self) 
-        self.menu_bar.addMenu("File") 
+        self.menu_bar.addMenu("File")
+        self.menu_bar.addMenu("Help") 
+        #self.menu_bar.addMenu("Expert mode")
+        #self.menu_bar.addAction(QtGui.QAction('Expert mode', self.menu_bar, checkable=True))
+        action = self.menu_bar.addAction("Expert mode", self.expert_mode_clicked)
+        action.setCheckable(True)
         #self.menu_bar.setStyleSheet("QMenuBar::item { color: rgb(255, 255, 255); }")
+        #self.expert_mode_checkbox = QtGui.QCheckBox("Expert mode", self)
 
         # Layout --------------------------------------------------------------
         _main_hlayout = QtGui.QHBoxLayout()
         _main_hlayout.addWidget(self.menu_bar)
+        #_main_hlayout.addStretch(0) 
+        #_main_hlayout.addWidget(self.expert_mode_checkbox)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_hlayout) 
@@ -603,8 +611,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if len(args) > 0:
           if args[0]:
             return
-        BlissWidget.menu_bar.set_expert_mode(False)
-        BlissWidget.menu_bar.expert_mode_checkbox.setChecked(False)
+
+        #BlissWidget.menu_bar.set_expert_mode(False)
+        #BlissWidget.menu_bar.expert_mode_checkbox.setChecked(False)
+        self.menu_bar.set_expert_mode(False)
+        #self.menu_bar.expert_mode_checkbox.setChecked(False)
 
     def add_item(self, item_cfg, parent):
         item_type = item_cfg["type"]

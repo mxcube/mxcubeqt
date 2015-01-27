@@ -483,7 +483,7 @@ class GUIEditorWindow(QtGui.QWidget):
         self.connection_editor_window = Qt4_ConnectionEditor.Qt4_ConnectionEditor(self.configuration)
         width = QtGui.QApplication.desktop().width()
         height = QtGui.QApplication.desktop().height()
-        self.connection_editor_window.resize(0.85 * width, 0.7 * height)
+        #self.connection_editor_window.resize(0.85 * width, 0.7 * height)
         self.connection_editor_window.show()
 
     def updateProperties(self, item_cfg):

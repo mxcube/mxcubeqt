@@ -114,13 +114,13 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
 
         main_layout = QtGui.QVBoxLayout(self)
         main_layout.addWidget(top_panel)
-        main_layout.addWidget(self.add_connection_button, QtCore.Qt.AlignHCenter)
+        main_layout.addWidget(self.add_connection_button) #, QtCore.Qt.AlignHCenter)
         main_layout.addWidget(bottom_panel)
-        main_layout.addWidget(self.remove_connection_button, QtCore.Qt.AlignHCenter) 
+        main_layout.addWidget(self.remove_connection_button) #, QtCore.Qt.AlignHCenter) 
         main_layout.addWidget(button_panel)
         main_layout.setSpacing(5)
         main_layout.setContentsMargins(2, 2, 2, 2) 
-        main_layout.addStretch(0)
+        #main_layout.addStretch(0)
         self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
@@ -132,13 +132,10 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                                      QtGui.QSizePolicy.Fixed)
         self.cancel_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
                                          QtGui.QSizePolicy.Fixed) 
-        self.connections_treewidget.setSizePolicy(QtGui.QSizePolicy.Expanding, 
-                                                  QtGui.QSizePolicy.Expanding)
+        #self.connections_treewidget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
+        #                                          QtGui.QSizePolicy.MinimumExpanding)
 
         # Qt signal/slot connections ------------------------------------------
-        #self.connect(self.emitter_windows_listwidget, QtCore.SIGNAL('itemChanged (QListWidgetItem * item )'), 
-        #             self.emitter_window_changed)
-
         self.emitter_windows_listwidget.currentItemChanged.connect(self.emitter_window_changed)
         self.emitter_objects_listwidget.currentItemChanged.connect(self.emitter_object_changed) 
         self.receiver_windows_listwidget.currentItemChanged.connect(self.receiver_window_changed)
