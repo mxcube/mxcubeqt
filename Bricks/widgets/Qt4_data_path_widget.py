@@ -37,9 +37,9 @@ class DataPathWidget(QtGui.QWidget):
         if name is not None:
             self.setObjectName(name)
 
-        #
-        # Attributes
-        #
+        # Hardware objects ----------------------------------------------------
+
+        # Internal variables --------------------------------------------------
         self._base_image_dir = None
         self._base_process_dir = None
         self.path_conflict_state = False
@@ -51,9 +51,7 @@ class DataPathWidget(QtGui.QWidget):
         
         self._data_model_pm = DataModelInputBinder(self._data_model)
 
-        #
-        # Layout
-        #
+        # Graphic elements ----------------------------------------------------
         if layout == "vertical":
             self.data_path_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_data_path_widget_vertical_layout.ui"))
@@ -61,30 +59,20 @@ class DataPathWidget(QtGui.QWidget):
             self.data_path_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_data_path_widget_horizontal_layout.ui"))
 
+        # Layout --------------------------------------------------------------
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self.data_path_widget)
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
-        #
-        # Logic
-        #
-        self._data_model_pm.bind_value_update('base_prefix', 
-                                              self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
-                                              str,
-                                              None)
-        
-        self._data_model_pm.bind_value_update('run_number', 
-                                              self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
-                                              int,
-                                              QtGui.QIntValidator(0, 1000, self))
 
-        self.connect(self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'), 
-                     QtCore.SIGNAL("textChanged(const QString &)"), 
+        # Qt signal/slot connections ------------------------------------------ 
+        self.connect(self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
+                     QtCore.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
-        
-        self.connect(self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'), 
-                     QtCore.SIGNAL("textChanged(const QString &)"), 
+
+        self.connect(self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
+                     QtCore.SIGNAL("textChanged(const QString &)"),
                            self._run_number_ledit_change)
 
         self.connect(self.data_path_widget.findChild(QtGui.QPushButton, 'browse_button'),
@@ -94,6 +82,17 @@ class DataPathWidget(QtGui.QWidget):
         self.connect(self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit'),
                      QtCore.SIGNAL("textChanged(const QString &)"),
                      self._folder_ledit_change)
+
+        # Other ---------------------------------------------------------------
+        self._data_model_pm.bind_value_update('base_prefix', 
+             self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'), 
+             str, None)
+        
+        self._data_model_pm.bind_value_update('run_number', 
+             self.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
+             int, QtGui.QIntValidator(0, 1000, self))
+
+        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def _browse_clicked(self):
         get_dir = QtGui.QFileDialog(self)
@@ -113,7 +112,8 @@ class DataPathWidget(QtGui.QWidget):
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
                                       int(self._data_model.precision) * '#' )
         file_name = file_name.strip(' ')
-        self.data_path_widget.findChild(QtGui.QLineEdit, 'file_name_value_label').setText(file_name)
+        self.data_path_widget.findChild(QtGui.QLabel, 
+                                        'file_name_value_label').setText(file_name)
         
         self.emit(QtCore.SIGNAL('path_template_changed'),
                   self.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
@@ -168,7 +168,7 @@ class DataPathWidget(QtGui.QWidget):
             self.data_path_widget.findChild(QtGui.QLineEdit, 'folder_ledit').setText('')
             self._data_model.directory = base_image_dir
 
-        self.data_path_widget.findChild(QtGui.QLineEdit, 'base_path_label').setText(base_image_dir)
+        self.data_path_widget.findChild(QtGui.QLineEdit, 'base_path_ledit').setText(base_image_dir)
 
     def set_run_number(self, run_number):
         self._data_model.run_number = int(run_number)

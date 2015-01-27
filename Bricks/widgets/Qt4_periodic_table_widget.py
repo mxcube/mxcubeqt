@@ -60,36 +60,41 @@ class PeriodicTableWidget(QtGui.QWidget):
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self.periodic_table)
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.main_layout.setContentsMargins(5, 2, 0, 0)
         self.setLayout(self.main_layout)  
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        self.periodic_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
+                                          QtGui.QSizePolicy.Fixed)
+        self.periodic_table.setFixedSize(458, 156)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.periodic_table, QtCore.SIGNAL("itemClicked(QTableWidgetItem*)"),
-                     self.periodic_table_element_changed) 
+        self.periodic_table.itemClicked.connect(self.periodic_table_element_clicked)
 
         # Other ---------------------------------------------------------------
         self.prepare_periodic_table()
         self.selected_element = None
         self.selected_edge = None
+        self.previous_selection = None
 
     def prepare_periodic_table(self):
         self.periodic_table.verticalHeader().setVisible(False)        
         self.periodic_table.horizontalHeader().setVisible(False)
         self.periodic_table.setShowGrid(False)
+        current_font = self.periodic_table.font()
+        current_font.setPointSize(9)
+        self.periodic_table.setFont(current_font)
         for row_index, row in enumerate(PERIODIC_ELEMENTS):
             for col_index, element_symbol in enumerate(row):
                 if len(element_symbol) > 0:
                    self.periodic_table.setItem(row_index, col_index, QtGui.QTableWidgetItem(element_symbol))
                    self.periodic_table.item(row_index, col_index).setBackground(QtGui.QBrush(Qt4_widget_colors.LIGHT_GRAY)) 
                    self.periodic_table.item(row_index, col_index).setTextAlignment(QtCore.Qt.AlignHCenter)
-                   self.periodic_table.setColumnWidth(col_index, 30)
-            self.periodic_table.setRowHeight (row_index, 30)
+                   self.periodic_table.setColumnWidth(col_index, 24)
+            self.periodic_table.setRowHeight (row_index, 22)
 
-    def periodic_table_element_changed(self, current_item):
+    def periodic_table_element_clicked(self, current_item):
         self.selected_element = current_item.text() 
 
     def get_selected_element_edge(self):
