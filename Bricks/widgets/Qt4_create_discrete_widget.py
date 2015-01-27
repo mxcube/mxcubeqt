@@ -27,6 +27,7 @@ import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
+from BlissFramework.Utils import Qt4_widget_colors
 from Qt4_data_path_widget import DataPathWidget
 from Qt4_processing_widget import ProcessingWidget
 from Qt4_acquisition_widget import AcquisitionWidget
@@ -40,28 +41,22 @@ class CreateDiscreteWidget(CreateTaskBase):
         if not name:
             self.setObjectName("Qt4_create_discrete_widget")
 
+        # Hardware objects ----------------------------------------------------
+
+        # Internal variables --------------------------------------------------
         self.previous_energy = None
         self.init_models()
 
-        #
-        # Layout
-        #
-        self._acq_frame = QtGui.QFrame(self)
-        self._acq_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
-
-        self._acq_gbox = QtGui.QGroupBox('Acquisition', self._acq_frame)
+        # Graphic elements ----------------------------------------------------
+        self._acq_gbox = QtGui.QGroupBox('Acquisition', self)
         self._acq_gbox.setObjectName('acq_gbox')
-        self._acq_widget = \
-            AcquisitionWidget(self._acq_gbox,
+        self._acq_widget =  AcquisitionWidget(self._acq_gbox,
                               "acquisition_widget",
                               layout='vertical',
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
-        self._data_path_frame = QtGui.QFrame(self)
-        self._data_path_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
-
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self._data_path_frame)
+        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
         self._data_path_gbox.setObjectName('data_path_gbox')        
         self._data_path_widget = \
             DataPathWidget(self._data_path_gbox,
@@ -69,56 +64,37 @@ class CreateDiscreteWidget(CreateTaskBase):
                            data_model=self._path_template,
                            layout='vertical')
 
-        self._processing_frame = QtGui.QFrame(self)
-        self._processing_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
-
-        self._processing_gbox = QtGui.QGroupBox('Processing', self._processing_frame)
+        self._processing_gbox = QtGui.QGroupBox('Processing', self)
         self._processing_gbox.setObjectName('processing_gbox')
-
         self._processing_widget = \
             ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
-        self._acq_frame_layout = QtGui.QVBoxLayout(self)
-        self._acq_frame_layout.addWidget(self._acq_gbox)
-        self._acq_frame_layout.setSpacing(0)
-        self._acq_frame_layout.setContentsMargins(0,0,0,0)
-        self._acq_frame.setLayout(self._acq_frame_layout)
-
         self._acq_gbox_layout = QtGui.QVBoxLayout(self)
         self._acq_gbox_layout.addWidget(self._acq_widget)
         self._acq_gbox_layout.setSpacing(0)
         self._acq_gbox_layout.setContentsMargins(0,0,0,0)
         self._acq_gbox.setLayout(self._acq_gbox_layout)
 
-        self._data_path_frame_layout = QtGui.QVBoxLayout(self)
-        self._data_path_frame_layout.addWidget(self._data_path_gbox)
-        self._data_path_frame_layout.setSpacing(0)
-        self._data_path_frame_layout.setContentsMargins(0,0,0,0)
-        self._data_path_frame.setLayout(self._data_path_frame_layout)
-
         self._data_path_gbox_layout = QtGui.QVBoxLayout(self)
         self._data_path_gbox_layout.addWidget(self._data_path_widget)
+        self._data_path_gbox_layout.setSpacing(0)
+        self._data_path_gbox_layout.setContentsMargins(0,0,0,0)
         self._data_path_gbox.setLayout(self._data_path_gbox_layout)
-
-
-        self._processing_frame_layout = QtGui.QVBoxLayout(self)
-        self._processing_frame_layout.addWidget(self._processing_gbox)
-        self._processing_frame_layout.setSpacing(0)
-        self._processing_frame_layout.setContentsMargins(0,0,0,0)
-        self._processing_frame.setLayout(self._processing_frame_layout)
 
         self._processing_gbox_layout = QtGui.QVBoxLayout(self)
         self._processing_gbox_layout.addWidget(self._processing_widget)
+        self._processing_gbox_layout.setSpacing(0)
+        self._processing_gbox_layout.setContentsMargins(0,0,0,0)
         self._processing_gbox.setLayout(self._processing_gbox_layout)
 
         self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self._acq_frame)
-        self.main_layout.addWidget(self._data_path_frame)
-        self.main_layout.addWidget(self._processing_frame)
+        self.main_layout.addWidget(self._acq_gbox)
+        self.main_layout.addWidget(self._data_path_gbox)
+        self.main_layout.addWidget(self._processing_gbox)
         self.main_layout.addStretch(0)
-        self.main_layout.setSpacing(0)
+        self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 
@@ -129,14 +105,15 @@ class CreateDiscreteWidget(CreateTaskBase):
                            QtGui.QSizePolicy.Expanding)
         self._processing_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
                            QtGui.QSizePolicy.Expanding)
-        """self.connect(self._acq_widget, QtCore.SIGNAL('mad_energy_selected'),
+        self.connect(self._acq_widget, QtCore.SIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
         
-        self.connect(dp_layout.child('prefix_ledit'),
+        # Qt signal/slot connections ------------------------------------------
+        self.connect(self._data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
                      QtCore.SIGNAL("textChanged(const QString &)"),
                      self._prefix_ledit_change)
 
-        self.connect(dp_layout.child('run_number_ledit'),
+        self.connect(self._data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
                      QtCore.SIGNAL("textChanged(const QString &)"),
                      self._run_number_ledit_change)
 
@@ -146,7 +123,15 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         self.connect(self._data_path_widget,
                      QtCore.SIGNAL("path_template_changed"),
-                     self.handle_path_conflict)"""
+                     self.handle_path_conflict)
+
+        # Other ---------------------------------------------------------------
+        Qt4_widget_colors.set_widget_color(self._acq_gbox,
+                                           Qt4_widget_colors.GROUP_BOX_GRAY)
+        Qt4_widget_colors.set_widget_color(self._data_path_gbox,
+                                           Qt4_widget_colors.GROUP_BOX_GRAY)
+        Qt4_widget_colors.set_widget_color(self._processing_gbox,
+                                           Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def init_models(self):
         CreateTaskBase.init_models(self)

@@ -51,7 +51,6 @@ class CreateTaskBase(QtGui.QWidget):
          QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
          self.setObjectName(name)
          
-         self._graphics_manager = None
          self._tree_brick = None
          self._task_node_name = task_node_name
 
@@ -67,6 +66,7 @@ class CreateTaskBase(QtGui.QWidget):
          self._energy_scan_result = None
          self._session_hwobj = None
          self._beamline_setup_hwobj = None
+         self._graphics_manager_hwobj = None
          
          #QtCore.QObject.connect(QtGui.QApplication, QtCore.SIGNAL('tab_changed'),
          #                       self.tab_changed)
@@ -126,7 +126,7 @@ class CreateTaskBase(QtGui.QWidget):
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
         
-        self._graphics_manager = bl_setup_hwobj.shape_history_hwobj
+        self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
 
@@ -266,7 +266,7 @@ class CreateTaskBase(QtGui.QWidget):
         self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        self._graphics_manager.select_shape_with_cpos(cpos)
+        self._graphics_manager_hwobj.select_shape_with_cpos(cpos)
             
     def selection_changed(self, items):
         if items:
@@ -392,7 +392,7 @@ class CreateTaskBase(QtGui.QWidget):
              if isinstance(pos, graphics_manager.Point):
                  if self._acq_widget and isinstance(item, Qt4_queue_item.TaskQueueItem):
                      cpos = pos.get_centred_positions()[0]
-                     snapshot = self._graphics_manager.get_snapshot([pos.qub_point])
+                     snapshot = self._graphics_manager_hwobj.get_snapshot([pos.qub_point])
                      cpos.snapshot_image = snapshot        
                      self._acquisition_parameters.centred_position = cpos
 

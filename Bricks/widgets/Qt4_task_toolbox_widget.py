@@ -31,7 +31,8 @@ from widgets.Qt4_create_discrete_widget import CreateDiscreteWidget
 from widgets.Qt4_create_helical_widget import CreateHelicalWidget
 from widgets.Qt4_create_char_widget import CreateCharWidget
 from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
-#from widgets.Qt4_create_workflow_widget import Qt4_CreateWorkflowWidget
+from widgets.Qt4_create_xrf_scan_widget import CreateXRFScanWidget
+from widgets.Qt4_create_advanced_scan_widget import CreateAdvancedScanWidget
 
 
 class TaskToolBoxWidget(QtGui.QWidget):
@@ -40,15 +41,13 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.setObjectName = name
 
         # Hardware objects ----------------------------------------------------
-        self.shape_history = None
+        self.graphics_manager_hwobj = None
 
-        # Internal values -----------------------------------------------------
+        # Internal variables --------------------------------------------------
         self.tree_brick = None
         self.previous_page_index = 0
 
         # Graphic elements ----------------------------------------------------
-        #self.v_layout = QtGui.QVBoxLayout(self)
-        #self.v_layout.setSpacing(10)
         self.method_group_box = QtGui.QGroupBox(" Collection method", self)
         font = self.method_group_box.font()
         font.setPointSize(10)
@@ -60,18 +59,18 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.tool_box.setFont(font)
         
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
-        #self.discrete_page.setBackgroundMode(QtGui.QWidget.PaletteBackground)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
-        #self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
-        #self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
+        self.xrf_scan_page = CreateXRFScanWidget(self.tool_box, "xrf_scan")  
+        self.advanced_scan_page = CreateAdvancedScanWidget(self.tool_box, "advanced_scan")
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-        #self.tool_box.addItem(self.workflow_page, "Advanced")
+        self.tool_box.addItem(self.xrf_scan_page, "XRF Scan")
+        self.tool_box.addItem(self.advanced_scan_page, "Advanced")
 
         self.button_box = QtGui.QWidget(self)
         self.create_task_button = QtGui.QPushButton("  Add to queue", self.button_box)
@@ -128,7 +127,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_beamline_setup(beamline_setup_hwobj)
 
-        self.shape_history = beamline_setup_hwobj.shape_history_hwobj
+        self.graphics_manager_hwobj = beamline_setup_hwobj.shape_history_hwobj
         #self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
         #self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
 
@@ -173,7 +172,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 new_pt.directory = previous_pt.directory
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
-            elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
                 data_collection = tree_item.get_model()
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                     if self.tool_box.currentWidget() == self.helical_page:
@@ -183,16 +182,16 @@ class TaskToolBoxWidget(QtGui.QWidget):
                         self.create_task_button.setEnabled(True)
                 elif self.tool_box.currentWidget() == self.discrete_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.CharacterisationQueueItem):
                 if self.tool_box.currentWidget() == self.char_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, queue_item.EnergyScanQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.EnergyScanQueueItem):
                 if self.tool_box.currentWidget() == self.energy_scan_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, queue_item.XRFScanQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.XRFScanQueueItem):
                 if self.tool_box.currentWidget() == self.xrf_scan_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.GenericWorkflowQueueItem):
                 if self.tool_box.currentWidget() == self.workflow_page:
                     self.create_task_button.setEnabled(True)
 
@@ -239,7 +238,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                             "would like to add to.")
             else:
                 for item in items:
-                    shapes = self.shape_history.selected_shapes
+                    shapes = self.graphics_manager_hwobj.selected_shapes
                     task_model = item.get_model()
 
                     # Create a new group if sample is selected

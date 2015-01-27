@@ -42,111 +42,121 @@ class CreateHelicalWidget(CreateTaskBase):
         if not name:
             self.setObjectName("create_helical_widget")
          
+        # Hardware objects ----------------------------------------------------
 
-         
-
-        """self.init_models()
+        # Internal variables --------------------------------------------------
+        self.init_models()
         self._prev_pos = None
         self._current_pos = None
         self._list_item_map = {}
         self.init_models()
 
-        v_layout = QtGui.QVBoxLayout(self, 2, 5, "v_layout")
-        self._lines_gbox = QtGui.QGroupBox('Lines', self, "lines_gbox")
-        self._lines_gbox.setColumnLayout(0, QtCore.Qt.Vertical)
-        self._lines_gbox.layout().setSpacing(6)
-        self._lines_gbox.layout().setMargin(11)
-        lines_gbox_layout = QtGui.QHBoxLayout(self._lines_gbox.layout())
-        lines_gbox_layout.setAlignment(QtCore.Qt.AlignTop)
+        self._lines_gbox = QtGui.QGroupBox('Lines', self)
+        self._lines_list_widget = QtGui.QListWidget(self._lines_gbox)
+        self._lines_list_widget.setFixedWidth(175)
+        self._lines_list_widget.setFixedHeight(50)
+        self._lines_list_widget.setToolTip(\
+             "Select the line(s) to perfrom helical scan on")
 
-        self._list_box = QtGui.QListBox(self._lines_gbox, "helical_page")
-        self._list_box.setSelectionMode(qt.QListBox.Extended)
-        self._list_box.setFixedWidth(175)
-        self._list_box.setFixedHeight(50)
-        list_box_tool_tip = "Select the line(s) to perfrom helical scan on"
-        self._list_box.setToolTip(list_box_tool_tip)
-
-        lines_gbox_layout.addWidget(self._list_box)
-
-        button_layout = QtGui.QVBoxLayout(None, 0, 6, "button_layout")
-        button_layout.setSpacing(5)
-        add_button = QtGui.QPushButton("+", self._lines_gbox, "add_button")
+        add_button = QtGui.QPushButton("+", self._lines_gbox)
         add_button.setFixedWidth(20)
         add_button.setFixedHeight(20)
-        remove_button = QtGui.QPushButton("-", self._lines_gbox, "add_button")
+        remove_button = QtGui.QPushButton("-", self._lines_gbox)
         remove_button.setFixedWidth(20)
         remove_button.setFixedHeight(20)        
-        button_layout.addWidget(add_button)
-        button_layout.addWidget(remove_button)
-        lines_gbox_layout.addLayout(button_layout)
 
         add_button_tool_tip = "Add a line between two saved positions, " \
                               "CTRL click to select more than one position"
         add_button.setToolTip(add_button_tool_tip)
         remove_button_tool_tip = "Remove selected line(s)"
-        QtGui.QToolTip.add(remove_button, remove_button_tool_tip)
+        remove_button.setToolTip(remove_button_tool_tip)
 
-        self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
-        self._acq_widget = \
-            AcquisitionWidget(self._acq_gbox,
-                              "acquisition_widget", layout='vertical',
+        self._acq_gbox = QtGui.QGroupBox('Acquisition', self)
+        self._acq_widget =  AcquisitionWidget(self._acq_gbox,
+                              "acquisition_widget",
+                              layout='vertical',
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
-
-        self._acq_widget.disable_inverse_beam(True)
-        self._data_path_gbox = qt.QVGroupBox('Data location', self,
-                                             'data_path_gbox')
+        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
         self._data_path_widget = \
-            DataPathWidget(self._data_path_gbox, 
-                           data_model = self._path_template,
-                           layout = 'vertical')
+            DataPathWidget(self._data_path_gbox,
+                           'create_dc_path_widget',
+                           data_model=self._path_template,
+                           layout='vertical')
 
-        self._processing_gbox = qt.QVGroupBox('Processing', self, 
-                                              'processing_gbox')
-        
+        self._processing_gbox = QtGui.QGroupBox('Processing', self)
+        self._processing_gbox.setObjectName('processing_gbox')
         self._processing_widget = \
             ProcessingWidget(self._processing_gbox,
-                             data_model = self._processing_parameters)
+                             data_model=self._processing_parameters)
 
-        v_layout.addWidget(self._lines_gbox)
-        v_layout.addWidget(self._acq_gbox)
-        v_layout.addWidget(self._data_path_gbox)
-        v_layout.addWidget(self._processing_gbox)
+        # Layout --------------------------------------------------------------
+        _lines_gbox_gridlayout = QtGui.QGridLayout(self)
+        _lines_gbox_gridlayout.addWidget(self._lines_list_widget, 0, 0, 2, 1)
+        _lines_gbox_gridlayout.addWidget(add_button, 0, 1)
+        _lines_gbox_gridlayout.addWidget(remove_button, 1, 1) 
+        _lines_gbox_gridlayout.setSpacing(2)
+        _lines_gbox_gridlayout.setColumnStretch(2, 10)
+        _lines_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
+        self._lines_gbox.setLayout(_lines_gbox_gridlayout)
 
-        qt.QObject.connect(add_button, qt.SIGNAL("clicked()"),
-                        self.add_clicked)
+        _acq_gbox_layout = QtGui.QVBoxLayout(self)
+        _acq_gbox_layout.addWidget(self._acq_widget)
+        _acq_gbox_layout.setSpacing(0)
+        _acq_gbox_layout.setContentsMargins(0,0,0,0)
+        self._acq_gbox.setLayout(_acq_gbox_layout)
 
-        qt.QObject.connect(remove_button, qt.SIGNAL("clicked()"),
-                        self.remove_clicked)
+        _data_path_gbox_layout = QtGui.QVBoxLayout(self)
+        _data_path_gbox_layout.addWidget(self._data_path_widget)
+        _data_path_gbox_layout.setSpacing(0)
+        _data_path_gbox_layout.setContentsMargins(0,0,0,0)
+        self._data_path_gbox.setLayout(_data_path_gbox_layout)
 
-        qt.QObject.connect(self._list_box, qt.SIGNAL("selectionChanged()"),
-                           self.list_box_selection_changed)
+        _processing_gbox_layout = QtGui.QVBoxLayout(self)
+        _processing_gbox_layout.addWidget(self._processing_widget)
+        _processing_gbox_layout.setSpacing(0)
+        _processing_gbox_layout.setContentsMargins(0,0,0,0)
+        self._processing_gbox.setLayout(_processing_gbox_layout)
 
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self._lines_gbox)
+        _main_vlayout.addWidget(self._acq_gbox)
+        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._processing_gbox)
+        _main_vlayout.addStretch(0)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(0,0,0,0)
+        self.setLayout(_main_vlayout)
+
+        # SizePolicies --------------------------------------------------------
+
+        # Qt signal/slot connections ------------------------------------------
+        add_button.clicked.connect(self.add_clicked)
+        remove_button.clicked.connect(self.remove_clicked)
         prefix_ledit = self._data_path_widget.\
-                       data_path_widget_layout.child('prefix_ledit')
-
+                       data_path_widget.findChild(QtGui.QLineEdit, 
+                                                  'prefix_ledit')
+        prefix_ledit.textChanged.connect(self._prefix_ledit_change)
         run_number_ledit = self._data_path_widget.\
-                           data_path_widget_layout.child('run_number_ledit')
+                           data_path_widget.findChild(QtGui.QLineEdit, 
+                                                      'run_number_ledit')
+        run_number_ledit.textChanged.connect(self._run_number_ledit_change)
 
-        self.connect(prefix_ledit, 
-                     qt.SIGNAL("textChanged(const QString &)"), 
-                     self._prefix_ledit_change)
+        QtCore.QObject.connect(self._lines_list_widget, 
+                               QtCore.SIGNAL("selectionChanged()"),
+                               self.list_box_selection_changed)
 
-        self.connect(run_number_ledit,
-                     qt.SIGNAL("textChanged(const QString &)"), 
-                     self._run_number_ledit_change)
-
-        self.connect(self._data_path_widget,
-                     qt.PYSIGNAL("path_template_changed"),
-                     self.handle_path_conflict)"""
+        QtCore.QObject.connect(self._data_path_widget,
+                     QtCore.SIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
   
-        """if self._beamline_setup_hwobj is not None:
+        if self._beamline_setup_hwobj is not None:
             has_shutter_less = self._beamline_setup_hwobj.\
                                detector_has_shutterless()
             self._acquisition_parameters.shutterless = has_shutter_less
@@ -155,7 +165,7 @@ class CreateHelicalWidget(CreateTaskBase):
                 get_default_acquisition_parameters()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()"""
+            self._path_template = queue_model_objects.PathTemplate()
 
     def add_clicked(self):
         selected_shapes = self._graphics_manager.selected_shapes.values()
@@ -171,21 +181,23 @@ class CreateHelicalWidget(CreateTaskBase):
 
             line.show()
             self._graphics_manager.add_shape(line)
-            list_box_item = qt.QListBoxText(self._list_box, 'Line')
+            list_box_item = qt.QListBoxText(self._lines_list_widget, 'Line')
             self._list_item_map[list_box_item] = line
 
             # De select previous items
             for item in self.selected_items():
-                self._list_box.setSelected(item, False)
+                self._lines_list_widget.setSelected(item, False)
             
-            self._list_box.setSelected(list_box_item, True)
+            self._lines_list_widget.setSelected(list_box_item, True)
+        else:
+            print "No points selected"
 
     def remove_clicked(self):
         selected_items = self.selected_items()
 
         if selected_items:
             for item in selected_items:
-                self._list_box.removeItem(self._list_box.index(item))
+                self._lines_list_widget.removeItem(self._list_box.index(item))
                 line = self._list_item_map[item]
                 self._graphics_manager.delete_shape(line)
                 del self._list_item_map[item]
@@ -201,7 +213,7 @@ class CreateHelicalWidget(CreateTaskBase):
                         items_to_remove.append((list_item, line))
 
             for (list_item, line) in items_to_remove:
-                self._list_box.removeItem(self._list_box.index(list_item))
+                self._lines_list_widget.removeItem(self._list_box.index(list_item))
                 del self._list_item_map[list_item]
 
     def centred_position_selection(self, positions):
@@ -223,9 +235,9 @@ class CreateHelicalWidget(CreateTaskBase):
     def selected_items(self):
         selected_items = []
                 
-        for item_index in range(0, self._list_box.numRows()):
-            if self._list_box.isSelected(item_index):
-                selected_items.append(self._list_box.item(item_index))
+        for item_index in range(0, self._lines_list_widget.count()):
+            if self._lines_list_widget.isSelected(item_index):
+                selected_items.append(self._lines_list_widget.item(item_index))
 
         return selected_items
         
@@ -278,9 +290,9 @@ class CreateHelicalWidget(CreateTaskBase):
         for (list_item, shape) in self._list_item_map.iteritems():
 
             if selected_line is shape:
-                self._list_box.setSelected(list_item, True)
+                self._lines_list_widget.setSelected(list_item, True)
             else:
-                self._list_box.setSelected(list_item, False)
+                self._lines_list_widget.setSelected(list_item, False)
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
