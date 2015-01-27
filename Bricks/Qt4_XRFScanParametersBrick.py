@@ -1,29 +1,48 @@
-import qt
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube.
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+
+from BlissFramework.Qt4_BaseComponents import BlissWidget
+from widgets.Qt4_xrf_scan_parameters_widget import XRFScanParametersWidget
 
 
-from BlissFramework import BaseComponents
-from widgets.xrf_scan_parameters_widget import XRFScanParametersWidget
+__category__ = 'Qt4_Task'
 
 
-__category__ = 'mxCuBE_v3'
-
-
-class XRFScanParametersBrick(BaseComponents.BlissWidget):
+class Qt4_XRFScanParametersBrick(BlissWidget):
 
     def __init__(self, *args):
-        BaseComponents.BlissWidget.__init__(self, *args)
+        BlissWidget.__init__(self, *args)
 
         self.addProperty('xrf-scan', 'string', '')        
         self.addProperty("session", "string", "/session")
         self.session_hwobj = None
 	self.xrf_scan_hwobj = None
         
-        # Layout
-        main_layout = qt.QVBoxLayout(self)
         self.xrf_scan_widget = XRFScanParametersWidget(self)
-        main_layout.addWidget(self.xrf_scan_widget)
 
-        # Qt-Slots and signals
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.xrf_scan_widget)
+        self.setLayout(_main_vlayout) 
+
         self.defineSlot("populate_parameter_widget", ({}))
 
     def populate_parameter_widget(self, item):

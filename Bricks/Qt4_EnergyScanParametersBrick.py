@@ -5,7 +5,7 @@ from BlissFramework import BaseComponents
 from widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
 
 
-__category__ = 'mxCuBE_v3'
+__category__ = 'Qt4_TaskToolbox_Tabs'
 
 
 class EnergyScanParametersBrick(BaseComponents.BlissWidget):

@@ -74,6 +74,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("hide_sample_changer_tab", ())
         self.defineSignal("hide_edna_tab", ())
         self.defineSignal("hide_energy_scan_tab",())
+        self.defineSignal("hide_xrf_scan_tab",())
         self.defineSignal("hide_workflow_tab", ())
 
         # Populating the tabs with data
@@ -81,6 +82,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("populate_edna_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("populate_energy_scan_widget", ())
+        self.defineSignal("populate_xrf_scan_widget", ())
         self.defineSignal("populate_workflow_tab", ())
 
         # Handle selection
@@ -166,6 +168,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     # Framework 2 method
@@ -458,6 +461,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
         self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     def show_sample_tab(self, item):
@@ -471,6 +475,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
         self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     def show_dcg_tab(self):
@@ -482,11 +487,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
 
     def populate_parameters_tab(self, item = None):
-        self.emit(QtCore.SIGNAL("populate_parameter_widget"),
-                  (item,))
+        self.emit(QtCore.SIGNAL("populate_parameter_widget"), item)
         
     def show_datacollection_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
@@ -497,6 +502,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_parameters_tab(item)
 
@@ -509,12 +515,12 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_edna_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_edna_parameters_tab(item)
 
     def populate_edna_parameters_tab(self, item):
-        self.emit(QtCore.SIGNAL("populate_edna_parameter_widget"),
-                  (item,))
+        self.emit(QtCore.SIGNAL("populate_edna_parameter_widget"), item)
 
     def show_energy_scan_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
@@ -525,11 +531,28 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True) 
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
-        self.emit(QtCore.SIGNAL("populate_energy_scan_widget"), (item,))
+        self.emit(QtCore.SIGNAL("populate_energy_scan_widget"), item)
+
+    def show_xrf_scan_tab(self, item):
+        self.sample_changer_widget.findChild(QtGui.QPushButton, 
+             'details_button').setText("Show SC")
+        self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
+        self.populate_xrf_scan_tab(item)
+
+    def populate_xrf_scan_tab(self, item):
+        self.emit(QtCore.SIGNAL("populate_xrf_scan_widget"), item)
 
     def show_workflow_tab_from_model(self):
         self.show_workflow_tab(None)
@@ -543,13 +566,14 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True) 
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), False)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), False)
 
         running = self.queue_hwobj.is_executing() 
         self.populate_workflow_tab(item, running=running)
 
     def populate_workflow_tab(self, item, running = False):
-        self.emit(QtCore.SIGNAL("populate_workflow_tab"), (item, running))
+        self.emit(QtCore.SIGNAL("populate_workflow_tab"), item, running)
         
     def toggle_sample_changer_tab(self): 
         if self.current_view == self.sample_changer_widget:
@@ -582,21 +606,23 @@ class Qt4_TreeBrick(BlissWidget):
                 self.populate_edna_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.populate_energy_scan_tab(item)
+            elif isinstance(item, queue_item.XRFScanQueueItem):
+                self.populate_xrf_scan_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.populate_workflow_tab(item)
 
-        self.emit(QtCore.SIGNAL("selection_changed"), (items,))
+        self.emit(QtCore.SIGNAL("selection_changed"), items)
 
     def emit_set_directory(self):
         directory = self.session_hwobj.get_base_image_directory()
-        self.emit(QtCore.SIGNAL("set_directory"), (directory,))
+        self.emit(QtCore.SIGNAL("set_directory"), directory)
 
     def emit_set_prefix(self, item):
         prefix = self.session_hwobj.get_default_prefix(item.get_model())
-        self.emit(QtCore.SIGNAL("set_prefix"), (prefix,))
+        self.emit(QtCore.SIGNAL("set_prefix"), prefix)
 
     def emit_set_sample(self, item):
-        self.emit(QtCore.SIGNAL("set_sample"), (item,))
+        self.emit(QtCore.SIGNAL("set_sample"), item)
 
     def get_selected_items(self):
         items = self.dc_tree_widget.get_selected_items()

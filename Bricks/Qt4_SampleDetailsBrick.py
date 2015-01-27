@@ -30,7 +30,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-__category__ = 'Qt4_General'
+__category__ = 'Qt4_Task'
 
 
 class Qt4_SampleDetailsBrick(BlissWidget):

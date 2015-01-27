@@ -1,53 +1,81 @@
-import qt
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube.
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+
+from BlissFramework.Qt4_BaseComponents import BlissWidget
+from widgets.Qt4_char_parameters_widget import CharParametersWidget
 
 
-from BlissFramework import BaseComponents
-from widgets.char_parameters_widget import CharParametersWidget
+__category__ = 'Qt4_Task'
 
 
-__category__ = 'mxCuBE_v3'
-
-class CharParametersBrick(BaseComponents.BlissWidget):
+class Qt4_CharParametersBrick(BlissWidget):
     def __init__(self, *args):
-        BaseComponents.BlissWidget.__init__(self, *args)
+        BlissWidget.__init__(self, *args)
 
+        # Hardware objects ----------------------------------------------------
         self.session_hwobj = None
 
-        # Framwork-2 properties
+        # Internal variables --------------------------------------------------
+
+        # Properties ----------------------------------------------------------
         self.addProperty("tunable-energy", "boolean", "True")
         self.addProperty("session", "string", "/session")
-        self.addProperty("beamline_setup", "string", "/beamline-setup")
+        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
 
-        # Qt-Slots
-        self.defineSlot("populate_edna_parameter_widget",({}))
+        # Signals -------------------------------------------------------------
 
-        # Layout        
-        self.stack = qt.QWidgetStack(self, 'stack')
+        # Slots ---------------------------------------------------------------
+        self.defineSlot("populate_char_parameter_widget", {})
+
+        # Graphic elements ---------------------------------------------------- 
+        self.stacked_widget = QtGui.QStackedWidget(self)
         self.parameters_widget = CharParametersWidget(self)
-        self.toggle_page_button = qt.QPushButton('View Results', 
-                                              self, 'toggle_page_button')
+        self.toggle_page_button = QtGui.QPushButton('View Results', self)
         self.toggle_page_button.setFixedWidth(100)
 
-        self.results_view = qt.QTextBrowser(self, "results_view")
-        self.stack.addWidget(self.parameters_widget)
-        self.stack.addWidget(self.results_view)
+        self.results_view = QtGui.QTextBrowser(self)
+        self.stacked_widget.addWidget(self.parameters_widget)
+        self.stacked_widget.addWidget(self.results_view)
 
-        main_layout = qt.QVBoxLayout(self)
-        self.layout().addWidget(self.stack)
-        bottom_layout = qt.QHBoxLayout(main_layout)
-        bottom_layout.addStretch()
-        bottom_layout.addWidget(self.toggle_page_button)
+        # Layout --------------------------------------------------------------
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.stacked_widget)
+        _main_vlayout.addStretch(0)
+        _main_vlayout.addWidget(self.toggle_page_button)
+        self.setLayout(_main_vlayout)
 
-        # Logic
-        self.stack.raiseWidget(self.parameters_widget)
+        # SizePolicies -------------------------------------------------------
+
+        # Qt signal/slot connections ------------------------------------------
+        self.toggle_page_button.clicked.connect(self.toggle_page)
+
+        # Other --------------------------------------------------------------- 
+        self.stacked_widget.setCurrentWidget(self.parameters_widget)
         self.parameters_widget.collection_type = None
-        qt.QObject.connect(self.toggle_page_button, 
-                           qt.SIGNAL('clicked()'),
-                           self.toggle_page)
-
         self.toggle_page_button.setDisabled(True)
 
-    def populate_edna_parameter_widget(self, item):
+    def populate_char_parameter_widget(self, item):
         self.parameters_widget.path_widget._base_image_dir = \
             self.session_hwobj.get_base_image_directory()
         self.parameters_widget.path_widget._base_process_dir = \

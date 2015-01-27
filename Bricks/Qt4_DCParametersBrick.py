@@ -26,7 +26,7 @@ from widgets.Qt4_dc_parameters_widget import DCParametersWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'Qt4_Task'
 
 
 class Qt4_DCParametersBrick(BlissWidget):
