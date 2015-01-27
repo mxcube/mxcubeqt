@@ -6,9 +6,73 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>822</width>
-    <height>254</height>
+    <width>733</width>
+    <height>189</height>
    </rect>
+  </property>
+  <property name="palette">
+   <palette>
+    <active>
+     <colorrole role="Base">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="Window">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>230</red>
+        <green>230</green>
+        <blue>230</blue>
+       </color>
+      </brush>
+     </colorrole>
+    </active>
+    <inactive>
+     <colorrole role="Base">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="Window">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>230</red>
+        <green>230</green>
+        <blue>230</blue>
+       </color>
+      </brush>
+     </colorrole>
+    </inactive>
+    <disabled>
+     <colorrole role="Base">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>230</red>
+        <green>230</green>
+        <blue>230</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="Window">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>230</red>
+        <green>230</green>
+        <blue>230</blue>
+       </color>
+      </brush>
+     </colorrole>
+    </disabled>
+   </palette>
   </property>
   <property name="windowTitle">
    <string>Acquisition widget</string>
@@ -18,17 +82,23 @@
     <number>0</number>
    </property>
    <property name="margin">
-    <number>10</number>
+    <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout">
      <property name="spacing">
-      <number>15</number>
+      <number>2</number>
      </property>
      <item>
       <layout class="QVBoxLayout">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <item>
         <layout class="QHBoxLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
          <item>
           <layout class="QVBoxLayout">
            <item>
@@ -76,7 +146,7 @@
             <widget class="QLineEdit" name="osc_start_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -92,7 +162,7 @@
             <widget class="QLineEdit" name="first_image_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -108,7 +178,7 @@
             <widget class="QLineEdit" name="transmission_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -124,7 +194,7 @@
             <widget class="QLineEdit" name="exp_time_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -140,26 +210,13 @@
          </item>
         </layout>
        </item>
-       <item>
-        <spacer name="col_one_spacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>1</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </item>
      <item>
       <layout class="QVBoxLayout">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <item>
         <layout class="QHBoxLayout">
          <item>
@@ -205,7 +262,7 @@
             <widget class="QLineEdit" name="osc_range_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -221,7 +278,7 @@
             <widget class="QLineEdit" name="num_images_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -237,7 +294,7 @@
             <widget class="QLineEdit" name="resolution_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -273,10 +330,19 @@
      </item>
      <item>
       <layout class="QVBoxLayout">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <item>
         <layout class="QHBoxLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
          <item>
           <layout class="QVBoxLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
            <item>
             <widget class="QLabel" name="overlap_label">
              <property name="text">
@@ -327,11 +393,14 @@
          </item>
          <item>
           <layout class="QVBoxLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
            <item>
             <widget class="QLineEdit" name="overlap_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -347,7 +416,7 @@
             <widget class="QLineEdit" name="num_passes_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -378,7 +447,7 @@
            <item>
             <layout class="QHBoxLayout">
              <property name="spacing">
-              <number>10</number>
+              <number>2</number>
              </property>
              <item>
               <widget class="QCheckBox" name="mad_cbox">
@@ -396,35 +465,16 @@
          </item>
         </layout>
        </item>
-       <item>
-        <spacer name="col_three_vspacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>1</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </item>
      <item>
-      <spacer name="spacer18">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Expanding</enum>
-       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>1</width>
+         <width>40</width>
          <height>20</height>
         </size>
        </property>
@@ -433,25 +483,9 @@
     </layout>
    </item>
    <item>
-    <spacer name="row_one_two_spacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>16</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <layout class="QHBoxLayout">
      <property name="spacing">
-      <number>37</number>
+      <number>2</number>
      </property>
      <item>
       <widget class="QCheckBox" name="shutterless_cbx">
@@ -481,7 +515,7 @@
    <item>
     <layout class="QHBoxLayout">
      <property name="spacing">
-      <number>20</number>
+      <number>2</number>
      </property>
      <item>
       <widget class="QCheckBox" name="inverse_beam_cbx">
@@ -509,7 +543,7 @@
         <widget class="QLineEdit" name="subwedge_size_ledit">
          <property name="maximumSize">
           <size>
-           <width>50</width>
+           <width>75</width>
            <height>32767</height>
           </size>
          </property>
