@@ -15,8 +15,13 @@ import BlissFramework
 from BlissFramework import GUISupervisor
 from BlissFramework.Utils import ErrorHandler
 from BlissFramework.Utils import terminal_server
+from BlissFramework.Utils import GUILogHandler
 
 from HardwareRepository import HardwareRepository
+
+_logger = logging.getLogger()
+_GUIhdlr = GUILogHandler.GUILogHandler()
+_logger.addHandler(_GUIhdlr)
 
 def do_gevent():
     # can't call gevent.run inside inner event loops (message boxes...)
