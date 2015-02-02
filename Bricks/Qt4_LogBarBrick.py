@@ -20,7 +20,6 @@
 import logging
 
 from PyQt4 import QtGui
-from PyQt4 import QtCore
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_log_bar_widget import LogBarWidget
@@ -31,11 +30,17 @@ __category__ = 'Qt4_Log'
 
 
 class Qt4_LogBarBrick(BlissWidget):
+    """
+    Descript. :
+    """
     COLORS = {logging.NOTSET: 'lightgrey', logging.DEBUG: 'darkgreen', 
               logging.INFO: 'darkblue', logging.WARNING: 'orange', 
               logging.ERROR: 'red', logging.CRITICAL: 'black' }
 
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Layout
@@ -54,14 +59,20 @@ class Qt4_LogBarBrick(BlissWidget):
         logger.info('Ready')
 
     def customEvent(self, event):
+        """
+        Descript. :
+        """
         if self.isRunning():
             self.append_log_record(event.record)
 
     def append_log_record(self, record):
+        """
+        Descript. :
+        """
         if record.name == 'user_level_log':
             msg = record.getMessage()#.replace('\n',' ').strip()
             level = record.getLevel()
-            color = LogBarBrick.COLORS[level]
+            color = Qt4_LogBarBrick.COLORS[level]
             date_time = "%s %s" % (record.getDate(), record.getTime())
 
             self._status_bar_widget.text_edit.\

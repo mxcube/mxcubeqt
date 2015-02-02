@@ -19,7 +19,6 @@
 
 import html_template
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 from widgets.Qt4_dc_parameters_widget import DCParametersWidget
@@ -30,13 +29,17 @@ __category__ = 'Qt4_Task'
 
 
 class Qt4_DCParametersBrick(BlissWidget):
+    """
+    Descript. :
+    """
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.energy_hwobj = None
-        self.transmission_hwobj = None
-        self.resolution_hwobj = None
+        self.beamline_setup_hwobj = None
         self.queue_model_hwobj = None
         self.session_hwobj = None
 
@@ -60,7 +63,6 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.stacked_widget = QtGui.QStackedWidget(self)
         self.stacked_widget.addWidget(self.parameters_widget)
         self.stacked_widget.addWidget(self.results_view) 
- 
        
         # Layout -------------------------------------------------------------- 
         _main_vlayout = QtGui.QVBoxLayout(self)
@@ -72,17 +74,17 @@ class Qt4_DCParametersBrick(BlissWidget):
         # SizePolicies -------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(self.toggle_page_button, QtCore.SIGNAL('clicked()'),
-                               self.toggle_page)
-
+        self.toggle_page_button.clicked.connect(self.toggle_page)
 
         # Other --------------------------------------------------------------- 
-        #self.stack.raiseWidget(self.parameters_widget)
         self.parameters_widget.collection_type = None
         self.toggle_page_button.setDisabled(True)
         self.stacked_widget.setCurrentWidget(self.parameters_widget) 
 
     def populate_parameter_widget(self, item):
+        """
+        Descript. :
+        """
         self.parameters_widget.path_widget._base_image_dir = \
             self.session_hwobj.get_base_image_directory()
         self.parameters_widget.path_widget._base_process_dir = \
@@ -104,16 +106,24 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.toggle_page_button.setEnabled(data_collection.is_collected())
 
     def populate_results(self, data_collection):
+        """
+        Descript. :
+        """
         if data_collection.html_report[-4:] == 'html':
             if self.results_view.mimeSourceFactory().\
                    data(data_collection.html_report) == None:
-                self.results_view.setText(html_template.html_report(data_collection))
+                self.results_view.setText(\
+                     html_template.html_report(data_collection))
             else:
                 self.results_view.setSource(data_collection.html_report)
         else:
-            self.results_view.setText(html_template.html_report(data_collection))
+            self.results_view.setText(\
+                 html_template.html_report(data_collection))
         
     def toggle_page(self):
+        """
+        Descript. :
+        """
         if self.stack.visibleWidget() is self.parameters_widget:
             self.results_view.reload()
             self.stack.raiseWidget(self.results_view)
@@ -123,10 +133,14 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.toggle_page_button.setText("View Results")
 
     def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
         if property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'beamline_setup':            
-            self.beamline_setup = self.getHardwareObject(new_value)
-            self.parameters_widget.set_beamline_setup(self.beamline_setup)
+            self.beamline_setup_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.set_beamline_setup(self.beamline_setup_hwobj)
         elif property_name == 'queue-model':            
-            self.parameters_widget.queue_model_hwobj = self.getHardwareObject(new_value)
+            self.parameters_widget.queue_model_hwobj = \
+                 self.getHardwareObject(new_value)

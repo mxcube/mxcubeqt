@@ -19,8 +19,8 @@
 
 import os
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import QtCore
 from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
@@ -34,7 +34,13 @@ __category__ = 'Qt4_Task'
 
 
 class Qt4_SampleDetailsBrick(BlissWidget):
+    """
+    Descript. :
+    """
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Internal variables ------------------------------------------------
@@ -50,11 +56,13 @@ class Qt4_SampleDetailsBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         _info_widget = QtGui.QWidget(self)
-        self.crystal_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                "widgets/ui_files/Qt4_crystal_widget_layout.ui"))
+        self.crystal_widget = uic.loadUi(os.path.join(
+                            os.path.dirname(__file__),
+                            "widgets/ui_files/Qt4_crystal_widget_layout.ui"))
         Qt4_widget_colors.set_widget_color(self.crystal_widget,
                                            Qt4_widget_colors.LIGHT_GRAY)
-        self.sample_info_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.sample_info_widget = uic.loadUi(
+                                os.path.join(os.path.dirname(__file__),
                                 "widgets/ui_files/Qt4_sample_info_widget_layout.ui"))
         Qt4_widget_colors.set_widget_color(self.sample_info_widget,
                                            Qt4_widget_colors.LIGHT_GRAY)        
@@ -80,10 +88,9 @@ class Qt4_SampleDetailsBrick(BlissWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        return
-        self.crystal_mib.bind_value_update('space_group',
+        self.crystal_mib.bind_value_update('space_group',  
                                            self.crystal_widget.space_group_value_label,
-                                           str,
+                                           str, 
                                            None)
 
         self.crystal_mib.bind_value_update('protein_acronym',
@@ -153,6 +160,9 @@ class Qt4_SampleDetailsBrick(BlissWidget):
 
 
     def populate_sample_details(self, sample):
+        """
+        Descript. :
+        """
         self.sample = sample
         self.crystal = sample.crystals[0]
         self.crystal_mib.set_model(self.crystal)

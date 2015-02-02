@@ -35,15 +35,24 @@ __category__ = 'Qt4_General'
 
 PROPOSAL_GUI_EVENT = QtCore.QEvent.User
 class ProposalGUIEvent(QtCore.QEvent):
+    """
+    Descript. :
+    """
     def __init__(self, method, arguments):
         QtCore.QEvent.__init__(self, PROPOSAL_GUI_EVENT)
         self.method = method
         self.arguments = arguments
 
 class Qt4_ProposalBrick2(BlissWidget):
-    NOBODY_STR="<nobr><b>Login is required for collecting data!</b>"
+    """
+    Descript. :
+    """
+    NOBODY_STR = "<nobr><b>Login is required for collecting data!</b>"
 
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
@@ -62,64 +71,53 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.instanceServer = None
 
         # Properties ----------------------------------------------------------
-        self.addProperty('ldapServer','string','')
-        self.addProperty('instanceServer','string','')
-        self.addProperty('localLogin','string','')
-        self.addProperty('titlePrefix','string','')
-        self.addProperty('autoSessionUsers','string','')
-        self.addProperty('codes','string','fx ifx ih im ix ls mx opid')
-        self.addProperty('icons','string','')
-        self.addProperty('serverStartDelay','integer',500)
-        self.addProperty('dbConnection','string')
+        self.addProperty('ldapServer', 'string', '')
+        self.addProperty('instanceServer', 'string', '')
+        self.addProperty('localLogin', 'string', '')
+        self.addProperty('titlePrefix', 'string', '')
+        self.addProperty('autoSessionUsers', 'string', '')
+        self.addProperty('codes', 'string', 'fx ifx ih im ix ls mx opid')
+        self.addProperty('icons', 'string', '')
+        self.addProperty('serverStartDelay', 'integer', 500)
+        self.addProperty('dbConnection', 'string')
         self.addProperty('session', 'string', '/session')
 
         # Signals ------------------------------------------------------------
-        self.defineSignal('sessionSelected',())
-        self.defineSignal('setWindowTitle',())
+        self.defineSignal('sessionSelected', ())
+        self.defineSignal('setWindowTitle', ())
         self.defineSignal('loggedIn', ())
         self.defineSignal('user_group_saved', ())
-        self.defineSlot('setButtonEnabled',())
-        self.defineSlot('impersonateProposal',())
+        self.defineSlot('setButtonEnabled', ())
+        self.defineSlot('impersonateProposal', ())
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
         self.login_widget = QtGui.QWidget(self)
-        code_label = QtGui.QLabel("  Code: ",self.login_widget)
+        code_label = QtGui.QLabel("  Code: ", self.login_widget)
         self.proposal_type_combox = QtGui.QComboBox(self.login_widget)
         self.proposal_type_combox.setEditable(True)
         self.proposal_type_combox.setFixedWidth(50)
-        Qt4_widget_colors.set_widget_color(self.proposal_type_combox, 
-                                           Qt4_widget_colors.LIGHT_RED)
-        dash_label = QtGui.QLabel(" - ",self.login_widget)
+        dash_label = QtGui.QLabel(" - ", self.login_widget)
         self.proposal_number_ledit = QtGui.QLineEdit(self.login_widget)
-        Qt4_widget_colors.set_widget_color(self.proposal_number_ledit, 
-                                           Qt4_widget_colors.LIGHT_RED)
-        self.proposal_number_ledit.setFixedWidth(35)
-        password_label = QtGui.QLabel("   Password: ",self.login_widget)
+        self.proposal_number_ledit.setFixedWidth(40)
+        password_label = QtGui.QLabel("   Password: ", self.login_widget)
         self.proposal_password_ledit = QtGui.QLineEdit(self.login_widget)
         self.proposal_password_ledit.setEchoMode(QtGui.QLineEdit.Password)
-        Qt4_widget_colors.set_widget_color(self.proposal_password_ledit, 
-                                           Qt4_widget_colors.LIGHT_RED)
-        self.proposal_password_ledit.setFixedWidth(45)
+        self.proposal_password_ledit.setFixedWidth(40)
 
         self.login_button = QtGui.QToolButton(self.login_widget)
         self.login_button.setText("Login")
         self.login_button.setUsesTextLabel(True)
-        #self.login_button.setTextPosition(QToolButton.BesideIcon)
 
-        self.title_label = QtGui.QLabel(self.login_widget)
+        self.user_group_widget = QtGui.QWidget(self)
+        self.title_label = QtGui.QLabel(self.user_group_widget)
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.title_label.hide()
-
-        self.user_group_label = QtGui.QLabel("  Group: ", self.login_widget)
-        self.user_group_ledit = QtGui.QLineEdit(self.login_widget)
-        self.user_group_ledit.setFixedWidth(100)
-        self.user_group_save_button = QtGui.QToolButton(self.login_widget)
+        self.user_group_label = QtGui.QLabel("  Group: ", self.user_group_widget)
+        self.user_group_ledit = QtGui.QLineEdit(self.user_group_widget)
+        self.user_group_ledit.setFixedWidth(70)
+        self.user_group_save_button = QtGui.QToolButton(self.user_group_widget)
         self.user_group_save_button.setText("Set")
-        self.user_group_label.hide()
-        self.user_group_ledit.hide()
-        self.user_group_save_button.hide()
         self.saved_group = True
 
         self.logout_button = QtGui.QToolButton(self)
@@ -132,46 +130,73 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.logout_button.hide()
 
         # Layout --------------------------------------------------------------
-        login_widget_layout = QtGui.QHBoxLayout(self)
-        login_widget_layout.addWidget(code_label)
-        login_widget_layout.addWidget(self.proposal_type_combox)
-        login_widget_layout.addWidget(dash_label)
-        login_widget_layout.addWidget(self.proposal_number_ledit)
-        login_widget_layout.addWidget(password_label)
-        login_widget_layout.addWidget(self.proposal_password_ledit)
-        login_widget_layout.setSpacing(0)
-        login_widget_layout.setContentsMargins(0, 0, 0, 0)
-        self.login_widget.setLayout(login_widget_layout) 
+        _user_group_widget_hlayout = QtGui.QHBoxLayout(self)
+        _user_group_widget_hlayout.setSpacing(2)
+        _user_group_widget_hlayout.addWidget(self.title_label)
+        _user_group_widget_hlayout.addWidget(self.user_group_label) 
+        _user_group_widget_hlayout.addWidget(self.user_group_ledit)
+        _user_group_widget_hlayout.addWidget(self.user_group_save_button)
+        _user_group_widget_hlayout.setContentsMargins(0, 0, 0, 0)
+        self.user_group_widget.setLayout(_user_group_widget_hlayout)
+        self.user_group_widget.hide()
 
-        main_layout = QtGui.QHBoxLayout(self)
-        main_layout.addWidget(self.login_widget)
-        main_layout.addStretch(0)
-        main_layout.addWidget(self.login_button)
-        main_layout.addWidget(self.logout_button)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(2, 2, 2, 2)
-        self.setLayout(main_layout)
+        _login_widget_layout = QtGui.QHBoxLayout(self)
+        _login_widget_layout.addWidget(code_label)
+        _login_widget_layout.addWidget(self.proposal_type_combox)
+        _login_widget_layout.addWidget(dash_label)
+        _login_widget_layout.addWidget(self.proposal_number_ledit)
+        _login_widget_layout.addWidget(password_label)
+        _login_widget_layout.addWidget(self.proposal_password_ledit)
+        _login_widget_layout.addWidget(self.login_button)
+    
+        _login_widget_layout.setSpacing(2)
+        _login_widget_layout.setContentsMargins(0, 0, 0, 0)
+        self.login_widget.setLayout(_login_widget_layout) 
+
+        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout.addWidget(self.login_widget)
+        _main_vlayout.addWidget(self.user_group_widget)
+        _main_vlayout.addStretch(0)
+        _main_vlayout.addWidget(self.logout_button)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
-        self.proposal_type_combox.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.MinimumExpanding)
+        """self.proposal_type_combox.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                                QtGui.QSizePolicy.MinimumExpanding)
         self.proposal_number_ledit.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.MinimumExpanding)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
         self.login_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
         self.proposal_password_ledit.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.MinimumExpanding)
         self.login_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        self.logout_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.logout_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)"""
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.proposal_password_ledit, QtCore.SIGNAL('returnPressed()'), self.login)
-        self.connect(self.login_button,QtCore.SIGNAL('clicked()'),self.login)
-        self.connect(self.logout_button, QtCore.SIGNAL('clicked()'),self.openLogoutDialog)  
-        self.connect(self.user_group_save_button, QtCore.SIGNAL('clicked()'), self.save_group)
-        self.connect(self.user_group_ledit, QtCore.SIGNAL('returnPressed ()'), self.save_group)
-        self.connect(self.user_group_ledit, QtCore.SIGNAL('textChanged(const QString &)'), self.user_group_changed)
+        self.proposal_password_ledit.returnPressed.connect(self.login)
+        self.login_button.clicked.connect(self.login)
+        self.logout_button.clicked.connect(self.logout_clicked)  
+        self.user_group_save_button.clicked.connect(self.save_group)
+        self.user_group_ledit.returnPressed.connect(self.save_group)
+        self.user_group_ledit.textChanged.connect(self.user_group_changed)
 
         # Other ---------------------------------------------------------------
+        """Qt4_widget_colors.set_widget_color(self.proposal_type_combox,
+                                           Qt4_widget_colors.LIGHT_RED, 
+                                           QtGui.QPalette.Window)"""
+        Qt4_widget_colors.set_widget_color(self.proposal_number_ledit,
+                                           Qt4_widget_colors.LIGHT_RED,
+                                           QtGui.QPalette.Base)
+        Qt4_widget_colors.set_widget_color(self.proposal_password_ledit,
+                                           Qt4_widget_colors.LIGHT_RED,
+                                           QtGui.QPalette.Base)
+ 
+        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def save_group(self):
+        """
+        Descript. :
+        """
         user_group = str(self.user_group_ledit.text())
 
         pattern = r"^[a-zA-Z0-9_-]*$"
@@ -189,6 +214,9 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.user_group_ledit.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
             
     def user_group_changed(self, value):
+        """
+        Descript. :
+        """
         if self.saved_group:
             msg = 'User group changed, press set to apply change'
             logging.getLogger("user_level_log").warning(msg)
@@ -196,15 +224,16 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         self.saved_group = False
         
-    def customEvent(self,event):
-        #logging.getLogger().debug("Qt4_ProposalBrick2: custom event (%s)" % str(event))
-
+    def customEvent(self, event):
+        """
+        Descript. :
+        """
         if self.isRunning():
             if event.type() == PROPOSAL_GUI_EVENT:
                 try:
-                    method=event.method
-                    arguments=event.arguments
-                except Exception,diag:
+                    method = event.method
+                    arguments = event.arguments
+                except Exception, diag:
                     logging.getLogger().exception("Qt4_ProposalBrick2: problem in event! (%s)" % str(diag))
                 except:
                     logging.getLogger().exception("Qt4_ProposalBrick2: problem in event!")
@@ -213,7 +242,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                     if callable(method):
                         try:
                             method(*arguments)
-                        except Exception,diag:
+                        except Exception, diag:
                             logging.getLogger().exception("Qt4_ProposalBrick2: uncaught exception! (%s)" % str(diag))
                         except:
                             logging.getLogger().exception("Qt4_ProposalBrick2: uncaught exception!")
@@ -224,50 +253,55 @@ class Qt4_ProposalBrick2(BlissWidget):
                         logging.getLogger().warning('Qt4_ProposalBrick2: uncallable custom event!')
 
     # Enabled/disabled the login/logout button
-    def setButtonEnabled(self,state):
+    def setButtonEnabled(self, state):
+        """
+        Descript. :
+        """
         self.login_button.setEnabled(state)
         self.logout_button.setEnabled(state)
 
-    def impersonateProposal(self,proposal_code,proposal_number):
+    def impersonateProposal(self, proposal_code, proposal_number):
+        """
+        Descript. :
+        """
         if BlissWidget.isInstanceUserIdInhouse():
-            self._do_login(proposal_code, proposal_number, None, self.lims_hwobj.beamline_name, impersonate=True)
+            self._do_login(proposal_code, proposal_number, None, \
+                self.lims_hwobj.beamline_name, impersonate = True)
         else:
             logging.getLogger().debug('Qt4_ProposalBrick2: cannot impersonate unless logged as the inhouse user!')
 
     # Opens the logout dialog (modal); if the answer is OK then logout the user
-    def openLogoutDialog(self):
-        logout_dialog = QtGui.QMessageBox("Confirm logout","Press OK to logout.",\
-            				  QtGui.QMessageBox.Question,
-                                          QtGui.QMessageBox.Ok,
-                                          QtGui.QMessageBox.Cancel,
-			                  QtGui.QMessageBox.NoButton,self)
-        s=self.font().pointSize()
-        f = logout_dialog.font()
-        f.setPointSize(s)
-        logout_dialog.setFont(f)
-        logout_dialog.updateGeometry()
-        if logout_dialog.show() == QtGui.QMessageBox.Ok:
-            self.logout()
+    def logout_clicked(self):
+        """
+        Descript. :
+        """
+        if QtGui.QMessageBox.question(self, 
+                                      "Confirm logout", 
+                                      "Press OK to logout.",
+                                      QtGui.QMessageBox.Ok,
+                                      QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Ok:
+            self.log_out()
 
     # Logout the user; reset the brick; changes from logout mode to login mode
-    def logout(self):
+    def log_out(self):
+        """
+        Descript. :
+        """
         # Reset brick info
         self.proposal_number_ledit.setText("")
-        self.proposal=None
-        self.session=None
+        self.proposal = None
+        self.session = None
         #self.sessionId=None
-        self.person=None
-        self.laboratory=None
+        self.person = None
+        self.laboratory = None
         # Change mode from logout to login
         self.login_widget.show()
         self.logout_button.hide()
         self.title_label.hide()
-        self.user_group_label.hide()
-        self.user_group_ledit.hide()
-        self.user_group_save_button.hide()
+        self.user_group_widget.hide()
        
 	#resets active proposal
-	self.resetProposal()
+        self.resetProposal()
  
         #self.proposalLabel.setText(Qt4_ProposalBrick2.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
@@ -278,13 +312,19 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.emit(QtCore.SIGNAL("loggedIn"), False)
 
     def resetProposal(self):
+        """
+        Descript. :
+        """
         self.session_hwobj.proposal_code = None
         self.session_hwobj.session_id = None
         self.session_hwobj.proposal_id = None
         self.session_hwobj.proposal_number = None 	
 
     # Sets the current session; changes from login mode to logout mode
-    def setProposal(self,proposal,person,laboratory,session,localcontact):
+    def setProposal(self, proposal, person, laboratory, session, localcontact):
+        """
+        Descript. :
+        """
         self.lims_hwobj.enable()
         self.session_hwobj.proposal_code = proposal['code']
         self.session_hwobj.session_id = session['sessionId']
@@ -296,73 +336,70 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.logout_button.show()
 
         # Store info in the brick
-        self.proposal=proposal
-        self.session=session
-        self.person=person
-        self.laboratory=laboratory
+        self.proposal = proposal
+        self.session = session
+        self.person = person
+        self.laboratory = laboratory
 
-        code=proposal["code"].lower()
-        if code=="":
+        code = proposal["code"].lower()
+        if code == "":
             #self.proposalLabel.setText("<nobr><i>%s</i>" % personFullName(person))
-            session_id=""
+            session_id = ""
             logging.getLogger().warning("Using local login: the data collected won't be stored in the database")
             self.lims_hwobj.disable()
-            expiration_time=0
+            expiration_time = 0
         else:
-            codes_list=self["codes"].split()
+            codes_list = self["codes"].split()
             if code not in codes_list:
-                codes=self["codes"]+" "+code
-                self["codes"]=codes
+                codes = self["codes"] + " " + code
+                self["codes"] = codes
                 self.propertyBag.getProperty('codes').setValue(codes)
 
             # Build the info for the interface
-            title=str(proposal['title'])
-            session_id=session['sessionId']
-            start_date=session['startDate'].split()[0]
-            end_date=session['endDate'].split()[0]
+            title = str(proposal['title'])
+            session_id = session['sessionId']
+            start_date = session['startDate'].split()[0]
+            end_date = session['endDate'].split()[0]
             try:
-                comments=session['comments']
+                comments = session['comments']
             except KeyError:
-                comments=None
-            person_name=personFullName(person)
+                comments = None
+            person_name = personFullName(person)
             if laboratory.has_key('name'):
-                person_name=person_name+" "+laboratory['name']
-            localcontact_name=personFullName(localcontact)
+                person_name = person_name + " " + laboratory['name']
+            localcontact_name = personFullName(localcontact)
             #title="<big><b>%s-%s %s</b></big>" % (proposal['code'],proposal['number'],title)
             if localcontact:
-                header="%s Dates: %s to %s Local contact: %s" % (person_name,start_date,end_date,localcontact_name)
+                header = "%s Dates: %s to %s Local contact: %s" % \
+                       (person_name,start_date,end_date,localcontact_name)
             else:
-                header="%s Dates: %s to %s" % (person_name,start_date,end_date)
+                header = "%s Dates: %s to %s" % (person_name, start_date, end_date)
 
             # Set interface info and signal the new session
-            proposal_text = "%s-%s" % (proposal['code'],proposal['number'])
+            proposal_text = "%s-%s" % (proposal['code'], proposal['number'])
             self.title_label.setText("<nobr>   User: <b>%s</b>" % proposal_text)
             tooltip = "\n".join([proposal_text, header, title]) 
             if comments:
-                tooltip+='\n'
-                tooltip+='Comments: '+comments 
+                tooltip += '\n'
+                tooltip += 'Comments: ' + comments 
             self.title_label.setToolTip(tooltip)
-            self.title_label.show()
-            self.user_group_label.show()
-            self.user_group_ledit.show()
-            self.user_group_save_button.show()
-        
+            self.user_group_widget.show()
             try:
-                end_time=session['endDate'].split()[1]
-                end_date_list=end_date.split('-')
-                end_time_list=end_time.split(':')
-                expiration_time=time.mktime((\
+                end_time = session['endDate'].split()[1]
+                end_date_list = end_date.split('-')
+                end_time_list = end_time.split(':')
+                expiration_time = time.mktime((\
                     int(end_date_list[0]),\
                     int(end_date_list[1]),\
                     int(end_date_list[2]),\
-                    23,59,59,\
-                    0,0,0))
-            except (TypeError,IndexError,ValueError):
-                expiration_time=0
+                    23, 59, 59,\
+                    0, 0, 0))
+            except (TypeError, IndexError, ValueError):
+                expiration_time = 0
 
         is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
-        win_title="%s (%s-%s)" % (self["titlePrefix"],\
-            self.lims_hwobj.translate(proposal["code"],'gui'),\
+        win_title = "%s (%s-%s)" % (self["titlePrefix"], \
+            self.lims_hwobj.translate(proposal["code"], 'gui'), \
             proposal["number"])
         self.emit(QtCore.SIGNAL("setWindowTitle"), win_title)
         self.emit(QtCore.SIGNAL("sessionSelected"),
@@ -375,62 +412,59 @@ class Qt4_ProposalBrick2(BlissWidget):
                   is_inhouse)
         self.emit(QtCore.SIGNAL("loggedIn"), True)
 
-    def setCodes(self,codes):
-        codes_list=codes.split()
+    def setCodes(self, codes):
+        """
+        Descript. :
+        """
+        codes_list = codes.split()
         self.proposal_type_combox.clear()
         for cd in codes_list:
             self.proposal_type_combox.addItem(cd)
 
     def run(self):
+        """
+        Descript. :
+        """
         self.setEnabled(self.session_hwobj is not None)
           
         # find if we are using ldap, dbconnection, etc. or not
         if None in (self.ldap_connection_hwobj, self.lims_hwobj):
-          self.login_widget.hide()
-          self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
-          self.title_label.show()
-          self.user_group_label.show()
-          self.user_group_ledit.show()
-          self.user_group_save_button.show()
-
-          self.session_hwobj.proposal_code = ""
-          self.session_hwobj.session_id = 1
-          self.session_hwobj.proposal_id = ""
-          self.session_hwobj.proposal_number = "" 
-
-          self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
-          self.emit(QtCore.SIGNAL("loggedIn"), False)
-          self.emit(QtCore.SIGNAL("sessionSelected"), None)
-          self.emit(QtCore.SIGNAL("loggedIn"), True)
-          self.emit(QtCore.SIGNAL("sessionSelected"), self.session_hwobj.session_id,
-                                                  str(os.environ["USER"]),
-                                                  0,
-                                                  '',
-                                                  '',
-                                                  self.session_hwobj.session_id, 
-                                                  False)
+            self.login_widget.hide()
+            self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
+            self.title_label.show()
+            self.user_group_widget.show()
+            self.session_hwobj.proposal_code = ""
+            self.session_hwobj.session_id = 1
+            self.session_hwobj.proposal_id = ""
+            self.session_hwobj.proposal_number = "" 
+    
+            self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
+            self.emit(QtCore.SIGNAL("loggedIn"), False)
+            self.emit(QtCore.SIGNAL("sessionSelected"), None)
+            self.emit(QtCore.SIGNAL("loggedIn"), True)
+            self.emit(QtCore.SIGNAL("sessionSelected"), 
+                 self.session_hwobj.session_id,
+                 str(os.environ["USER"]), 0, '', '',
+                 self.session_hwobj.session_id, False)
         else: 
-          self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
-          self.emit(QtCore.SIGNAL("sessionSelected"), None)
-          self.emit(QtCore.SIGNAL("loggedIn"), False)
+            self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
+            self.emit(QtCore.SIGNAL("sessionSelected"), None)
+            self.emit(QtCore.SIGNAL("loggedIn"), False)
 
-        start_server_event=ProposalGUIEvent(self.startServers,())
-        QtGui.QApplication.postEvent(self,start_server_event)
-
-        #self.contents_widget.font()
-        #font.setPointSize(12)
-        #self.contents_widget.setFont(font)
-
-        #font = self.login_widget.font()
-        #font.setPointSize(10)
-        #self.login_widget.setFont(font)
-        
+        start_server_event = ProposalGUIEvent(self.startServers,())
+        QtGui.QApplication.postEvent(self, start_server_event)
 
     def startServers(self):
+        """
+        Descript. :
+        """
         if self.instanceServer is not None:
             self.instanceServer.initializeInstance()
 
-    def refuseLogin(self,stat,message=None):
+    def refuseLogin(self, stat, message = None):
+        """
+        Descript. :
+        """
         if message is not None:
             if stat is False:
                 icon = QtGui.QMessageBox.Critical
@@ -438,133 +472,154 @@ class Qt4_ProposalBrick2(BlissWidget):
                 icon = QtGui.QMessageBox.Warning
             elif stat is True:
                 icon = QtGui.QMessageBox.Information
-            msg_dialog = QtGui.QMessageBox("Register user",message,\
+            msg_dialog = QtGui.QMessageBox("Register user", message, \
                 icon, QtGui.QMessageBox.Ok, QtGui.QMessageBox.NoButton,\
-                QtGui.QMessageBox.NoButton,self)
-            s=self.font().pointSize()
+                QtGui.QMessageBox.NoButton, self)
+            s = self.font().pointSize()
             f = msg_dialog.font()
             f.setPointSize(s)
             msg_dialog.setFont(f)
             msg_dialog.updateGeometry()
-            msg_dialog.exec_loop()
+            msg_dialog.show()
 
         self.setEnabled(True)
 
-    def acceptLogin(self,proposal_dict,person_dict,lab_dict,session_dict,contact_dict):
-        self.setProposal(proposal_dict,person_dict,lab_dict,session_dict,contact_dict)
+    def acceptLogin(self, proposal_dict, person_dict, lab_dict, session_dict, contact_dict):
+        """
+        Descript. :
+        """
+        self.setProposal(proposal_dict, person_dict, lab_dict, 
+                         session_dict, contact_dict)
         self.setEnabled(True)
 
     def ispybDown(self):
-        msg_dialog = QtGui.QMessageBox("Register user",\
+        """
+        Descript. :
+        """
+        msg_dialog = QtGui.QMessageBox("Register user", \
             "Couldn't contact the ISPyB database server: you've been logged as the local user.\nYour experiments' information will not be stored in ISPyB!",\
             QtGui.QMessageBox.Warning, 
             QtGui.QMessageBox.Ok, 
             QtGui.QMessageBox.NoButton,
             QtGui.QMessageBox.NoButton,self)
-        s=self.font().pointSize()
-        f=msg_dialog.font()
+        s = self.font().pointSize()
+        f = msg_dialog.font()
         f.setPointSize(s)
         msg_dialog.setFont(f)
         msg_dialog.updateGeometry()
         msg_dialog.show()
 
-        now=time.strftime("%Y-%m-%d %H:%M:S")
-        prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
-        ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
+        now = time.strftime("%Y-%m-%d %H:%M:S")
+        prop_dict = {'code' : '', 'number' : '', 'title' : '', 'proposalId' : ''}
+        ses_dict = {'sessionId' : '', 'startDate' : now, 'endDate' : now, 'comments' : ''}
         try:
-            locallogin_person=self.local_login_hwobj.person
+            locallogin_person = self.local_login_hwobj.person
         except AttributeError:
-            locallogin_person="local user"
-        pers_dict={'familyName':locallogin_person}
-        lab_dict={'name':'ESRF'}
-        cont_dict={'familyName':'local contact'}
-        self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
+            locallogin_person = "local user"
+        pers_dict = {'familyName' : locallogin_person}
+        lab_dict = {'name':'EMBL-HH'}
+        cont_dict = {'familyName' : 'local contact'}
+        self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
 
     def askForNewSession(self):
-        create_session_dialog=QtGui.QMessageBox("Create session",\
-            "Unable to find an appropriate session.\nPress OK to create one for today.",\
+        """
+        Descript. :
+        """
+        create_session_dialog = QtGui.QMessageBox("Create session", \
+            "Unable to find an appropriate session.\nPress OK to create one for today.", \
             QtGui.QMessageBox.Question, 
             QtGui.QMessageBox.Ok,QMessageBox.Cancel,
             QtGui.QMessageBox.NoButton,self)
-        s=self.font().pointSize()
+        s = self.font().pointSize()
         f = create_session_dialog.font()
         f.setPointSize(s)
         create_session_dialog.setFont(f)
         create_session_dialog.updateGeometry()
-        answer=create_session_dialog.show()
+        answer = create_session_dialog.show()
         return answer == QtGui.QMessageBox.Ok
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
+        """
+        Descript. :
+        """
         self.saved_group = False
         Qt4_widget_colors.set_widget_color(self.user_group_ledit, Qt4_widget_colors.WHITE)
         self.user_group_ledit.setText('')
         self.setEnabled(False)
 
-        prop_type=str(self.proposal_type_combox.currentText())
-        prop_number=str(self.proposal_number_ledit.text())
-        prop_password=str(self.proposal_password_ledit.text())
+        prop_type = str(self.proposal_type_combox.currentText())
+        prop_number = str(self.proposal_number_ledit.text())
+        prop_password = str(self.proposal_password_ledit.text())
         self.proposal_password_ledit.setText("")
 
-        if prop_type=="" and prop_number=="":
+        if prop_type == "" and prop_number == "":
             if self.local_login_hwobj is None:
                 return self.refuseLogin(False,"Local login not configured.")
             try:
-                locallogin_password=self.local_login_hwobj.password
+                locallogin_password = self.local_login_hwobj.password
             except AttributeError:
                 return self.refuseLogin(False,"Local login not configured.")
 
-            if prop_password!=locallogin_password:
+            if prop_password != locallogin_password:
                 return self.refuseLogin(None,"Invalid local login password.")
 
-            now=time.strftime("%Y-%m-%d %H:%M:S")
-            prop_dict={'code':'', 'number':'', 'title':'', 'proposalId':''}
-            ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
+            now = time.strftime("%Y-%m-%d %H:%M:S")
+            prop_dict = {'code' : '', 'number' : '', 'title' : '', 'proposalId' : ''}
+            ses_dict = {'sessionId' : '', 'startDate' : now, 'endDate' : now, 'comments' : ''}
             try:
-                locallogin_person=self.local_login_hwobj.person
+                locallogin_person = self.local_login_hwobj.person
             except AttributeError:
-                locallogin_person="local user"
-            pers_dict={'familyName':locallogin_person}
-            lab_dict={'name':'ESRF'}
-            cont_dict={'familyName':'local contact'}
+                locallogin_person = "local user"
+            pers_dict = {'familyName' : locallogin_person}
+            lab_dict = {'name' : 'EMBL-HH'}
+            cont_dict = {'familyName' : 'local contact'}
 
             logging.getLogger().debug("ProposalBrick: local login password validated")
             
-            return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
+            return self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
 
         if self.ldap_connection_hwobj == None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
         if self.lims_hwobj == None:
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
 
-        self._do_login(prop_type,prop_number,prop_password, self.lims_hwobj.beamline_name)
+        self._do_login(prop_type, prop_number, prop_password, self.lims_hwobj.beamline_name)
 
-    def passControl(self,has_control_id):
+    def passControl(self, has_control_id):
+        """
+        Descript. :
+        """
         pass
 
-    def haveControl(self,have_control):
+    def haveControl(self, have_control):
+        """
+        Descript. :
+        """
         pass
 
-    # Callback fot the brick's properties
-    def propertyChanged(self,propertyName,oldValue,newValue):
-        if propertyName=='ldapServer':
-            self.ldap_connection_hwobj=self.getHardwareObject(newValue)
-        elif propertyName=='codes':
-            self.setCodes(newValue)
-        elif propertyName=='localLogin':
-            self.local_login_hwobj=self.getHardwareObject(newValue)
-        elif propertyName=='dbConnection':
-            self.lims_hwobj = self.getHardwareObject(newValue)
-        elif propertyName=='instanceServer':
+    def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
+        if property_name == 'ldapServer':
+            self.ldap_connection_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'codes':
+            self.setCodes(new_value)
+        elif property_name == 'localLogin':
+            self.local_login_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'dbConnection':
+            self.lims_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'instanceServer':
             if self.instanceServer is not None:
                 self.disconnect(self.instanceServer, QtCore.SIGNAL('passControl'), self.passControl)
                 self.disconnect(self.instanceServer, QtCore.SIGNAL('haveControl'), self.haveControl)
-            self.instanceServer=self.getHardwareObject(newValue)
+            self.instanceServer = self.getHardwareObject(new_value)
             if self.instanceServer is not None:
                 self.connect(self.instanceServer, QtCore.SIGNAL('passControl'), self.passControl)
                 self.connect(self.instanceServer, QtCore.SIGNAL('haveControl'), self.haveControl)
-        elif propertyName == 'icons':
-            icons_list=newValue.split()
+        elif property_name == 'icons':
+            icons_list = new_value.split()
             try:
                 self.login_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[0])))
             except IndexError:
@@ -573,130 +628,135 @@ class Qt4_ProposalBrick2(BlissWidget):
                 self.logout_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[1])))
             except IndexError:
                 pass
-        elif propertyName == 'session':
-            self.session_hwobj = self.getHardwareObject(newValue)
+        elif property_name == 'session':
+            self.session_hwobj = self.getHardwareObject(new_value)
         else:
-            BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    def _do_login(self, proposal_code,proposal_number,proposal_password,beamline_name, impersonate=False):
+    def _do_login(self, proposal_code, proposal_number, proposal_password, beamline_name, impersonate=False):
+        """
+        Descript. :
+        """
         if not impersonate:
-            login_name=self.lims_hwobj.translate(proposal_code,'ldap')+str(proposal_number)
+            login_name = self.lims_hwobj.translate(proposal_code, 'ldap') + \
+                             str(proposal_number)
             logging.getLogger().debug('ProposalBrick: querying LDAP...')
-            ok, msg=self.ldap_connection_hwobj.login(login_name,proposal_password)
+            ok, msg = self.ldap_connection_hwobj.login(login_name, proposal_password)
             if not ok:
-                msg="%s." % msg.capitalize()
-                self.refuseLogin(None,msg)
+                msg = "%s." % msg.capitalize()
+                self.refuseLogin(None, msg)
                 return
 
-            logging.getLogger().debug("ProposalBrick: password for %s-%s validated" % (proposal_code,proposal_number))
+            logging.getLogger().debug("ProposalBrick: password for %s-%s validated" % \
+                     (proposal_code,proposal_number))
 
         # Get proposal and sessions
         logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
-        prop=self.lims_hwobj.getProposal(proposal_code,proposal_number)
+        prop = self.lims_hwobj.getProposal(proposal_code, proposal_number)
 
         # Check if everything went ok
-        prop_ok=True
+        prop_ok = True
         try:
-            prop_ok=(prop['status']['code']=='ok')
+            prop_ok = (prop['status']['code'] == 'ok')
         except KeyError:
-            prop_ok=False
+            prop_ok = False
         if not prop_ok:
             self.ispybDown()
             return
 
         logging.getLogger().debug('ProposalBrick: got sessions from ISPyB...')
 
-        proposal=prop['Proposal']
-        person=prop['Person']
-        laboratory=prop['Laboratory']
+        proposal = prop['Proposal']
+        person = prop['Person']
+        laboratory = prop['Laboratory']
         try:
-            sessions=prop['Session']
+            sessions = prop['Session']
         except KeyError:
-            sessions=None
+            sessions = None
 
         # Check if there are sessions in the proposal
-        todays_session=None
-        if sessions is None or len(sessions)==0:
+        todays_session = None
+        if sessions is None or len(sessions) == 0:
             pass
         else:
             # Check for today's session
             for session in sessions:
-                beamline=session['beamlineName']
-                start_date="%s 00:00:00" % session['startDate'].split()[0]
-                end_date="%s 23:59:59" % session['endDate'].split()[0]
+                beamline = session['beamlineName']
+                start_date = "%s 00:00:00" % session['startDate'].split()[0]
+                end_date = "%s 23:59:59" % session['endDate'].split()[0]
                 try:
-                    start_struct=time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
+                    start_struct = time.strptime(start_date, "%Y-%m-%d %H:%M:%S")
                 except ValueError:
                     pass
                 else:
                     try:
-                        end_struct=time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
+                        end_struct = time.strptime(end_date, "%Y-%m-%d %H:%M:%S")
                     except ValueError:
                         pass
                     else:
-                        start_time=time.mktime(start_struct)
-                        end_time=time.mktime(end_struct)
-                        current_time=time.time()
+                        start_time = time.mktime(start_struct)
+                        end_time = time.mktime(end_struct)
+                        current_time = time.time()
 
                         # Check beamline name
-                        if beamline==beamline_name:
+                        if beamline == beamline_name:
                             # Check date
-                            if current_time>=start_time and current_time<=end_time:
-                                todays_session=session
+                            if current_time >= start_time and current_time <= end_time:
+                                todays_session = session
                                 break
 
         if todays_session is None:
             is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
             if not is_inhouse:
                 if BlissWidget.isInstanceRoleClient():
-                    self.refuseLogin(None,"You don't have a session scheduled for today!")
+                    self.refuseLogin(None, "You don't have a session scheduled for today!")
                     return
 
                 if not self.askForNewSession():
-                    self.refuseLogin(None,None)
+                    self.refuseLogin(None, None)
                     return
 
-            current_time=time.localtime()
-            start_time=time.strftime("%Y-%m-%d 00:00:00", current_time)
-            end_time=time.mktime(current_time)+60*60*24
-            tomorrow=time.localtime(end_time)
-            end_time=time.strftime("%Y-%m-%d 07:59:59", tomorrow)
+            current_time = time.localtime()
+            start_time = time.strftime("%Y-%m-%d 00:00:00", current_time)
+            end_time = time.mktime(current_time) + 60 * 60 *24
+            tomorrow = time.localtime(end_time)
+            end_time = time.strftime("%Y-%m-%d 07:59:59", tomorrow)
 
             # Create a session
-            new_session_dict={}
-            new_session_dict['proposalId']=prop['Proposal']['proposalId']
-            new_session_dict['startDate']=start_time
-            new_session_dict['endDate']=end_time
-            new_session_dict['beamlineName']=beamline_name
-            new_session_dict['scheduled']=0
-            new_session_dict['nbShifts']=3
-            new_session_dict['comments']="Session created by the BCM"
-            session_id=self.lims_hwobj.createSession(new_session_dict)
-            new_session_dict['sessionId']=session_id
+            new_session_dict = {}
+            new_session_dict['proposalId'] = prop['Proposal']['proposalId']
+            new_session_dict['startDate'] = start_time
+            new_session_dict['endDate'] = end_time
+            new_session_dict['beamlineName'] = beamline_name
+            new_session_dict['scheduled'] = 0
+            new_session_dict['nbShifts'] = 3
+            new_session_dict['comments'] = "Session created by the BCM"
+            session_id = self.lims_hwobj.createSession(new_session_dict)
+            new_session_dict['sessionId'] = session_id
 
-            todays_session=new_session_dict
-            localcontact=None
+            todays_session = new_session_dict
+            localcontact = None
         else:
-            session_id=todays_session['sessionId']
+            session_id = todays_session['sessionId']
             logging.getLogger().debug('ProposalBrick: getting local contact for %s' % session_id)
-            localcontact=self.lims_hwobj.getSessionLocalContact(session_id)
+            localcontact = self.lims_hwobj.getSessionLocalContact(session_id)
 
-        self.acceptLogin(prop['Proposal'],\
-            prop['Person'],\
-            prop['Laboratory'],\
-            todays_session,\
-            localcontact)
+        self.acceptLogin(prop['Proposal'], prop['Person'], prop['Laboratory'],
+            todays_session, localcontact)
 
 
 ### Auxiliary method to merge a person's name
 def personFullName(person):
+    """
+    Descript. :
+    """
     try:
-        name=person['givenName']+" "
+        name = person['givenName'] + " "
     except KeyError:
-        name=""
+        name = ""
     except TypeError:
         return ""
     if person.has_key('familyName') and person['familyName'] is not None:
-        name=name+person['familyName']
+        name = name + person['familyName']
     return name.strip()
 

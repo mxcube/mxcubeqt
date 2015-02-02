@@ -72,14 +72,14 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("hide_sample_centring_tab", ())
         self.defineSignal("hide_dcg_tab", ())
         self.defineSignal("hide_sample_changer_tab", ())
-        self.defineSignal("hide_edna_tab", ())
+        self.defineSignal("hide_char_parameters_tab", ())
         self.defineSignal("hide_energy_scan_tab",())
         self.defineSignal("hide_xrf_scan_tab",())
         self.defineSignal("hide_workflow_tab", ())
 
         # Populating the tabs with data
         self.defineSignal("populate_parameter_widget", ())
-        self.defineSignal("populate_edna_parameter_widget",())
+        self.defineSignal("populate_char_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("populate_energy_scan_widget", ())
         self.defineSignal("populate_xrf_scan_widget", ())
@@ -164,7 +164,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
@@ -459,7 +459,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
@@ -473,7 +473,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
@@ -484,7 +484,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
@@ -499,28 +499,28 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.populate_parameters_tab(item)
 
-    def show_edna_tab(self, item):
+    def show_char_parameters_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), False)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), False)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
-        self.populate_edna_parameters_tab(item)
+        self.populate_char_parameters_tab(item)
 
-    def populate_edna_parameters_tab(self, item):
-        self.emit(QtCore.SIGNAL("populate_edna_parameter_widget"), item)
+    def populate_char_parameters_tab(self, item):
+        self.emit(QtCore.SIGNAL("populate_char_parameter_widget"), item)
 
     def show_energy_scan_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
@@ -528,7 +528,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True) 
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), False)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), True)
@@ -544,7 +544,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), False)
@@ -563,7 +563,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
-        self.emit(QtCore.SIGNAL("hide_edna_tab"), True)
+        self.emit(QtCore.SIGNAL("hide_char_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_tab"), True) 
         self.emit(QtCore.SIGNAL("hide_energy_scan_tab"), True)
         self.emit(QtCore.SIGNAL("hide_xrf_scan_tab"), False)
@@ -592,8 +592,10 @@ class Qt4_TreeBrick(BlissWidget):
             self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         
     def selection_changed(self, items):
+        print "selection_changed: ", items
         if len(items) == 1:
             item = items[0]
+            print item
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.emit(QtCore.SIGNAL("populate_sample_details"), item.get_model())
                 self.emit_set_sample(item)
@@ -603,7 +605,7 @@ class Qt4_TreeBrick(BlissWidget):
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 self.populate_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
-                self.populate_edna_parameters_tab(item)
+                self.populate_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.populate_energy_scan_tab(item)
             elif isinstance(item, queue_item.XRFScanQueueItem):

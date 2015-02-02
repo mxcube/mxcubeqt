@@ -18,13 +18,11 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import time
 import logging
-import tempfile
 import traceback
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import QtCore
 
 import queue_model_objects_v1 as queue_model_objects
 import Qt4_GraphicsManager as graphics_manager
@@ -51,28 +49,28 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
         # Hardware objects ----------------------------------------------------
         self.diffractometer_hwobj = None
-	self.beam_info_hwobj = None
+        self.beam_info_hwobj = None
         self.graphics_manager_hwobj = None
         self.collect_hwobj = None
         self.queue_hwobj = None
 
         # Internal values -----------------------------------------------------
-	self.beam_position = [0, 0]
+        self.beam_position = [0, 0]
         self.beam_size = [0, 0]
-	self.beam_shape = "Rectangular"
-	self.pixels_per_mm = [0, 0]
+        self.beam_shape = "Rectangular"
+        self.pixels_per_mm = [0, 0]
         self.inside_data_collection =  False
         self.current_centring = None
         self.reset_methods = None
         self.successful_methods = None
 
         # Properties ----------------------------------------------------------
-        self.addProperty('minidiff','string','')
-	self.addProperty('beamInfo', 'string', '')
+        self.addProperty('minidiff', 'string', '')
+        self.addProperty('beamInfo', 'string', '')
         self.addProperty('collection', 'string', '')
         self.addProperty('graphicsManager', 'string', '')
-        self.addProperty('icons','string','')
-        self.addProperty('label','string','Sample centring')
+        self.addProperty('icons', 'string', '')
+        self.addProperty('label', 'string', 'Sample centring')
 
         # Signals ------------------------------------------------------------
         self.defineSignal('newCentredPos', ())
@@ -84,39 +82,40 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.main_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
          
         self.button_centre = MenuButton(self.main_frame, "Centre")
-        self.button_centre.setMinimumSize(QtCore.QSize(75,50))
+        self.button_centre.setMinimumSize(QtCore.QSize(75, 50))
 
         self.button_accept = QtGui.QToolButton(self.main_frame)
         self.button_accept.setUsesTextLabel(True)
         self.button_accept.setText("Save")
-        self.button_accept.setFixedSize(QtCore.QSize(75,50))
-        self.button_standard_color = self.button_accept.palette().color(QtGui.QPalette.Window)
+        self.button_accept.setFixedSize(QtCore.QSize(75, 50))
+        self.button_standard_color = \
+             self.button_accept.palette().color(QtGui.QPalette.Window)
 
         self.button_reject = QtGui.QToolButton(self.main_frame)
         self.button_reject.setUsesTextLabel(True)
         self.button_reject.setText("Reject")
-        self.button_reject.setFixedSize(QtCore.QSize(75,50))
+        self.button_reject.setFixedSize(QtCore.QSize(75, 50))
         self.button_reject.hide()
 
         self.button_snapshot = QtGui.QToolButton(self.main_frame)
         self.button_snapshot.setUsesTextLabel(True)
         self.button_snapshot.setText("Snapshot")
-        self.button_snapshot.setFixedSize(QtCore.QSize(75,50))
+        self.button_snapshot.setFixedSize(QtCore.QSize(75, 50))
 
         self.button_toogle_phase = QtGui.QToolButton(self.main_frame)
         self.button_toogle_phase.setUsesTextLabel(True)
         self.button_toogle_phase.setText("MD phase")
-        self.button_toogle_phase.setFixedSize(QtCore.QSize(75,50))
+        self.button_toogle_phase.setFixedSize(QtCore.QSize(75, 50))
 
         self.button_refresh_camera = QtGui.QToolButton(self.main_frame)
         self.button_refresh_camera.setUsesTextLabel(True)
         self.button_refresh_camera.setText("Camera")
-        self.button_refresh_camera.setFixedSize(QtCore.QSize(75,50))
+        self.button_refresh_camera.setFixedSize(QtCore.QSize(75, 50))
 
         self.button_visual_align = QtGui.QToolButton(self.main_frame)
         self.button_visual_align.setUsesTextLabel(True)
         self.button_visual_align.setText("Realign")
-        self.button_visual_align.setFixedSize(QtCore.QSize(75,50))
+        self.button_visual_align.setFixedSize(QtCore.QSize(75, 50))
 
         # Layout -------------------------------------------------------------- 
         self.main_frame_layout = QtGui.QVBoxLayout()
@@ -129,24 +128,28 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.main_frame_layout.addWidget(self.button_visual_align)
         self.main_frame_layout.addStretch(0)
         self.main_frame_layout.setSpacing(0)
-        self.main_frame_layout.setContentsMargins(0,0,0,0)
+        self.main_frame_layout.setContentsMargins(0, 0, 0, 0)
         self.main_frame.setLayout(self.main_frame_layout)
 
         main_layout = QtGui.QVBoxLayout()
         main_layout.addWidget(self.main_frame)
         main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0,0,0,0)
+        main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(main_layout)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.button_centre, QtCore.SIGNAL("executeCommand"), self.centring_started_clicked)
-        self.connect(self.button_centre, QtCore.SIGNAL("cancelCommand"), self.centring_cancel_clicked)
-        self.connect(self.button_accept, QtCore.SIGNAL("clicked()"), self.accept_clicked)
-        self.connect(self.button_reject, QtCore.SIGNAL("clicked()"), self.reject_clicked)
-        self.connect(self.button_snapshot, QtCore.SIGNAL("clicked()"), self.save_snapshot_clicked)
-        self.connect(self.button_toogle_phase, QtCore.SIGNAL("clicked()"), self.toggle_phase_clicked) 
-        self.connect(self.button_refresh_camera, QtCore.SIGNAL("clicked()"),self.refresh_camera_clicked)
-        self.connect(self.button_visual_align, QtCore.SIGNAL("clicked()"),self.visual_align_clicked)
+        self.connect(self.button_centre, 
+                     QtCore.SIGNAL("executeCommand"), 
+                     self.centring_started_clicked)
+        self.connect(self.button_centre, 
+                     QtCore.SIGNAL("cancelCommand"), 
+                     self.centring_cancel_clicked)
+        self.button_accept.clicked.connect(self.accept_clicked)
+        self.button_reject.clicked.connect(self.reject_clicked)
+        self.button_snapshot.clicked.connect(self.save_snapshot_clicked)
+        self.button_toogle_phase.clicked.connect(self.toggle_phase_clicked) 
+        self.button_refresh_camera.clicked.connect(self.refresh_camera_clicked)
+        self.button_visual_align.clicked.connect(self.visual_align_clicked)
 
         # Other ---------------------------------------------------------------
         self.instanceSynchronize("")
@@ -156,23 +159,23 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Descript. : Event triggered when user property changed in the property
                     editor. 
         Args.     : property_name (string), old_value, new_value
-        Return.   : None
+        Return    : None
         """
-        if property_name=='minidiff':
+        if property_name == 'minidiff':
             if self.diffractometer_hwobj is not None:
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffReady'), self.minidiff_ready)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffNotReady'), self.minidiff_not_ready)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffStateChanged'), self.minidiff_state_changed)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringStarted'), self.centring_started)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringSuccessful'), self.centring_successful)
-		self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringAccepted'), self.centring_accepted)
+                self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringAccepted'), self.centring_accepted)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringFailed'), self.centring_failed)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringMoving'), self.centring_moving)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringInvalid'), self.centring_invalid)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('centringSnapshots'), self.centring_snapshots)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('progressMessage'), self.minidiff_message)
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('omegaReferenceChanged'), self.omega_reference_changed)
-		self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('zoomMotorPredefinedPositionChanged'), self.zoom_position_changed)
+                self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL('zoomMotorPredefinedPositionChanged'), self.zoom_position_changed)
             self.diffractometer_hwobj = self.getHardwareObject(new_value)
             if self.diffractometer_hwobj is not None:
                 self.connect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffReady'), self.minidiff_ready)
@@ -193,24 +196,24 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 else:
                     self.minidiff_not_ready()
 
-	        self.reset_methods = {self.diffractometer_hwobj.MANUAL3CLICK_MODE: self.manual_centre_reset}
+                self.reset_methods = {self.diffractometer_hwobj.MANUAL3CLICK_MODE: self.manual_centre_reset}
                 self.successful_methods = {self.diffractometer_hwobj.MANUAL3CLICK_MODE:None}
             else:
                 self.minidiff_not_ready()
-	elif property_name == "beamInfo":
-  	    if self.beam_info_hwobj is not None:
+        elif property_name == "beamInfo":
+            if self.beam_info_hwobj is not None:
                 self.disconnect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), self.beam_info_changed)
-		self.disconnect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed)
-	    self.beam_info_hwobj = self.getHardwareObject(new_value)
-	    if self.beam_info_hwobj is not None:
+                self.disconnect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed)
+            self.beam_info_hwobj = self.getHardwareObject(new_value)
+            if self.beam_info_hwobj is not None:
                 self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), self.beam_info_changed)
-		self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed)
+                self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed)
         elif property_name == "graphicsManager":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
             if self.graphics_manager_hwobj is not None:
-                self.connect(self.graphics_manager_hwobj , QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
+                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
         elif property_name == "collection":
             self.collect_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'icons':
@@ -219,9 +222,14 @@ class Qt4_HutchMenuBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def set_icons(self, icons):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         icons_list = icons.split()
         try:
-            self.button_centre.setQt4_Icons(icons_list[0],icons_list[1])
+            self.button_centre.set_Icons(icons_list[0], icons_list[1])
             self.button_accept.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[2])))
             self.button_snapshot.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[3])))
             self.button_reject.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[4])))
@@ -232,26 +240,39 @@ class Qt4_HutchMenuBrick(BlissWidget):
             logging.getLogger().error("HutchMenuBrick: Unable to set icons")            
 
     def centring_started_clicked(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if (self.diffractometer_hwobj is not None and
             self.graphics_manager_hwobj is not None):
-            self.diffractometer_hwobj.start_centring_method(self.diffractometer_hwobj.MANUAL3CLICK_MODE)
+            self.diffractometer_hwobj.start_centring_method(\
+                 self.diffractometer_hwobj.MANUAL3CLICK_MODE)
         else:
             logging.getLogger().error("HutchMenuBrick: Unable to start " +\
                                       "centring.Diffractometer or/and" +\
                                       " graphics hardware object are not defined")
 
     def save_snapshot_clicked(self):
-        formats=""
-        for format in HutchMenuBrick.SNAPSHOT_FORMATS:
-            formats+="*.%s " % format
-        formats=formats.strip()
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        formats = ""
+        for image_format in Qt4_HutchMenuBrick.SNAPSHOT_FORMATS:
+            formats += "*.%s " % image_format
+        formats = formats.strip()
 
-        current_filename=os.path.join(self.directory, self.prefix)
-        current_filename=current_filename + '_%d%s%s' % (self.fileIndex, os.path.extsep, self.formatType)
-        filename=str(QFileDialog.getSaveFileName(current_filename,"Images (%s)" % formats,\
-            self,None,"Choose a filename to save under",None,False))
+        current_filename = os.path.join(self.directory, self.prefix)
+        current_filename = current_filename + '_%d%s%s' % (self.file_index, \
+                           os.path.extsep, self.formatType)
+        filename = str(QtGui.QFileDialog.getSaveFileName(current_filename, \
+            "Images (%s)" % formats, self, None, \
+            "Choose a filename to save under", None, False))
         if len(filename):
-            image_type=os.path.splitext(filename)[1].strip('.').upper()
+            image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
                 matrix = self.__drawing.matrix()
                 zoom = 1
@@ -259,23 +280,38 @@ class Qt4_HutchMenuBrick(BlissWidget):
                     zoom = matrix.m11()
                 img = self.__drawing.getPPP()
                 logging.getLogger().info("Saving snapshot : %s", filename)
-                QubImageSave.save(filename, img, self.__drawing.canvas(), zoom, image_type)
+                #QubImageSave.save(filename, img, self.__drawing.canvas(), zoom, image_type)
             except:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
                 logging.getLogger().error("HutchMenuBrick: error saving snapshot!")
             else:
-                self.formatType=image_type.lower()
-                self.fileIndex+=1
+                self.formatType = image_type.lower()
+                self.fileIndex += 1 
 
     def toggle_phase_clicked(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.diffractometer_hwobj is not None:
             self.diffractometer_hwobj.toggle_phase()
 
     def refresh_camera_clicked(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.diffractometer_hwobj is not None:
             self.diffractometer_hwobj.refresh_video()
 
     def visual_align_clicked(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.diffractometer_hwobj is not None:
             selected_shapes = self.shape_history_hwobj.selected_shapes.values()
             if len(selected_shapes) == 2:
@@ -286,41 +322,73 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 logging.getLogger("user_level_log").\
                                 error("Select two centred position (CTRL click) to continue")
 
-    def centring_cancel_clicked(self,reject=False):
-        self.diffractometer_hwobj.cancel_centring_method(reject=reject)
+    def centring_cancel_clicked(self, reject=False):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        self.diffractometer_hwobj.cancel_centring_method(reject = reject)
 
     def accept_clicked(self):
-        Qt4_widget_colors.set_widget_color(self.button_accept, self.button_standard_color)
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        Qt4_widget_colors.set_widget_color(self.button_accept, 
+                                           self.button_standard_color)
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
         self.diffractometer_hwobj.accept_centring()
 
     def reject_clicked(self):
-        Qt4_widget_colors.set_widget_color(self.button_accept, self.button_standard_color)
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        Qt4_widget_colors.set_widget_color(self.button_accept, 
+                                           self.button_standard_color)
         self.button_reject.setEnabled(False)
         self.button_accept.setEnabled(False)
         self.diffractometer_hwobj.reject_centring()
 
     def centring_moving(self):
-        self.is_moving=True
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        self.is_moving = True
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
 
     def centring_invalid(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(None)
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
 
     def centring_accepted(self, state, centring_status):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.graphics_manager_hwobj.set_centring_state(False) 
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(centring_status)
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
         if self.inside_data_collection:
-          self.inside_data_collection = False
-	beam_info = self.beam_info_hwobj.get_beam_info()	
+            self.inside_data_collection = False
+        beam_info = self.beam_info_hwobj.get_beam_info()	
 	#if beam_info is not None:
 	#    beam_info['size_x'] = beam_info['size_x'] * self.pixels_per_mm[0]
 	#    beam_info['size_y'] = beam_info['size_y'] * self.pixels_per_mm[1]
@@ -349,24 +417,34 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 traceback.print_exc()
 
         if self.queue_hwobj is not None:
-           if self.queue_hwobj.is_executing():
-               self.setEnabled(False)
+            if self.queue_hwobj.is_executing():
+                self.setEnabled(False)
 
-    def centring_snapshots(self,state):
+    def centring_snapshots(self, state):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if state is None:
-            self.is_shooting=True
+            self.is_shooting = True
             self.main_frame.setEnabled(False)
         else:
-            self.is_shooting=False
+            self.is_shooting = False
             self.main_frame.setEnabled(True)
 
     def centring_started(self, method, flexible):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.setEnabled(True)
         self.emit(QtCore.SIGNAL("enableMinidiff"), (False,))
         if self.inside_data_collection:
-          self.emit(QtCore.SIGNAL("centringStarted"), ())
+            self.emit(QtCore.SIGNAL("centringStarted"), ())
 
-        self.is_centring=True
+        self.is_centring = True
         self.current_centring = method
         self.button_centre.command_started()
         self.button_accept.setEnabled(False)
@@ -376,7 +454,12 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.graphics_manager_hwobj.set_centring_state(True)
             #self.graphics_manager_hwobj.set_centring_state(True)
 
-    def centring_successful(self,method,centring_status):
+    def centring_successful(self, method, centring_status):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.button_centre.command_done()
         if self.current_centring is not None:
             self.current_centring = None
@@ -384,19 +467,21 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.button_accept.setEnabled(True)
         self.button_reject.setEnabled(True)
         if self.inside_data_collection:
-            Qt4_widget_colors.set_widget_color(self.button_accept, widget_colors.LIGHT_GREEN)
-            Qt4_widget_colors.set_widget_color(self.button_reject, widget_colors.LIGHT_RED)
+            Qt4_widget_colors.set_widget_color(self.button_accept, 
+                                               Qt4_widget_colors.LIGHT_GREEN)
+            Qt4_widget_colors.set_widget_color(self.button_reject, 
+                                               Qt4_widget_colors.LIGHT_RED)
 
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(centring_status)
 
-        self.is_moving=False
+        self.is_moving = False
         self.main_frame.setEnabled(True)
         self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
         try:
             successful_method = self.successful_methods[method]
-        except KeyError,diag:
+        except KeyError, diag:
             pass
         else:
             try:
@@ -404,8 +489,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
             except:
                 pass
 
-    def centring_failed(self,method,centring_status):
-        self.clickedPoints=[]
+    def centring_failed(self, method, centring_status):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        self.clickedPoints = []
 
         self.button_centre.command_failed()
         if self.current_centring is not None:
@@ -427,7 +517,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
         try:
             reset_method = self.reset_methods[method]
-        except KeyError,diag:
+        except KeyError, diag:
             pass
         else:
             try:
@@ -436,38 +526,67 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 pass
 
     def manual_centre_reset(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.resetPoints()
 
     # Handler for clicking the video when doing the 3-click centring
     def image_clicked(self, x, y):
-        print "clicked: ",x , y
-        print self.current_centring
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.current_centring is not None:
-            print self.current_centring
-            print self.diffractometer_hwobj.MANUAL3CLICK_MODE
             if (self.current_centring == self.diffractometer_hwobj.MANUAL3CLICK_MODE and
                 self.diffractometer_hwobj.isReady()):
-                points = self.diffractometer_hwobj.image_clicked(x,y)
+                points = self.diffractometer_hwobj.image_clicked(x, y)
                 #    self.addPoint(x,y)
  
-    # Signals a new point in the 3-click centering
-    def addPoint(self,x,y,xi,yi):
-        self.clickedPoints.append((x,y,xi,yi))
+    def addPoint(self, x, y, xi, yi):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        self.clickedPoints.append((x, y, xi, yi))
         self.emitWidgetSynchronize()
 
-    # Resets the points in the 3-click centering
     def resetPoints(self):
-        self.clickedPoints=[]
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        self.clickedPoints = []
         self.emitWidgetSynchronize()
 
     def minidiff_ready(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.main_frame.setEnabled(True)
 
     def minidiff_not_ready(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if not self.button_centre.is_executing():
-           self.main_frame.setEnabled(False)
+            self.main_frame.setEnabled(False)
 
-    def minidiff_state_changed(self,state):
+    def minidiff_state_changed(self, state):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.button_centre.is_executing():
             return
         try:
@@ -476,42 +595,82 @@ class Qt4_HutchMenuBrick(BlissWidget):
             pass
 
     def minidiff_message(self, msg = None):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         logging.getLogger().info(msg)
 
     def beam_position_changed(self, position):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if (self.diffractometer_hwobj is not None and 
             self.graphics_manager_hwobj is not None and
             position is not None):
             self.graphics_manager_hwobj.update_beam_position(position)
 
     def beam_info_changed(self, beam_info):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if (self.diffractometer_hwobj is not None and
             self.graphics_manager_hwobj is not None and
             beam_info is not None):
             self.graphics_manager_hwobj.update_beam_info(beam_info)
 
     def zoom_position_changed(self, position, offset):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.graphics_manager_hwobj is not None:
             self.pixels_per_mm = self.diffractometer_hwobj.get_pixels_per_mm()
             self.graphics_manager_hwobj.update_pixels_per_mm(self.pixels_per_mm) 
 
     def omega_reference_changed(self, omega_reference):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.graphics_manager_hwobj is not None:
             self.graphics_manager_hwobj.update_omega_reference(omega_reference)
             
 class MenuButton(QtGui.QToolButton):
+    """
+    Descript. : 
+    Args.     : 
+    Return    : 
+    """
     def __init__(self, parent, caption):
-        QtGui.QToolButton.__init__(self,parent)
-        self.executing=None
-        self.run_icon=None
-        self.stop_scon=None
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        QtGui.QToolButton.__init__(self, parent)
+        self.executing = None
+        self.run_icon = None
+        self.stop_icon = None
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
         self.setUsesTextLabel(True)
         self.setText(caption)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         QtCore.QObject.connect(self, QtCore.SIGNAL('clicked()'), self.button_clicked)
 
-    def setQt4_Icons(self,icon_run,icon_stop):
+    def set_Icons(self, icon_run, icon_stop):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.run_icon = QtGui.QIcon(Qt4_Icons.load(icon_run))
         self.stop_icon = QtGui.QIcon(Qt4_Icons.load(icon_stop))
         if self.executing:
@@ -520,6 +679,11 @@ class MenuButton(QtGui.QToolButton):
             self.setIcon(self.run_icon)
 
     def button_clicked(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         if self.executing:
             self.emit(QtCore.SIGNAL('cancelCommand'), ())
         else:
@@ -527,6 +691,11 @@ class MenuButton(QtGui.QToolButton):
             self.emit(QtCore.SIGNAL('executeCommand'), ())
 
     def command_started(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         Qt4_widget_colors.set_widget_color(self, QtCore.Qt.yellow)
         if self.stop_icon is not None:
             self.setIcon(self.stop_icon)
@@ -534,14 +703,29 @@ class MenuButton(QtGui.QToolButton):
         self.setEnabled(True)
 
     def is_executing(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         return self.executing
 
     def command_done(self):
-        self.executing=False
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        self.executing = False
         Qt4_widget_colors.set_widget_color(self, self.standard_color)
         if self.run_icon is not None:
             self.setIcon(self.run_icon)
         self.setEnabled(True)
 
     def command_failed(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
         self.command_done()

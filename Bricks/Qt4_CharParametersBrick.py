@@ -17,10 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from PyQt4 import QtGui
-from PyQt4 import QtCore
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
@@ -30,7 +27,13 @@ __category__ = 'Qt4_Task'
 
 
 class Qt4_CharParametersBrick(BlissWidget):
+    """
+    Descript. :
+    """
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
@@ -76,10 +79,13 @@ class Qt4_CharParametersBrick(BlissWidget):
         self.toggle_page_button.setDisabled(True)
 
     def populate_char_parameter_widget(self, item):
+        """
+        Descript. :
+        """
         self.parameters_widget.path_widget._base_image_dir = \
-            self.session_hwobj.get_base_image_directory()
+             self.session_hwobj.get_base_image_directory()
         self.parameters_widget.path_widget._base_process_dir = \
-            self.session_hwobj.get_base_process_directory()
+             self.session_hwobj.get_base_process_directory()
 
         char = item.get_model()
 
@@ -98,13 +104,16 @@ class Qt4_CharParametersBrick(BlissWidget):
                 self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
         else:
             self.parameters_widget.set_enabled(True)
-            self.stack.raiseWidget(self.parameters_widget)
+            self.stacked_widget.setCurrentWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
         self.parameters_widget.populate_parameter_widget(item)
         self.toggle_page_button.setEnabled(char.is_executed())
 
     def toggle_page(self):
+        """
+        Descript. :
+        """
         if self.stack.visibleWidget() is self.parameters_widget:
             self.stack.raiseWidget(self.results_view)
             self.toggle_page_button.setText("View parameters")
@@ -112,8 +121,10 @@ class Qt4_CharParametersBrick(BlissWidget):
             self.stack.raiseWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-    # Framework-2 callback
     def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
         if property_name == 'tunable-energy':
             self.parameters_widget.acq_widget.set_tunable_energy(new_value)            
         elif property_name == 'session':
