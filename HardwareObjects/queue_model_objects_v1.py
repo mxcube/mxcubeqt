@@ -166,13 +166,14 @@ class TaskNode(object):
 
         return s
 
+    def get_display_name(self):
+        return self.get_name()        
 
 class RootNode(TaskNode):
     def __init__(self):
         TaskNode.__init__(self)
         self._name = 'root'
         self._total_node_count = 0
-
 
 class TaskGroup(TaskNode):
     def __init__(self):
@@ -237,8 +238,8 @@ class Sample(TaskNode):
             return ''
 
     def init_from_sc_sample(self, sc_sample):
-        self.loc_str = ":".join(map(str,sc_sample[-1]))
-        self.location = sc_sample[-1]
+        self.loc_str = str(sc_sample[1]) + ':' + str(sc_sample[2])
+        self.location = (sc_sample[1], sc_sample[2])
         self.set_name(self.loc_str)
 
     def init_from_lims_object(self, lims_sample):
@@ -325,9 +326,32 @@ class Sample(TaskNode):
         processing_params.cell_c = self.crystals[0].cell_c
         processing_params.cell_gamma = self.crystals[0].cell_gamma
         processing_params.protein_acronym = self.crystals[0].protein_acronym
-     
-
         return processing_params
+
+class Basket(TaskNode):
+    def __init__(self):
+        TaskNode.__init__(self)
+        self.name = str()
+        self.location = None
+        self.is_present = False
+        self.free_pin_mode = False
+
+    def init_from_sc_basket(self, sc_basket):
+        self.location = sc_basket[0]
+        self.name = "Puck %d" % self.location
+        self.is_present = sc_basket[2]
+
+    def get_name(self):
+        return self.name
+
+    def get_location(self):
+        return self.location
+
+    def get_is_present(self):
+        return self.is_present
+
+    def set_is_present(self, present):
+        self.is_present = present
 
 
 class DataCollection(TaskNode):
@@ -377,6 +401,7 @@ class DataCollection(TaskNode):
         self.lims_group_id = None
         self.lims_start_pos_id = None
         self.lims_end_pos_id = None
+        self.grid_id = None
 
     def as_dict(self):
 
@@ -390,7 +415,11 @@ class DataCollection(TaskNode):
                 'num_images': parameters.num_images,
                 'osc_start': parameters.osc_start,
                 'osc_range': parameters.osc_range,
+                'kappa': parameters.kappa,
+                'kappa_phi': parameters.kappa_phi,
                 'overlap': parameters.overlap,
+                'kappa': parameters.kappa,
+                'kappa_phi': parameters.kappa_phi,
                 'exp_time': parameters.exp_time,
                 'num_passes': parameters.num_passes,
                 'path': path_template.directory,
@@ -398,6 +427,7 @@ class DataCollection(TaskNode):
                 'energy': parameters.energy,
                 'resolution': parameters.resolution,
                 'transmission': parameters.transmission,
+                'detector_mode': parameters.detector_mode,
                 'shutterless': parameters.shutterless,
                 'inverse_beam': parameters.inverse_beam,
                 'sample': str(self.crystal),
@@ -405,7 +435,12 @@ class DataCollection(TaskNode):
                 'acq_parameters': str(parameters),
                 'snapshot': parameters.centred_position.snapshot_image}
 
-    def get_name(self):
+    def set_experiment_type(self, exp_type):
+        self.experiment_type = exp_type
+        if self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.MESH:
+            self.set_requires_centring(False)       
+
+    def get_name(self): 
         return '%s_%i' % (self._name, self._number)
 
     def is_collected(self):
@@ -424,7 +459,11 @@ class DataCollection(TaskNode):
         return file_locations
 
     def get_centred_positions(self):
-        return [self.acquisitions[0].acquisition_parameters.centred_position]
+        centred_pos = [] 
+        for pos in self.acquisitions:
+             centred_pos.append(pos.acquisition_parameters.centred_position)
+        return centred_pos
+        #return [self.acquisitions[0].acquisition_parameters.centred_position]
 
     def set_centred_positions(self, cp):
         self.acquisitions[0].acquisition_parameters.centred_position = cp
@@ -451,6 +490,35 @@ class DataCollection(TaskNode):
                 acq_parameters.centred_position.snapshot_image = snapshot_image_copy
 
         return new_node
+
+    def get_point_index(self):
+        cp = self.get_centred_positions()
+        return cp[0].get_index()
+
+    def get_helical_point_index(self):
+        cp = self.get_centred_positions()
+        return cp[0].get_index(), cp[1].get_index() 
+ 
+    def set_grid_id(self, grid_id):
+        self.grid_id = grid_id
+
+    def get_display_name(self):
+        if self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
+            start_index, end_index = self.get_helical_point_index()
+            display_name = "%s (Line - %d:%d)" %(self.get_name(), start_index, end_index)
+        elif self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.MESH:
+            display_name = "%s (%s)" %(self.get_name(), self.grid_id)
+        else:
+            index = self.get_point_index()
+            if index:
+                index = str(index)
+            else:
+                index = "not defined"
+            display_name = "%s (Point - %s)" %(self.get_name(), index)
+        return display_name
+
+    def is_mesh_scan(self):
+        return self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.MESH
 
 class ProcessingParameters():
     def __init__(self):
@@ -521,6 +589,19 @@ class Characterisation(TaskNode):
 
         return new_node
 
+    def get_point_index(self):
+        cp = self.get_centred_positions()
+        return cp[0].get_index()
+
+    def get_display_name(self):
+        index = self.get_point_index()
+        if index:
+            index = str(index)
+        else:
+            index = "not defined"
+        display_name = "%s (Point - %s)" %(self.get_name(), index)
+        return display_name
+
 class CharacterisationParameters(object):
     def __init__(self):
         # Setting num_ref_images to EDNA_NUM_REF_IMAGES.NONE
@@ -557,7 +638,7 @@ class CharacterisationParameters(object):
         self.account_rad_damage = bool()
         self.auto_res = bool()
         self.opt_sad = bool()
-        self.sad_res = float()
+	self.sad_res = float()
         self.determine_rad_params = bool()
         self.burn_osc_start = float()
         self.burn_osc_interval = int()
@@ -592,7 +673,7 @@ class CharacterisationParameters(object):
                 "account_rad_damage": self.account_rad_damage,
                 "auto_res": self.auto_res,
                 "opt_sad": self.opt_sad,
-                "sad_res": self.sad_res,
+	  	"sad_res": self.sad_res,
                 "determine_rad_params": self.determine_rad_params,
                 "burn_osc_start": self.burn_osc_start,
                 "burn_osc_interval": self.burn_osc_interval,
@@ -609,16 +690,17 @@ class CharacterisationParameters(object):
 
 
 class EnergyScan(TaskNode):
-    def __init__(self, sample=None, path_template=None):
+    def __init__(self, sample=None, path_template=None, cpos=None):
         TaskNode.__init__(self)
         self.element_symbol = None
         self.edge = None
-        self.set_requires_centring(False)
+        self.set_requires_centring(True)
+        self.centred_position = cpos
 
         if not sample:
             self.sample = Sample()
         else:
-            self.sampel = sample
+            self.sample = sample
 
         if not path_template:
             self.path_template = PathTemplate()
@@ -636,24 +718,144 @@ class EnergyScan(TaskNode):
     def get_path_template(self):
         return self.path_template
 
+    def set_scan_result_data(self, data):
+        self.result.data = data
+
+    def get_scan_result(self): 
+        return self.result
+
+    def is_collected(self):
+        return self.is_executed()
+
+    def set_collected(self, collected):
+        return self.set_executed(collected)
+
+    def get_point_index(self):
+        if self.centred_position:
+            return self.centred_position.get_index() 
+
+    def get_display_name(self):
+        index = self.get_point_index()
+        if index:
+            index = str(index)
+        else:
+            index = "not defined"
+        display_name = "%s (Point - %s)" %(self.get_name(), index)
+        return display_name
+
+    def copy(self):
+        new_node = copy.deepcopy(self)
+        cpos = self.centred_position
+        if cpos:
+            snapshot_image = self.centred_position.snapshot_image
+            if snapshot_image:
+                snapshot_image_copy = snapshot_image.copy()
+                new_node.centred_position.snapshot_image = snapshot_image_copy
+        return new_node
+
 
 class EnergyScanResult(object):
     def __init__(self):
         object.__init__(self)
-        self.inflection = 0
-        self.peak = 0
-        self.first_remote = 0
-        self.second_remote = 0
-        self.data_file_path = PathTemplate()
+        self.inflection = None
+        self.peak = None
+        self.first_remote = None
+        self.second_remote = None
 
+        self.data = None
+  
+        self.pk = None
+        self.fppPeak = None
+        self.fpPeak = None        
+        self.ip = None
+        self.fppInfl = None
+        self.fpInfl = None
+        self.rm = None
+        self.chooch_graph_x = None
+        self.chooch_graph_y1 = None
+        self.chooch_graph_y2 = None
+        self.title = None
+
+class XRFScan(TaskNode):
+    def __init__(self, sample=None, path_template=None, cpos=None):
+        TaskNode.__init__(self)
+        self.count_time = None 
+        self.set_requires_centring(True)
+        self.centred_position = cpos
+
+        if not sample:
+            self.sample = Sample()
+        else:
+            self.sample = sample
+
+        if not path_template:
+            self.path_template = PathTemplate()
+        else:
+            self.path_template = path_template
+
+        self.result = XRFScanResult()
+
+    def get_run_number(self):
+        return self.path_template.run_number
+
+    def get_prefix(self):
+        return self.path_template.get_prefix()
+
+    def get_path_template(self):
+        return self.path_template
+
+    def get_point_index(self):
+        if self.centred_position:
+            return self.centred_position.get_index()
+
+    def get_display_name(self):
+        index = self.get_point_index()
+        if index:
+            index = str(index)
+        else:
+            index = "not defined"
+        display_name = "%s (Point - %s)" %(self.get_name(), index)
+        return display_name
+
+    def set_count_time(self, count_time):
+        self.count_time = count_time
+
+    def is_collected(self):
+        return self.is_executed()
+
+    def set_collected(self, collected):
+        return self.set_executed(collected)
+
+    def get_scan_result(self):
+        return self.result
+
+    def copy(self):
+        new_node = copy.deepcopy(self)
+        cpos = self.centred_position
+        if cpos:
+            snapshot_image = self.centred_position.snapshot_image
+            if snapshot_image:
+                snapshot_image_copy = snapshot_image.copy()
+                new_node.centred_position.snapshot_image = snapshot_image_copy
+        return new_node
+
+class XRFScanResult(object):
+    def __init__(self):
+        object.__init__(self)
+        self.mca_data = None
+        self.mca_calib = None
+        self.mca_config = None
 
 class SampleCentring(TaskNode):
-    def __init__(self, name = None):
+    def __init__(self, name = None, kappa = None, kappa_phi = None):
         TaskNode.__init__(self)
         self._tasks = []
 
         if name:
             self.set_name(name)
+
+        self.kappa = kappa
+        self.kappa_phi = kappa_phi 
 
     def add_task(self, task_node):
         self._tasks.append(task_node)
@@ -664,6 +866,11 @@ class SampleCentring(TaskNode):
     def get_name(self):
         return self._name
 
+    def get_kappa(self):
+        return self.kappa
+
+    def get_kappa_phi(self): 
+        return self.kappa_phi
 
 class Acquisition(object):
     def __init__(self):
@@ -758,23 +965,23 @@ class PathTemplate(object):
         :returns: Archive directory.
         :rtype: str
         """
-        folders = self.directory.split('/')
+        """folders = self.directory.split('/')
         endstation_name = None
         
         if 'visitor' in folders:
             endstation_name = folders[4]
-            folders[2] = PathTemplate.archive_folder
+            folders[2] = 'store'
             temp = folders[3]
             folders[3] = folders[4]
             folders[4] = temp
         else:
             endstation_name = folders[2]
-            folders[2] = PathTemplate.archive_folder
+            folders[2] = 'store'
             folders[3] = endstation_name
 
-        archive_directory = os.path.join(os.path.join(PathTemplate.archive_base_directory, *folders[2:]))
+        return archive_directory"""
 
-        return archive_directory
+	return self.directory
 
     def get_files_to_be_written(self):
         file_locations = []
@@ -822,6 +1029,8 @@ class AcquisitionParameters(object):
         self.osc_start = float()
         self.osc_range = float()
         self.overlap = float()
+        self.kappa = float()
+        self.kappa_phi = float()
         self.exp_time = float()
         self.num_passes = int()
         self.energy = int()
@@ -830,11 +1039,13 @@ class AcquisitionParameters(object):
         self.transmission = float()
         self.inverse_beam = False
         self.shutterless = False
-        self.take_snapshots = True
+        self.take_snapshots = 0
         self.take_dark_current = True
         self.skip_existing_images = False
-        self.detector_mode = str()
+        self.detector_mode = int()
         self.induce_burn = False
+        self.mesh_steps = int()
+        self.mesh_range = ()
 
 
 class Crystal(object):
@@ -852,7 +1063,6 @@ class Crystal(object):
         # MAD energies
         self.energy_scan_result = EnergyScanResult()
 
-
 class CentredPosition(object):
     """
     Class that represents a centred position.
@@ -865,10 +1075,12 @@ class CentredPosition(object):
     @staticmethod
     def set_diffractometer_motor_names(*names):
         CentredPosition.DIFFRACTOMETER_MOTOR_NAMES = names[:]
-        
+
     def __init__(self, motor_dict=None):
         self.snapshot_image = None
         self.centring_method = True
+        self.index = None
+
         for motor_name in CentredPosition.DIFFRACTOMETER_MOTOR_NAMES:
            setattr(self, motor_name, 0)
 
@@ -888,6 +1100,20 @@ class CentredPosition(object):
 
     def __ne__(self, cpos):
         return not (self == cpos)
+
+    def set_index(self, index):
+        self.index = index
+
+    def get_index(self):
+        return self.index
+
+    def get_kappa_value(self):
+        return self.kappa
+
+    def get_kappa_phi_value(self):
+        return self.kappa_phi
+
+
 
 class Workflow(TaskNode):
     def __init__(self):
@@ -975,6 +1201,7 @@ def to_collect_dict(data_collection, session, sample):
              'transmission': acq_params.transmission,
              'energy': acq_params.energy,
              #'input_files': 1,
+             'detector_mode': acq_params.detector_mode,
              'oscillation_sequence': [{'exposure_time': acq_params.exp_time,
                                        #'kappaStart': 0.0,
                                        #'phiStart': 0.0,
@@ -1040,7 +1267,7 @@ def dc_from_edna_output(edna_result, reference_image_collection,
 
             acq = Acquisition()
             acq.acquisition_parameters = beamline_setup_hwobj.\
-                get_default_acquisition_parameters()
+                get_default_acquisition_parameters("default_acquisition_values")
             acquisition_parameters = acq.acquisition_parameters
 
             acquisition_parameters.centred_position =\
