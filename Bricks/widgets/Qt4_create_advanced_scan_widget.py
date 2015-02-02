@@ -17,13 +17,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import os
 import logging
 from copy import deepcopy
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
+from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects 
 import Qt4_queue_item
@@ -44,31 +44,16 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.setObjectName("create_advanced_Scan_widget")
 
         # Hardware objects ----------------------------------------------------
+        self.__mini_diff_hwobj = None
  
         # Internal variables --------------------------------------------------
-
-        # Graphic elements ----------------------------------------------------
-
-        add_button  = QtGui.QPushButton("Add mesh", self)
-
-        _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(add_button)
-        _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-
-        add_button.clicked.connect(self.add_button_clicked)
-
-        return
-
-        self.__mini_diff_hwobj = None
-
         self.init_models()
         self._prev_pos = None
         self._current_pos = None
         self._list_item_map = {}
         self.init_models()
 
-        self.current_motor_positions = {}
+        self.__current_motor_positions = {}
         self.__cell_width = 0
         self.__cell_height = 0
         self.__list_items = {}
@@ -86,87 +71,79 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self.__beam_size_y = 0
         self.__angle_active = 0
 
-        v_layout = qt.QVBoxLayout(self, 2, 5, "v_layout")
-        self._parameters_gbox = qt.QVGroupBox('Mesh parameters', self, "scan_gbox")
+        # Graphic elements ----------------------------------------------------
+        self.mesh_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+                               'ui_files/Qt4_mesh_widget_layout.ui'))
 
-        self.mesh_parameters_widget = qtui.QWidgetFactory.\
-                     create(os.path.join(os.path.dirname(__file__),
-                                         'ui_files/mesh_widget_layout.ui'))
-        self.mesh_parameters_widget.reparent(self._parameters_gbox, qt.QPoint(0, 0))
-        self._parameters_gbox.setFixedHeight(335)
- 
-        self._acq_gbox = qt.QVGroupBox('Acquisition', self, 'acq_gbox')
-        self._acq_widget = \
-            AcquisitionWidget(self._acq_gbox,
-                              "acquisition_widget", layout='vertical',
+        self._acq_gbox = QtGui.QGroupBox('Acquisition', self)
+        self._acq_gbox.setObjectName('acq_gbox')
+        self._acq_widget =  AcquisitionWidget(self._acq_gbox,
+                              "acquisition_widget",
+                              layout='vertical',
                               acq_params=self._acquisition_parameters,
                               path_template=self._path_template)
 
-        self._acq_gbox.setSizePolicy(qt.QSizePolicy.MinimumExpanding,qt.QSizePolicy.Fixed)
+        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
+        self._data_path_gbox.setObjectName('data_path_gbox')
+        self._data_path_widget = DataPathWidget(self._data_path_gbox,
+                                   'create_dc_path_widget',
+                                   data_model = self._path_template,
+                                   layout = 'vertical')
 
-        self._acq_widget.disable_inverse_beam(True)
-        self._acq_widget.disable_image_parameters(True)         
+        # Layout --------------------------------------------------------------
+        self._acq_gbox_layout = QtGui.QVBoxLayout(self)
+        self._acq_gbox_layout.addWidget(self._acq_widget)
+        self._acq_gbox_layout.setSpacing(0)
+        self._acq_gbox_layout.setContentsMargins(0,0,0,0)
+        self._acq_gbox.setLayout(self._acq_gbox_layout)
 
-        self._data_path_gbox = qt.QVGroupBox('Data location', self,
-                                             'data_path_gbox')
-        self._data_path_widget = \
-            DataPathWidget(self._data_path_gbox, 
-                           data_model = self._path_template,
-                           layout = 'vertical')
+        self._data_path_gbox_layout = QtGui.QVBoxLayout(self)
+        self._data_path_gbox_layout.addWidget(self._data_path_widget)
+        self._data_path_gbox_layout.setSpacing(0)
+        self._data_path_gbox_layout.setContentsMargins(0,0,0,0)
+        self._data_path_gbox.setLayout(self._data_path_gbox_layout)
 
-        v_layout.addWidget(self._parameters_gbox)
-        v_layout.addWidget(self._acq_gbox)
-        v_layout.addWidget(self._data_path_gbox)
-        v_layout.addStretch()
+        _main_vlayout = QtGui.QVBoxLayout(self) 
+        _main_vlayout.addWidget(self.mesh_widget)
+        _main_vlayout.addWidget(self._acq_gbox)
+        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addStretch(0)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        self.setLayout(_main_vlayout)
 
-        prefix_ledit = self._data_path_widget.\
-                       data_path_widget_layout.child('prefix_ledit')
+        # SizePolicies --------------------------------------------------------
 
-        run_number_ledit = self._data_path_widget.\
-                           data_path_widget_layout.child('run_number_ledit')
+        # Qt signal/slot connections ------------------------------------------
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
+             connect(self._prefix_ledit_change)
 
-        self.connect(prefix_ledit, 
-                     qt.SIGNAL("textChanged(const QString &)"), 
-                     self._prefix_ledit_change)
-
-        self.connect(run_number_ledit,
-                     qt.SIGNAL("textChanged(const QString &)"), 
-                     self._run_number_ledit_change)
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
 
         self.connect(self._data_path_widget,
-                     qt.PYSIGNAL("path_template_changed"),
+                     QtCore.SIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
-        qt.QObject.connect(self.mesh_parameters_widget.child("draw_button"),
-                           qt.SIGNAL("clicked()"),
-                           self.start_surface_drawing)
+        self.mesh_widget.draw_button.clicked.\
+             connect(self.start_surface_drawing)
+      
+        self.mesh_widget.add_button.clicked.connect(self.add_drawing)
 
-        qt.QObject.connect(self.mesh_parameters_widget.child("add_button"),
-                           qt.SIGNAL("clicked()"),
-                           self.add_drawing)
+        self.mesh_widget.remove_button.clicked.connect(self.delete_drawing)
 
-        qt.QObject.connect(self.mesh_parameters_widget.child("remove_button"),
-                           qt.SIGNAL("clicked()"),
-                           self.delete_drawing)
+        self.mesh_widget.hor_spacing_ledit.textChanged.\
+             connect(self.set_hspace)
 
-        qt.QObject.connect(self.mesh_parameters_widget.child("hor_spacing_ledit"),
-                           qt.SIGNAL("textChanged ( const QString & )"),
-                           self.set_hspace)
+        self.mesh_widget.ver_spacing_ledit.textChanged.\
+             connect(self.set_vspace)
 
-        qt.QObject.connect(self.mesh_parameters_widget.child("ver_spacing_ledit"),
-                           qt.SIGNAL("textChanged ( const QString & )"),
-                           self.set_vspace)
+        QtCore.QObject.connect(self.mesh_widget.mesh_treewidget,
+                               QtCore.SIGNAL("itemSelectionChanged()"),
+                               self.mesh_treewidget_selection_changed)
 
-        self.__mesh_list_view = self.mesh_parameters_widget.child("mesh_listview")
-
-        qt.QObject.connect(self.__mesh_list_view,
-                           qt.SIGNAL("selectionChanged(QListViewItem * )"),
-                           self.mesh_listview_selection_changed)
-
-        self.__visibility_button = self.mesh_parameters_widget.child("visibility_button")
-        qt.QObject.connect(self.__visibility_button,
-                           qt.SIGNAL("clicked()"),
-                           self.toggle_visibility_grid)
+        self.mesh_widget.visibility_button.clicked.\
+             connect(self.toggle_visibility_grid)
 
         #TODO somehow make this better
         for child in self._acq_widget.children(): 
@@ -175,22 +152,19 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                     if hasattr(child_child, 'hide'):
                         child_child.hide()
          
-        self._acq_widget.child("osc_range_label").show()
-        self._acq_widget.child("osc_range_ledit").show()
-        self._acq_widget.child("detector_mode_label").show()
-        self._acq_widget.child("detector_mode_combo").show()
-        self._acq_widget.child("exp_time_label").show()
-        self._acq_widget.child("exp_time_ledit").show()
-        self._acq_widget.child("energy_label").show()
-        self._acq_widget.child("energy_ledit").show()
-        self._acq_widget.child("resolution_label").show()
-        self._acq_widget.child("resolution_ledit").show()
-        self._acq_widget.child("transmission_label").show()
-        self._acq_widget.child("transmission_ledit").show()
-        self._acq_widget.setFixedHeight(185)
-
-    def add_button_clicked(self):
-        self._graphics_manager_hwobj.start_mesh_draw(False)
+        self._acq_widget.findChild(QtGui.QLabel, "osc_range_label").show()
+        self._acq_widget.findChild(QtGui.QLineEdit, "osc_range_ledit").show()
+        #self._acq_widget.findChild(QtGui.QLabel, "detector_mode_label").show()
+        #self._acq_widget.findChild(QtGui.QComboBox, "detector_mode_combo").show()
+        self._acq_widget.findChild(QtGui.QLabel, "exp_time_label").show()
+        self._acq_widget.findChild(QtGui.QLineEdit, "exp_time_ledit").show()
+        self._acq_widget.findChild(QtGui.QLabel, "energy_label").show()
+        self._acq_widget.findChild(QtGui.QLineEdit, "energy_ledit").show()
+        self._acq_widget.findChild(QtGui.QLabel, "resolution_label").show()
+        self._acq_widget.findChild(QtGui.QLineEdit,"resolution_ledit").show()
+        self._acq_widget.findChild(QtGui.QLabel, "transmission_label").show()
+        self._acq_widget.findChild(QtGui.QLineEdit,"transmission_ledit").show()
+        #self._acq_widget.setFixedHeight(185)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -213,7 +187,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
 
-        list_view_item = self.__mesh_list_view.selectedItem()
+        list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
         if list_view_item is not None:
             drawing_mgr = self.__list_items[list_view_item]
             key = str(list_view_item.text(0))
@@ -230,11 +204,11 @@ class CreateAdvancedScanWidget(CreateTaskBase):
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
 
-        if isinstance(tree_item, queue_item.SampleQueueItem):
+        if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
             #self._processing_parameters = sample_model.processing_parameters
             #self._processing_widget.update_data_model(self._processing_parameters)
-        elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
+        elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == EXPERIMENT_TYPE.MESH:
@@ -258,9 +232,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         else:
             self.setDisabled(True)
 
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionQueueItem):
+        if isinstance(tree_item, Qt4_queue_item.SampleQueueItem) or \
+           isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem) or \
+           isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
 
             #self._processing_widget.update_data_model(self._processing_parameters)
             self._acq_widget.update_data_model(self._acquisition_parameters,
@@ -270,7 +244,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         data_collections = []
 
         selected_grid_info = None
-        list_view_item = self.__mesh_list_view.selectedItem()
+        list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
         if list_view_item is not None:
             drawing_mgr = self.__list_items[list_view_item]
             key = str(list_view_item.text(0))
@@ -314,17 +288,17 @@ class CreateAdvancedScanWidget(CreateTaskBase):
 
     def set_kappa(self, new_value):
         self.kappa_position = new_value
-        self.mesh_parameters_widget.child("kappa_ledit").\
+        self.mesh_widget.findChild(QtGui.QLineEdit, "kappa_ledit").\
              setText("%.2f" % float(new_value))
 
     def set_kappa_phi(self, new_value):
         self.kappa_phi_position = new_value
-        self.mesh_parameters_widget.child("kappa_phi_ledit").\
+        self.mesh_widget.findChild(QtGui.QLineEdit, "kappa_phi_ledit").\
              setText("%.2f" % float(new_value))
 
     def update_osc_start(self, new_value):
         self.omega_position = new_value
-        self.mesh_parameters_widget.child("omega_ledit").\
+        self.mesh_widget.findChild(QtGui.QLineEdit, "omega_ledit").\
              setText("%.2f" % float(new_value))
 
     def set_beam_info(self, beam_info_dict):
@@ -340,6 +314,10 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.__drawing_mgr.set_cell_shape(self.__beam_shape == "ellipse")
 
     def start_surface_drawing(self):
+        self._graphics_manager_hwobj.start_mesh_draw(False)
+
+        return 
+
         if self.__mini_diff_hwobj is not None:
             (self.__x_pixel_size, self.__y_pixel_size) = \
                     self.__mini_diff_hwobj.get_pixels_per_mm()
@@ -371,7 +349,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             vspace, hspace = self.get_cell_dim()
             vspace = vspace * 1000
             hspace = hspace * 1000
-            list_view_item = qt.QListViewItem(self.__mesh_list_view, name,
+            list_view_item = qt.QListViewItem(self.mesh_widget.mesh_treewidget, name,
                 beam_width,  beam_height, str(hspace), str(vspace))
             self.__list_items[list_view_item] = self.__drawing_mgr
             self.__drawing_mgr.stopDrawing()
@@ -380,7 +358,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                                           self.kappa_position,
                                           self.kappa_phi_position)[0]
             cell_count = self.__drawing_mgr.get_total_steps()[0]
-            self.mesh_parameters_widget.child("num_images_ledit").\
+            self.mesh_widget.findChild(QtGui.QLineEdit, "num_images_ledit").\
                  setText("%d" % cell_count)
 
             self.__drawing_mgr.set_motor_pos_created(deepcopy(self.current_motor_positions))[0]
@@ -418,23 +396,23 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition(cpos)
             self.__drawing_mgr.set_grid_center_point(cpos)[0]
 
-            self.__mesh_list_view.setSelected(list_view_item, True)
+            self.mesh_widget.mesh_treewidget.setSelected(list_view_item, True)
             self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
             self.start_surface_drawing()
 
     def delete_drawing(self):
         if len(self.__list_items):
-            list_view_item = self.__mesh_list_view.selectedItem()
+            list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
             del self.__list_items[list_view_item]
-            self.__mesh_list_view.takeItem(list_view_item)
+            self.mesh_widget.mesh_treewidget.takeItem(list_view_item)
 
-            list_view_item = self.__mesh_list_view.lastItem()
-            self.mesh_parameters_widget.child("num_images_ledit").setText("")
-            self.__mesh_list_view.setSelected(list_view_item, True)
+            list_view_item = self.mesh_widget.mesh_treewidget.lastItem()
+            self.mesh_widget.findChild(QtGui.QLineEdit, "num_images_ledit").setText("")
+            self.mesh_widget.mesh_treewidget.setSelected(list_view_item, True)
 
     def get_cell_dim(self):
-        hspace = self.mesh_parameters_widget.child("hor_spacing_ledit").text()
-        vspace = self.mesh_parameters_widget.child("ver_spacing_ledit").text()
+        hspace = self.mesh_widget.findChild(QtGui.QLineEdit, "hor_spacing_ledit").text()
+        vspace = self.mesh_widget.findChild(QtGui.QLineEdit, "ver_spacing_ledit").text()
         try:
             vspace = float(vspace)
         except ValueError:
@@ -510,42 +488,42 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             # Drawing manager not set when called
             pass
 
-    def mesh_listview_selection_changed(self, item):
+    def mesh_treewidget_selection_changed(self, item):
         for index, current_item in enumerate(self.__list_items.iterkeys()):
             drawing_mgr = self.__list_items[current_item]
             if current_item == item:
                 drawing_mgr.highlight()
                 key = str(current_item.text(0))
                 if drawing_mgr.isVisible()[0]:
-                    self.__visibility_button.setText("Hide")
+                    self.mesh_widget.visibility_button.setText("Hide")
                 else:
-                    self.__visibility_button.setText("Show")
+                    self.mesh_widget.visibility_button.setText("Show")
                 cell_count = drawing_mgr.get_total_steps()[0]
-                self.mesh_parameters_widget.child("num_images_ledit").\
+                self.mesh_widget.findChild(QtGui.QLineEdit, "num_images_ledit").\
                      setText("%d" % cell_count)
                 (omega_pos, kappa_pos, kappa_phi_pos) = drawing_mgr.get_angles()[0]
 
-                self.mesh_parameters_widget.child("omega_ledit").\
+                self.mesh_widget.findChild(QtGui.QLineEdit, "omega_ledit").\
                      setText("%.2f" % float(omega_pos))
-                self.mesh_parameters_widget.child("kappa_ledit").\
+                self.mesh_widget.findChild(QtGui.QLineEdit, "kappa_ledit").\
                      setText("%.2f" % float(kappa_pos))
-                self.mesh_parameters_widget.child("kappa_phi_ledit").\
+                self.mesh_widget.findChild(QtGui.QLineEdit, "kappa_phi_ledit").\
                      setText("%.2f" % float(kappa_phi_pos))
             else:
                 drawing_mgr.unhighlight()
 
     def toggle_visibility_grid(self):
-        item = self.__mesh_list_view.currentItem()
+        item = self.mesh_widget.mesh_treewidget.currentItem()
 
         for current_item in self.__list_items.iterkeys():
             drawing_mgr = self.__list_items[current_item]
             if current_item == item:
                 if drawing_mgr.isVisible()[0]:
                     drawing_mgr.hide()
-                    self.__visibility_button.setText("Show")
+                    self.mesh_widget.visibility_button.setText("Show")
                 else:
                     drawing_mgr.show()
-                    self.__visibility_button.setText("Hide")
+                    self.mesh_widget.visibility_button.setText("Hide")
 
     def display_grids(self, display):
         for drawing_mgr in self.__list_items.values():
@@ -565,7 +543,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             drawing_mgr.set_grid_coordinates(grid_coordinates)[0]
 
     def move_to_center_point(self):
-        list_view_item = self.__mesh_list_view.selectedItem()
+        list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
         drawing_mgr = self.__list_items[list_view_item]
         #motors_positions = drawing_mgr.get_grid_center_point()[0]
         #self.__mini_diff_hwobj.move_to_motors_positions(motors_positions)
@@ -573,7 +551,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self.__mini_diff_hwobj.moveToMotorsPositions(cpos)
 
     def _get_grid_info(self, grid_dict):
-        list_view_item = self.__mesh_list_view.selectedItem()
+        list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
         if list_view_item is not None:
             drawing_mgr = self.__list_items[list_view_item]
             key = str(list_view_item.text(0))

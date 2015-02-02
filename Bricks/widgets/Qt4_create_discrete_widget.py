@@ -35,7 +35,14 @@ from Qt4_create_task_base import CreateTaskBase
 
 
 class CreateDiscreteWidget(CreateTaskBase):
+    """
+    Descript. :
+    """
     def __init__(self, parent=None, name=None, fl=0):
+        """
+        Descript. :
+        """
+
         CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), "Standart")
 
         if not name:
@@ -74,19 +81,19 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._acq_gbox_layout = QtGui.QVBoxLayout(self)
         self._acq_gbox_layout.addWidget(self._acq_widget)
         self._acq_gbox_layout.setSpacing(0)
-        self._acq_gbox_layout.setContentsMargins(0,0,0,0)
+        self._acq_gbox_layout.setContentsMargins(0, 0, 0, 0)
         self._acq_gbox.setLayout(self._acq_gbox_layout)
 
         self._data_path_gbox_layout = QtGui.QVBoxLayout(self)
         self._data_path_gbox_layout.addWidget(self._data_path_widget)
         self._data_path_gbox_layout.setSpacing(0)
-        self._data_path_gbox_layout.setContentsMargins(0,0,0,0)
+        self._data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
         self._data_path_gbox.setLayout(self._data_path_gbox_layout)
 
         self._processing_gbox_layout = QtGui.QVBoxLayout(self)
         self._processing_gbox_layout.addWidget(self._processing_widget)
         self._processing_gbox_layout.setSpacing(0)
-        self._processing_gbox_layout.setContentsMargins(0,0,0,0)
+        self._processing_gbox_layout.setContentsMargins(0, 0, 0, 0)
         self._processing_gbox.setLayout(self._processing_gbox_layout)
 
         self.main_layout = QtGui.QVBoxLayout(self)
@@ -95,7 +102,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.main_layout.addWidget(self._processing_gbox)
         self.main_layout.addStretch(0)
         self.main_layout.setSpacing(2)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
@@ -109,13 +116,11 @@ class CreateDiscreteWidget(CreateTaskBase):
                      self.mad_energy_selected)
         
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self._data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'),
-                     QtCore.SIGNAL("textChanged(const QString &)"),
-                     self._prefix_ledit_change)
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
+             connect(self._prefix_ledit_change)
 
-        self.connect(self._data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
-                     QtCore.SIGNAL("textChanged(const QString &)"),
-                     self._run_number_ledit_change)
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
 
         self.connect(self._acq_widget,
                      QtCore.SIGNAL("path_template_changed"),
@@ -134,14 +139,23 @@ class CreateDiscreteWidget(CreateTaskBase):
                                            Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def init_models(self):
+        """
+        Descript. :
+        """
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
     def set_tunable_energy(self, state):
+        """
+        Descript. :
+        """
         self._acq_widget.set_tunable_energy(state)
 
     def update_processing_parameters(self, crystal):
+        """
+        Descript. :
+        """
         self._processing_parameters.space_group = crystal.space_group
         self._processing_parameters.cell_a = crystal.cell_a
         self._processing_parameters.cell_alpha = crystal.cell_alpha
@@ -152,6 +166,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def mad_energy_selected(self, name, energy, state):
+        """
+        Descript. :
+        """
         item = self._current_selected_items[0]
         model = item.get_model()
         
@@ -174,6 +191,9 @@ class CreateDiscreteWidget(CreateTaskBase):
                 item.setText(0, model.get_name())
 
     def single_item_selection(self, tree_item):
+        """
+        Descript. :
+        """
         CreateTaskBase.single_item_selection(self, tree_item)
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
@@ -216,8 +236,11 @@ class CreateDiscreteWidget(CreateTaskBase):
             self.setDisabled(True)
 
     def approve_creation(self):
+        """
+        Descript. :
+        """
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = self._graphics_manager.selected_shapes
+        selected_shapes = self._graphics_manager_hwobj.selected_shapes
 
         for shape in selected_shapes:
             if isinstance(shape, graphics_manager.Line):
@@ -228,16 +251,19 @@ class CreateDiscreteWidget(CreateTaskBase):
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
+        """
+        Descript. :
+        """
         tasks = []
 
         if not shape:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager.get_snapshot([])
+            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot([])
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
             if isinstance(shape, graphics_manager.Point):
-                snapshot = self._graphics_manager.\
+                snapshot = self._graphics_manager_hwobj.\
                            get_snapshot([shape.qub_point])
 
                 cpos = copy.deepcopy(shape.get_centred_positions()[0])
@@ -266,9 +292,12 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         return tasks
     
-    def create_dc(self, sample, run_number=None, start_image=None,
-                  num_images=None, osc_start=None, sc=None,
+    def create_dc(self, sample, run_number = None, start_image = None,
+                  num_images = None, osc_start = None, sc = None,
                   cpos=None, inverse_beam = False):
+        """
+        Descript. :
+        """
         tasks = []
 
         # Acquisition for start position

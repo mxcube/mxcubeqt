@@ -51,6 +51,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._list_item_map = {}
         self.init_models()
 
+        # Graphic elements ----------------------------------------------------
         self._lines_gbox = QtGui.QGroupBox('Lines', self)
         self._lines_list_widget = QtGui.QListWidget(self._lines_gbox)
         self._lines_list_widget.setFixedWidth(175)
@@ -133,15 +134,14 @@ class CreateHelicalWidget(CreateTaskBase):
 
         # Qt signal/slot connections ------------------------------------------
         add_button.clicked.connect(self.add_clicked)
+
         remove_button.clicked.connect(self.remove_clicked)
-        prefix_ledit = self._data_path_widget.\
-                       data_path_widget.findChild(QtGui.QLineEdit, 
-                                                  'prefix_ledit')
-        prefix_ledit.textChanged.connect(self._prefix_ledit_change)
-        run_number_ledit = self._data_path_widget.\
-                           data_path_widget.findChild(QtGui.QLineEdit, 
-                                                      'run_number_ledit')
-        run_number_ledit.textChanged.connect(self._run_number_ledit_change)
+
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
+             connect(self._prefix_ledit_change)
+
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
 
         QtCore.QObject.connect(self._lines_list_widget, 
                                QtCore.SIGNAL("selectionChanged()"),

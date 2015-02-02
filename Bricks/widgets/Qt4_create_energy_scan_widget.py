@@ -18,9 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import copy
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 import Qt4_queue_item
@@ -35,7 +33,15 @@ from Qt4_periodic_table_widget import PeriodicTableWidget
 
 
 class CreateEnergyScanWidget(CreateTaskBase):
+    """
+    Descript. :
+    """ 
+
     def __init__(self, parent = None,name = None, fl = 0):
+        """
+        Descript. :
+        """
+ 
         CreateTaskBase.__init__(self, parent, name, fl, 'Energy scan')
 
         if not name:
@@ -62,6 +68,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # Qt signal/slot connections ------------------------------------------
 
     def init_models(self):
+        """
+        Descript. :
+        """
+       
         CreateTaskBase.init_models(self)
         self.enery_scan = queue_model_objects.EnergyScan()
         self._path_template.start_num = 1
@@ -69,11 +79,16 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.suffix = 'raw'
 
     def set_energy_scan_hwobj(self, energy_scan_hwobj):
+        """
+        Descript. :
+        """
         self.periodic_table.periodicTable.\
             setElements(energy_scan_hwobj.getElements())
 
-
     def single_item_selection(self, tree_item):
+        """
+        Descript. :
+        """
         CreateTaskBase.single_item_selection(self, tree_item)
         escan_model = tree_item.get_model()
 
@@ -91,8 +106,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
                      isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem)):
             self.setDisabled(True)
 
-
     def approve_creation(self):
+        """
+        Descript. :
+        """
         base_result = CreateTaskBase.approve_creation(self)
 
         selected_edge = False
@@ -108,6 +125,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
+        """
+        Descript. :
+        """
         data_collections = []
 
         if self.periodic_table.current_edge:

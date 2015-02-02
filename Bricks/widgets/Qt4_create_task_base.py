@@ -26,7 +26,7 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 import Qt4_queue_item
-import Qt4_GraphicsManager as graphics_manager
+import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
@@ -160,6 +160,10 @@ class CreateTaskBase(QtGui.QWidget):
                     item.setText(0, model.get_name())
 
     def handle_path_conflict(self, widget, new_value):
+        if self._tree_brick is None:
+            #TODO fix this. Signals should be in a correct order
+            return
+
         self._tree_brick.dc_tree_widget.check_for_path_collisions()
         
         path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
@@ -269,6 +273,7 @@ class CreateTaskBase(QtGui.QWidget):
         self._graphics_manager_hwobj.select_shape_with_cpos(cpos)
             
     def selection_changed(self, items):
+        print "selection changed: ", items
         if items:
             if len(items) == 1:
                 self._current_selected_items = items
@@ -276,6 +281,7 @@ class CreateTaskBase(QtGui.QWidget):
             elif len(items) > 1:                
                 sample_items = []
 
+                
                 # Allow mutiple selections on sample items, only.
                 for item in items:
                     if isinstance(item, Qt4_queue_item.SampleQueueItem):
@@ -389,7 +395,7 @@ class CreateTaskBase(QtGui.QWidget):
              item = self._current_selected_items[0]
              pos = positions[0]
 
-             if isinstance(pos, graphics_manager.Point):
+             if isinstance(pos, Qt4_GraphicsManager.Point):
                  if self._acq_widget and isinstance(item, Qt4_queue_item.TaskQueueItem):
                      cpos = pos.get_centred_positions()[0]
                      snapshot = self._graphics_manager_hwobj.get_snapshot([pos.qub_point])
@@ -483,7 +489,7 @@ class CreateTaskBase(QtGui.QWidget):
     def _create_acq(self, sample):
         parameters = self._acquisition_parameters
         path_template = self._path_template
-        graphics_manager = self._graphics_manager
+        graphics_manager = self._graphics_manager_hwobj
         processing_parameters = self._processing_parameters
         bl_setup = self._beamline_setup_hwobj
 

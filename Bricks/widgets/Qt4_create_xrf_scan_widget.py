@@ -79,10 +79,8 @@ class CreateXRFScanWidget(CreateTaskBase):
 
         # Qt signal/slot connections ------------------------------------------
 
-        self.connect(self._data_path_widget.data_path_widget.\
-                     findChild(QtGui.QLineEdit, 'run_number_ledit'),
-                     QtCore.SIGNAL("textChanged(const QString &)"), 
-                     self._run_number_ledit_change)
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
         
         self.connect(self._data_path_widget,
                      QtCore.SIGNAL("path_template_changed"),
