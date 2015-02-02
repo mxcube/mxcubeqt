@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
+    <width>789</width>
     <height>189</height>
    </rect>
   </property>
@@ -525,47 +525,30 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout">
-       <item>
-        <widget class="QLabel" name="subwedge_size_label">
-         <property name="mouseTracking">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Subwedge size:</string>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="subwedge_size_ledit">
-         <property name="maximumSize">
-          <size>
-           <width>75</width>
-           <height>32767</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="subwedge_fill_spacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
+      <widget class="QLabel" name="subwedge_size_label">
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Subwedge size:</string>
+       </property>
+       <property name="wordWrap">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="subwedge_size_ledit">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>32767</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout"/>
      </item>
      <item>
       <spacer name="spacer16">

@@ -171,7 +171,7 @@
           <item>
            <layout class="QVBoxLayout" name="vbox3">
             <item>
-             <widget class="QLineEdit" name="i_ver_sigma_ledit">
+             <widget class="QLineEdit" name="i_over_sigma_ledit">
               <property name="minimumSize">
                <size>
                 <width>75</width>

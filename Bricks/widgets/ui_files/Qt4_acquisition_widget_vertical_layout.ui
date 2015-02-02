@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
-    <height>300</height>
+    <width>460</width>
+    <height>280</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,6 +47,9 @@
        </property>
        <item>
         <layout class="QHBoxLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
          <item>
           <layout class="QVBoxLayout">
            <property name="spacing">
@@ -80,7 +83,7 @@
             <widget class="QLineEdit" name="osc_range_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -96,7 +99,7 @@
             <widget class="QLineEdit" name="osc_start_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -114,6 +117,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
          <item>
           <layout class="QVBoxLayout">
            <property name="spacing">
@@ -153,7 +159,7 @@
             <widget class="QLineEdit" name="first_image_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -169,7 +175,7 @@
             <widget class="QLineEdit" name="num_images_ledit">
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>0</height>
               </size>
              </property>
@@ -248,7 +254,7 @@
           <widget class="QLineEdit" name="exp_time_ledit">
            <property name="minimumSize">
             <size>
-             <width>50</width>
+             <width>75</width>
              <height>0</height>
             </size>
            </property>
@@ -284,7 +290,7 @@
            <item>
             <layout class="QHBoxLayout">
              <property name="spacing">
-              <number>10</number>
+              <number>2</number>
              </property>
              <item>
               <widget class="QCheckBox" name="mad_cbox">
@@ -333,7 +339,7 @@
           <widget class="QLineEdit" name="resolution_ledit">
            <property name="minimumSize">
             <size>
-             <width>50</width>
+             <width>75</width>
              <height>0</height>
             </size>
            </property>
@@ -355,7 +361,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>50</width>
+             <width>75</width>
              <height>32767</height>
             </size>
            </property>
@@ -401,6 +407,9 @@
          </property>
          <item>
           <layout class="QHBoxLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
            <item>
             <widget class="QLabel" name="subwedge_size_label">
              <property name="toolTip">
@@ -418,7 +427,7 @@
             <widget class="QLineEdit" name="subwedge_size_ledit">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>75</width>
                <height>32767</height>
               </size>
              </property>

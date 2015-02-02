@@ -378,7 +378,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="alfa_value_label">
+           <widget class="QLabel" name="alpha_value_label">
             <property name="text">
              <string>0</string>
             </property>
