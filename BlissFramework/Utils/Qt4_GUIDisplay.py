@@ -141,26 +141,6 @@ class CustomMenuBar(QtGui.QWidget):
             QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("quit"), ())
             QtGui.QApplication.quit()
 
-class CustomTabBar(QtGui.QTabBar):
-    def paintLabel(self,p,br,t,has_focus):
-        current_index=self.parent().currentPageIndex()
-        current_tab=self.tabAt(current_index)
-        warn_mode=False
-        if current_tab is not t:
-            for i in range(self.count()):
-                t2=self.tabAt(i)
-                if t2 is t:
-                    if self.parent().hasCountChanged(i):
-                        warn_mode=True
-                        break
-        if warn_mode:
-            p.setBackgroundMode(qt.Qt.OpaqueMode)
-            p.setBackgroundColor(qt.Qt.yellow)
-        else:
-            p.setBackgroundMode(qt.Qt.TransparentMode)
-        qt.QTabBar.paintLabel(self,p,br,t,has_focus)
-
-
 class WindowDisplayWidget(QtGui.QScrollArea):
 
     class Spacer(QtGui.QFrame):
@@ -315,29 +295,13 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         def __init__(self, *args, **kwargs):
             QtGui.QTabWidget.__init__(self, args[0])
             self.setObjectName(args[1])
-
-            self.close_button = None
+            self.close_tab_button = None
 
             #self.tab_widgets = []
             self.countChanged = {}
-
             self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-
             QtCore.QObject.connect(self, QtCore.SIGNAL('currentChanged(int)'), self._pageChanged)
 
-        def set_close_button(self):
-            self.close_button = QtGui.QToolButton(self)
-            self.close_button.setIcon(QtGui.QIcon(Qt4_Icons.load('delete_small')))
-            self.setCornerWidget(self.close_button, QtCore.Qt.TopRightCorner)
-            self.close_button.clicked.connect(self.close_current_tab)
-               
-
-        def close_current_tab(self):
-            slotName = "hidePage_%s" % self.tabText(self.currentIndex())
-            slotName = slotName.replace(" ", "_")
-            getattr(self, slotName)()
-            #QtGui.QApplication.emit(QtCore.SIGNAL('tab_closed'), self.currentWidget(), slotName)
-        
         def _pageChanged(self, index):
             page = self.widget(index)
             self.countChanged[index]=False
@@ -669,24 +633,21 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 newItem.setText(item_cfg["properties"]["text"])
             elif item_type == "tab":
                 item_cfg.widget = newItem
-
-                newItem.set_close_button()
-
-                """newItem.cmdCloseTab = QtGui.QToolButton(newItem)
-                newItem.cmdCloseTab.setIcon(QtGui.QIcon(Qt4_Icons.load('delete_small')))
-                newItem.setCornerWidget(newItem.cmdCloseTab)
-                newItem.cmdCloseTab.hide()
+                newItem.close_tab_button = QtGui.QToolButton(newItem)
+                newItem.close_tab_button.setIcon(QtGui.QIcon(Qt4_Icons.load('delete_small')))
+                newItem.setCornerWidget(newItem.close_tab_button)
+                newItem.close_tab_button.hide()
                 def close_current_page(tab=newItem):
-                  slotName = "hidePage_%s" % str(tab.tabLabel(tab.currentPage()))
+                  slotName = "hidePage_%s" % str(tab.tabText(tab.currentIndex()))
                   slotName = slotName.replace(" ", "_")
                   getattr(tab, slotName)()
-                  QtGui.QApplicaiton.emit(QtCore.SIGNAL('tab_closed'), tab, slotName)
-                def current_item_changed(item_index):
-                  item_cfg.notebookPageChanged(newItem.widget(item_index))                  
+                  #QtGui.QApplication.emit(QtCore.SIGNAL('tab_closed'), tab, slotName)
+                def current_page_changed(index):
+                  item_cfg.notebookPageChanged(newItem.tabText(index))
+ 
                 newItem._close_current_page_cb = close_current_page
-               
-                QtCore.QObject.connect(newItem, QtCore.SIGNAL('currentChanged(int)'), current_item_changed)
-                QtCore.QObject.connect(newItem.cmdCloseTab, QtCore.SIGNAL("clicked()"), close_current_page)"""
+                QtCore.QObject.connect(newItem, QtCore.SIGNAL('currentChanged(int)'), current_page_changed)
+                QtCore.QObject.connect(newItem.close_tab_button, QtCore.SIGNAL("clicked()"), close_current_page)
             elif item_type == "vsplitter" or type == "hsplitter":
                 pass
                 
@@ -700,29 +661,29 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             self.containerNum += 1
         for child in item_cfg["children"]:
             try:
-                newItem = self.add_item(child, parent)
+                new_item = self.add_item(child, parent)
             except:
                 logging.getLogger().exception("Cannot add item %s", child["name"])
             else:
                 if not self.execution_mode:
-                    newItem.installEventFilter(self)
+                    new_item.installEventFilter(self)
             if parent.__class__ == WindowDisplayWidget.items["tab"]:
-                newTab = parent.add_tab(newItem, child["properties"]["label"], 
+                newTab = parent.add_tab(new_item, child["properties"]["label"], 
                                         child["properties"]["icon"])
                 newTab.item_cfg = child
-                self.preview_items.append(newItem)
+                self.preview_items.append(new_item)
             else:
                 if isinstance(child, ContainerCfg):
-                    newItem.setSizePolicy(self.getSizePolicy(child["properties"]["hsizepolicy"], 
-                                                             child["properties"]["vsizepolicy"]))                 
+                    new_item.setSizePolicy(self.getSizePolicy(child["properties"]["hsizepolicy"], 
+                                                              child["properties"]["vsizepolicy"]))                 
                 if not isinstance(child, BrickCfg):
                     if child["properties"].hasProperty("fontSize"):
-                        f = newItem.font()
+                        f = new_item.font()
                         if child["properties"]["fontSize"] <= 0:
                             child["properties"].getProperty("fontSize").setValue(f.pointSize())
                         else:
                             f.setPointSize(int(child["properties"]["fontSize"]))
-                            newItem.setFont(f)
+                            new_item.setFont(f)
 
                 if hasattr(parent, "_preferred_layout"):
                     layout = parent._preferred_layout
@@ -739,16 +700,16 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                         stretch = 1
 
                         if child["properties"]["fixed_size"]:
-                            newItem.setFixedSize(child["properties"]["size"])
+                            new_item.setFixedSize(child["properties"]["size"])
                     else:
                         stretch = 0
-                    self.preview_items.append(newItem)
+                    self.preview_items.append(new_item)
                     if alignment_flags is not None:
-                        layout.addWidget(newItem, stretch, QtCore.Qt.Alignment(alignment_flags))
+                        layout.addWidget(new_item, stretch, QtCore.Qt.Alignment(alignment_flags))
                     else:
-                        layout.addWidget(newItem, stretch)
+                        layout.addWidget(new_item, stretch)
            
-            self.make_item(child, newItem)
+            self.make_item(child, new_item)
 
 
     def drawPreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
@@ -935,12 +896,12 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 alignment_flags = alignment_flags | QtCore.Qt.AlignHCenter
         if "left" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = qt.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+                alignment_flags = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
             else:
                 alignment_flags = alignment_flags | QtCore.Qt.AlignLeft
         if "right" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = qt.Qt.AlignRight | QtCore.Qt.AlignVCenter
+                alignment_flags = QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
             else:
                 alignment_flags = alignment_flags | QtCore.Qt.AlignRight
         return alignment_flags

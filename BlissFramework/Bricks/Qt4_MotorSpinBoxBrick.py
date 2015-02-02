@@ -693,13 +693,12 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 self.spin_box.hide()
         elif property_name == 'showBox':
             if new_value:
-                #elf.main_button_gbox.setFrameShape(self.self.main_button_gbox)
-                self.main_gbox.setContentsMargins(2, 2, 0, 0)
+                self.main_button_gbox.setFrameShape(self.self.main_button_gbox)
+                #self.main_gbox.setContentsMargins(2, 2, 0, 0)
                 #elf.containerBox.setInsideSpacing(0)
             else:
-                print "self.main_button_gbox.setFrameShape - not implemented"
-                self.main_gbox.setContentsMargins(0, 0, 0, 0)
-                #elf.containerBox.setFrameShape(self.containerBox.NoFrame)
+                self.main_gbox.setContentsMargins(2, 0, 0, 0)
+                #self.containerBox.setFrameShape(self.containerBox.NoFrame)
                 #elf.containerBox.setInsideSpacing(0)            
             self.setLabel(self['label'])
         elif property_name == 'icons':

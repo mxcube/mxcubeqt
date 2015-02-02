@@ -117,8 +117,6 @@ class MenuEditor(QtGui.QDialog):
         self.setModal(False)
         self.setWindowTitle("Menu editor - %s" % window_name)
 
-        print "MenuEditor"
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(QtGui.QLabel("<h2>feature to be implemented, sorry for the inconvenience</h2>", self))
         self.setLayout(_main_vlayout)
@@ -255,12 +253,12 @@ class TabCfg(ContainerCfg):
                 self.slots[slot_name.replace(" ", "_")]=()
 
     def notebookPageChanged(self, new_page): 
-        print "notebookPageChanged: - not implemented"
-        return
-        if self.properties.getProperty("closable_%s" % new_page.item_cfg["properties"]["label"]).getValue():
-            self.widget.cmdCloseTab.show()
+        print new_page
+        #if self.properties.getProperty("closable_%s" % new_page.item_cfg["properties"]["label"]).getValue():
+        if self.properties.getProperty("closable_%s" % new_page).getValue():
+            self.widget.close_tab_button.show()
         else:
-            self.widget.cmdCloseTab.hide()
+            self.widget.close_tab_button.hide()
 
 
 class SplitterCfg(ContainerCfg):

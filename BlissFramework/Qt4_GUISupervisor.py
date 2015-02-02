@@ -120,7 +120,7 @@ class GUISupervisor(QtGui.QWidget):
                     f = open(GUIConfigFile)
                 except:
                     logging.getLogger().exception("Cannot open file %s", GUIConfigFile)
-                    QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % GUIConfigFile, qt.QMessageBox.Ok)
+                    QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % GUIConfigFile, QtGui.QMessageBox.Ok)
                 else:
                     #
                     # find mnemonics to speed up loading
@@ -220,9 +220,9 @@ class GUISupervisor(QtGui.QWidget):
         if (QtGui.QMessageBox.question(self,
                                    "Reload GUI",
                                    "Are you sure you want to reload the GUI ?\nThis will stop the current application and restart it.",
-                                   qt.QMessageBox.Yes,
-                                   qt.QMessageBox.No,
-                                   qt.QMessageBox.Cancel) == qt.QMessageBox.Yes):
+                                   QtGui.QMessageBox.Yes,
+                                   QtGui.QMessageBox.No,
+                                   QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Yes):
             self.finalize()
 
             win0 = self.windows[0]
@@ -331,11 +331,14 @@ class GUISupervisor(QtGui.QWidget):
         return main_window
                 
     def saveOrReloadSize(self,key) :
-        if key & (qt.Qt.SHIFT|qt.Qt.CTRL) :
-            key &= ~(qt.Qt.SHIFT|qt.Qt.CTRL)
+        if key & (QtCore.Qt.SHIFT|QtCore.Qt.CTRL) :
+            key &= ~(QtCore.Qt.SHIFT|QtCore.Qt.CTRL)
             keyname = 'F%d' % ((key - qt.Qt.Key_F9) + 9)
             self.saveSize('_%d' % key)
-            qt.QMessageBox.information(self,'Position and size','This configuration is saved on key %s' % keyname,qt.QMessageBox.Default)
+            QtGui.QMessageBox.information(self,'Position and size',
+                                          'This configuration is saved on key %s' % 
+                                          keyname,
+                                          QtGui.QMessageBox.Default)
         else:
             for display in self.windows:
                 window = self.configuration.windows[str(display.name())]

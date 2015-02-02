@@ -1226,8 +1226,8 @@ class GUIBuilder(QtGui.QMainWindow):
 
     def save_as_clicked(self):
         f = self.filename
-        self.filename = str(QtGui.QFileDialog.getSaveFileName(os.environ["HOME"],
-             "GUI file (*.gui)", self, "Save file", "Choose a filename to save under"))
+        self.filename = str(QtGui.QFileDialog.getSaveFileName(self, os.environ["HOME"],
+             "GUI file (*.gui)", "Save file", "Choose a filename to save under"))
 
         if len(self.filename) == 0:
             self.filename = f

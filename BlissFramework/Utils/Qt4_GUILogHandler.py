@@ -20,7 +20,9 @@
 import logging
 import time
 import weakref
+import gevent
 
+from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 _logHandler = None
@@ -31,8 +33,7 @@ _timer = None
 class LogEvent(QtCore.QEvent):
     def __init__(self, record):
         #QCustomEvent.__init__(self, QEvent.User)
-        QtCore.Event.__init__(self, QtCore.QEvent.User)
-
+        QtCore.QEvent.__init__(self, QtCore.QEvent.User)
         self.record = record
         
 
@@ -53,6 +54,11 @@ def processLogMessages():
     del _logHandler.buffer[0:i]
     
 
+def do_process_log_messages(sleep_time):
+    while True:
+        processLogMessages()
+        time.sleep(sleep_time)  
+
 def GUILogHandler():
     global _logHandler
     global _timer
@@ -60,10 +66,10 @@ def GUILogHandler():
     if _logHandler is None:
         _logHandler = __GUILogHandler()
 
-        _timer = QtCore.QTimer()
-        QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
-        print "timer - fix"
-        _timer.start(10)
+        _timer =  gevent.spawn(do_process_log_messages, 0.2) 
+        #_timer = QtCore.QTimer()
+        #QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
+        #_timer.start(10)
 
     return _logHandler
 

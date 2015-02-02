@@ -126,7 +126,8 @@ class SignalSlotFilter:
       self.should_cache = should_cache
 
     def __call__(self, *args):
-        if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_SLAVE and BlissWidget._instanceMirror==BlissWidget.INSTANCE_MIRROR_PREVENT:
+        if (BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE and 
+            BlissWidget._instanceMirror==BlissWidget.INSTANCE_MIRROR_PREVENT):
            if self.should_cache:
                BlissWidget._eventsCache[self.slot]=(time.time(), self.slot, args)
                return
@@ -137,11 +138,15 @@ class SignalSlotFilter:
 
 
 class BlissWidget(QtGui.QWidget, Connectable.Connectable):
-    (INSTANCE_ROLE_UNKNOWN,INSTANCE_ROLE_SERVER,INSTANCE_ROLE_SERVERSTARTING,INSTANCE_ROLE_CLIENT,INSTANCE_ROLE_CLIENTCONNECTING) = (0,1,2,3,4)
-    (INSTANCE_MODE_UNKNOWN,INSTANCE_MODE_MASTER,INSTANCE_MODE_SLAVE) = (0,1,2)
-    (INSTANCE_LOCATION_UNKNOWN,INSTANCE_LOCATION_LOCAL,INSTANCE_LOCATION_INHOUSE,INSTANCE_LOCATION_INSITE,INSTANCE_LOCATION_EXTERNAL) = (0,1,2,3,4)
-    (INSTANCE_USERID_UNKNOWN,INSTANCE_USERID_LOGGED,INSTANCE_USERID_INHOUSE,INSTANCE_USERID_IMPERSONATE) = (0,1,2,3)
-    (INSTANCE_MIRROR_UNKNOWN,INSTANCE_MIRROR_ALLOW,INSTANCE_MIRROR_PREVENT) = (0,1,2)
+    (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
+     INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
+    (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
+    (INSTANCE_LOCATION_UNKNOWN, INSTANCE_LOCATION_LOCAL, 
+     INSTANCE_LOCATION_INHOUSE,INSTANCE_LOCATION_INSITE,
+     INSTANCE_LOCATION_EXTERNAL) = (0,1,2,3,4)
+    (INSTANCE_USERID_UNKNOWN, INSTANCE_USERID_LOGGED, INSTANCE_USERID_INHOUSE,
+     INSTANCE_USERID_IMPERSONATE) = (0,1,2,3)
+    (INSTANCE_MIRROR_UNKNOWN, INSTANCE_MIRROR_ALLOW, INSTANCE_MIRROR_PREVENT) = (0,1,2)
 
     _runMode = False
     _instanceRole = INSTANCE_ROLE_UNKNOWN
@@ -256,32 +261,30 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
 
         return False
 
-
     def connectGroupBox(self,widget,widget_name,masterSync):
         brick_name = self.name()
-        self.connect(widget, QtCore.SIGNAL('toggled(bool)'),lambda s:BlissWidget.widgetGroupBoxToggled(brick_name,widget_name, masterSync,s))
-
+        self.connect(widget, QtCore.SIGNAL('toggled(bool)'), lambda \
+             s:BlissWidget.widgetGroupBoxToggled(brick_name,widget_name, masterSync,s))
 
     def connectComboBox(self,widget,widget_name,masterSync):
         brick_name = self.name()
-        self.connect(widget, QtCore.SIGNAL('activated(int)'),lambda i:BlissWidget.widgetComboBoxActivated(brick_name,widget_name,widget,masterSync, i))
-
+        self.connect(widget, QtCore.SIGNAL('activated(int)'),lambda \
+             i:BlissWidget.widgetComboBoxActivated(brick_name,widget_name,widget,masterSync, i))
 
     def connectLineEdit(self,widget,widget_name,masterSync):
         brick_name = self.name()
-        self.connect(widget, QtCore.SIGNAL('textChanged(const QString &)'),lambda t:BlissWidget.widgetLineEditTextChanged(brick_name,widget_name,masterSync,t))
-
+        self.connect(widget, QtCore.SIGNAL('textChanged(const QString &)'), lambda \
+             t:BlissWidget.widgetLineEditTextChanged(brick_name,widget_name,masterSync,t))
 
     def connectSpinBox(self,widget,widget_name,masterSync):
         brick_name = self.name()
-        self.connect(widget, QtCore.SIGNAL('editorTextChanged'),lambda t:BlissWidget.widgetSpinBoxTextChanged(brick_name,widget_name,masterSync,t))
-        #self.connect(widget,SIGNAL('valueChanged(const QString &)'),lambda v:BlissWidget.widgetSpinBoxValueChanged(self,widget_name,v))
+        self.connect(widget, QtCore.SIGNAL('editorTextChanged'), lambda \
+             t:BlissWidget.widgetSpinBoxTextChanged(brick_name,widget_name,masterSync,t))
 
-
-    def connectGenericWidget(self,widget,widget_name,masterSync):
+    def connectGenericWidget(self, widget, widget_name, masterSync):
         brick_name = self.name()
-        self.connect(widget, QtCore.SIGNAL('widgetSynchronize'),lambda state:BlissWidget.widgetGenericChanged(brick_name,widget_name,masterSync,state))
-
+        self.connect(widget, QtCore.SIGNAL('widgetSynchronize'), lambda \
+             state:BlissWidget.widgetGenericChanged(brick_name,widget_name,masterSync,state))
 
     def _instanceModeChanged(self,mode):
         for widget,widget_name,masterSync in self._widgetEvents:
@@ -455,13 +458,15 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
     def updateWidget(brick_name,widget_name,method_name,method_args,masterSync):
         #logging.getLogger().debug("------------------------- UPDATE WIDGET, masterSync=%s", masterSync)
         if not masterSync or BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.mainWidget().emit(QtCore.SIGNAL('applicationBrickChanged'),(brick_name,widget_name,method_name,method_args,masterSync))
+            QtGui.QApplication.mainWidget().emit(QtCore.SIGNAL('applicationBrickChanged'), 
+                  (brick_name,widget_name,method_name,method_args,masterSync))
 
 
     @staticmethod
     def updateTabWidget(tab_name,tab_index):
         if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.mainWidget().emit(QtCore.SIGNAL('applicationTabChanged'),(tab_name,tab_index))
+            QtGui.QApplication.mainWidget().emit(QtCore.SIGNAL('applicationTabChanged'),
+                  (tab_name,tab_index))
 
 
     @staticmethod
@@ -544,9 +549,6 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         Connectable.Connectable.__init__(self)
         QtGui.QWidget.__init__(self, parent)
         self.setObjectName(widgetName)
-
-        ##self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, \
-        ##                   QtGui.QSizePolicy.MinimumExpanding)
         self.propertyBag = PropertyBag.PropertyBag()
                 
         self.__enabledState = True #saved enabled state
@@ -564,15 +566,14 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         # add properties shared by all BlissWidgets
         #
         self.addProperty('fontSize', 'string', str(self.font().pointSize()))
-        #self.addProperty("alignment", "combo", ("none", "top center", "top left", "top right", "bottom center", "bottom left", "bottom right", "center", "left", "right"), "none")
         self.addProperty('instanceAllowAlways', 'boolean', False)#, hidden=True)
         self.addProperty('instanceAllowConnected', 'boolean', False)#, hidden=True)
-
         #
         # connect signals / slots
         #
-        dispatcher.connect(self.__hardwareObjectDiscarded, 'hardwareObjectDiscarded', HardwareRepository.HardwareRepository())
- 
+        dispatcher.connect(self.__hardwareObjectDiscarded, 
+                           'hardwareObjectDiscarded', 
+                           HardwareRepository.HardwareRepository())
         self.defineSlot('enable_widget', ())
 
     def __run(self):
