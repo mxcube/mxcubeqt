@@ -47,7 +47,6 @@ class DCParametersWidget(QtGui.QWidget):
         self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
-
         self._data_collection = None
         self.add_dc_cb = None
         self._tree_view_item = None
@@ -68,6 +67,7 @@ class DCParametersWidget(QtGui.QWidget):
         self.processing_widget = ProcessingWidget(_dc_parameters_widget)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
+        self.position_widget.setMinimumSize(450, 340)
         
         # Layout --------------------------------------------------------------
         _dc_parameters_widget_layout = QtGui.QVBoxLayout(self)
@@ -94,11 +94,11 @@ class DCParametersWidget(QtGui.QWidget):
         self.connect(self.acq_widget, QtCore.SIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
 
-        self.connect(self.path_widget.data_path_widget.findChild(QtGui.QLineEdit, 'prefix_ledit'), 
+        self.connect(self.path_widget.data_path_layout.findChild(QtGui.QLineEdit, 'prefix_ledit'), 
                      QtCore.SIGNAL("textChanged(const QString &)"), 
                      self._prefix_ledit_change)
 
-        self.connect(self.path_widget.data_path_widget.findChild(QtGui.QLineEdit, 'run_number_ledit'),
+        self.connect(self.path_widget.data_path_layout.findChild(QtGui.QLineEdit, 'run_number_ledit'),
                      QtCore.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
 
@@ -135,6 +135,10 @@ class DCParametersWidget(QtGui.QWidget):
             self._tree_view_item.setText(0, self._data_collection.get_name())
 
     def handle_path_conflict(self, widget, new_value):
+        if self._tree_view_item is None:
+            #TODO fix this
+            return 
+
         dc_tree_widget = self._tree_view_item.listView().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
@@ -211,8 +215,9 @@ class DCParametersWidget(QtGui.QWidget):
             image = data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             
-            image = image.scale(427, 320)
-            self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
+            image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
+            self.position_widget.findChild(QtGui.QLabel, "svideo").\
+                 setPixmap(QtGui.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
 

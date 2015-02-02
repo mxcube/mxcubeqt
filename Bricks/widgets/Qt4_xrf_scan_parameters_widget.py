@@ -103,12 +103,12 @@ class XRFScanParametersWidget(QtGui.QWidget):
         #                   QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------ 
-        QtCore.QObject.connect(self.data_path_widget.data_path_widget.\
+        QtCore.QObject.connect(self.data_path_widget.data_path_layout.\
                                findChild(QtGui.QLineEdit, 'prefix_ledit'), 
                                QtCore.SIGNAL("textChanged(const QString &)"), 
                                self._prefix_ledit_change)
 
-        QtCore.QObject.connect(self.data_path_widget.data_path_widget.\
+        QtCore.QObject.connect(self.data_path_widget.data_path_layout.\
                                findChild(QtGui.QLineEdit, 'run_number_ledit'), 
                                QtCore.SIGNAL("textChanged(const QString &)"), 
                                self._run_number_ledit_change)

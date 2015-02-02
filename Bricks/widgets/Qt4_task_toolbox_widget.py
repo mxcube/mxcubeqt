@@ -214,16 +214,17 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 data_collection = items[0].get_model()
 
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
-                    self.tool_box.setCurrentItem(self.helical_page)
+                    self.tool_box.setCurrentWidget(self.helical_page)
                 else:
-                    self.tool_box.setCurrentItem(self.discrete_page)
-
+                    self.tool_box.setCurrentWidget(self.discrete_page)
             elif isinstance(items[0], Qt4_queue_item.CharacterisationQueueItem):
-                self.tool_box.setCurrentItem(self.char_page)
+                self.tool_box.setCurrentWidget(self.char_page)
             elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
-                self.tool_box.setCurrentItem(self.energy_scan_page)
+                self.tool_box.setCurrentWidget(self.energy_scan_page)
+            elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
+                self.tool_box.setCurrentWidget(self.xrf_scan_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
-                self.tool_box.setCurrentItem(self.workflow_page)
+                self.tool_box.setCurrentWidget(self.workflow_page)
 
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)

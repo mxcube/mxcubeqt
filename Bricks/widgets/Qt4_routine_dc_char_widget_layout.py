@@ -21,8 +21,16 @@ from PyQt4 import QtGui
 
 
 class RoutineDCWidgetLayout(QtGui.QWidget):
-    def __init__(self,parent = None,name = None,fl = 0):
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent = None, name = None, flags = 0):
+        """
+        Descript. :
+        """
+
+        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("RoutineDCWidgetLayout")
@@ -69,6 +77,9 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
 
 
     def languageChange(self):
+        """
+        Descript. :
+        """
         self.setWindowTitle(self.__tr("RoutineDCWidget"))
         #self.dose_time_bgroup.setTitle(QtGui.QString.null)
         self.min_dose_radio.setText(self.__tr("Use min dose"))
@@ -79,4 +90,7 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
 
 
     def __tr(self,s,c = None):
+        """
+        Descript. :
+        """
         return QtGui.QApplication.translate("RoutineDCWidgetLayout",s,c)

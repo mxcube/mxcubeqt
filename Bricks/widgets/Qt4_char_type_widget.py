@@ -22,9 +22,9 @@ from PyQt4 import QtGui
 
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_routine_dc_char_widget_layout import RoutineDCWidgetLayout
-#from widgets.Qt4_sad_char_widget_layout import SADWidgetLayout
-#from widgets.Qt4_radiation_damage_char_widget_layout import \
-#    RadiationDamageWidgetLayout
+from widgets.Qt4_sad_char_widget_layout import SADWidgetLayout
+from widgets.Qt4_radiation_damage_char_widget_layout import \
+     RadiationDamageWidgetLayout
 
 
 class CharTypeWidget(QtGui.QWidget):
@@ -48,12 +48,12 @@ class CharTypeWidget(QtGui.QWidget):
 
         self.charact_type_tbox = QtGui.QToolBox(self.charact_type_gbox)
         self.routine_dc_page = RoutineDCWidgetLayout(self.charact_type_tbox)
-        #self.sad_page = SADWidgetLayout(self.charact_type_tbox)
-        #self.rad_damage_page = RadiationDamageWidgetLayout(self.charact_type_tbox)
+        self.sad_page = SADWidgetLayout(self.charact_type_tbox)
+        self.rad_damage_page = RadiationDamageWidgetLayout(self.charact_type_tbox)
 
         self.charact_type_tbox.addItem(self.routine_dc_page, "Routine-DC")
-        #self.charact_type_tbox.addItem(self.sad_page, "SAD")
-        #self.charact_type_tbox.addItem(self.rad_damage_page, "Radiation damage")
+        self.charact_type_tbox.addItem(self.sad_page, "SAD")
+        self.charact_type_tbox.addItem(self.rad_damage_page, "Radiation damage")
 
         # Layout --------------------------------------------------------------
         _charact_type_gbox_vlayout = QtGui.QVBoxLayout(self)
@@ -73,17 +73,12 @@ class CharTypeWidget(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(self.routine_dc_page.dose_limit_cbx,
-                               QtCore.SIGNAL("toggled(bool)"),
-                               self.enable_dose_ledit)
- 
-        QtCore.QObject.connect(self.routine_dc_page.time_limit_cbx,
-                               QtCore.SIGNAL("toggled(bool)"),
-                               self.enable_time_ledit)
-
-        QtCore.QObject.connect(self.routine_dc_page.dose_time_bgroup, 
-                               QtCore.SIGNAL("clicked(int)"),
-                               self._toggle_time_dose)
+        self.routine_dc_page.dose_limit_cbx.toggled.connect(\
+             self.enable_dose_ledit)
+        self.routine_dc_page.time_limit_cbx.toggled.connect(\
+             self.enable_time_ledit)
+        self.routine_dc_page.dose_time_bgroup.buttonClicked.connect(\
+             self._toggle_time_dose)
 
         # Other ---------------------------------------------------------------
         self._toggle_time_dose(self.routine_dc_page.dose_time_bgroup.checkedId())

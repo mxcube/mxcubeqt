@@ -58,31 +58,31 @@ class OptimisationParametersWidgetLayout(QtGui.QWidget):
 
     def languageChange(self):
         self.setWindowTitle(self.__tr("OptimisationParametersWidget"))
-        self.opt_param_widget.findChild(QtGui.QGroupBox, "main_groupbox").\
+        self.opt_param_widget.main_groupbox.\
              setTitle(self.__tr("Optimization parameters"))
-        self.opt_param_widget.findChild(QtGui.QLabel, "aimed_i_over_sigma_label").setText(self.__trUtf8("\x41\x69\x6d\x65\x64\x20\x49\x2f\xcf\x83\x20\x61\x74\x20\x68\x69\x67\x68\x65\x73\x74\x20\x72\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x3a"))
-        self.opt_param_widget.findChild(QtGui.QLabel, "aimed_completeness_label").\
+        self.opt_param_widget.aimed_i_over_sigma_label.setText(self.__trUtf8("\x41\x69\x6d\x65\x64\x20\x49\x2f\xcf\x83\x20\x61\x74\x20\x68\x69\x67\x68\x65\x73\x74\x20\x72\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x3a"))
+        self.opt_param_widget.aimed_completeness_label.\
              setText(self.__tr("Aimed completeness:"))
-        self.opt_param_widget.findChild(QtGui.QCheckBox, "maximum_res_cbx").\
+        self.opt_param_widget.maximum_res_cbx.\
              setText(self.__tr("Maximum resolution:"))
-        self.opt_param_widget.findChild(QtGui.QCheckBox, "aimed_mult_cbx").\
+        self.opt_param_widget.aimed_mult_cbx.\
              setText(self.__tr("Aimed multiplicity:"))
-        self.opt_param_widget.findChild(QtGui.QLabel, "strat_comp_label").\
+        self.opt_param_widget.strat_comp_label.\
              setText(self.__tr("Strategy complexity:"))
-        self.opt_param_widget.findChild(QtGui.QComboBox, "start_comp_cbox").clear()
-        self.opt_param_widget.findChild(QtGui.QComboBox, "start_comp_cbox").\
+        self.opt_param_widget.start_comp_cbox.clear()
+        self.opt_param_widget.start_comp_cbox.\
              addItem(self.__tr("Single subwedge"))
-        self.opt_param_widget.findChild(QtGui.QComboBox, "start_comp_cbox").\
+        self.opt_param_widget.start_comp_cbox.\
              addItem(self.__tr("Few subwedges"))
-        self.opt_param_widget.findChild(QtGui.QComboBox, "start_comp_cbox").\
+        self.opt_param_widget.start_comp_cbox.\
              addItem(self.__tr("Many subwedges"))
-        self.opt_param_widget.findChild(QtGui.QCheckBox, "permitted_range_cbx").\
+        self.opt_param_widget.permitted_range_cbx.\
              setText(self.__tr("Use permitted rotation range:"))
-        self.opt_param_widget.findChild(QtGui.QLabel, "phi_start_label").\
+        self.opt_param_widget.phi_start_label.\
              setText(self.__trUtf8("\xcf\x89\x2d\x73\x74\x61\x72\x74\x3a"))
-        self.opt_param_widget.findChild(QtGui.QLabel, "phi_end_label").\
+        self.opt_param_widget.phi_end_label.\
              setText(self.__trUtf8("\xcf\x89\x2d\x65\x6e\x64\x3a"))
-        self.opt_param_widget.findChild(QtGui.QCheckBox, "low_res_pass_cbx").\
+        self.opt_param_widget.low_res_pass_cbx.\
              setText(self.__tr("Calculate low resolution pass strategy"))
 
     def __tr(self,s,c = None):

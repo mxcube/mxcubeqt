@@ -30,8 +30,14 @@ from widgets.Qt4_confirm_dialog_widget_vertical_layout \
 
 
 class FileTreeWidgetItem(QtGui.QTreeWidgetItem):
+    """
+    Descript. :
+    """
 
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtGui.QTreeWidgetItem.__init__(self, args[0])
         self.setText(0, args[2])
         self.setText(1, args[3])
@@ -39,28 +45,24 @@ class FileTreeWidgetItem(QtGui.QTreeWidgetItem):
         self.brush = QtGui.QBrush(QtCore.Qt.black)
         self.__normal_brush = QtGui.QBrush(QtCore.Qt.black)
         
-    def paintCell(self, painter, color_group, column, width, align):
-        try:
-            painter.save()
-            
-            color_group = QtGui.QColorGroup(color_group)
-            color_group.setColor(QtGui.QColorGroup.Text, self.brush.color())
-            color_group.setBrush(QtGui.QColorGroup.Text, self.brush)
-        
-            QtGui.QTreeWidgetItem.paintCell(self, painter, color_group, 
-                                       column, width, align)
-        finally:
-            painter.restore()
-
-
     def set_brush(self, qt_brush):
+        """
+        Descript. :
+        """
         self.brush = qt_brush
 
-
 class ConfirmDialog(QtGui.QDialog):
-    def __init__(self, parent = None, name = None, fl = 0):
-        QtGui.QWidget.__init__(self, parent, 
-              QtCore.Qt.WindowFlags(fl | QtCore.Qt.WindowStaysOnTopHint))
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent = None, name = None, flags = 0):
+        """
+        Descript. :
+        """
+
+        QtGui.QDialog.__init__(self, parent, 
+              QtCore.Qt.WindowFlags(flags | QtCore.Qt.WindowStaysOnTopHint))
 
         if name is not None:
             self.setObjectName(name) 
@@ -99,21 +101,31 @@ class ConfirmDialog(QtGui.QDialog):
         self.setWindowTitle('Confirm collection')
 
     def set_plate_mode(self, plate_mode):
-        self.dialog_layout_widget.snapshots_list = [0,1] if plate_mode else [0,1,2,4]
+        """
+        Descript. :
+        """
+        self.dialog_layout_widget.snapshots_list = [0, 1] if plate_mode \
+             else [0, 1, 2, 4]
         self.dialog_layout_widget.languageChange()
  
- 
     def disable_dark_current_cbx(self):
+        """
+        Descript. :
+        """
         self.dialog_layout_widget.force_dark_cbx.setEnabled(False)
         self.dialog_layout_widget.force_dark_cbx.setOn(False)
 
-
     def enable_dark_current_cbx(self):
+        """
+        Descript. :
+        """
         self.dialog_layout_widget.force_dark_cbx.setEnabled(True)
         self.dialog_layout_widget.force_dark_cbx.setOn(True)
         
-
     def set_items(self, checked_items):
+        """
+        Descript. :
+        """
         self.sample_items = []
         self.files_to_be_written = []
         self.checked_items = checked_items
@@ -145,8 +157,8 @@ class ConfirmDialog(QtGui.QDialog):
                 file_paths = path_template.get_files_to_be_written()
                 num_images += len(file_paths)
 
-                for fp in file_paths:
-                    (dir_name, f_name) = os.path.split(fp)
+                for file_path in file_paths:
+                    (dir_name, f_name) = os.path.split(file_path)
                     sample_name = current_sample_item.get_model().get_display_name()
 
                     if sample_name is '':
@@ -156,11 +168,11 @@ class ConfirmDialog(QtGui.QDialog):
                     last_item = self.dialog_layout_widget.file_tree_widget.topLevelItem(\
                                 (self.dialog_layout_widget.file_tree_widget.topLevelItemCount() - 1)) 
 
-                    fl = FileTreeWidgetItem(self.dialog_layout_widget.file_tree_widget,
-                                          last_item, sample_name, dir_name, f_name)
+                    file_treewidgee_item = FileTreeWidgetItem(self.dialog_layout_widget.file_tree_widget,
+                                            last_item, sample_name, dir_name, f_name)
 
-                    if os.path.isfile(fp):
-                            fl.set_brush(qt.QBrush(qt.Qt.red))
+                    if os.path.isfile(file_path):
+                        file_treewidgee_item.set_brush(QtGui.QBrush(QtCore.Qt.red))
 
         num_samples = len(self.sample_items)
         num_collections = len(collection_items)
@@ -173,6 +185,9 @@ class ConfirmDialog(QtGui.QDialog):
 
 
     def continue_button_click(self):
+        """
+        Descript. :
+        """
         for item in self.checked_items:
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 item.get_model().acquisitions[0].acquisition_parameters.\
@@ -187,9 +202,7 @@ class ConfirmDialog(QtGui.QDialog):
 
 
     def cancel_button_click(self):
-#         for item, run_number in self.item_run_number_list:
-#             item.get_model().set_number(run_number)
-#             path_template = item.get_model().get_path_template()
-#             path_template.run_number = run_number
-                    
+        """
+        Descript. :
+        """
         self.reject()

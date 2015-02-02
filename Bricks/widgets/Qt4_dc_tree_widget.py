@@ -41,8 +41,16 @@ SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
 
 
 class DataCollectTree(QtGui.QWidget):
+    """
+    Descript. :
+    """ 
+
     def __init__(self, parent = None, name = "data_collect", 
                  selection_changed = None):
+        """
+        Descript. :
+        """
+ 
         QtGui.QWidget.__init__(self, parent)
 
         self.setObjectName(name)
@@ -139,29 +147,31 @@ class DataCollectTree(QtGui.QWidget):
                                                                 QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.up_button, QtCore.SIGNAL("clicked()"), self.up_click)
-        self.connect(self.down_button, QtCore.SIGNAL("clicked()"), self.down_click)
-        self.connect(self.delete_button, QtCore.SIGNAL("clicked()"), self.delete_click)
-        self.connect(self.collect_button, QtCore.SIGNAL("clicked()"), self.collect_stop_toggle)
-        self.connect(self.sample_tree_widget, QtCore.SIGNAL("selectionChanged()"),
-                               self.sample_tree_widget_selection)
+        self.up_button.clicked.connect(self.up_click)
+
+        self.down_button.clicked.connect(self.down_click)
+
+        self.delete_button.clicked.connect(self.delete_click)
+
+        self.collect_button.clicked.connect(self.collect_stop_toggle)
+
+        self.sample_tree_widget.itemSelectionChanged.\
+             connect(self.sample_tree_widget_selection)
+
         self.connect(self.sample_tree_widget,
-                              QtCore.SIGNAL("customContextMenuRequested (const QPoint & pos)"),
-                              self.show_context_menu)
+                     QtCore.SIGNAL("customContextMenuRequested (const QPoint & pos)"),
+                     self.show_context_menu)
         #tCore.QObject.connect(self.sample_tree_widget, 
         #                      QtCore.SIGNAL("itemRenamed(QListViewItem *, int , const QString& )"),
         #                      self.item_renamed)
-        self.connect(self.sample_tree_widget,
-                               QtCore.SIGNAL("itemDoubleClicked(QTreeWidgetItem*, int)"),
-                               self.item_double_click)
+        self.sample_tree_widget.itemDoubleClicked.connect(self.item_double_click)
 
-        self.connect(self.sample_tree_widget,
-                               QtCore.SIGNAL("itemClicked(QTreeWidgetItem*, int)"),
-                               self.item_click)
+        self.sample_tree_widget.itemClicked.connect(self.item_click)
+
         self.connect(self.confirm_dialog, QtCore.SIGNAL("continue_clicked"),
                                self.collect_items)
-        self.connect(self.continue_button, QtCore.SIGNAL("clicked()"),
-                               self.continue_button_click)
+
+        self.continue_button.clicked.connect(self.continue_button_click)
 
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(2)
@@ -177,6 +187,9 @@ class DataCollectTree(QtGui.QWidget):
         self.setWindowTitle("Data collect")
  
     def eventFilter(self, _object, event):
+        """
+        Descript. :
+        """
         if event.type() == QtCore.QEvent.MouseButtonDblClick:
             self.show_details()
             return True
@@ -184,6 +197,9 @@ class DataCollectTree(QtGui.QWidget):
             return False
 
     def enable_collect(self, state):
+        """
+        Descript. :
+        """
         self.sample_tree_widget.setDisabled(not state)
         self.collect_button.setDisabled(not state)
         self.up_button.setDisabled(not state)
@@ -191,6 +207,9 @@ class DataCollectTree(QtGui.QWidget):
         self.delete_button.setDisabled(not state)
 
     def show_context_menu(self, item, point, col):
+        """
+        Descript. :
+        """
         menu = QtGui.QMenu(self.sample_tree_widget)
 
         if item:
@@ -204,7 +223,7 @@ class DataCollectTree(QtGui.QWidget):
                     if self.is_mounted_sample_item(item): 
                         menu.insertItem(QtCore.QString("Un-Mount"), self.unmount_sample)
                     else:
-                        menu.insertItem(QtCore.QString("Mount"), self.mount_sample)
+                        menu.insertItem("Mount", self.mount_sample)
                        
                 menu.insertSeparator(3)
                 menu.insertItem(QtCore.QString("Details"), self.show_details) 
@@ -217,12 +236,21 @@ class DataCollectTree(QtGui.QWidget):
                 menu.insertItem(QtCore.QString("Details"), self.show_details)
             
     def item_double_click(self):
+        """
+        Descript. :
+        """
         self.show_details()
 
     def item_click(self):
+        """
+        Descript. :
+        """
         self.check_for_path_collisions()
 
     def context_collect_item(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
         
         if len(items) == 1:
@@ -235,6 +263,9 @@ class DataCollectTree(QtGui.QWidget):
             self.collect_items(items)
 
     def show_details(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
         if len(items) == 1:
             item = items[0]
@@ -243,7 +274,7 @@ class DataCollectTree(QtGui.QWidget):
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 self.tree_brick.show_datacollection_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
-                self.tree_brick.show_edna_tab(item)
+                self.tree_brick.show_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
 	    elif isinstance(item, Qt4_queue_item.XRFScanQueueItem):
@@ -254,19 +285,31 @@ class DataCollectTree(QtGui.QWidget):
         #    self.tree_brick.show_sample_tab()
 
     def rename_list_view_item(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
         if len(items) == 1:
             items[0].setRenameEnabled(0, True);
             items[0].startRename(0);
 
     def item_renamed(self, item, col, text):
+        """
+        Descript. :
+        """
         item.get_model().set_name(text)
 
     def mount_sample(self):
+        """
+        Descript. :
+        """
         self.enable_collect(False)
         gevent.spawn(self.mount_sample_task)
 
     def mount_sample_task(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
         
         if len(items) == 1:
@@ -288,6 +331,9 @@ class DataCollectTree(QtGui.QWidget):
                   info('Its not possible to mount samples in free pin mode')
 
     def centring_done(self, success, centring_info):
+        """
+        Descript. :
+        """
         if success:
             self.sample_centring_result.set(centring_info)
         else:
@@ -296,9 +342,15 @@ class DataCollectTree(QtGui.QWidget):
             logging.getLogger("user_level_log").warning(msg)
 
     def unmount_sample(self):
+        """
+        Descript. :
+        """
         gevent.spawn(self.unmount_sample_task)
 
     def unmount_sample_task(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
 
         if len(items) == 1:
@@ -320,6 +372,9 @@ class DataCollectTree(QtGui.QWidget):
             items[0].set_mounted_style(False)
 
     def sample_tree_widget_selection(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
         if len(items) == 1:
             item = items[0]
@@ -335,13 +390,15 @@ class DataCollectTree(QtGui.QWidget):
                        isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                     self.delete_button.setDisabled(False)
                     break
-
         self.selection_changed_cb(items)        
         #checked_items = self.get_checked_items()
         #self.collect_button.setDisabled(len(checked_items) == 0)
         #self.set_first_element()
 
     def add_empty_task_node(self):
+        """
+        Descript. :
+        """
         samples = self.get_selected_samples()
         task_node = queue_model_objects.TaskGroup()
         task_node.set_name('Collection group')
@@ -350,7 +407,9 @@ class DataCollectTree(QtGui.QWidget):
                                                 task_node.get_display_name())
 
     def get_item_by_model(self, parent_node):
-        
+        """
+        Descript. :
+        """
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
     
@@ -364,6 +423,9 @@ class DataCollectTree(QtGui.QWidget):
         return self.sample_tree_widget
 
     def last_top_level_item(self):
+        """
+        Descript. :
+        """
         last_child_index = self.sample_tree_widget.topLevelItemCount() - 1
         return self.sample_tree_widget.topLevelItem(last_child_index) 
 
@@ -377,6 +439,9 @@ class DataCollectTree(QtGui.QWidget):
         return last_child"""
         
     def add_to_view(self, parent, task):
+        """
+        Descript. :
+        """
         view_item = None
         parent_tree_item = self.get_item_by_model(parent)
 
@@ -402,18 +467,27 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.resizeColumnToContents(0)
 
     def get_selected_items(self):
+        """
+        Descript. :
+        """
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
                                              Qt4_queue_item.is_selected,
                                              Qt4_queue_item.get_item)
         return res
 
     def get_selected_samples(self):
+        """
+        Descript. :
+        """
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
                                           Qt4_queue_item.is_selected_sample,
                                           Qt4_queue_item.get_item)
         return res
     
     def get_selected_tasks(self):
+        """
+        Descript. :
+        """
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
                                              Qt4_queue_item.is_selected_task,
                                              Qt4_queue_item.get_item)
@@ -421,18 +495,27 @@ class DataCollectTree(QtGui.QWidget):
         return res
 
     def get_selected_dcs(self):
+        """
+        Descript. :
+        """
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
                                           Qt4_queue_item.is_selected_dc,
                                           Qt4_queue_item.get_item)
         return res
 
     def get_selected_task_nodes(self):
+        """
+        Descript. :
+        """
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
                                              Qt4_queue_item.is_selected_task_node,
                                              Qt4_queue_item.get_item)
         return res
 
     def is_sample_selected(self):
+        """
+        Descript. :
+        """
         items = self.get_selected_items()
         
         for item in items:
@@ -442,6 +525,9 @@ class DataCollectTree(QtGui.QWidget):
         return False
 
     def filter_sample_list(self, option):
+        """
+        Descript. :
+        """
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
@@ -485,6 +571,9 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget_selection()
         
     def set_centring_method(self, method_number):       
+        """
+        Descript. :
+        """
         self.centring_method = method_number
 
         try:
@@ -499,6 +588,9 @@ class DataCollectTree(QtGui.QWidget):
             pass
 
     def continue_button_click(self):
+        """
+        Descript. :
+        """
         if self.queue_hwobj.is_executing():
             if not self.queue_hwobj.is_paused():
                 self.queue_hwobj.set_pause(True)
@@ -506,6 +598,9 @@ class DataCollectTree(QtGui.QWidget):
                 self.queue_hwobj.set_pause(False)
 
     def queue_paused_handler(self, state):
+        """
+        Descript. :
+        """
         if state:
             self.parent().enable_hutch_menu(True)
             self.parent().enable_command_menu(True)
@@ -526,6 +621,9 @@ class DataCollectTree(QtGui.QWidget):
                               QtGui.QPalette.Button)
 
     def collect_stop_toggle(self):
+        """
+        Descript. :
+        """
         checked_items = self.get_checked_items()
         self.queue_hwobj.disable(False)
 
@@ -559,11 +657,17 @@ class DataCollectTree(QtGui.QWidget):
             self.stop_collection()
 
     def enable_sample_changer_widget(self, state):
-        self.parent().sample_changer_widget.findChild(QtGui.QPushButton, 'synch_button').setEnabled(state)
-        self.parent().sample_changer_widget.findChild(QtGui.QComboBox, 'centring_cbox').setEnabled(state)
-        self.parent().sample_changer_widget.findChild(QtGui.QComboBox, 'filter_cbox').setEnabled(state)
+        """
+        Descript. :
+        """
+        self.parent().sample_changer_widget.synch_button.setEnabled(state)
+        self.parent().sample_changer_widget.centring_cbox.setEnabled(state)
+        self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
 
     def is_mounted_sample_item(self, item):
+        """
+        Descript. :
+        """
         result = False
 
         if isinstance(item, Qt4_queue_item.SampleQueueItem):
@@ -577,6 +681,9 @@ class DataCollectTree(QtGui.QWidget):
         return result
 
     def collect_items(self, items = [], checked_items = []):
+        """
+        Descript. :
+        """
         self.beamline_setup_hwobj.shape_history_hwobj.de_select_all()
         for item in checked_items:
             # update the run-number text incase of re-collect
@@ -606,14 +713,23 @@ class DataCollectTree(QtGui.QWidget):
             raise e
         
     def stop_collection(self):
+        """
+        Descript. :
+        """
         self.queue_hwobj.stop()
         self.queue_stop_handler()
 
     def queue_stop_handler(self, status = None):
+        """
+        Descript. :
+        """
         self.user_stopped = True
         self.queue_execution_completed(None)
                
     def queue_execution_completed(self, status):
+        """
+        Descript. :
+        """
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(QtGui.QIcon(self.play_pixmap))
@@ -629,6 +745,9 @@ class DataCollectTree(QtGui.QWidget):
         self.set_sample_pin_icon()
 
     def get_checked_items(self):
+        """
+        Descript. :
+        """
         res = Qt4_queue_item.perform_on_children(self.sample_tree_widget,
                                           Qt4_queue_item.is_checked,
                                           Qt4_queue_item.get_item)
@@ -636,6 +755,9 @@ class DataCollectTree(QtGui.QWidget):
         return res
  
     def delete_click(self, selected_items = None):
+        """
+        Descript. :
+        """
         children = []
 
         if not isinstance(selected_items, list):
@@ -673,6 +795,9 @@ class DataCollectTree(QtGui.QWidget):
         self.set_first_element() 
 
     def set_first_element(self):
+        """
+        Descript. :
+        """
         selected_items = self.get_selected_items()
         if len(selected_items) == 0:        
             it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
@@ -683,6 +808,9 @@ class DataCollectTree(QtGui.QWidget):
                 #self.sample_tree_widget.setSelected(self.sample_list_view.firstChild(), True)
 
     def down_click(self):
+        """
+        Descript. :
+        """
         selected_items = self.get_selected_items()
 
         if len(selected_items) == 1:
@@ -693,6 +821,9 @@ class DataCollectTree(QtGui.QWidget):
                     item.move_item(item.treeWidget().itemBelow(item))
 
     def previous_sibling(self, item):
+        """
+        Descript. :
+        """
         if item.parent():
             first_child = item.parent().child(0)
         else:
@@ -715,6 +846,9 @@ class DataCollectTree(QtGui.QWidget):
             return None
         
     def up_click(self):
+        """
+        Descript. :
+        """
         selected_items = self.get_selected_items()
 
         if len(selected_items) == 1:
@@ -726,17 +860,11 @@ class DataCollectTree(QtGui.QWidget):
                     older_sibling.move_item(item)
 
     def samples_from_sc_content(self, sc_basket_content, sc_sample_content):
-        """sample_list = []
-        
-        for sample_info in sc_content:
-            sample = queue_model_objects.Sample()
-            sample.init_from_sc_sample(sample_info)
-            sample_list.append(sample)
-
-        return sample_list"""
+        """
+        Descript. :
+        """
         basket_list = []
         sample_list = []
-        #IK added sample groups    
         for basket_info in sc_basket_content:
             basket = queue_model_objects.Basket()
             basket.init_from_sc_basket(basket_info)
@@ -748,6 +876,9 @@ class DataCollectTree(QtGui.QWidget):
         return basket_list, sample_list
 
     def samples_from_lims(self, lims_sample_list):
+        """
+        Descript. :
+        """
         barcode_samples = {}
         location_samples = {}
 
@@ -764,12 +895,18 @@ class DataCollectTree(QtGui.QWidget):
         return (barcode_samples, location_samples)
 
     def enqueue_samples(self, sample_list):
+        """
+        Descript. :
+        """
         for sample in sample_list:
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
                                              get_model_root(), sample)
             self.add_to_queue([sample], self.sample_tree_widget, False)
 
     def populate_free_pin(self):
+        """
+        Descript. :
+        """
         self.queue_model_hwobj.clear_model('free-pin')
         self.queue_model_hwobj.select_model('free-pin')
         sample = queue_model_objects.Sample()
@@ -778,19 +915,10 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
 
-    """def populate_list_view(self, sample_list):
-        self.queue_hwobj.clear()
-        self.queue_model_hwobj.clear_model('ispyb')
-        self.sample_tree_widget.clear()
-        self.queue_model_hwobj.select_model('ispyb')
-        
-        for sample in sample_list:
-            sample.set_enabled(False)
-            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-                                             get_model_root(), sample)
-        self.set_sample_pin_icon()"""
-
     def populate_tree_widget(self, basket_list, sample_list):   
+        """
+        Descript. :
+        """
         self.queue_hwobj.clear()
         self.queue_model_hwobj.clear_model('ispyb')
         self.sample_tree_widget.clear()
@@ -807,7 +935,9 @@ class DataCollectTree(QtGui.QWidget):
         self.set_sample_pin_icon()
     
     def set_sample_pin_icon(self):
-
+        """
+        Descript. :
+        """
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
@@ -838,6 +968,9 @@ class DataCollectTree(QtGui.QWidget):
             item = it.value()
 
     def check_for_path_collisions(self):
+        """
+        Descript. :
+        """
         conflict = False
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
@@ -860,4 +993,3 @@ class DataCollectTree(QtGui.QWidget):
             item = it.value()
 
         return conflict
-        

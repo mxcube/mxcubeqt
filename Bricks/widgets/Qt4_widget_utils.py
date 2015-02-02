@@ -1,3 +1,22 @@
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube.
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
@@ -37,10 +56,14 @@ class DataModelInputBinder(object):
         if validator:
             if validator.validate(new_value, widget.cursorPosition())[0] \
                     == QtGui.QValidator.Acceptable:
-                Qt4_widget_colors.set_widget_color(widget, QtCore.Qt.white) 
+                Qt4_widget_colors.set_widget_color(widget, 
+                                                   QtCore.Qt.white,
+                                                   QtGui.QPalette.Base) 
                 return True
             else:
-                Qt4_widget_colors.set_widget_color(widget, Qt4_widget_colors.LIGHT_RED)
+                Qt4_widget_colors.set_widget_color(widget, 
+                                                   Qt4_widget_colors.LIGHT_RED,
+                                                   QtGui.QPalette.Base)
                 return False
         else:
             return True
