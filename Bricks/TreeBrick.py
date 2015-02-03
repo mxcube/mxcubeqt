@@ -305,20 +305,21 @@ class TreeBrick(BaseComponents.BlissWidget):
         barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(samples)
         l_samples = dict()            
    
-        # TODO: add test for sample changer type, here code is for Robodiff only
-        for location, l_sample in location_samples.iteritems():
-          if l_sample.lims_location != (None, None):
-            basket, sample = l_sample.lims_location
-            cell = int(round((basket+0.5)/3.0))
-            puck = basket-3*(cell-1)
-            new_location = (cell, puck, sample)
-            l_sample.lims_location = new_location
-            l_samples[new_location] = l_sample
-            name = l_sample.get_name()
-            l_sample.init_from_sc_sample([new_location])
-            l_sample.set_name(name)
+        if self.sample_changer_hwobj.__class__.__TYPE__ == 'Robodiff':
+          for location, l_sample in location_samples.iteritems():
+            if l_sample.lims_location != (None, None):
+              basket, sample = l_sample.lims_location
+              cell = int(round((basket+0.5)/3.0))
+              puck = basket-3*(cell-1)
+              new_location = (cell, puck, sample)
+              l_sample.lims_location = new_location
+              l_samples[new_location] = l_sample
+              name = l_sample.get_name()
+              l_sample.init_from_sc_sample([new_location])
+              l_sample.set_name(name)
+        else:
+          l_samples.update(location_samples)
 
-        #import pdb;pdb.set_trace()
         return barcode_samples, l_samples
 
     def refresh_sample_list(self):
@@ -330,7 +331,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         samples = lims_client.get_samples(self.session_hwobj.proposal_id,
                                           self.session_hwobj.session_id)
         sample_list = []
-        
+       
         if samples:
             (barcode_samples, location_samples) = \
                 self.samples_from_lims(samples) #self.dc_tree_widget.samples_from_lims(samples)
