@@ -25,7 +25,9 @@ class QueueItem(qt.QCheckListItem):
         controller = kwargs.pop('controller', None)
         args = args + (controller, )
 
-        qt.QCheckListItem.__init__(self, *args, **kwargs)
+        #qt.QCheckListItem.__init__(self, *args, **kwargs)
+        #IK Python version
+        qt.QCheckListItem.__init__(self, *args)
 
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
