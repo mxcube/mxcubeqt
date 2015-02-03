@@ -488,6 +488,7 @@ class SampleQueueEntry(BaseQueueEntry):
                                    'inverse_beam': inverse_beam})
 
         try:
+            #TODO move this to AutoProcessing hwobj
             programs = self.beamline_setup.collect_hwobj["auto_processing"]
         except IndexError:
             # skip autoprocessing of the data
@@ -514,13 +515,24 @@ class SampleCentringQueueEntry(BaseQueueEntry):
         self.sample_changer_hwobj = None
         self.diffractometer_hwobj = None
         self.shape_history = None
+        self.move_kappa_phi_task = None
 
     def execute(self):
         BaseQueueEntry.execute(self)
 
         self.get_view().setText(1, 'Waiting for input')
         log = logging.getLogger("user_level_log")
-        log.warning("Please select a centred position, and press continue.")
+
+        kappa = self._data_model.get_kappa()
+        phi = self._data_model.get_kappa_phi()
+
+        self.move_kappa_phi_task = self.diffractometer_hwobj.\
+                                   move_kappa_and_phi(kappa, phi)
+        self.move_kappa_phi_task.get()
+
+        #TODO agree on correct message
+        log.warning("Please center a new point, and press continue.")
+        #log.warning("Please select a centred position, and press continue.")
 
         self.get_queue_controller().pause(True)
         pos = None
@@ -536,7 +548,7 @@ class SampleCentringQueueEntry(BaseQueueEntry):
             # Create a centred postions of the current postion
             pos_dict = self.diffractometer_hwobj.getPositions()
             cpos = queue_model_objects.CentredPosition(pos_dict)
-            pos = shape_history.Point(None, cpos, None)
+            pos = shape_history.Point(None, cpos, None, True)
 
         # Get tasks associated with this centring
         tasks = self.get_data_model().get_tasks()
@@ -666,9 +678,15 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                     #msg = "Helical data collection, moving to start position"
                     #log.info(msg)
                     #list_item.setText(1, "Moving sample")
+                elif dc.experiment_type is EXPERIMENT_TYPE.MESH:
+                    mesh_steps = acq_1.acquisition_parameters.mesh_steps
+                    mesh_range = acq_1.acquisition_parameters.mesh_range
+                    self.collect_hwobj.setMeshScanParameters(mesh_steps, mesh_range)
+                    self.collect_hwobj.setHelical(0)
                 else:
                     self.collect_hwobj.set_helical(False)
 
+                #TODO why this is commented?
                 """empty_cpos = queue_model_objects.CentredPosition()
                 
                 if cpos != empty_cpos:
@@ -691,6 +709,14 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                 self.collect_task = self.collect_hwobj.\
                     collect(COLLECTION_ORIGIN_STR.MXCUBE, param_list)                
                 self.collect_task.get()
+                #TODO as a gevent task?
+                #self.collect_task = gevent.spawn(self.collect_hwobj.collect,
+                #             COLLECTION_ORIGIN_STR.MXCUBE,
+                #             param_list)
+                #self.collect_task.get()
+                #self.collect_hwobj.ready_event.wait()
+                #self.collect_hwobj.ready_event.clear()
+
 
                 if 'collection_id' in param_list[0]:
                     dc.id = param_list[0]['collection_id']
@@ -714,6 +740,7 @@ class DataCollectionQueueEntry(BaseQueueEntry):
 
     def collect_started(self, owner, num_oscillations):
         logging.getLogger("user_level_log").info('Collection started')
+        self.get_view().setText(1, "Collecting")
 
     def collect_number_of_frames(self, number_of_images=0):
         pass

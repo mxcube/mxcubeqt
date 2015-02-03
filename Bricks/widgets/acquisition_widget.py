@@ -165,12 +165,12 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('osc_range', osc_range_ledit,
                                                 float, osc_range_validator)
 
-        kappa_validator = qt.QDoubleValidator(0, 180, 2, self)
+        kappa_validator = qt.QDoubleValidator(0, 360, 2, self)
         kappa_ledit = self.acq_widget_layout.child('kappa_ledit')
         self._acquisition_mib.bind_value_update('kappa', kappa_ledit,
                                                 float, kappa_validator)
 
-        kappa_phi_validator = qt.QDoubleValidator(0, 180, 2, self)
+        kappa_phi_validator = qt.QDoubleValidator(0, 360, 2, self)
         kappa_phi_ledit = self.acq_widget_layout.child('kappa_phi_ledit')
         self._acquisition_mib.bind_value_update('kappa_phi', kappa_phi_ledit,
                                                 float, kappa_phi_validator)

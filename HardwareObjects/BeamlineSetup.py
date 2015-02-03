@@ -98,6 +98,13 @@ class BeamlineSetup(HardwareObject):
         :returns: True if the detector is capable of shuterless.
         :rtype: bool
         """
+        #Suggestion 1.1.2
+        #shutter_less = False
+        #try:
+        #    shutter_less = self.detector_hwobj.has_shutterless()
+        #except:
+        #    shutter_less = False
+        #return shutter_less
         try:
           return self.detector_hwobj.getProperty('type').lower()=='pilatus'
         except:
@@ -162,8 +169,11 @@ class BeamlineSetup(HardwareObject):
         overlap = round(float(self[parent_key].getProperty('overlap')), 2)
         exp_time = round(float(self[parent_key].getProperty('exposure_time')), 4)
         num_passes = int(self[parent_key].getProperty('number_of_passes'))
-        shutterless = self.detector_has_shutterless()
-        detector_mode = 1 #unbinned...
+        #hutterless = self.detector_has_shutterless()
+        #etector_mode = 1 #unbinned...
+
+        shutterless = self.detector_hwobj.has_shutterless()
+        detector_mode = self._get_detector_mode()
 
         acq_parameters.first_image = int(img_start_num)
         acq_parameters.num_images = int(num_images)
@@ -259,8 +269,11 @@ class BeamlineSetup(HardwareObject):
         overlap = round(float(self[parent_key].getProperty('overlap')), 2)
         exp_time = round(float(self[parent_key].getProperty('exposure_time')), 4)
         num_passes = int(self[parent_key].getProperty('number_of_passes'))
-        shutterless = self.detector_has_shutterless()
-        detector_mode = 1 #unbinned
+        #shutterless = self.detector_has_shutterless()
+        #detector_mode = 1 #unbinned
+
+        shutterless = self.detector_hwobj.has_shutterless()
+        detector_mode = self._get_detector_mode()
 
         acq_parameters.first_image = img_start_num
         acq_parameters.num_images = num_images
@@ -292,19 +305,29 @@ class BeamlineSetup(HardwareObject):
 
         try:
             exp_time_limit = self[parent_key].getProperty('exposure_time')
-            limits['exposure_time'] = exp_time_limit
+            if exp_time_limit is not None:
+                limits['exposure_time'] = exp_time_limit
         except:
             pass
 
         try:
             range_limit = self[parent_key].getProperty('osc_range')
-            limits['osc_range'] = range_limit
+            if range_limit is not None:
+                limits['osc_range'] = range_limit
         except:
             pass
 
         try:
             num_images_limit = self[parent_key].getProperty('number_of_images')
-            limits['number_of_images'] = num_images_limit
+            if num_images_limit is not None:
+                limits['number_of_images'] = num_images_limit
+        except:
+            pass
+
+        try:
+            kappa_limit = self[parent_key].getProperty('kappa')
+            if kappa_limit is not None:
+                limits['kappa'] = kappa_limit
         except:
             pass
 
@@ -363,6 +386,19 @@ class BeamlineSetup(HardwareObject):
             resolution = 0
 
         return resolution
+
+    def _get_detector_mode(self):
+        """
+        Descript. :
+        """
+        try:
+            detector_mode = int(self.detector_hwobj.get_detector_mode())
+        except AttributeError:
+            detector_mode = 0
+        except TypeError:
+            detector_mode = 0
+
+        return detector_mode
 
     def _get_omega_axis_position(self):
         result = 0

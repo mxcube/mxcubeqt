@@ -192,9 +192,10 @@ class DiffractometerMockup(Equipment):
         last_centred_position[1] = y
         random_num = random.random()
         centred_pos_dir = {'phiy': random_num * 10, 'phiz': random_num, 
-                         'sampx': 0.0, 'sampy': 9.3, 'zoom': 8.53,
-                         'phi': 311.1, 'focus': -0.42, 'kappa': 0.0009, 
-                         ' kappa_phi': 311.0}
+                           'sampx': 0.0, 'sampy': 9.3, 'zoom': 8.53,
+                           'phi': 311.1, 'focus': -0.42, 
+                           'kappa': self.kappaMotor.getPosition(), 
+                           'kappa_phi': self.kappaPhiMotor.getPosition()}
         return centred_pos_dir 		
 
     def set_sample_info(self, sample_info):
@@ -467,9 +468,11 @@ class DiffractometerMockup(Equipment):
             curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
             self.centring_status["endTime"] = curr_time
             random_num = random.random()
-            motors = {'phiy': random_num * 10,  'phiz': random_num*20,
-                      'sampx': 0.0, 'sampy': 9.3, 'zoom': 8.53, 'phi': 311.1, 
-		      'focus': -0.42, 'kappa': 0.0009, ' kappa_phi': 311.0}
+            motors = {'phiy': random_num * 10,  'phiz': random_num * 20,
+                      'sampx': 0.0, 'sampy': 9.3, 'zoom': 8.53, 
+                      'phi': 311.1, 'focus': -0.42, 
+                      'kappa': self.kappaMotor.getPosition(),
+                      'kappa_phi': self.kappaPhiMotor.getPosition()}
 
             motors["beam_x"] = 0.1
             motors["beam_y"] = 0.1
@@ -503,8 +506,10 @@ class DiffractometerMockup(Equipment):
         """
         random_num = random.random()
         return {"phi": random_num * 10, "focus": random_num * 20, 
-                "phiy" : -1.07, "phiz": -0.22, "sampx": 0.0, "sampy": 9.3,
-		"kappa": 0.0009, "kappa_phi": 311.0, "zoom": 8.53}
+                "phiy" : -1.07, "phiz": -0.22, "sampx": 0.0, 
+                "sampy": 9.3, "zoom": 8.53,
+                "kappa": self.kappaMotor.getPosition(),
+                "kappa_phi": self.kappaPhiMotor.getPosition()}
 
     def simulateAutoCentring(self, sample_info = None):
         """
