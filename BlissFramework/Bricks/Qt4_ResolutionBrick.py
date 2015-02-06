@@ -120,6 +120,7 @@ class Qt4_ResolutionBrick(BlissWidget):
                 self.connect(self.resolution_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.connect(self.resolution_hwobj, QtCore.SIGNAL('stateChanged'), self.resolution_state_changed)
                 self.connect(self.resolution_hwobj, QtCore.SIGNAL('positionChanged'), self.resolution_value_changed)
+                self.resolution_hwobj.update_values()
 
                 if self.resolution_hwobj.isReady():
                     self.connected()
@@ -136,7 +137,14 @@ class Qt4_ResolutionBrick(BlissWidget):
         Args.     : 
         Return    : None
         """
-        print text
+        if input_field_text == "":
+            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
+                                               Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                                               QtGui.QPalette.Base)
+        else:
+            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
+                                               Qt4_widget_colors.LINE_EDIT_CHANGED,
+                                               QtGui.QPalette.Base)
 
     def current_value_changed(self):
         """
@@ -144,7 +152,8 @@ class Qt4_ResolutionBrick(BlissWidget):
         Args.     : 
         Return    : None
         """
-        pass
+        self.resolution_hwobj.newResolution(float(self.new_value_ledit.text()))
+        self.new_value_ledit.setText("")
 
     def connected(self):
         """

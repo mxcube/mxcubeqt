@@ -45,9 +45,10 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_items_initialized = None
         self.graphics_scene_size = None
         self.graphics_view = None
+        self.graphics_camera_frame = None
 
         # Properties ----------------------------------------------------------       
-        self.addProperty("graphicsManager", "string", "/graphics-manager")
+        self.addProperty("graphicsManager", "string", "/Qt4_graphics-manager")
         self.addProperty("camera", "string", "")
         self.addProperty("fixedSize", "string", "")
         self.addProperty('displayBeam', 'boolean', True)
@@ -55,9 +56,6 @@ class Qt4_CameraBrick(BlissWidget):
         self.addProperty('displayOmegaAxis', 'boolean', True)
 
         # Graphic elements-----------------------------------------------------
-        #self.graphics_view = Qt4_GraphicsManager.GraphicsView(self)
-        #self.graphics_scene = Qt4_GraphicsManager.GraphicsScene(self)
-        #self.graphics_view.setScene(self.graphics_scene)
 
         # Layout --------------------------------------------------------------
         self.main_layout = QtGui.QVBoxLayout() 
@@ -71,13 +69,8 @@ class Qt4_CameraBrick(BlissWidget):
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
 
         # Scene elements ------------------------------------------------------
-        ##self.graphics_camera_frame = QtGui.QGraphicsPixmapItem()
-        #self.graphics_scene.clearSelection()
-        ##self.graphics_view.add_item(self.graphics_camera_frame)
-        #self.graphics_scene.addItem(self.graphics_camera_frame)
         self.graphics_scene_centring_points = []
         self.setMouseTracking(True)
-        
 
     def propertyChanged(self, property_name, old_value, new_value):
         """

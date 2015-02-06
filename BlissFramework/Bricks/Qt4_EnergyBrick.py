@@ -112,10 +112,10 @@ class Qt4_EnergyBrick(BlissWidget):
                            QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.new_value_ledit, QtCore.SIGNAL("returnPressed()"), self.current_value_changed)
-        self.connect(self.new_value_ledit, QtCore.SIGNAL("textChanged(const QString &)"), self.input_field_changed)
+        self.new_value_ledit.returnPressed.connect(self.current_value_changed)
+        self.new_value_ledit.textChanged.connect(self.input_field_changed)
         self.connect(self.units_combobox, QtCore.SIGNAL("activated(const QString &)"), self.units_changed)
-        self.connect(self.stop_button, QtCore.SIGNAL("clicked()"), self.stop_clicked)
+        self.stop_button.clicked.connect(self.stop_clicked)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)
@@ -123,7 +123,9 @@ class Qt4_EnergyBrick(BlissWidget):
         Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
                                        Qt4_widget_colors.LINE_EDIT_ACTIVE,
                                        QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(self.new_value_ledit)
+        self.new_value_validator = QtGui.QDoubleValidator(0, 15, 4, self.new_value_ledit)
+        #self.new_value_ledit.setValidator(self.new_value_validator)
+     
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -144,7 +146,7 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
-                
+                self.energy_hwobj.update_values() 
                 if self.energy_hwobj.isReady():
                     self.connected()
                 else:
@@ -202,6 +204,7 @@ class Qt4_EnergyBrick(BlissWidget):
         Return.   : 
         """
         self.energy_hwobj.move_energy(float(self.new_value_ledit.text()))
+        self.new_value_ledit.setText("")
 
     def input_field_changed(self, input_field_text):
         """
@@ -209,10 +212,14 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
-                                       Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                       QtGui.QPalette.Base)
-        print self.new_value_ledit.validator().validate(input_field_text, 0)
+        if input_field_text == "":
+            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
+                                               Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                                               QtGui.QPalette.Base)
+        else: 
+            Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
+                                               Qt4_widget_colors.LINE_EDIT_CHANGED,
+                                               QtGui.QPalette.Base)
 
     def units_changed(self, unit):
         """

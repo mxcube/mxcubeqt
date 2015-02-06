@@ -58,15 +58,21 @@ class McaSpectrumBrick(BlissWidget):
         QVBoxLayout(self)        
         self.layout().addWidget(self.mcafit)
 
-    def setData(self, data,calib,config):
+    def setData(self, data, calib, config):
         try:
-            if config["file"]:
+            configured = False
+            if config["file"] is not None:
                 self._configure(config)
+                configured = True
+            #TODO what is the data format? 
+            data = Numeric.array(data)
+
             x = Numeric.array(data[:,0]).astype(Numeric.Float)
             y = Numeric.array(data[:,1]).astype(Numeric.Float)
             xmin = float(config["min"])
             xmax = float(config["max"])
-            self.mcafit.refreshWidgets()
+
+            #self.mcafit.refreshWidgets()
             calib = Numeric.ravel(calib).tolist()
             kw = {}
             kw.update(config)
@@ -76,18 +82,28 @@ class McaSpectrumBrick(BlissWidget):
             self.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
             self.mcafit._energyAxis = False
             self.mcafit.toggleEnergyAxis()
-            result = self._fit()
+
+            #Not sure how to use this
+            #It is not necessary to fit after each setData            
+            #result = self._fit()
+
             #pyarch file name and directory
             pf = config["legend"].split(".")
             pd = pf[0].split("/")
             outfile = pd[-1]
             outdir = config['htmldir']
             sourcename = config['legend']
-            report = McaAdvancedFit.QtMcaAdvancedFitReport.QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,fitresult=result, sourcename=sourcename, plotdict={'logy':False}, table=2)
 
-            text = report.getText()
-            report.writeReport(text=text)
-  
+            if configured:
+                report = McaAdvancedFit.QtMcaAdvancedFitReport.\
+                         QtMcaAdvancedFitReport(None, outfile=outfile, 
+                                                outdir=outdir,fitresult=result, 
+                                                sourcename=sourcename, 
+                                                plotdict = {'logy' : False}, 
+                                                table=2)
+
+                text = report.getText()
+                report.writeReport(text=text)
         except:
             logging.getLogger().exception('McaSpectrumBrick: problem fitting %s %s %s' % (str(data),str(calib),str(config)))
             raise
@@ -108,4 +124,9 @@ class McaSpectrumBrick(BlissWidget):
         if config.has_key('time'):
             d['concentrations']['time'] = float(config['time'])
         self.mcafit.mcafit.configure(d)
+
+    def clear(self):
+        x = Numeric.array([0]).astype(Numeric.Float)
+        y = Numeric.array([0]).astype(Numeric.Float)
+        self.mcafit.setdata(x, y)
         
