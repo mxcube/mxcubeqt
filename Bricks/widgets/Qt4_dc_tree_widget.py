@@ -272,7 +272,10 @@ class DataCollectTree(QtGui.QWidget):
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.tree_brick.show_sample_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                self.tree_brick.show_datacollection_tab(item)
+                if item.get_model().is_mesh_scan():
+                    self.tree_brick.show_advanced_scan_tab(item)
+                else:
+                    self.tree_brick.show_datacollection_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 self.tree_brick.show_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):

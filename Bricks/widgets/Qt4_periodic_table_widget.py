@@ -54,14 +54,21 @@ class PeriodicTableWidget(QtGui.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.periodic_table = QtGui.QTableWidget(7, 19, self)
+        _main_gbox = QtGui.QGroupBox("Periodic table", self)
+        self.periodic_table = QtGui.QTableWidget(7, 19, _main_gbox)
 
         # Layout --------------------------------------------------------------
+        _main_gbox_vlayout = QtGui.QVBoxLayout(self)
+        _main_gbox_vlayout.addWidget(self.periodic_table)
+        _main_gbox_vlayout.setSpacing(0)
+        _main_gbox_vlayout.setContentsMargins(2, 2, 0, 0)
+        _main_gbox.setLayout(_main_gbox_vlayout)
+
         self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self.periodic_table)
+        self.main_layout.addWidget(_main_gbox)
+        self.main_layout.addStretch(0)
         self.main_layout.setSpacing(0)
-        
-        self.main_layout.setContentsMargins(5, 2, 0, 0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)  
 
         # SizePolicies --------------------------------------------------------
@@ -75,7 +82,7 @@ class PeriodicTableWidget(QtGui.QWidget):
         # Other ---------------------------------------------------------------
         self.prepare_periodic_table()
         self.selected_element = None
-        self.selected_edge = None
+        self.selected_edge = "L3"
         self.previous_selection = None
 
     def prepare_periodic_table(self):
@@ -95,8 +102,10 @@ class PeriodicTableWidget(QtGui.QWidget):
             self.periodic_table.setRowHeight (row_index, 22)
 
     def periodic_table_element_clicked(self, current_item):
-        self.selected_element = current_item.text() 
+        self.selected_element = str(current_item.text())
 
     def get_selected_element_edge(self):
         return self.selected_element, self.selected_edge
   
+    def set_current_element(self, element_str):
+        print "set_current_element: implement" 

@@ -20,6 +20,7 @@
 import logging
 
 from PyQt4 import QtGui
+from PyQt4 import QtCore
 
 import Qt4_queue_item
 import Qt4_GraphicsManager as graphics_manager
@@ -54,10 +55,21 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         # Graphic elements ----------------------------------------------------
         self.periodic_table = PeriodicTableWidget(self)
+        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
+        self._data_path_widget = DataPathWidget(self._data_path_gbox,
+                                               data_model = self._path_template,
+                                               layout = 'vertical')
 
         # Layout --------------------------------------------------------------
+        self._data_path_gbox_vlayout = QtGui.QVBoxLayout(self)
+        self._data_path_gbox_vlayout.addWidget(self._data_path_widget)
+        self._data_path_gbox_vlayout.setSpacing(0)
+        self._data_path_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
+        self._data_path_gbox.setLayout(self._data_path_gbox_vlayout)
+
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self.periodic_table)
+        self.main_layout.addWidget(self._data_path_gbox)
         self.main_layout.addStretch(0)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -66,6 +78,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
+
+        self.connect(self._data_path_widget,
+                     QtCore.SIGNAL("path_template_changed"),
+                     self.handle_path_conflict)
 
     def init_models(self):
         """
@@ -114,7 +132,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         selected_edge = False
 
-        if self.periodic_table.current_edge:
+        if self.periodic_table.selected_element:
             selected_edge = True
         else:
             logging.getLogger("user_level_log").\
@@ -130,17 +148,32 @@ class CreateEnergyScanWidget(CreateTaskBase):
         """
         data_collections = []
 
-        if self.periodic_table.current_edge:
+        if self.periodic_table.selected_element:
+            if not shape:
+                cpos = queue_model_objects.CentredPosition()
+                cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot([])
+            else:
+                # Shapes selected and sample is mounted, get the
+                # centred positions for the shapes
+                if isinstance(shape, graphics_manager.Point):
+                    snapshot = self._graphics_manager_hwobj.\
+                               get_snapshot([shape.qub_point])
+
+                    cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                    cpos.snapshot_image = snapshot
+
             path_template = self._create_path_template(sample, self._path_template)
 
             energy_scan = queue_model_objects.EnergyScan(sample,
-                                                         path_template)
+                                                         path_template,
+                                                         cpos)
             energy_scan.set_name(path_template.get_prefix())
             energy_scan.set_number(path_template.run_number)
-            energy_scan.element_symbol = self.periodic_table.current_element
-            energy_scan.edge = self.periodic_table.current_edge
+            energy_scan.element_symbol = self.periodic_table.selected_element
+            energy_scan.edge = self.periodic_table.selected_edge
 
             data_collections.append(energy_scan)
+            self._path_template.run_number += 1
         else:
             logging.getLogger("user_level_log").\
                 info("No element selected, please select an element.")

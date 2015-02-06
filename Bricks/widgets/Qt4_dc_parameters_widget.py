@@ -216,8 +216,7 @@ class DCParametersWidget(QtGui.QWidget):
                 acquisition_parameters.centred_position.snapshot_image
             
             image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
-            self.position_widget.findChild(QtGui.QLabel, "svideo").\
-                 setPixmap(QtGui.QPixmap(image))
+            self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
 

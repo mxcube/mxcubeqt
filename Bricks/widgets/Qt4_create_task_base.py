@@ -273,7 +273,6 @@ class CreateTaskBase(QtGui.QWidget):
         self._graphics_manager_hwobj.select_shape_with_cpos(cpos)
             
     def selection_changed(self, items):
-        print "selection changed: ", items
         if items:
             if len(items) == 1:
                 self._current_selected_items = items

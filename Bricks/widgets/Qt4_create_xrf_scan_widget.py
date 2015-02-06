@@ -134,9 +134,22 @@ class CreateXRFScanWidget(CreateTaskBase):
         data_collections = []
 
 	if self.count_time is not None:
+            if not shape:
+                cpos = queue_model_objects.CentredPosition()
+                cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot([])
+            else:
+                # Shapes selected and sample is mounted, get the
+                # centred positions for the shapes
+                if isinstance(shape, graphics_manager.Point):
+                    snapshot = self._graphics_manager_hwobj.\
+                               get_snapshot([shape.qub_point])
+
+                    cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                    cpos.snapshot_image = snapshot
+
             path_template = self._create_path_template(sample, self._path_template)
            
-            xrf_scan = queue_model_objects.XRFScan(sample, path_template)
+            xrf_scan = queue_model_objects.XRFScan(sample, path_template, cpos)
             xrf_scan.set_name(path_template.get_prefix())
             xrf_scan.set_number(path_template.run_number)
             xrf_scan.count_time = self.count_time

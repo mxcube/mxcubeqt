@@ -44,7 +44,7 @@ class XRFScanParametersWidget(QtGui.QWidget):
         self.xrf_scan_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.xrf_scan = queue_model_objects.XRFScan()
+        self.xrf_scan_model = queue_model_objects.XRFScan()
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
@@ -129,17 +129,17 @@ class XRFScanParametersWidget(QtGui.QWidget):
                                            Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def _prefix_ledit_change(self, new_value):
-        self.xrf_scan.set_name(str(new_value))
-        self._tree_view_item.setText(0, self.xrf_scan.get_display_name())
+        self.xrf_scan_model.set_name(str(new_value))
+        self._tree_view_item.setText(0, self.xrf_scan_model.get_display_name())
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
-            self.xrf_scan.set_number(int(new_value))
-            self._tree_view_item.setText(0, self.xrf_scan.get_display_name())
+            self.xrf_scan_model.set_number(int(new_value))
+            self._tree_view_item.setText(0, self.xrf_scan_model.get_display_name())
 
     def _count_time_ledit_change(self, new_value):
         if str(new_value).isdigit():
-            self.xrf_scan.set_count_time(float(new_value))
+            self.xrf_scan_model.set_count_time(float(new_value))
         
     def tab_changed(self):
         if self._tree_view_item:
@@ -147,29 +147,29 @@ class XRFScanParametersWidget(QtGui.QWidget):
 
     def populate_widget(self, item):
         self._tree_view_item = item
-        self.xrf_scan = item.get_model()
-        executed = self.xrf_scan.is_executed()
+        self.xrf_scan_model = item.get_model()
+        executed = self.xrf_scan_model.is_executed()
 
         self.data_path_widget.setEnabled(not executed)
         self.other_parameters_gbox.setEnabled(not executed)    
         self.mca_spectrum_widget.setEnabled(executed)        
  
         if executed:
-            result = self.xrf_scan.get_scan_result()
+            result = self.xrf_scan_model.get_scan_result()
             self.mca_spectrum_widget.setData(result.mca_data, result.mca_calib, result.mca_config) 
         else:
             self.mca_spectrum_widget.clear()
         
-        self.data_path_widget.update_data_model(self.xrf_scan.path_template)  
-        self.count_time_ledit.setText(str(self.xrf_scan.count_time)) 
+        self.data_path_widget.update_data_model(self.xrf_scan_model.path_template)  
+        self.count_time_ledit.setText(str(self.xrf_scan_model.count_time)) 
 
-        image = self.xrf_scan.centred_position.snapshot_image
-        if image:
+        image = self.xrf_scan_model.centred_position.snapshot_image
+        if image is not None:
             try:
-               image = image.scale(427, 320)
-               self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
+               image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
+               self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
             except:
-               pass 
+               pass
 
     def set_xrf_scan_hwobj(self, xrf_scan_hwobj):
         self.xrf_scan_hwobj = xrf_scan_hwobj

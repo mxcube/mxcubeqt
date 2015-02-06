@@ -126,11 +126,11 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                      self.handle_path_conflict)
 
         self.mesh_widget.draw_button.clicked.\
-             connect(self.start_surface_drawing)
+             connect(self.draw_button_clicked)
       
-        self.mesh_widget.add_button.clicked.connect(self.add_drawing)
+        self.mesh_widget.add_button.clicked.connect(self.add_drawing_clicked)
 
-        self.mesh_widget.remove_button.clicked.connect(self.delete_drawing)
+        self.mesh_widget.remove_button.clicked.connect(self.delete_drawing_clicked)
 
         self.mesh_widget.hor_spacing_ledit.textChanged.\
              connect(self.set_hspace)
@@ -313,9 +313,8 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.__drawing_mgr.set_cell_height(self.__beam_size_y + vspace)
             self.__drawing_mgr.set_cell_shape(self.__beam_shape == "ellipse")
 
-    def start_surface_drawing(self):
-        self._graphics_manager_hwobj.start_mesh_draw(False)
-
+    def draw_button_clicked(self):
+        self._graphics_manager_hwobj.set_mesh_draw_state(True)
         return 
 
         if self.__mini_diff_hwobj is not None:
@@ -340,7 +339,10 @@ class CreateAdvancedScanWidget(CreateTaskBase):
     def end_surface_drawing(self, drawing_mgr = None):
         drawing_mgr.reshape()
 
-    def add_drawing(self):
+    def add_drawing_clicked(self):
+        self._graphics_manager_hwobj.set_mesh_draw_state(False)
+        return
+
         if self.__drawing_mgr.isVisible()[0]:
             self.__item_counter += 1
             name = ("Grid - %i" % self.__item_counter)
@@ -398,9 +400,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
 
             self.mesh_widget.mesh_treewidget.setSelected(list_view_item, True)
             self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
-            self.start_surface_drawing()
+            self.draw_button_clicked()
 
-    def delete_drawing(self):
+    def delete_drawing_clicked(self):
         if len(self.__list_items):
             list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
             del self.__list_items[list_view_item]
