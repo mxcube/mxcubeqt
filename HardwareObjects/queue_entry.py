@@ -1061,9 +1061,20 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         sample.crystals[0].energy_scan_result.peak = pk
         sample.crystals[0].energy_scan_result.inflection = ip
         sample.crystals[0].energy_scan_result.first_remote = rm
-        sample.crystals[0].second_remote = None
+        sample.crystals[0].energy_scan_result.second_remote = None
 
-        energy_scan.result = sample.crystals[0].energy_scan_result
+        energy_scan.result.pk = pk
+        energy_scan.result.fppPeak = fppPeak
+        energy_scan.result.fpPeak = fpPeak
+        energy_scan.result.ip = ip
+        energy_scan.result.fppInfl = fppInfl
+        energy_scan.result.fpInfl = fpInfl
+        energy_scan.result.rm = rm
+        energy_scan.result.chooch_graph_x = chooch_graph_x
+        energy_scan.result.chooch_graph_y1 = chooch_graph_y1
+        energy_scan.result.chooch_graph_y2 = chooch_graph_y2
+        energy_scan.result.title = title
+        energy_scan.result.data = self.energy_scan_hwobj.get_scan_data()
 
         logging.getLogger("user_level_log").\
             info("Energy scan, result: peak: %.4f, inflection: %.4f" %
