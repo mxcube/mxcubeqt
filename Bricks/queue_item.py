@@ -191,6 +191,8 @@ class QueueItem(qt.QCheckListItem):
     def get_model(self):
         return self._data_model
 
+    def set_background_color(self, color_index):
+        self.setBackgroundColor(widget_colors.QUEUE_ENTRY_COLORS[color_index]) 
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):

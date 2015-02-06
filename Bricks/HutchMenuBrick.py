@@ -738,7 +738,7 @@ class HutchMenuBrick(BlissWidget):
           pass
 
     def updateBeam(self,force=False):
-        if self["displayBeam"]:
+        if self["displayBeam"] and self.minidiff is not None:
               if not self.minidiff.isReady(): time.sleep(0.2)
               try:
                  self.__rectangularBeam.set_xMid_yMid(self.beam_position[0],
