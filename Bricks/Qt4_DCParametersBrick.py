@@ -53,7 +53,7 @@ class Qt4_DCParametersBrick(BlissWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot("populate_parameter_widget",({}))
+        self.defineSlot("populate_dc_parameter_widget",({}))
        
         # Graphic elements ---------------------------------------------------- 
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
@@ -81,7 +81,7 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.toggle_page_button.setDisabled(True)
         self.stacked_widget.setCurrentWidget(self.parameters_widget) 
 
-    def populate_parameter_widget(self, item):
+    def populate_dc_parameter_widget(self, item):
         """
         Descript. :
         """
@@ -102,7 +102,7 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.stacked_widget.setCurrentWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
-        self.parameters_widget.populate_parameter_widget(item)
+        self.parameters_widget.populate_widget(item)
         self.toggle_page_button.setEnabled(data_collection.is_collected())
 
     def populate_results(self, data_collection):

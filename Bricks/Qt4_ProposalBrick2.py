@@ -465,6 +465,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
+        print "refuse" 
         if message is not None:
             if stat is False:
                 icon = QtGui.QMessageBox.Critical
@@ -528,14 +529,11 @@ class Qt4_ProposalBrick2(BlissWidget):
         create_session_dialog = QtGui.QMessageBox("Create session", \
             "Unable to find an appropriate session.\nPress OK to create one for today.", \
             QtGui.QMessageBox.Question, 
-            QtGui.QMessageBox.Ok,QMessageBox.Cancel,
-            QtGui.QMessageBox.NoButton,self)
-        s = self.font().pointSize()
-        f = create_session_dialog.font()
-        f.setPointSize(s)
-        create_session_dialog.setFont(f)
-        create_session_dialog.updateGeometry()
-        answer = create_session_dialog.show()
+            QtGui.QMessageBox.Ok, 
+            QtGui.QMessageBox.Cancel,
+            QtGui.QMessageBox.NoButton,
+            self)
+        answer = create_session_dialog.exec_()
         return answer == QtGui.QMessageBox.Ok
 
     # Handler for the Login button (check the password in LDAP)

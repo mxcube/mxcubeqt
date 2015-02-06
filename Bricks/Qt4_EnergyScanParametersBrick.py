@@ -17,9 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+from PyQt4 import QtGui
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-#from widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
+from widgets.Qt4_energy_scan_parameters_widget import EnergyScanParametersWidget
 
 
 __category__ = 'Qt4_Task'
@@ -37,9 +38,11 @@ class Qt4_EnergyScanParametersBrick(BlissWidget):
         self.session_hwobj = None
         
         # Layout
-        #main_layout = qt.QVBoxLayout(self)
-        #self.energy_scan_widget = EnergyScanParametersWidget(self)
-        #main_layout.addWidget(self.energy_scan_widget)
+        self.energy_scan_widget = EnergyScanParametersWidget(self)
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.energy_scan_widget)
+        self.setLayout(_main_vlayout) 
 
         # Qt-Slots
         self.defineSlot("populate_parameter_widget", ({}))
@@ -60,7 +63,7 @@ class Qt4_EnergyScanParametersBrick(BlissWidget):
                     object) run method.
         """
         if property_name == 'energy-scan':
-            return 
-            self.energy_scan_widget.periodic_table['mnemonic'] = new_value
+            print new_value
+            self.energy_scan_widget.set_enegy_scan_hwobj(self.getHardwareObject(new_value))
         elif property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)

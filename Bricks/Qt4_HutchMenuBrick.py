@@ -374,6 +374,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.collect_hwobj.setCentringStatus(None)
         self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
+        self.graphics_manager_hwobj.set_centring_state(False)
 
     def centring_accepted(self, state, centring_status):
         """
@@ -474,6 +475,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(centring_status)
+        self.graphics_manager_hwobj.set_centring_state(False)
 
         self.is_moving = False
         self.main_frame.setEnabled(True)
@@ -501,6 +503,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
         if self.current_centring is not None:
             #    self.current_centring.setPaletteBackgroundColor(self.defaultBackgroundColor)
             self.current_centring = None
+
+        self.graphics_manager_hwobj.set_centring_state(False)
 
         self.button_accept.setEnabled(False)
         if self.inside_data_collection:

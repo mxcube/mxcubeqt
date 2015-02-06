@@ -111,7 +111,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
-        limits_dict = self._beamline_setup.get_acqisition_limt_values()
+        limits_dict = self._beamline_setup.get_acquisition_limit_values()
 
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
