@@ -37,7 +37,7 @@ class CreateCharWidget(CreateTaskBase):
         self._acq_widget = \
             AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
                                     path_template = self._path_template)
-        self._acq_widget.setFixedHeight(170)
+        #self._acq_widget.setFixedHeight(170)
 
         current_dir = os.path.dirname(__file__)
         ui_file = 'ui_files/vertical_crystal_dimension_widget_layout.ui'
@@ -274,6 +274,13 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         return CreateTaskBase.approve_creation(self)
+        selected_shapes = self._shape_history.selected_shapes
+
+        for shape in selected_shapes:
+            if isinstance(shape, shape_history.Line):
+                result = False
+
+        return result
         
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
@@ -290,7 +297,8 @@ class CreateCharWidget(CreateTaskBase):
                 snapshot = self._shape_history.\
                            get_snapshot([shape.qub_point])
 
-                cpos = shape.get_centred_positions()[0]
+                #cpos = shape.get_centred_positions()[0]
+                cpos = copy.deepcopy(shape.get_centred_positions()[0])
                 cpos.snapshot_image = snapshot
 
         char_params = copy.deepcopy(self._char_params)
@@ -304,6 +312,7 @@ class CreateCharWidget(CreateTaskBase):
         # Reference images for characterisations should be taken 90 deg apart
         # this is achived by setting overap to -89
         acq.acquisition_parameters.overlap = -89
+        acq.acquisition_parameters.centred_position = cpos
         
         
         dc.acquisitions[0] = acq
