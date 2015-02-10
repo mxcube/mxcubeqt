@@ -50,8 +50,8 @@ class HutchMenuBrick(BlissWidget):
         #self.allowMoveToBeamCentring = False
 
         # Define properties
+        self.addProperty('beamInfo', 'string', '')
         self.addProperty('minidiff','string','')
-	self.addProperty('beamInfo', 'string', '')
         self.addProperty('dataCollect','string','')
         self.addProperty('samplechanger','string','')
         self.addProperty('extraCommands','string','')
@@ -159,7 +159,15 @@ class HutchMenuBrick(BlissWidget):
            self.minidiff.enableAutoStartLoopCentring(enable)
 
     def propertyChanged(self,propertyName,oldValue,newValue):
-        if propertyName=='minidiff':
+        if propertyName=="beamInfo":
+            if self.beamInfo is not None:
+                self.disconnect(self.beamInfo,PYSIGNAL('beamInfoChanged'), self.beamInfoChanged)
+                self.disconnect(self.beamInfo,PYSIGNAL('beamPosChanged'), self.beamPosChanged)
+            self.beamInfo=self.getHardwareObject(newValue)
+            if self.beamInfo is not None:
+                self.connect(self.beamInfo,PYSIGNAL('beamInfoChanged'), self.beamInfoChanged)
+                self.connect(self.beamInfo,PYSIGNAL('beamPosChanged'), self.beamPosChanged)
+        elif propertyName=='minidiff':
             if self.minidiff is not None:
                 self.disconnect(self.minidiff,PYSIGNAL('minidiffReady'),self.miniDiffReady)
                 self.disconnect(self.minidiff,PYSIGNAL('minidiffNotReady'),self.miniDiffNotReady)
@@ -204,15 +212,6 @@ class HutchMenuBrick(BlissWidget):
             				#MiniDiff.MiniDiff.MOVE_TO_BEAM_MODE:self.moveToBeamSuccessful}
             else:
                 self.miniDiffNotReady()
-	elif propertyName=="beamInfo":
-  	    if self.beamInfo is not None:
-                self.disconnect(self.beamInfo,PYSIGNAL('beamInfoChanged'), self.beamInfoChanged)
-		self.disconnect(self.beamInfo,PYSIGNAL('beamPosChanged'), self.beamPosChanged)
-	    self.beamInfo=self.getHardwareObject(newValue)
-	    if self.beamInfo is not None:
-                self.connect(self.beamInfo,PYSIGNAL('beamInfoChanged'), self.beamInfoChanged)
-		self.connect(self.beamInfo,PYSIGNAL('beamPosChanged'), self.beamPosChanged)
-                self.beamInfo.evaluate_beam_info()
         elif propertyName=="samplechanger":
             self.sampleChanger=self.getHardwareObject(newValue)
         elif propertyName=="dataCollect":
@@ -577,7 +576,6 @@ class HutchMenuBrick(BlissWidget):
 
     # Handler for clicking the video when doing the 3-click centring
     def imageClicked(self,x,y,xi,yi):
-        #print "HutchMenuBrick.imageClicked",self.minidiff,self.manualCentering
         if self.currentCentring is not None\
 	and str(self.currentCentring.text()) == self.minidiff.MANUAL3CLICK_MODE\
 	and self.minidiff.isReady():
@@ -600,7 +598,6 @@ class HutchMenuBrick(BlissWidget):
 
     # Displays a message
     def showMessageToUser(self,message=None):
-        #print "showMessage",message
         try:
             self.__drawing.setInfo(message)
         except:
@@ -608,18 +605,19 @@ class HutchMenuBrick(BlissWidget):
 
     def connectNotify(self, signalName):
         if signalName=='beamPositionChanged':
-            if self.minidiff and self.minidiff.isReady():
-		self.beam_position = self.beamInfo.get_beam_position()
-		self.pixels_per_mm = self.minidiff.get_pixels_per_mm()
-                self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
-							    self.beam_position[1],
-                                                            self.beam_size[0],\
-							    self.beam_size[1]))
+            if self.minidiff and self.beamInfo:
+                if self.minidiff.isReady():
+		    self.beam_position = self.beamInfo.get_beam_position()
+                    self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
+		                                                self.beam_position[1],
+                                                                self.beam_size[0],\
+							        self.beam_size[1]))
         elif signalName=='calibrationChanged':
             if self.minidiff and self.minidiff.isReady():
                 try:
-                    self.emit(PYSIGNAL("calibrationChanged"), (1e3/self.pixels_per_mm[0],\
-							       1e3/self.pixels_per_mm[1]))     			
+                    self.pixels_per_mm = self.minidiff.get_pixels_per_mm()
+                    self.emit(PYSIGNAL("calibrationChanged"), (1e3 / self.pixels_per_mm[0],\
+							       1e3 / self.pixels_per_mm[1]))     			
                 except:
                     pass
 
@@ -717,7 +715,6 @@ class HutchMenuBrick(BlissWidget):
                 pass
             else:
 		self.emit(PYSIGNAL("calibrationChanged"), (self.__scaleX, self.__scaleY))
-                self.beamInfo.emit_beam_info_change()
                 self.updateBeam(force=True)
         except:
             logging.getLogger().exception("HutchMenuBrick: problem starting up display")
