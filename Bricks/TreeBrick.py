@@ -249,16 +249,21 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         self.enable_collect(logged_in)
         
-        sc_content = self.get_sc_content()
+        #sc_content = self.get_sc_content()
+        sc_basket_content, sc_sample_content = self.get_sc_content()
         
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
-            if sc_content:
-              sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
-              self.dc_tree_widget.populate_list_view(sc_sample_list)
+            sc_basket_content, sc_sample_content = self.get_sc_content()
+
+            if sc_basket_content and sc_sample_content:
+              #sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
+              sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                                                    sc_basket_content, sc_sample_content)
+              self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
         else:
-            if sc_content:
+            if sc_sample_content :
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
             else:
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(2) 
@@ -331,7 +336,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         samples = lims_client.get_samples(self.session_hwobj.proposal_id,
                                           self.session_hwobj.session_id)
         sample_list = []
-       
+        
         if samples:
             (barcode_samples, location_samples) = \
                 self.samples_from_lims(samples) #self.dc_tree_widget.samples_from_lims(samples)
@@ -395,9 +400,17 @@ class TreeBrick(BaseComponents.BlissWidget):
         
         :returns: A list with tuples, containing the sample information.
         """
-        sc_content = []
+        sc_basket_content = []
+        sc_sample_content = []
       
-        try: 
+        #try: 
+        if True: 
+            for basket in self.sample_changer_hwobj.getBasketList():
+                basket_index = basket.getIndex()
+                basket_code = basket.getID() or ""
+                is_present = basket.isPresent()
+                sc_basket_content.append((basket_index+1, basket_code, is_present)) 
+
             for sample in self.sample_changer_hwobj.getSampleList():
                 coords = sample.getCoords()
                 matrix = sample.getID() or ""
@@ -405,14 +418,15 @@ class TreeBrick(BaseComponents.BlissWidget):
                 vial_index = ":".join(map(str, coords[1:]))
                 basket_code = sample.getContainer().getID() or ""
             
-                sc_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
-        except Exception:
+                sc_sample_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
+        #except Exception:
+        else:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
                      " the sample changer is turned on. Using free pin mode")
 
-        return sc_content
+        return sc_basket_content, sc_sample_content
 
     def status_msg_changed(self, msg, color):
         """
