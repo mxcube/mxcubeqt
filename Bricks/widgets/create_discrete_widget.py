@@ -161,7 +161,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         selected_shapes = self._shape_history.selected_shapes
 
         for shape in selected_shapes:
-            if isinstance(shape, shape_history.Line):
+            if (isinstance(shape, shape_history.Line) or
+                isinstance(shape, shape_history.CanvasGrid)):
                 result = False
 
         return result
@@ -171,10 +172,9 @@ class CreateDiscreteWidget(CreateTaskBase):
     def _create_task(self, sample, shape):
         tasks = []
 
-        if not shape:
-            cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._shape_history.get_snapshot([])
-        else:
+        cpos = queue_model_objects.CentredPosition()
+        cpos.snapshot_image = self._shape_history.get_snapshot([])
+        if shape is not None:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
             if isinstance(shape, shape_history.Point):

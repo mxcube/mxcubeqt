@@ -4,6 +4,7 @@ import copy
 import queue_item
 import queue_model_objects_v1 as queue_model_objects
 import sys
+import ShapeHistory as shape_history
 
 from PeriodicTableBrick import PeriodicTableBrick
 from create_task_base import CreateTaskBase
@@ -87,6 +88,11 @@ class CreateEnergyScanWidget(CreateTaskBase):
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
         
+        selected_shapes = self._shape_history.selected_shapes
+        for shape in selected_shapes:
+            if isinstance(shape, shape_history.Line):
+                base_result = False
+ 
         selected_edge = False
         
         if self.periodic_table.current_edge:
@@ -104,21 +110,52 @@ class CreateEnergyScanWidget(CreateTaskBase):
         data_collections = []
 
         if self.periodic_table.current_edge:
+            
+            if not shape:
+                cpos = queue_model_objects.CentredPosition()
+                cpos.snapshot_image = self._shape_history.get_snapshot([])
+            else:
+                # Shapes selected and sample is mounted, get the
+                # centred positions for the shapes
+                if isinstance(shape, shape_history.Point):
+                    snapshot = self._shape_history.\
+                               get_snapshot([shape.qub_point])
+
+                    cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                    cpos.snapshot_image = snapshot
+
             path_template = self._create_path_template(sample, self._path_template)
            
             energy_scan = queue_model_objects.EnergyScan(sample,
-                                                         path_template)
+                                                         path_template,
+                                                         cpos)
             energy_scan.set_name(path_template.get_prefix())
             energy_scan.set_number(path_template.run_number)
             energy_scan.element_symbol = self.periodic_table.current_element
             energy_scan.edge = self.periodic_table.current_edge
 
             data_collections.append(energy_scan)
+            self._path_template.run_number += 1
         else:
             logging.getLogger("user_level_log").\
                 info("No element selected, please select an element.") 
 
         return data_collections
+
+    # Called by the owning widget (task_toolbox_widget) when
+    # one or several centred positions are selected.
+    def centred_position_selection(self, positions):
+        self._selected_positions = positions
+
+        if len(self._current_selected_items) == 1 and len(positions) == 1:
+            item = self._current_selected_items[0]
+            pos = positions[0]
+            if isinstance(pos, shape_history.Point):
+                if isinstance(item, queue_item.EnergyScanQueueItem):
+                    cpos = pos.get_centred_positions()[0]
+                    snapshot = self._shape_history.get_snapshot([pos.qub_point])
+                    cpos.snapshot_image = snapshot
+                    item.get_model().centred_position = cpos
 
 
 if __name__ == "__main__":
