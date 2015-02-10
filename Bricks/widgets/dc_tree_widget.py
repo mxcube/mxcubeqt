@@ -153,6 +153,8 @@ class DataCollectTree(qt.QWidget):
         self.sample_list_view.viewport().installEventFilter(self)
         self.setFixedWidth(415)
 
+        self.collect_button.setDisabled(True)
+
     def eventFilter(self, _object, event):
         if event.type() == qt.QEvent.MouseButtonDblClick:
             self.show_details()
@@ -317,6 +319,9 @@ class DataCollectTree(qt.QWidget):
                     break
 
         self.selection_changed_cb(items)
+        checked_items = self.get_checked_items()
+        self.collect_button.setDisabled(len(checked_items) == 0)
+        self.set_first_element()
 
     def add_empty_task_node(self):
         samples = self.get_selected_samples()
@@ -362,11 +367,18 @@ class DataCollectTree(qt.QWidget):
 
         if parent_tree_item.lastItem():
             view_item = cls(parent_tree_item, last_item,
-                            task.get_name())
+                            task.get_display_name())
+            #view_item = cls(parent_tree_item, last_item,
+            #                task.get_name())
         else:
-            view_item = cls(parent_tree_item, task.get_name())
+            view_item = cls(parent_tree_item, task.get_display_name())
+
+        if isinstance (task, queue_model_objects.Basket):
+            view_item.setOpen(task.get_is_present())
+        else:
+            view_item.setOpen(True)
                 
-        view_item.setOpen(True)
+        #view_item.setOpen(True)
         self.queue_model_hwobj.view_created(view_item, task)
 
     def get_selected_items(self):
@@ -626,6 +638,14 @@ class DataCollectTree(qt.QWidget):
 
         self.check_for_path_collisions()
 
+    def set_first_element(self):
+        selected_items = self.get_selected_items()
+        if len(selected_items) == 0:
+            it = qt.QListViewItemIterator(self.sample_list_view)
+            item = it.current()
+            if item.get_model().free_pin_mode:
+                self.sample_list_view.setSelected(self.sample_list_view.firstChild(), True)
+
     def down_click(self):
         selected_items = self.get_selected_items()
 
@@ -666,15 +686,26 @@ class DataCollectTree(qt.QWidget):
                 if older_sibling :
                     older_sibling.moveItem(item)
 
-    def samples_from_sc_content(self, sc_content):
+    def samples_from_sc_content(self, sc_basket_content, sc_sample_content):
+        #sample_list = []
+        # 
+        #for sample_info in sc_content:
+        #    sample = queue_model_objects.Sample()
+        #    sample.init_from_sc_sample(sample_info)
+        #    sample_list.append(sample)
+        #
+        #return sample_list
+        basket_list = []
         sample_list = []
-        
-        for sample_info in sc_content:
+        for basket_info in sc_basket_content:
+            basket = queue_model_objects.Basket()
+            basket.init_from_sc_basket(basket_info)
+            basket_list.append(basket)
+        for sample_info in sc_sample_content:
             sample = queue_model_objects.Sample()
             sample.init_from_sc_sample(sample_info)
             sample_list.append(sample)
-
-        return sample_list
+        return basket_list, sample_list
 
     def samples_from_lims(self, lims_sample_list):
         barcode_samples = {}
@@ -707,16 +738,22 @@ class DataCollectTree(qt.QWidget):
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
 
-    def populate_list_view(self, sample_list):
+    def populate_list_view(self, basket_list, sample_list):
         self.queue_hwobj.clear()
         self.queue_model_hwobj.clear_model('ispyb')
         self.sample_list_view.clear()
         self.queue_model_hwobj.select_model('ispyb')
-        
-        for sample in sample_list:
-            sample.set_enabled(False)
+        for basket in basket_list:
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-                                             get_model_root(), sample)
+                                             get_model_root(), basket)
+            basket.set_enabled(False)
+            for sample in sample_list:
+                if sample.location[0] == basket.get_location():
+                     self.queue_model_hwobj.add_child(basket, sample)
+                     sample.set_enabled(False)
+            #sample.set_enabled(False)
+            #self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+            #                                 get_model_root(), sample)
         self.set_sample_pin_icon()
     
     def set_sample_pin_icon(self):
@@ -727,14 +764,21 @@ class DataCollectTree(qt.QWidget):
             if self.is_mounted_sample_item(item):
                 item.setSelected(True)
                 item.set_mounted_style(True)
-                self.sample_list_view_selection()
+                #self.sample_list_view_selection()
             elif isinstance(item, queue_item.SampleQueueItem):
                 item.set_mounted_style(False)
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
                     item.setPixmap(0, self.ispyb_pixmap)
                     item.setText(0, item.get_model().loc_str + ' - ' \
-                                 + item.get_model().get_name())
+                                 + item.get_model().get_display_name())
+            elif isinstance(item, queue_item.BasketQueueItem):
+                #if item.get_model().lims_location != (None, None):
+                #    item.setPixmap(0, self.ispyb_pixmap)
+                item.setText(0, item.get_model().get_display_name())
+                if not item.get_model().get_is_present():
+                    item.setEnabled(False)
+                    item.setOpen(False)
         
             it += 1
             item = it.current()
