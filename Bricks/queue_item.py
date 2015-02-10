@@ -346,6 +346,7 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.Basket: BasketQueueItem,
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 
