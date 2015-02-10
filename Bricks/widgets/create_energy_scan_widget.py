@@ -142,6 +142,21 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         return data_collections
 
+    # Called by the owning widget (task_toolbox_widget) when
+    # one or several centred positions are selected.
+    def centred_position_selection(self, positions):
+        self._selected_positions = positions
+
+        if len(self._current_selected_items) == 1 and len(positions) == 1:
+            item = self._current_selected_items[0]
+            pos = positions[0]
+            if isinstance(pos, shape_history.Point):
+                if isinstance(item, queue_item.EnergyScanQueueItem):
+                    cpos = pos.get_centred_positions()[0]
+                    snapshot = self._shape_history.get_snapshot([pos.qub_point])
+                    cpos.snapshot_image = snapshot
+                    item.get_model().centred_position = cpos
+
 
 if __name__ == "__main__":
     app = qt.QApplication(sys.argv)

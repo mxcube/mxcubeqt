@@ -134,7 +134,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters()
+                get_default_acquisition_parameters("default_helical_values")
         else:
             self._acquisition_parameters = qmo.AcquisitionParameters()
             self._path_template = qmo.PathTemplate()
