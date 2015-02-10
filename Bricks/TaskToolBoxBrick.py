@@ -181,14 +181,11 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             centred_position_selection(selected_positions)
         self.task_tool_box_widget.energy_scan_page.\
             centred_position_selection(selected_positions)
-        self.task_tool_box_widget.xrf_scan_page.\
-            centred_position_selection(selected_positions)
 
         self.task_tool_box_widget.discrete_page.refresh_current_item()
         self.task_tool_box_widget.helical_page.refresh_current_item()
         self.task_tool_box_widget.char_page.refresh_current_item()
         self.task_tool_box_widget.energy_scan_page.refresh_current_item()
-        self.task_tool_box_widget.xrf_scan_page.refresh_current_item()
 
     def shape_deleted(self, shape):
         """
