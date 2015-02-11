@@ -257,7 +257,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
-            sc_basket_content, sc_sample_content = self.get_sc_content()
 
             if sc_basket_content and sc_sample_content:
               #sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
@@ -341,13 +340,14 @@ class TreeBrick(BaseComponents.BlissWidget):
         sample_list = []
         
         if samples:
-            (barcode_samples, location_samples) = \
-                self.samples_from_lims(samples) #self.dc_tree_widget.samples_from_lims(samples)
+            (barcode_samples, location_samples) = self.samples_from_lims(samples)
 
-            sc_content = self.get_sc_content()
-            sc_sample_list = self.dc_tree_widget.\
-                             samples_from_sc_content(sc_content)
+            sc_basket_content, sc_samples_content = self.get_sc_content()
+            sc_basket_list, sc_sample_list = self.dc_tree_widget.\
+                samples_from_sc_content(sc_basket_content, sc_samples_content)
            
+            basket_list = sc_basket_list
+
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -395,7 +395,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                                 warning("No sample in ISPyB for location %s" % str(sc_sample.location))
                             sample_list.append(sc_sample)
 
-            self.dc_tree_widget.populate_list_view(sample_list)
+            self.dc_tree_widget.populate_list_view(basket_list, sample_list)
 
     def get_sc_content(self):
         """
@@ -412,7 +412,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                 basket_index = basket.getIndex()
                 basket_code = basket.getID() or ""
                 is_present = basket.isPresent()
-                sc_basket_content.append((basket_index+1, basket_code, is_present)) 
+                sc_basket_content.append((basket_index+1, basket)) #basket_code, is_present)) 
 
             for sample in self.sample_changer_hwobj.getSampleList():
                 coords = sample.getCoords()
