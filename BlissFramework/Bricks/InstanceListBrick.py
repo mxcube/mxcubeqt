@@ -1,7 +1,8 @@
-#from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework.BaseComponents import BlissWidget
+from BlissFramework import BaseComponents 
 from BlissFramework import Icons
 import BlissFramework
+import qt
 from qt import *
 import logging
 #import DataCollectBrick2
@@ -11,6 +12,8 @@ from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
 import email.Utils
 import smtplib
 import os
+from HardwareRepository.HardwareRepository import dispatcher
+
 
 __category__ = "mxCuBE"
 
@@ -298,6 +301,28 @@ class InstanceListBrick(BlissWidget):
             self.haveControl(False,gui_only=True)
             self.initName(my_nickname)
             #self.giveControl.setChecked(False)
+
+            # workaround for the remote access problem
+            # (have to disable video display when DC is running)
+            camera_brick = None
+
+            for w in qt.QApplication.allWidgets():
+                if isinstance(w, BaseComponents.BlissWidget):
+                    if "CameraBrick" in str(w.__class__):
+                        camera_brick = w
+                        camera_brick.installEventFilter(self)
+                        break
+
+            # find the video brick, make sure it is hidden when collecting data
+            # and that it is shown again when DC is finished
+            def disable_video(w=camera_brick):
+                w.disable_update()
+            self.__disable_video=disable_video
+            def enable_video(w=camera_brick):
+                w.enable_update()
+            self.__enable_video=enable_video
+            dispatcher.connect(self.__disable_video, "collect_started")
+            dispatcher.connect(self.__enable_video, "collect_finished")
 
             msg_event=MsgDialogEvent(QMessageBox.Information,\
                 "Successfully connected to the server application.",\
