@@ -45,7 +45,11 @@ class CreateXRFScanWidget(CreateTaskBase):
         self.connect(self._data_path_widget.data_path_widget_layout.child('run_number_ledit'),
                      qt.SIGNAL("textChanged(const QString &)"), 
                      self._run_number_ledit_change)
-        
+
+        self.connect(self._data_path_widget.data_path_widget_layout.child('prefix_ledit'),
+                     qt.SIGNAL("textChanged(const QString &)"),
+                     self._prefix_ledit_change)
+
         self.connect(self._data_path_widget,
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
