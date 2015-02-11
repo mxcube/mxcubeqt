@@ -30,12 +30,12 @@ class PeriodicTableBrick(BlissWidget):
         self.holeBox = QWidget(self.topBox)
         QGridLayout(self.holeBox)
 
-        HOLE = ["Not selected", "L3","L2","L1"]
+        self.HOLE = ["Not selected", "L3","L2","L1"]
         self.hole_label = QLabel("Hole:", self.holeBox)
         self.holeBox.layout().addWidget(self.hole_label , 1, 0)
         self.hole = QComboBox(self.holeBox)
         self.holeBox.layout().addWidget(self.hole, 1, 1)
-        for item_name in HOLE:
+        for item_name in self.HOLE:
             self.hole.insertItem(item_name)
         QObject.connect(self.hole, SIGNAL('activated(int)'), self.hole_activated)
         #self.hole_label.setEnabled(False)
@@ -50,6 +50,13 @@ class PeriodicTableBrick(BlissWidget):
         QHBoxLayout(self)
         self.layout().addWidget(self.topBox)
 
+    def set_hole(self, edge):
+        try:
+            index = self.HOLE.index(edge)
+        except ValueError:
+            index = 0
+        self.hole.setCurrentItem(index)
+
     def hole_activated(self, value):
         if value == 3:
             self.current_edge = "L1"
@@ -58,6 +65,10 @@ class PeriodicTableBrick(BlissWidget):
         else:
             self.current_edge = "L3"
         self.periodicTable.tableElementChanged(self.current_element, self.current_edge)
+
+    def setTableElement(self, element, edge):
+        self.periodicTable.tableElementChanged(element, edge)
+        self.set_hole(edge)
 
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
