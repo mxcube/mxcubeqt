@@ -88,6 +88,9 @@ class XRFScanParametersWidget(qt.QWidget):
     def populate_widget(self, item):
         self._tree_view_item = item
         self.xrf_scan = item.get_model()
+        self.data_path_widget.update_data_model(self.xrf_scan.path_template)  
+        self.count_time_ledit.setText(str(self.xrf_scan.count_time)) 
+
         executed = self.xrf_scan.is_executed()
 
         self.data_path_widget.setEnabled(not executed)
@@ -96,12 +99,10 @@ class XRFScanParametersWidget(qt.QWidget):
  
         if executed:
             result = self.xrf_scan.get_scan_result()
-            self.mca_spectrum.setData(result.mca_data, result.mca_calib, result.mca_config) 
+            if not None in (result.mca_data, result.mca_calib, result.mca_config):
+                self.mca_spectrum.setData(result.mca_data, result.mca_calib, result.mca_config) 
         else:
             self.mca_spectrum.clear()
-        
-        self.data_path_widget.update_data_model(self.xrf_scan.path_template)  
-        self.count_time_ledit.setText(str(self.xrf_scan.count_time)) 
 
         image = self.xrf_scan.centred_position.snapshot_image
         if image:

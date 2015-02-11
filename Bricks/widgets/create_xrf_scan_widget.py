@@ -7,6 +7,7 @@ import ShapeHistory as shape_history
 import queue_model_objects_v1 as queue_model_objects
 
 from create_task_base import CreateTaskBase
+from widgets.widget_utils import DataModelInputBinder
 from widgets.data_path_widget import DataPathWidget
 
 
@@ -18,6 +19,8 @@ class CreateXRFScanWidget(CreateTaskBase):
 
         # Data attributes
         self.init_models()
+        xrfscan_model = queue_model_objects.XRFScan()
+        self.xrfscan_mib = DataModelInputBinder(xrfscan_model)
 
         #Layout
         v_layout = qt.QVBoxLayout(self, 2, 6, "main_v_layout")
@@ -34,6 +37,10 @@ class CreateXRFScanWidget(CreateTaskBase):
 
 	self.count_time_ledit = qt.QLineEdit("1.0", parameters_hor_gbox,"count_time_ledit")
         self.count_time_ledit.setFixedWidth(50)
+
+        self.xrfscan_mib.bind_value_update('count_time',
+                                           self.count_time_ledit,
+                                           float) #,
 
         spacer = qt.QWidget(parameters_hor_gbox)
         spacer.setSizePolicy(qt.QSizePolicy.Expanding,qt.QSizePolicy.Fixed)
@@ -62,9 +69,11 @@ class CreateXRFScanWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-        xrfscan_model = tree_item.get_model()
 
         if isinstance(tree_item, queue_item.XRFScanQueueItem):
+            xrfscan_model = tree_item.get_model()
+            self.xrfscan_mib.set_model(xrfscan_model)
+
             if xrfscan_model.is_executed():
                 self.setDisabled(True)
             else:
