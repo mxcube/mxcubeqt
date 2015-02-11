@@ -370,17 +370,14 @@ class DataCollectTree(qt.QWidget):
         if parent_tree_item.lastItem():
             view_item = cls(parent_tree_item, last_item,
                             task.get_display_name())
-            #view_item = cls(parent_tree_item, last_item,
-            #                task.get_name())
         else:
             view_item = cls(parent_tree_item, task.get_display_name())
 
         if isinstance (task, queue_model_objects.Basket):
-            view_item.setOpen(task.get_is_present())
+            view_item.setOpen(False) #task.get_is_present())
         else:
             view_item.setOpen(True)
                 
-        #view_item.setOpen(True)
         self.queue_model_hwobj.view_created(view_item, task)
 
     def get_selected_items(self):
@@ -689,14 +686,6 @@ class DataCollectTree(qt.QWidget):
                     older_sibling.moveItem(item)
 
     def samples_from_sc_content(self, sc_basket_content, sc_sample_content):
-        #sample_list = []
-        # 
-        #for sample_info in sc_content:
-        #    sample = queue_model_objects.Sample()
-        #    sample.init_from_sc_sample(sample_info)
-        #    sample_list.append(sample)
-        #
-        #return sample_list
         basket_list = []
         sample_list = []
         for basket_info in sc_basket_content:
@@ -775,13 +764,13 @@ class DataCollectTree(qt.QWidget):
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
             elif isinstance(item, queue_item.BasketQueueItem):
-                #if item.get_model().lims_location != (None, None):
-                #    item.setPixmap(0, self.ispyb_pixmap)
-                item.setText(0, item.get_model().get_display_name())
-                if not item.get_model().get_is_present():
-                    item.setEnabled(False)
-                    item.setOpen(False)
-        
+                item.setOn(False) 
+                #item.setText(0, item.get_model().get_display_name())
+                #item.setEnabled(item.get_model().get_is_present())
+                #print 'should %s %s %s %s' % ("open" if item.get_model().get_is_present() else "close", item.get_model(), item.get_model().location, item)
+                #item.setOpen(item.get_model().get_is_present())
+                pass
+ 
             it += 1
             item = it.current()
 
