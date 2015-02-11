@@ -32,7 +32,7 @@ class XRFScanParametersWidget(qt.QWidget):
         widget = qtui.QWidgetFactory.create(widget_ui)
         widget.reparent(self, qt.QPoint(0, 0))
         self.position_widget = widget
-        self.position_widget.setFixedSize(457, 350) 
+        self.position_widget.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
 
         self.mca_spectrum = McaSpectrumBrick(self)
         self.mca_spectrum.setSizePolicy(qt.QSizePolicy.Expanding,qt.QSizePolicy.Expanding)
@@ -107,7 +107,12 @@ class XRFScanParametersWidget(qt.QWidget):
         image = self.xrf_scan.centred_position.snapshot_image
         if image:
             try:
-               image = image.scale(427, 320)
+               w = image.width()
+               h = image.height()
+               ratio = w/float(h)
+               h2 = self.data_path_widget.height()+self.other_parameters_gbox.height()
+               w2 = h2 * ratio
+               image = image.scale(w2, h2)
                self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
             except:
                pass 
