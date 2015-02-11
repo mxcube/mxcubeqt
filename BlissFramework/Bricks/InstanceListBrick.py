@@ -240,7 +240,8 @@ class InstanceListBrick(BlissWidget):
                 self.takeControlButton.show()
                 self.takeControlButton.setEnabled(BlissWidget.isInstanceRoleServer()) #BlissWidget.isInstanceModeMaster())
                 if self.hutchtrigger is not None and not BlissWidget.isInstanceModeMaster():
-                    hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
+                    hutch_opened = self.hutchtrigger.hutchIsOpened()
+                    #hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
                     logging.getLogger().info("%s: hutch is %s, %s 'Take control' button", self.name(), hutch_opened and "opened" or "close", hutch_opened and "disabling" or "enabling")
                     self.takeControlButton.setEnabled(1-hutch_opened)
             else:
@@ -463,7 +464,7 @@ class InstanceListBrick(BlissWidget):
         if self['initializeServer']:
             start_server_event=StartServerEvent()
             qApp.postEvent(self,start_server_event)
-
+        
     def instanceUserIdChanged(self,userid):
         logging.getLogger().info("Instance user identification is %s" % InstanceListBrick.IDS[userid].replace("_"," ").lower())
         self.updateMirroring()
@@ -560,7 +561,8 @@ class InstanceListBrick(BlissWidget):
                 self.askForControlButton.setEnabled(True)
             elif BlissWidget.isInstanceUserIdInhouse():
                  if self.hutchtrigger is not None:
-                    hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
+                    hutch_opened = self.hutchtrigger.hutchIsOpened()
+                    #hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
                     logging.getLogger().debug("%s: hutch is %s, %s 'Take control' button", self.name(), hutch_opened and "opened" or "close", hutch_opened and "disabling" or "enabling")
                     self.takeControlButton.setEnabled(1-hutch_opened)
             #elif BlissWidget.isInstanceRoleServer():
