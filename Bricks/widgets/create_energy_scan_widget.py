@@ -52,10 +52,13 @@ class CreateEnergyScanWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
+        qt.QObject.connect(self.periodic_table, qt.PYSIGNAL('edgeSelected'), 
+                           self.element_clicked)
+
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self.enery_scan = queue_model_objects.EnergyScan()
+        self.energy_scan = queue_model_objects.EnergyScan()
         self._path_template.start_num = 1
         self._path_template.num_files = 1
         self._path_template.suffix = 'raw'
@@ -79,6 +82,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
             if escan_model.get_path_template():
                 self._path_template = escan_model.get_path_template()
 
+            symbol, edge = escan_model.element_symbol, escan_model.edge
+            self.periodic_table.setTableElement(symbol, edge)
+            
             self._data_path_widget.update_data_model(self._path_template)
         elif not(isinstance(tree_item, queue_item.SampleQueueItem) or \
                      isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
@@ -156,6 +162,13 @@ class CreateEnergyScanWidget(CreateTaskBase):
                     snapshot = self._shape_history.get_snapshot([pos.qub_point])
                     cpos.snapshot_image = snapshot
                     item.get_model().centred_position = cpos
+
+    def element_clicked(self, symbol, energy):
+        if len(self._current_selected_items) == 1:
+            item = self._current_selected_items[0]
+            if isinstance(item, queue_item.EnergyScanQueueItem):
+                item.get_model().element_symbol = symbol
+                item.get_model().edge = energy
 
 
 if __name__ == "__main__":
