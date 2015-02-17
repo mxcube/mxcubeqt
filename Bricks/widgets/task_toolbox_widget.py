@@ -215,6 +215,9 @@ class TaskToolBoxWidget(qt.QWidget):
             task_list = self.tool_box.currentItem().create_task(sample, shape)
 
             for child_task_node in task_list:
+                if isinstance(child_task_node, queue_model_objects.DataCollection):
+                    for acq in child_task_node.acquisitions:
+                        acq.acquisition_parameters.overlap = 0
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
 
         # The selected item is a task, make a copy.
