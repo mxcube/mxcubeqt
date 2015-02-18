@@ -764,12 +764,19 @@ class DataCollectTree(qt.QWidget):
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
             elif isinstance(item, queue_item.BasketQueueItem):
-                item.setOn(False) 
+                do_it = True
+                child_item = item.firstChild()
+                while child_item:
+                    if child_item.firstChild():
+                        do_it = False
+                        break
+                    child_item = child_item.nextSibling()
+                if do_it:
+                    item.setOn(False)
                 #item.setText(0, item.get_model().get_display_name())
                 #item.setEnabled(item.get_model().get_is_present())
                 #print 'should %s %s %s %s' % ("open" if item.get_model().get_is_present() else "close", item.get_model(), item.get_model().location, item)
                 #item.setOpen(item.get_model().get_is_present())
-                pass
  
             it += 1
             item = it.current()
