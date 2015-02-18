@@ -135,7 +135,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
             osc_start_validator = qt.QDoubleValidator(lower, upper, 4, self)
             osc_range_validator = qt.QDoubleValidator(lower, upper, 4, self)
         else:
-            osc_start_validator = qt.QDoubleValidator(10000, 10000, 4, self)
+            osc_start_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
             osc_range_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
 
         osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
