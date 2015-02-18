@@ -71,12 +71,12 @@ class KappaPhiMotorsBrick(BlissWidget):
     def propertyChanged(self,propertyName,oldValue,newValue):
         if propertyName=='mnemonic':
             if self.diffractometer_hwobj is not None:
-                self.disconnect(self.diffractometer_hwobj, qt.PYSIGNAL("kappa_value_changed"), self.kappa_value_changed) 
-                self.disconnect(self.diffractometer_hwobj, qt.PYSIGNAL("phiMoved"), self.phi_value_changed)
+                self.disconnect(self.diffractometer_hwobj, qt.PYSIGNAL("kappaMoved"), self.kappa_value_changed) 
+                self.disconnect(self.diffractometer_hwobj, qt.PYSIGNAL("kappPhiMoved"), self.phi_value_changed)
             self.diffractometer_hwobj = self.getHardwareObject(newValue)
             if self.diffractometer_hwobj is not None:
-                self.connect(self.diffractometer_hwobj, qt.PYSIGNAL("kappa_value_changed"), self.kappa_value_changed)            
-                self.connect(self.diffractometer_hwobj, qt.PYSIGNAL("phiMoved"), self.phi_value_changed)
+                self.connect(self.diffractometer_hwobj, qt.PYSIGNAL("kappaMoved"), self.kappa_value_changed)            
+                self.connect(self.diffractometer_hwobj, qt.PYSIGNAL("kappaPhiMoved"), self.phi_value_changed)
         elif propertyName=='label':
             self.setLabel(newValue)
         elif propertyName=='showLabel':

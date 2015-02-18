@@ -20,6 +20,7 @@ class AcquisitionWidget(qt.QWidget):
         #
         self._beamline_setup = None
         self.previous_energy = 0
+        self.layout_type = layout
 
         if acq_params is None:
             self._acquisition_parameters = queue_model_objects.\
@@ -105,8 +106,10 @@ class AcquisitionWidget(qt.QWidget):
             insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
-        self.acq_widget_layout.child('kappa_ledit').setEnabled(True)
-        self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(True)
+        self.acq_widget_layout.child('kappa_ledit').setEnabled(False)
+        self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(False)
+        self.acq_widget_layout.child('detector_mode_label').setEnabled(False)
+        self.acq_widget_layout.child('detector_mode_combo').setEnabled(False)
 
     def osc_start_cbox_click(self, state):
         self.update_osc_start(self._beamline_setup._get_omega_axis_position())
@@ -138,10 +141,12 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
 
     def use_kappa(self, state):
-        self.acq_widget_layout.child('kappa_ledit').setEnabled(state)
+        if self.layout_type == "vertical":
+            self.acq_widget_layout.child('kappa_ledit').setEnabled(state)
 
     def use_kappa_phi(self, state):
-        self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(state)
+        if self.layout_type == "vertical":
+            self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
