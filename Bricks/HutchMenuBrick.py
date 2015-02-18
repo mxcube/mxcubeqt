@@ -757,15 +757,19 @@ class HutchMenuBrick(BlissWidget):
     
     def beamPosChanged(self, position):
 	self.beam_position = position
-	self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
-						    self.beam_position[1],
+        self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
+                                                    self.beam_position[1],
                                                     self.beam_size[0],\
-						    self.beam_size[1]))
+                                                    self.beam_size[1]))
 	self.updateBeam(True)
 
     def beamInfoChanged(self, beam_info):
         self.beam_size = (beam_info["size_x"], beam_info["size_y"])
         self.beam_shape = beam_info["shape"]
+        self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
+                                                    self.beam_position[1],
+                                                    self.beam_size[0],\
+                                                    self.beam_size[1]))
     	self.updateBeam(True)
 
     # Zoom changed: update pixels per mm
