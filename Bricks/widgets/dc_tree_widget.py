@@ -738,8 +738,10 @@ class DataCollectTree(qt.QWidget):
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
                                              get_model_root(), basket)
             basket.set_enabled(False)
+            basket.clear_sample_list()
             for sample in sample_list:
                 if sample.location[0] == basket.get_location():
+                     basket.add_sample(sample)
                      self.queue_model_hwobj.add_child(basket, sample)
                      sample.set_enabled(False)
             #sample.set_enabled(False)

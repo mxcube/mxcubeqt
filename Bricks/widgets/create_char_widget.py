@@ -228,7 +228,8 @@ class CreateCharWidget(CreateTaskBase):
             self._char_params_mib.set_model(self._char_params)
             #self._char_params = copy.deepcopy(self._char_params)
             #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-
+        elif isinstance(tree_item, queue_item.BasketQueueItem):
+            self.setDisabled(False)
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
             if tree_item.get_model().is_executed():
                 self.setDisabled(True)

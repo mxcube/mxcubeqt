@@ -139,23 +139,24 @@ class TaskToolBoxWidget(qt.QWidget):
 
     def selection_changed(self, items):
         """
-        Called by the parent widget when selection in the tree changes.
+        Descript. : Called by the parent widget when selection in the tree changes.
+                    It also enables/disables add to queue button.
+                    If one tree item is selected then tool_box current page is set 
+                    to the page associated to the item. For example if a energy scan 
+                    item is selected then create_energy_scan tool box page is selected.
+                    Add to queue is disable if sample centring is selected
         """
         if len(items) == 1:
-            
-            if isinstance(items[0], queue_item.DataCollectionGroupQueueItem):
+            if isinstance(items[0], queue_item.SampleCentringQueueItem):
                 self.create_task_button.setEnabled(False)
             else:
-                self.create_task_button.setEnabled(True)
-
+                self.create_task_button.setEnabled(True)   
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
-
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                     self.tool_box.setCurrentItem(self.helical_page)
                 else:
                     self.tool_box.setCurrentItem(self.discrete_page)
-
             elif isinstance(items[0], queue_item.CharacterisationQueueItem):
                 self.tool_box.setCurrentItem(self.char_page)
             elif isinstance(items[0], queue_item.EnergyScanQueueItem):
@@ -219,7 +220,15 @@ class TaskToolBoxWidget(qt.QWidget):
                     for acq in child_task_node.acquisitions:
                         acq.acquisition_parameters.overlap = 0
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
-
+        elif isinstance(task_node, queue_model_objects.Basket):
+            for sample_node in task_node.get_sample_list():
+                task_list = self.tool_box.currentItem().create_task(sample_node, shape)
+                 
+                for child_task_node in task_list:
+                    if isinstance(child_task_node, queue_model_objects.DataCollection):
+                        for acq in child_task_node.acquisitions:
+                            acq.acquisition_parameters.overlap = 0
+                    self.tree_brick.queue_model_hwobj.add_child(sample_node, child_task_node)
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)

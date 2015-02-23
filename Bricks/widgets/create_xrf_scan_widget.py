@@ -83,8 +83,10 @@ class CreateXRFScanWidget(CreateTaskBase):
                 self._path_template = xrfscan_model.get_path_template()
 
             self._data_path_widget.update_data_model(self._path_template)
+        elif isinstance(tree_item, queue_item.BasketQueueItem):
+            self.setDisabled(False)
         elif not(isinstance(tree_item, queue_item.SampleQueueItem) or \
-                     isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
+                 isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
             self.setDisabled(True)
 
     def approve_creation(self):
