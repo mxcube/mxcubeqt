@@ -184,30 +184,39 @@ class TaskToolBoxWidget(qt.QWidget):
 
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
-                        group_task_node = queue_model_objects.TaskGroup()
-                        current_item = self.tool_box.currentItem()
-
-                        if current_item is self.workflow_page:
-                            group_name = current_item._workflow_cbox.currentText()
+                        task_model = self.create_task_group(task_model)
+                        if len(shapes):
+                            for shape in shapes:
+                                self.create_task(task_model, shape)
                         else:
-                            group_name = current_item._task_node_name
-
-                        group_task_node.set_name(group_name)
-                        num = task_model.get_next_number_for_name(group_name)
-                        group_task_node.set_number(num)
-
-                        self.tree_brick.queue_model_hwobj.\
-                          add_child(task_model, group_task_node)
-
-                        task_model = group_task_node
-                    
-                    if len(shapes):
-                        for shape in shapes:
-                            self.create_task(task_model, shape)
-                    else:
-                        self.create_task(task_model)
+                            self.create_task(task_model)
+                    elif isinstance(task_model, queue_model_objects.Basket):
+                        for sample_node in task_model.get_sample_list():
+                            child_task_model = self.create_task_group(sample_node)
+                            if len(shapes):
+                                for shape in shapes:
+                                    self.create_task(child_task_model, shape)
+                            else:
+                                self.create_task(child_task_model) 
 
             self.tool_box.currentItem().update_selection()
+
+    def create_task_group(self, task_model):
+        group_task_node = queue_model_objects.TaskGroup()
+        current_item = self.tool_box.currentItem()
+
+        if current_item is self.workflow_page:
+            group_name = current_item._workflow_cbox.currentText()
+        else:
+            group_name = current_item._task_node_name
+        group_task_node.set_name(group_name)
+        num = task_model.get_next_number_for_name(group_name)
+        group_task_node.set_number(num)
+                         
+        self.tree_brick.queue_model_hwobj.\
+        add_child(task_model, group_task_node)
+
+        return group_task_node
 
     def create_task(self, task_node, shape = None):
         # Selected item is a task group
@@ -220,15 +229,6 @@ class TaskToolBoxWidget(qt.QWidget):
                     for acq in child_task_node.acquisitions:
                         acq.acquisition_parameters.overlap = 0
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
-        elif isinstance(task_node, queue_model_objects.Basket):
-            for sample_node in task_node.get_sample_list():
-                task_list = self.tool_box.currentItem().create_task(sample_node, shape)
-                 
-                for child_task_node in task_list:
-                    if isinstance(child_task_node, queue_model_objects.DataCollection):
-                        for acq in child_task_node.acquisitions:
-                            acq.acquisition_parameters.overlap = 0
-                    self.tree_brick.queue_model_hwobj.add_child(sample_node, child_task_node)
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
