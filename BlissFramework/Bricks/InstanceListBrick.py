@@ -1,7 +1,8 @@
-#from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework.BaseComponents import BlissWidget
+from BlissFramework import BaseComponents 
 from BlissFramework import Icons
 import BlissFramework
+import qt
 from qt import *
 import logging
 #import DataCollectBrick2
@@ -11,6 +12,8 @@ from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
 import email.Utils
 import smtplib
 import os
+from HardwareRepository.HardwareRepository import dispatcher
+
 
 __category__ = "mxCuBE"
 
@@ -237,7 +240,8 @@ class InstanceListBrick(BlissWidget):
                 self.takeControlButton.show()
                 self.takeControlButton.setEnabled(BlissWidget.isInstanceRoleServer()) #BlissWidget.isInstanceModeMaster())
                 if self.hutchtrigger is not None and not BlissWidget.isInstanceModeMaster():
-                    hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
+                    hutch_opened = self.hutchtrigger.hutchIsOpened()
+                    #hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
                     logging.getLogger().info("%s: hutch is %s, %s 'Take control' button", self.name(), hutch_opened and "opened" or "close", hutch_opened and "disabling" or "enabling")
                     self.takeControlButton.setEnabled(1-hutch_opened)
             else:
@@ -298,6 +302,28 @@ class InstanceListBrick(BlissWidget):
             self.haveControl(False,gui_only=True)
             self.initName(my_nickname)
             #self.giveControl.setChecked(False)
+
+            # workaround for the remote access problem
+            # (have to disable video display when DC is running)
+            camera_brick = None
+
+            for w in qt.QApplication.allWidgets():
+                if isinstance(w, BaseComponents.BlissWidget):
+                    if "CameraBrick" in str(w.__class__):
+                        camera_brick = w
+                        camera_brick.installEventFilter(self)
+                        break
+
+            # find the video brick, make sure it is hidden when collecting data
+            # and that it is shown again when DC is finished
+            def disable_video(w=camera_brick):
+                w.disable_update()
+            self.__disable_video=disable_video
+            def enable_video(w=camera_brick):
+                w.enable_update()
+            self.__enable_video=enable_video
+            dispatcher.connect(self.__disable_video, "collect_started")
+            dispatcher.connect(self.__enable_video, "collect_finished")
 
             msg_event=MsgDialogEvent(QMessageBox.Information,\
                 "Successfully connected to the server application.",\
@@ -438,7 +464,7 @@ class InstanceListBrick(BlissWidget):
         if self['initializeServer']:
             start_server_event=StartServerEvent()
             qApp.postEvent(self,start_server_event)
-
+        
     def instanceUserIdChanged(self,userid):
         logging.getLogger().info("Instance user identification is %s" % InstanceListBrick.IDS[userid].replace("_"," ").lower())
         self.updateMirroring()
@@ -535,7 +561,8 @@ class InstanceListBrick(BlissWidget):
                 self.askForControlButton.setEnabled(True)
             elif BlissWidget.isInstanceUserIdInhouse():
                  if self.hutchtrigger is not None:
-                    hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
+                    hutch_opened = self.hutchtrigger.hutchIsOpened()
+                    #hutch_opened = 1-int(self.hutchtrigger.getChannelObject("status").getValue())
                     logging.getLogger().debug("%s: hutch is %s, %s 'Take control' button", self.name(), hutch_opened and "opened" or "close", hutch_opened and "disabling" or "enabling")
                     self.takeControlButton.setEnabled(1-hutch_opened)
             #elif BlissWidget.isInstanceRoleServer():
