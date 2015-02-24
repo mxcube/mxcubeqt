@@ -379,6 +379,7 @@ class DataCollectTree(qt.QWidget):
             view_item.setOpen(True)
                 
         self.queue_model_hwobj.view_created(view_item, task)
+        self.collect_button.setDisabled(False)
 
     def get_selected_items(self):
         res = queue_item.perform_on_children(self.sample_list_view,
@@ -634,7 +635,9 @@ class DataCollectTree(qt.QWidget):
 
         if children:
             self.delete_click(selected_items = children)
-
+      
+        if len(self.get_checked_items()) == 0:
+            self.collect_button.setDisabled(True)
         self.check_for_path_collisions()
 
     def set_first_element(self):
@@ -738,8 +741,10 @@ class DataCollectTree(qt.QWidget):
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
                                              get_model_root(), basket)
             basket.set_enabled(False)
+            basket.clear_sample_list()
             for sample in sample_list:
                 if sample.location[0] == basket.get_location():
+                     basket.add_sample(sample)
                      self.queue_model_hwobj.add_child(basket, sample)
                      sample.set_enabled(False)
             #sample.set_enabled(False)

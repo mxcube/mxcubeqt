@@ -398,7 +398,11 @@ class CreateTaskBase(qt.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
 
             self.setDisabled(False)
-
+        elif isinstance(tree_item, queue_item.BasketQueueItem):
+            self.setDisabled(False)
+            self._path_template = copy.deepcopy(self._path_template)
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
@@ -513,11 +517,10 @@ class CreateTaskBase(qt.QWidget):
     # a task. When a task_node is selected.
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
-       
+
         try: 
             sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
                                 getLoadedSample().getCoords() == sample.location
-
         except AttributeError:
             sample_is_mounted = False
 
