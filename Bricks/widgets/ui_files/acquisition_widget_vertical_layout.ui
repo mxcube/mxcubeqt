@@ -552,7 +552,7 @@
                                         <string>Inverse beam</string>
                                     </property>
                                     <property name="toolTip" stdset="0">
-                                        <string>Check to use inverse beam and specify subwedge size</string>
+                                        <string>Check to use inverse beam and specify subwedge size in frames</string>
                                     </property>
                                 </widget>
                                 <widget class="QCheckBox">
@@ -589,7 +589,7 @@
                                                 <string>Subwedge size:</string>
                                             </property>
                                             <property name="toolTip" stdset="0">
-                                                <string>Check to use inverse beam and specify subwedge size</string>
+                                                <string>Check to use inverse beam and specify subwedge size in frames</string>
                                             </property>
                                         </widget>
                                         <widget class="QLineEdit">
@@ -603,7 +603,7 @@
                                                 </size>
                                             </property>
                                             <property name="toolTip" stdset="0">
-                                                <string>Check to use inverse beam and specify subwedge size</string>
+                                                <string>Check to use inverse beam and specify subwedge size in frames</string>
                                             </property>
                                         </widget>
                                         <spacer>
