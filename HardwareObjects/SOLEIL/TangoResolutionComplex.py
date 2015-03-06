@@ -117,9 +117,13 @@ class TangoResolutionComplex(BaseHardwareObjects.Equipment):
         self.emit("deviceNotReady")
         
 
+    def get_value(self):
+        return self.getPosition()
+        
+
     def getPosition(self):
-        if self.currentResolution is None:
-            self.recalculateResolution()
+        #if self.currentResolution is None:
+        self.recalculateResolution()
         return self.currentResolution
 
     def energyChanged(self, energy):

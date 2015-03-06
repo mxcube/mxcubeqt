@@ -28,7 +28,7 @@ class SOLEILSession(Session.Session):
         if self.is_inhouse( self.username ):
            usertype = 'soleil'
         else:
-           usertype = 'user'
+           usertype = 'users'
 
         basedir = os.path.dirname( path )
         ruchepath = basedir.replace( self["file_info"].getProperty('base_directory'), '' )

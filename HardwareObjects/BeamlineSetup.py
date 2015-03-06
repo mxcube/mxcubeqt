@@ -357,14 +357,18 @@ class BeamlineSetup(HardwareObject):
         return transmission
 
     def _get_resolution(self):
+        logging.getLogger('HWR').debug('BeamlineSetup _get_resolution')
+        logging.getLogger('HWR').debug('BeamlineSetup _get_resolution %s' % self.resolution_hwobj)
         try:
             resolution = self.resolution_hwobj.getPosition()
             resolution = round(float(resolution), 3)
         except AttributeError:
+            logging.getLogger('HWR').debug('BeamlineSetup _get_resolution AttributeError')
             resolution = 0
         except TypeError:
+            logging.getLogger('HWR').debug('BeamlineSetup _get_resolution TypeError')
             resolution = 0
-
+        logging.getLogger('HWR').debug('BeamlineSetup _get_resolution %s' % resolution)
         return resolution
 
     def _get_omega_axis_position(self):

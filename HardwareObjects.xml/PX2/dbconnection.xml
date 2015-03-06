@@ -1,7 +1,7 @@
 <object class="SOLEILISPyBClient">
 
   <ws_root>
-    http://suntest.synchrotron-soleil.fr/ispyb-ejb3/ispybWS/
+    http://suntest.synchrotron-soleil.fr/ispyb/ispybWS/
   </ws_root>
 
   <ws_username>ab361</ws_username>

@@ -2,9 +2,9 @@
 <beamline_pars>
     <BEAMLINE_PARS>
         <synchrotron_name>Soleil</synchrotron_name>
-        <beamline_name>Proxima1</beamline_name>
+        <beamline_name>Proxima2A</beamline_name>
         <undulator>
-            <type>u20</type>
+            <type>u24</type>
         </undulator> 
     </BEAMLINE_PARS>
     <COLLECT_PARS>

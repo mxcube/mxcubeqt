@@ -110,30 +110,26 @@ class TangoDCMotor(Device):
     
     def getLimits(self):
         try:
-            limits = self.getProperty('min'), self.getProperty('max')
-            #info = self.positionChan.getInfo() 
-            #max = float(info.max_value)
-            #min = float(info.min_value)
-            logging.getLogger("HWR").info("TangoDCMotor.getLimits: %.4f %.4f" % limits)
-            return limits
-            #return [min,max]
-        except:
-            logging.getLogger("HWR").info("TangoDCMotor.getLimits: Cannot get limits for %s" % self.name())
-            retval = [-1, 1]
-            if self.name() == '/phi':
-                retval = [-10000, 10000]
-            return retval
-            
-        try:
+            logging.getLogger("HWR").info("TangoDCMotor.getLimits: trying to get limits for motor_name %s " % (self.motor_name))
             limits = self.ho.getMotorLimits(self.motor_name) #limitsCommand() # self.ho.getMotorLimits(self.motor_name)
             logging.getLogger("HWR").info("TangoDCMotor.getLimits: Getting limits for %s -- %s " % (self.motor_name, str(limits)))
             import numpy
             if numpy.inf in limits:
                 limits = numpy.array([-10000, 10000])
-            return limits
         except:
             import traceback
-            logging.getLogger("HWR").info("TangoDCMotor.getLimits: Cannot get limits for %s.\nException %s " % (self.motor_name, traceback.print_exc()))
+            #logging.getLogger("HWR").info("TangoDCMotor.getLimits: Cannot get limits for %s.\nException %s " % (self.motor_name, traceback.print_exc()))
+            limits = None
+            
+        if limits is None:
+            try:
+                limits = self.getProperty('min'), self.getProperty('max')
+                logging.getLogger("HWR").info("TangoDCMotor.getLimits: %.4f %.4f" % limits)
+                limits = numpy.array(limits)
+            except:
+                #logging.getLogger("HWR").info("TangoDCMotor.getLimits: Cannot get limits for %s" % self.name())
+                limits = None
+        return limits
         
     def motorLimitsChanged(self):
         self.emit('limitsChanged', (self.getLimits(), )) 

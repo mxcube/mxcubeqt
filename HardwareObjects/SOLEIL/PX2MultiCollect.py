@@ -31,6 +31,14 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self.translational = False
         self.standard_collect = False
         
+        self.close_safty_shutter = self.getProperty("close_safty_shutter") 
+        
+        self.imgtojpeg = self.getProperty("imgtojpeg")
+        self._detector.imgtojpeg = self.imgtojpeg
+        self.jpegoption = self.getProperty("jpegoption")
+        self.test_mode = int(self.getProperty("test_mode"))
+        self.lima_overhead = float(self.getProperty("lima_overhead"))
+        logging.info("<PX2 MultiCollect> lima_overhead %s" % self.lima_overhead)
         self._detector.prepareHeader = self.prepareHeader
         SOLEILMultiCollect.init(self)
        
@@ -236,6 +244,13 @@ class PX2MultiCollect(SOLEILMultiCollect):
         #dirty fix for drift between Run3 and Run4 2014
         beam_center_x -= 3.08
         beam_center_y -= 1.45
+        #dirty fix for shift (re-focusing) beginning Run1 2015
+        beam_center_x -= 2.45
+        beam_center_y += 0.28
+        ##beam_center_x -= 2.45
+        ##beam_center_y += 0.28
+        beam_center_x += 2.60
+        beam_center_y -= 2.59
         
         beam_center_y *= q
         beam_center_x *= q
@@ -294,6 +309,131 @@ class PX2MultiCollect(SOLEILMultiCollect):
         logging.info("<PX2 MultiCollect> set grid")
         self.grid = onmode
 
+
+        def rotate(self, angle, unit='radians'):
+        if unit != 'radians':
+            angle = math.radians(angle)
+            
+        r = numpy.array([[ math.cos(angle),  math.sin(angle), 0.], 
+                         [-math.sin(angle),  math.cos(angle), 0.], 
+                         [              0.,               0., 1.]])
+        return r
+        
+
+    def shift(self, displacement):
+        s = numpy.array([[1., 0., displacement[0]], 
+                         [0., 1., displacement[1]], 
+                         [0., 0.,              1.]])
+        return s
+
+
+    def scale(self, factor):
+        s = numpy.diag([factor[0], factor[1], 1.])
+        return s
+        
+
+    def scan(self, center, nbsteps, lengths, attributes):
+        '''2D scan on an md2 attribute'''
+        
+        center = numpy.array(center)
+        nbsteps = numpy.array(nbsteps)
+        lengths = numpy.array(lengths)
+        
+        stepsizes = lengths / nbsteps
+        
+        print 'center', center
+        print 'nbsteps', nbsteps
+        print 'lengths', lengths
+        print 'stepsizes', stepsizes
+        
+        # adding [1] so that we can use homogeneous coordinates
+        positions = list(itertools.product(range(nbsteps[0]), range(nbsteps[1]), [1])) 
+        
+        points = [numpy.array(position) for position in positions]
+        points = numpy.array(points)
+        points = numpy.dot(self.shift(- nbsteps / 2.), points.T).T
+        points = numpy.dot(self.scale(stepsizes), points.T).T
+        points = numpy.dot(self.shift(center), points.T).T
+        
+        grid = numpy.reshape(points, numpy.hstack((nbsteps, 3)))
+        
+        gs = grid.shape
+        for i in range(gs[0]):
+            line = grid[i, :]
+            if (i + 1) % 2 == 0:
+                line = line[: : -1]
+            for point in line:
+                self.moveMotors()
+                self.measure()
+    
+    def raster(self, grid):
+        gs = grid.shape
+        orderedGrid = []
+        for i in range(gs[0]):
+            line = grid[i, :]
+            if (i + 1) % 2 == 0:
+                line = line[: : -1]
+            orderedGrid.append(line)
+        return numpy.array(orderedGrid)
+        
+
+    #def calculateGridPositions(self, grid_description):
+        """
+        The grid description dictionary has the following format:
+
+        grid = {'id': 'grid-n',
+                'dx_mm': total width in mm,
+                'dy_mm': total height in mm,
+                'steps_x': number of colls,
+                'steps_y': number of rows,
+                'x1': top left cell center x coord,
+                'y1': top left cell center y coord,
+                'beam_width': beam width in mm
+                'beam_height': beam height in mm
+                'angle': 0}
+        """
+        
+    def calculateGridPositions(self, start=[0., 0.], nbsteps=[15, 10], lengths=[1.5, 1.], angle=0., motors=['PhiY', 'PhiZ']):
+        #import scipy.ndimage #rotate, shift
+        center = numpy.array(start)
+        nbsteps = numpy.array(nbsteps)
+        lengths = numpy.array(lengths)
+        
+        stepsizes = lengths / nbsteps
+        
+        print 'center', center
+        print 'nbsteps', nbsteps
+        print 'lengths', lengths
+        print 'stepsizes', stepsizes
+        
+        # adding [1] so that we can use homogeneous coordinates
+        positions = list(itertools.product(range(nbsteps[0]), range(nbsteps[1]), [1])) 
+        
+        points = [numpy.array(position) for position in positions]
+        points = numpy.array(points)
+        points = numpy.dot(self.shift(- nbsteps / 2.), points.T).T
+        points = numpy.dot(self.rotate(angle), points.T).T
+        points = numpy.dot(self.scale(stepsizes), points.T).T
+        points = numpy.dot(self.shift(center), points.T).T
+        
+        grid = numpy.reshape(points, numpy.hstack((nbsteps, 3)))
+        
+        rastered = self.raster(grid)
+        
+        orderedPositions = rastered.reshape((grid.size/3, 3))
+        
+        dictionariesOfOrderedPositions = [{motors[0]: position[0], motors[1]: position[1]} for position in orderedPositions]
+        
+        return dictionariesOfOrderedPositions
+
+
+    def setGridParameters(self, start, nbsteps, lengths):
+        self.grid_start = start
+        self.grid_nbsteps = nbsteps
+        self.grid_lengths = lengths
+        self.grid_angle = self.getPhiValue()
+        
+        
     def getPoints(self, start, final, nbSteps):
         logging.info("<PX2 MultiCollect> getPoints start %s, final %s" % (start, final))
         step = 1./ (nbSteps - 1)
@@ -336,21 +476,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
             explicit_positions += to_add
         return explicit_positions
     
-    def calculateGridPositions(self, grid_description):
-        """
-        The grid description dictionary has the following format:
 
-        grid = {'id': 'grid-n',
-                'dx_mm': total width in mm,
-                'dy_mm': total height in mm,
-                'steps_x': number of colls,
-                'steps_y': number of rows,
-                'x1': top left cell center x coord,
-                'y1': top left cell center y coord,
-                'beam_width': beam width in mm
-                'beam_height': beam height in mm
-                'angle': 0}
-        """
     def safe_mono_turnoff(self):
         logging.info("<PX2 MultiCollect> truning off the mono1-mt_rx motor before collect")
         k=0
@@ -477,11 +603,18 @@ class PX2MultiCollect(SOLEILMultiCollect):
         print 'excuting command', 'ssh p10 "rsync -av %s %s"' % (source, self.sync_destination)
         os.system('ssh p10 "rsync -av %s %s"' % (source, self.sync_destination))
         
+    def should_i_take_snapshots(self, data_collect_parameters):
+        if data_collect_parameters['oscillation_sequence'][0]['start_image_number'] != 1:
+            return False
+        return True
+        
     @task
     def do_collect(self, owner, data_collect_parameters, in_multicollect=False):
         # reset collection id on each data collect
         logging.info("<SOLEIL do_collect>  data_collect_parameters %s" % data_collect_parameters)
+        logging.info("<SOLEIL do_collect>  in_multicollect %s" % in_multicollect)
         self.collection_id = None
+        self.snapshots_taken = False
 
         # Preparing directory path for images and processing files
         # creating image file template and jpegs files templates
@@ -509,15 +642,19 @@ class PX2MultiCollect(SOLEILMultiCollect):
             if self.bl_control.machine_current is not None:
                 data_collect_parameters["synchrotronMode"] = self.get_machine_fill_mode()
             data_collect_parameters["status"] = "failed"
-
-            (self.collection_id, detector_id) = \
+            try:
+                (self.collection_id, detector_id) = \
                                  self.bl_control.lims.store_data_collection(data_collect_parameters, self.bl_config)
               
-            data_collect_parameters['collection_id'] = self.collection_id
-
-            if detector_id:
-                data_collect_parameters['detector_id'] = detector_id
-              
+                data_collect_parameters['collection_id'] = self.collection_id
+    
+                if detector_id:
+                    data_collect_parameters['detector_id'] = detector_id
+            except:
+                import traceback
+                logging.info("<PX2MultiCollect> - problem with connection to LIMS")
+                data_collect_parameters['detector_id'] = 'ADSC Quantum 315r SN927'
+                logging.info(traceback.print_exc())
         # Creating the directory for images and processing information
         logging.info("<PX2MultiCollect> - Creating directories for images and processing %s %s" % (file_parameters['directory'],file_parameters['process_directory'] ) )
         self.create_directories(file_parameters['directory'], file_parameters['process_directory'], os.path.join(file_parameters['directory'], 'process'))
@@ -542,14 +679,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
         else:
             data_collect_parameters["actualSampleBarcode"] = None
             data_collect_parameters["actualContainerBarcode"] = None
-
-        try:
-            # why .get() is not working as expected?
-            # got KeyError anyway!
-            if data_collect_parameters["take_snapshots"]:
-                self.take_crystal_snapshots()
-        except KeyError:
-            pass
 
         centring_info = {}
         try:
@@ -680,8 +809,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 # images have to be consecutive
                 break
         
-        
-        
         if nframes == 0:
             return
             
@@ -693,6 +820,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         # data collection
         self.data_collection_hook(data_collect_parameters)
         
+                                     
         if 'transmission' in data_collect_parameters:
           self.set_transmission(data_collect_parameters["transmission"])
 
@@ -703,10 +831,31 @@ class PX2MultiCollect(SOLEILMultiCollect):
         
         if 'resolution' in data_collect_parameters:
           resolution = data_collect_parameters["resolution"]["upper"]
-          self.set_resolution(resolution)
+          #self.set_resolution(resolution)
+          self.send_resolution(resolution)
         elif 'detdistance' in oscillation_parameters:
-          self.move_detector(oscillation_parameters["detdistance"])
-          
+          #self.move_detector(oscillation_parameters["detdistance"])
+          self.send_detector(oscillation_parameters["detdistance"])
+         
+        try:
+            if data_collect_parameters["take_snapshots"] and self.should_i_take_snapshots(data_collect_parameters):
+                self.take_crystal_snapshots()
+        except KeyError:
+            pass
+        
+        frame = start_image_number
+        osc_range = oscillation_parameters["range"]
+        exptime = oscillation_parameters["exposure_time"]
+        npass = oscillation_parameters["number_of_passes"]
+        
+        self.prepare_acquisition(1 if data_collect_parameters.get("dark", 0) else 0,
+                                     wedges_to_collect[0][0],
+                                     osc_range,
+                                     exptime,
+                                     npass,
+                                     nframes,
+                                     data_collect_parameters["comment"],
+                                     lima_overhead = self.lima_overhead)
         #self.close_fast_shutter()
 
         with cleanup(self.data_collection_cleanup):
@@ -714,11 +863,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
             
             self.prepare_intensity_monitors()
            
-            frame = start_image_number
-            osc_range = oscillation_parameters["range"]
-            exptime = oscillation_parameters["exposure_time"]
-            npass = oscillation_parameters["number_of_passes"]
-
             # update LIMS
             if self.bl_control.lims:
                   try:
@@ -753,13 +897,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
             if self.bl_control.lims and self.bl_config.input_files_server:
                 self.write_input_files(self.collection_id, wait=False) 
 
-            self.prepare_acquisition(1 if data_collect_parameters.get("dark", 0) else 0,
-                                     wedges_to_collect[0][0],
-                                     osc_range,
-                                     exptime,
-                                     npass,
-                                     nframes,
-                                     data_collect_parameters["comment"])
             data_collect_parameters["dark"] = 0
 
             # at this point input files should have been written           
@@ -783,13 +920,18 @@ class PX2MultiCollect(SOLEILMultiCollect):
                     #logging.info("PX2MultiCollect moving into collect position %s " % self.collect_position)
                     #self.bl_control.diffractometer.moveMotors(self.collect_position)
                
-            logging.info('moving motors before collect %s' % motors_to_move_before_collect)
-            self.move_motors(motors_to_move_before_collect)
-            self.bl_control.diffractometer.wait()
             self.safe_mono_turnoff()
             
             file_location = file_parameters["directory"]
             self.get_sync_destination(file_location)
+            
+            self.verify_detector_distance()
+            self.verify_resolution()
+            self.bl_control.diffractometer.verifyGonioInCollect()
+            
+            logging.info('moving motors before collect %s' % motors_to_move_before_collect)
+            self.move_motors(motors_to_move_before_collect)
+            self.bl_control.diffractometer.wait()
             
             for start, wedge_size in wedges_to_collect:
                 k += 1
@@ -844,7 +986,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                         try:
                           self.bl_control.lims.store_image(lims_image)
                         except:
-                          logging.getLogger("HWR").exception("Could not store store image in LIMS")
+                          logging.getLogger("HWR").exception("Could not store image in LIMS")
                                               
                     self.emit("collectImageTaken", frame)
                         

@@ -16,14 +16,15 @@ class TangoDCMotorWPositions(TangoDCMotor):
         logging.info('__ initializing hw TangoDCMotorWPositions %s' % self.name())
         self.positionChan = self.getChannelObject("position") # utile seulement si positionchan n'est pas defini dans le code
         self.stateChan    = self.getChannelObject("state")    # utile seulement si statechan n'est pas defini dans le code
-
+        self.focus_ho = self.getObjectByRole("focus_motor")
+        
         self.positionChan.connectSignal("update", self.positionChanged)
         self.stateChan.connectSignal("update", self.motorStateChanged)
- 
+            
         TangoDCMotor._init(self)
 
     def init(self):
-        logging.info('initializing hw TangoDCMotorWPositions %s' % self.name())
+        logging.info('initializing hw TangoDCMotorWPositions 2 %s' % self.name())
 
         self.predefinedPositions          = {} 
         self.predefinedFocusPositions     = {}
@@ -55,6 +56,9 @@ class TangoDCMotorWPositions(TangoDCMotor):
                     
             self.sortPredefinedPositionsList()
             
+        logging.info('TangoDCMotorWPositions self.predefinedPositions %s' % self.predefinedPositions)
+        logging.info('TangoDCMotorWPositions self.predefinedFocusPositions %s' % self.predefinedFocusPositions)   
+        
     def connectNotifyTO(self, signal):
 
         if signal == 'predefinedPositionChanged':
@@ -104,8 +108,12 @@ class TangoDCMotorWPositions(TangoDCMotor):
             abspos = self.predefinedPositions[positionName]
             try:
                 TangoDCMotor.move(self, int(abspos) )
+                self.focus_ho.move(self.predefinedFocusPositions[positionName])
             except:
-                TangoDCMotor.move(self, float(abspos) )
+                import traceback
+                logging.getLogger().debug("error moving the zoom with offset %s" % traceback.format_exc())
+                #TangoDCMotor.move(self, float(abspos) )
+                #self.focus.move(self.predefinedFocusPositions[positionName])
             #self.move(self.predefinedPositions[positionName], focus_offset = self.predefinedFocusPositions[positionName])
         except:
             logging.getLogger().exception('Cannot move motor %s: invalid position name.', str(self.userName()))

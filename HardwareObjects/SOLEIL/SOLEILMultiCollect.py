@@ -235,11 +235,10 @@ class LimaAdscDetector:
            self.ready = True
 
     @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
+    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment="", lima_overhead=0.):
         if not self.ready:
             return
-        lima_exposure_offset = 0.7 # 0.7
-        #lima_exposure_offset = 1.0
+            
         logging.info('Preparing LIMA Detector')
         #if self.limaadscdev.state().name != 'STANDBY':
             #self.limaadscdev.Stop()
@@ -251,7 +250,7 @@ class LimaAdscDetector:
         self.wait(self.adscdev)
         self.wait(self.limaadscdev)
         
-        self.limaadscdev.exposuretime = (exptime + lima_exposure_offset) * 1e3
+        self.limaadscdev.exposuretime = (exptime + lima_overhead) * 1e3
         if (self.limaadscdev.get_timeout_millis() - self.limaadscdev.exposuretime) < 2000:
             self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposuretime) + 2000)
         
@@ -545,7 +544,6 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self._detector = detector
         self._tunable_bl = tunable_bl
         self._centring_status = None
-        self.test = True
 
     def stopCollect(self, owner):
         self.stop_acquisition()
@@ -656,6 +654,20 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
 
     @task
+    def send_resolution(self, new_resolution):
+        logging.info("<SOLEIL MultiCollect> send resolution to %s" % new_resolution)
+        logging.getLogger("user_level_log").info("Setting resolution -- moving the detector.")
+        self.bl_control.resolution.move(new_resolution)
+       
+    @task
+    def verify_resolution(self):
+        logging.info("<SOLEIL MultiCollect verify resolution> motor stateValue is %s" % self.bl_control.resolution.motorIsMoving())
+        while self.bl_control.resolution.motorIsMoving():
+            logging.info("<SOLEIL MultiCollect verify resolution> motor stateValue is %s" % self.bl_control.resolution.motorIsMoving())
+            time.sleep(0.5)
+        logging.getLogger("user_level_log").info("Setting resolution -- done.")
+        
+    @task
     def set_resolution(self, new_resolution):
         logging.info("<SOLEIL MultiCollect> set resolution to %s" % new_resolution)
         logging.getLogger("user_level_log").info("Setting resolution -- moving the detector.")
@@ -664,6 +676,20 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         while self.bl_control.resolution.motorIsMoving():
             logging.info("<SOLEIL MultiCollect set resolution> motor stateValue is %s" % self.bl_control.resolution.motorIsMoving())
             time.sleep(0.5)
+        logging.getLogger("user_level_log").info("Setting resolution -- done.")
+
+    @task
+    def send_detector(self, detector_distance):
+        logging.info("<SOLEIL MultiCollect> Moving detector to %s" % detector_distance)
+        logging.getLogger("user_level_log").info("Moving the detector -- it may take a few seconds.")
+        self.bl_control.detector_distance.move(detector_distance)
+        
+    @task
+    def verify_detector_distance(self):
+        logging.info("<SOLEIL MultiCollect> verify detector distance")
+        while self.bl_control.detector_distance.motorIsMoving():
+            time.sleep(0.5)
+        logging.getLogger("user_level_log").info("Moving the detector -- done.")
 
     @task
     def move_detector(self, detector_distance):
@@ -672,6 +698,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self.bl_control.detector_distance.move(detector_distance)
         while self.bl_control.detector_distance.motorIsMoving():
             time.sleep(0.5)
+        logging.getLogger("user_level_log").info("Moving the detector -- done.")
 
 
     @task
@@ -722,8 +749,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def open_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - open safety shutter" )
-        self.test = True
-        if self.test == True:
+        if self.test_mode == 1:
             logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
             return
 
@@ -740,8 +766,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     @task
     def close_safety_shutter(self):
         logging.info("<SOLEIL MultiCollect> VERIFY - close safety shutter" )
-        self.test = True
-        if self.test == True:
+        if self.test_mode == 1:
             logging.info("<SOLEIL MultiCollect> simulation mode -- leaving safety shutter as it was" )
             return
 
@@ -763,7 +788,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         return AbstractMultiCollect.prepare_wedges_to_collect(self, start, nframes, osc_range, reference_interval, inverse_beam, overlap)
 
     @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
+    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment="", lima_overhead=0):
         # Program scan and other values in md2 for all the oscillations
         # TOFILL self.monoOff()
 
@@ -771,9 +796,11 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self.diffr_wait_ready(timeout=3.0)
         while self.bl_control.diffractometer.getState() in [ 'MOVING', 'RUNNING' ]:
           time.sleep(0.1)
-        self.bl_control.diffractometer.goniometerReady( osc_range, npass, exptime)
-
-        return self._detector.prepare_acquisition(take_dark, start, osc_range, exptime, npass, number_of_images, comment)
+        
+        #self.bl_control.diffractometer.goniometerReady( osc_range, npass, exptime)
+        self.bl_control.diffractometer.sendGonioToCollect(osc_range, npass, exptime)
+        
+        return self._detector.prepare_acquisition(take_dark, start, osc_range, exptime, npass, number_of_images, comment, lima_overhead)
 
     def finalize_acquisition(self):
         # TOFILL self.monoOn()
@@ -944,6 +971,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         return self.bl_config.directory_prefix
 
     def store_image_in_lims(self, frame, first_frame, last_frame):
+        return True
         if isinstance(self._detector, CcdDetector):
             return True
 
@@ -1032,9 +1060,11 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
             return -1
 
     def get_machine_message(self):
-        logging.info("<PX1 MultiCollect> getting machine message" )
+        logging.info("<SOLEIL MultiCollect> getting machine message" )
+        return 'Dummy message'
         if  self.bl_control.machine_current is not None:
-            return self.bl_control.machine_current.getMessage()
+            return 'Dummy message'
+            #return self.bl_control.machine_current.getMessage()
         else:
             return 'Not implemented yet'
 

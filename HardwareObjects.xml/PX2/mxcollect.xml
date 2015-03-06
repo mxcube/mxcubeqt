@@ -25,4 +25,9 @@
    <detmttxname>i11-ma-cx1/dt/dtc_ccd.1-mt_tx</detmttxname>
    <detmttzname>i11-ma-cx1/dt/dtc_ccd.1-mt_tz</detmttzname>
    <!-- Following devices are used during datacollection -->
+
+   <directory_prefix>PX2</directory_prefix>
+   <close_safty_shutter>0</close_safty_shutter>
+   <test_mode>0</test_mode>
+   <lima_overhead>0.7</lima_overhead>
 </procedure>

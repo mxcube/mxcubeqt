@@ -392,10 +392,13 @@ class TaskGroupQueueEntry(BaseQueueEntry):
                 gid = self.lims_client_hwobj.\
                   _store_data_collection_group(group_data)
                 self.get_data_model().lims_group_id = gid
-            except Exception as ex:
-                msg = 'Could not create the data collection group' + \
-                      ' in LIMS. Reason: ' + str(ex)
-                raise QueueExecutionException(msg, self)
+            except:
+                pass
+            
+            #except Exception as ex:
+                #msg = 'Could not create the data collection group' + \
+                      #' in LIMS. Reason: ' + str(ex)
+                #raise QueueExecutionException(msg, self)
 
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
@@ -695,8 +698,10 @@ class DataCollectionQueueEntry(BaseQueueEntry):
 
                 if 'collection_id' in param_list[0]:
                     dc.id = param_list[0]['collection_id']
-
-                dc.acquisitions[0].path_template.xds_dir = param_list[0]['xds_dir']
+                try:
+                    dc.acquisitions[0].path_template.xds_dir = param_list[0]['xds_dir']
+                except:
+                    dc.acquisitions[0].path_template.xds_dir = '/tmp'
 
             except gevent.GreenletExit:
                 #log.warning("Collection stopped by user.")

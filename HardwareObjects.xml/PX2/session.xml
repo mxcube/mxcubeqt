@@ -7,6 +7,14 @@
   <endstation_name>px2</endstation_name>
   <beamline_name>Proxima2</beamline_name>
     
+  <proposals>
+      <proposal>
+            <code>ifx</code>
+            <ispyb>fx</ispyb>
+            <gui>fx</gui>
+      </proposal>
+  </proposals>
+
   <inhouse_users>
     <proposal>
       <code>px2test</code>
@@ -19,10 +27,10 @@
 
   <file_info>
     <file_suffix>img</file_suffix>
-    <base_directory>/927bis/ccd/2014/Run5</base_directory>
-    <ispyb_base_directory>/nfs/ruche-proxima1</ispyb_base_directory>
+    <base_directory>/927bis/ccd/2015_Run1</base_directory>
+    <ispyb_base_directory>/nfs/ruche-proxima2a/proxima2a-soleil/ispyb</ispyb_base_directory>
     <raw_data_folder_name>RAW_DATA</raw_data_folder_name>
-    <processed_data_base_directory>/927bis/ccd/2014/Run5</processed_data_base_directory>
+    <processed_data_base_directory>/927bis/ccd/2015_Run1</processed_data_base_directory>
     <processed_data_folder_name>PROCESSED_DATA</processed_data_folder_name>
     <archive_folder>Archive</archive_folder>
     <archive_base_directory>/927bis/ccd/Database</archive_base_directory>

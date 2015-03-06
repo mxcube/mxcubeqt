@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+import os
+
+MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
+sys.path.insert(0, MXCUBE_ROOT)
+
+brickpaths=[]
+brickpaths.append( os.path.join(MXCUBE_ROOT, "Bricks"))
+brickpaths.append( os.path.join(MXCUBE_ROOT, "Bricks/SOLEIL"))
+brickpaths.append( os.path.join(MXCUBE_ROOT, "Bricks/widgets"))
+
+hwopaths=[]
+hwopaths.append(os.path.join(MXCUBE_ROOT,"HardwareObjects"))
+hwopaths.append(os.path.join(MXCUBE_ROOT,"HardwareObjects/SOLEIL"))
+hwopaths.append(os.path.join(MXCUBE_ROOT,"HardwareObjects/sample_changer"))
+hwopaths.append(os.path.join(MXCUBE_ROOT,"HardwareRepository/HardwareObjects"))
+
+os.environ["CUSTOM_BRICKS_PATH"]=":".join(brickpaths)
+os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=":".join(hwopaths)
+
+
+#MXCUBE_ROOT = "/home/experiences/proxima2a/com-proxima2a/mxcube_v2"
+#sys.path.append("/home/experiences/proxima2a/com-proxima2a/python_modules/lib/python2.6/site-packages")
+
+
+#
+# be aware this setting is for local HardwareObjects.xml (no server is used here)
+#
+#HARDWARE_REPOSITORY_SERVER   = os.path.join(MXCUBE_ROOT,"HardwareObjects.xml/PX2_Jlib")
+#
+#HARDWARE_REPOSITORY_SERVER   = localhost:hwr
+#
+#brickpaths = []
+#hwopaths   = []
+
+#if "CUSTOM_BRICKS_PATH" in os.environ:
+   #brickpaths.append( os.environ["CUSTOM_BRICKS_PATH"] ) 
+#
+#brickpaths.append( os.path.join(MXCUBE_ROOT,"Bricks") )
+#brickpaths.append( os.path.join(MXCUBE_ROOT,"Bricks/SOLEIL") )
+#brickpaths.append( os.path.join(MXCUBE_ROOT,"Bricks/widgets") )
+#
+#if "CUSTOM_HARDWARE_OBJECTS_PATH" in os.environ:
+   #hwopaths.append( os.environ["CUSTOM_HARDARE_OBJECTS_PATH"] ) 
+#hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareObjects") )
+#hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareObjects/sample_changer") )
+#hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareObjects/SOLEIL") )
+#hwopaths.append( os.path.join(MXCUBE_ROOT,"HardwareRepository/HardwareObjects") )
+#
+#CUSTOM_HARDWARE_OBJECTS_PATH = ":".join( hwopaths )
+#
+#os.environ["CUSTOM_BRICKS_PATH"]           = ":".join( brickpaths )
+#os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"] = ":".join( hwopaths )
+#os.environ["HARDWARE_REPOSITORY_SERVER"]   = HARDWARE_REPOSITORY_SERVER
+
+#sys.path.insert(0,"/home/experiences/proxima2a/com-proxima2a/python_modules/lib/python2.6/site-packages")
+#sys.path.insert(0, MXCUBE_ROOT)
+
+
+from BlissFramework import startGUI
+
+startGUI.run()
+

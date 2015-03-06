@@ -1,3 +1,10 @@
 *.pyc
 *~
 mxcube.gui
+HardwareObjects.xml/PX2_old
+*pck
+*normalization
+*old*
+*saved*
+lucid
+mahotas

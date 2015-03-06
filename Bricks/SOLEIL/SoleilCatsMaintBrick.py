@@ -38,7 +38,7 @@ class SoleilCatsMaintBrick(BaseComponents.BlissWidget):
         qt.QObject.connect(self.widget.btSafe, qt.SIGNAL('clicked()'), self._safeTraj)
         # MS 2014-11-18
         qt.QObject.connect(self.widget.btHome, qt.SIGNAL('clicked()'), self._homeTraj)
-        qt.QObject.connect(self.widget.btDry, qt.SIGNAL('clicked()'), self._dryTraj)
+        qt.QObject.connect(self.widget.btDry, qt.SIGNAL('clicked()'), self._drySoakTraj)
         qt.QObject.connect(self.widget.btSoak, qt.SIGNAL('clicked()'), self._soakTraj)
         qt.QObject.connect(self.widget.btMemoryClear, qt.SIGNAL('clicked()'), self._clearMemory)
         qt.QObject.connect(self.widget.btToolOpen, qt.SIGNAL('clicked()'), self._openTool)
@@ -313,7 +313,15 @@ class SoleilCatsMaintBrick(BaseComponents.BlissWidget):
                 self.device.dryTraj()
         except:
             qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
-            
+    
+    def _drySoakTraj(self):
+        logging.getLogger("user_level_log").info("CATS: Dry and soak the gripper.")
+        try:
+            if self.device is not None:
+                self.device.drySoakTraj()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        
     def _soakTraj(self):
         logging.getLogger("user_level_log").info("CATS: Soak the gripper.")
         try:

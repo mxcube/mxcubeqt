@@ -39,7 +39,7 @@ class CatsMaintSoleil(Equipment):
         self._chnLN2Regulation = self.getChannelObject("_chnLN2RegulationDewar1")
         self._chnLN2Regulation.connectSignal("update", self._updateRegulationState)
         logging.info('self._chnPathRunning %s' % self._chnPathRunning)
-        for command_name in ("_cmdReset", "_cmdBack", "_cmdSafe", "_cmdHome", "_cmdDry", "_cmdSoak", "_cmdClearMemory",\
+        for command_name in ("_cmdReset", "_cmdBack", "_cmdSafe", "_cmdHome", "_cmdDry", "_cmdDrySoak", "_cmdSoak", "_cmdClearMemory",\
                              "_cmdOpenTool", "_cmdToolCal", "_cmdPowerOn", "_cmdPowerOff", \
                              "_cmdOpenLid1", "_cmdCloseLid1", "_cmdOpenLid2", "_cmdCloseLid2", "_cmdOpenLid3", "_cmdCloseLid3", \
                              "_cmdRegulOn"):
@@ -77,6 +77,12 @@ class CatsMaintSoleil(Equipment):
         Drying the gripper
         """    
         return self._executeTask(False,self._doDry)  
+        
+    def drySoakTraj(self):    
+        """
+        Dry and Soak the gripper
+        """    
+        return self._executeTask(False,self._doDrySoak)
         
     def soakTraj(self):    
         """
@@ -161,6 +167,16 @@ class CatsMaintSoleil(Equipment):
         """
         argin = 1
         self._executeServerTask(self._cmdDry, argin)
+    
+    def _doDrySoak(self):
+        """
+        Launch the "dry_soak" trajectory on the CATS Tango DS
+
+        :returns: None
+        :rtype: None
+        """
+        argin = ('1', '2')
+        self._executeServerTask(self._cmdDrySoak, argin)
         
     def _doSoak(self):
         """

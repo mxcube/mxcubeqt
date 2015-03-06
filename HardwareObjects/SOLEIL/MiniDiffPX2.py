@@ -376,6 +376,31 @@ class MiniDiffPX2(Equipment):
         self.beamShape = "rectangular"
         return d
        
+    def sendGonioToCollect(self, oscrange, npass, exptime):
+        logging.info("MiniDiffPX2 / send gonio to collect oscrange=%s npass=%s exptime=%s" % (oscrange,npass, exptime) )
+        if self.md2_ready:
+
+            diffstate = self.getState()
+            logging.info("SOLEILCollect - setting gonio ready (state: %s)" % diffstate)
+
+            #self.md2.write_attribute('ScanAnticipation', self.anticipation)
+            self.md2.write_attribute('ScanNumberOfPasses', npass)
+            self.md2.write_attribute('ScanRange', oscrange)
+            self.md2.write_attribute('ScanExposureTime', exptime)
+            logging.info("SOLEILCollect - setting the collect phase position %s" % self.collect_phaseposition)
+            logging.info("SOLEILCollect - current phase %s" % self.md2.currentphase)
+            logging.info("SOLEILCollect - current phase index %s" % self.md2.currentphaseindex)
+            if self.md2.currentphase != self.collect_phaseposition:
+                logging.getLogger("user_level_log").info("Setting gonio to data collection phase.")
+                self.md2.startsetphase(self.collect_phaseposition)
+            else:
+                self.md2.backlightison=False
+              
+    def verifyGonioInCollect(self):
+        while self.md2.currentphase != self.collect_phaseposition:
+            time.sleep(0.1)
+        logging.getLogger("user_level_log").info("Capillary beamstop in the beam path, starting to collect.")
+              
     def goniometerReady(self, oscrange, npass, exptime):
        logging.info("MiniDiffPX2 / programming gonio oscrange=%s npass=%s exptime=%s" % (oscrange,npass, exptime) )
 
@@ -397,6 +422,7 @@ class MiniDiffPX2(Equipment):
               self.md2.startsetphase(self.collect_phaseposition)
               while self.md2.currentphase != self.collect_phaseposition:
                 time.sleep(0.1)
+              logging.getLogger("user_level_log").info("Capillary beamstop in the beam path, starting to collect.")
           else:
               self.md2.backlightison=False
           
@@ -774,24 +800,41 @@ class MiniDiffPX2(Equipment):
     
     def beamPositionCheck(self):
         logging.getLogger("HWR").info("Going to check the beam position at all zooms")
+        logging.getLogger("user_level_log").info("Starting beam position check for all zooms")
         gevent.spawn(self.bpc)
     
     def bpc(self):
         calib = calibrator.calibrator(fresh=True, save=True)
+        logging.getLogger("user_level_log").info("Adjusting camera exposure time for visualisation on the scintillator")
         calib.prepare()
+        logging.getLogger("user_level_log").info("Calculating beam position for individual zooms")
         for zoom in calib.zooms:
+            logging.getLogger("user_level_log").info("Zoom %s" % zoom)
             calibrator.main(calib, zoom)
-        calib.tidy()
+            
+        logging.getLogger("user_level_log").info("Saving results into database")
         calib.updateMD2BeamPositions()
+        logging.getLogger("user_level_log").info("Setting camera exposure time back to 0.050 seconds")
+        calib.tidy()
+        diff = calib.get_difference_zoom_10()
+        logging.getLogger("user_level_log").info("The beam moved %s um horizontally and %s um vertically since the last calibration" % (str(round(diff[0],1)), str(round(diff[1],1))) )
+        
         calib.saveSnap()
+        
+        logging.getLogger("user_level_log").info("Beam position check finished")
         
     def apertureAlign(self):
         logging.getLogger("HWR").info("Going to realign the current aperture")
+        logging.getLogger("user_level_log").info("Aligning the current aperture")
         gevent.spawn(self.aa)
         
     def aa(self):
+        logging.getLogger("user_level_log").info("Adjusting camera exposure time for visualisation on the scintillator")
         a = scan_and_align.scan_and_align('aperture', display=False)
+        logging.getLogger("user_level_log").info("Scanning the aperture")
         a.scan()
         a.align(optimum='com')
         a.save_scan()
+        logging.getLogger("user_level_log").info("Setting camera exposure time back to 0.050 seconds")
+        logging.getLogger("user_level_log").info("Aligning aperture finished")
         a.predict()

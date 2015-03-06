@@ -3,6 +3,9 @@
 <!-- device class="TangoMotorWPositionsPX2" -->
 <device class="TangoDCMotorWPositions">
     <username>Zoom</username>
+    <motor_name>zoom</motor_name>
+    <min>1</min>
+    <max>10</max>
     <!--   <tangoname>i10-c-cx1/ex/zoom.1-mt_tz</tangoname> -->
     <tangoname>i11-ma-cx1/ex/md2</tangoname> <!--check!-->
     <focus>AlignmentXPosition</focus>
@@ -10,6 +13,7 @@
 <!--    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="ZoomPredefinedPosition">ZoomPredefinedPosition</channel>
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="ZoomPosition">ZoomPosition</channel>
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="ZoomLevel">ZoomLevel</channel>-->
+    <object href="/focus" role="focus_motor" />
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">CoaxialCameraZoomValue</channel>
     <datatype>int</datatype>
     <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="focus_position">AlignmentXPosition</channel>
