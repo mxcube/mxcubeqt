@@ -244,14 +244,16 @@ class PX2MultiCollect(SOLEILMultiCollect):
         #dirty fix for drift between Run3 and Run4 2014
         beam_center_x -= 3.08
         beam_center_y -= 1.45
+
         #dirty fix for shift (re-focusing) beginning Run1 2015
-        beam_center_x -= 2.45
-        beam_center_y += 0.28
-        ##beam_center_x -= 2.45
-        ##beam_center_y += 0.28
-        beam_center_x += 2.60
-        beam_center_y -= 2.59
+        beam_center_x += 0.15
+        beam_center_y -= 2.34
         
+        #shift beginning Run2 2015
+        beam_center_x -= 0.21
+        beam_center_y -= 0.86
+        
+        #
         beam_center_y *= q
         beam_center_x *= q
         
