@@ -309,8 +309,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         logging.info("<PX2 MultiCollect> set grid")
         self.grid = onmode
 
-
-        def rotate(self, angle, unit='radians'):
+    def rotate(self, angle, unit='radians'):
         if unit != 'radians':
             angle = math.radians(angle)
             
@@ -1003,7 +1002,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                                    data_collect_parameters.get("sample_reference", {}).get("spacegroup", ""),
                                                    data_collect_parameters.get("sample_reference", {}).get("cell", ""))
                 
-                self.synchronize_thread(file_location, filename)
+                #self.synchronize_thread(file_location, filename)
                 frame += 1
 
             self.sync_collect(file_location, filename, image_file_template)
