@@ -242,9 +242,18 @@ class TangoResolutionComplex(BaseHardwareObjects.Equipment):
             self.__dist2resA2 = None
 
 
-    def move(self, res):
+    def move(self, res, mindist=114, maxdist=1000):
         self.currentWavelength = self.blenergyHO.getCurrentWavelength()
-        self.device.position = self.res2dist(res)
+        distance = self.res2dist(res)
+        if distance >= mindist and distance <= maxdist:
+            self.device.position = distance
+        elif distance < mindist:
+            logging.getLogger("user_level_log").warning("TangoResolution: requested resolution is above limit for specified energy, moving to maximum allowed resolution")
+            self.device.position = mindist
+        elif distance > maxdist:
+            logging.getLogger("user_level_log").warning("TangoResolution: requested resolution is below limit for specified energy, moving to minimum allowed resolution")
+            self.device.position = maxdist
+            
 
     def newDistance(self, dist):
         self.device.position = dist
