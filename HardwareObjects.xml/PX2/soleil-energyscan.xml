@@ -19,22 +19,9 @@
             <directory>rm</directory>
         </defaultenergy>
     </mad>
-  <!--  <tangoname>/BLEnergy</tangoname> 
-    <blenergy>i11-ma-c00/ex/beamlineenergy</blenergy>
-    <mono>i11-ma-c03/op/mono1</mono>
-    <mono_mt_rx>i11-ma-c03/op/mono1-mt_rx</mono_mt_rx>
-    <U24Energy>ans-c11/ei/m-u24_energy</U24Energy>
-    <ketek>i11-ma-cx1/dt/dtc-mca_xmap.1</ketek> 
-    <counter>i11-ma-c00/ca/cpt.2</counter> 
-    <xbpm>i11-ma-c04/dt/xbpm_diode.1</xbpm> 
-    <attenuator>i11-ma-c05/ex/att.1</attenuator> 
-    <md2>i11-ma-cx1/ex/md2</md2>
-    <light>i11-ma-cx1/ex/md2</light>  
-    <bst>i11-ma-cx1/ex/md2-mvbs</bst> 
-    <ketekinsert>i11-ma-cx1/ex/md2</ketekinsert> 
-    <safetyshutter>i11-ma-c04/ex/obx.1</safetyshutter>
     
     <directoryprefix>/927bis/ccd/2014</directoryprefix>-->
+    <theoritical_edge_threshold>0.02</theoritical_edge_threshold>
     <scan>
         <roiwidth>0.3</roiwidth>
         <before>0.030</before>

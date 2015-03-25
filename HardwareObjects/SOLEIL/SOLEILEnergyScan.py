@@ -386,6 +386,9 @@ class SOLEILEnergyScan(Equipment):
         logging.getLogger("HWR").info("th. Edge %s ; chooch results are pk=%f, ip=%f, rm=%f" % (self.thEdge, pk,ip,rm))
         logging.info('math.fabs(self.thEdge - ip) %s' % math.fabs(self.thEdge - ip))
         logging.info('self.thEdgeThreshold %s' % self.thEdgeThreshold)
+        
+        logging.getLogger("HWR").warning('EnergyScan: calculated peak (%f) is more that 20eV %s the theoretical value (%f). Please check your scan and choose the energies manually' % (savpk, (self.thEdge - ip) < self.thEdgeThreshold and "below" or "above", self.thEdge))
+        
         if math.fabs(self.thEdge - ip) > self.thEdgeThreshold:
           logging.info('Theoretical edge too different from the one just determined')
           pk = 0
@@ -393,7 +396,7 @@ class SOLEILEnergyScan(Equipment):
           rm = self.thEdge + 0.03
           comm = 'Calculated peak (%f) is more that 10eV away from the theoretical value (%f). Please check your scan' % (savpk, self.thEdge)
    
-          logging.getLogger("HWR").warning('EnergyScan: calculated peak (%f) is more that 20eV %s the theoretical value (%f). Please check your scan and choose the energies manually' % (savpk, (self.thEdge - ip) > 0.02 and "below" or "above", self.thEdge))
+          logging.getLogger("HWR").warning('EnergyScan: calculated peak (%f) is more that 20eV %s the theoretical value (%f). Please check your scan and choose the energies manually' % (savpk, (self.thEdge - ip) < self.thEdgeThreshold and "below" or "above", self.thEdge))
 
         archiveEfsFile=os.path.extsep.join((scanArchiveFilePrefix, "efs"))
 
@@ -404,7 +407,7 @@ class SOLEILEnergyScan(Equipment):
         if not os.path.exists(dirname): 
             try:
                os.makedirs( dirname )
-               logging.getLogger("user_level_log").error( "Chooch. Archive path (%s) created"  % dirname)
+               logging.getLogger("user_level_log").info( "Chooch. Archive path (%s) created"  % dirname)
             except OSError:
                logging.getLogger("user_level_log").error( "Chooch. Archive path is not accessible (%s)" % dirname)
                return None

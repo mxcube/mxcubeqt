@@ -590,7 +590,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         while os.path.getsize(filename) != 18874880:
             time.sleep(0.05)
         logging.info('Size of the image before sync %s' % os.path.getsize(filename))
-        print 'sync command %s' % ('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination))
+        logging.info('sync command %s' % ('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination)))
         os.system('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination))
     
     def sync_collect(self, file_location, last_file, image_file_template):
@@ -1004,7 +1004,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                                    data_collect_parameters.get("sample_reference", {}).get("spacegroup", ""),
                                                    data_collect_parameters.get("sample_reference", {}).get("cell", ""))
                 
-                #self.synchronize_thread(file_location, filename)
+                self.synchronize_thread(file_location, filename)
                 frame += 1
 
             self.sync_collect(file_location, filename, image_file_template)

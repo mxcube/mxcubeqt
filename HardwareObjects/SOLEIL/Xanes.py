@@ -24,8 +24,8 @@ class xanes(object):
                  blsample_id=None,
                  nbSteps=100,
                  roiwidth=0.25,
-                 beforeEdge=0.025,
-                 afterEdge=0.075,
+                 beforeEdge=0.05,
+                 afterEdge=0.05,
                  integrationTime=1,
                  peakingTime=2.5,
                  dynamicRange=20000, #47200
