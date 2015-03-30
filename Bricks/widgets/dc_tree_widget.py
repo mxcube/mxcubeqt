@@ -453,10 +453,14 @@ class DataCollectTree(qt.QWidget):
 
         try:
             dm = self.beamline_setup_hwobj.diffractometer_hwobj
+            dm.do_centring = True
         
             if self.centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
                 dm.user_confirms_centring = False
             else:
+                if self.centring_method == CENTRING_METHOD.NO:
+                  dm.do_centring = False
+                  dm.user_confirms_centring = False
                 dm.user_confirms_centring = True
         except AttributeError:
             #beamline_setup_hwobj not set when method called

@@ -194,6 +194,11 @@
                                             <string>Fully Automatic</string>
                                         </property>
                                     </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>No Centring</string>
+                                        </property>
+                                    </item>
                                     <property name="name">
                                         <cstring>centring_cbox</cstring>
                                     </property>
