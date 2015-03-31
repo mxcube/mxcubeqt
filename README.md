@@ -30,13 +30,5 @@ script:
 
     ./bin/Qt4_mxcube --hardwareRepository=<directory or host:port>
 
-As it was previously mentioned: it is not possible to run Qt3 and Qt4 in the same application. 
-This version of MXCuBE contains a minimum set of files to run the software. There is a 
-necessity to discuss, try or find alternative to the current dependencies: 
-* PyMca
-* Periodic table (could be used from PyMca or created from scratch) 
-* Chooch for energy scans
-* Graphs 
-
 
 Any comments or suggestions are welcome!
