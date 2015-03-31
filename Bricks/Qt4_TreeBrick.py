@@ -79,7 +79,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("hide_advanced_scan_tab", ())
 
         # Populating the tabs with data
-        self.defineSignal("populate_dc_parameters_widget", ())
+        self.defineSignal("populate_dc_parameter_widget", ())
         self.defineSignal("populate_char_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("populate_energy_scan_widget", ())
@@ -157,7 +157,7 @@ class Qt4_TreeBrick(BlissWidget):
 
         # Other --------------------------------------------------------------- 
         self.enable_collect(False)
-        self.setFixedWidth(315) 
+        #self.setFixedWidth(315) 
         #self.sample_changer_widget.child('centring_cbox').setCurrentItem(1)
         self.dc_tree_widget.set_centring_method(1)
 
@@ -497,7 +497,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_advanced_scan_tab"), True)
 
     def populate_dc_parameters_tab(self, item = None):
-        self.emit(QtCore.SIGNAL("populate_dc_parameters_widget"), item)
+        self.emit(QtCore.SIGNAL("populate_dc_parameter_widget"), item)
         
     def show_datacollection_tab(self, item):
         self.sample_changer_widget.findChild(QtGui.QPushButton,
@@ -629,7 +629,7 @@ class Qt4_TreeBrick(BlissWidget):
                 self.emit_set_prefix(item)
                 #self.populate_edna_parameter_widget(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                self.populate_parameters_tab(item)
+                self.populate_dc_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 self.populate_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):

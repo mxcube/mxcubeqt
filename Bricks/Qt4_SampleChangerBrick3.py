@@ -503,10 +503,11 @@ class StatusView(QtGui.QWidget):
     def __init__(self,parent):
         QtGui.QWidget.__init__(self, parent)
 
-        self.contentsBox=QVGroupBox("Unknown",self)
-        self.contentsBox.setInsideMargin(4)
-        self.contentsBox.setInsideSpacing(2)
-        self.contentsBox.setAlignment(Qt.AlignHCenter)
+        self.contentsBox= QtGui.QGroupBox("Unknown",self) #vertical
+
+        #self.contentsBox.setInsideMargin(4)
+        #self.contentsBox.setInsideSpacing(2)
+        #self.contentsBox.setAlignment(Qt.AlignHCenter)
 
         self.box1=QHBox(self.contentsBox, 'content_box')
 
@@ -701,42 +702,41 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.inExpert=None
         self.lastBasketChecked=()
 
-        return
-        self.contentsBox=QVBox(self)
-        self.contentsBox.setSpacing(10)
+        #self.contentsBox=QVBox(self)
+        #self.contentsBox.setSpacing(10)
         
         #self.contentsBox.setInsideMargin(4)
         #self.contentsBox.setInsideSpacing(2)
 
-        QLabel("<b><i>NEW: Mount/unmount samples by right-clicking on the data collection tree on the left</b></i>", self.contentsBox)
-        self.status=StatusView(self.contentsBox)
-        self.cmdSwitchToSampleTransfer = QPushButton("Switch to Sample Transfer mode", self.contentsBox)
-        self.currentBasket=CurrentBasketView(self.contentsBox)
-        self.currentSample=CurrentSampleView(self.contentsBox)
+        _mount_label = QtGui.QLabel("<b><i>NEW: Mount/unmount samples by right-clicking on the data collection tree on the left</b></i>", self)
+        self.status=StatusView(self)
+        self.switch_to_sample_transfer_button = QtGui.QPushButton("Switch to Sample Transfer mode", self)
+        self.currentBasket=CurrentBasketView(self)
+        self.currentSample=CurrentSampleView(self)
         #VerticalSpacer(self.contentsBox)
-        self.scContents = QVGroupBox("Contents", self.contentsBox)
-        self.scContents.setInsideMargin(4)
-        self.scContents.setInsideSpacing(2)
-        self.scContents.setAlignment(Qt.AlignHCenter)
-        self.cmdResetBasketsSamples = QPushButton("Reset sample changer contents", self.scContents)
-        QObject.connect(self.cmdResetBasketsSamples, SIGNAL("clicked()"), self.resetBasketsSamplesInfo)
+        self.sc_contents_gbox = QtGui.QGroupBox("Contents", self)
+        #self.sc_contents_gbox.setInsideMargin(4)
+        #self.sc_contents_gbox.setInsideSpacing(2)
+        #self.sc_contents_gbox.setAlignment(Qt.AlignHCenter)
+        self.reset_baskets_samples_button = QtGui.QPushButton("Reset sample changer contents", self.sc_contents_gbox)
+        QtCore.QObject.connect(self.reset_baskets_samples_button, QtCore.SIGNAL("clicked()"), self.resetBasketsSamplesInfo)
 
-        self.basket1=BasketView(self.scContents,1)
-        self.basket2=BasketView(self.scContents,2)
-        self.basket3=BasketView(self.scContents,3)
-        self.basket4=BasketView(self.scContents,4)
-        self.basket5=BasketView(self.scContents,5)
+        self.basket1=BasketView(self.sc_contents_gbox,1)
+        self.basket2=BasketView(self.sc_contents_gbox,2)
+        self.basket3=BasketView(self.sc_contents_gbox,3)
+        self.basket4=BasketView(self.sc_contents_gbox,4)
+        self.basket5=BasketView(self.sc_contents_gbox,5)
         self.baskets=(self.basket1,self.basket2,self.basket3,self.basket4,self.basket5)
  
         for i in range(5):
-          QObject.connect(self.baskets[i],PYSIGNAL("loadThisSample"),self.loadThisSample)
+          QtCore.QObject.connect(self.baskets[i], QtCore.SIGNAL("loadThisSample"),self.loadThisSample)
           self.baskets[i].setChecked(False)
           self.baskets[i].setEnabled(False)
 
-        self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.scContents)
+        self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.sc_contents_gbox)
         self.doubleClickLoads.hide()
 
-        self.scanBaskets=ScanBasketsView(self.scContents)
+        self.scanBaskets=ScanBasketsView(self.sc_contents_gbox)
 
         self.currentSample.setStateMsg("Unknown smart magnet state")
         self.currentSample.setStateColor("UNKNOWN")
@@ -752,7 +752,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         QObject.connect(self.status,PYSIGNAL("sampleChangerToLoadingPosition"),self.sampleChangerToLoadingPosition)
         QObject.connect(self.status,PYSIGNAL("minidiffGetControl"),self.minidiffGetControl)
         QObject.connect(self.status,PYSIGNAL("resetSampleChanger"),self.resetSampleChanger)
-        QObject.connect(self.cmdSwitchToSampleTransfer, SIGNAL("clicked()"), self.switchToSampleTransferMode)
+        QObject.connect(self.switch_to_sample_transfer_button, SIGNAL("clicked()"), self.switchToSampleTransferMode)
  
         QObject.connect(self.currentBasket,PYSIGNAL("selectedChanged"),self.changeBasket)
         QObject.connect(self.currentBasket,PYSIGNAL("scanBasket"),self.scanBasket)
@@ -850,7 +850,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             self.basketsSamplesSelectionDialog.reject()
 
     def basketTransferModeChanged(self, basket_transfer):
-        self.cmdSwitchToSampleTransfer.setEnabled(basket_transfer)
+        self.switch_to_sample_transfer_button.setEnabled(basket_transfer)
 
     def switchToSampleTransferMode(self):
         self.sampleChanger.changeMode(SampleChangerMode.Normal, wait=False)
@@ -929,7 +929,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             basket.setState(state)
         #self.doubleClickLoads.setMyState(state)
         self.scanBaskets.setState(state)
-        self.cmdResetBasketsSamples.setEnabled(SC_STATE_GENERAL.get(state, False))
+        self.reset_baskets_samples_button.setEnabled(SC_STATE_GENERAL.get(state, False))
 
     def sampleChangerCanLoad(self,can_load):
         self.status.setSampleChangerLoadStatus(can_load)

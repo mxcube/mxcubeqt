@@ -63,7 +63,6 @@ class Qt4_EnergyScanParametersBrick(BlissWidget):
                     object) run method.
         """
         if property_name == 'energy-scan':
-            print new_value
             self.energy_scan_widget.set_enegy_scan_hwobj(self.getHardwareObject(new_value))
         elif property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)

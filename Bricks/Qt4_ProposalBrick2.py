@@ -106,9 +106,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.proposal_password_ledit.setEchoMode(QtGui.QLineEdit.Password)
         self.proposal_password_ledit.setFixedWidth(40)
 
-        self.login_button = QtGui.QToolButton(self.login_widget)
-        self.login_button.setText("Login")
-        self.login_button.setUsesTextLabel(True)
+        self.login_button = QtGui.QPushButton("Login", self.login_widget)
+        self.login_button.setFixedWidth(60)
 
         self.user_group_widget = QtGui.QWidget(self)
         self.title_label = QtGui.QLabel(self.user_group_widget)
@@ -120,13 +119,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.user_group_save_button.setText("Set")
         self.saved_group = True
 
-        self.logout_button = QtGui.QToolButton(self)
-        self.logout_button.setText("Logout")
-        font = self.logout_button.font()
-        font.setPointSize(10)
-        self.logout_button.setFont(font)
-        self.logout_button.setUsesTextLabel(True)
-        #self.logout_button.setTextPosition(QToolButton.BesideIcon)
+        self.logout_button = QtGui.QPushButton("Logout", self.login_widget)
         self.logout_button.hide()
 
         # Layout --------------------------------------------------------------
@@ -147,7 +140,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         _login_widget_layout.addWidget(self.proposal_number_ledit)
         _login_widget_layout.addWidget(password_label)
         _login_widget_layout.addWidget(self.proposal_password_ledit)
-        _login_widget_layout.addWidget(self.login_button)
     
         _login_widget_layout.setSpacing(2)
         _login_widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -157,20 +149,13 @@ class Qt4_ProposalBrick2(BlissWidget):
         _main_vlayout.addWidget(self.login_widget)
         _main_vlayout.addWidget(self.user_group_widget)
         _main_vlayout.addStretch(0)
+        _main_vlayout.addWidget(self.login_button)
         _main_vlayout.addWidget(self.logout_button)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
-        """self.proposal_type_combox.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                                QtGui.QSizePolicy.MinimumExpanding)
-        self.proposal_number_ledit.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.MinimumExpanding)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
-        self.login_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
-        self.proposal_password_ledit.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.MinimumExpanding)
-        self.login_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        self.logout_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)"""
 
         # Qt signal/slot connections ------------------------------------------
         self.proposal_password_ledit.returnPressed.connect(self.login)
@@ -296,6 +281,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.laboratory = None
         # Change mode from logout to login
         self.login_widget.show()
+        self.login_button.show()
         self.logout_button.hide()
         self.title_label.hide()
         self.user_group_widget.hide()
@@ -333,6 +319,7 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         # Change mode
         self.login_widget.hide()
+        self.login_button.hide() 
         self.logout_button.show()
 
         # Store info in the brick
@@ -430,6 +417,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         # find if we are using ldap, dbconnection, etc. or not
         if None in (self.ldap_connection_hwobj, self.lims_hwobj):
             self.login_widget.hide()
+            self.login_button.hide()
             self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
             self.title_label.show()
             self.user_group_widget.show()
