@@ -24,6 +24,7 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 from BlissFramework.Utils import Qt4_widget_colors
+from PyMca import QPeriodicTable
 
 PERIODIC_ELEMENTS = [['H', '', '', '', '', '', '', '', '', '', '', '', '',
                       '', '', '', '', '', 'He'],
@@ -54,8 +55,11 @@ class PeriodicTableWidget(QtGui.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
+
+        self.periodic_table = CustomPeriodicTable(self)
+
         _main_gbox = QtGui.QGroupBox("Periodic table", self)
-        self.periodic_table = QtGui.QTableWidget(7, 19, _main_gbox)
+        #self.periodic_table = QtGui.QTableWidget(7, 19, _main_gbox)
 
         # Layout --------------------------------------------------------------
         _main_gbox_vlayout = QtGui.QVBoxLayout(self)
@@ -74,13 +78,13 @@ class PeriodicTableWidget(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
         self.periodic_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
                                           QtGui.QSizePolicy.Fixed)
-        self.periodic_table.setFixedSize(458, 156)
+        self.periodic_table.setFixedSize(450, 300)
 
         # Qt signal/slot connections ------------------------------------------
-        self.periodic_table.itemClicked.connect(self.periodic_table_element_clicked)
+        #self.periodic_table.itemClicked.connect(self.periodic_table_element_clicked)
 
         # Other ---------------------------------------------------------------
-        self.prepare_periodic_table()
+        #self.prepare_periodic_table()
         self.selected_element = None
         self.selected_edge = "L3"
         self.previous_selection = None
@@ -109,3 +113,62 @@ class PeriodicTableWidget(QtGui.QWidget):
   
     def set_current_element(self, element_str):
         print "set_current_element: implement" 
+
+class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
+    def __init__(self, *args):
+        QPeriodicTable.QPeriodicTable.__init__(self, *args)
+
+        self.elementsDict={}
+        #QtCore.QObject.connect(self, QtCore.SSIGNAL('elementClicked'),self.tableElementChanged)
+        for b in self.eltButton:
+            self.eltButton[b].colors[0]= QtGui.QColor(QtCore.Qt.green)
+            self.eltButton[b].colors[1]= QtGui.QColor(QtCore.Qt.darkGreen)
+            self.eltButton[b].setEnabled(False)
+        for el in QPeriodicTable.Elements:
+            symbol=el[0]
+            self.elementsDict[symbol]=el
+
+    def elementEnter(self,symbol,z,name):
+        b=self.eltButton[symbol]
+        if b.isEnabled():
+            b.setCurrent(True)
+
+    def elementLeave(self,symbol):
+        b=self.eltButton[symbol]
+        if b.isEnabled():
+            b.setCurrent(False)
+
+    def tableElementChanged(self,symbol):
+        energy=self.energiesDict[symbol]
+        self.setSelection((symbol,))
+
+        try:
+            energy=self.energiesDict[symbol]
+        except KeyError:
+            pass
+        else:
+            index=self.elementsDict[symbol][1]
+            name=self.elementsDict[symbol][4]
+            txt="<large>%s - %s </large>(%s,%s)" % (symbol,energy,index,name)
+            self.eltLabel.setText(txt)
+            self.emit(qt.PYSIGNAL('edgeSelected'), (symbol,energy))
+            self.emit(qt.PYSIGNAL("widgetSynchronize"),((symbol,),))
+
+    def setElements(self,elements):
+        self.energiesDict={}
+        for b in self.eltButton:
+            self.eltButton[b].setEnabled(False)
+
+        first_el=None
+        for el in elements:
+            symbol=el["symbol"]
+            if first_el is None:
+                first_el=symbol
+            energy=el["energy"]
+            self.energiesDict[symbol]=energy
+            b=self.eltButton[symbol]
+            b.setEnabled(True)
+
+    def widgetSynchronize(self,state):
+        symbol=state[0]
+        self.tableElementChanged(symbol)

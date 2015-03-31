@@ -141,10 +141,10 @@ class DataCollectTree(QtGui.QWidget):
         self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
-                                             QtGui.QSizePolicy.Expanding))   
-        self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
-                                                                QtGui.QSizePolicy.Expanding))
+        #self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
+        #                                     QtGui.QSizePolicy.Expanding))   
+        #self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
+        #                                                        QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
@@ -181,7 +181,7 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
         self.setAttribute(QtCore.Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
-        self.setFixedWidth(315)
+        #self.setFixedWidth(315)
 
         self.collect_button.setDisabled(True)
         self.setWindowTitle("Data collect")

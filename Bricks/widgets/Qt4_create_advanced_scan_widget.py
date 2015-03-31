@@ -125,8 +125,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                      QtCore.SIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
-        self.mesh_widget.draw_button.clicked.\
-             connect(self.draw_button_clicked)
+        self.mesh_widget.draw_button.clicked.connect(self.draw_button_clicked)
       
         self.mesh_widget.add_button.clicked.connect(self.add_drawing_clicked)
 
@@ -162,8 +161,8 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self._acq_widget.findChild(QtGui.QLineEdit, "energy_ledit").show()
         self._acq_widget.findChild(QtGui.QLabel, "resolution_label").show()
         self._acq_widget.findChild(QtGui.QLineEdit,"resolution_ledit").show()
-        self._acq_widget.findChild(QtGui.QLabel, "transmission_label").show()
-        self._acq_widget.findChild(QtGui.QLineEdit,"transmission_ledit").show()
+        #self._acq_widget.transmission_label.show()
+        #self._acq_widget.transmission_ledit.show()
         #self._acq_widget.setFixedHeight(185)
 
     def init_models(self):
@@ -187,7 +186,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
 
-        list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
+        list_view_item = self.mesh_widget.mesh_treewidget.currentItem()
         if list_view_item is not None:
             drawing_mgr = self.__list_items[list_view_item]
             key = str(list_view_item.text(0))
@@ -314,7 +313,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.__drawing_mgr.set_cell_shape(self.__beam_shape == "ellipse")
 
     def draw_button_clicked(self):
-        self._graphics_manager_hwobj.set_mesh_draw_state(True)
+        self._graphics_manager_hwobj.start_mesh_draw()
+
+
         return 
 
         if self.__mini_diff_hwobj is not None:
@@ -340,7 +341,8 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         drawing_mgr.reshape()
 
     def add_drawing_clicked(self):
-        self._graphics_manager_hwobj.set_mesh_draw_state(False)
+        self._graphics_manager_hwobj.save_current_mesh()
+
         return
 
         if self.__drawing_mgr.isVisible()[0]:

@@ -81,6 +81,8 @@ class ConfirmDialog(QtGui.QDialog):
         # Layout --------------------------------------------------------------
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.dialog_layout_widget)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setSpacing(0) 
         self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------

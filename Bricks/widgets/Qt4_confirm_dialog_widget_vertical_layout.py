@@ -71,12 +71,16 @@ class ConfirmDialogWidgetVerticalLayout(QtGui.QWidget):
         cbx_layout = QtGui.QVBoxLayout(self)
         cbx_layout.addWidget(self.force_dark_cbx)
         cbx_layout.addWidget(self.skip_existing_images_cbx)
+        cbx_layout.setContentsMargins(0, 0, 0, 0)
+        cbx_layout.setSpacing(2)
         self.cbx_widget.setLayout(cbx_layout)        
 
         take_snapshots_layout = QtGui.QHBoxLayout(self)
-        take_snapshots_layout.addWidget(self.take_snapshots_cbox)
         take_snapshots_layout.addWidget(self.take_snapshots_label)
+        take_snapshots_layout.addWidget(self.take_snapshots_cbox)
         take_snapshots_layout.addStretch(0)
+        take_snapshots_layout.setContentsMargins(0, 0, 0, 0)
+        take_snapshots_layout.setSpacing(2)
         self.take_snapshots_widget.setLayout(take_snapshots_layout)
 
         cbx_layout.addWidget(self.take_snapshots_widget)

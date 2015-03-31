@@ -43,6 +43,12 @@ class DCParametersWidget(QtGui.QWidget):
         if name is not None:
             self.setObjectName(name) 
 
+        # Properties ----------------------------------------------------------
+
+        # Signals ------------------------------------------------------------
+
+        # Slots ---------------------------------------------------------------
+
         # Hardware objects ----------------------------------------------------
         self._beamline_setup_hwobj = None
 
@@ -50,12 +56,6 @@ class DCParametersWidget(QtGui.QWidget):
         self._data_collection = None
         self.add_dc_cb = None
         self._tree_view_item = None
-
-        # Properties ----------------------------------------------------------
-
-        # Signals ------------------------------------------------------------
-
-        # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
         _dc_parameters_widget = QtGui.QWidget(self)
@@ -67,7 +67,7 @@ class DCParametersWidget(QtGui.QWidget):
         self.processing_widget = ProcessingWidget(_dc_parameters_widget)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
-        self.position_widget.setMinimumSize(450, 340)
+        #self.position_widget.setMinimumSize(310, 210)
         
         # Layout --------------------------------------------------------------
         _dc_parameters_widget_layout = QtGui.QVBoxLayout(self)
@@ -87,27 +87,22 @@ class DCParametersWidget(QtGui.QWidget):
         #_main_hlayout.addStretch(0)
         self.setLayout(_main_hlayout)
 
-        # SizePolicies -------------------------------------------------------
+        # SizePolicies --------------------------------------------------------
+        
 
         # Qt signal/slot connections ------------------------------------------
-
+        self.path_widget.data_path_layout.prefix_ledit.textChanged.connect(
+                     self._prefix_ledit_change)
+        self.path_widget.data_path_layout.run_number_ledit.textChanged.connect( 
+                     self._run_number_ledit_change)
         self.connect(self.acq_widget, QtCore.SIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
-
-        self.connect(self.path_widget.data_path_layout.findChild(QtGui.QLineEdit, 'prefix_ledit'), 
-                     QtCore.SIGNAL("textChanged(const QString &)"), 
-                     self._prefix_ledit_change)
-
-        self.connect(self.path_widget.data_path_layout.findChild(QtGui.QLineEdit, 'run_number_ledit'),
-                     QtCore.SIGNAL("textChanged(const QString &)"), 
-                     self._run_number_ledit_change)
-
         self.connect(self.acq_widget,
                      QtCore.SIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
-        #qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
-        #                   self.tab_changed)
+        #QtCore.QObject.connect(QtGui.QApplication, QtCore.SIGNAL('tab_changed'),
+        #                       self.tab_changed)
 
         # Other ---------------------------------------------------------------
         Qt4_widget_colors.set_widget_color(self.path_widget,
@@ -184,7 +179,7 @@ class DCParametersWidget(QtGui.QWidget):
         self.path_widget.setEnabled(state)
         self.processing_widget.setEnabled(state)
 
-    def populate_parameter_widget(self, item):
+    def populate_widget(self, item):
         data_collection = item.get_model()
         self._tree_view_item = item
         self._data_collection = data_collection
@@ -214,8 +209,8 @@ class DCParametersWidget(QtGui.QWidget):
                 centred_position.snapshot_image:
             image = data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
-            
-            image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
+            ration = image.height() / float(image.width())
+            image = image.scaled(300, 300 * ration, QtCore.Qt.KeepAspectRatio)
             self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
