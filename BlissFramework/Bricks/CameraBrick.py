@@ -329,7 +329,7 @@ class CameraBrick(BlissWidget):
             self.imageReceivedConnected = False
 
     def disable_update(self):
-        self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
+        #self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
         self.update_disabled = True
 
     def enable_update(self):
