@@ -291,6 +291,7 @@ class DuoStateBrick(BaseComponents.BlissWidget):
 ###
 class WrapperHO(QObject):
     wagoStateDict={'in':'in', 'out':'out', 'unknown':'unknown'}
+    actuatorStateDict={'in':'in', 'out':'out', 'unknown':'unknown'}
 
     shutterStateDict={'fault':'error', 'opened':'in', 'closed':'out',\
         'unknown':'unknown', 'moving':'moving', 'automatic':'automatic',\
@@ -310,7 +311,6 @@ class WrapperHO(QObject):
         self.getState = new.instancemethod(lambda self: "unknown", self)
 
         self.dev=hardware_obj
-
         try:
             sClass = str(self.dev.__class__)
             i, j = re.search("'.*'", sClass).span()
@@ -327,6 +327,9 @@ class WrapperHO(QObject):
         if self.devClass=="TangoShutter":
             self.devClass="Shutter"
 
+        if self.devClass=="MicrodiffInOut":
+            self.devClass="Actuator"
+
         #2011-08-30-bessy-mh: let the wrapper also feel responsible for my new ShutterEpics hardware object
         #                     identical to the original Shutter hardware object
         if self.devClass == "ShutterEpics":
@@ -338,7 +341,7 @@ class WrapperHO(QObject):
             self.devClass = "Shutter"
         #2013-10-31-bessy-mh: end
             
-        if not self.devClass in ("WagoPneu", "Shutter", "SpecMotorWSpecPositions", "Procedure"):
+        if not self.devClass in ("WagoPneu", "Shutter", "SpecMotorWSpecPositions", "Procedure", "Actuator"):
           self.devClass = "WagoPneu"
 
         initFunc = getattr(self, "init%s" % self.devClass)
@@ -387,6 +390,34 @@ class WrapperHO(QObject):
         state=self.dev.getWagoState()
         try:
             state=WrapperHO.wagoStateDict[state]
+        except KeyError:
+            state='error'
+        return state
+
+    # Actuator HO methods
+    def initActuator(self):
+        #print "initActuator"
+        self.dev.connect(self.dev,'actuatorStateChanged', self.stateChangedActuator)
+    def setInActuator(self):
+        #print "setInActuator"
+        self.emit(PYSIGNAL('duoStateChanged'), ('moving', ))
+        self.dev.actuatorIn()
+    def setOutActuator(self):
+        #print "setOutActuator"
+        self.emit(PYSIGNAL('duoStateChanged'), ('moving', ))
+        self.dev.actuatorOut()
+    def stateChangedActuator(self,state):
+        #print "stateChangedActuator",state
+        try:
+            state=WrapperHO.actuatorStateDict[state]
+        except KeyError:
+            state='error'
+        self.emit(PYSIGNAL('duoStateChanged'), (state, ))
+    def getStateActuator(self):
+        #print "getStateActuator"
+        state=self.dev.getActuatorState()
+        try:
+            state=WrapperHO.actuatorStateDict[state]
         except KeyError:
             state='error'
         return state
