@@ -170,7 +170,10 @@ class TangoResolutionComplex(BaseHardwareObjects.Equipment):
     def stateChanged(self, state):
         #logging.getLogger("HWR").debug("%s: TangoResolution.stateChanged: %s"\
         #                                            % (self.name(), state))
-        self.emit('stateChanged', (TangoResolutionComplex.stateDict[str(state)], ))
+        try:
+            self.emit('stateChanged', (TangoResolutionComplex.stateDict[str(state)], ))
+        except KeyError:
+            self.emit('stateChanged', (TangoResolutionComplex.stateDict['UNKNOWN'], )) #ms 2015-03-26 trying to get rid of the fatal error with connection to detector ts motor
 
 
     def getLimits(self, callback=None, error_callback=None):
@@ -270,8 +273,9 @@ class TangoResolutionComplex(BaseHardwareObjects.Equipment):
         
     def dist2res(self, Distance, callback=None, error_callback=None):
 
-        Distance = float(Distance)
+        #Distance = float(Distance)# MS 2015-03-26 moving statement inside try loop
         try:
+            Distance = float(Distance)
             #Wavelength = self.monodevice._SimpleDevice__DevProxy.read_attribute("lambda").value
             if self.currentWavelength is None:
                 self.currentWavelength = self.blenergyHO.getCurrentWavelength()
