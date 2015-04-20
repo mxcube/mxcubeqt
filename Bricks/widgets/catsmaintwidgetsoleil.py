@@ -251,7 +251,7 @@ class CatsMaintWidgetSoleil(QWidget):
         self.btDry.setText(self.__tr("Dry"))
         self.btSoak.setText(self.__tr("Soak"))
         self.groupBox14.setTitle(QString.null)
-        self.btMemoryClear.setText(self.__tr("Clear Memory"))
+        self.btMemoryClear.setText(self.__tr("Missing Sample")) #MS 2015-03-25 replacing Clear Memory by Missing Sample
         self.btToolOpen.setText(self.__tr("Open Tool"))
         self.btToolcal.setText(self.__tr("Calibrate"))
         self.groupBox13.setTitle(QString.null)
