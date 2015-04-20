@@ -40,7 +40,8 @@ class SoleilCatsMaintBrick(BaseComponents.BlissWidget):
         qt.QObject.connect(self.widget.btHome, qt.SIGNAL('clicked()'), self._homeTraj)
         qt.QObject.connect(self.widget.btDry, qt.SIGNAL('clicked()'), self._drySoakTraj)
         qt.QObject.connect(self.widget.btSoak, qt.SIGNAL('clicked()'), self._soakTraj)
-        qt.QObject.connect(self.widget.btMemoryClear, qt.SIGNAL('clicked()'), self._clearMemory)
+        #qt.QObject.connect(self.widget.btMemoryClear, qt.SIGNAL('clicked()'), self._clearMemory)
+        qt.QObject.connect(self.widget.btMemoryClear, qt.SIGNAL('clicked()'), self._ackSampleMemory)
         qt.QObject.connect(self.widget.btToolOpen, qt.SIGNAL('clicked()'), self._openTool)
         qt.QObject.connect(self.widget.btToolcal, qt.SIGNAL('clicked()'), self._toolcalTraj)
         ###
@@ -337,7 +338,15 @@ class SoleilCatsMaintBrick(BaseComponents.BlissWidget):
                 self.device.clearMemory()
         except:
             qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
-            
+   
+    def _ackSampleMemory(self):
+        logging.getLogger("user_level_log").info("CATS: acknowlege missing sample.")
+        try:
+            if self.device is not None:
+                self.device.ackSampleMemory()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+         
     def _openTool(self):
         logging.getLogger("user_level_log").info("CATS: Open the tool.")
         try:
