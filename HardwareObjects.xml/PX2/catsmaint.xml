@@ -11,6 +11,7 @@
   <command type="tango" name="_cmdDrySoak">dry_soak</command>
   <command type="tango" name="_cmdSoak">soak</command>
   <command type="tango" name="_cmdClearMemory">clear_memory</command>
+  <command type="tango" name="_cmdAckSampleMemory">ack_sample_memory</command>
   <command type="tango" name="_cmdOpenTool">opentool</command>
   <command type="tango" name="_cmdToolCal">toolcal</command>
 
