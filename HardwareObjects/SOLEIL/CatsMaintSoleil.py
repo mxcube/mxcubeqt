@@ -40,7 +40,7 @@ class CatsMaintSoleil(Equipment):
         self._chnLN2Regulation.connectSignal("update", self._updateRegulationState)
         logging.info('self._chnPathRunning %s' % self._chnPathRunning)
         for command_name in ("_cmdReset", "_cmdBack", "_cmdSafe", "_cmdHome", "_cmdDry", "_cmdDrySoak", "_cmdSoak", "_cmdClearMemory",\
-                             "_cmdOpenTool", "_cmdToolCal", "_cmdPowerOn", "_cmdPowerOff", \
+                             "_cmdAckSampleMemory", "_cmdOpenTool", "_cmdToolCal", "_cmdPowerOn", "_cmdPowerOff", \
                              "_cmdOpenLid1", "_cmdCloseLid1", "_cmdOpenLid2", "_cmdCloseLid2", "_cmdOpenLid3", "_cmdCloseLid3", \
                              "_cmdRegulOn"):
             setattr(self, command_name, self.getCommandObject(command_name))
@@ -92,9 +92,15 @@ class CatsMaintSoleil(Equipment):
         
     def clearMemory(self):    
         """
-        Moves the robot arm to the home position
+        Clears the memory
         """    
         return self._executeTask(False,self._doClearMemory)  
+    
+    def ackSampleMemory(self):    
+        """
+        Acknowledge incoherence between memorized and actual sample status -- e.g. if robot executed put trajectory but no sample was mounted on the gonio -- either because of empty position or problem with gripper.
+        """    
+        return self._executeTask(False,self._doAckSampleMemory) 
         
     def opentool(self):    
         """
@@ -197,6 +203,16 @@ class CatsMaintSoleil(Equipment):
         """
         #argin = 1
         self._executeServerTask(self._cmdClearMemory)
+        
+    def _doAckSampleMemory(self):
+        """
+        Execute "clear_memory" command on the CATS Tango DS
+
+        :returns: None
+        :rtype: None
+        """
+        #argin = 1
+        self._executeServerTask(self._cmdAckSampleMemory)
     
     def _doOpentool(self):
         """
@@ -309,6 +325,14 @@ class CatsMaintSoleil(Equipment):
 
     def _updateMessage(self, value):
         logging.info('CatsMaint _updateMessage %s' % value)
+        if 'incoherent' in value.lower():
+            value = '%s\nThe sample is not present on the gonio although robot thinks it should be.\nThis can happen in three cases:\n1. there was no sample in the specified position in the puck,\n2. the robot could not get it (rare)\n3. the gonio can not detect sample which is present (very rare).\nIf the sample is really not present on the gonio please click "abort" button\n and then "Missing sample" button below to be able to continue.' % value
+        if 'trfgtd' in value.lower():
+            value = '%s\nTransfer permission was not granted by the gonio.\n1. Please Abort the trajectory\n2. set gonio to Transfer phase from the pull down menu on the right\n3. Start the load/unload trajectory again.' % s
+        if 'dback' in value.lower():
+            value = '%s\nThe detector is too close (less then 180 mm from the sample)\nPlease move it to at least 181 mm.' % value
+        if 'remote mode requested' in value.lower():
+            value = '%s\nRemote operation not enabled.\nPlease turn the robot key to the remote position.\nThe key is located next to the experiment hutch door.' % value
         self.emit('messageChanged', (value, ))
 
     def _updateRegulationState(self, value):
