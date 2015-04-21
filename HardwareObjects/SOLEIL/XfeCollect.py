@@ -173,6 +173,7 @@ class XfeCollect(object):
         self.md2.FluoDetectorIsBack = True
     
     def startXfeSpectrum(self):
+        self.transmission(0.5)
         self.measureSpectrum()
         return 
         
@@ -266,6 +267,7 @@ class XfeCollect(object):
         cal = self.get_calibration()
         pickle.dump({'x': x, 'energies': energies, 'calibration': cal, 'y': y}, f)
         f.close()
+        #self.plotSpectrum()
         
     def plotSpectrum(self):
         x = self.get_calibrated_energies() #getXvals()
@@ -280,7 +282,7 @@ class XfeCollect(object):
         pylab.ylabel('Intensity [Counts]')
         pylab.savefig(self.filename)
         
-        pylab.show()
+        ##pylab.show()
         
 if __name__ == '__main__':
     usage = 'Program to perform collect on PX2 beamline.\n\n%prog -n <number_of_images>\n\nNumber of images to be collected has to be specified, others are optional.'
@@ -299,4 +301,4 @@ if __name__ == '__main__':
     time.sleep(0.5)
     doCollect.measureSpectrum()
     doCollect.plotSpectrum()
-
+    pylab.show()
