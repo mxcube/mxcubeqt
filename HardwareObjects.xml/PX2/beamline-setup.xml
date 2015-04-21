@@ -15,7 +15,7 @@
   <!-- Software (abstract) concepts -->
   <object href="/shape-history"      role="shape_history"/>
   <object href="/session"            role="session"/>
-  <object href="/dbconnection"       role="lims_client" />
+  <object href="/dbconnection-mockup"       role="lims_client" />
   <object href="/data-analysis"      role="data_analysis"/>
   <object href="/mxcollect"          role="collect"/>
  
