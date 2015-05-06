@@ -41,6 +41,9 @@ class QueueItem(QtGui.QTreeWidgetItem):
     bg_normal_brush = QtGui.QBrush(QtCore.Qt.white)
 
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         # All subclasses should have the following
         # data attributes.
         self.deletable = kwargs.pop('deletable', False)
@@ -59,14 +62,17 @@ class QueueItem(QtGui.QTreeWidgetItem):
         self.setText(1, '')         
 
     def activate(self):
-         """
-         Inherited from QCheckListitem, called whenever the user presses the 
-         mouse on this item or presses Space on it. 
-         """
-         if self._checkable:
-             qt.QCheckListItem.activate(self)
+        """
+        Inherited from QCheckListitem, called whenever the user presses the 
+        mouse on this item or presses Space on it. 
+        """
+        if self._checkable:
+            QtGui.QCheckListItem.activate(self)
 
     def stateChange(self, state):
+        """
+        Descript. :
+        """
         if self._checkable:
             QtGui.QCheckListItem.stateChange(self, state)
             # The QCheckListItem is somewhat tricky:
@@ -138,6 +144,9 @@ class QueueItem(QtGui.QTreeWidgetItem):
         color_group.setBrush(qt.QColorGroup.Text, self.normal_brush)
 
     def move_item(self, after):
+        """
+        Descript. :
+        """
         self.parent().takeChild(self.parent().indexOfChild(self))
         after.parent().insertChild(after.parent().indexOfChild(after), self)
 

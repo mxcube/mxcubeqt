@@ -36,7 +36,14 @@ __category__ = 'Qt4_General'
 
 
 class Qt4_McaSpectrumBrick(BlissWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         self.defineSlot('setData',())
@@ -57,6 +64,9 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         
 
     def setData(self, data, calib, config):
+        """
+        Descript. :
+        """
         try:
             configured = False
             if config.get("file", None):
@@ -100,9 +110,15 @@ class Qt4_McaSpectrumBrick(BlissWidget):
             logging.getLogger().exception('McaSpectrumBrick: problem fitting %s %s %s' % (str(data),str(calib),str(config)))
 
     def _fit(self):
+        """
+        Descript. :
+        """
         return self.mcafit.fit()
 
     def _configure(self,config):
+        """
+        Descript. :
+        """
         d = ConfigDict.ConfigDict()
         d.read(config["file"])
         if not d.has_key('concentrations'):
@@ -117,6 +133,9 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         self.mcafit.mcafit.configure(d)
 
     def clear(self):
+        """
+        Descript. :
+        """
         #TODO make with clear
         x = Numeric.array([0]).astype(Numeric.Float)
         y = Numeric.array([0]).astype(Numeric.Float)

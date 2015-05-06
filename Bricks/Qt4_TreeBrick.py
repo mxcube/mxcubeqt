@@ -40,7 +40,14 @@ __category__ = 'Qt4_General'
 
 
 class Qt4_TreeBrick(BlissWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
@@ -163,6 +170,9 @@ class Qt4_TreeBrick(BlissWidget):
 
     # Framework 2 method
     def run(self):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
@@ -176,6 +186,9 @@ class Qt4_TreeBrick(BlissWidget):
 
     # Framework 2 method
     def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
         if property_name == 'holder_length_motor':
             self.dc_tree_widget.hl_motor_hwobj = self.getHardwareObject(new_value)
 
@@ -233,13 +246,15 @@ class Qt4_TreeBrick(BlissWidget):
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,
                     is_inhouse = None):
-
-         self.session_hwobj.set_session_start_date(start_date)
+        """
+        Descript. :
+        """
+        self.session_hwobj.set_session_start_date(start_date)
 
     def logged_in(self, logged_in):
         """
-        Connected to the signal loggedIn of ProposalBrick2.
-        The signal is emitted when a user was succesfully logged in.
+        Descript. :Connected to the signal loggedIn of ProposalBrick2.
+                   The signal is emitted when a user was succesfully logged in.
         """
         self.enable_collect(logged_in)
         
@@ -274,12 +289,21 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.enable_collect(state)
 
     def enable_hutch_menu(self, state):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("enable_hutch_menu"), state)
 
     def enable_command_menu(self, state):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("enable_command_menu"), state)
 
     def enable_task_toolbox(self, state):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("enable_task_toolbox"), state)
 
     def get_tree_brick(self, tree_brick):
@@ -296,6 +320,9 @@ class Qt4_TreeBrick(BlissWidget):
         tree_brick['tree_brick'] = self
 
     def samples_from_lims(self, samples):
+        """
+        Descript. :
+        """
         barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(samples)
         l_samples = dict()            
    
@@ -397,7 +424,8 @@ class Qt4_TreeBrick(BlissWidget):
         sc_basket_content = []
         sc_sample_content = []
 
-        try:
+        #try:
+        if True:
             for basket in self.sample_changer_hwobj.getBasketList():
                 basket_index = basket.getIndex()
                 basket_code = basket.getID() or ""
@@ -411,7 +439,8 @@ class Qt4_TreeBrick(BlissWidget):
                 basket_code = sample.getContainer().getID() or ""
 
                 sc_sample_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
-        except Exception:
+        else:
+        #except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
@@ -455,6 +484,9 @@ class Qt4_TreeBrick(BlissWidget):
             setPaletteBackgroundColor(qt.QColor(s_color))
 
     def show_sample_centring_tab(self):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton, 
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
@@ -469,6 +501,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_advanced_scan_tab"), True)
 
     def show_sample_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
@@ -484,6 +519,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_advanced_scan_tab"), True)
 
     def show_dcg_tab(self):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
@@ -497,9 +535,15 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_advanced_scan_tab"), True)
 
     def populate_dc_parameters_tab(self, item = None):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("populate_dc_parameter_widget"), item)
         
     def show_datacollection_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
@@ -514,6 +558,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_dc_parameters_tab(item)
 
     def show_char_parameters_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
@@ -528,9 +575,15 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_char_parameters_tab(item)
 
     def populate_char_parameters_tab(self, item):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("populate_char_parameter_widget"), item)
 
     def show_energy_scan_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
@@ -545,9 +598,15 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("populate_energy_scan_widget"), item)
 
     def show_xrf_scan_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton, 
              'details_button').setText("Show SC")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
@@ -562,9 +621,15 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_xrf_scan_tab(item)
 
     def populate_xrf_scan_tab(self, item):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("populate_xrf_scan_widget"), item)
 
     def show_advanced_scan_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
@@ -579,12 +644,21 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_xrf_scan_tab(item)
 
     def populate_xrf_scan_tab(self, item):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("populate_xrf_scan_widget"), item)
 
     def show_workflow_tab_from_model(self):
+        """
+        Descript. :
+        """
         self.show_workflow_tab(None)
         
     def show_workflow_tab(self, item):
+        """
+        Descript. :
+        """
         self.sample_changer_widget.findChild(QtGui.QPushButton,
              'details_button').setText("Show SC-details")
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
@@ -601,9 +675,15 @@ class Qt4_TreeBrick(BlissWidget):
         self.populate_workflow_tab(item, running=running)
 
     def populate_workflow_tab(self, item, running = False):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("populate_workflow_tab"), item, running)
         
     def toggle_sample_changer_tab(self): 
+        """
+        Descript. :
+        """
         if self.current_view == self.sample_changer_widget:
             self.current_view = None
             self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
@@ -620,6 +700,9 @@ class Qt4_TreeBrick(BlissWidget):
             self.emit(QtCore.SIGNAL("hide_sample_tab"), True)
         
     def selection_changed(self, items):
+        """
+        Descript. :
+        """
         if len(items) == 1:
             item = items[0]
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
@@ -642,21 +725,36 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("selection_changed"), items)
 
     def emit_set_directory(self):
+        """
+        Descript. :
+        """
         directory = self.session_hwobj.get_base_image_directory()
         self.emit(QtCore.SIGNAL("set_directory"), directory)
 
     def emit_set_prefix(self, item):
+        """
+        Descript. :
+        """
         prefix = self.session_hwobj.get_default_prefix(item.get_model())
         self.emit(QtCore.SIGNAL("set_prefix"), prefix)
 
     def emit_set_sample(self, item):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("set_sample"), item)
 
     def get_selected_items(self):
+        """
+        Descript. :
+        """
         items = self.dc_tree_widget.get_selected_items()
         return items
 
     def add_to_queue(self, task_list, parent_tree_item = None, set_on = True):
+        """
+        Descript. :
+        """
         if not parent_tree_item :
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
         
