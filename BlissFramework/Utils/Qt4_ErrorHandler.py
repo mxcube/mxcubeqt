@@ -24,6 +24,9 @@ _handler = None
 
 
 def Handler():
+    """
+    Descript. :
+    """
     global _handler
 
     if _handler is None:
@@ -33,6 +36,9 @@ def Handler():
 
 
 def disableStdErrRedirection():
+    """
+    Descript. :
+    """
     global _handler
     
     _handler = None
@@ -42,23 +48,34 @@ def disableStdErrRedirection():
     
 
 def enableStdErrRedirection():
-    #
-    # redirect stderr and installs excepthook 
-    #
+    """
+    Descript. : redirect stderr and installs excepthook 
+    """
     sys.stderr = Handler()
     sys.excepthook = Handler().excepthook
       
 
 class __Handler:
+    """
+    Descript. :
+    """
+
     def write(self, buffer):
+        """
+        Descript. :
+        """
         logging.getLogger().error(buffer)
            
- 
     def flush(self):
+        """
+        Descript. :
+        """
         pass
 
-    
     def excepthook(self, type, value, tb):
+        """
+        Descript. :
+        """
         if type == KeyboardInterrupt:
           #qt.qApp.quit()
           QtGui.QApplication.quit()

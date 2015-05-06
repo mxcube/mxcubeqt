@@ -24,12 +24,15 @@ import Qt4_GraphicsManager
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+
 __category__ = 'Qt4_Graphics'
+
 
 class Qt4_CameraBrick(BlissWidget):
     """
     Descript. :
     """
+
     def __init__(self, *args):
         """
         Descript. : Initiates BlissWidget Brick

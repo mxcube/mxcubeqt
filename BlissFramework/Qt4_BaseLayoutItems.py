@@ -29,8 +29,16 @@ DEFAULT_MARGIN = 5
 DEFAULT_SPACING = 5
 DEFAULT_ALIGNMENT = "top center"
 
+
 class _CfgItem:
+    """
+    Descript. :
+    """
+
     def __init__(self, name, item_type=""):
+        """
+        Descript. :
+        """
         self.name = name
         self.type = item_type
         self.children = []
@@ -61,27 +69,43 @@ class _CfgItem:
             elif item_property.hidden:
                 self.properties[item_property.getName()] = item_property
                 
-        
     def __getitem__(self, item):
+        """
+        Descript. :
+        """
         try:
             return getattr(self, item)
         except AttributeError:
             raise KeyError, item
 
-
     def __setitem__(self, item, value):
+        """
+        Descript. :
+        """
         setattr(self, item, value)
-    
 
     def __repr__(self):
+        """
+        Descript. :
+        """
         return repr(self.__dict__)
 
     def rename(self, new_name):
+        """
+        Descript. :
+        """
         self.name = new_name
         
 
 class ContainerCfg(_CfgItem):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         _CfgItem.__init__(self, *args)
         
         self.properties.addProperty("label", "string", "")
@@ -95,22 +119,39 @@ class ContainerCfg(_CfgItem):
         self.properties.addProperty("shadowstyle", "combo", ("plain", "raised", "sunken", "default"), "default")
 
     def addChild(self, item):
+        """
+        Descript. :
+        """
         self.children.append(item)
         return ""
     
-
-    def childPropertyChanged(self, child_name, property, old_value, new_value):
+    def childPropertyChanged(self, child_name, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
         pass
 
     def updateSlots(self):
+        """
+        Descript. :
+        """
         pass
 
     def removeChild(self, child_index):
+        """
+        Descript. :
+        """
         del self.children[child_index]
 
-
 class MenuEditor(QtGui.QDialog):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent, window_name):
+        """
+        Descript. :
+        """
         QtGui.QDialog.__init__(self, parent)
 
         self.window_name = window_name
@@ -121,14 +162,22 @@ class MenuEditor(QtGui.QDialog):
         _main_vlayout.addWidget(QtGui.QLabel("<h2>feature to be implemented, sorry for the inconvenience</h2>", self))
         self.setLayout(_main_vlayout)
         
-
     def __repr__(self):
+        """
+        Descript. :
+        """
         return "'<Menu Editor - %s>'" % self.window_name
     
 
-
 class WindowCfg(ContainerCfg):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         _CfgItem.__init__(self, *args)
 
         self.type = "window"
@@ -136,7 +185,8 @@ class WindowCfg(ContainerCfg):
         
         self.properties.addProperty("caption", "string", "")
         self.properties.addProperty("show", "boolean", True)
-        for suffix in ['','_%d' % QtCore.Qt.Key_F9,'_%d' % QtCore.Qt.Key_F10,'_%d' % QtCore.Qt.Key_F11,'_%d' % QtCore.Qt.Key_F12] :
+        for suffix in ['','_%d' % QtCore.Qt.Key_F9,'_%d' % QtCore.Qt.Key_F10, \
+                       '_%d' % QtCore.Qt.Key_F11,'_%d' % QtCore.Qt.Key_F12] :
             self.properties.addProperty("x%s" % suffix, "integer", 0) #, hidden=True)
             self.properties.addProperty("y%s" % suffix, "integer", 0) #, hidden=True)
             self.properties.addProperty("w%s" % suffix, "integer", 0) #, hidden=True)
@@ -149,18 +199,10 @@ class WindowCfg(ContainerCfg):
         self.signals.update({ "isShown": (), "isHidden": (), "enableExpertMode": (), "quit":() })
         self.slots.update({ "show": (), "hide": (), "setCaption": (), "exitExpertMode": () })
 
-    """
-    def addChild(self, item):
-        if len(self.children) > 0:
-            # allow only one child
-            return "Windows can only have one container child."
-
-        if isinstance(item, ContainerCfg):
-            return ContainerCfg.addChild(self, item)
-        else:
-            return "Windows can only have one container child."
-    """
     def menuEditor(self):
+        """
+        Descript. :
+        """
         if not hasattr(self, "_menuEditor"):
             # backward compatibility!
             self._menuEditor=None
@@ -172,14 +214,23 @@ class WindowCfg(ContainerCfg):
     
         
 class TabCfg(ContainerCfg):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         ContainerCfg.__init__(self, *args)
 
         self.properties.addProperty("fontSize", "integer", 0)  
         self.signals.update({ "notebookPageChanged": "pageName"})
 
-
     def setProperties(self, properties):
+        """
+        Descript. :
+        """
         for property in properties:
             prop_name = property.getName()
             if prop_name in self.properties.properties:
@@ -187,8 +238,10 @@ class TabCfg(ContainerCfg):
             elif property.hidden or prop_name.startswith("closable_"):
                 self.properties[prop_name] = property
 
-
     def __repr__(self):
+        """
+        Descript. :
+        """
         try:
             widget = self.widget
         except AttributeError:
@@ -205,25 +258,33 @@ class TabCfg(ContainerCfg):
         """
         return r
 
-
     def addChild(self, item):
+        """
+        Descript. :
+        """
         if isinstance(item, ContainerCfg):
             return ContainerCfg.addChild(self, item)
         else:
             return "Tabs can only have container children."
-        
 
-    def childPropertyChanged(self, child_name, property, old_value, new_value):
-        if property == "label":
+    def childPropertyChanged(self, child_name, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
+        if property_name == "label":
             self.updateSlots()
             
-
     def removeChild(self, child_index):
+        """
+        Descript. :
+        """
         ContainerCfg.removeChild(self, child_index)
         self.updateSlots()
 
-
     def updateSlots(self):
+        """
+        Descript. :
+        """
         closable_props = {}
         for prop in self.properties:
           if prop.name.startswith("closable_"):
@@ -236,24 +297,27 @@ class TabCfg(ContainerCfg):
         for child in self.children:  
             if "label" in child["properties"].properties:
                 child_lbl = child["properties"]["label"]
-                self.properties.addProperty("closable_%s" % child_lbl, "boolean", closable_props.get("closable_%s"%child_lbl,False))
+                self.properties.addProperty("closable_%s" % child_lbl, 
+                     "boolean", closable_props.get("closable_%s" % child_lbl, False))
                 #self.properties.getProperty("closable_%s" % child_lbl).child_item=id(child)
  
-                slot_name="showPage_%s" % child_lbl
-                self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="hidePage_%s" % child_lbl
-                self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="enablePage_%s" % child_lbl
-                self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="enableTab_%s" % child_lbl
-                self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="incTabCount_%s" % child_lbl
-                self.slots[slot_name.replace(" ", "_")]=()
-                slot_name="resetTabCount_%s" % child_lbl
-                self.slots[slot_name.replace(" ", "_")]=()
+                slot_name = "showPage_%s" % child_lbl
+                self.slots[slot_name.replace(" ", "_")] = ()
+                slot_name = "hidePage_%s" % child_lbl
+                self.slots[slot_name.replace(" ", "_")] = ()
+                slot_name = "enablePage_%s" % child_lbl
+                self.slots[slot_name.replace(" ", "_")] = ()
+                slot_name = "enableTab_%s" % child_lbl
+                self.slots[slot_name.replace(" ", "_")] = ()
+                slot_name = "incTabCount_%s" % child_lbl
+                self.slots[slot_name.replace(" ", "_")] = ()
+                slot_name = "resetTabCount_%s" % child_lbl
+                self.slots[slot_name.replace(" ", "_")] = ()
 
     def notebookPageChanged(self, new_page): 
-        print new_page
+        """
+        Descript. :
+        """
         #if self.properties.getProperty("closable_%s" % new_page.item_cfg["properties"]["label"]).getValue():
         if self.properties.getProperty("closable_%s" % new_page).getValue():
             self.widget.close_tab_button.show()
@@ -262,16 +326,30 @@ class TabCfg(ContainerCfg):
 
 
 class SplitterCfg(ContainerCfg):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         ContainerCfg.__init__(self, *args)
 
-        self.properties.addProperty("sizes", "string", "[]", hidden=True)
-        for key in [QtCore.Qt.Key_F9,QtCore.Qt.Key_F10,QtCore.Qt.Key_F11,QtCore.Qt.Key_F12] :
-            self.properties.addProperty("sizes_%d" % key,"string","[]",hidden = True)
+        self.properties.addProperty("sizes", "string", "[]", hidden = True)
+        for key in [QtCore.Qt.Key_F9, QtCore.Qt.Key_F10, QtCore.Qt.Key_F11, QtCore.Qt.Key_F12] :
+            self.properties.addProperty("sizes_%d" % key, "string", "[]", hidden = True)
 
 
 class SpacerCfg(_CfgItem):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         _CfgItem.__init__(self, *args)
 
         self.properties.addProperty("fixed_size", "boolean", False)
@@ -279,7 +357,14 @@ class SpacerCfg(_CfgItem):
         
 
 class LabelCfg(_CfgItem):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         _CfgItem.__init__(self, *args)
 
         self.properties.addProperty("text", "string", "")
@@ -287,14 +372,28 @@ class LabelCfg(_CfgItem):
 
 
 class IconCfg(_CfgItem):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         _CfgItem.__init__(self, *args)
 
         self.properties.addProperty("filename", "file", "")
 
 
 class BrickCfg(_CfgItem):
-    def __init__(self, name, brick_type, brick=None):
+    """
+    Descript. :
+    """
+
+    def __init__(self, name, brick_type, brick = None):
+        """
+        Descript. :
+        """
         _CfgItem.__init__(self, name, brick_type)
 
         self.brick = brick
@@ -308,12 +407,16 @@ class BrickCfg(_CfgItem):
             self.setProperties(brick.propertyBag)
         
     def setProperties(self, properties):
+        """
+        Descript. :
+        """
         self.brick.setPersistentPropertyBag(properties)
-
         self.properties = self.brick.propertyBag
 
-
     def rename(self, new_name):
+        """
+        Descript. :
+        """
         _CfgItem.rename(self, new_name)
 
         if self.brick is not None:

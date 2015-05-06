@@ -23,12 +23,15 @@ from PyQt4 import QtCore
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+
 __category__ = "Qt4_General"
+
 
 class Qt4_AttenuatorsBrick(BlissWidget):
     """
     Descript. : 
     """
+
     def __init__(self, *args):
         """
         Descript. : Initiates BlissWidget Brick
@@ -93,10 +96,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.new_value_ledit, QtCore.SIGNAL('returnPressed()'), 
-                     self.current_value_changed)
-        self.connect(self.new_value_ledit, QtCore.SIGNAL('textChanged(const QString &)'), 
-                     self.input_field_changed)
+        self.new_value_ledit.returnPressed.connect(self.current_value_changed)
+        self.new_value_ledit.textChanged.connect(self.input_field_changed)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)

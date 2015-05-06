@@ -32,10 +32,16 @@ from BlissFramework import Qt4_Icons
 
 
 class CustomMenuBar(QtGui.QWidget):
-    # parent *must* be the window ; it contains a centralWidget in its viewport
+    """
+    Descript. :
+    """
+
     def __init__(self, parent):
+        """
+        Descript. : parent *must* be the window ; it contains a centralWidget 
+                    in its viewport
+        """
         QtGui.QWidget.__init__(self)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
 
         # Internal values -----------------------------------------------------        
         self.parent = parent
@@ -63,6 +69,10 @@ class CustomMenuBar(QtGui.QWidget):
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_hlayout) 
 
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
+                           QtGui.QSizePolicy.Fixed)
+
+
         # Qt signal/slot connections ------------------------------------------
         """QtCore.QObject.connect(self.expert_mode_checkbox, 
                                QtCore.SIGNAL('clicked()'), 
@@ -72,12 +82,17 @@ class CustomMenuBar(QtGui.QWidget):
         self.expert_mode_checkboxStdColor=None
 
     def configure(self, menu_data, expert_pwd, execution_mode):
+        """
+        Descript. :
+        """
         self.menu_data = menu_data
         self.expert_pwd = expert_pwd
         self.execution_mode = execution_mode
 
-
     def expert_mode_clicked(self):
+        """
+        Descript. :
+        """
         if self.expert_mode_checkbox.isChecked():
             res = QtGui.QInputDialog.getText(self, 
                                              "Switch to expert mode",
@@ -97,11 +112,14 @@ class CustomMenuBar(QtGui.QWidget):
             else:
                 self.expert_mode_checkbox.setChecked(False)
         else:
-            Qt4_widget_colors.set_widget_color(self.expert_mode_checkbox, Qt4_widget_colors.LINE_EDIT_ORIGINAL)
-            #self.expert_mode_checkbox.setPaletteBackgroundColor(self.expertMode.parent().paletteBackgroundColor())
+            Qt4_widget_colors.set_widget_color(self.expert_mode_checkbox, 
+                                               Qt4_widget_colors.LINE_EDIT_ORIGINAL)
             self.set_expert_mode(False)
 
     def set_expert_mode(self,state):
+        """
+        Descript. :
+        """
         if not self.execution_mode:
             return
         
@@ -130,21 +148,36 @@ class CustomMenuBar(QtGui.QWidget):
                     except:
                         logging.getLogger().exception("Could not set %s to user mode", w.objectName())
 
-
     def whatsthis(self):
+        """
+        Descript. :
+        """
         if self.execution_mode:
             BlissWidget.updateWhatsThis()
 
-
     def quit(self):
+        """
+        Descript. :
+        """
         if self.execution_mode:
             QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("quit"), ())
             QtGui.QApplication.quit()
 
+
 class WindowDisplayWidget(QtGui.QScrollArea):
+    """
+    Descript. :
+    """
 
     class Spacer(QtGui.QFrame):
+        """
+        Descript. :
+        """
+
         def __init__(self, *args, **kwargs):
+            """
+            Descript. :
+            """
             QtGui.QFrame.__init__(self, args[0])
             self.setObjectName(args[1])
 
@@ -161,8 +194,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             self.main_layout.setContentsMargins(0,0,0,0)
             self.setLayout(self.main_layout)
 
-
         def setFixedSize(self, fixed_size):
+            """
+            Descript. :
+            """
             if fixed_size >= 0:
                 hor_size_policy = self.orientation == "horizontal" and \
                                   QtGui.QSizePolicy.Fixed or QtGui.QSizePolicy.MinimumExpanding
@@ -179,9 +214,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 ver_size_policy = hor_size_policy == QtGui.QSizePolicy.Expanding and \
                                   QtGui.QSizePolicy.MinimumExpanding or QtGui.QSizePolicy.Expanding
             self.setSizePolicy(hor_size_policy, ver_size_policy)
-                
             
         def paintEvent(self, event):
+            """
+            Descript. :
+            """
             QtGui.QFrame.paintEvent(self, event)
 
             if self.execution_mode:
@@ -205,27 +242,36 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 p.drawLine(w, self.height(), w - 5, self.height() - 5)
                 p.drawLine(w, self.height(), w + 5, self.height() - 5)
 
-                
-
     def verticalSpacer(*args, **kwargs):
+        """
+        Descript. :
+        """
         kwargs["orientation"]="vertical"
         return WindowDisplayWidget.Spacer(*args, **kwargs)
 
-
     def horizontalSpacer(*args, **kwargs):
+        """
+        Descript. :
+        """
         kwargs["orientation"]="horizontal"
         return WindowDisplayWidget.Spacer(*args, **kwargs)
 
-
     def horizontalSplitter(*args, **kwargs):
+        """
+        Descript. :
+        """
         return QtGui.QSplitter(QtCore.Qt.Horizontal, *args)
 
-
     def verticalSplitter(*args, **kwargs):
+        """
+        Descript. :
+        """
         return QtGui.QSplitter(QtCore.Qt.Vertical, *args)
     
-
     def verticalBox(*args, **kwargs):
+        """
+        Descript. :
+        """
         executionMode = kwargs.get('executionMode', False)
 
         frame = QtGui.QFrame(args[0])
@@ -241,9 +287,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         frame.setLayout(frame_layout)
  
         return frame
- 
 
     def horizontalBox(*args, **kwargs):
+        """
+        Descript. :
+        """
         executionMode = kwargs.get('executionMode', False)
 
         frame = QtGui.QFrame(args[0])
@@ -261,8 +309,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         return frame
        
-        
     def horizontalGroupBox(*args, **kwargs):
+        """
+        Descript. :
+        """
         executionMode = kwargs.get('executionMode', False)
        
         groupbox = QtGui.QGroupBox(args[0])
@@ -276,8 +326,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         return groupbox
 
-
     def verticalGroupBox(*args, **kwargs):
+        """
+        Descript. :
+        """
         executionMode = kwargs.get('executionMode', False)
 
         groupbox = QtGui.QGroupBox(args[0])
@@ -292,7 +344,15 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         return groupbox        
 
     class CustomTabWidget(QtGui.QTabWidget):
+        """
+        Descript. :
+        """
+
         def __init__(self, *args, **kwargs):
+            """
+            Descript. :
+            """
+
             QtGui.QTabWidget.__init__(self, args[0])
             self.setObjectName(args[1])
             self.close_tab_button = None
@@ -303,6 +363,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             QtCore.QObject.connect(self, QtCore.SIGNAL('currentChanged(int)'), self._pageChanged)
 
         def _pageChanged(self, index):
+            """
+            Descript. :
+            """
             page = self.widget(index)
             self.countChanged[index]=False
 
@@ -334,6 +397,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
         def hasCountChanged(self,tab_index):
+            """
+            Descript. :
+            """
             try:
                 changed=self.countChanged[tab_index]
             except KeyError:
@@ -341,7 +407,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             return changed
 
 
-        def add_tab(self, page_widget, label, icon=""):
+        def add_tab(self, page_widget, label, icon = ""):
+            """
+            Descript. :
+            """
             #TODO add scroll area 
             scroll_area = page_widget
             self.addTab(scroll_area, label) 
@@ -492,7 +561,14 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
     class label(QtGui.QLabel):
+        """
+        Descript. :
+        """
+
         def __init__(self, *args, **kwargs):
+            """
+            Descript. :
+            """
             QtGui.QLabel.__init__(self, args[0])
             self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
  
@@ -510,6 +586,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtGui.QScrollArea.__init__(self, args[0])
 
         self.additionalWindows = {}
@@ -547,6 +626,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.setLayout(_main_vlayout)
 
     def set_menu_bar(self, menu_data, exp_pwd, execution_mode):
+        """
+        Descript. :
+        """
         self.menu_bar.configure(menu_data, exp_pwd, execution_mode)
         self.menu_bar.show()
           
@@ -554,24 +636,38 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         #self.layout().addWidget(self.menu_bar)
 
     def set_status_bar(self):
+        """
+        Descript. :
+        """
         self.status_bar.show()	
 
     def show(self, *args):
+        """
+        Descript. :
+        """
         ret = QtGui.QWidget.show(self)
         self.emit(QtCore.SIGNAL("isShown"), ())
         return ret
 
     def hide(self, *args):
+        """
+        Descript. :
+        """
         ret = QtGui.QWidget.hide(self)
         self.emit(QtCore.SIGNAL("isHidden"), ())
         return ret
     
-
     def setCaption(self, *args):
+        """
+        Descript. :
+        """
         ret=QtGui.QWidget.setWindowTitle(self, *args)
         return ret
 
     def exitExpertMode(self, *args):
+        """
+        Descript. :
+        """
         if len(args) > 0:
           if args[0]:
             return
@@ -582,6 +678,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         #self.menu_bar.expert_mode_checkbox.setChecked(False)
 
     def add_item(self, item_cfg, parent):
+        """
+        Descript. :
+        """
         item_type = item_cfg["type"]
         item_name = item_cfg["name"]
         newItem = None
@@ -656,6 +755,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         return newItem
  
     def make_item(self, item_cfg, parent):
+        """
+        Descript. :
+        """
         previewItemsList = []
         if isinstance(item_cfg, ContainerCfg):
             self.containerNum += 1
@@ -713,6 +815,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
     def drawPreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
+        """
+        Descript. :
+        """
         for (w, m) in self.additionalWindows.itervalues():
             w.close()
         # reset colors
@@ -783,6 +888,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 self.set_status_bar()
 
     def remove_widget(self, item_name, child_name_list):
+        """
+        Descript. :
+        """
         remove_item_list = child_name_list
         remove_item_list.append(item_name)
 
@@ -794,6 +902,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         item_widget.deleteLater()
 
     def add_widget(self, child, parent):
+        """
+        Descript. :
+        """
         #main window
         if parent is None:
             self.drawPreview(child, 0, [])
@@ -814,6 +925,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             self.preview_items.append(newItem)
   
     def updatePreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
+        """
+        Descript. :
+        """
         if callable(self.__putBackColors):
             self.__putBackColors()
             self.__putBackColors = None
@@ -859,8 +973,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.__putBackColors = putBackColors
         #qt.QTimer.singleShot(300, putBackColors)
 
-
     def eventFilter(self, widget, event):
+        """
+        Descript. :
+        """
         if widget is not None and event is not None:
             if event.type() == QtCore.QEvent.MouseButtonRelease and event.button() == QtCore.Qt.LeftButton:
                 self.emit(QtCore.SIGNAL("itemClicked"), widget.objectName())
@@ -868,8 +984,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         
         return QtGui.QScrollArea.eventFilter(self, widget, event)
 
-
     def getAlignmentFlags(self, alignment_directives_string):
+        """
+        Descript. :
+        """
         if alignment_directives_string is None:
             alignment_directives = ['none']
         else:
@@ -906,8 +1024,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 alignment_flags = alignment_flags | QtCore.Qt.AlignRight
         return alignment_flags
 
-
     def getSizePolicy(self, hsizepolicy, vsizepolicy):
+        """
+        Descript. :
+        """
         def _getSizePolicyFlag(policy_flag):
             if policy_flag == "expanding":
                 return QtGui.QSizePolicy.Expanding
@@ -921,6 +1041,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
 
 def display(configuration, noBorder=False):
+    """
+    Descript. :
+    """
     windows = []
     for window in configuration.windows_list:
         display = WindowDisplayWidget(None, window["name"], executionMode=True, noBorder=noBorder)
@@ -936,6 +1059,9 @@ def display(configuration, noBorder=False):
     return windows
 
 def restoreSizes(configuration, window, display, configurationSuffix="",moveWindowFlag = True):
+    """
+    Descript. :
+    """
     splitters = configuration.findAllChildrenWType("splitter", window)
     
     if len(splitters):

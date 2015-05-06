@@ -31,7 +31,6 @@ GRAY =  QtGui.QColor(5)
 GREEN = QtGui.QColor(8)
 
 
-
 LINE_EDIT_ORIGINAL = QtGui.QColor(0, 0, 12)
 LINE_EDIT_ACTIVE = QtGui.QColor(204,255,204)
 LINE_EDIT_CHANGED =  QtGui.QColor(255,165,0)
@@ -45,6 +44,9 @@ QUEUE_ENTRY_COLORS = [WHITE, LIGHT_GREEN, LIGHT_YELLOW, LIGHT_RED]
 
 
 def set_widget_color(widget, color, color_role =None):
+    """
+    Descript. :
+    """
     if color_role is None:
         color_role = QtGui.QPalette.Window
     widget_palette = widget.palette()

@@ -36,13 +36,6 @@ class Qt4_EnergyBrick(BlissWidget):
         """
         BlissWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.energy_hwobj = None
-
-        # Internal values -----------------------------------------------------
-        self.energy_limits = None
-        self.wavelength_limits = None
-
         # Properties ----------------------------------------------------------       
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('defaultMode', 'combo', ('keV', 'Ang'), 'keV')
@@ -52,6 +45,13 @@ class Qt4_EnergyBrick(BlissWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
+
+        # Hardware objects ----------------------------------------------------
+        self.energy_hwobj = None
+
+        # Internal values -----------------------------------------------------
+        self.energy_limits = None
+        self.wavelength_limits = None
 
         # Graphic elements ----------------------------------------------------
         self.main_frame = QtGui.QFrame(self)
@@ -126,6 +126,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_validator = QtGui.QDoubleValidator(0, 15, 4, self.new_value_ledit)
         #self.new_value_ledit.setValidator(self.new_value_validator)
      
+
 
     def propertyChanged(self, property_name, old_value, new_value):
         """

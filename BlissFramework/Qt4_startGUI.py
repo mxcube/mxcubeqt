@@ -47,8 +47,9 @@ _logger.addHandler(_GUIhdlr)
 
 
 def do_gevent():
-    # can't call gevent.run inside inner event loops (message boxes...)
-    #if QtGui.QApplication.loopLevel() == 1:
+    """
+    Descript.  can't call gevent.run inside inner event loops (message boxes...)
+    """
     if QtCore.QEventLoop():
         try:
           gevent.wait(timeout=0.01)
@@ -59,11 +60,22 @@ def do_gevent():
         pass
 
 class MyCustomEvent(QtCore.QEvent):
+    """
+    Descript. : 
+    """
+
     def __init__(self, event_type, data):
+        """
+        Descript. : 
+        """
         QtCore.QEvent.__init__(self, event_type)
         self.data = data     
 
-def run(GUIConfigFile=None):    
+def run(GUIConfigFile = None):    
+    """
+    Descript. : 
+    """
+
     defaultHwrServer = 'localhost:hwr'
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
 
@@ -232,7 +244,7 @@ def run(GUIConfigFile=None):
     #
     logLevel = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(logLevel)
-    logInfo = 'GUI started (%s)' % (GUIConfigFile or "unnamed")
+    logInfo = 'Qt4 GUI started (%s)' % (GUIConfigFile or "unnamed")
     logInfo += ', HWRSERVER=%s' % hwrServer
     if len(hoDirs) > 0:
         logInfo += ', HODIRS=%s' % os.path.pathsep.join(hoDirs)

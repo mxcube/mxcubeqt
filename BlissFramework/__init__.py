@@ -42,6 +42,15 @@ blissframeworkpath = os.path.dirname(__file__)
 sys.path.insert(0, blissframeworkpath)
 
 
+_gui_version = 'qt3'
+
+def set_gui_version(verson_str):
+    global _gui_version
+    _gui_version = verson_str
+
+def get_gui_version():
+    return _gui_version  
+
 def getStdBricksPath():
     stdbrickspkg = __import__('BlissFramework.Bricks', globals(), locals(), [''])
     return os.path.dirname(stdbrickspkg.__file__)

@@ -47,7 +47,14 @@ else:
  
 
 class HorizontalSpacer(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self, *args)
         
         h_size = kwargs.get("size", None)
@@ -58,19 +65,36 @@ class HorizontalSpacer(QtGui.QWidget):
         else:
             self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
 
+
 class MyListView(QtGui.QListWidget):
+    """
+    Descript. :
+    """
 
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         QtGui.QListView.__init__(self, *args)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
     def addToolTip(self, item, text):
+        """
+        Descript. :
+        """
         self.setToolTip(text)
 
 
 class GUITreeWidget(QtGui.QTreeWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         QtGui.QTreeWidget.__init__(self, *args)
 
         self._presspos = None
@@ -90,17 +114,31 @@ class GUITreeWidget(QtGui.QTreeWidget):
         self.drag_target_item = None
 
     def dragEnterEvent(self, event):
+        """
+        Descript. :
+        """
         self.drag_source_item = self.itemAt(event.pos())
         event.accept() 
 
     def dropEvent(self, event):
+        """
+        Descript. :
+        """
         self.drag_target_item = self.itemAt(event.pos())
         if self.drag_source_item and self.drag_target_item:
             self.emit(QtCore.SIGNAL("dragdrop"), self.drag_source_item, self.drag_target_item)
         event.accept()
+
             
 class ToolboxWindow(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self, *args)
        
         # Internal variables --------------------------------------------------
@@ -131,7 +169,6 @@ class ToolboxWindow(QtGui.QWidget):
         # Other ---------------------------------------------------------------
         self.setWindowTitle("Toolbox") 
         
-
     def addBrickTab(self, name):
         """
         Descript. : Add a new brick tab called 'name'
@@ -154,6 +191,9 @@ class ToolboxWindow(QtGui.QWidget):
         map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + tuple(BlissFramework.getCustomBricksDirs()))
 
     def brickTextLabel(self, brickName):
+        """
+        Descript. :
+        """
         if brickName.endswith("Brick"):
             brickTextLabel = brickName[:-5]
         else:
@@ -170,7 +210,9 @@ class ToolboxWindow(QtGui.QWidget):
         
 
     def addBricks(self, brickDir):
-        """Add the bricks found in the 'brickDir' directory to the bricks tab widget"""
+        """
+        Descript. : Add the bricks found in the 'brickDir' directory to the 
+                    bricks tab widget"""
         findCategoryRE = re.compile("^__category__\s*=\s*['\"](.*)['\"]$", re.M)
         findDocstringRE = re.compile('^"""(.*?)"""?$', re.M | re.S)
         
@@ -250,14 +292,23 @@ class ToolboxWindow(QtGui.QWidget):
                 bricksListWidget.addToolTip(newBrick, description)
                 self.bricks_dict[id(newBrick)] = (dirname, brickName)
 
-
     def brick_selected(self, item):
-        dirname, brickName = self.bricks_dict[id(item)]
-        self.emit(QtCore.SIGNAL("addBrick"), brickName)
+        """
+        Descript. :
+        """
+        dir_name, brick_name = self.bricks_dict[id(item)]
+        self.emit(QtCore.SIGNAL("addBrick"), brick_name)
         
 
 class Qt4_PropertyEditorWindow(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self, *args)
  
         self.setWindowTitle("Properties")
@@ -275,10 +326,16 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
 
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-    def editProperties(self, propertyBag):
-        self.properties_table.setPropertyBag(propertyBag)
+    def editProperties(self, property_bag):
+        """
+        Descript. :
+        """
+        self.properties_table.setPropertyBag(property_bag)
 
     def property_changed(self, *args):
+        """
+        Descript. :
+        """
         try:
             cb = self.__property_changed_cb[self.properties_table.propertyBag]
         except KeyError, err:
@@ -286,14 +343,23 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
         else:
             cb(*args)
             
-      
     def addProperties(self, propertyBag, property_changed_cb):
+        """
+        Descript. :
+        """
         self.__property_changed_cb[propertyBag] = property_changed_cb
         self.editProperties(propertyBag)
     
 
 class ToolButton(QtGui.QToolButton):
-    def __init__(self, parent, icon, text=None, callback=None, tooltip=None):
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent, icon, text = None, callback = None, tooltip = None):
+        """
+        Descript. :
+        """
         QtGui.QToolButton.__init__(self, parent)
 
         self.setIcon(QtGui.QIcon(Qt4_Icons.load(icon)))
@@ -317,7 +383,15 @@ class ToolButton(QtGui.QToolButton):
 
 
 class GUIEditorWindow(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
+
         QtGui.QWidget.__init__(self, *args)
 
         # Internal values -----------------------------------------------------
@@ -325,41 +399,40 @@ class GUIEditorWindow(QtGui.QWidget):
 
         # Graphic elements ----------------------------------------------------
         _tools_widget = QtGui.QWidget(self)
-        _add_window_toolbutton = ToolButton(_tools_widget, "window_new", 
-                                            self.add_window_clicked, "add a new window (container)")
-        _add_tab_toolbutton = ToolButton(_tools_widget, "tab", 
-                                         self.add_tab_clicked, "add a new tab (container)")
-        _add_hbox_toolbutton = ToolButton(_tools_widget, "add_hbox", 
-                                          self.add_hbox_clicked, "add a new horizontal box (container)")
-        _add_vbox_toolbutton = ToolButton(_tools_widget, "add_vbox", 
-                                          self.add_vbox_clicked, "add a new vertical box (container)")
-        _add_hgroupbox_toolbutton = ToolButton(_tools_widget, "hgroupbox", 
-                                               self.add_hgroupbox_clicked, 
-                                               "add a new horizontal group box (container)")
-        _add_vgroupbox_toolbutton = ToolButton(_tools_widget, "vgroupbox", 
-                                               self.add_vgroupbox_clicked, "add a new vertical group box (container)")
-        _add_hspacer_toolbutton = ToolButton(_tools_widget, "add_hspacer", 
-                                             self.add_hspacer_clicked, "add a new horizontal spacer")
-        _add_vspacer_toolbutton = ToolButton(_tools_widget, "add_vspacer", 
-                                             self.add_vspacer_clicked, "add a new vertical spacer")
-        _add_hsplitter_toolbutton = ToolButton(_tools_widget, "hsplitter", 
-                                               self.add_hsplitter_clicked, "add a new horizontal splitter (container)")
-        _add_vsplitter_toolbutton = ToolButton(_tools_widget, "vsplitter", 
-                                               self.add_vsplitter_clicked, "add a new vertical splitter (container)")
-        _add_icon_toolbutton = ToolButton(_tools_widget, "icon", 
-                                          self.add_icon_clicked, "add a new icon")
-        _add_label_toolbutton = ToolButton(_tools_widget, "label", 
-                                           self.add_label_clicked, "add a new label")
+        _add_window_toolbutton = ToolButton(_tools_widget, "window_new", \
+             self.add_window_clicked, "add a new window (container)")
+        _add_tab_toolbutton = ToolButton(_tools_widget, "tab", \
+             self.add_tab_clicked, "add a new tab (container)")
+        _add_hbox_toolbutton = ToolButton(_tools_widget, "add_hbox", \
+             self.add_hbox_clicked, "add a new horizontal box (container)")
+        _add_vbox_toolbutton = ToolButton(_tools_widget, "add_vbox", \
+             self.add_vbox_clicked, "add a new vertical box (container)")
+        _add_hgroupbox_toolbutton = ToolButton(_tools_widget, "hgroupbox", \
+             self.add_hgroupbox_clicked, "add a new horizontal group box (container)")
+        _add_vgroupbox_toolbutton = ToolButton(_tools_widget, "vgroupbox", \
+             self.add_vgroupbox_clicked, "add a new vertical group box (container)")
+        _add_hspacer_toolbutton = ToolButton(_tools_widget, "add_hspacer", \
+             self.add_hspacer_clicked, "add a new horizontal spacer")
+        _add_vspacer_toolbutton = ToolButton(_tools_widget, "add_vspacer", \
+             self.add_vspacer_clicked, "add a new vertical spacer")
+        _add_hsplitter_toolbutton = ToolButton(_tools_widget, "hsplitter", \
+             self.add_hsplitter_clicked, "add a new horizontal splitter (container)")
+        _add_vsplitter_toolbutton = ToolButton(_tools_widget, "vsplitter", \
+             self.add_vsplitter_clicked, "add a new vertical splitter (container)")
+        _add_icon_toolbutton = ToolButton(_tools_widget, "icon", \
+             self.add_icon_clicked, "add a new icon")
+        _add_label_toolbutton = ToolButton(_tools_widget, "label", \
+             self.add_label_clicked, "add a new label")
 
         _tree_handling_widget = QtGui.QWidget(self)
-        _show_connections_toolbutton = ToolButton(_tree_handling_widget, "connect_creating",
-                                           self.show_connections_clicked, "manage connections between items")
-        _move_up_toolbutton = ToolButton(_tree_handling_widget, "Up2", 
-                                         self.move_up_clicked, "move an item up")
-        _move_down_toolbutton = ToolButton(_tree_handling_widget, "Down2", 
-                                           self.move_down_clicked, "move an item down")
-        _remove_item_toolbutton = ToolButton(_tree_handling_widget, "delete_small", 
-                                             self.remove_item_clicked, "delete an item")
+        _show_connections_toolbutton = ToolButton(_tree_handling_widget, "connect_creating", \
+              self.show_connections_clicked, "manage connections between items")
+        _move_up_toolbutton = ToolButton(_tree_handling_widget, "Up2", \
+              self.move_up_clicked, "move an item up")
+        _move_down_toolbutton = ToolButton(_tree_handling_widget, "Down2", \
+              self.move_down_clicked, "move an item down")
+        _remove_item_toolbutton = ToolButton(_tree_handling_widget, "delete_small", \
+                self.remove_item_clicked, "delete an item")
 
         self.tree_widget = GUITreeWidget(self)
         self.root_element = QtGui.QTreeWidgetItem(self.tree_widget)
@@ -422,7 +495,11 @@ class GUIEditorWindow(QtGui.QWidget):
         self.item_rename_started = None
         self.setWindowTitle("GUI Editor")
 
-    def create_action(self, text, slot=None, shortcut=None, icon=None, tip=None, checkable=False, signal="triggered()"):
+    def create_action(self, text, slot = None, shortcut = None, icon = None, 
+                      tip = None, checkable = False, signal = "triggered()"):
+        """
+        Descript. :
+        """
         action = QtGui.QAction(text, self)
         if icon is not None:
             action.setIcon(QtGui.QIcon(Qt4_Icons.load(icon)))
@@ -438,6 +515,9 @@ class GUIEditorWindow(QtGui.QWidget):
         return action
 
     def add_actions(self, target, actions):
+        """
+        Descript. :
+        """
         for action in actions:
             if action is None:
                 target.addSeparator()
@@ -445,6 +525,9 @@ class GUIEditorWindow(QtGui.QWidget):
                 target.addAction(action)
 
     def set_configuration(self, configuration):
+        """
+        Descript. :
+        """
         self.configuration = configuration
         self.tree_widget.blockSignals(True)
         self.emit(QtCore.SIGNAL('hidePropertyEditorWindow'), ())
@@ -480,6 +563,9 @@ class GUIEditorWindow(QtGui.QWidget):
         self.emit(QtCore.SIGNAL('showProperyEditorWindow'), ())
 
     def show_connections_clicked(self):
+        """
+        Descript. :
+        """
         self.connection_editor_window = Qt4_ConnectionEditor.Qt4_ConnectionEditor(self.configuration)
         width = QtGui.QApplication.desktop().width()
         height = QtGui.QApplication.desktop().height()
@@ -487,17 +573,25 @@ class GUIEditorWindow(QtGui.QWidget):
         self.connection_editor_window.show()
 
     def updateProperties(self, item_cfg):
+        """
+        Descript. :
+        """
         self.emit(QtCore.SIGNAL("editProperties"), item_cfg["properties"])
         
     def _getParentWindowName(self, item): 
+        """
+        Descript. :
+        """
         while item:
             if str(item.text(1)) == "window":
                 return str(item.text(0))
             else:
                 item = item.parent()
     
-            
-    def appendItem(self, parentItem, column1_text, column2_text, icon=None):
+    def appendItem(self, parentItem, column1_text, column2_text, icon = None):
+        """
+        Descript. :
+        """
         newListItem = QtGui.QTreeWidgetItem(parentItem)  
         newListItem.setText(0, QtCore.QString(str(column1_text)))
         newListItem.setText(1, QtCore.QString(str(column2_text))) 
@@ -513,6 +607,9 @@ class GUIEditorWindow(QtGui.QWidget):
         return newListItem
         
     def remove_item_clicked(self):
+        """
+        Descript. :
+        """
         currentItem = self.tree_widget.currentItem()
         if currentItem:
             item_parent_name = str(currentItem.parent().text(0))
@@ -538,17 +635,26 @@ class GUIEditorWindow(QtGui.QWidget):
                     (item.parent() or root).removeChild(item)               
             
     def draw_window_preview(self):
+        """
+        Descript. :
+        """
         container_name = self.root_element.child(0).text(0)
         container_cfg, window_id, container_ids, selected_item = \
              self.prepare_window_preview(container_name, None, "")
         self.emit(QtCore.SIGNAL("drawPreview"), container_cfg, window_id, container_ids, selected_item)
 
-    def update_window_preview(self, container_name, container_cfg=None, selected_item=""): 
+    def update_window_preview(self, container_name, container_cfg = None, selected_item = ""): 
+        """
+        Descript. :
+        """
         upd_container_cfg, upd_window_id, upd_container_ids, upd_selected_item = \
              self.prepare_window_preview(container_name, container_cfg, selected_item)
         self.emit(QtCore.SIGNAL("updatePreview"), upd_container_cfg, upd_window_id, upd_container_ids, selected_item)
 
     def prepare_window_preview(self, item_name, item_cfg = None, selected_item = ""):
+        """
+        Descript. :
+        """
         item_list = self.tree_widget.findItems(QtCore.QString(item_name), QtCore.Qt.MatchRecursive, 0)
         item = item_list[0]
         item_type = str(item.text(1))
@@ -582,6 +688,9 @@ class GUIEditorWindow(QtGui.QWidget):
         return item_cfg, window_id, item_ids, selected_item
 
     def connectItem(self, parent, new_item, new_list_item):
+        """
+        Descript. :
+        """
         if self.configuration.isBrick(new_item):
             self.emit(QtCore.SIGNAL("newItem"), new_item["brick"].propertyBag, new_item["brick"]._propertyChanged)
         else:
@@ -621,11 +730,16 @@ class GUIEditorWindow(QtGui.QWidget):
                     parent.childPropertyChanged(item_name, property, old_value, new_value)
             self.emit(QtCore.SIGNAL("newItem"), new_item["properties"], property_changed_cb)
                   
-
     def add_window_clicked(self):
+        """
+        Descript. :
+        """
         self._addItem(self.root_element, "window")
 
     def _addItem(self, parentListItem, item_type, *args):
+        """
+        Descript. :
+        """
         parent_name = str(parentListItem.text(0))
 
         parent = self.configuration.findContainer(parent_name)
@@ -682,14 +796,22 @@ class GUIEditorWindow(QtGui.QWidget):
         finally:
             QtGui.QApplication.restoreOverrideCursor()
 
-
     def addBrick(self, brick_type):
+        """
+        Descript. :
+        """
         self.addItem("brick", brick_type)
 
     def addContainer(self, container_type, container_subtype=None):
+        """
+        Descript. :
+        """
         self.addItem(container_type, container_subtype)
 
     def addItem(self, item_type, item_subtype):
+        """
+        Descript. :
+        """
         currentItem = self.tree_widget.currentItem()
         if currentItem:
             item_cfg = self.configuration.findItem(str(currentItem.text(0)))
@@ -706,45 +828,85 @@ class GUIEditorWindow(QtGui.QWidget):
                 QtGui.QMessageBox.warning(self, "Cannot add %s" % item_type, "Please select a suitable parent container", QtGui.QMessageBox.Ok)
     
     def add_hbox_clicked(self):
+        """
+        Descript. :
+        """
         self.addContainer("hbox", "hbox")
 
     def add_vbox_clicked(self):
+        """
+        Descript. :
+        """
         self.addContainer("vbox", "vbox")
        
     def add_hgroupbox_clicked(self):
+        """
+        Descript. :
+        """
         self.addContainer("hgroupbox", "hgroupbox")
 
     def add_vgroupbox_clicked(self):
+        """
+        Descript. :
+        """
         self.addContainer("vgroupbox", "vgroupbox")
 
     def add_hspacer_clicked(self):
+        """
+        Descript. :
+        """
         self.addItem("hspacer", "hspacer")
 
     def add_vspacer_clicked(self):
+        """
+        Descript. :
+        """
         self.addItem("vspacer", "vspacer")
 
     def add_tab_clicked(self):
-         self.addContainer("tab")
+        """
+        Descript. :
+        """
+        self.addContainer("tab")
 
     def add_vsplitter_clicked(self):
+        """
+        Descript. :
+        """
         self.addContainer("vsplitter", "vsplitter")
 
     def add_hsplitter_clicked(self):
+        """
+        Descript. :
+        """
         self.addContainer("hsplitter", "hsplitter")
         
     def add_icon_clicked(self):
+        """
+        Descript. :
+        """
         self.addItem("icon", "icon")
 
     def add_label_clicked(self):
+        """
+        Descript. :
+        """
         self.addItem("label", "label")
 
     def selectItem(self, item_name):
-        item = self.tree_widget.findItems(QtCore.QString(item_name), QtCore.Qt.MatchRecursive, 0)
+        """
+        Descript. :
+        """
+        item = self.tree_widget.findItems(QtCore.QString(item_name), 
+                    QtCore.Qt.MatchRecursive, 0)
         if item is not None:
             self.tree_widget.setCurrentItem(item[0])
             self.tree_widget.scrollToItem(item[0], QtGui.QAbstractItemView.EnsureVisible)
             
     def item_double_clicked(self, item, column):
+        """
+        Descript. :
+        """
         if item and column == 0:
             item_name = str(item.text(0))
             item_cfg = self.configuration.findItem(item_name)
@@ -758,6 +920,9 @@ class GUIEditorWindow(QtGui.QWidget):
                               QtCore.Qt.ItemIsEnabled)
 
     def item_selected(self):
+        """
+        Descript. :
+        """
         self.item_rename_started = None
         item = self.tree_widget.currentItem()      
         if not item == self.root_element:
@@ -784,6 +949,9 @@ class GUIEditorWindow(QtGui.QWidget):
                                           new_item_name, QtGui.QMessageBox.Ok)
 
     def item_right_clicked(self, item):
+        """
+        Descript. :
+        """
         item_name = str(item.text(0))
         item_cfg = self.configuration.findItem(item_name)
         if self.configuration.isBrick(item_cfg):
@@ -800,10 +968,11 @@ class GUIEditorWindow(QtGui.QWidget):
             popup_menu.insertItem("reload brick", 0)
             popup_menu.exec_loop(QtCore.QCursor.pos())
 
-            #self.tree_widget.setSelected(item, True)
-
 
     def item_drag_dropped(self, source_item, target_item):
+        """
+        Descript. :
+        """
         dragged_item_name = source_item.text(0) 
         dropped_on_item_name = target_item.text(0)
 
@@ -856,6 +1025,9 @@ class GUIEditorWindow(QtGui.QWidget):
         self.tree_widget.scrollToItem(source_item, QtGui.QAbstractItemView.EnsureVisible)
  
     def move_item(self, direction):
+        """
+        Descript. :
+        """
         item = self.tree_widget.currentItem()
 
         if item:
@@ -906,14 +1078,27 @@ class GUIEditorWindow(QtGui.QWidget):
             self.tree_widget.scrollToItem(item, QtGui.QAbstractItemView.EnsureVisible)
 
     def move_up_clicked(self):
+        """
+        Descript. :
+        """
         self.move_item("up")
 
     def move_down_clicked(self):
+        """
+        Descript. :
+        """
         self.move_item("down")
     
 
 class GUIPreviewWindow(QtGui.QWidget):
-   def __init__(self, *args, **kwargs):
+    """
+    Descript. :
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self, *args)
        
         self.setWindowTitle("GUI Preview")
@@ -931,52 +1116,82 @@ class GUIPreviewWindow(QtGui.QWidget):
         QtCore.QObject.connect(self.window_preview, QtCore.SIGNAL("itemClicked"), self.preview_item_clicked) 
         self.resize(630,480)
 
-   def renew(self):
-       return
-       self.window_preview_box.close()
-       self.window_preview_box = QtGui.QGroupBox("Preview window", self)
-       self.window_preview = Qt4_GUIDisplay.WindowDisplayWidget(self.window_preview_box)
+    def renew(self):
+        """
+        Descript. :
+        """
+        return
+        self.window_preview_box.close()
+        self.window_preview_box = QtGui.QGroupBox("Preview window", self)
+        self.window_preview = Qt4_GUIDisplay.WindowDisplayWidget(self.window_preview_box)
 
-       self.window_preview_box_layout = QtGui.QVBoxLayout()
-       self.window_preview_box_layout.addWidget(self.window_preview)
-       self.window_preview_box.setLayout(self.window_preview_box_layout)
+        self.window_preview_box_layout = QtGui.QVBoxLayout()
+        self.window_preview_box_layout.addWidget(self.window_preview)
+        self.window_preview_box.setLayout(self.window_preview_box_layout)
 
-       self._main_vlayout = QtGui.QVBoxLayout()
-       self._main_vlayout.addWidget(self.window_preview_box)
-       self.setLayout(self._main_vlayout)
-       QtCore.QObject.connect(self.window_preview, QtCore.SIGNAL("itemClicked"), self.preview_item_clicked)
+        self._main_vlayout = QtGui.QVBoxLayout()
+        self._main_vlayout.addWidget(self.window_preview_box)
+        self.setLayout(self._main_vlayout)
+        QtCore.QObject.connect(self.window_preview, QtCore.SIGNAL("itemClicked"), self.preview_item_clicked)
 
-       self.resize(650,480)
-       self.window_preview_box.show()
+        self.resize(650,480)
+        self.window_preview_box.show()
 
-   def preview_item_clicked(self, item_name):
-       self.emit(QtCore.SIGNAL("previewItemClicked"), item_name)
+    def preview_item_clicked(self, item_name):
+        """
+        Descript. :
+        """
+        self.emit(QtCore.SIGNAL("previewItemClicked"), item_name)
 
-   def drawWindow(self, container_cfg, window_id, container_ids, selected_item):
-       if container_cfg["type"] == "window":
-           caption = container_cfg["properties"]["caption"]
-           s = caption and " - %s" % caption or ""
-           self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
-       self.window_preview.drawPreview(container_cfg, window_id, container_ids, selected_item)
+    def drawWindow(self, container_cfg, window_id, container_ids, selected_item):
+        """
+        Descript. :
+        """
+        if container_cfg["type"] == "window":
+            caption = container_cfg["properties"]["caption"]
+            s = caption and " - %s" % caption or ""
+            self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
+        self.window_preview.drawPreview(container_cfg, window_id, container_ids, selected_item)
 
-   def updateWindow(self, container_cfg, window_id, container_ids, selected_item):
-       if container_cfg["type"] == "window":
-           caption = container_cfg["properties"]["caption"]
-           s = caption and " - %s" % caption or ""
-           self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
-       self.window_preview.updatePreview(container_cfg, window_id, container_ids, selected_item)
+    def updateWindow(self, container_cfg, window_id, container_ids, selected_item):
+        """
+        Descript. :
+        """
+        if container_cfg["type"] == "window":
+            caption = container_cfg["properties"]["caption"]
+            s = caption and " - %s" % caption or ""
+            self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
+        self.window_preview.updatePreview(container_cfg, window_id, container_ids, selected_item)
 
-   def add_window_widget(self, window_cfg):
-       self.window_preview.add_window(window_cfg)
+    def add_window_widget(self, window_cfg):
+        """
+        Descript. :
+        """
+        self.window_preview.add_window(window_cfg)
+ 
+    def remove_item_widget(self, item_widget, children_name_list):
+        """
+        Descript. :
+        """
+        self.window_preview.remove_widget(item_widget, children_name_list)
 
-   def remove_item_widget(self, item_widget, children_name_list):
-       self.window_preview.remove_widget(item_widget, children_name_list)
+    def add_item_widget(self, item_widget, parent_widget):
+        """
+        Descript. :
+        """
+        self.window_preview.add_widget(item_widget, parent_widget)
 
-   def add_item_widget(self, item_widget, parent_widget):
-       self.window_preview.add_widget(item_widget, parent_widget)
 
 class HWRWindow(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
+
         QtGui.QWidget.__init__(self, *args)
 
         self.setWindowTitle("Hardware Repository browser")
@@ -1007,6 +1222,9 @@ class HWRWindow(QtGui.QWidget):
         self.add_hwr_browser()
         
     def add_hwr_browser(self):
+        """
+        Descript. :
+        """
         try:
             _hwr_widget = HardwareRepositoryBrowser.HardwareRepositoryBrowser
         except AttributeError:
@@ -1017,12 +1235,23 @@ class HWRWindow(QtGui.QWidget):
             self.hwr_widget.show()
                 
     def refresh(self):
+        """
+        Descript. :
+        """
         self.hwr_widget.close(True)
         self.add_hwr_browser()
 
 
 class GUIBuilder(QtGui.QMainWindow):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
+
         QtGui.QMainWindow.__init__(self, *args)
 
         self.filename = None
@@ -1114,7 +1343,8 @@ class GUIBuilder(QtGui.QMainWindow):
                      self.show_property_editor_window)
         self.connect(self.gui_editor_window, QtCore.SIGNAL("hidePropertyEditorWindow"), 
                      self.hide_property_editor_window)
-        self.connect(self.gui_editor_window, QtCore.SIGNAL("showPreview"), self.show_gui_preview_window)
+        self.connect(self.gui_editor_window, QtCore.SIGNAL("showPreview"), 
+                     self.show_gui_preview_window)
 
         self.toolbox_window.refresh_clicked()
 
@@ -1123,6 +1353,9 @@ class GUIBuilder(QtGui.QMainWindow):
 
     def create_action(self, text, slot = None, shortcut = None, icon = None,
                       tip = None, checkable = False, signal = "triggered()"):
+        """
+        Descript. :
+        """
         action = QtGui.QAction(text, self)
         if icon is not None:
             action.setIcon(icon)
@@ -1138,6 +1371,9 @@ class GUIBuilder(QtGui.QMainWindow):
         return action
 
     def add_actions(self, target, actions):
+        """
+        Descript. :
+        """
         for action in actions:
             if action is None:
                 target.addSeparator()
@@ -1145,6 +1381,9 @@ class GUIBuilder(QtGui.QMainWindow):
                 target.addAction(action)
         
     def new_clicked(self, filename = None):
+        """
+        Descript. :
+        """
         self.configuration = Qt4_Configuration.Configuration()
         self.filename = filename
 
@@ -1157,6 +1396,9 @@ class GUIBuilder(QtGui.QMainWindow):
         self.gui_editor_window.set_configuration(self.configuration)
 
     def open_clicked(self):
+        """
+        Descript. :
+        """
         filename = str(QtGui.QFileDialog.getOpenFileName(os.environ["HOME"],
                        "GUI file (*.gui)", self, "Save file", "Choose a GUI file to open"))
 
@@ -1187,6 +1429,9 @@ class GUIBuilder(QtGui.QMainWindow):
                 
 
     def save_clicked(self):
+        """
+        Descript. :
+        """
         if True: #try:
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             
@@ -1225,6 +1470,9 @@ class GUIBuilder(QtGui.QMainWindow):
 
 
     def save_as_clicked(self):
+        """
+        Descript. :
+        """
         f = self.filename
         self.filename = str(QtGui.QFileDialog.getSaveFileName(self, os.environ["HOME"],
              "GUI file (*.gui)", "Save file", "Choose a filename to save under"))
@@ -1237,8 +1485,10 @@ class GUIBuilder(QtGui.QMainWindow):
 
         return self.save_clicked()
                                                     
-
     def quit_clicked(self):
+        """
+        Descript. :
+        """
         if self.gui_editor_window.configuration.hasChanged:
             if QtGui.QMessageBox.warning(self, "Please confirm",
                      "Are you sure you want to quit ?\nYour changes will be lost.",
@@ -1247,25 +1497,46 @@ class GUIBuilder(QtGui.QMainWindow):
         exit(0) 
 
     def show_property_editor_window(self):
+        """
+        Descript. :
+        """
         self.property_editor_window.show()
 
     def hide_property_editor_window(self):
+        """
+        Descript. :
+        """
         self.property_editor_window.close()
 
     def show_gui_preview_window(self):
+        """
+        Descript. :
+        """
         self.gui_preview_window.show()
 
     def show_log_window(self):
+        """
+        Descript. :
+        """
         self.log_window.show()
 
     def show_hwr_window(self):
+        """
+        Descript. :
+        """
         self.hwr_window.show()
 
     def closeEvent(self,event):
+        """
+        Descript. :
+        """
         event.ignore()
         self.quit_clicked() 
 
     def launch_gui_cicked(self):
+        """
+        Descript. :
+        """
         if self.gui_editor_window.configuration.hasChanged or self.filename is None:
             if QtGui.QMessageBox.warning(self, "GUI file not saved yet",
                      "Before starting the GUI, the file needs to be saved.\nContinue ?",

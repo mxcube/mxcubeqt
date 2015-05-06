@@ -30,7 +30,14 @@ from BlissFramework import Qt4_Icons
 
 
 class Qt4_ConfigurationTable(QtGui.QTableWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent):
+        """
+        Descript. :
+        """
         QtGui.QTableWidget.__init__(self, parent)
 
         self.setObjectName("configurationTable")
@@ -51,6 +58,9 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         QtCore.QObject.connect(self, QtCore.SIGNAL('cellChanged(int, int)'), self.OnCellChanged)
         
     def clear(self):
+        """
+        Descript. :
+        """
         for i in range(self.rowCount()):
             self.removeRow(i)
         self.setRowCount(0)
@@ -58,14 +68,15 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
 
         
     def setPropertyBag(self, propertyBag, showHidden=False):
+        """
+        Descript. :
+        """
         self.clear()           
-
         if self.propertyBag is not None:
             for prop in self.propertyBag:
                 prop._editor = None
 
         self.propertyBag = propertyBag
-
 
         if self.propertyBag is not None:
             self.setRowCount(len(self.propertyBag))
@@ -94,6 +105,9 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         self.resizeColumnsToContents()    
         
     def setWidgetFromProperty(self, row, prop):
+        """
+        Descript. :
+        """
         if prop.getType() == 'boolean':
             newPropertyItem = QtGui.QTableWidgetItem(QtCore.QString(""))
             self.setItem(row, 1, newPropertyItem)
@@ -123,6 +137,9 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             self.setItem(row, 1, tempTableItem)
 
     def OnCellChanged(self, row, col):
+        """
+        Descript. :
+        """
         col += 1
         item_property = self.propertyBag.getProperty(str(self.item(row, 0).text()))
         oldValue = item_property.getUserValue()
@@ -150,35 +167,45 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                       oldValue, item_property.getUserValue())
 
     def OnValidateClick(self):
+        """
+        Descript. :
+        """
         self.endEdit(self.currentRow(), 1, 1, 0) #current row, col 1, accept = 1, replace = 0
         self.activateNextCell()
         
-
     def OnInvalidateClick(self):
+        """
+        Descript. :
+        """
         self.endEdit(self.currentRow(), 1, 0, 0) #current row, col 1, accept = 0, replace = 0
 
-
     def OnResetClick(self):
+        """
+        Descript. :
+        """
         self.endEdit(self.currentRow(), 1, 0, 0)
 
         property = self.propertyBag.getProperty(str(self.text(self.currentRow(), 0)))
-
 
         defaultValue = property.getDefaultValue()
         if not defaultValue == None:
             property.setValue(defaultValue)
         
         self.setWidgetFromProperty(self.currentRow(), property)
-            
 
     def beginEdit(self, row, col, replace):
+        """
+        Descript. :
+        """
         if col == 1 and row >= 0:
             self.item(row, 2).setEnabled(1)
             
         return QTable.beginEdit(self, row, col, replace)
 
-        
     def endEdit(self, row, col, accept, replace):
+        """
+        Descript. :
+        """
         if col == 1 and row >= 0:
             self.item(row, 2).setEnabled(0)
 
@@ -208,11 +235,14 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         return QTable.endEdit(self, row, col, accept, replace)
 
 
-
 class ValidationTableItem(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent=None):
         """
-        parent (QTreeWidget) : Item's QTreeWidget parent.
+        Descript. : parent (QTreeWidget) : Item's QTreeWidget parent.
         """
 
         QtGui.QWidget.__init__(self, parent)
@@ -237,6 +267,9 @@ class ValidationTableItem(QtGui.QWidget):
         self.setLayout(main_layout)
 
     def setEnabled(self, enabled):
+        """
+        Descript. :
+        """
         if enabled:
             self.Reset.setEnabled(True)
             self.OK.setEnabled(True)
@@ -247,7 +280,14 @@ class ValidationTableItem(QtGui.QWidget):
             self.Cancel.setEnabled(False)
 
 class ComboBoxTableItem(QtGui.QComboBox):
-    def __init__(self, parent, col, row, items_list=None):
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent, col, row, items_list = None):
+        """ 
+        Descript. :
+        """
         QtGui.QComboBox.__init__(self)
         if items_list is not None:
             self.addItems(items_list)  
@@ -257,10 +297,20 @@ class ComboBoxTableItem(QtGui.QComboBox):
         QtCore.QObject.connect(self, QtCore.SIGNAL('currentIndexChanged(int)'), self.current_index_changed)
 
     def current_index_changed(self, index): 
+        """
+        Descript. :
+        """
         self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'), self.row, self.col) 
 
 class FileTableItem(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent, col, row, filename, file_filter):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self)
 
         self.file_filter = file_filter
@@ -280,6 +330,9 @@ class FileTableItem(QtGui.QWidget):
         self.set_filename(filename)
 
     def set_filename(self, filename):
+        """
+        Descript. :
+        """
         self.filename = str(filename)
 
         if self.cmdBrowse is not None:
@@ -288,19 +341,32 @@ class FileTableItem(QtGui.QWidget):
         self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'), self.row, self.col)
 
     def get_filename(self):
+        """
+        Descript. :
+        """
         return self.filename        
         
     def browse_clicked(self):
+        """
+        Descript. :
+        """
         new_filename = QtGui.QFileDialog.getOpenFileName(
                              self, os.path.dirname(self.filename) or os.getcwd(), 
                              self.file_filter, '', 'Select a file')
         
         if len(new_filename) > 0:
             self.set_filename(new_filename)
-            
 
+            
 class ColorTableItem(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent, col, row, color):
+        """
+        Descript. :
+        """
         QtGui.QTableWidget.__init__(self, parent)
 
         self.col = col
@@ -325,8 +391,10 @@ class ColorTableItem(QtGui.QWidget):
         #main_layout.addWidget(hbox) 
         #self.setLayout(main_layout) 
 
-        
     def setColor(self, color):
+        """
+        Descript. :
+        """
         try:
           rgb = color.rgb()
         except:
@@ -352,52 +420,43 @@ class ColorTableItem(QtGui.QWidget):
 
         self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'), self.row, self.col)
 
-
     def cmdChangeColorClicked(self):
+        """
+        Descript. :
+        """
         newColor = QtGui.QColorDialog.getColor(self.qtcolor or QtGui.QColor("white"), None, 'Select a color')
         if newColor.isValid():
             self.setColor(newColor)
 
     def cmdResetColorClicked(self):
+        """
+        Descript. :
+        """
         self.setColor(None)
     
+
 class Dialog(QtGui.QDialog):
+    """
+    Descript. :
+    """
+
     def __init__(self, propertyBag):
+        """
+        Descript. :
+        """
         QtGui.QDialog.__init__(self, None, None, Qt.WDestructiveClose)
-        
-        #
-        # create GUI
-        #
+
         self.setCaption("Configuration Editor")
         self.propertiesTable = ConfigurationTable(self)
         self.propertiesTable.setPropertyBag(propertyBag)
         cmdClose = QPushButton('Close', self)
         
-        #
-        # connect signals/slots
-        #
         self.connect(self.propertiesTable, PYSIGNAL('propertyChanged'), PYSIGNAL('propertyChanged'))
         self.connect(cmdClose, SIGNAL('clicked()'), self.close)
 
-        #
-        # layout
-        #
         QVBoxLayout(self, 0, 0)
         self.layout().setResizeMode(QLayout.FreeResize)
         self.layout().addWidget(self.propertiesTable)
         self.layout().addWidget(cmdClose)
         
         self.setFixedHeight(500)
-       
-
-
-
-
-
-
-
-
-
-
-
-

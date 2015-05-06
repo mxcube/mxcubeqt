@@ -28,6 +28,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
     """
     Descript. :
     """ 
+
     def __init__(self, configuration):
         """
         Descript. :
@@ -157,7 +158,10 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         self.receiver_windows_listwidget.setFont(self.receiver_windows_listwidget.font())
         self.showConnections()
 
-    def getSignallingChildren(self, parent):
+    def get_signalling_children(self, parent):
+        """
+        Descript. :
+        """
         children = []
         
         for child in parent["children"]:
@@ -170,12 +174,14 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             if n_signals > 0:
                 children.append(child)
                     
-            children += self.getSignallingChildren(child)
+            children += self.get_signalling_children(child)
                     
         return children
 
-            
-    def getReceiverChildren(self, parent):
+    def get_receiver_children(self, parent):
+        """
+        Descript. :
+        """
         children = []
                 
         for child in parent["children"]:
@@ -188,28 +194,32 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             if n_slots > 0:
                 children.append(child)
 
-            children += self.getReceiverChildren(child)
+            children += self.get_receiver_children(child)
 
         return children
 
-
-    def getConnectingChildren(self, parent):
+    def get_connecting_children(self, parent):
+        """
+        Descript. :
+        """
         children = []
                 
         for child in parent["children"]:
             if len(child["connections"]):
                 children.append(child)
         
-            children += self.getConnectingChildren(child)
+            children += self.get_connecting_children(child)
 
         return children
         
-    
     def showConnections(self):
+        """
+        Descript. :
+        """
         def senderInWindow(senderName, window):
             windowName = window["name"]
             
-            self.signalling_child_dict[windowName] = self.getSignallingChildren(window)
+            self.signalling_child_dict[windowName] = self.get_signalling_children(window)
 
             ok = False
             for sender in self.signalling_child_dict[windowName]:
@@ -222,7 +232,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         def receiverInWindow(receiverName, window):
             windowName = window["name"]
             
-            self.receiving_child_dict[windowName] = self.getReceiverChildren(window)
+            self.receiving_child_dict[windowName] = self.get_receiver_children(window)
 
             ok = False
             for receiver in self.receiving_child_dict[windowName]:
@@ -272,15 +282,17 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             for connection in window["connections"]:
                 addConnection(window, window, connection)
 
-            children = self.getConnectingChildren(window)
+            children = self.get_connecting_children(window)
             self.connecting_child_dict[window["name"]] = children
 
             for child in children:
                 for connection in child["connections"]:
                     addConnection(window, child, connection)
-            
        
     def emitter_window_changed(self, item):
+        """
+        Descript. :
+        """
         self.emitter_objects_listwidget.clear()
         self.emitter_signals_listwidget.clear()
 
@@ -297,7 +309,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             try:
                 signallingChildren = self.signalling_child_dict[windowName]
             except KeyError:
-                signallingChildren = self.getSignallingChildren(window)
+                signallingChildren = self.get_signalling_children(window)
                 self.signalling_child_dict[windowName] = signallingChildren
             
             for child in signallingChildren:
@@ -308,8 +320,10 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                 self.emitter_signals_listwidget.addItem(signalName)
             self.emitter_signals_listwidget.setFont(self.emitter_signals_listwidget.font())
  
-
     def emitter_object_changed(self, item):
+        """
+        Descript. :
+        """
         if item is None:
             self.emitter_window_changed(self.emitter_windows_listwidget.currentItem())
             return
@@ -330,6 +344,9 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         
 
     def receiver_window_changed(self, item):
+        """
+        Descript. :
+        """
         self.receiver_objects_listwidget.clear()
         self.receiver_slots_listwidget.clear()
 
@@ -346,7 +363,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             try:
                 receiverChildren = self.receiving_child_dict[windowName]
             except KeyError:
-                receiverChildren = self.getReceiverChildren(window)
+                receiverChildren = self.get_receiver_children(window)
                 self.receiving_child_dict[windowName] = receiverChildren
             
             for child in self.receiving_child_dict[windowName]:
@@ -357,8 +374,10 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                 self.receiver_slots_listwidget.addItem(slotName)
             self.receiver_slots_listwidget.setFont(self.receiver_slots_listwidget.font())
  
-
     def receiver_object_changed(self, item):
+        """
+        Descript. :
+        """
         if item is None:
             self.receiver_window_changed(self.receiver_windows_listwidget.currentItem())
             return
@@ -379,6 +398,9 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         
 
     def add_connection_button_clicked(self):
+        """
+        Descript. :
+        """
         senderWindowItem = self.emitter_windows_listwidget.currentItem()
         if senderWindowItem:
             senderWindowName = str(senderWindowItem.text())
@@ -419,46 +441,54 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             QtGui.QMessageBox.warning(self, 'Cannot add connection', 'Missing slot.')
             return
         
-        self.addPendingConnection({'senderWindow': senderWindowName,
-                                   'senderObject': senderObjectName,
-                                   'signal': signalName,
-                                   'receiverWindow': receiverWindowName,
-                                   'receiverObject': receiverObjectName,
-                                   'slot': slotName})
+        self.add_pending_connection({'senderWindow': senderWindowName,
+                                     'senderObject': senderObjectName,
+                                     'signal': signalName,
+                                     'receiverWindow': receiverWindowName,
+                                     'receiverObject': receiverObjectName,
+                                     'slot': slotName})
         
-
-    def addPendingConnection(self, connectionDict):
-        newItem = QtGui.QTreeWidgetItem(self.connections_treewidget, QtCore.QStringList([
+    def add_pending_connection(self, connection_dict):
+        """
+        Descript. :
+        """
+        new_item = QtGui.QTreeWidgetItem(self.connections_treewidget, 
+                                         QtCore.QStringList([
                                 '',
-                                connectionDict['senderWindow'],
-                                connectionDict['senderObject'],
-                                connectionDict['signal'],
-                                connectionDict['receiverWindow'],
-                                connectionDict['receiverObject'],
-                                connectionDict['slot']]))
-        newItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_ok_small')))
-        self.connections_treewidget.addTopLevelItem(newItem)
+                                connection_dict['senderWindow'],
+                                connection_dict['senderObject'],
+                                connection_dict['signal'],
+                                connection_dict['receiverWindow'],
+                                connection_dict['receiverObject'],
+                                connection_dict['slot']]))
+        new_item.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_ok_small')))
+        self.connections_treewidget.addTopLevelItem(new_item)
     
     def connections_treewidget_selection_changed(self):
+        """
+        Descript. :
+        """
         self.remove_connection_button.setEnabled(True)
 
-        
     def remove_connection_button_clicked(self):
-      	#item = self.connections_treewidget.currentItem();
+        """
+        Descript. :
+        """
         self.connections_treewidget.takeTopLevelItem(self.connections_treewidget.currentIndex().row())
         self.remove_connection_button.setEnabled(False)
         
     def ok_button_clicked(self):
-        #
+        """
+        Descript. :
+        """
         # erase previous connections
-        #
         for window in self.configuration.windows.itervalues():
             window["connections"] = []
 
             try:
                 children = self.connecting_child_dict[window["name"]]
             except KeyError:
-                children = self.getConnectingChildren(window)
+                children = self.get_connecting_children(window)
 
             for child in children:
                 child["connections"] = []
@@ -487,21 +517,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         self.done(True)
 
     def cancel_button_clicked(self):
+        """
+        Descript. :
+        """
         self.done(False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

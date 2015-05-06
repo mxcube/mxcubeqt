@@ -34,6 +34,7 @@ class Qt4_ResolutionBrick(BlissWidget):
     """
     Descript. : 
     """
+
     def __init__(self, *args):
         """
         Descript. : Initiates BlissWidget Brick
@@ -89,8 +90,8 @@ class Qt4_ResolutionBrick(BlissWidget):
                            QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.new_value_ledit, QtCore.SIGNAL('returnPressed()'), self.current_value_changed)
-        self.connect(self.new_value_ledit, QtCore.SIGNAL('textChanged(const QString &)'), self.input_field_changed)
+        self.new_value_ledit.returnPressed.connect(self.current_value_changed)
+        self.new_value_ledit.textChanged.connect(self.input_field_changed)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)
@@ -131,7 +132,7 @@ class Qt4_ResolutionBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_value, old_value, new_value)
 
-    def input_field_changed(self,text):
+    def input_field_changed(self, input_field_text):
         """
         Descript. : 
         Args.     : 

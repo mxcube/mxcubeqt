@@ -49,8 +49,12 @@ except ImportError:
 
 _emitterCache = weakref.WeakKeyDictionary()
 
+
 class _QObject(QtCore.QObject):
     def __init__(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         QtCore.QObject.__init__(self, *args)
 
         try:
@@ -59,59 +63,82 @@ class _QObject(QtCore.QObject):
             self.__ho = None
 
 def emitter(ob):
-    """Returns a QObject surrogate for *ob*, to use in Qt signaling.
-       This function enables you to connect to and emit signals from (almost)
-       any python object with having to subclass QObject.
+    """
+    Descript. : Returns a QObject surrogate for *ob*, to use in Qt signaling. 
+                This function enables you to connect to and emit signals 
+                from (almost) any python object with having to subclass QObject.
     """
     if ob not in _emitterCache:
         _emitterCache[ob] = _QObject(ho=ob)
     return _emitterCache[ob]
 
+
 class InstanceEventFilter(QtCore.QObject):
     def eventFilter(self, w, e):
+        """
+        Descript. :
+        """
         obj=w
         while obj is not None:
             if isinstance(obj,BlissWidget):
-                if isinstance(e,QtCore.QContextMenuEvent):
+                if isinstance(e, QtCore.QContextMenuEvent):
                     #if obj.shouldFilterEvent():
                     #    return True
                     return True
-                elif isinstance(e,QtCore.QMouseEvent):
-                    if e.button()==Qt.RightButton:
+                elif isinstance(e, QtCore.QMouseEvent):
+                    if e.button() == Qt.RightButton:
                         return True
                     elif obj.shouldFilterEvent():
                         return True
-                elif isinstance(e,QtCore.QKeyEvent) or isinstance(e,QtCore.QFocusEvent):
+                elif isinstance(e, QtCore.QKeyEvent) or isinstance(e, QtCore.QFocusEvent):
                     if obj.shouldFilterEvent():
                         return True
-                return QtCore.QObject.eventFilter(self,w,e)
+                return QtCore.QObject.eventFilter(self, w, e)
             #try:
             if True:
-                obj=obj.parent()
+                obj = obj.parent()
             #except:
             #    obj=None
-        return QtCore.QObject.eventFilter(self,w,e)
+        return QtCore.QObject.eventFilter(self, w, e)
 
 
 class WeakMethodBound:
     def __init__(self , f):
+        """
+        Descript. :
+        """
         self.f = weakref.ref(f.im_func)
         self.c = weakref.ref(f.im_self)
+
     def __call__(self , *args):
+        """
+        Descript. :
+        """
         obj = self.c()
         if obj is None:
             return None
         else:
-            f=self.f()
+            f = self.f()
             return f.__get__(obj)
+
 
 class WeakMethodFree:
     def __init__(self , f):
+        """
+        Descript. :
+        """
         self.f = weakref.ref(f)
     def __call__(self, *args):
+        """
+        Descript. :
+        """
         return self.f()
 
+
 def WeakMethod(f):
+    """
+    Descript. :
+    """
     try:
         f.im_func
     except AttributeError :
@@ -121,13 +148,19 @@ def WeakMethod(f):
 
 class SignalSlotFilter:
     def __init__(self, signal, slot, should_cache):
-      self.signal = signal
-      self.slot = WeakMethod(slot)
-      self.should_cache = should_cache
+        """
+        Descript. :
+        """
+        self.signal = signal
+        self.slot = WeakMethod(slot)
+        self.should_cache = should_cache
 
     def __call__(self, *args):
+        """
+        Descript. :
+        """
         if (BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE and 
-            BlissWidget._instanceMirror==BlissWidget.INSTANCE_MIRROR_PREVENT):
+            BlissWidget._instanceMirror == BlissWidget.INSTANCE_MIRROR_PREVENT):
            if self.should_cache:
                BlissWidget._eventsCache[self.slot]=(time.time(), self.slot, args)
                return
@@ -163,6 +196,9 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
     
     @staticmethod
     def setRunMode(mode):
+        """
+        Descript. :
+        """
         if mode:
             BlissWidget._runMode = True
             for w in QtGui.QApplication.allWidgets():
@@ -183,28 +219,32 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                     except:
                         logging.getLogger().exception("Could not set %s to expert mode", w.name())
 
-
     @staticmethod
     def isRunning():
+        """
+        Descript. :
+        """
         return BlissWidget._runMode
-
 
     @staticmethod
     def updateMenuBarColor(enable_checkbox=None):
+        """
+        Descript. :
+        """
         color=None
         if BlissWidget._menuBar is not None:
-            if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-                if BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_IMPERSONATE:
-                    color=Qt4_widget_colors.LIGHT_BLUE
+            if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
+                if BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_IMPERSONATE:
+                    color = Qt4_widget_colors.LIGHT_BLUE
                 else:
-                    color=Qt4_widget_colors.LIGHT_GREEN
-            elif BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_SLAVE:
-                if BlissWidget._instanceRole==BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
-                    color=Qt4_widget_colors.LIGHT_RED
-                elif BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_UNKNOWN:
-                    color=QtGui.QColor(255,165,0)
+                    color = Qt4_widget_colors.LIGHT_GREEN
+            elif BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE:
+                if BlissWidget._instanceRole == BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
+                    color = Qt4_widget_colors.LIGHT_RED
+                elif BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_UNKNOWN:
+                    color = QtGui.QColor(255, 165, 0)
                 else:
-                    color=Qt4_widget_colors.LIGHT_YELLOW
+                    color = Qt4_widget_colors.LIGHT_YELLOW
         if color is not None:
             BlissWidget._menuBar.setPaletteBackgroundColor(color)
             children = BlissWidget._menuBar.children() or []
@@ -216,41 +256,46 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                         if enable_checkbox and child.isChecked():
                             child.setPaletteBackgroundColor(Qt.yellow)
 
-
     @staticmethod
     def setInstanceMode(mode):
+        """
+        Descript. :
+        """
         BlissWidget._instanceMode = mode
-
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
                 #try:
                 w._instanceModeChanged(mode)
                 #except:
                 #    pass
-
-        if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
+        if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
             if BlissWidget._filterInstalled:
-                QtGui.QApplication.removeEventFilter(BlissWidget._applicationEventFilter)
+                QtGui.QApplication.removeEventFilter(\
+                      BlissWidget._applicationEventFilter, None)
                 BlissWidget._filterInstalled = False
                 BlissWidget.synchronizeWithCache() # why?
         else:
             if not BlissWidget._filterInstalled:
-                QtGui.QApplication.installEventFilter(BlissWidget._applicationEventFilter)
+                QtGui.QApplication.installEventFilter(\
+                      BlissWidget._applicationEventFilter, None)
                 BlissWidget._filterInstalled = True
 
-        BlissWidget.updateMenuBarColor(BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER)
-
+        BlissWidget.updateMenuBarColor(BlissWidget._instanceMode == \
+                    BlissWidget.INSTANCE_MODE_MASTER)
 
     def shouldFilterEvent(self):
-        if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
+        """
+        Descript. :
+        """
+        if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
             return False
         try:
-            allow_always=self['instanceAllowAlways']
+            allow_always = self['instanceAllowAlways']
         except KeyError:
             return False
         if not allow_always:
             try:
-                allow_connected=self['instanceAllowConnected']
+                allow_connected = self['instanceAllowConnected']
             except KeyError:
                 return False
 
@@ -261,45 +306,68 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
 
         return False
 
-    def connectGroupBox(self,widget,widget_name,masterSync):
-        brick_name = self.name()
+    def connectGroupBox(self, widget, widget_name, master_sync):
+        """
+        Descript. :
+        """
+        brick_name = self.objectName()
         self.connect(widget, QtCore.SIGNAL('toggled(bool)'), lambda \
-             s:BlissWidget.widgetGroupBoxToggled(brick_name,widget_name, masterSync,s))
+             s:BlissWidget.widgetGroupBoxToggled(brick_name, \
+             widget_name, master_sync,s))
 
-    def connectComboBox(self,widget,widget_name,masterSync):
-        brick_name = self.name()
+    def connectComboBox(self, widget, widget_name, master_sync):
+        """
+        Descript. :
+        """
+        brick_name = self.objectName()
         self.connect(widget, QtCore.SIGNAL('activated(int)'),lambda \
-             i:BlissWidget.widgetComboBoxActivated(brick_name,widget_name,widget,masterSync, i))
+             i:BlissWidget.widgetComboBoxActivated(brick_name, \
+             widget_name, widget, master_sync, i))
 
-    def connectLineEdit(self,widget,widget_name,masterSync):
-        brick_name = self.name()
+    def connectLineEdit(self, widget, widget_name, master_sync):
+        """
+        Descript. :
+        """
+        brick_name = self.objectName()
         self.connect(widget, QtCore.SIGNAL('textChanged(const QString &)'), lambda \
-             t:BlissWidget.widgetLineEditTextChanged(brick_name,widget_name,masterSync,t))
+             t:BlissWidget.widgetLineEditTextChanged(brick_name, widget_name, \
+             master_sync, t))
 
-    def connectSpinBox(self,widget,widget_name,masterSync):
-        brick_name = self.name()
+    def connectSpinBox(self,widget,widget_name,master_sync):
+        """
+        Descript. :
+        """
+        brick_name = self.objectName()
         self.connect(widget, QtCore.SIGNAL('editorTextChanged'), lambda \
-             t:BlissWidget.widgetSpinBoxTextChanged(brick_name,widget_name,masterSync,t))
+             t:BlissWidget.widgetSpinBoxTextChanged(brick_name, widget_name, \
+             master_sync, t))
 
-    def connectGenericWidget(self, widget, widget_name, masterSync):
-        brick_name = self.name()
+    def connectGenericWidget(self, widget, widget_name, master_sync):
+        """
+        Descript. :
+        """
+        brick_name = self.objectName()
         self.connect(widget, QtCore.SIGNAL('widgetSynchronize'), lambda \
-             state:BlissWidget.widgetGenericChanged(brick_name,widget_name,masterSync,state))
+             state:BlissWidget.widgetGenericChanged(brick_name, widget_name, \
+             master_sync, state))
 
     def _instanceModeChanged(self,mode):
-        for widget,widget_name,masterSync in self._widgetEvents:
-            if isinstance(widget, QtHui.QGroupBox):
-                self.connectGroupBox(widget,widget_name,masterSync)
+        """
+        Descript. :
+        """
+        for widget, widget_name, master_sync in self._widgetEvents:
+            if isinstance(widget, QtGui.QGroupBox):
+                self.connectGroupBox(widget, widget_name, master_sync)
             elif isinstance(widget,QtGui.QComboBox):
-                self.connectComboBox(widget,widget_name,masterSync)
+                self.connectComboBox(widget, widget_name, master_sync)
             elif isinstance(widget, QtGui.QLineEdit):
-                self.connectLineEdit(widget,widget_name,masterSync)
+                self.connectLineEdit(widget, widget_name, master_sync)
             elif isinstance(widget, QtGui.QSpinBox):
-                self.connectSpinBox(widget,widget_name,masterSync)
+                self.connectSpinBox(widget, widget_name, master_sync)
             else:
                 ### verify if widget has the widgetSynchronize method!!!
-                self.connectGenericWidget(widget,widget_name,masterSync)
-        self._widgetEvents=[]
+                self.connectGenericWidget(widget, widget_name, master_sync)
+        self._widgetEvents = []
 
         if self.shouldFilterEvent():
             self.setCursor(QtGui.QCursor(QtCore.Qt.ForbiddenCursor))
@@ -308,53 +376,73 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
 
         self.instanceModeChanged(mode)
 
-
-    def instanceModeChanged(self,mode):
+    def instanceModeChanged(self, mode):
+        """
+        Descript. :
+        """
         pass
-
 
     @staticmethod
     def isInstanceModeMaster():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER
-
 
     @staticmethod
     def isInstanceModeSlave():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_SLAVE
-
 
     @staticmethod
     def isInstanceRoleUnknown():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceRole==BlissWidget.INSTANCE_ROLE_UNKNOWN
-
 
     @staticmethod
     def isInstanceRoleClient():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceRole==BlissWidget.INSTANCE_ROLE_CLIENT
-
 
     @staticmethod
     def isInstanceRoleServer():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceRole==BlissWidget.INSTANCE_ROLE_SERVER
-
 
     @staticmethod
     def isInstanceUserIdUnknown():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_UNKNOWN
-
 
     @staticmethod
     def isInstanceUserIdLogged():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_LOGGED
-
 
     @staticmethod
     def isInstanceUserIdInhouse():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceUserId==BlissWidget.INSTANCE_USERID_INHOUSE
-
 
     @staticmethod
     def setInstanceRole(role):
+        """
+        Descript. :
+        """
         if role==BlissWidget._instanceRole:
             return
         BlissWidget._instanceRole = role
@@ -365,9 +453,11 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 except:
                     pass
 
-
     @staticmethod
     def setInstanceLocation(location):
+        """
+        Descript. :
+        """
         if location==BlissWidget._instanceLocation:
             return
         BlissWidget._instanceLocation = location
@@ -378,9 +468,11 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 except:
                     pass
 
-
     @staticmethod
     def setInstanceUserId(user_id):
+        """
+        Descript. :
+        """
         if user_id==BlissWidget._instanceUserId:
             return
         BlissWidget._instanceUserId = user_id
@@ -391,12 +483,13 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                     w.instanceUserIdChanged(user_id)
                 except:
                     pass
-
         BlissWidget.updateMenuBarColor()
-
 
     @staticmethod
     def setInstanceMirror(mirror):
+        """
+        Descript. :
+        """
         if mirror==BlissWidget._instanceMirror:
             return
         BlissWidget._instanceMirror = mirror
@@ -411,94 +504,123 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 except:
                     pass
 
-        #BlissWidget.updateMenuBarColor()
-
-
     def instanceMirrorChanged(self,mirror):
+        """
+        Descript. :
+        """
         pass
-
     
     def instanceLocationChanged(self,location):
+        """
+        Descript. :
+        """
         pass
-
 
     @staticmethod
     def isInstanceLocationUnknown():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceLocation==BlissWidget.INSTANCE_LOCATION_UNKNOWN
-
 
     @staticmethod
     def isInstanceLocationLocal():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceLocation==BlissWidget.INSTANCE_LOCATION_LOCAL
-
 
     @staticmethod
     def isInstanceMirrorAllow():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceMirror==BlissWidget.INSTANCE_MIRROR_ALLOW
 
-
     def instanceUserIdChanged(self,user_id):
+        """
+        Descript. :
+        """
         pass
-
 
     def instanceRoleChanged(self,role):
+        """
+        Descript. :
+        """
         pass
-
 
     @staticmethod
     def updateWhatsThis():
+        """
+        Descript. :
+        """
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
                 QtGui.QWhatsThis.remove(w)
                 QtGui.QWhatsThis.add(w, "%s (%s)\n%s" % (w.name(), w.__class__.__name__, w.getHardwareObjectsInfo()))
         QtGui.QWhatsThis.enterWhatsThisMode()
 
-
     @staticmethod
-    def updateWidget(brick_name,widget_name,method_name,method_args,masterSync):
-        #logging.getLogger().debug("------------------------- UPDATE WIDGET, masterSync=%s", masterSync)
-        if not masterSync or BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.mainWidget().emit(QtCore.SIGNAL('applicationBrickChanged'), 
-                  (brick_name,widget_name,method_name,method_args,masterSync))
-
+    def updateWidget(brick_name,widget_name,method_name,method_args,master_sync):
+        """
+        Descript. :
+        """
+        if not master_sync or BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
+            QtGui.QApplication.activeWindow().emit(QtCore.SIGNAL('applicationBrickChanged'), 
+                  brick_name, widget_name, method_name, method_args, master_sync)
 
     @staticmethod
     def updateTabWidget(tab_name,tab_index):
+        """
+        Descript. :
+        """
         if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.mainWidget().emit(QtCore.SIGNAL('applicationTabChanged'),
-                  (tab_name,tab_index))
-
-
-    @staticmethod
-    def widgetGroupBoxToggled(brick_name,widget_name,masterSync,state):
-        BlissWidget.updateWidget(brick_name,widget_name,"setChecked",(state,),masterSync)
-
+            QtGui.QApplication.activeWindow().emit(QtCore.SIGNAL('applicationTabChanged'),
+                  tab_name, tab_index)
 
     @staticmethod
-    def widgetComboBoxActivated(brick_name, widget_name,widget,masterSync,index):
+    def widgetGroupBoxToggled(brick_name,widget_name,master_sync,state):
+        """
+        Descript. :
+        """
+        BlissWidget.updateWidget(brick_name,widget_name,"setChecked",(state,),master_sync)
+
+    @staticmethod
+    def widgetComboBoxActivated(brick_name, widget_name,widget,master_sync,index):
+        """
+        Descript. :
+        """
         lines=[]
         if widget.editable():
             for i in range(widget.count()):
                 lines.append(str(widget.text(i)))
-        BlissWidget.updateWidget(brick_name,widget_name,"activated",(index,lines),masterSync)
-
-
-    @staticmethod
-    def widgetLineEditTextChanged(brick_name,widget_name,masterSync,text):
-        BlissWidget.updateWidget(brick_name,widget_name,"setText",(str(text),),masterSync)
-
+        BlissWidget.updateWidget(brick_name,widget_name,"activated",(index,lines),master_sync)
 
     @staticmethod
-    def widgetSpinBoxTextChanged(brick_name,widget_name,masterSync,text):
-        BlissWidget.updateWidget(brick_name,widget_name,"setEditorText",(str(text),), masterSync)
-
+    def widgetLineEditTextChanged(brick_name,widget_name,master_sync,text):
+        """
+        Descript. :
+        """
+        BlissWidget.updateWidget(brick_name,widget_name,"setText",(str(text),),master_sync)
 
     @staticmethod
-    def widgetGenericChanged(brick_name,widget_name,masterSync,state):
-        BlissWidget.updateWidget(brick_name,widget_name,"widgetSynchronize",(state,),masterSync)
+    def widgetSpinBoxTextChanged(brick_name,widget_name,master_sync,text):
+        """
+        Descript. :
+        """
+        BlissWidget.updateWidget(brick_name,widget_name,"setEditorText",(str(text),), master_sync)
 
+    @staticmethod
+    def widgetGenericChanged(brick_name,widget_name,master_sync,state):
+        """
+        Descript. :
+        """
+        BlissWidget.updateWidget(brick_name,widget_name,"widgetSynchronize",(state,),master_sync)
 
-    def instanceForwardEvents(self,widget_name,masterSync):
+    def instanceForwardEvents(self,widget_name,master_sync):
+        """
+        Descript. :
+        """
         if widget_name=="":
             widget=self
         else:
@@ -509,30 +631,38 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
             widget.setEditorText = new.instancemethod(SpinBoxSetEditorText,widget,widget.__class__)
             widget.editorTextChanged = new.instancemethod(SpinBoxEditorTextChanged,widget,widget.__class__)
             self.connect(widget.lineEdit(), QtCore.SIGNAL('textChanged(const QString &)'), widget.editorTextChanged)
-        self._widgetEvents.append((widget, widget_name, masterSync))
-
+        self._widgetEvents.append((widget, widget_name, master_sync))
 
     def instanceSynchronize(self,*args, **kwargs):
+        """
+        Descript. :
+        """
         for widget_name in args:
-            self.instanceForwardEvents(widget_name, kwargs.get("masterSync", True))
-
+            self.instanceForwardEvents(widget_name, kwargs.get("master_sync", True))
 
     @staticmethod
     def shouldRunEvent():
+        """
+        Descript. :
+        """
         return BlissWidget._instanceMirror==BlissWidget.INSTANCE_MIRROR_ALLOW
-
 
     @staticmethod
     def addEventToCache(timestamp,method,*args):
+        """
+        Descript. :
+        """
         try:
             m = WeakMethod(method)
         except TypeError:
             m = method
         BlissWidget._eventsCache[m]=(timestamp, m, args)
 
-
     @staticmethod
     def synchronizeWithCache():
+        """
+        Descript. :
+        """
         events=BlissWidget._eventsCache.values()
         ordered_events=sorted(events,key=operator.itemgetter(0))
         for event_timestamp,event_method,event_args in ordered_events:
@@ -544,8 +674,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 pass
         BlissWidget._eventsCache={}
 
-
     def __init__(self, parent = None, widgetName = ''):       
+        """
+        Descript. :
+        """
         Connectable.Connectable.__init__(self)
         QtGui.QWidget.__init__(self, parent)
         self.setObjectName(widgetName)
@@ -577,24 +709,23 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         self.defineSlot('enable_widget', ())
 
     def __run(self):
+        """
+        Descript. :
+        """
         self.setAcceptDrops(False)
-
-        #
-        # put it back to a normal state
-        #
         self.blockSignals(False)
         
         self.setEnabled(self.__enabledState)
  
-        #import sys, gc, types
-        
         try:        
             self.run()
         except:
             logging.getLogger().exception("Could not set %s to run mode", self.objectName())
 
-
     def __stop(self):
+        """
+        Descript. :
+        """
         self.blockSignals(True)
         
         try:
@@ -606,20 +737,26 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         self.__enabledState = self.isEnabled()
         QtGui.QWidget.setEnabled(self, True)
        
-
     def __repr__(self):
+        """
+        Descript. :
+        """
         return repr("<%s: %s>" % (self.__class__, self.objectName))
 
-
     def connectSignalSlotFilter(self,sender,signal,slot,should_cache):
+        """
+        Descript. :
+        """
         uid=(sender, signal, hash(slot))
 	signalSlotFilter = SignalSlotFilter(signal, slot, should_cache)
         self._signalSlotFilters[uid]=signalSlotFilter
 
 	QtCore.QObject.connect(sender, signal, signalSlotFilter)
 
-
     def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
+        """
+        Descript. :
+        """
 	signal = str(signal)
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
@@ -646,8 +783,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         if hasattr(sender, "connectNotify"):
             sender.connectNotify(QtCore.SIGNAL(signal))
     
-
     def disconnect(self, sender, signal, slot):
+        """
+        Descript. :
+        """
 	signal = str(signal)
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
@@ -678,8 +817,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         else:
             QtCore.QObject.disconnect(sender, pysignal and QtCore.SIGNAL(signal) or QtCore.SIGNAL(signal), signalSlotFilter)
 
-
     def reparent(self, widget_to):
+        """
+        Descript. :
+        """
         savedEnabledState = self.isEnabled()
         if self.parent() is not None:
             self.parent().layout().removeWidget(self)
@@ -688,34 +829,46 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
             self.setEnabled(savedEnabledState)
         
     def blockSignals(self, block):
+        """
+        Descript. :
+        """
         for child in self.children():
             child.blockSignals(block)
             
-                
     def run(self):
+        """
+        Descript. :
+        """
         pass
-
 
     def stop(self):
+        """
+        Descript. :
+        """
         pass
 
-    
     def restart(self):
+        """
+        Descript. :
+        """
         self.stop()
         self.run()
-              
 
     def loadUIFile(self, filename):
+        """
+        Descript. :
+        """
         for path in [BlissFramework.getStdBricksPath()]+BlissFramework.getCustomBricksDirs():
-          #modulePath = sys.modules[self.__class__.__module__].__file__
-          #path = os.path.dirname(modulePath)
-          if os.path.exists(os.path.join(path, filename)):
-            return qtui.QWidgetFactory.create(os.path.join(path, filename))
-
+            #modulePath = sys.modules[self.__class__.__module__].__file__
+            #path = os.path.dirname(modulePath)
+            if os.path.exists(os.path.join(path, filename)):
+                return qtui.QWidgetFactory.create(os.path.join(path, filename))
 
     def createGUIFromUI(self, UIFile):
+        """
+        Descript. :
+        """
         widget = self.loadUIFile(UIFile)
-
         if widget is not None:
             children = self.children() or []
             for child in children:
@@ -728,8 +881,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
             self.setLayout(layout)
             return widget
 
-  
     def setPersistentPropertyBag(self, persistentPropertyBag):
+        """
+        Descript. :
+        """
         if id(persistentPropertyBag) != id(self.propertyBag):
             for property in persistentPropertyBag:
                 #
@@ -742,8 +897,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         
         self.readProperties()
                             
-           
     def readProperties(self):
+        """
+        Descript. :
+        """
         for prop in self.propertyBag:
             self._propertyChanged(prop.getName(), None, prop.getUserValue())
         
@@ -756,43 +913,59 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
     """
 
     def addProperty(self, *args, **kwargs):
+        """
+        Descript. :
+        """
         self.propertyBag.addProperty(*args, **kwargs)
                
+    def getProperty(self, property_name):
+        """
+        Descript. :
+        """
+        return self.propertyBag.getProperty(property_name)
 
-    def getProperty(self, propertyName):
-        return self.propertyBag.getProperty(propertyName)
+    def showProperty(self, property_name):
+        """
+        Descript. :
+        """
+        return self.propertyBag.showProperty(property_name)
 
+    def hideProperty(self, property_name):
+        """
+        Descript. :
+        """
+        return self.propertyBag.hideProperty(property_name)
 
-    def showProperty(self, propertyName):
-        return self.propertyBag.showProperty(propertyName)
-
-
-    def hideProperty(self, propertyName):
-        return self.propertyBag.hideProperty(propertyName)
-
-
-    def delProperty(self, propertyName):
-        return self.propertyBag.delProperty(propertyName)
+    def delProperty(self, property_name):
+        """
+        Descript. :
+        """
+        return self.propertyBag.delProperty(property_name)
     
+    def getHardwareObject(self, hardware_object_name):
+        """
+        Descript. :
+        """
+        if not hardware_object_name in self.__loadedHardwareObjects:
+            self.__loadedHardwareObjects.append(hardware_object_name)
 
-    def getHardwareObject(self, hardwareObjectName):
-        if not hardwareObjectName in self.__loadedHardwareObjects:
-            self.__loadedHardwareObjects.append(hardwareObjectName)
-
-        ho = HardwareRepository.HardwareRepository().getHardwareObject(hardwareObjectName)
+        ho = HardwareRepository.HardwareRepository().getHardwareObject(hardware_object_name)
     
         return ho
         
-
-    def __hardwareObjectDiscarded(self, hardwareObjectName):
-        if hardwareObjectName in self.__loadedHardwareObjects:
+    def __hardwareObjectDiscarded(self, hardware_object_name):
+        """
+        Descript. :
+        """
+        if hardware_object_name in self.__loadedHardwareObjects:
             # there is a high probability we need to reload this hardware object...
             self.readProperties() #force to read properties
 
-
     def getHardwareObjectsInfo(self):
+        """
+        Descript. :
+        """
         d = {}
-        
         for ho_name in self.__loadedHardwareObjects:
             info = HardwareRepository.HardwareRepository().getInfo(ho_name)
             
@@ -804,27 +977,27 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         else:
             return ""
         
-
-    def __getitem__(self, propertyName):
-        #
-        # direct access to properties values
-        #
-        return self.propertyBag[propertyName]
+    def __getitem__(self, property_name):
+        """
+        Descript. : Direct access tp properties values
+        """
+        return self.propertyBag[property_name]
         
-
-    def __setitem__(self, propertyName, value):
-        p = self.propertyBag.getProperty(propertyName)
+    def __setitem__(self, property_name, value):
+        """
+        Descript. :
+        """
+        p = self.propertyBag.getProperty(property_name)
         oldValue = p.getValue()
         p.setValue(value)
 
-        self._propertyChanged(propertyName, oldValue, p.getUserValue())
-                    
+        self._propertyChanged(property_name, oldValue, p.getUserValue())
     
-    def _propertyChanged(self, propertyName, oldValue, newValue):
+    def _propertyChanged(self, property_name, old_value, new_value):
         #import time; t0=time.time()    
-        if propertyName == 'fontSize':
+        if property_name == 'fontSize':
             try:
-                s = int(newValue)
+                s = int(new_value)
             except:
                 self.getProperty('fontSize').setValue(self.font().pointSize())
             else:
@@ -840,36 +1013,48 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                 self.update()
         else:
             try:
-                self.propertyChanged(propertyName, oldValue, newValue)
+                self.propertyChanged(property_name, old_value, new_value)
             except:
-                logging.getLogger().exception('Error while setting property %s for %s (details in log file).', propertyName, str(self.objectName()))
+                logging.getLogger().exception('Error while setting property %s for %s (details in log file).', property_name, str(self.objectName()))
 
         #if not BlissWidget.isRunning():
         #    self.blockSignals(True)
-        
 
-    def propertyChanged(self, propertyName, oldValue, newValue):
+    def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
         pass
 
-
     def set_expert_mode(self, expert):
+        """
+        Descript. :
+        """
         pass
     
     def enable_widget(self, state):
-      if state:
-        self.setEnabled(True)
-      else:
-        self.setDisabled(True)
+        """
+        Descript. :
+        """
+        if state:
+            self.setEnabled(True)
+        else:
+            self.setDisabled(True)
   
+
 class NullBrick(BlissWidget):
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         self.propertyBag = PropertyBag.PropertyBag()
 
     """
     def setShelf(self, shelf):
-        persistentPropertyBag = PropertyBag.unpickleFromShelf(shelf, self.name())
+        persistentPropertyBag = PropertyBag.unpickleFromShelf(shelf, self.objectName())
 
         if not persistentPropertyBag.isEmpty():       
             for property in persistentPropertyBag:
@@ -879,38 +1064,48 @@ class NullBrick(BlissWidget):
                 self.propertyBag[property.getName()] = property
     """
     def setPersistentPropertyBag(self, persistentPropertyBag):
+        """
+        Descript. :
+        """
         self.propertyBag = persistentPropertyBag
         
-    
     def sizeHint(self):
+        """
+        Descript. :
+        """
         return QtCore.QSize(100, 100)  
 
-
     def run(self):
+        """
+        Descript. :
+        """
         self.hide()
 
-
     def stop(self):
+        """
+        Descript. :
+        """
         self.show()
 
-
     def paintEvent(self, event):
+        """
+        Descript. :
+        """
         if not self.isRunning():
             p = QtGui.QPainter(self)
             p.setPen(QtGui.QPen(QtCore.Qt.black, 1))
             p.drawLine(0, 0, self.width(), self.height())
             p.drawLine(0, self.height(), self.width(), 0)
   
-
 class ProcedureBrick(BlissWidget):
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         self.__pages = []
-    
-        #
-        # add properties
-        #
+
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('equipment', 'string', '')
 
@@ -941,71 +1136,96 @@ class ProcedureBrick(BlissWidget):
         self.layout().addWidget(self.procedureTab, 0)
         self.layout().addWidget(self.runStopPanel, 0, Qt.AlignRight | Qt.AlignBottom)        
 
-
     def setMnemonic(self, mne):
+        """
+        Descript. :
+        """
         self.getProperty('mnemonic').setValue(mne)
 
  	proc = HardwareRepository.HardwareRepository().getProcedure(mne)
 
 	self.__setProcedure(proc)
 
-
     def __setProcedure(self, proc):
+        """
+        Descript. :
+        """
         for p in self.__pages:
             p.setProcedure(proc)
 
         self.setProcedure(proc)
         
-    
     def setProcedure(self, proc):
+        """
+        Descript. :
+        """
         pass
 
-    
     def setEquipmentMnemonic(self, mne):
+        """
+        Descript. :
+        """
         self.getProperty('equipment').setValue(mne)
         
         e = self.getHardwareObject(mne)
         
         self.setEquipment(e)
 
-
     def setEquipment(self, equipment):
+        """
+        Descript. :
+        """
         pass
-    
         
     def launchProcedure(self):
+        """
+        Descript. :
+        """
         pass
-
 
     def stopProcedure(self):
+        """
+        Descript. :
+        """
         pass
-    
 
     def dataFileChanged(self, filename):
+        """
+        Descript. :
+        """
         pass
     
-            
     def addPage(self, pageName):
+        """
+        Descript. :
+        """
         self.__pages.append(Qt4_ProcedureWidgets.ProcedurePanel(self))
-
-        self.__pages[-1].setProcedure(HardwareRepository.HardwareRepository().getProcedure(self['mnemonic']))
+        self.__pages[-1].setProcedure(HardwareRepository.HardwareRepository().\
+             getProcedure(self['mnemonic']))
         self.procedureTab.addTab(self.__pages[-1], pageName)
 
         return self.__pages[-1]
 
-
     def showPage(self, page):
+        """
+        Descript. :
+        """
         self.procedureTab.showPage(page)
         
-        
-    def propertyChanged(self, property, oldValue, newValue):
-        if property == 'mnemonic':
-       	    self.setMnemonic(newValue) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
-        elif property == 'equipment':
-            self.setEquipment(self.getHardwareObject(newValue))
+    def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Descript. :
+        """
+        if property_name == 'mnemonic':
+       	    self.setMnemonic(new_value) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
+        elif property_name == 'equipment':
+            self.setEquipment(self.getHardwareObject(new_value))
 
 
-def ComboBoxActivated(self,index,lines):
+def ComboBoxActivated(self, index, lines):
+    """
+    Descript. :
+    """
     if self.editable():
         #lines=state[1]
         last=self.count()
@@ -1019,15 +1239,21 @@ def ComboBoxActivated(self,index,lines):
                 else:
                     self.insertItem(line)
                     self.setCurrentItem(i)
-                    self.emit(QtCore.SIGNAL('activated(const QString &)'), (line,))
-                    self.emit(QtCore.SIGNAL('activated(int)'), (i,))
+                    self.emit(QtCore.SIGNAL('activated(const QString &)'), line)
+                    self.emit(QtCore.SIGNAL('activated(int)'), i)
                 i+=1
     self.setCurrentItem(index)
-    self.emit(QtCore.SIGNAL('activated(const QString &)'), (self.currentText(),))
-    self.emit(QtCore.SIGNAL('activated(int)'), (index,))
+    self.emit(QtCore.SIGNAL('activated(const QString &)'), self.currentText())
+    self.emit(QtCore.SIGNAL('activated(int)'), index)
 
+def SpinBoxEditorTextChanged(self, t):
+    """
+    Descript. :
+    """
+    self.emit(QtCore.SIGNAL('editorTextChanged'), str(t))
 
-def SpinBoxEditorTextChanged(self,t):
-    self.emit(QtCore.SIGNAL('editorTextChanged'), (str(t),))
-def SpinBoxSetEditorText(self,t):
+def SpinBoxSetEditorText(self, t):
+    """
+    Descript. :
+    """
     self.editor().setText(t)

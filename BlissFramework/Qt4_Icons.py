@@ -21,11 +21,15 @@ from os import path
 
 from PyQt4 import QtGui
 
+
 ICONS_DIR = path.join(path.dirname(__file__), 'Icons')
 
-def load(iconName):
-    """Try to load an icon from file and return the QPixmap object"""
-    filename = path.join(ICONS_DIR, iconName)
+
+def load(icon_name): 
+    """
+    Descript. : Try to load an icon from file and return the QPixmap object
+    """
+    filename = path.join(ICONS_DIR, icon_name)
 
     if not path.exists(filename):
         for ext in ['png', 'xpm', 'gif', 'bmp']:
@@ -45,9 +49,11 @@ def load(iconName):
             return icon
 
 
-def getIconPath(iconName):
-    """Return path to an icon"""
-    filename = path.join(ICONS_DIR, iconName)
+def getIconPath(icon_name):
+    """
+    Descript. : Return path to an icon
+    """
+    filename = path.join(ICONS_DIR, icon_name)
 
     if not path.exists(filename):
         for ext in ['png', 'xpm', 'gif', 'bmp']:
