@@ -95,6 +95,9 @@ class DataPathWidget(QtGui.QWidget):
         Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def _browse_clicked(self):
+        """
+        Descript. :
+        """
         get_dir = QtGui.QFileDialog(self)
         given_dir = self._base_image_dir
 
@@ -107,6 +110,9 @@ class DataPathWidget(QtGui.QWidget):
             self.set_directory(d)
 
     def _prefix_ledit_change(self, new_value):
+        """
+        Descript. :
+        """
         self._data_model.base_prefix = str(new_value)
         file_name = self._data_model.get_image_file_name()
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
@@ -120,6 +126,9 @@ class DataPathWidget(QtGui.QWidget):
                   new_value)
 
     def _run_number_ledit_change(self, new_value):
+        """
+        Descript. :
+        """
         if str(new_value).isdigit():
             self.set_run_number(new_value)
             self.emit(QtCore.SIGNAL('path_template_changed'),
@@ -127,6 +136,9 @@ class DataPathWidget(QtGui.QWidget):
                       new_value)
 
     def _folder_ledit_change(self, new_value):        
+        """
+        Descript. :
+        """
         base_image_dir = self._base_image_dir
         base_proc_dir = self._base_process_dir
         new_sub_dir = str(new_value).strip(' ')
@@ -142,14 +154,17 @@ class DataPathWidget(QtGui.QWidget):
             
         self._data_model.directory = new_image_directory
         self._data_model.process_directory = new_proc_dir 
-        Qt4_widget_colors.set_widget_color(self.data_path_layout.findChild(QtGui.QLineEdit, 'folder_ledit'), 
-                                           Qt4_widget_colors.WHITE)
+        Qt4_widget_colors.set_widget_color(self.data_path_layout.findChild(\
+               QtGui.QLineEdit, 'folder_ledit'), Qt4_widget_colors.WHITE)
 
-        self.emit(QtCore.SIGNAL('path_template_changed'),
+        self.emit(QtCore.SIGNAL('pathTemplateChanged'),
                   self.data_path_layout.findChild(QtGui.QLineEdit, 'folder_ledit'),
                   new_value)
 
     def set_data_path(self, path):
+        """
+        Descript. :
+        """
         (dir_name, file_name) = os.path.split(path)
         self.set_directory(dir_name)
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
@@ -157,6 +172,9 @@ class DataPathWidget(QtGui.QWidget):
         self.data_path_layout.findChild(QtGui.QLabel, 'file_name_value_label').setText(file_name)
     
     def set_directory(self, directory):
+        """
+        Descript. :
+        """
         base_image_dir = self._base_image_dir
         dir_parts = directory.split(base_image_dir)
 
@@ -171,11 +189,17 @@ class DataPathWidget(QtGui.QWidget):
         self.data_path_layout.findChild(QtGui.QLineEdit, 'base_path_ledit').setText(base_image_dir)
 
     def set_run_number(self, run_number):
+        """
+        Descript. :
+        """
         self._data_model.run_number = int(run_number)
         self.data_path_layout.findChild(QtGui.QLineEdit, 'run_number_ledit').\
             setText(str(run_number))
 
     def set_prefix(self, base_prefix):
+        """
+        Descript. :
+        """
         self._data_model.base_prefix = str(base_prefix)
         self.data_path_layout.findChild(QtGui.QLineEdit, 'prefix_ledit').setText(str(base_prefix))
         file_name = self._data_model.get_image_file_name()
@@ -184,11 +208,17 @@ class DataPathWidget(QtGui.QWidget):
         self.data_path_layout.findChild(QtGui.QLabel, 'file_name_value_label').setText(file_name)
 
     def update_data_model(self, data_model):
+        """
+        Descript. :
+        """
         self._data_model = data_model
         self.set_data_path(data_model.get_image_path())
         self._data_model_pm.set_model(data_model)
 
     def indicate_path_conflict(self, conflict):
+        """
+        Descript. :
+        """
         if conflict:
             Qt4_widget_colors.set_widget_color(self.data_path_layout.\
                               findChild(QtGui.QLineEdit, 'prefix_ledit'),

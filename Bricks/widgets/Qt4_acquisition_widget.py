@@ -104,6 +104,7 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget.subwedge_size_ledit.textChanged.connect(self.subwedge_size_ledit_change)
         self.acq_widget.osc_start_cbox.toggled.connect(self.osc_start_cbox_click)
 
+        # Other --------------------------------------------------------------- 
         self.acq_widget.subwedge_size_ledit.setDisabled(True)
         self.acq_widget.energies_combo.setDisabled(True)
         self.acq_widget.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
@@ -256,7 +257,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if str(new_value).isdigit():
             self._path_template.start_num = int(new_value)
             widget = self.acq_widget.first_image_ledit
-            self.emit(QtCore.SIGNAL('path_template_changed'),
+            self.emit(QtCore.SIGNAL('pathTemplateChanged'),
                       widget, new_value)
 
     def num_images_ledit_change(self, new_value):
@@ -266,7 +267,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if str(new_value).isdigit():
             self._path_template.num_files = int(new_value)
             widget = self.acq_widget.num_images_ledit
-            self.emit(QtCore.SIGNAL('path_template_changed'),
+            self.emit(QtCore.SIGNAL('pathTemplateChanged'),
                       widget, new_value)
 
     def overlap_changed(self, new_value):

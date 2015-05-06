@@ -148,7 +148,7 @@ class CreateHelicalWidget(CreateTaskBase):
                                self.list_box_selection_changed)
 
         QtCore.QObject.connect(self._data_path_widget,
-                     QtCore.SIGNAL("path_template_changed"),
+                     QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)
 
     def init_models(self):

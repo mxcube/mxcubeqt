@@ -78,12 +78,11 @@ class CreateXRFScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
         
         self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("path_template_changed"),
+                     QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)
 
         # Other ---------------------------------------------------------------

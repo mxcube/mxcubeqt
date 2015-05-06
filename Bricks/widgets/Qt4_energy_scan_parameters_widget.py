@@ -29,6 +29,8 @@ from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget
 from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 
+#from widgets.Qt4_scan_plot_widget import ScanPlotWidget
+
 from BlissFramework.Utils import Qt4_widget_colors
 
 
@@ -62,6 +64,13 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.scan_plot_widget = TwoAxisPlotWidget(self)
         self.scan_plot_widget.set_real_time_plot(True)
         self.result_plot_widget = TwoAxisPlotWidget(self)
+
+        """self.scan_plot_widget = ScanPlotWidget(self)
+        self.scan_plot_widget.setRealTimePlot(True)
+        self.result_plot_widget = ScanPlotWidget(self)
+        self.result_plot_widget.setRealTimePlot(False)
+        self.scan_plot_widget.setFixedHeight(200)
+        self.result_plot_widget.setFixedHeight(200)"""
  
         # Layout -------------------------------------------------------------
         _parameters_widget_layout = QtGui.QVBoxLayout()
@@ -149,8 +158,9 @@ class EnergyScanParametersWidget(QtGui.QWidget):
             self.result_plot_widget.clear()
 
         self.data_path_widget.update_data_model(self.energy_scan_model.path_template)
-        self.periodic_table_widget.set_current_element(\
-             self.energy_scan_model.element_symbol)
+        self.periodic_table_widget.set_current_element_edge(\
+             self.energy_scan_model.element_symbol,
+             self.energy_scan_model.edge)
 
         image = self.energy_scan_model.centred_position.snapshot_image
         if image is not None:
@@ -167,9 +177,9 @@ class EnergyScanParametersWidget(QtGui.QWidget):
     def set_enegy_scan_hwobj(self, energy_scan_hwobj):
         self.energy_scan_hwobj = energy_scan_hwobj
         if self.energy_scan_hwobj:
-            self.energy_scan_hwobj.connect(QtCore.SIGNAL("scanStart"), self.scan_started)
-            self.energy_scan_hwobj.connect(QtCore.SIGNAL("scanNewPoint"), self.scan_new_point) 
-            self.energy_scan_hwobj.connect(QtCore.SIGNAL("choochFinished"), self.chooch_finished)
+            self.energy_scan_hwobj.connect("scanStart", self.scan_started)
+            self.energy_scan_hwobj.connect("scanNewPoint", self.scan_new_point) 
+            self.energy_scan_hwobj.connect("choochFinished", self.chooch_finished)
 
     def scan_started(self, scan_parameters):
         self.scan_plot_widget.start_new_scan(scan_parameters)

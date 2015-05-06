@@ -36,14 +36,15 @@ stored and managed by the ShapeHistory. the Line object represents a line
 between two Point objects.
 
 """
-
+import copy
+import types
 import logging
 import traceback
-import queue_model_objects_v1 as queue_model_objects
-import types
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import QtCore
+
+import queue_model_objects_v1 as queue_model_objects
 
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from HardwareRepository.HardwareRepository import dispatcher
@@ -118,7 +119,6 @@ class Qt4_GraphicsManager(HardwareObject):
 
     def graphics_view_mouse_released(self, x, y):
         self.graphics_mesh_draw_item.set_draw_mode(False)
-        print self.graphics_mesh_draw_item.is_draw_mode()
 
     def graphics_view_mouse_moved(self, x, y):
         if self.centring_state:
@@ -331,8 +331,19 @@ class Qt4_GraphicsManager(HardwareObject):
         return image
 
     def set_mesh_draw_state(self, state):
-        print "set_mesh_drawing_state", state
         self.mesh_drawing_state = state
+
+    def start_mesh_draw(self):
+        self.graphics_mesh_draw_item.show()
+        self.mesh_drawing_state = True
+
+    def save_current_mesh(self):
+        new_mesh_obj = GraphicsItemMesh(self)
+        new_mesh_obj.set_properties(self.graphics_mesh_draw_item.get_properties())
+
+        self.add_shape(self.graphics_mesh_draw_item)
+        self.graphics_mesh_draw_item = GraphicsItemMesh(self)
+        self.graphics_mesh_draw_item.hide()
   
 class GraphicsItem(QtGui.QGraphicsItem):
     """
@@ -406,16 +417,14 @@ class GraphicsItemMesh(GraphicsItem):
         self.__cell_width = 70
         self.__corner_points_motor_pos = []
         self.__corner_points_coord = [[0, 0], [0, 0], [0, 0], [0, 0]]
-        self.__corner_points_coord = [[200, 220], [420, 260], [320, 340], [340, 380]]
-        #self.__num_col = 0      
-        #self.__num_row = 0
-        self.__num_col = 5
-        self.__num_row = 3
+        self.__num_col = 0      
+        self.__num_row = 0
+        #self.__num_col = 5
+        #self.__num_row = 3
         self.__draw_mode = True
-        self.__draw_projection = True
+        self.__draw_projection = False
 
     def set_draw_start_position(self, pos_x, pos_y):
-        return
         self.__corner_points_coord[0][0] = pos_x
         self.__corner_points_coord[0][1] = pos_y
         self.__corner_points_coord[1][1] = pos_y
@@ -423,10 +432,6 @@ class GraphicsItemMesh(GraphicsItem):
         self.scene().update()
 
     def set_draw_end_position(self, pos_x, pos_y):
-        self.__corner_points_coord[3][0] = pos_x
-        self.__corner_points_coord[3][1] = pos_y
-        self.scene().update()
-        return
         self.__corner_points_coord[1][0] = pos_x
         self.__corner_points_coord[2][1] = pos_y
         self.__corner_points_coord[3][0] = pos_x
@@ -439,11 +444,31 @@ class GraphicsItemMesh(GraphicsItem):
     def is_draw_mode(self):
         return self.__draw_mode
 
+    def get_properties(self):
+        return {"beam_hor" : self.__beam_size_hor,
+                "beam_ver" : self.__beam_size_ver,
+                "cell_height" : self.__cell_height,
+                "cell_width" : self.__cell_width,
+                "corner_pos" : self.__corner_points_motor_pos,
+                "corner_coord" : self.__corner_points_coord,
+                "num_col" : self.__num_col,
+                "num_row" : self.__num_row}
+
+    def set_properties(self, properties_dict):
+        self.__beam_size_hor = properties_dict.get("beam_hor")
+        self.__beam_size_ver = properties_dict.get("beam_ver")
+        self.__cell_width = properties_dict.get("cell_width")
+        self.__cell_height = properties_dict.get("cell_height")
+        self.__corner_points_motor_pos = properties_dict.get("corner_pos") 
+        self.__corner_points_coord = properties_dict.get("corner_coord")
+        self.__num_col = properties_dict.get("num_col")
+        self.__num_row = properties_dict.get("num_row")
+
     def paint(self, painter, option, widget):
         pen = QtGui.QPen(self.style)
         pen.setWidth(1)
         brush = QtGui.QBrush(self.style)
-        brush.setColor(QtGui.QColor(122,175,220))
+        brush.setColor(QtGui.QColor(70,70,165))
         if option.state & QtGui.QStyle.State_Selected:
             pen.setStyle(QtCore.Qt.DashLine)
             pen.setColor(QtCore.Qt.green)
@@ -455,7 +480,7 @@ class GraphicsItemMesh(GraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
         
-        if self.__draw_projection == False:
+        if not self.__draw_projection:
             self.__num_col = int(abs(self.__corner_points_coord[0][0] - \
                                      self.__corner_points_coord[1][0]) / \
                                      self.__beam_size_hor)
@@ -480,59 +505,7 @@ class GraphicsItemMesh(GraphicsItem):
                                      self.__cell_width)
                      
         else:
-           painter.drawText(self.__corner_points_coord[0][0],
-                            self.__corner_points_coord[0][1], "0")
-           painter.drawText(self.__corner_points_coord[1][0],
-                            self.__corner_points_coord[1][1], "1")
-           painter.drawText(self.__corner_points_coord[2][0],
-                            self.__corner_points_coord[2][1], "2")
-           painter.drawText(self.__corner_points_coord[3][0],
-                            self.__corner_points_coord[3][1], "3")
-
-           for row in range(0, self.__num_row + 1):
-               start_x = min(self.__corner_points_coord[0][0], 
-                             self.__corner_points_coord[2][0]) + \
-                         (abs(self.__corner_points_coord[0][0] - \
-                              self.__corner_points_coord[2][0]) / \
-                              self.__num_row * row)
-               start_y = min(self.__corner_points_coord[0][1], 
-                             self.__corner_points_coord[2][1]) + \
-                         (abs(self.__corner_points_coord[0][1] - \
-                              self.__corner_points_coord[2][1]) / \
-                              self.__num_row * row) 
-               end_x = min(self.__corner_points_coord[1][0], 
-                           self.__corner_points_coord[3][0]) + \
-                       (abs(self.__corner_points_coord[1][0] - \
-                            self.__corner_points_coord[3][0]) / \
-                            self.__num_row * row)
-               end_y = min(self.__corner_points_coord[1][1], 
-                           self.__corner_points_coord[3][1]) + \
-                       (abs(self.__corner_points_coord[1][1] - \
-                            self.__corner_points_coord[3][1]) / \
-                            self.__num_row * row)
-               painter.drawLine(start_x, start_y, end_x, end_y)
-           for col in range(0, self.__num_col + 1):
-               start_x = min(self.__corner_points_coord[0][0], \
-                             self.__corner_points_coord[1][0]) + \
-                         (abs(self.__corner_points_coord[0][0] - \
-                              self.__corner_points_coord[1][0]) / \
-                              self.__num_col * col)
-               start_y = min(self.__corner_points_coord[0][1], \
-                             self.__corner_points_coord[1][1]) + \
-                         (abs(self.__corner_points_coord[0][1] - \
-                              self.__corner_points_coord[1][1]) / \
-                              self.__num_col * col)
-               end_x = min(self.__corner_points_coord[2][0], \
-                           self.__corner_points_coord[3][0]) + \
-                       (abs(self.__corner_points_coord[2][0] - \
-                            self.__corner_points_coord[3][0]) / \
-                            self.__num_col * col)
-               end_y = min(self.__corner_points_coord[2][1], \
-                           self.__corner_points_coord[3][1]) + \
-                       (abs(self.__corner_points_coord[2][1] - \
-                            self.__corner_points_coord[3][1]) / \
-                            self.__num_col * col)
-               painter.drawLine(start_x, start_y, end_x, end_y)
+            print "draw projection"
  
 class GraphicsItemScale(GraphicsItem):
     """

@@ -22,8 +22,16 @@ from PyQt4 import QtGui
 
 import sys
 
+
 class ConfirmDialogWidgetVerticalLayout(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent = None, name = None, fl = 0):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
 
         if not name:
@@ -107,6 +115,9 @@ class ConfirmDialogWidgetVerticalLayout(QtGui.QWidget):
         self.setAttribute(QtCore.Qt.WA_WState_Polished)
 
     def languageChange(self):
+        """
+        Descript. :
+        """
         self.setWindowTitle(self.__tr("Confirm collect"))
         self.summary_gbox.setTitle(self.__tr("Summary"))
         self.summary_label.setText(self.__tr("<summary label>"))
@@ -127,4 +138,7 @@ class ConfirmDialogWidgetVerticalLayout(QtGui.QWidget):
         self.cancel_button.setText(self.__tr("Cancel"))
 
     def __tr(self, s, c = None):
+        """
+        Descript. :
+        """
         return QtGui.QApplication.translate("ConfirmDialogWidgetVerticalLayout", s, c)

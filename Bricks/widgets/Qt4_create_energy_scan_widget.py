@@ -54,7 +54,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self.periodic_table = PeriodicTableWidget(self)
+        self._periodic_table_widget = PeriodicTableWidget(self)
         self._data_path_gbox = QtGui.QGroupBox('Data location', self)
         self._data_path_widget = DataPathWidget(self._data_path_gbox,
                                                data_model = self._path_template,
@@ -68,7 +68,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._data_path_gbox.setLayout(self._data_path_gbox_vlayout)
 
         self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self.periodic_table)
+        self.main_layout.addWidget(self._periodic_table_widget)
         self.main_layout.addWidget(self._data_path_gbox)
         self.main_layout.addStretch(0)
         self.main_layout.setSpacing(0)
@@ -82,7 +82,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
              connect(self._run_number_ledit_change)
 
         self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("path_template_changed"),
+                     QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)
 
     def init_models(self):
@@ -100,8 +100,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         """
         Descript. :
         """
-        self.periodic_table.periodicTable.\
-            setElements(energy_scan_hwobj.getElements())
+        self._periodic_table_widget.periodic_table.setElements(energy_scan_hwobj.getElements())
 
     def single_item_selection(self, tree_item):
         """
@@ -129,16 +128,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
         Descript. :
         """
         base_result = CreateTaskBase.approve_creation(self)
-
-        selected_edge = False
-
-        if self.periodic_table.selected_element:
-            selected_edge = True
-        else:
+        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()
+        if not selected_element:
             logging.getLogger("user_level_log").\
                 info("No element selected, please select an element.")
 
-        return base_result and selected_edge
+        return base_result and selected_element
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
@@ -147,8 +142,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
         Descript. :
         """
         data_collections = []
+        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()   
 
-        if self.periodic_table.selected_element:
+        if selected_element:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
                 cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot([])
@@ -169,8 +165,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
                                                          cpos)
             energy_scan.set_name(path_template.get_prefix())
             energy_scan.set_number(path_template.run_number)
-            energy_scan.element_symbol = self.periodic_table.selected_element
-            energy_scan.edge = self.periodic_table.selected_edge
+            energy_scan.element_symbol = selected_element
+            energy_scan.edge = selected_edge
 
             data_collections.append(energy_scan)
             self._path_template.run_number += 1

@@ -961,10 +961,9 @@ class DataCollectTree(QtGui.QWidget):
                 #if item.get_model().lims_location != (None, None):
                 #    item.setPixmap(0, self.ispyb_pixmap)
                 item.setText(0, item.get_model().get_display_name())
-                if not item.get_model().get_is_present():
-                    item.setDisabled(True)
-                    item.setExpanded(False)
-                    #item.setOn(False)
+                #if not item.get_model().get_is_present():
+                #    item.setDisabled(True)
+                #    item.setExpanded(False)
             #self.sample_tree_widget.resizeColumnToContents(1) 
         
             it += 1

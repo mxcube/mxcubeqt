@@ -37,6 +37,10 @@ from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 
 
 class CreateAdvancedScanWidget(CreateTaskBase):
+    """
+    Descript. :
+    """
+
     def __init__(self, parent = None,name = None, fl = 0):
         CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), 'Advanced')
 
@@ -122,7 +126,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
              connect(self._run_number_ledit_change)
 
         self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("path_template_changed"),
+                     QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)
 
         self.mesh_widget.draw_button.clicked.connect(self.draw_button_clicked)
@@ -166,6 +170,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         #self._acq_widget.setFixedHeight(185)
 
     def init_models(self):
+        """
+        Descript. :
+        """
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
@@ -184,6 +191,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self._path_template = queue_model_objects.PathTemplate()
 
     def approve_creation(self):
+        """
+        Descript. :
+        """
         result = CreateTaskBase.approve_creation(self)
 
         list_view_item = self.mesh_widget.mesh_treewidget.currentItem()
@@ -198,9 +208,15 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         return result and selected_grid
             
     def update_processing_parameters(self, crystal):
+        """
+        Descript. :
+        """
         return
 
     def single_item_selection(self, tree_item):
+        """
+        Descript. :
+        """
         CreateTaskBase.single_item_selection(self, tree_item)
 
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
@@ -240,6 +256,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                                                self._path_template)
   
     def _create_task(self,  sample, shape):
+        """
+        Descript. :
+        """
         data_collections = []
 
         selected_grid_info = None
@@ -278,6 +297,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         return data_collections            
 
     def connectToView(self, view_dict):
+        """
+        Descript. :
+        """
         qub_image = view_dict.get("drawing")
         if qub_image is not None:
             self.__canvas = qub_image.canvas()
@@ -286,21 +308,33 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             #self.__drawing_mgr = Qub2PointSurfaceDrawingMgr(self.__canvas, self.__matrix)
 
     def set_kappa(self, new_value):
+        """
+        Descript. :
+        """
         self.kappa_position = new_value
         self.mesh_widget.findChild(QtGui.QLineEdit, "kappa_ledit").\
              setText("%.2f" % float(new_value))
 
     def set_kappa_phi(self, new_value):
+        """
+        Descript. :
+        """
         self.kappa_phi_position = new_value
         self.mesh_widget.findChild(QtGui.QLineEdit, "kappa_phi_ledit").\
              setText("%.2f" % float(new_value))
 
     def update_osc_start(self, new_value):
+        """
+        Descript. :
+        """
         self.omega_position = new_value
         self.mesh_widget.findChild(QtGui.QLineEdit, "omega_ledit").\
              setText("%.2f" % float(new_value))
 
     def set_beam_info(self, beam_info_dict):
+        """
+        Descript. :
+        """
         self.__beam_size_x = beam_info_dict.get("size_x", 0)
         self.__beam_size_y = beam_info_dict.get("size_y", 0)
         self.__beam_shape = beam_info_dict.get("shape", 0)
@@ -313,6 +347,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.__drawing_mgr.set_cell_shape(self.__beam_shape == "ellipse")
 
     def draw_button_clicked(self):
+        """
+        Descript. :
+        """
         self._graphics_manager_hwobj.start_mesh_draw()
 
 
@@ -338,9 +375,15 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self.__drawing_mgr.setColor(qt.Qt.darkGreen)
 
     def end_surface_drawing(self, drawing_mgr = None):
+        """
+        Descript. :
+        """
         drawing_mgr.reshape()
 
     def add_drawing_clicked(self):
+        """
+        Descript. :
+        """
         self._graphics_manager_hwobj.save_current_mesh()
 
         return
@@ -405,6 +448,9 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.draw_button_clicked()
 
     def delete_drawing_clicked(self):
+        """
+        Descript. :
+        """
         if len(self.__list_items):
             list_view_item = self.mesh_widget.mesh_treewidget.selectedItem()
             del self.__list_items[list_view_item]

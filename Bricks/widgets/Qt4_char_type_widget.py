@@ -28,7 +28,14 @@ from widgets.Qt4_radiation_damage_char_widget_layout import \
 
 
 class CharTypeWidget(QtGui.QWidget):
-    def __init__(self,parent = None,name = None,fl = 0):
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent = None, name = None, fl = 0):
+        """
+        Descript. :
+        """
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
 
         if not name:
@@ -85,16 +92,22 @@ class CharTypeWidget(QtGui.QWidget):
 
         Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
-
     def enable_time_ledit(self, state):
+        """
+        Descript. :
+        """
         self.routine_dc_page.time_ledit.setEnabled(state)
 
-
     def enable_dose_ledit(self, state):
+        """
+        Descript. :
+        """
         self.routine_dc_page.dose_ledit.setEnabled(state)
 
-
     def _toggle_time_dose(self, index):
+        """
+        Descript. :
+        """
         if index is 1:
             self.routine_dc_page.dose_ledit.setEnabled(False)
             self.routine_dc_page.dose_limit_cbx.setEnabled(False)
@@ -115,9 +128,9 @@ class CharTypeWidget(QtGui.QWidget):
             self.routine_dc_page.dose_limit_cbx.setEnabled(False)
             self.routine_dc_page.radiation_damage_cbx.setEnabled(False)
 
-
     def toggle_time_dose(self):
+        """
+        Descript. :
+        """
         index = self.routine_dc_page.dose_time_bgroup.checkedId()
         self._toggle_time_dose(index)
-                
-                

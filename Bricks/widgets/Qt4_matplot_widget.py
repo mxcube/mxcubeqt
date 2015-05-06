@@ -20,7 +20,7 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
-from numpy import arange, sin, pi
+import numpy as np
 
 from matplotlib.backends import qt4_compat
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -31,14 +31,21 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
 class TwoAxisPlotWidget(BlissWidget):
-    def __init__(self, realtime_plot):
+    """
+    Descript. :
+    """
+
+    def __init__(self, realtime_plot = False):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self)
 
-        self.realtime_plot = False
-        self.two_axis_figure_canvas = StaticMplCanvas(self)
+        self._two_axis_figure_canvas = MplCanvas(self)
+        self._two_axis_figure_canvas.set_real_time(realtime_plot)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.two_axis_figure_canvas)  
+        _main_vlayout.addWidget(self._two_axis_figure_canvas)  
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_vlayout)
@@ -47,35 +54,60 @@ class TwoAxisPlotWidget(BlissWidget):
                            QtGui.QSizePolicy.Expanding)
 
     def set_real_time_plot(self, realtime_plot):
-        self.realtime_plot = realtime_plot
+        """
+        Descript. :
+        """
+        self._realtime_plot = realtime_plot
 
     def clear(self):
-        self.two_axis_figure_canvas.axes.cla()
+        """
+        Descript. :
+        """
+        self._two_axis_figure_canvas.clear()
 
     def plot_scan_curve(self, result):
-        self.axes.plot(t, result)
-
-        print "plot_scan_curve", result
+        self._two_axis_figure_canvas.clear()
+        self._two_axis_figure_canvas.add_curve(result, 'energy')
 
     def start_new_scan(self, scan_parameters):
-        print "start_new_scan", scan_parameters
+        """
+        Descript. :
+        """
+        self._two_axis_figure_canvas.clear()
+        self._two_axis_figure_canvas.set_axes_labels(scan_parameters.get('xlabel', ''),
+                                                     scan_parameters.get('ylabel', ''))
 
     def plot_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
                      chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
-        print "plot_results: ", self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
-                    chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title
+        self._two_axis_figure_canvas.add_curve(chooch_graph_y1, chooch_graph_x, 'spline')
+        self._two_axis_figure_canvas.add_curve(chooch_graph_y2, chooch_graph_x, 'fp') 
      
-
     def plot_finished(self):
+        """
+        Descript. :
+        """
         print "plot_finished"   
 
+    def add_new_plot_value(self, x, y):
+        """
+        Descript. :
+        """
+        if self._realtime_plot:
+            self._two_axis_figure_canvas.append_new_point(x, y)
 
 class MplCanvas(FigureCanvas):
+    """
+    Descript. : Class to draw plots on canvas
+    """
+
     def __init__(self, parent = None, width = 5, height=4, dpi = 60):
+        """
+        Descript. :
+        """
+
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         self.axes.hold(False)
-        self.compute_initial_figure()
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
@@ -83,17 +115,31 @@ class MplCanvas(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-    def compute_initial_figure(self):
-        pass
+        self._axis_x_array = np.empty(0)
+        self._axis_y_array = np.empty(0)
 
-class StaticMplCanvas(MplCanvas):
-    def compute_initial_figure(self):
-        t = arange(0.0, 3.0, 0.01)
-        s = sin(2*pi*t)
-        self.axes.plot(t, s)
-        self.axes.set_xlabel("x label")
-        self.axes.set_ylabel("y_label")
-        #legend = self.axes.legend(loc='upper center', shadow=True, fontsize='x-large')
+    def set_real_time(self, real_time):
+        self.real_time = real_time
 
+    def clear(self):
+        self.axes.cla()
 
+    def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None):
+        if x_axis_array is None:
+            self.axes.plot(y_axis_array, label=curve_name)
+        else:
+            self.axes.plot(x_axis_array, y_axis_array, label=curve_name)
 
+    def append_new_point(self, x, y):
+        self._axis_x_array = np.append(self._axis_x_array, x)
+        self._axis_y_array = np.append(self._axis_y_array, y)
+        self.axes.plot(self._axis_x_array, self._axis_y_array)
+        self.draw()
+
+    def set_axes_labels(self, x_label, y_label):
+        self.axes.set_xlabel(x_label)
+        self.axes.xaxis.set_label_coords(1.05, -0.025)
+        self.axes.set_ylabel(y_label)
+
+    def set_title(self, title):
+        self.title(title)

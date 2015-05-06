@@ -150,7 +150,7 @@ class CreateCharWidget(CreateTaskBase):
              connect(self._space_group_change)
 
         self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("path_template_changed"),
+                     QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)
 
         #self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
