@@ -3,13 +3,17 @@ import time
 import gevent
 import logging
 
-import PyChooch
-
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from HardwareRepository.TaskUtils import *
 from HardwareRepository.BaseHardwareObjects import Equipment
+
+try:
+   import PyChooch
+except:
+   print "PyChooch not found"
+
 
 
 scan_test_data = [(10841.0, 20.0), (10842.0, 20.0), (10843.0, 20.0), 
@@ -116,10 +120,9 @@ class EnergyScanMockup(Equipment):
             pyarch_f.close()
             self.scan_info["scanFileFullPath"] = str(archiveRawScanFile)
 
-        print 1 
+        
         pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, chooch_graph_data = PyChooch.calc(scanData, elt, edge, scanFile)
 
-        print 2
         rm = (pk + 30) / 1000.0
         pk = pk / 1000.0
         savpk = pk
@@ -238,7 +241,6 @@ class EnergyScanMockup(Equipment):
         title = "%s %s: %s %s" % (self.scan_info["sessionId"],
             self.scan_info["blSampleId"], self.scan_info["element"], self.scan_info["edgeEnergy"])
         dic = {'xlabel': 'energy', 'ylabel': 'counts', 'scaletype': 'normal', 'title': title}
-        print "scanStart", dic
         self.emit('scanStart', dic)
         self.scan_info['startTime'] = time.strftime("%Y-%m-%d %H:%M:%S")
         self.scanning = True
