@@ -1,36 +1,12 @@
 import os
 import logging
 from PyMca.QtBlissGraph import QtBlissGraph
-from SpecClient_gevent import SpecScan
 from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 import time
 
 __category__ = 'mxCuBE'
-
-class QSpecScan(QObject, SpecScan.SpecScanA):
-    def __init__(self, specVersion):
-        QObject.__init__(self)
-        SpecScan.SpecScanA.__init__(self, specVersion)
-
-        self.x = []
-        self.y = []
-        self.graph_data = None
-
-    def newScan(self, scanParameters):
-        self.x = []
-        self.y = []
-        self.graph_data = None
-
-    def newScanPoint(self, i, x, y):
-	# if x is in keV, transform into eV otherwise let it like it is
-        self.x.append(x < 1000 and x*1000.0 or x)
-        self.y.append(y)
-
-    def scanFinished(self): 
-        self.graph_data = zip(self.x, self.y)
-
 
 class shortLineEdit(QLineEdit):
     PARAMETER_STATE={"INVALID":QWidget.red,\
@@ -327,16 +303,6 @@ class EnergyScanBrick(BlissWidget):
             self.clearEnergies()
             self.energyScan = self.getHardwareObject(newValue)
             if self.energyScan is not None:
-                """
-		self.scanObject = None
-		try:
-                  specversion = self.energyScan.getCommandObject("executeScan").specVersion
-                except:
-                  logging.getLogger().exception("%s: could not get spec version from Energy Scan Hardware Object", self.name())
-                else:
-                  self.scanObject = QSpecScan(specversion)
-                """
-
                 self.connect(self.energyScan, 'energyScanStarted', self.scanStarted)
                 self.connect(self.energyScan, 'energyScanFinished', self.scanFinished)
                 self.connect(self.energyScan, 'energyScanFailed', self.scanFailed)
