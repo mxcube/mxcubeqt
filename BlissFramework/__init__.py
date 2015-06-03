@@ -92,13 +92,15 @@ def setLogFile(filename):
     # log to rotating files
     #
     global _hdlr
-    from logging.handlers import RotatingFileHandler
+    #from logging.handlers import RotatingFileHandler
+    from logging.handlers import TimedRotatingFileHandler
 
     logging.getLogger().info("Logging to file %s" % filename)
 
     _logger.removeHandler(_hdlr)
         
-    _hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 5 files max.
+    #_hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 10 files max.
+    _hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=1)
     os.chmod(filename, 0666)
     _hdlr.setFormatter(_formatter)
     _logger.addHandler(_hdlr)
