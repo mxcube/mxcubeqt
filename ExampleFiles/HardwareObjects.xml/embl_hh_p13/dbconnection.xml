@@ -1,0 +1,4 @@
+<object class="ISPyBClient2">
+  <ws_root>http://ispyb.embl-hamburg.de:8080/ispyb-ejb3/ispybWS/</ws_root>
+  <object role="session" href="/session"/>
+</object>

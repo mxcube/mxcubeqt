@@ -1,0 +1,7 @@
+<procedure class="PPUControl">
+  <command type="tine" name="furkaRestart" tinename="/P13/ppu/ppu-cmd">furka-restart-self</command>
+  <command type="tine" name="allStatus" tinename="/P13/ppu/ppu-cmd">all-status</command>
+  <command type="tine" name="allRestart" tinename="/P13/ppu/ppu-cmd">all-restart-self</command>
+  <executionState>Execution in progress</executionState>
+  <errorState>ERROR</errorState>
+</procedure>

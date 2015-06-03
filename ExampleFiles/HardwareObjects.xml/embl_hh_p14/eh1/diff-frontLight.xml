@@ -1,0 +1,4 @@
+<device class="MicrodiffMotor">
+  <motor_name>FrontLight</motor_name>
+  <exporter_address>p14md301.embl-hamburg.de:9001</exporter_address>
+</device>
