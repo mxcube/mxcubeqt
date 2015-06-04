@@ -73,6 +73,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("hide_sample_changer_tab", ())
         self.defineSignal("hide_edna_tab", ())
         self.defineSignal("hide_energy_scan_tab",())
+        self.defineSignal("hide_xrf_scan_tab",())
         self.defineSignal("hide_workflow_tab", ())
 
         # Populating the tabs with data
@@ -80,6 +81,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("populate_edna_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("populate_energy_scan_widget", ())
+        self.defineSignal("populate_xrf_scan_widget", ())
         self.defineSignal("populate_workflow_tab", ())
 
         # Handle selection
@@ -147,6 +149,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
         camera_brick = None
@@ -249,16 +252,20 @@ class TreeBrick(BaseComponents.BlissWidget):
         """
         self.enable_collect(logged_in)
         
-        sc_content = self.get_sc_content()
+        #sc_content = self.get_sc_content()
+        sc_basket_content, sc_sample_content = self.get_sc_content()
         
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
-            if sc_content:
-              sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
-              self.dc_tree_widget.populate_list_view(sc_sample_list)
+
+            if sc_basket_content and sc_sample_content:
+              #sc_sample_list = self.dc_tree_widget.samples_from_sc_content(sc_content)
+              sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                                                    sc_basket_content, sc_sample_content)
+              self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
         else:
-            if sc_content:
+            if sc_sample_content :
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
             else:
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(2) 
@@ -305,20 +312,21 @@ class TreeBrick(BaseComponents.BlissWidget):
         barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(samples)
         l_samples = dict()            
    
-        # TODO: add test for sample changer type, here code is for Robodiff only
-        for location, l_sample in location_samples.iteritems():
-          if l_sample.lims_location != (None, None):
-            basket, sample = l_sample.lims_location
-            cell = int(round((basket+0.5)/3.0))
-            puck = basket-3*(cell-1)
-            new_location = (cell, puck, sample)
-            l_sample.lims_location = new_location
-            l_samples[new_location] = l_sample
-            name = l_sample.get_name()
-            l_sample.init_from_sc_sample([new_location])
-            l_sample.set_name(name)
+        if self.sample_changer_hwobj.__class__.__TYPE__ == 'Robodiff':
+          for location, l_sample in location_samples.iteritems():
+            if l_sample.lims_location != (None, None):
+              basket, sample = l_sample.lims_location
+              cell = int(round((basket+0.5)/3.0))
+              puck = basket-3*(cell-1)
+              new_location = (cell, puck, sample)
+              l_sample.lims_location = new_location
+              l_samples[new_location] = l_sample
+              name = l_sample.get_name()
+              l_sample.init_from_sc_sample([new_location])
+              l_sample.set_name(name)
+        else:
+          l_samples.update(location_samples)
 
-        #import pdb;pdb.set_trace()
         return barcode_samples, l_samples
 
     def refresh_sample_list(self):
@@ -332,13 +340,14 @@ class TreeBrick(BaseComponents.BlissWidget):
         sample_list = []
         
         if samples:
-            (barcode_samples, location_samples) = \
-                self.samples_from_lims(samples) #self.dc_tree_widget.samples_from_lims(samples)
+            (barcode_samples, location_samples) = self.samples_from_lims(samples)
 
-            sc_content = self.get_sc_content()
-            sc_sample_list = self.dc_tree_widget.\
-                             samples_from_sc_content(sc_content)
+            sc_basket_content, sc_samples_content = self.get_sc_content()
+            sc_basket_list, sc_sample_list = self.dc_tree_widget.\
+                samples_from_sc_content(sc_basket_content, sc_samples_content)
            
+            basket_list = sc_basket_list
+
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -386,7 +395,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                                 warning("No sample in ISPyB for location %s" % str(sc_sample.location))
                             sample_list.append(sc_sample)
 
-            self.dc_tree_widget.populate_list_view(sample_list)
+            self.dc_tree_widget.populate_list_view(basket_list, sample_list)
 
     def get_sc_content(self):
         """
@@ -394,9 +403,17 @@ class TreeBrick(BaseComponents.BlissWidget):
         
         :returns: A list with tuples, containing the sample information.
         """
-        sc_content = []
+        sc_basket_content = []
+        sc_sample_content = []
       
-        try: 
+        #try: 
+        if True: 
+            for basket in self.sample_changer_hwobj.getBasketList():
+                basket_index = basket.getIndex()
+                basket_code = basket.getID() or ""
+                is_present = basket.isPresent()
+                sc_basket_content.append((basket_index+1, basket)) #basket_code, is_present)) 
+
             for sample in self.sample_changer_hwobj.getSampleList():
                 coords = sample.getCoords()
                 matrix = sample.getID() or ""
@@ -404,14 +421,15 @@ class TreeBrick(BaseComponents.BlissWidget):
                 vial_index = ":".join(map(str, coords[1:]))
                 basket_code = sample.getContainer().getID() or ""
             
-                sc_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
-        except Exception:
+                sc_sample_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
+        #except Exception:
+        else:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
                      " the sample changer is turned on. Using free pin mode")
 
-        return sc_content
+        return sc_basket_content, sc_sample_content
 
     def status_msg_changed(self, msg, color):
         """
@@ -453,6 +471,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_sample_tab(self, item):
@@ -465,6 +484,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def show_dcg_tab(self):
@@ -475,6 +495,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
     def populate_parameters_tab(self, item = None):
@@ -489,6 +510,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_parameters_tab(item)
 
@@ -500,6 +522,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (False,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_edna_parameters_tab(item)
 
@@ -515,11 +538,27 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
         self.emit(qt.PYSIGNAL("populate_energy_scan_widget"), (item,))
+
+    def show_xrf_scan_tab(self, item):
+        self.sample_changer_widget.child('details_button').setText("Show SC")
+        self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.populate_xrf_scan_tab(item)
+
+    def populate_xrf_scan_tab(self, item):
+        self.emit(qt.PYSIGNAL("populate_xrf_scan_widget"), (item,))
 
     def show_workflow_tab_from_model(self):
         self.show_workflow_tab(None)
@@ -532,6 +571,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_edna_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,)) 
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
 
         running = self.queue_hwobj.is_executing() 
@@ -570,6 +610,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.populate_edna_parameters_tab(item)
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.populate_energy_scan_tab(item)
+            elif isinstance(item, queue_item.XRFScanQueueItem):
+                self.populate_xrf_scan_tab(item)
             elif isinstance(item, queue_item.GenericWorkflowQueueItem):
                 self.populate_workflow_tab(item)
 

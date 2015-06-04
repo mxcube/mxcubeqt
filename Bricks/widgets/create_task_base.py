@@ -98,6 +98,19 @@ class CreateTaskBase(qt.QWidget):
             bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
             bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+            #TODO discuss dynamic value limits
+            #bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
+            #bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
+            #bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
+            if bl_setup_hwobj.omega_axis_hwobj is not None:
+                bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+            if bl_setup_hwobj.kappa_axis_hwobj is not None:
+                bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
+            if bl_setup_hwobj.kappa_phi_axis_hwobj is not None:
+                bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
+            #bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_mode)
+            #bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
+            #bl_setup_hwobj.beam_info_hwobj.connect('beamInfoChanged', self.set_beam_info)
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
@@ -112,6 +125,20 @@ class CreateTaskBase(qt.QWidget):
         if acq_widget:
             acq_widget.update_osc_start(new_value)
 
+    def update_kappa(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            self.kappa_value = new_value
+            acq_widget.update_kappa(new_value)
+
+    def update_kappa_phi(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            self.kappa_phi_value = new_value
+            acq_widget.update_kappa_phi(new_value)
+
     def _prefix_ledit_change(self, new_value):
         item = self._current_selected_items[0]
         model = item.get_model()
@@ -122,7 +149,19 @@ class CreateTaskBase(qt.QWidget):
                 self._path_template.base_prefix = str(new_value)
                 name = self._path_template.get_prefix()
                 model.set_name(name)
-                item.setText(0, model.get_name())
+                #item.setText(0, model.get_name())
+                item.setText(0, model.get_display_name())
+
+    def refresh_current_item(self):
+        if len(self._current_selected_items) > 0:
+            item = self._current_selected_items[0]
+            model = item.get_model()
+            if self.isEnabled():
+                if isinstance(item, queue_item.TaskQueueItem) and \
+                     not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                    name = self._path_template.get_prefix()
+                    model.set_name(name)
+                    item.setText(0, model.get_display_name())
         
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -133,7 +172,8 @@ class CreateTaskBase(qt.QWidget):
                    not isinstance(item, queue_item.DataCollectionGroupQueueItem):
                 if str(new_value).isdigit():
                     model.set_number(int(new_value))
-                    item.setText(0, model.get_name())
+                    #item.setText(0, model.get_name())
+                    item.setText(0, model.get_display_name())
 
     def handle_path_conflict(self, widget, new_value):
         self._tree_brick.dc_tree_widget.check_for_path_collisions()
@@ -204,6 +244,53 @@ class CreateTaskBase(qt.QWidget):
         
         if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_resolution(res)
+
+    def set_detector_mode(self, detector_mode):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            acq_widget.update_detector_mode(detector_mode)
+
+    def set_kappa(self, kappa):
+        acq_widget = self.get_acquisition_widget()
+
+        if self._item_is_group_or_sample() and acq_widget:
+            acq_widget.update_kappa(kappa)
+
+    def set_kappa_phi(self, kappa_phi):
+        acq_widget = self.get_acquisition_widget()
+        if self._item_is_group_or_sample() and acq_widget:
+            acq_widget.update_kappa_phi(kappa_phi)
+
+    def set_energy_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+            if acq_widget:
+                acq_widget.update_energy_limits(limits)
+
+    def set_transmission_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.update_transmission_limits(limits)
+
+    def set_resolution_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.update_resolution_limits(limits)
+
+    def set_detector_exp_time_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.update_detector_exp_time_limits(limits)
+
+    def set_beam_info(self, beam_info_dict):
+        pass
                                                       
     def set_run_number(self, run_number):
         data_path_widget = self.get_data_path_widget()
@@ -278,7 +365,8 @@ class CreateTaskBase(qt.QWidget):
             # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
                 prefix = self.get_default_prefix(sample_data_model)
-                (data_directory, proc_directory) = self.get_default_directory(tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
+                (data_directory, proc_directory) = self.get_default_directory(tree_item, \
+                                 sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
@@ -310,7 +398,11 @@ class CreateTaskBase(qt.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
 
             self.setDisabled(False)
-
+        elif isinstance(tree_item, queue_item.BasketQueueItem):
+            self.setDisabled(False)
+            self._path_template = copy.deepcopy(self._path_template)
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
@@ -333,7 +425,8 @@ class CreateTaskBase(qt.QWidget):
 
             # Sample with lims information, use values from lims
             # to set the data path.
-            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
+            (data_directory, proc_directory) = self.get_default_directory(\
+                             sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
@@ -359,18 +452,41 @@ class CreateTaskBase(qt.QWidget):
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
     def centred_position_selection(self, positions):
-         self._selected_positions = positions
+        """
+        Descript. : Called by the owning widget (task_toolbox_widget) when
+                    one or several centred positions are selected. 
+                    Updates kappa/phi position from the centring point
+                    Enables kappa/phi edit if not collection item and no
+                    centring point is selected. In all other cases kappa/phi
+                    edit is disabled.
+                    Also updates centring point if a data collection item is
+                    selected and new centring point clicked 
+        Args.     : centring points
+        Return    "
+        """
+        self._selected_positions = positions
 
-         if len(self._current_selected_items) == 1 and len(positions) == 1:
-             item = self._current_selected_items[0]
-             pos = positions[0]
+        if self._acq_widget:
+            self._acq_widget.use_kappa(False)
+            self._acq_widget.use_kappa_phi(False)
 
-             if isinstance(pos, shape_history.Point):
-                 if self._acq_widget and isinstance(item, queue_item.TaskQueueItem):
-                     cpos = pos.get_centred_positions()[0]
-                     snapshot = self._shape_history.get_snapshot([pos.qub_point])
-                     cpos.snapshot_image = snapshot        
-                     self._acquisition_parameters.centred_position = cpos
+            if len(self._current_selected_items) == 1:
+                item = self._current_selected_items[0]
+                if len(positions) == 1:
+                    pos = positions[0]
+                    if isinstance(pos, shape_history.Point):
+                        cpos = pos.get_centred_positions()[0]
+                        self._acq_widget.update_kappa(cpos.kappa)
+                        self._acq_widget.update_kappa_phi(cpos.kappa_phi)
+                        if isinstance(item, queue_item.TaskQueueItem):
+                            snapshot = self._shape_history.get_snapshot([pos.qub_point])
+                            cpos.snapshot_image = snapshot
+                            self._acquisition_parameters.centred_position = cpos
+                elif len(positions) == 0:
+                    if isinstance(item, queue_item.SampleQueueItem):
+                        self._acq_widget.use_kappa(True)
+                        self._acq_widget.use_kappa_phi(True)
+
 
     # Should be called by the object that calls create_task,
     # and add_task.
@@ -386,17 +502,25 @@ class CreateTaskBase(qt.QWidget):
                       ' from another task. Correct the problem before adding to queue')
             result = False
 
+        #Decide how to make this more general 
+        """if self._acq_widget is not None:
+            parameter_conflict =  self._acq_widget.check_parameter_conflict()
+            if parameter_conflict:
+                logging.getLogger("user_level_log").\
+                    error('One or several collection parameters are out of range. ' +\
+                          'Correct the problem before adding to queue')
+                result = False"""
+
         return result
             
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
-       
+
         try: 
             sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
                                 getLoadedSample().getCoords() == sample.location
-
         except AttributeError:
             sample_is_mounted = False
 
@@ -414,8 +538,22 @@ class CreateTaskBase(qt.QWidget):
                 # Check if the tasks requires centring, assumes that all
                 # the "sub tasks" has the same centring requirements.
                 if temp_tasks[0].requires_centring():
-                    sc = queue_model_objects.SampleCentring('sample-centring')
+                    kappa = None
+                    kappa_phi = None
+                    task_label = 'sample-centring'
+                    if isinstance(temp_tasks[0], queue_model_objects.DataCollection):
+                        kappa = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa
+                        kappa_phi = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa_phi
+                        if kappa and kappa_phi:
+                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                    elif isinstance(temp_tasks[0], queue_model_objects.Characterisation):
+                        kappa = temp_tasks[0].reference_image_collection.acquisitions[0].acquisition_parameters.kappa
+                        kappa_phi = temp_tasks[0].reference_image_collection.acquisitions[0].acquisition_parameters.kappa_phi
+                        if kappa and kappa_phi:
+                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                    sc = queue_model_objects.SampleCentring(task_label, kappa, kappa_phi)
                     tasks.append(sc)
+
 
         for task in temp_tasks:
             if sc:
