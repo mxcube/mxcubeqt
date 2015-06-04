@@ -747,7 +747,7 @@ class DataCollectTree(qt.QWidget):
             basket.set_enabled(False)
             basket.clear_sample_list()
             for sample in sample_list:
-                if sample.location[0] == basket.get_location():
+                if sample.location[:-1] == basket.get_location():
                      basket.add_sample(sample)
                      self.queue_model_hwobj.add_child(basket, sample)
                      sample.set_enabled(False)

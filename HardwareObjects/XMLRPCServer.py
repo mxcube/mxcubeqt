@@ -12,6 +12,7 @@ import pkgutil
 import types
 import gevent
 import socket
+import time
 import json
 
 from HardwareRepository.BaseHardwareObjects import HardwareObject
@@ -90,10 +91,13 @@ class XMLRPCServer(HardwareObject):
         self._server.register_function(self.get_diffractometer_positions)
         self._server.register_function(self.move_diffractometer)
         self._server.register_function(self.save_snapshot)
-        self._server.register_function(self.get_cp)
-        self._server.register_function(self.save_current_pos)
         self._server.register_function(self.cryo_temperature)
         self._server.register_function(self.flux)
+        self._server.register_function(self.set_aperture)
+        self._server.register_function(self.get_aperture)
+        self._server.register_function(self.get_aperture_list)
+        self._server.register_function(self.get_cp)
+        self._server.register_function(self.save_current_pos)
  
         # Register functions from modules specified in <apis> element
         if self.hasObject("apis"):
@@ -339,6 +343,24 @@ class XMLRPCServer(HardwareObject):
         if flux is None:
             flux = 0
         return float(flux)
+
+    def set_aperture(self,pos_name, timeout=20):
+        self.diffractometer_hwobj.beam_info.aperture_HO.moveToPosition(pos_name)
+        t0=time.time()
+        while self.diffractometer_hwobj.beam_info.aperture_HO.getState() == 'MOVING':
+            time.sleep(0.1)
+            if time.time()-t0 > timeout:
+                 raise RuntimeError("Timeout waiting for aperture to move")
+        return True
+
+    def get_aperture(self):
+        return self.diffractometer_hwobj.beam_info.aperture_HO.getPosition()
+
+    def get_aperture_list(self):
+        aperture_list=[]
+        for i in range(0, len(self.diffractometer_hwobj.beam_info.aperture_HO['positions'])):
+            aperture_list.append(self.diffractometer_hwobj.beam_info.aperture_HO['positions'][0][i].getProperty('name'))
+        return aperture_list
 
     def _register_module_functions(self, module_name, recurse=True, prefix=""):
         log = logging.getLogger("HWR")
