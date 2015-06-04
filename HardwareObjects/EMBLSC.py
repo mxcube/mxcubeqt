@@ -17,7 +17,7 @@ class Pin(Sample):
 
     def getVialNo(self):
         return self.getIndex()+1
-
+
     @staticmethod
     def getSampleAddress(basket_number, sample_number):
         return str(basket_number) + ":" + "%02d" % (sample_number)

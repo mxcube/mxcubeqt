@@ -97,6 +97,9 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
                undulators.append(undulator)
         except:
            pass  
+
+        self.exp_type_dict = {'Mesh': 'raster',
+                              'Helical': 'Helical'}
       
         self.setBeamlineConfiguration(directory_prefix = self.getProperty("directory_prefix"),
                                       default_exposure_time = self.bl_control.detector.getProperty("default_exposure_time"),
@@ -133,7 +136,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         self.cmd_collect_energy = self.getCommandObject('collectEnergy')
         self.cmd_collect_exposure_time = self.getCommandObject('collectExposureTime')
         self.cmd_collect_helical_position = self.getCommandObject('collectHelicalPosition')
-        #self.cmd_collect_in_queue = self.getCommandObject('collectInQueue')
+        self.cmd_collect_in_queue = self.getCommandObject('collectInQueue')
         self.cmd_collect_num_images = self.getCommandObject('collectNumImages')
         self.cmd_collect_overlap = self.getCommandObject('collectOverlap')
         self.cmd_collect_range = self.getCommandObject('collectRange')
@@ -164,11 +167,12 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         if self._actual_collect_status in ["ready", "unknown", "error"]:
             comment = 'Comment: %s' % str(p['comments'])
             self._error_msg = ""
+            self._collecting = True
             self.cmd_collect_description(comment)
             self.cmd_collect_detector(self.bl_control.detector.get_collect_name())
             self.cmd_collect_directory(str(p["fileinfo"]["directory"]))
             self.cmd_collect_exposure_time(p['oscillation_sequence'][0]['exposure_time'])
-            #self.cmd_collect_in_queue(p['in_queue'])
+            self.cmd_collect_in_queue(p['in_queue'])
             self.cmd_collect_overlap(p['oscillation_sequence'][0]['overlap'])
             shutter_name = self.bl_control.detector.get_shutter_name()
             if shutter_name is not None:  
@@ -178,13 +182,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
             else:
                 self.cmd_collect_shutterless(0)
             self.cmd_collect_range(p['oscillation_sequence'][0]['range'])
-            if p['experiment_type'] == 'Helical':
-                self.cmd_collect_scan_type(p['experiment_type'])
-                self.cmd_collect_num_images(p['oscillation_sequence'][0]['number_of_images'])
-            elif p['experiment_type'] == 'Mesh':
-                self.cmd_collect_scan_type('raster')
-            else:
-                self.cmd_collect_scan_type('OSC')
+            if p['experiment_type'] != 'Mesh':
                 self.cmd_collect_num_images(p['oscillation_sequence'][0]['number_of_images'])
             self.cmd_collect_start_angle(p['oscillation_sequence'][0]['start'])
             self.cmd_collect_start_image(p['oscillation_sequence'][0]['start_image_number'])
@@ -195,7 +193,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
             self.cmd_collect_space_group(space_group)
             unit_cell = list(eval(p['sample_reference']['cell']))
             self.cmd_collect_unit_cell(unit_cell)
-            self._collecting = True
+            self.cmd_collect_scan_type(self.exp_type_dict.get(p['experiment_type'], 'OSC'))
             self.cmd_collect_start()
         else:
             self.emit_collection_failed()
@@ -220,6 +218,9 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
             elif self._previous_collect_status == 'collecting':
                 if self._actual_collect_status == "ready":
                     self.emit_collection_finished()
+                elif self._actual_collect_status == "aborting":
+                    logging.info("Aborting...")
+                    self.emit_collection_failed()
 
     def collect_error_update(self, error_msg):
         """
@@ -246,7 +247,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         self.ready_event.set()
 
         self.store_in_lims() 
-  
+
     def emit_collection_finished(self):  
         """
         Descript. :
@@ -283,6 +284,16 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
             except:
                logging.getLogger("HWR").exception("Could not store data collection into ISPyB")        
 
+    def update_lims_with_workflow(self, workflow_id, grid_snapshot_filename):
+        if self.bl_control.lims is not None:
+            try:
+               self.actual_data_collect_parameters["workflow_id"] = workflow_id
+               self.actual_data_collect_parameters["xtalSnapshotFullPath3"] = \
+                    grid_snapshot_filename
+               self.bl_control.lims.update_data_collection(self.actual_data_collect_parameters)
+            except:
+               logging.getLogger("HWR").exception("Could not store data collection into ISPyB")
+
     def collect_frame_update(self, frame):
         """
         Descript. : 
@@ -307,9 +318,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
                               'synchrotronCurrent': self.get_machine_current(),
                               'machineMessage': self.get_machine_message(),
                               'temperature': self.get_cryo_temperature()}
-                #archive_directory = self.get_archive_directory(file_location)
-                #self.actual_data_collect_parameters["archive_directory"] = archive_directory
-                archive_directory = self.actual_data_collect_parameters.get('archive_directory')
+                archive_directory = self.actual_data_collect_parameters['fileinfo']['archive_directory']
                 if archive_directory:
                     jpeg_filename = "%s.jpeg" % os.path.splitext(image_file_template)[0]
                     thumb_filename = "%s.thumb.jpeg" % os.path.splitext(image_file_template)[0]
@@ -322,7 +331,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
                 self.bl_control.lims.store_image(lims_image) 
             except:
                 logging.debug("Unable to store image in ISPyB")  
-        self.trigger_auto_processing("image", self.actual_data_collect_parameters, 1)
+        self.trigger_auto_processing("image", self.actual_data_collect_parameters, frame)
 
     def trigger_auto_processing(self, process_event, params_dict, frame_number):
         """
@@ -358,16 +367,12 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
                              arg["2"]["sampx"], arg["2"]["sampy"]]
         self.cmd_collect_helical_position(helical_positions)       
 
-    def setMeshScanParameters(self, mesh_step, mesh_range):
+    def setMeshScanParameters(self, num_lines, num_images_per_line, mesh_range):
         """
         Descript. : 
         """
-        if self.bl_control.diffractometer.is_vertical_gonio():
-            self.cmd_collect_raster_lines(mesh_step[0])
-            self.cmd_collect_num_images(mesh_step[1])
-        else:
-            self.cmd_collect_raster_lines(mesh_step[1])
-            self.cmd_collect_num_images(mesh_step[0])
+        self.cmd_collect_raster_lines(num_lines)
+        self.cmd_collect_num_images(num_images_per_line)        
         self.cmd_collect_raster_range(mesh_range)
 
     def log_message_from_spec(self, msg):
@@ -405,7 +410,7 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         """
         Descript. : 
         """
-        self.cmd_collect_energy(int(energy * 1000))
+        self.cmd_collect_energy(energy * 1000.0)
 
     def set_resolution(self, resolution):
         """
@@ -564,6 +569,13 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         """
         if self.bl_control.detector is not None:	
             return self.bl_control.detector.get_distance()
+
+    def get_detector_distance_limits(self):
+        """
+        Descript. : 
+        """
+        if self.bl_control.detector is not None:
+            return self.bl_control.detector.get_distance_limits()
        
     def get_resolution(self):
         """
@@ -597,8 +609,9 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         """
         Descript. : 
         """
-        if self.bl_control.resolution is not None:
-            return self.bl_control.resolution.getPosition()
+        return
+        #if self.bl_control.resolution is not None:
+        #    return self.bl_control.resolution.getPosition()
 
     def get_beam_size(self):
         """
@@ -625,7 +638,8 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         """
         Descript. : 
         """
-        return 0
+        #return 0
+        return 3.000000e+12
 
     def get_machine_current(self):
         """
@@ -650,7 +664,8 @@ class EMBLMultiCollect(AbstractMultiCollect, HardwareObject):
         Descript. : 
         """
         if self.bl_control.machine_current:
-            return self.bl_control.machine_current.getFillMode()
+            fill_mode = str(self.bl_control.machine_current.getFillMode()) 
+            return fill_mode[:20]
         else:
             return ''
 

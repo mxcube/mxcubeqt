@@ -53,6 +53,10 @@ class EMBLMiniDiff(Equipment):
     C3D_MODE = "Computer automatic"
     MOVE_TO_BEAM_MODE = "Move to Beam"
 
+    MINIKAPPA = "MiniKappa"
+    PLATE = "Plate"
+    SC = "SC"
+
     def __init__(self, *args):
         """
         Description:
@@ -84,6 +88,7 @@ class EMBLMiniDiff(Equipment):
         self.chan_calib_x = None
         self.chan_calib_y = None
         self.chan_head_type = None
+        self.chan_fast_shutter_is_open = None
         self.chan_sync_move_motors = None
         self.cmd_start_set_phase = None
         self.cmd_start_auto_focus = None   
@@ -101,6 +106,7 @@ class EMBLMiniDiff(Equipment):
         self.current_positions_dict = None
         self.current_state_dict = None
         self.current_phase = None
+        self.fast_shutter_is_open = None
         self.head_type = None
         self.centring_methods = None
         self.centring_status = None
@@ -112,6 +118,8 @@ class EMBLMiniDiff(Equipment):
         self.move_to_motors_positions_procedure = None
         self.ready_event = None
         self.in_collection = None
+        self.phase_list = []
+        self.reference_pos = None
         
         self.connect(self, 'equipmentReady', self.equipmentReady)
         self.connect(self, 'equipmentNotReady', self.equipmentNotReady)     
@@ -141,15 +149,18 @@ class EMBLMiniDiff(Equipment):
         self.centring_hwobj = self.getDeviceByRole('centring')
         self.minikappa_correction_hwobj = self.getDeviceByRole('minikappa_correction')
 
-        self.chan_calib_x = self.getChannelObject('chan_calib_x')
-        self.chan_calib_y = self.getChannelObject('chan_calib_y') 
-        self.chan_head_type = self.getChannelObject('chan_head_type')
+        self.chan_calib_x = self.getChannelObject('CoaxCamScaleX')
+        self.chan_calib_y = self.getChannelObject('CoaxCamScaleY') 
+        self.chan_head_type = self.getChannelObject('HeadType')
         if self.chan_head_type is not None:
             self.head_type = self.chan_head_type.getValue()
-        self.chan_current_phase = self.getChannelObject('chan_current_phase')
+        self.chan_current_phase = self.getChannelObject('CurrentPhase')
+        self.chan_fast_shutter_is_open = self.getChannelObject('FastShutterIsOpen')
+        if self.chan_fast_shutter_is_open is not None: 
+            self.chan_fast_shutter_is_open.connectSignal("update", self.fast_shutter_state_changed)
        
-        self.cmd_start_set_phase = self.getCommandObject('cmd_start_set_phase')
-        self.cmd_start_auto_focus = self.getCommandObject('cmd_start_autofocus')
+        self.cmd_start_set_phase = self.getCommandObject('startSetPhase')
+        self.cmd_start_auto_focus = self.getCommandObject('startAutoFocus')
 
         self.phiMotor = self.getDeviceByRole('phi')
         self.phizMotor = self.getDeviceByRole('phiz')
@@ -273,10 +284,21 @@ class EMBLMiniDiff(Equipment):
         except:
             self.grid_direction = {"fast": (0, 1), "slow": (1, 0)}
             logging.getLogger("HWR").warning('EMBLMiniDiff: Grid direction is not defined. Using default.')
+
+        try:
+            self.phase_list = eval(self.getProperty("phaseList"))
+        except:
+            self.phase_list = []  
          
 
     def in_plate_mode(self):
-        return self.chan_head_type.getValue() == "Plate"
+        plate_mode = False
+        if self.chan_head_type is not None:
+            plate_mode = self.head_type == "Plate"
+        return plate_mode
+
+    def in_sc_mode(self):
+        return False
 
     def get_grid_direction(self):
         """
@@ -329,15 +351,6 @@ class EMBLMiniDiff(Equipment):
             self.phiMotor is not None and \
             self.phizMotor is not None and \
             self.phiyMotor is not None
-
-    def is_vertical_gonio(self):
-        """
-        Descript. :
-        """
-        isVertical = False
-        if self.omega_reference_par is not None:
-            isVertical = self.omega_reference_par["camera_axis"].lower() == "x"
-        return isVertical     
 
     def current_phase_changed(self, phase):
         """
@@ -415,7 +428,6 @@ class EMBLMiniDiff(Equipment):
         """
         Descript. :
         """
-        print pos
         self.current_positions_dict["kappa"] = pos
         if time.time() - self.centring_time > 1.0:
             self.invalidate_centring()
@@ -532,13 +544,17 @@ class EMBLMiniDiff(Equipment):
             pos = self.omega_reference_par["direction"] * \
                   (pos - self.omega_reference_par["position"]) * \
                   self.pixels_per_mm_x + self.zoom_centre['x']
-            reference_pos = (pos, -10)
+            self.reference_pos = (pos, -10)
         else:
             pos = self.omega_reference_par["direction"] * \
                   (pos - self.omega_reference_par["position"]) * \
                   self.pixels_per_mm_y + self.zoom_centre['y']
-            reference_pos = (-10, pos)
-        self.emit('omegaReferenceChanged', (reference_pos,))
+            self.reference_pos = (-10, pos)
+        self.emit('omegaReferenceChanged', (self.reference_pos,))
+
+    def fast_shutter_state_changed(self, is_open):
+        self.fast_shutter_is_open = is_open
+	self.emit('minidiffShutterStateChanged', (self.fast_shutter_is_open, ))
 
     def refresh_omega_reference_position(self):
         """
@@ -607,6 +623,9 @@ class EMBLMiniDiff(Equipment):
         """
         return self.in_collection
 
+    def get_phase_list(self):
+        return self.phase_list
+
     def start_set_phase(self, name):
         """
         Descript. :
@@ -663,16 +682,33 @@ class EMBLMiniDiff(Equipment):
             pos = self.convert_from_obj_to_name(pos)
         return pos
 
-    def move_to_coord(self, x, y):
+    def get_point_between_two_points(self, point_one, point_two, frame_num, frame_total):
+        new_point = {}
+        point_one = point_one.as_dict()
+        point_two = point_two.as_dict()
+        for motor in point_one.keys():
+            new_motor_pos = frame_num / float(frame_total) * abs(point_one[motor] - \
+                  point_two[motor]) + point_one[motor]
+            new_motor_pos += 0.5 * (point_two[motor] - point_one[motor]) / \
+                  frame_total
+            new_point[motor] = new_motor_pos
+        return new_point
+
+    def move_to_coord(self, x, y, omega=None):
         """
         Descript. : function to create a centring point based on all motors
                     positions.
         """  
-        try:
-            pos = self.get_centred_point_from_coord(x, y, return_by_names=False)
-            self.move_to_motors_positions(pos)
-        except:
-            logging.getLogger("HWR").exception("EMBLMiniDiff: could not center to beam, aborting")
+        if self.current_phase != "BeamLocation":
+            try:
+                pos = self.get_centred_point_from_coord(x, y, return_by_names=False)
+                if omega is not None:
+                    pos["phiMotor"] = omega 
+                self.move_to_motors_positions(pos)
+            except:
+                logging.getLogger("HWR").exception("EMBLMiniDiff: could not center to beam, aborting")
+        else:
+            logging.getLogger("HWR").debug("Move to screen position disabled in BeamLocation phase.")
 
     def start_centring_method(self, method, sample_info = None):
         """
@@ -742,7 +778,7 @@ class EMBLMiniDiff(Equipment):
         """
         return
 
-    def start_2D_centring(self):
+    def start_2D_centring(self, coord_x=None, coord_y=None, omega=None):
         """
         Descript. :
         """
@@ -752,9 +788,16 @@ class EMBLMiniDiff(Equipment):
             self.centring_status = {"valid": True, 
                                     "startTime": curr_time,
                                     "endTime": curr_time}
-            motors = self.get_centred_point_from_coord(self.beam_position[0],
-                                                       self.beam_position[1],
-                                                       return_by_names=True)
+            if (coord_x is None and
+                coord_y is None):
+                coord_x = self.beam_position[0]
+                coord_y = self.beam_position[1]
+
+            motors = self.get_centred_point_from_coord(\
+                  coord_x, coord_y, return_by_names=True)
+            if omega is not None:
+                motors["phi"] = omega         
+ 
             self.centring_status["motors"] = motors
             self.centring_status["valid"] = True
             self.centring_status["angleLimit"] = True 
@@ -770,24 +813,21 @@ class EMBLMiniDiff(Equipment):
         Descript. :
         """
         self.centring_hwobj.initCentringProcedure()
-        head_type = self.chan_head_type.getValue()
+        self.head_type = self.chan_head_type.getValue()
         for click in (0, 1, 2):
             self.user_clicked_event = AsyncResult()
             x, y = self.user_clicked_event.get()
             self.centring_hwobj.appendCentringDataPoint(
                  {"X": (x - self.beam_position[0])/ self.pixels_per_mm_x,
                   "Y": (y - self.beam_position[1])/ self.pixels_per_mm_y})
-            if head_type == "MiniKappa":
+            if self.head_type == "MiniKappa":
                 if click < 2:
-                    print "will move by 90"
-                    #self.phiMotor.moveRelative(90)
-            elif head_type == "Plate":
+                    self.phiMotor.moveRelative(90)
+            elif self.head_type == "Plate":
                 dynamic_limits = self.phiMotor.getDynamicLimits()
                 if click == 0:
-                    print "Move to first limit: ", dynamic_limits[0] 
                     self.phiMotor.move(dynamic_limits[0])
                 elif click == 1:
-                    print "Move to first limit: ", dynamic_limits[1] 
                     self.phiMotor.move(dynamic_limits[1])
         self.omega_reference_add_constraint()
         return self.centring_hwobj.centeredPosition(return_by_name=False)
@@ -844,26 +884,29 @@ class EMBLMiniDiff(Equipment):
         """
         Descript. :
         """
-        try:
-            x, y = centred_position.beam_x, centred_position.beam_y
-            dx = (self.beam_position[0] - self.zoom_centre['x']) / \
-                  self.pixels_per_mm_x - x
-            dy = (self.beam_position[1] - self.zoom_centre['y']) / \
-                  self.pixels_per_mm_y - y
-            motor_pos = {self.sampleXMotor: centred_position.sampx,
-                         self.sampleYMotor: centred_position.sampy,
-                         self.phiMotor: centred_position.phi,
-                         self.phiyMotor: centred_position.phiy + \
-                              self.centring_hwobj.camera2alignmentMotor(self.phiyMotor, \
-                              {"X" : dx, "Y" : dy}), 
-                         self.phizMotor: centred_position.phiz + \
-                              self.centring_hwobj.camera2alignmentMotor(self.phizMotor, \
-                              {"X" : dx, "Y" : dy}),
-                         self.kappaMotor: centred_position.kappa,
-                         self.kappaPhiMotor: centred_position.kappa_phi}
-            self.move_to_motors_positions(motor_pos)
-        except:
-            logging.exception("Could not move to centred position")
+        if self.current_phase != "BeamLocation":
+            try:
+                x, y = centred_position.beam_x, centred_position.beam_y
+                dx = (self.beam_position[0] - self.zoom_centre['x']) / \
+                      self.pixels_per_mm_x - x
+                dy = (self.beam_position[1] - self.zoom_centre['y']) / \
+                      self.pixels_per_mm_y - y
+                motor_pos = {self.sampleXMotor: centred_position.sampx,
+                             self.sampleYMotor: centred_position.sampy,
+                             self.phiMotor: centred_position.phi,
+                             self.phiyMotor: centred_position.phiy + \
+                                  self.centring_hwobj.camera2alignmentMotor(self.phiyMotor, \
+                                  {"X" : dx, "Y" : dy}), 
+                             self.phizMotor: centred_position.phiz + \
+                                  self.centring_hwobj.camera2alignmentMotor(self.phizMotor, \
+                                  {"X" : dx, "Y" : dy}),
+                             self.kappaMotor: centred_position.kappa,
+                             self.kappaPhiMotor: centred_position.kappa_phi}
+                self.move_to_motors_positions(motor_pos)
+           except:
+                logging.exception("Could not move to centred position")
+        else:
+            logging.getLogger("HWR").debug("Move to centred position disabled in BeamLocation phase.")
 
     def move_kappa_and_phi(self, kappa, kappa_phi, wait = False):
         """
@@ -939,12 +982,10 @@ class EMBLMiniDiff(Equipment):
                 motor_role = motor
                 motor = self.get_motor_hwobj(motor_role)
                 del motor_position_dict[motor_role]
-                print motor
                 if motor is None:
-                    print 1 
                     continue
                 motor_position_dict[motor] = position   
-            logging.getLogger("HWR").info("Moving motor '%s' to %f", motor.getMotorMnemonic(), position)
+            #logging.getLogger("HWR").info("Moving motor '%s' to %f", motor.getMotorMnemonic(), position)
             motor.move(position)
         while any([motor.motorIsMoving() for motor in motor_position_dict.iterkeys()]):
             time.sleep(0.5)
@@ -1065,7 +1106,7 @@ class EMBLMiniDiff(Equipment):
         for index in range(image_count):
             logging.getLogger("HWR").info("EMBLMiniDiff: taking snapshot #%d", index + 1)
             centred_images.append((self.phiMotor.getPosition(), str(myimage(drawing))))
-            if self.chan_head_type.getValue() == "MiniKappa":
+            if (self.head_type == "MiniKappa"and image_count > 1):
                 self.phiMotor.syncMoveRelative(-90)
             centred_images.reverse() # snapshot order must be according to positive rotation direction
         return centred_images
@@ -1125,4 +1166,11 @@ class EMBLMiniDiff(Equipment):
                                        self.sampleYMotor:new_sampy, 
                                        self.phiyMotor:new_phiy})
 
+    def update_values(self):
+        self.emit('minidiffPhaseChanged', (self.current_phase, ))            
+        self.emit('omegaReferenceChanged', (self.reference_pos,))
+        self.emit('minidiffShutterStateChanged', (self.fast_shutter_is_open, ))
 
+    def toggle_fast_shutter(self):
+        if self.chan_fast_shutter_is_open is not None:
+            self.chan_fast_shutter_is_open.setValue(not self.fast_shutter_is_open) 

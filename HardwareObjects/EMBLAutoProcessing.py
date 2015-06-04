@@ -90,7 +90,7 @@ class EMBLAutoProcessing(HardwareObject):
                             will_execute = True 	
                     if will_execute:	
                         lineToExecute = executable + endOfLineToExecute
-                        logging.info("Process event %s, executing %s" % (process_event, str(lineToExecute)))
+                        #logging.info("Process event %s, executing %s" % (process_event, str(lineToExecute)))
                         subprocess.Popen(str(lineToExecute), shell = True, 
                                     stdin = None, stdout = None, stderr = None, 
                                     close_fds = True)	
@@ -151,7 +151,7 @@ class EMBLAutoProcessing(HardwareObject):
                 logging.debug('EMBLAutoprocessing: XDS.INP file is there, size={0}'.\
                         format(os.stat(autoproc_xds_filename).st_size))
             else:
-                os.system("ls %s %s > /dev/null"%(os.path.dirname(autoproc_path), autoproc_path))
+                os.system("ls %s> /dev/null"%(os.path.dirname(autoproc_path)))
                 gevent.sleep(WAIT_XDS_RESOLUTION)
         if not xds_appeared:
             logging.error('EMBLAutoprocessing: XDS.INP file ({0}) failed to appear after {1} seconds'.\

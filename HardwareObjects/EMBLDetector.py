@@ -232,6 +232,7 @@ class EMBLDetector(GenericDetector):
         """
         Descript. :
         """
+        self.emit('detectorModeChanged', (self.collect_mode, )) 
         temp = self.chan_temperature.getValue()
         self.emit('temperatureChanged', (temp, temp < self.temp_treshold))
         hum = self.chan_humidity.getValue()

@@ -30,7 +30,7 @@ class EMBLXRFSpectrum(Equipment):
         self.db_connection_hwobj = None
         self.beam_info_hwobj = None
 
-        self.chan_scan_start = None
+        self.cmd_scan_start = None
         self.chan_scan_status = None
         self.chan_scan_consts = None
 
@@ -39,7 +39,7 @@ class EMBLXRFSpectrum(Equipment):
         Descript. :
         """
         self.ready_event = gevent.event.Event()
- 
+
         self.energy_hwobj = self.getObjectByRole("energy")
 
         self.transmission_hwobj = self.getObjectByRole("transmission")
@@ -54,16 +54,14 @@ class EMBLXRFSpectrum(Equipment):
         if self.beam_info_hwobj is None:
             logging.getLogger("HWR").warning("EMBLXRFSpectrum: Beam info hwobj not defined")
 
-        try:
-            self.chan_scan_start = self.getCommandObject('chan_xrf_spectrum_get')
-
-            self.chan_scan_status = self.getChannelObject('xrfScanStatus')
+        self.cmd_scan_start = self.getCommandObject('cmdScanStart')
+        self.cmd_adjust_transmission = self.getCommandObject('cmdAdjustTransmission')
+        self.chan_scan_status = self.getChannelObject('chanScanStatus')
+        if self.chan_scan_status is not None:
             self.chan_scan_status.connectSignal('update', self.scan_status_update)
-            self.chan_scan_consts = self.getChannelObject('xrfScanConsts')
-            self.can_scan = True
-        except:
-            logging.getLogger("HWR").error('EMBLXRFSpectrum: unable to connect to scan channel(s).')
+        self.chan_scan_consts = self.getChannelObject('chanScanConsts')
 
+        self.can_scan = True
         if self.isConnected():
             self.sConnected()
 
@@ -129,6 +127,7 @@ class EMBLXRFSpectrum(Equipment):
                 self.emit('xrfScanStatusChanged', ("Error creating directory", ))
                 self.spectrumCommandAborted()
                 return False
+
         if not os.path.exists(directory):
             try:
                 logging.getLogger().debug("EMBLXRFSpectrum: creating %s", directory)
@@ -169,7 +168,7 @@ class EMBLXRFSpectrum(Equipment):
         Descript. :
         """
         try:
-            self.chan_scan_start(ct)
+            self.cmd_scan_start(ct)
         except:
             logging.getLogger().exception('EMBLXRFSpectrum: problem in starting scan')
             self.emit('xrfScanStatusChanged', ("Error problem in starting scan",))
@@ -231,7 +230,7 @@ class EMBLXRFSpectrum(Equipment):
             self.spectrum_info['endTime'] = time.strftime("%Y-%m-%d %H:%M:%S")
             self.scanning = False
 
-            values = list(self.chan_scan_start.get())
+            values = list(self.cmd_scan_start.get())
 
             xmin = 0
             xmax = 0
@@ -246,13 +245,14 @@ class EMBLXRFSpectrum(Equipment):
                 if value < xmin:
                     xmin = value
                 calibrated_data.append([energy, value])
+
             calibrated_array = numpy.array(calibrated_data)
 
             self.spectrum_info["beamTransmission"] = self.transmission_hwobj.getAttFactor()
             self.spectrum_info["energy"] = self.getCurrentEnergy()
             beam_size = self.beam_info_hwobj.get_beam_size()
-            self.spectrum_info["beamSizeHorizontal"] = beam_size[0]
-            self.spectrum_info["beamSizeVertical"] = beam_size[1]
+            self.spectrum_info["beamSizeHorizontal"] = int(beam_size[0] * 1000)
+            self.spectrum_info["beamSizeVertical"] = int(beam_size[1] * 1000)
 
             mcaConfig = {}
             mcaConfig["legend"] = "Xfe spectrum"
@@ -309,3 +309,7 @@ class EMBLXRFSpectrum(Equipment):
             except:
                 logging.getLogger("HWR").exception("EMBLXRFScan: couldn't read energy")
                 return None
+
+    def adjust_transmission(self):
+        if self.cmd_adjust_transmission is not None:
+            self.cmd_adjust_transmission() 

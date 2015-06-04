@@ -37,9 +37,9 @@ class EMBLEnergyScan(Equipment):
         self.defaultWavelength = None
         self.thEdgeThreshold = None     
 
-        self.energy_motor_hwobj = None
+        self.energy_hwobj = None
         self.db_connection_hwobj = None
-        self.mach_current_hwobj = None
+        self.transmission_hwob = None
         self.beam_info_hwobj = None
 
         self.chan_scan_start = None
@@ -60,20 +60,20 @@ class EMBLEnergyScan(Equipment):
         if self.thEdgeThreshold:
             self.thEdgeThreshold = 0.01
 	
-        self.energy_motor_hwobj = self.getObjectByRole("energy")
-        if self.energy_motor_hwobj:
-            self.energy_motor_hwobj.connect('positionChanged', 
+        self.energy_hwobj = self.getObjectByRole("energy")
+        if self.energy_hwobj:
+            self.energy_hwobj.connect('positionChanged', 
                                          self.energyPositionChanged)
-            self.energy_motor_hwobj.connect('limitsChanged', 
+            self.energy_hwobj.connect('limitsChanged', 
                                          self.energyLimitsChanged)
 
         self.db_connection_hwobj = self.getObjectByRole("dbserver")
         if self.db_connection_hwobj is None:
             logging.getLogger("HWR").warning('EMBLEnergyScan: Database hwobj not defined')
 
-        self.mach_current_hwobj = self.getObjectByRole("machcurrent")
-        if self.mach_current_hwobj is None:
-            logging.getLogger("HWR").warning('EMBLEnergyScan: Machine current hwobj not defined')
+        self.transmission_hwobj = self.getObjectByRole("transmission")
+        if self.transmission_hwobj is None:
+            logging.getLogger("HWR").warning('EMBLEnergyScan: Transmission hwobj not defined')
 
         self.beam_info_hwobj = self.getObjectByRole("beam_info")
         if self.beam_info_hwobj is None:
@@ -119,13 +119,6 @@ class EMBLEnergyScan(Equipment):
                 self.scanCommandFailed()  	
                 logging.getLogger("HWR").error('Energy scan failed')
 	    	
-    def scanTransmissionUpdate(self, value):
-        """
-        Descript. :
-        """
-        if self.scanning:
-            self.scanInfo['transmissionFactor'] = float(value) 
-
     def emitNewDataPoint(self, values):
         """
         Descript. :
@@ -183,7 +176,7 @@ class EMBLEnergyScan(Equipment):
         self._element = element
         self._edge = edge
         self.scanInfo = {"sessionId": session_id, "blSampleId": blsample_id,
-                       "element": element,"edgeEnergy": edge}
+                         "element": element,"edgeEnergy": edge}
         self.scanData = []
         if not os.path.isdir(directory):
             logging.getLogger("HWR").debug("EnergyScan: creating directory %s" % directory)
@@ -195,11 +188,21 @@ class EMBLEnergyScan(Equipment):
                 return False
         try:
             if self.chan_scan_status.getValue() == 'ready':	
-                self.scanInfo['transmissionFactor'] = 0
+                if self.transmission_hwobj is not None:
+                    self.scanInfo['transmissionFactor'] = self.transmission_hwobj.get_value()
+                else:
+                    self.scanInfo['transmissionFactor'] = None
                 self.scanInfo['exposureTime'] = exptime
                 self.scanInfo['startEnergy'] = 0
                 self.scanInfo['endEnergy'] = 0
-                self.scanInfo['beamSizeHorizontal'], self.scanInfo['beamSizeVertical'] = self.beam_info_hwobj.get_beam_size()
+                size_hor = None
+                size_ver = None
+                if self.beam_info_hwobj is not None:
+                    size_hor, size_ver = self.beam_info_hwobj.get_beam_size()
+                    size_hor = size_hor * 1000
+                    size_ver = size_ver * 1000
+                self.scanInfo['beamSizeHorizontal'] = size_hor
+                self.scanInfo['beamSizeVertical'] = size_ver
                 self.chan_scan_start.setValue("%s;%s" % (element, edge))
                 self.scanCommandStarted()
             else:
@@ -275,26 +278,45 @@ class EMBLEnergyScan(Equipment):
             self.scanInfo["endEnergy"] = self.scanData[-1][1]
             self.emit('energyScanFinished', (self.scanInfo,))
 
-    def doChooch(self, elt, edge, scanArchiveFilePrefix, scanFilePrefix):
+    def doChooch(self, elt, edge, scan_directory, archive_directory, prefix):
         """
         Descript. :
         """
         symbol = "_".join((elt, edge))
-        scanArchiveFilePrefix = "_".join((scanArchiveFilePrefix, symbol))
-        i = 1
-        while os.path.isfile(os.path.extsep.join((scanArchiveFilePrefix + str(i), "raw"))):
-            i = i + 1
-        scanArchiveFilePrefix = scanArchiveFilePrefix + str(i) 
-        archiveRawScanFile = os.path.extsep.join((scanArchiveFilePrefix, "raw"))
-        rawScanFile = os.path.extsep.join((scanFilePrefix, "raw"))
-        scanFile = os.path.extsep.join((scanFilePrefix, "efs"))
-        if not os.path.exists(os.path.dirname(scanArchiveFilePrefix)):
-            os.makedirs(os.path.dirname(scanArchiveFilePrefix))
+
+        scan_file_prefix = os.path.join(scan_directory, prefix) 
+        archive_file_prefix = os.path.join(archive_directory, prefix)
+
+        if os.path.exists(scan_file_prefix + ".raw"):
+            i = 1
+            while os.path.exists(scan_file_prefix + ".raw"):
+                  i = i + 1
+            scan_file_prefix += "_%d" % i
+            archive_file_prefix += "_%d" % i
+
+        scan_file_raw_filename = os.path.extsep.join((scan_file_prefix, "raw"))
+        archive_file_raw_filename = os.path.extsep.join((archive_file_prefix, "raw"))
+        scan_file_efs_filename = os.path.extsep.join((scan_file_prefix, "efs"))
+        archive_file_efs_filename = os.path.extsep.join((archive_file_prefix, "efs"))
+        scan_file_png_filename = os.path.extsep.join((scan_file_prefix, "png"))
+        archive_file_png_filename = os.path.extsep.join((archive_file_prefix, "png"))
+
         try:
-            f = open(rawScanFile, "w")
-            pyarch_f = open(archiveRawScanFile, "w")
+            if not os.path.exists(scan_directory):
+                os.makedirs(scan_directory)
+            if not os.path.exists(archive_directory):
+                os.makedirs(archive_directory)
         except:
-            logging.getLogger("HWR").exception("could not create raw scan files")
+            logging.getLogger("HWR").exception("EMBLEnergyScan: could not create energy scan result directory.")
+            self.store_energy_scan()
+            self.emit("energyScanFailed", ())
+            return
+
+        try:
+            scan_file_raw = open(scan_file_raw_filename, "w")
+            archive_file_raw = open(archive_file_raw_filename, "w")
+        except:
+            logging.getLogger("HWR").exception("EMBLEnergyScan: could not create energy scan result raw file")
             self.store_energy_scan()
             self.emit("energyScanFailed", ())
             return
@@ -305,19 +327,21 @@ class EMBLEnergyScan(Equipment):
                 x = x < 1000 and x * 1000.0 or x 
                 y = float(self.scanData[i][1])
                 scanData.append((x, y))
-                f.write("%f,%f\r\n" % (x, y))
-                pyarch_f.write("%f,%f\r\n" % (x, y)) 
-            f.close()
-            pyarch_f.close()
-            self.scanInfo["scanFileFullPath"] = str(archiveRawScanFile)
+                scan_file_raw.write("%f,%f\r\n" % (x, y))
+                archive_file_raw.write("%f,%f\r\n" % (x, y)) 
+            scan_file_raw.close()
+            archive_file_raw.close()
+            self.scanInfo["scanFileFullPath"] = str(scan_file_raw_filename)
 
-        pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, chooch_graph_data = PyChooch.calc(scanData, elt, edge, scanFile)
+        pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, chooch_graph_data = \
+             PyChooch.calc(scanData, elt, edge, scan_file_efs_filename)
+
         rm = (pk + 30) / 1000.0
         pk = pk / 1000.0
         savpk = pk
         ip = ip / 1000.0
         comm = ""
-        logging.getLogger("HWR").info("th. Edge %s ; chooch results are pk=%f, ip=%f, rm=%f" %\
+        logging.getLogger("HWR").info("EMBLEnergyScan : Results th. Edge %s ; chooch results are pk=%f, ip=%f, rm=%f" %\
                (self.thEdgeThreshold, pk, ip, rm))
 
         """if math.fabs(self.thEdge - ip) > self.thEdgeThreshold:
@@ -328,10 +352,9 @@ class EMBLEnergyScan(Equipment):
    
           logging.getLogger("HWR").warning('EMBLEnergyScan: calculated peak (%f) is more that 20eV %s the theoretical value (%f). Please check your scan and choose the energies manually' % (savpk, (self.thEdge - ip) > 0.02 and "below" or "above", self.thEdge))"""
 
-        archiveEfsFile = os.path.extsep.join((scanArchiveFilePrefix, "efs"))
         try:
-            fi = open(scanFile)
-            fo = open(archiveEfsFile, "w")
+            fi = open(scan_file_efs_filename)
+            fo = open(archive_file_efs_filename, "w")
         except:
             self.store_energy_scan()
             self.emit("energyScanFailed", ())
@@ -355,13 +378,13 @@ class EMBLEnergyScan(Equipment):
         for i in range(len(chooch_graph_x)):
             chooch_graph_x[i] = chooch_graph_x[i] / 1000.0
 
-        logging.getLogger("HWR").info("<chooch> Saving png" )
+        #logging.getLogger("HWR").info("EMBLEnergyScan: Saving png" )
         # prepare to save png files
-        title = "%10s  %6s  %6s\n%6.2f  %6.2f  %6.2f\n%6.2f  %6.2f  %6.2f" % \
+        title = "%s  %s  %s\n%.4f  %.2f  %.2f\n%.4f  %.2f  %.2f" % \
               ("energy", "f'", "f''", pk, fpPeak, fppPeak, ip, fpInfl, fppInfl) 
         fig = Figure(figsize = (15, 11))
         ax = fig.add_subplot(211)
-        ax.set_title("%s\n%s" % (scanFile, title))
+        ax.set_title("%s\n%s" % (scan_file_efs_filename, title))
         ax.grid(True)
         ax.plot(*(zip(*scanData)), **{"color": 'black'})
         ax.set_xlabel("Energy")
@@ -375,17 +398,15 @@ class EMBLEnergyScan(Equipment):
         handles.append(ax2.plot(chooch_graph_x, chooch_graph_y2, color = 'red'))
         canvas = FigureCanvasAgg(fig)
 
-        escan_png = os.path.extsep.join((scanFilePrefix, "png"))
-        escan_archivepng = os.path.extsep.join((scanArchiveFilePrefix, "png")) 
-        self.scanInfo["jpegChoochFileFullPath"] = str(escan_archivepng)
+        self.scanInfo["jpegChoochFileFullPath"] = str(archive_file_png_filename)
         try:
-            logging.getLogger("HWR").info("Rendering energy scan and Chooch graphs to PNG file : %s", escan_png)
-            canvas.print_figure(escan_png, dpi = 80)
+            logging.getLogger("HWR").info("Rendering energy scan and Chooch graphs to PNG file : %s", scan_file_png_filename)
+            canvas.print_figure(scan_file_png_filename, dpi = 80)
         except:
             logging.getLogger("HWR").exception("could not print figure")
         try:
-            logging.getLogger("HWR").info("Saving energy scan to archive directory for ISPyB : %s", escan_archivepng)
-            canvas.print_figure(escan_archivepng, dpi = 80)
+            logging.getLogger("HWR").info("Saving energy scan to archive directory for ISPyB : %s", archive_file_png_filename)
+            canvas.print_figure(archive_file_png_filename, dpi = 80)
         except:
             logging.getLogger("HWR").exception("could not save figure")
 
@@ -419,9 +440,9 @@ class EMBLEnergyScan(Equipment):
         """
         Descript. :
         """
-        if self.energy_motor_hwobj is not None:
+        if self.energy_hwobj is not None:
             try:
-                return self.energy_motor_hwobj.getPosition()
+                return self.energy_hwobj.getPosition()
             except: 
                 logging.getLogger("HWR").exception("EnergyScan: couldn't read energy")
                 return None
@@ -440,18 +461,18 @@ class EMBLEnergyScan(Equipment):
         Descript. :
         """
         lims = None
-        if self.energy_motor_hwobj is not None:
-            if self.energy_motor_hwobj.isReady():
-                lims = self.energy_motor_hwobj.getLimits()
+        if self.energy_hwobj is not None:
+            if self.energy_hwobj.isReady():
+                lims = self.energy_hwobj.getLimits()
         return lims
 
     def getCurrentWavelength(self):
         """
         Descript. :
         """
-        if self.energy_motor_hwobj is not None:
+        if self.energy_hwobj is not None:
             try:
-                return self.energy2wavelength(self.energy_motor_hwobj.getPosition())
+                return self.energy2wavelength(self.energy_hwobj.getPosition())
             except:
                 logging.getLogger("HWR").exception("EnergyScan: couldn't read energy")
                 return None
@@ -464,9 +485,9 @@ class EMBLEnergyScan(Equipment):
         """
         lims = None
         try:
-            if self.energy_motor_hwobj is not None:
-                if self.energy_motor_hwobj.isReady():
-                    energy_lims = self.energy_motor_hwobj.getLimits()
+            if self.energy_hwobj is not None:
+                if self.energy_hwobj.isReady():
+                    energy_lims = self.energy_hwobj.getLimits()
                     lims = (self.energy2wavelength(energy_lims[1]), self.energy2wavelength(energy_lims[0]))
                     if lims[0] is None or lims[1] is None:
                         lims = None

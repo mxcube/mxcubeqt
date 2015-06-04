@@ -1,18 +1,25 @@
 from HardwareRepository import HardwareRepository
-from HardwareRepository.BaseHardwareObjects import Procedure
+from HardwareRepository.BaseHardwareObjects import Device
 import math
 import numpy
 
-class CentringMath(Procedure):
+class CentringMath(Device):
     """
-    CentringMath procedure	   
+    Descript. : CentringMath procedure	   
+    Dependenc.: math, numpy
     """
 
     def init(self):
         """
-        Ggonio axes definitions are static
-        motorHO is expected to have getPosition() that returns coordinate in mm
+        Descript. : Ggonio axes definitions are static. motorHO is expected to 
+                    have getPosition() that returns coordinate in mm
+
+                    This version is lacking video microscope object. Therefore
+                    we model only static camera axes directions, but no camera 
+                    axes scaling or center - which are dynamic. 
+                    Therefore, camera coordinates are relative, in mm. 
         """
+
         self.motorConstraints=[]
         self.gonioAxes = []
         for axis in self['gonioAxes']:
@@ -20,12 +27,6 @@ class CentringMath(Procedure):
 	      		         'motor_name':axis.motorname,'motor_HO':
                                   HardwareRepository.HardwareRepository().getHardwareObject(axis.motorHO) })      
         
-
-        """ 
-        This version is lacking video microscope object. Therefore we model only 
-        static camera axes directions, but no camera axes scaling or center - which 
-        are dynamic. Therefore, camera coordinates are relative, in mm. 
-        """
         self.cameraAxes = []
         for axis in self['cameraAxes']:
           self.cameraAxes.append({'axis_name':axis.axisname,'direction':eval(axis.direction)})
@@ -34,13 +35,15 @@ class CentringMath(Procedure):
         self.calibrate() 
 
     def centringToScreen(self,centring_dict,factorized = False):
+        """
+        Descript. : One _must_ self.factorize() before!!!
+                    Input positions are indexed by motor name as in original
+                    MiniDiff.
+                    For symmetry, output camera coordinates are indexed by 
+                    camera axis name, like {'X':<float>,'Y':<float>}, 
+                    but not just x,y as in original MiniDiff.
+        """
         if not factorized : self.factorize()
-        """
-        One _must_ self.factorize() before!!!
-        Input positions are indexed by motor name as in original MiniDiff.
-        For symmetry, output camera coordinates are indexed by camera axis name, like {'X':<float>,'Y':<float>}, 
-        but not just x,y as in original MiniDiff.
-        """
         tau_cntrd = self.centred_positions_to_vector(centring_dict)
         dum = self.tau - tau_cntrd
         return self.vector_to_camera_coordinates(numpy.dot(self.F.T,dum))
@@ -53,23 +56,33 @@ class CentringMath(Procedure):
         return lst
   
     def factorize(self):
-        # this should be automatic, on the gonio both rot and trans datum update
+        """
+        Descript. : this should be automatic, on the gonio both rot and 
+                    trans datum update
+        """
         self.F=self.factor_matrix()
         self.tau=self.translation_datum()
 
     def initCentringProcedure(self):
-        #call before starting rotate-click sequence 
+        """
+        Descript. : call before starting rotate-click sequence 
+        """
         self.centringDataTensor=[]
         self.centringDataMatrix=[]
         self.motorConstraints=[]
 
     def appendCentringDataPoint(self,camera_coordinates):
-        #call after each click and send click points - but relative in mm 
+        """
+        Descript. : call after each click and send click points - but relative in mm 
+        """
         self.centringDataTensor.append(self.factor_matrix())
         self.centringDataMatrix.append(self.camera_coordinates_to_vector(camera_coordinates))
 
     def centeredPosition(self, return_by_name=False):
-        #call after appending the last click. Returns a {motorHO:position} dictionary.
+        """
+        Descript. : call after appending the last click. 
+        Return    : {motorHO:position} dictionary.
+        """
         M=numpy.zeros(shape=(self.translationAxesCount,self.translationAxesCount))
         V=numpy.zeros(shape=(self.translationAxesCount))
 
@@ -83,13 +96,8 @@ class CentringMath(Procedure):
                     M[l][m] += self.centringDataTensor[i][l][k]*self.centringDataTensor[i][m][k]
         tau_cntrd = numpy.dot(numpy.linalg.pinv(M,rcond=1e-6),V)
         
-        #print tau_cntrd
         tau_cntrd = self.apply_constraints(M,tau_cntrd)
-        #print tau_cntrd 
-       
         return self.vector_to_centred_positions( - tau_cntrd + self.translation_datum(), return_by_name)
-
-    
 
     def apply_constraints(self,M,tau):
         V=numpy.zeros(shape=(self.translationAxesCount))
@@ -103,7 +111,10 @@ class CentringMath(Procedure):
         return tau
         
     def factor_matrix(self):
-        # This should be connected to goniostat rotation datum update, with F globalized
+        """
+        Descript. : This should be connected to goniostat rotation datum 
+                    update, with F globalized
+        """  
         F=numpy.zeros(shape=(self.translationAxesCount,len(self.cameraAxes)))
         R=self.mI
         j=0
@@ -200,8 +211,11 @@ class CentringMath(Procedure):
                return
 
     def camera2alignmentMotor(self,motor_HO,camxy):
-        # motor_HO must reference an ALIGNMENT motor!
-        # finds a projection of camera vector {"X":x,"Y":y} onto a motor axis of a motor_HO
+        """
+        Descript. : motor_HO must reference an ALIGNMENT motor!
+                    finds a projection of camera vector {"X":x,"Y":y} 
+                    onto a motor axis of a motor_HO
+        """
         for axis in self.gonioAxes:
             if axis['type'] == "translation" and motor_HO is axis['motor_HO']:
 	       res = 0.0
