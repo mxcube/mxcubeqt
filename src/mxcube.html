@@ -12,11 +12,19 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 <script src="http://underscorejs.org/underscore-min.js"></script>
 <script src="http://backbonejs.org/backbone-min.js"></script>
+<script src="http://code.angularjs.org/1.3.9/angular.js"></script>
+<script src="/js/ng-grid-2.0.14.debug.js"></script>
+<link href="/css/ng-grid.css" rel="stylesheet"/>
 
 <script type="text/jsx" src="/js/sample.jsx"></script>
 <script type="text/jsx" src="/js/queue.jsx"></script>
 <script type="text/jsx" src="/js/dc_methods.jsx"></script>
 <script type="text/jsx" src="/js/motor.jsx"></script>
+<script type="text/jsx" src="/js/beamline.jsx"></script>
+<script type="text/jsx" src="/js/sample_centring.jsx"></script>
+<script type="text/jsx" src="/js/sample_video.jsx"></script>
+<script type="text/jsx" src="/js/diff.jsx"></script>
+
 
 <style type="text/css">
 .top5 { margin-top:5px; }
@@ -87,22 +95,320 @@ function logout() {
    window.location.replace("/logout");
 }
 
+var centring = true; 
+var mouse_x = 0;
+var mouse_y = 0;
+
+var event_canvas = function(ev) {
+       var img_canvas = document.getElementById('sample_ova');
+       mouse_x = ev.pageX-img_canvas.offsetLeft;
+       mouse_y = ev.pageY-img_canvas.offsetTop;
+	   console.log("canvas event")
+       if (ev.type == "mouseup") {
+         if (centring) {
+           centring = false;
+           $.ajax({
+             error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+             url: 'centring',
+             type: 'GET',
+             data: { "X":mouse_x, "Y": mouse_y },
+             success: function(res) {
+               centring = res.continue;
+               /*draw_sample_video(); */
+             },
+             dataType: "json"
+           })
+         }
+       }
+}
+
+
 $( document ).ready(function() {
    window.app_dispatcher = _.extend({}, Backbone.Events);
 
    $.fn.editable.defaults.mode = 'popup';
+   $.fn.editable.defaults.send = "always";
+   
    $.get("/init");
    getSessionInfo();
    createSampleList();
    
    React.renderComponent(<Queue/>, $("#queue")[0]);
+   
    React.renderComponent(<DCMethods/>, $("#dc_method")[0]);
+   React.renderComponent(<BeamLine/>, $("#beamline")[0]);
+   React.renderComponent(<BeamLineInd/>, $("#beamlineind")[0]);
+   React.renderComponent(<SampleCentring/>, $("#samplepos")[0]);
+   React.renderComponent(<SampleCentringInd/>, $("#sampleind")[0]);
+   React.renderComponent(<SampleVideo/>, $("#samplevid")[0]);
+   React.renderComponent(<SampleVideoInd/>, $("#samplevidind")[0]);
+   
+   
+   React.renderComponent(<Diff/>, $("#diff")[0]);
+   console.log(document.getElementById('lightin'))
 
    drawSomething();
 
    $("#sample_video").attr("poster","/sample_video_stream");
 
+   var canvas = document.getElementById('sample_ova');
+   ctx= canvas.getContext('2d');
+   canvas.addEventListener('mouseup',   event_canvas, false);
+   
+   var irudia = new Image();
+   irudia.src = 'img/fakeimg.jpg';
+   console.log(irudia)
+   ctx.drawImage(irudia	, 0, 0,200,100);
+
+var evtSrc = new EventSource("/event");
+evtSrc.onopen = function(e){
+    console.log('con openned');
+    console.log(e);
+}
+evtSrc.onerror = function(e){
+    console.log('event error');
+    console.log(e);
+}
+evtSrc.onmessage = function(e) {
+    var data=JSON.parse(e.data);
+    if (data['name']=='motorPositionChanged'){
+    	//$('#energy').text(data["value"]);
+    	console.log(data)
+    	console.log(data['origin'])
+    	$('#'+data['origin']).text(data["value"]);
+    }
+};
+
+
+console.log("...........................loading......................")
+
+var video_socket = null;
+var jpeg_frame = new Image();
+var jpeg_data = "";
+var frame_id = null;
+var pixelsPerMmY = 1;
+var pixelsPerMmZ = 1;
+//var centring = false; 
+//var mouse_x = 0;
+//var mouse_y = 0;
+                
+
+$(document).ready(function() {
+  console.log("main.js loading......................")
+  setup();
 });
+
+
+var set_light = function(put_in) {
+  $.ajax({
+    error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+    url: 'set_light',
+    data: { "put_in": put_in },
+    type: 'GET',
+    success: function(res) {
+      update_gui(res);
+    },
+    dataType: "json" });
+}
+
+var set_light_in = function() { set_light(1); }
+var set_light_out = function() { set_light(0); }
+
+var set_zoom = function() {
+  var selected_zoom = $(this).find(":selected").val();
+  $.ajax({
+    error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+    url: 'set_zoom',
+    type: 'GET',
+    data: { "zoom_level": selected_zoom*20 },
+    success: function(res) {
+      update_gui(res);
+    },
+    dataType: "json" });
+}
+
+var set_light_level = function() {
+  $.ajax({
+    error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+    url: 'set_light_level',
+    type: 'GET',
+    data: { "light_level": $("#light").val() },
+    success: function(res) {
+      update_gui(res);
+    },
+    dataType: "json" });
+}
+
+var do_login = function() {
+  $.ajax({
+    error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+    url: 'login',
+    type: 'GET',
+    data: { "username": $("#username").val(), "password": $("#password").val() },
+    success: function(res) {
+      if (res.ok) {
+        $("#collect_button").attr("disabled", false);
+      } else {
+        $("#collect_button").attr("disabled", true); 
+        alert(res.err);
+      }
+    },
+    dataType: "json" });
+}
+
+var update_gui = function(res) {
+      $("#transmission").val(res.transmission);
+      $("#resolution").val(res.resolution);
+      $("#energy").val(res.energy);
+      if (res.light_state == "out") {
+        $("#lightout").button('toggle');
+      } else if (res.light_state == "in") {
+        $("#lightin").button("toggle");
+      }
+      $("#light").val(res.light);
+      $("#zoom").val(res.zoom);
+      pixelsPerMmY = res.pixelsPerMmY
+      pixelsPerMmZ = res.pixelsPerMmZ
+      console.log("Update gui..............")
+      console.log(res)
+}
+
+var draw_sample_video = function() {
+       var img_canvas = document.getElementById('sample_view')
+       var img_context = img_canvas.getContext("2d");
+
+       img_context.drawImage(jpeg_frame, 0, 0, 659, 493);
+       //window.URL.revokeObjectURL(jpeg_frame.src);
+       img_context.strokeStyle = "#FF0000" //red
+       img_context.beginPath();
+       img_context.moveTo((659/2)-20,493/2);
+       img_context.lineTo((659/2)+20,493/2);
+       img_context.moveTo(659/2,(493/2)-20);
+       img_context.lineTo(659/2,(493/2)+20);
+       img_context.stroke();
+       img_context.closePath();
+
+       img_context.beginPath();
+       img_context.strokeStyle = "#7FFF00" //chartreuse
+       img_context.fillStyle = "#7FFF00" //chartreuse
+       img_context.rect(10,493-110,3,100);
+       img_context.rect(10,493-7,100,3);
+       img_context.fill();
+       img_context.stroke();
+       img_context.closePath();
+
+       if (centring) {
+         img_context.strokeStyle="#FFFF00" //yellow
+         img_context.beginPath();
+         img_context.moveTo(0,mouse_y);
+         img_context.lineTo(659,mouse_y);
+         img_context.moveTo(mouse_x,0);
+         img_context.lineTo(mouse_x,493);
+         img_context.stroke();
+         img_context.closePath();
+      }
+}
+jpeg_frame.onload=draw_sample_video;
+
+var ev_canvas = function(ev) {
+       var img_canvas = document.getElementById('sample_view');
+       mouse_x = ev.pageX-img_canvas.offsetLeft;
+       mouse_y = ev.pageY-img_canvas.offsetTop;
+	   console.log("canvas event")
+       if (ev.type == "mouseup") {
+         if (centring) {
+           centring = false;
+           $.ajax({
+             error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+             url: 'centring',
+             type: 'GET',
+             data: { "X":mouse_x, "Y": mouse_y },
+             success: function(res) {
+               centring = res.continue;
+               /*draw_sample_video(); */
+             },
+             dataType: "json"
+           })
+         }
+       }
+}
+
+var start_centring = function() {
+  centring = true;
+  mouse_x = 0;
+  mouse_y = 0;
+}
+
+var get_state = function() {
+  $.ajax({
+             error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+             url: 'state',
+             type: 'GET',
+             success: function(res) {
+               update_gui(res);
+               setTimeout(get_state, 100);
+             },
+             dataType: "json"
+           })
+}
+
+function setup() {
+   console.log("Performing setup.............")
+   console.log(document.getElementById('lightin'))
+   var img_canvas = document.getElementById('sample_view')
+   var img_context = img_canvas.getContext("2d");
+   img_context.fillStyle="#808080"
+   img_context.fillRect(0,0,659,493)
+   img_canvas.addEventListener('mousemove', ev_canvas, false);
+   img_canvas.addEventListener('mouseup',   ev_canvas, false);
+   $.ajax({
+    error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+    url: 'init',
+    type: 'GET',
+    success: function(res) {
+      update_gui(res);
+
+      $("#collect_button").attr("disabled", true);
+      $("#lightin").click(set_light_in);
+      $("#lightout").click(set_light_out);
+      $("#zoom").change(set_zoom);
+      $("#set_light_level").click(set_light_level);
+      $("#login_button").click(do_login);
+      $("#centre_button").click(start_centring);
+
+      var video_source = new EventSource("sample_video_stream");
+      function display_sample_video() {
+          frame_id = null;
+          jpeg_frame.src = "data:image/jpeg;base64,"+jpeg_data;
+          /*
+          try {
+            var jpeg_blob = new Blob([pako.deflate(jpeg_data)], {type: "image/jpeg"});
+          } catch (e) {
+            // The BlobBuilder API has been deprecated in favour of Blob, but older
+            // browsers don't know about the Blob constructor
+            // IE10 also supports BlobBuilder, but since the `Blob` constructor
+            //  also works, there's no need to add `MSBlobBuilder`.
+            var BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder;
+            var b = new BlobBuilder();
+            b.append(pako.deflate(jpeg_data));
+            var jpeg_blob = bb.getBlob("image/jpeg");
+          }
+          jpeg_frame.src = window.URL.createObjectURL(jpeg_blob);
+          */
+      };
+      video_source.addEventListener("message", function(e) {
+        if (frame_id != null) { cancelAnimationFrame(frame_id); }
+        jpeg_data = e.data;
+        //jpeg_frame.src="data:image/jpeg;base64,"+jpeg_data;
+        frame_id = requestAnimationFrame(display_sample_video);
+      }, false);
+ 
+    },
+    dataType: "json" }) 
+};
+});
+
+
 
 </script>
 </head>
@@ -138,18 +444,50 @@ $( document ).ready(function() {
   <div class="row-fluid">
      <div class="col-md-3" id="samples_list"></div>
      <div class="col-md-3">
-       <div id="dc_method"></div>
-       <div id="queue"></div>
-     </div>
-     <div class="col-md-6">
+     	<div class="row">
+			<div class="col-md-8">
+				<div id="beamline"></div>
+			</div>
+			<div class="col-md-4">
+		        <div id="beamlineind"></div>
+			</div>				
+   		</div>
+       		<div id="dc_method"></div>
+       		<div id="queue"></div>
+       		
+     	</div>
+     	</div>
+        <div class="col-md-6">
+     		<div class="row">
+    			<div class="col-md-4">
+					<div id="samplepos"></div>
+				</div>
+				<div class="col-md-2">
+					<div id="sampleind"></div>
+				</div>
+    			<div class="col-md-4">
+	        		<div id="samplevid"></div>
+        		</div>
+				<div class="col-md-2">
+					<div id="samplevidind"></div>
+				</div>	
+			<div id="diff"></div>       
+     	
+     	
+     	</div>
+
+     <div class="col-md-2">
+     	
        <div class="col-centered text-center">
-         <!-- video class="sample_video" poster="/sample_video_stream" width="650" height="485"></video -->
-         <video class="sample_video" id="sample_video" width="650" height="485"></video>
-         <canvas class="sample_video_canvas" id="video_canvas" width="650" height="485"></canvas>
-       </div>
+         <!-- <video class="sample_video" poster="/sample_video_stream" width="650" height="485"></video> -->
+         <video class="sample_video" id="sample_video" width="652" height="485"></video>
+         <canvas class="sample_video_canvas" id="video_canvas" width="652" height="485"></canvas>
+       </div>      
      </div>
+     
   </div>
 </div>
+
 
 </body>
 </html>

@@ -42,7 +42,14 @@ var SampleList = React.createClass({
 
 var Sample = React.createClass({
      add_mount_task: function() {
-       window.app_dispatcher.trigger("queue:new_item", { "kind":"sample", "text": "Mount "+this.props.sample.sampleName, fields:{} });  
+       window.app_dispatcher.trigger("queue:new_item", { "kind":"sample", "text": "Mount "+this.props.sample.sampleName, fields:{} });
+       //everytime a new sample is loaded into the queue its name is sent to the server
+       $.ajax({
+       //error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+       url: 'sample_field_update',
+       type: 'POST',
+       data: { "Type":"Sample", "Name":this.props.sample.sampleName },
+       dataType: "json" });  
      },
 
      render: function() {
@@ -58,7 +65,7 @@ var Sample = React.createClass({
            fields.push( <EditableField key={fieldno} sampleid={this.props.sample.sampleId} name={field} value={value} /> );
            fieldno += 1;
        }
-
+       
        var mount_button = "";
        if (this.props.can_mount) {
          mount_button = <div className="btn-group pull-right">
@@ -86,11 +93,12 @@ var Sample = React.createClass({
 });
 
 var EditableField = React.createClass({
+	
    componentDidMount: function() {
       $(this.refs.editable.getDOMNode()).editable();
    }, 
 
    render: function() {
-       return <p>{this.props.name}: <a href="#" ref="editable" data-name={this.props.name} data-pk={this.props.sampleid} data-url="/sample_field_update" data-type="text" data-title="Edit value">{this.props.value}</a></p>
+       return <p>{this.props.name}: <a href="#" ref="editable"  data-name={this.props.name} data-pk={this.props.sampleid} data-url="/sample_field_update" data-type="text" data-title="Edit value">{this.props.value}</a></p>
    } 
 })

@@ -1,9 +1,12 @@
 /** @jsx React.DOM */
 
-var discrete_params = { osc_range: { label: "Oscillation range", default_value: 0.1 },
+var discrete_params =  {osc_range: { label: "Oscillation range", default_value: 1.0 },
                         osc_start: { label: "Oscillation start", default_value: 0 },
-                        exp_time: { label: "Exposure time", default_value: 0.02 },
-                        n_images: { label: "Number of images", default_value: 1 } } 
+                        exp_time: { label: "Exposure time", default_value: 10.0 },
+                        n_images: { label: "Number of images", default_value: 1 }} 
+
+//var discrete_params_simple = { {osc_range: 1.0} , {osc_start: 0} ,{exp_time: 10.0} ,{n_images: 1} } 
+
 
 var DCMethods = React.createClass({
      getDefaultProps: function() {
@@ -27,6 +30,14 @@ var DCMethods = React.createClass({
            text: "Discrete",
            fields: discrete_params
          });
+      //everytime a new dc is loaded into the queue its params are sent to the server
+        $.ajax({
+       //error: function(XMLHttpRequest, textStatus, errorThrown) { alert(textStatus) },
+       url: 'sample_field_update',
+       type: 'POST',
+       data: { "Type": "Discrete", "osc_range": 1.0, "osc_start": 0, "exp_time": 10.0, "n_images": 1 },
+       dataType: "json" });  
+         
      },
      add_characterisation: function() {
      },
