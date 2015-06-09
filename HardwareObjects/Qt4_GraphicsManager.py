@@ -18,16 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Contains the classes
-
-* ShapeHistory
-* DrawingEvent
-* Shape
-* Point
-* Line
-* CanvasGrid
-
-ShapeHistory keeps track of the current shapes the user has created. The
+Qt4_GraphicsManager keeps track of the current shapes the user has created. The
 shapes handled are any that inherits the Shape base class. There are currently
 two shapes implemented Point and Line.
 
@@ -92,7 +83,7 @@ class Qt4_GraphicsManager(HardwareObject):
         self.centring_points = []
         self.centring_state = False
         self.mesh_drawing_state = False
-        self.shapes = {}
+        self.point_count = 0
         self.selected_shapes = {}
 
         QtCore.QObject.connect(self.graphics_view.scene(), 
@@ -154,7 +145,7 @@ class Qt4_GraphicsManager(HardwareObject):
         """
         :returns: All the shapes currently handled.
         """
-        return self.shapes.values()
+        return self.shapes_dict.values()
 
     def get_points(self):
         """
@@ -163,7 +154,7 @@ class Qt4_GraphicsManager(HardwareObject):
         current_points = []
 
         for shape in self.get_shapes():
-            if isinstance(shape, Point):
+            if isinstance(shape, GraphicsItemCentredPoint):
                 current_points.append(shape)
 
         return current_points
@@ -176,15 +167,20 @@ class Qt4_GraphicsManager(HardwareObject):
         :type shape: Shape object.
 
         """
+        if isinstance(shape, GraphicsItemCentredPoint):
+            self.point_count += 1
+            shape.set_index(self.point_count)
+            
         self.graphics_view.graphics_scene.addItem(shape)
-        self.shapes[shape] = shape
+        self.shapes_dict[shape] = shape
 
     def _delete_shape(self, shape):
         shape.unhighlight()
 
         if shape in self.selected_shapes:
+            if isinstance(shape, GraphicsItemCentredPoint):
+                self.point_count -= 1   
             del self.selected_shapes[shape]
-
             if callable(self._drawing_event.selection_cb):
                 self._drawing_event.selection_cb(self.selected_shapes.values())
 
@@ -204,9 +200,11 @@ class Qt4_GraphicsManager(HardwareObject):
         related_points = []
 
         #If a point remove related line first
-        if isinstance(shape, Point):
+        if isinstance(shape, GraphicsItemLine):
             for s in self.get_shapes():
-                if isinstance(s, Line):
+                if isinstance(s, GraphicsItemLine):
+                    
+                    print "fix"
                     for s_qub_obj in s.get_qub_objects():
                         if  s_qub_obj in shape.get_qub_objects():
                             self._delete_shape(s)
@@ -214,12 +212,12 @@ class Qt4_GraphicsManager(HardwareObject):
                             break
 
         self._delete_shape(shape)
-        del self.shapes[shape]
+        del self.shapes_dict[shape]
 
         # Delete the related shapes after self._delete_shapes so that
         # related object still exists when calling delete call back.
         for point in related_points:
-            del self.shapes[point]
+            del self.shapes_dict[point]
 
     def move_shape(self, shape, new_positions):
         """
@@ -231,28 +229,25 @@ class Qt4_GraphicsManager(HardwareObject):
         :param new_position: A tuple (X, Y)
         :type new_position: <int, int>
         """
-        self.shapes[shape].move(new_positions)
+        self.shapes_dict[shape].move(new_positions)
 
     def clear_all(self):
         """
         Clear the shape history, remove all contents.
         """
-        for shape in self.shapes:
+        for shape in self.shapes_dict:
             self._delete_shape(shape)
 
-        self.shapes.clear()
+        self.shapes_dict.clear()
 
     def de_select_all(self):
         self.graphics_view.graphics_scene.clearSelection()
         #self._drawing_event.de_select_all()
 
     def select_shape_with_cpos(self, cpos):
-        print "select_shape_with_cpos: - implement"
-        return
         self._drawing_event.de_select_all()
-
         for shape in self.get_shapes():
-            if isinstance(shape, Point):
+            if isinstance(shape, GraphicsItemCentredPoint):
                 if shape.get_centred_positions()[0] == cpos:
                     self._drawing_event.set_selected(shape, True, call_cb = False)
 
@@ -590,7 +585,7 @@ class GraphicsItemCentredPoint(GraphicsItem):
         GraphicsItem.__init__(self, position_x, position_y)
 
         self.full_centring = full_centring
-        self.setFlags(QtGui.QGraphicsItem.ItemIsSelectable)
+        self.setFlags(QtGui.QGraphicsItem.ItemIsSelectable) 
 
         if centred_position is None:
             self.centred_position = queue_model_objects.CentredPosition()

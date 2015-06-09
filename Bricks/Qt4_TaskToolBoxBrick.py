@@ -96,35 +96,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        # Get a reference to the TreeBrick.
-        tree_brick = {}
-        self.emit(QtCore.SIGNAL("getTreeBrick"), tree_brick)
-        self.tree_brick = tree_brick.get('tree_brick', None)
-        self.task_tool_box_widget.set_tree_brick(self.tree_brick)
-
-        # Get a reference to the QUB view and setup 
-        # helper classes for handling centred positions.
-        #self.task_tool_box_widget.workflow_page._grid_widget.connectToView(d)
-        #self.task_tool_box_widget.workflow_page._grid_widget._setColor(qt.QWidget.green)
-        #self.task_tool_box_widget.workflow_page.\
-        #    _grid_widget._graphics_manager = self.shape_history_hwobj
-        
-        #With signals and slots
-        """self.graphics_manager_hwobj.set_drawing(d.get('drawing', None))
-        self.graphics_manager_hwobj.get_drawing_event_handler().\
-            selection_cb = self.shape_selected
-        self.graphics_manager_hwobj.get_drawing_event_handler().\
-            deletion_cb = self.shape_deleted
-        """
-        try:
-            pass
-            """self.graphics_manager_hwobj.get_drawing_event_handler().\
-                move_to_centred_position_cb = self.diffractometer_hwobj.\
-                                              moveToCentredPosition"""                            
-        except AttributeError:
-            logging.error('Could not get diffractometer_hwobj, check your configuration')
-            traceback.print_exc()
-
         self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
         if self.session_hwobj.session_id:
             self.setEnabled(True)
@@ -285,14 +256,13 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             try:
                 screen_pos = self.diffractometer_hwobj.\
                              motor_positions_to_screen(cpos.as_dict())
-
                 point = graphics_manager.Point(self.shape_history_hwobj.get_drawing(), 
                                          cpos, screen_pos)
-                #qub_point = self.graphics_manager_hwobj.draw_position(screen_pos)
-
+                print point
+                print point.get_index()
                 if point:
-                    #self.graphics_manager_hwobj.add_point(cpos, qub_point)
                     self.graphics_manager_hwobj.add_shape(point)
+                    cpos.set_index(point.get_index())
             except:
                 logging.getLogger('HWR').\
                     exception('Could not get screen positons for %s' % cpos)
