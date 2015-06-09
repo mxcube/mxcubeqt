@@ -156,9 +156,11 @@ class Qt4_InstanceListBrick(BlissWidget):
 
         self.users_listwidget = QtGui.QListWidget(_main_gbox)
         self.users_listwidget.setFixedHeight(100)
-        self.give_control_chbox=QtGui.QCheckBox("Selecting gives control", _main_gbox)
+        self.give_control_chbox=QtGui.QCheckBox(\
+             "Selecting gives control", _main_gbox)
         self.give_control_chbox.setChecked(False)
-        self.allow_timeout_control_chbox=QtGui.QCheckBox("Allow timeout control",_main_gbox)
+        self.allow_timeout_control_chbox=QtGui.QCheckBox(\
+             "Allow timeout control",_main_gbox)
         self.allow_timeout_control_chbox.setChecked(False)
 
         self.takeControlButton = QtGui.QToolButton(_main_gbox)
@@ -224,6 +226,9 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.timeout_timer.timeout.connect(self.timeoutApproaching)
 
     def propertyChanged(self, propertyName, oldValue, newValue):
+        """
+        Descript. :
+        """
         if propertyName == 'mnemonic':
             if self.instance_server_hwobj is not None:
                 self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('instanceInitializing'),self.instanceInitializing)
@@ -264,17 +269,8 @@ class Qt4_InstanceListBrick(BlissWidget):
             icons_list=newValue.split()
             try:
                 self.serverIcon=Qt4_Icons.load(icons_list[0])
-            except IndexError:
-                pass
-            try:
                 self.clientIcon=Qt4_Icons.load(icons_list[1])
-            except IndexError:
-                pass                
-            try:
                 self.takeControlButton.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[2])))
-            except IndexError:
-                pass
-            try:
                 self.ask_control_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[3])))
             except IndexError:
                 pass
@@ -282,6 +278,9 @@ class Qt4_InstanceListBrick(BlissWidget):
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
     def hutchTriggerChanged(self, hutch_opened):
+        """
+        Descript. :
+        """
         if hutch_opened:
             if not BlissWidget.isInstanceRoleServer():
               logging.getLogger().info("%s: HUTCH IS OPENED, YOU LOSE CONTROL", self.name())
@@ -295,7 +294,10 @@ class Qt4_InstanceListBrick(BlissWidget):
               self.takeControlButton.setEnabled(True) 
 
 
-    def setSession(self,session_id,prop_code=None,prop_number=None,prop_id=None,expiration=None,orig_prop_code=None,is_inhouse=None):
+    def setSession(self, session_id, prop_code = None, prop_number=None,prop_id=None,expiration=None,orig_prop_code=None,is_inhouse=None):
+        """
+        Descript. :
+        """
         self.externalUserInfoDialog.clearUserInfo()
 
         if prop_code is not None and prop_number is not None and prop_code!='' and prop_number!='':
@@ -339,9 +341,15 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.ask_control_button.setEnabled(False)
 
     def reconnectToServer(self):
+        """
+        Descript. :
+        """
         self.instance_server_hwobj.reconnect(quiet=True)
 
     def instanceInitializing(self):
+        """
+        Descript. :
+        """
         is_local=self.instance_server_hwobj.isLocal()
         if is_local:
             loc=BlissWidget.INSTANCE_LOCATION_LOCAL
@@ -357,6 +365,9 @@ class Qt4_InstanceListBrick(BlissWidget):
                      self.applicationTabChanged)
 
     def clientInitialized(self,connected,server_id=None,my_nickname=None,quiet=False):
+        """
+        Descript. :
+        """
         if connected is None:
             BlissWidget.setInstanceRole(BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING)
             BlissWidget.setInstanceMode(BlissWidget.INSTANCE_MODE_SLAVE)
@@ -398,6 +409,9 @@ class Qt4_InstanceListBrick(BlissWidget):
             QtGui.QApplication.postEvent(self, msg_event)
 
     def serverInitialized(self,started,server_id=None):
+        """
+        Descript. :
+        """
         if started:
             #BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_UNKNOWN)
             BlissWidget.setInstanceRole(BlissWidget.INSTANCE_ROLE_SERVER)
@@ -424,6 +438,9 @@ class Qt4_InstanceListBrick(BlissWidget):
             os._exit(1)
 
     def serverClosed(self,server_id):
+        """
+        Descript. :
+        """
         self.users_listwidget.clear()
         self.connections={}
         BlissWidget.setInstanceRole(BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING)
@@ -436,6 +453,9 @@ class Qt4_InstanceListBrick(BlissWidget):
                                  self.reconnectToServer)
 
     def widgetUpdate(self,timestamp,method,method_args,masterSync=True):
+        """
+        Descript. :
+        """
         #logging.getLogger().debug("widgetUpdate %s %r %r", timestamp, method, method_args)
         if self.instance_server_hwobj.isServer():
             BlissWidget.addEventToCache(timestamp,method,*method_args)
@@ -476,41 +496,68 @@ class Qt4_InstanceListBrick(BlissWidget):
                 BlissWidget.addEventToCache(timestamp,method,*method_args)
 
     def widgetCall(self,timestamp,method,method_args):
+        """
+        Descript. :
+        """
         try:
             method(*method_args)
         except:
             logging.getLogger().debug("Qt4_InstanceListBrick: problem executing an external call")
 
     def instanceLocationChanged(self,loc):
+        """
+        Descript. :
+        """
         logging.getLogger().info("Instance running in %s" % Qt4_InstanceListBrick.LOCATIONS[loc].lower())
 
     def instanceModeChanged(self,mode):
+        """
+        Descript. :
+        """
         logging.getLogger().info("Instance mode set to %s" % Qt4_InstanceListBrick.MODES[mode].lower())
         self.updateMirroring()
 
     def applicationTabChanged(self,tab_name,tab_index):
+        """
+        Descript. :
+        """
         if self.instance_server_hwobj is not None:
             tab_event=AppTabEvent(tab_name,tab_index)
             QtGui.QApplication.postEvent(self,tab_event)
 
     def applicationBrickChanged(self,brick_name,widget_name,method_name,method_args,masterSync):
+        """
+        Descript. :
+        """
         if not masterSync or self.instance_server_hwobj is not None:
             brick_event=AppBrickEvent(brick_name,widget_name,method_name,method_args,masterSync)
             QtGui.QApplication.postEvent(self,brick_event)
 
     def initName(self,new_name):
+        """
+        Descript. :
+        """
         self.nickname_ledit.setText(new_name)
         self.nickname_ledit.acceptInput()
 
     def changeMyName(self):
+        """
+        Descript. :
+        """
         self.nickname_ledit.setEnabled(False)
         name=str(self.nickname_ledit.text())
         self.instance_server_hwobj.requestIdChange(name)
 
     def askForControlClicked(self):
+        """
+        Descript. :
+        """ 
         self.instance_server_hwobj.askForControl()
 
     def takeControlClicked(self):
+        """
+        Descript. :
+        """
         current_user=self.instance_server_hwobj.inControl()
         user_id=current_user[0]
         user_prop=current_user[1]
@@ -529,20 +576,32 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.instance_server_hwobj.takeControl()
 
     def run(self):
+        """
+        Descript. :
+        """
         if self['initializeServer']:
             start_server_event=StartServerEvent()
             QtGui.QApplication.postEvent(self,start_server_event)
 
     def instanceUserIdChanged(self,userid):
+        """
+        Descript. :
+        """
         logging.getLogger().info("Instance user identification is %s" % Qt4_InstanceListBrick.IDS[userid].replace("_"," ").lower())
         self.updateMirroring()
 
     def instanceRoleChanged(self,role):
+        """
+        Descript. :
+        """
         logging.getLogger().info("Instance role is %s" % Qt4_InstanceListBrick.ROLES[role].replace("_"," ").lower())
         if role!=BlissWidget.INSTANCE_ROLE_UNKNOWN and not self.isShown():
             self.show()
 
     def newClient(self,client_id):
+        """
+        Descript. :
+        """
         client_print=self.instance_server_hwobj.idPrettyPrint(client_id)
         if self.clientIcon is None:
             item = QtGui.QListWidgetItem(client_print, self.users_listwidget) 
@@ -554,6 +613,9 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.connections[client_id[0]]=(item,client_id[1])
 
     def clientClosed(self,client_id):
+        """
+        Descript. :
+        """
         try:
             item=self.connections[client_id[0]][0]
         except KeyError:
@@ -563,6 +625,9 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.users_listwidget.takeItem(self.users_listwidget.row(item))
 
     def clientChanged(self,old_client_id,new_client_id):
+        """
+        Descript. :
+        """
         try:
             item=self.connections[old_client_id[0]][0]
         except KeyError:
@@ -575,15 +640,18 @@ class Qt4_InstanceListBrick(BlissWidget):
             if new_client_id[0]!=old_client_id[0]:
                 self.connections[new_client_id[0]]=self.connections[old_client_id[0]]
                 self.connections.pop(old_client_id[0])
-                if self.in_control is not None and old_client_id[0]==self.inControl[0]:
+                if self.in_control is not None and old_client_id[0]==self.in_control[0]:
                     self.in_control[0]=new_client_id[0]
             else:
-                if self.in_control is not None and old_client_id[0]==self.inControl[0]:
+                if self.in_control is not None and old_client_id[0]==self.in_control[0]:
                     self.in_control[1]=new_client_id[1]
                     self.updateMirroring()
             self.users_listwidget.updateGeometries()
 
     def user_selected(self,item):
+        """
+        Descript. :
+        """
         if item is None:
             return
         if BlissWidget.isInstanceModeMaster() and self.give_control_chbox.isChecked():
@@ -593,6 +661,9 @@ class Qt4_InstanceListBrick(BlissWidget):
                     break
 
     def haveControl(self,have_control,gui_only=False):
+        """
+        Descript. :
+        """
         if not gui_only:
             if have_control:
                 BlissWidget.setInstanceMode(BlissWidget.INSTANCE_MODE_MASTER)
@@ -666,6 +737,9 @@ class Qt4_InstanceListBrick(BlissWidget):
                 logging.getLogger('user_level_log').warning("You have lost control of the application!")
 
     def passControl(self,has_control_id):
+        """
+        Descript. :
+        """
         try:
             control_item=self.connections[has_control_id[0]][0]
         except KeyError:
@@ -683,6 +757,9 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.updateMirroring()
 
     def updateMirroring(self):
+        """
+        Descript. :
+        """
         if BlissWidget.isInstanceModeSlave():
             if BlissWidget.isInstanceUserIdUnknown():
                 if BlissWidget.isInstanceRoleServer() and self.in_control is not None and self.in_control[1] is None:
@@ -704,7 +781,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                     except:
                         my_prop_codes=[]
                     try:
-                        control_prop_codes=[self.in_control[1]['code'],self.inControl[1]['alias']]
+                        control_prop_codes=[self.in_control[1]['code'],self.in_control[1]['alias']]
                     except:
                         control_prop_codes=[]
                     mirror=BlissWidget.INSTANCE_MIRROR_PREVENT
@@ -729,6 +806,9 @@ class Qt4_InstanceListBrick(BlissWidget):
             BlissWidget.setInstanceMirror(BlissWidget.INSTANCE_MIRROR_PREVENT)
 
     def timeoutApproaching(self):
+        """
+        Descript. :
+        """
         if self.give_control_chboxDialog is not None:
             if self.timeout_left in (30,20,10):
                 self.instance_server_hwobj.sendChatMessage(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,"%s will have control in %d seconds..." % (self.give_control_chboxDialog.nickname,self.timeout_left))
@@ -739,9 +819,9 @@ class Qt4_InstanceListBrick(BlissWidget):
                 self.give_control_chboxDialog.setButtonText(QtGui.QMessageBox.Yes,"Allow (%d secs)" % self.timeout_left)
 
     def event(self, event):
-
-        #logging.getLogger().debug("Qt4_InstanceListBrick: custom event (%s)" % str(event))
-         
+        """
+        Descript. :
+        """
         if self.isRunning():
             if event.type() == WANTS_CONTROL_EVENT:
                 try:
@@ -850,6 +930,9 @@ class Qt4_InstanceListBrick(BlissWidget):
         return QtGui.QWidget.event(self, event)
 
     def wantsControl(self,client_id):
+        """
+        Descript. :
+        """
         if BlissWidget.isInstanceModeMaster() and self.give_control_chboxDialog is None and self.allow_timeout_control_chbox.isChecked():
             self.timeout_left=self['giveControlTimeout']
             client_print=self.instance_server_hwobj.idPrettyPrint(client_id)
@@ -880,6 +963,9 @@ class LineEditInput(QtGui.QLineEdit):
                      "WARNING" : QtCore.Qt.yellow}
     
     def __init__(self, parent):
+        """
+        Descript. :
+        """
         QtGui.QLineEdit.__init__(self, parent)
         QtCore.QObject.connect(self, QtCore.SIGNAL('textChanged(const QString &)'), self.txtChanged)
         QtCore.QObject.connect(self, QtCore.SIGNAL('returnPressed()'), self.retPressed)
@@ -900,6 +986,9 @@ class LineEditInput(QtGui.QLineEdit):
                                                       QtGui.QPalette.Background).color())
 
     def retPressed(self):
+        """
+        Descript. :
+        """
         if self.validator() is not None:
             if self.hasAcceptableInput():
                 self.emit(QtCore.SIGNAL("returnPressed"))
@@ -907,9 +996,15 @@ class LineEditInput(QtGui.QLineEdit):
             self.emit(QtCore.SIGNAL("returnPressed"))
 
     def text(self):
+        """
+        Descript. :
+        """
         return str(QtGui.QLineEdit.text(self))
 
     def txtChanged(self,txt):
+        """
+        Descript. :
+        """
         txt=str(txt)
         valid=None
         if self.validator() is not None:
@@ -954,27 +1049,42 @@ class LineEditInput(QtGui.QLineEdit):
             self.emit(QtCore.SIGNAL("inputValid"), self, valid)
 
     def sizeHint(self):
+        """
+        Descript. :
+        """
         size_hint=QtGui.QLineEdit.sizeHint(self)
         size_hint.setWidth(size_hint.width()/3)
         return size_hint
                 
     def setReadOnly(self,readonly):
+        """
+        Descript. :
+        """
         if readonly:
             self.setPalette(self.palette2)
         else:
             self.setPalette(self.origPalette)
-        QtGui.QLineEdit.setReadOnly(self,readonly)
-        
+        QtGui.QLineEdit.setReadOnly(self,readonly)       
+ 
     def origBackgroundColor(self):
+        """
+        Descript. :
+        """
         return self.origPalette.disabled().background()
 
     def setDefaultColor(self,color=None):
+        """
+        Descript. :
+        """
         self.colorDefault=color
         self.txtChanged(self.text())
 
 
 class NickEditInput(LineEditInput):
     def txtChanged(self,txt):
+        """
+        Descript. :
+        """
         txt=str(txt)
         valid=None
         if self.validator() is not None:
@@ -993,6 +1103,9 @@ class NickEditInput(LineEditInput):
             self.emit(QtCore.SIGNAL("inputValid"), self, valid)
 
     def acceptInput(self):
+        """
+        Descript. :
+        """
         Qt4_widget_colors.set_widget_color(self, 
                                            LineEditInput.PARAMETER_STATE["OK"],
                                            QtGui.QPalette.Base)
