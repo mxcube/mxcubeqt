@@ -33,6 +33,7 @@ class XRFScanParametersWidget(qt.QWidget):
         widget.reparent(self, qt.QPoint(0, 0))
         self.position_widget = widget
         self.position_widget.setFixedSize(457, 350) 
+        #self.position_widget.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
 
         self.mca_spectrum = McaSpectrumBrick(self)
         self.mca_spectrum.setSizePolicy(qt.QSizePolicy.Expanding,qt.QSizePolicy.Expanding)
@@ -88,6 +89,9 @@ class XRFScanParametersWidget(qt.QWidget):
     def populate_widget(self, item):
         self._tree_view_item = item
         self.xrf_scan = item.get_model()
+        self.data_path_widget.update_data_model(self.xrf_scan.path_template)  
+        self.count_time_ledit.setText(str(self.xrf_scan.count_time)) 
+
         executed = self.xrf_scan.is_executed()
 
         self.data_path_widget.setEnabled(not executed)
@@ -96,17 +100,20 @@ class XRFScanParametersWidget(qt.QWidget):
  
         if executed:
             result = self.xrf_scan.get_scan_result()
-            self.mca_spectrum.setData(result.mca_data, result.mca_calib, result.mca_config) 
+            if not None in (result.mca_data, result.mca_calib, result.mca_config):
+                self.mca_spectrum.setData(result.mca_data, result.mca_calib, result.mca_config) 
         else:
             self.mca_spectrum.clear()
-        
-        self.data_path_widget.update_data_model(self.xrf_scan.path_template)  
-        self.count_time_ledit.setText(str(self.xrf_scan.count_time)) 
 
         image = self.xrf_scan.centred_position.snapshot_image
         if image:
             try:
-               image = image.scale(427, 320)
+               w = image.width()
+               h = image.height()
+               ratio = w/float(h)
+               h2 = self.data_path_widget.height()+self.other_parameters_gbox.height()
+               w2 = h2 * ratio
+               image = image.scale(w2, h2)
                self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
             except:
                pass 

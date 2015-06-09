@@ -1,0 +1,5 @@
+<equipment class = "EMBLSC">
+   <!-- <channel type="tine" name="chanPuckSwitches" tinename="/TEST/collection/puckSwitches">position</channel>
+   <channel type="tine" name="chanSelectedPuck" tinename="/TEST/collection/mountedPuck">position</channel>
+   <channel type="tine" name="chanSelectedSample" tinename="/TEST/collection/mountedSample">position</channel> -->
+</equipment>

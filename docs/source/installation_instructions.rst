@@ -1,4 +1,4 @@
-Installing mxCuBE
+How to install MXCuBE
 -----------------
 .. rubric:: Git repository
 The MxCuBE Git repository can be found `here https://github.com/mxcube/mxcube`_

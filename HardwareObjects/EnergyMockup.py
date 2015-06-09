@@ -12,11 +12,10 @@ class EnergyMockup(Equipment):
 
        self.canMoveEnergy = self.can_move_energy
        self.move_energy = self.start_move_energy 
+       self.getEnergyLimits  = self.get_energy_limits
 
    def update_values(self):
        self.emit("energyChanged", self.energy_value, self.wavelength_value)
-
-   
 
    def can_move_energy(self):
        return self.tunable

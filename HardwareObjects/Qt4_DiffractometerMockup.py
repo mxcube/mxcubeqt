@@ -92,10 +92,14 @@ class Qt4_DiffractometerMockup(Equipment):
         self.connect(self, 'equipmentNotReady', self.equipmentNotReady)
 
         #IK - this will be sorted out
-        self.startCentringMethod = self.start_centring_method 
+        self.startCentringMethod = self.start_centring_method
+        self.cancelCentringMethod = self.cancel_centring_method
         self.imageClicked = self.image_clicked
         self.acceptCentring = self.accept_centring
         self.rejectCentring = self.reject_centring
+        self.getCentringStatus = self.get_centring_status
+        self.takeSnapshots = self.take_snapshots
+        self.moveMotors = self.move_motors
 
     def init(self):
         """
@@ -354,7 +358,6 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
-        print "image_clicked: ",x ,y 
         self.user_clicked_event.set((x, y))
 	
     def emit_cetring_started(self, method):
@@ -490,6 +493,9 @@ class Qt4_DiffractometerMockup(Equipment):
         Descript. :
         """
         return
+
+    def move_motors(self, motors_dict):
+        return
      
     def start_2D_centring(self):
         """
@@ -518,8 +524,8 @@ class Qt4_DiffractometerMockup(Equipment):
         centred_images = []
         for index in range(image_count):
             logging.getLogger("HWR").info("MiniDiff: taking snapshot #%d", index + 1)
-            centred_images.append((0, str(myimage(drawing))))
-            centred_images.reverse() 
+            #centred_images.append((0, str(myimage(drawing))))
+            #centred_images.reverse() 
         return centred_images
 
     def take_snapshots(self, image_count, wait = False):

@@ -463,7 +463,9 @@ class DataCollectTree(QtGui.QWidget):
         #    view_item = cls(parent_tree_item, task.get_display_name())
 
         if isinstance (task, queue_model_objects.Basket):
-            view_item.setExpanded(task.get_is_present())
+            #TODO fix this 
+            #view_item.setExpanded(task.get_is_present())
+            view_item.setExpanded(True)
         else:
             view_item.setExpanded(True)
         self.queue_model_hwobj.view_created(view_item, task)

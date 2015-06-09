@@ -120,6 +120,9 @@ class TaskNode(object):
 
         return name_list
 
+    def get_display_name(self):
+        return self.get_name()
+
     def get_path_template(self):
         return None
 
@@ -329,17 +332,29 @@ class Sample(TaskNode):
         return processing_params
 
 class Basket(TaskNode):
+    """
+    Class represents a basket in the tree. It has not task assigned.
+    It represents a parent for samples with the same basket id.
+    """
     def __init__(self):
         TaskNode.__init__(self)
         self.name = str()
         self.location = None
-        self.is_present = False
         self.free_pin_mode = False
+        self.sample_list = []
+
+    @property
+    def is_present(self):
+        return self.get_is_present()
 
     def init_from_sc_basket(self, sc_basket):
-        self.location = sc_basket[0]
-        self.name = "Puck %d" % self.location
-        self.is_present = sc_basket[2]
+        print "init_from_sc_basket... ", sc_basket 
+        self._basket_object = sc_basket[1] #self.is_present = sc_basket[2]
+        self.location = self._basket_object.getCoords() #sc_basket[0]
+        if len(self.location) == 2:
+            self.name = "Cell %d, puck %d" % self.location
+        else:
+            self.name = "Puck %d" % self.location
 
     def get_name(self):
         return self.name
@@ -348,11 +363,17 @@ class Basket(TaskNode):
         return self.location
 
     def get_is_present(self):
-        return self.is_present
+        self._basket_object.present
 
-    def set_is_present(self, present):
-        self.is_present = present
+    def clear_sample_list(self):
+        self.sample_list = []
 
+    def add_sample(self, sample):
+        self.sample_list.append(sample) 
+
+    def get_sample_list(self):
+        return self.sample_list
+ 
 
 class DataCollection(TaskNode):
     """
@@ -438,9 +459,9 @@ class DataCollection(TaskNode):
     def set_experiment_type(self, exp_type):
         self.experiment_type = exp_type
         if self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.MESH:
-            self.set_requires_centring(False)       
+            self.set_requires_centring(False)
 
-    def get_name(self): 
+    def get_name(self):
         return '%s_%i' % (self._name, self._number)
 
     def is_collected(self):
@@ -459,7 +480,7 @@ class DataCollection(TaskNode):
         return file_locations
 
     def get_centred_positions(self):
-        centred_pos = [] 
+        centred_pos = []
         for pos in self.acquisitions:
              centred_pos.append(pos.acquisition_parameters.centred_position)
         return centred_pos
@@ -492,20 +513,43 @@ class DataCollection(TaskNode):
         return new_node
 
     def get_point_index(self):
+        """
+        Descript. : Returns point index associated to the data collection
+        Args.     :
+        Return    : index (integer)
+        """
         cp = self.get_centred_positions()
         return cp[0].get_index()
 
     def get_helical_point_index(self):
+        """
+        Descript. : Return indexes of points associated to the helical line
+        Args.     :
+        Return    : index (integer), index (integer)
+        """ 
         cp = self.get_centred_positions()
-        return cp[0].get_index(), cp[1].get_index() 
- 
+        return cp[0].get_index(), cp[1].get_index()
+
     def set_grid_id(self, grid_id):
+        """
+        Descript. : Sets grid id associated to the data collection
+        Args.     : grid_id (integer)
+        Return    : 
+        """
         self.grid_id = grid_id
 
     def get_display_name(self):
+        """
+        Descript. : Returns display name depending from collection type
+        Args.     :
+        Return    : display_name (string)
+        """
         if self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
             start_index, end_index = self.get_helical_point_index()
-            display_name = "%s (Line - %d:%d)" %(self.get_name(), start_index, end_index)
+            if not None in (start_index, end_index):
+                display_name = "%s (Line - %d:%d)" %(self.get_name(), start_index, end_index)
+            else:
+                display_name = self.get_name()
         elif self.experiment_type == queue_model_enumerables.EXPERIMENT_TYPE.MESH:
             display_name = "%s (%s)" %(self.get_name(), self.grid_id)
         else:
@@ -590,10 +634,20 @@ class Characterisation(TaskNode):
         return new_node
 
     def get_point_index(self):
+        """
+        Descript. : Returns point index associated to the data collection
+        Args.     :
+        Return    : index (integer)
+        """
         cp = self.get_centred_positions()
         return cp[0].get_index()
 
     def get_display_name(self):
+        """
+        Descript. : Returns display name of the collection
+        Args.     :
+        Return    : display_name (string)
+        """
         index = self.get_point_index()
         if index:
             index = str(index)
@@ -777,9 +831,12 @@ class EnergyScanResult(object):
         self.title = None
 
 class XRFScan(TaskNode):
+    """
+    Descript. : Class represents XRF scan task
+    """ 
     def __init__(self, sample=None, path_template=None, cpos=None):
         TaskNode.__init__(self)
-        self.count_time = None 
+        self.count_time = 1
         self.set_requires_centring(True)
         self.centred_position = cpos
 
@@ -853,6 +910,9 @@ class SampleCentring(TaskNode):
 
         if name:
             self.set_name(name)
+ 
+        self.kappa = kappa
+        self.kappa_phi = kappa_phi
 
         self.kappa = kappa
         self.kappa_phi = kappa_phi 
@@ -869,7 +929,7 @@ class SampleCentring(TaskNode):
     def get_kappa(self):
         return self.kappa
 
-    def get_kappa_phi(self): 
+    def get_kappa_phi(self):
         return self.kappa_phi
 
 class Acquisition(object):
@@ -965,7 +1025,9 @@ class PathTemplate(object):
         :returns: Archive directory.
         :rtype: str
         """
-        """folders = self.directory.split('/')
+        #TODO make this site specifi 
+
+        folders = self.directory.split('/')
         endstation_name = None
         
         if 'visitor' in folders:
@@ -979,9 +1041,7 @@ class PathTemplate(object):
             folders[2] = 'store'
             folders[3] = endstation_name
 
-        return archive_directory"""
-
-	return self.directory
+        return archive_directory
 
     def get_files_to_be_written(self):
         file_locations = []
@@ -1045,7 +1105,7 @@ class AcquisitionParameters(object):
         self.detector_mode = int()
         self.induce_burn = False
         self.mesh_steps = int()
-        self.mesh_range = ()
+        self.mesh_range = ()        
 
 
 class Crystal(object):
@@ -1114,7 +1174,6 @@ class CentredPosition(object):
         return self.kappa_phi
 
 
-
 class Workflow(TaskNode):
     def __init__(self):
         TaskNode.__init__(self)
@@ -1135,7 +1194,7 @@ class Workflow(TaskNode):
 #
 # Collect hardware object utility function.
 #
-def to_collect_dict(data_collection, session, sample):
+def to_collect_dict(data_collection, session, sample, centred_pos=None):
     """ return [{'comment': '',
           'helical': 0,
           'motors': {},
@@ -1220,7 +1279,8 @@ def to_collect_dict(data_collection, session, sample):
              #'file_exists': 0,
              'experiment_type': queue_model_enumerables.\
              EXPERIMENT_TYPE_STR[data_collection.experiment_type],
-             'skip_images': acq_params.skip_existing_images}]
+             'skip_images': acq_params.skip_existing_images,
+             'motors': centred_pos.as_dict() if centred_pos is not None else {}}]
 
 
 def dc_from_edna_output(edna_result, reference_image_collection,

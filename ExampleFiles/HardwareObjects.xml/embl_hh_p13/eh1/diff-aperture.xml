@@ -1,0 +1,32 @@
+<device class="BeamAperture">
+    <exporter_address>p13md201.embl-hamburg.de:9001</exporter_address>
+   <channel type="exporter" name="CurrentApertureDiameterIndex">CurrentApertureDiameterIndex</channel>
+   <defaultPosition>100mu</defaultPosition>	
+   <positions> 	    
+      <position>
+	  <posName>100</posName>
+          <modesAllowed>['Unfocused', 'Horizontal', 'Vertical']</modesAllowed>
+ 	  <size>[0.10, 0.10]</size>
+      </position>
+      <position>
+	 <posName>70</posName>
+	 <modesAllowed>['Unfocused','Horizontal', 'Vertical', 'Double']</modesAllowed>
+         <size>[0.070, 0.070]</size>
+      </position>
+      <position>
+	 <posName>50</posName>
+         <modesAllowed>['Unfocused', 'Horizontal', 'Vertical', 'Double']</modesAllowed>
+	 <size>[0.050, 0.050]</size>
+      </position>
+      <position>
+         <posName>30</posName>
+         <modesAllowed>['Unfocused','Horizontal', 'Vertical', 'Double']</modesAllowed>
+         <size>[0.030, 0.030]</size>
+      </position>
+      <position>
+         <posName>15</posName>
+         <modesAllowed>['Unfocused', 'Horizontal', 'Vertical', 'Double']</modesAllowed>
+         <size>[0.0150, 0.0150]</size>
+      </position>
+   </positions>
+</device>

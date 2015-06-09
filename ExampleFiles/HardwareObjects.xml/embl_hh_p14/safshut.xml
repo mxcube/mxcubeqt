@@ -1,0 +1,16 @@
+<device class="TINEIcsShutter">
+  <username>TINEIcsShutter</username>
+
+  <command type="tine" name="cmdOpenShutter" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">OpenBeamShutter14.1</command>
+  <command type="tine" name="cmdCloseShutter" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">CloseBeamShutter14.1</command>
+  <channel type="tine" name="chanCollectStatus" tinename="/P14/collection/mx-standard" attach="event">status</channel>
+  <channel type="tine" name="chanShutterPermCondAbs" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="100">ABS14_0_offen</channel>
+  <channel type="tine" name="chanShutterPermCondBp" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="100">G14_2a_SFGerteilt</channel>
+  <channel type="tine" name="chanShutterIsOpen" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="100">BS14_1_offen</channel>
+
+  <shutterOpenPermissionCondBp>0</shutterOpenPermissionCondBp>
+  <shutterOpenPermissionCondAbs>0</shutterOpenPermissionCondAbs>
+  <shutterIsOpenCondition>0</shutterIsOpenCondition>
+
+  <useShutter>True</useShutter>
+</device>

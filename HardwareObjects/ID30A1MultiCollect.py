@@ -1,11 +1,14 @@
 from ESRFMultiCollect import *
+import HardwareRepository
 from detectors.LimaPilatus import Pilatus
 import gevent
 import shutil
 import logging
 import os
+import PyTango
+import decimal
 
-class ID30MultiCollect(ESRFMultiCollect):
+class ID30A1MultiCollect(ESRFMultiCollect):
     def __init__(self, name):
         ESRFMultiCollect.__init__(self, name, PixelDetector(Pilatus), FixedEnergy(0.965, 12.8))
 
@@ -23,10 +26,6 @@ class ID30MultiCollect(ESRFMultiCollect):
       file_info = data_collect_parameters["fileinfo"]
       diagfile = os.path.join(file_info["directory"], file_info["prefix"])+"_%d_diag.dat" % file_info["run_number"]
       self.getObjectByRole("diffractometer").controller.set_diagfile(diagfile)
-
-    @task
-    def take_crystal_snapshots(self, number_of_snapshots):
-        self.bl_control.diffractometer.takeSnapshots(number_of_snapshots, wait=True)
 
     @task
     def get_beam_size(self):
@@ -68,6 +67,7 @@ class ID30MultiCollect(ESRFMultiCollect):
         motion = ESRFMultiCollect.move_motors(self,motors_to_move_dict,wait=False)
 
         cover_task = self.getObjectByRole("eh_controller").detcover.set_out(wait=False, timeout=15)
+
         self.getObjectByRole("beamstop").moveToPosition("in")
         self.getObjectByRole("light").wagoOut()
 
@@ -99,20 +99,19 @@ class ID30MultiCollect(ESRFMultiCollect):
     def set_helical_pos(self, helical_oscil_pos):
         self.helical_pos = helical_oscil_pos
 
-    def get_flux(self):
-        return 1E12
-
     def set_transmission(self, transmission):
     	self.getObjectByRole("transmission").set_value(transmission)
 
     def get_transmission(self):
         return self.getObjectByRole("transmission").get_value()
 
-    def get_cryo_temperature(self):
-        return 0
-
     @task
     def prepare_intensity_monitors(self):
+        self.getObjectByRole("diffractometer").controller.set_diode_autorange('i0', True, 'i1', False) 
+        self.getObjectByRole("diffractometer").controller.diode(True, False)
+        i0_range = decimal.Decimal(str(self.getObjectByRole("diffractometer").controller.get_diode_range()[0]))
+        i1_range = float(str(i0_range.as_tuple().digits[0])+ 'e' + str(len(i0_range.as_tuple().digits[1:]) + i0_range.as_tuple().exponent))        
+        self.getObjectByRole("diffractometer").controller.set_i1_range(i1_range)
         return
 
     def get_beam_centre(self):

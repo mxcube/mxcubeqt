@@ -430,7 +430,7 @@ class Qt4_TreeBrick(BlissWidget):
                 basket_index = basket.getIndex()
                 basket_code = basket.getID() or ""
                 is_present = basket.isPresent()
-                sc_basket_content.append((basket_index+1, basket_code, is_present))
+                sc_basket_content.append((basket_index+1, basket)) #basket_code, is_present))
 
             for sample in self.sample_changer_hwobj.getSampleList():
                 matrix = sample.getID() or ""

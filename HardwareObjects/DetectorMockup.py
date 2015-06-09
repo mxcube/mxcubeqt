@@ -46,7 +46,10 @@ class DetectorMockup(Equipment):
         self.temp_treshold = self.getProperty("tempThreshold") 
         self.hum_treshold = self.getProperty("humidityThreshold")
         
-        self.detector_modes_dict = eval(self.getProperty("detectorModes"))
+        try:
+           self.detector_modes_dict = eval(self.getProperty("detectorModes"))
+        except:
+           pass
 
     def get_collect_name(self):
         """
@@ -79,11 +82,17 @@ class DetectorMockup(Equipment):
         """
         return self.detector_mode
 
+    def default_mode(self):
+        return 1
+
     def get_detector_modes_list(self):
         """
         Descript. :
         """
-        return self.detector_modes_dict.keys()	
+        if self.detector_modes_dict is not None:
+            return self.detector_modes_dict.keys()	
+        else:
+            return [] 
 
     def has_shutterless(self):
         """

@@ -20,16 +20,12 @@ class ID30A3MultiCollect(ESRFMultiCollect):
       self.getObjectByRole("diffractometer").controller.set_diagfile(diagfile)
 
     @task
-    def take_crystal_snapshots(self, number_of_snapshots):
-        self.bl_control.diffractometer.takeSnapshots(number_of_snapshots, wait=True)
-
-    @task
     def get_beam_size(self):
         return self.bl_control.beam_info.get_beam_size()
  
     @task
     def get_slit_gaps(self):
-        return (0.1, 0.1)
+        return (self.bl_control.diffractometer.controller.hgap.position(), self.bl_control.diffractometer.controller.vgap.position())
 
     def get_measured_intensity(self):
         return 0
@@ -93,9 +89,6 @@ class ID30A3MultiCollect(ESRFMultiCollect):
 
     def set_helical_pos(self, helical_oscil_pos):
         self.helical_pos = helical_oscil_pos
-
-    def get_flux(self):
-        return 1E12
 
     def set_transmission(self, transmission):
     	self.getObjectByRole("transmission").set_value(transmission)

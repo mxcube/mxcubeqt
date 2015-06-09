@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>822</width>
-            <height>254</height>
+            <height>274</height>
         </rect>
     </property>
     <property name="caption">
@@ -70,7 +70,7 @@
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>first_iamge_label</cstring>
+                                                <cstring>first_image_label</cstring>
                                             </property>
                                             <property name="text">
                                                 <string>First image:</string>
@@ -78,18 +78,26 @@
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>transmission_label</cstring>
+                                                <cstring>energy_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Transmission (%):</string>
+                                                <string>Energy (keV):</string>
                                             </property>
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>exp_time_label</cstring>
+                                                <cstring>detector_mode_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Exposure time:</string>
+                                                <string>Detector mode:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>kappa_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Kappa:</string>
                                             </property>
                                         </widget>
                                     </vbox>
@@ -108,13 +116,13 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -125,47 +133,64 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
                                         </widget>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>transmission_ledit</cstring>
+                                                <cstring>energy_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                        <widget class="QComboBox">
+                                            <property name="name">
+                                                <cstring>detector_mode_combo</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>75</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
                                         </widget>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>exp_time_ledit</cstring>
+                                                <cstring>kappa_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -244,6 +269,22 @@
                                                 <string>Resolution (Å):</string>
                                             </property>
                                         </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>transmission_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Transmission (%):</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>kappa_phi_label</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Phi:</string>
+                                            </property>
+                                        </widget>
                                     </vbox>
                                 </widget>
                                 <widget class="QLayoutWidget">
@@ -260,13 +301,13 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -277,13 +318,13 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -294,13 +335,47 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>transmission_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>75</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>75</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>kappa_phi_ledit</cstring>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>75</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -370,10 +445,10 @@
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>energy_label</cstring>
+                                                <cstring>exp_time_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Energy (KeV):</string>
+                                                <string>Exposure time (s):</string>
                                             </property>
                                         </widget>
                                         <spacer>
@@ -409,13 +484,13 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
@@ -426,20 +501,20 @@
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>0</height>
                                                 </size>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>
-                                                    <width>50</width>
+                                                    <width>75</width>
                                                     <height>32767</height>
                                                 </size>
                                             </property>
                                         </widget>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>energy_ledit</cstring>
+                                                <cstring>exp_time_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>

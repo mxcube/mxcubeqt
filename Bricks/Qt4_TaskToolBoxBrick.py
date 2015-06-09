@@ -100,6 +100,11 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         if self.session_hwobj.session_id:
             self.setEnabled(True)
 
+        tree_brick = {}
+        self.emit(QtCore.SIGNAL("getTreeBrick"), tree_brick)
+        self.tree_brick = tree_brick.get('tree_brick', None)
+        self.task_tool_box_widget.set_tree_brick(self.tree_brick)
+
     def user_group_saved(self, new_user_group):
         """
         Descript. :
@@ -258,8 +263,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
                              motor_positions_to_screen(cpos.as_dict())
                 point = graphics_manager.Point(self.shape_history_hwobj.get_drawing(), 
                                          cpos, screen_pos)
-                print point
-                print point.get_index()
                 if point:
                     self.graphics_manager_hwobj.add_shape(point)
                     cpos.set_index(point.get_index())

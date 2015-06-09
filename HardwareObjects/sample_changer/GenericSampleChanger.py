@@ -251,7 +251,7 @@ class SampleChanger(Container,Equipment):
         :rtype: str
         """           
         return self.getLoadedSample() is not None
-              
+
     
     def is_mounted_sample(self, sample_location):
         try:
@@ -348,6 +348,7 @@ class SampleChanger(Container,Equipment):
 
     def chained_load(self, sample_to_unload, sample_to_load):
         self.unload(sample_to_unload)
+        self.waitReady(timeout=3)
         return self.load(sample_to_load)
 
     def load(self, sample=None, wait=True):    
