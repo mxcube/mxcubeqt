@@ -16,6 +16,10 @@ class ResolutionMockup(BaseHardwareObjects.Equipment):
         self.current_wavelength = 10
         self.energy = 12
 
+    def update_values(self):
+        self.emit("positionChanged", (self.currentResolution, ))
+        self.emit('valueChanged', (self.currentResolution, ))
+
     def beam_centre_updated(self, beam_pos_dict):
         pass
 
@@ -78,8 +82,7 @@ class ResolutionMockup(BaseHardwareObjects.Equipment):
 
     def newResolution(self, res):
         self.currentResolution = res
-        self.emit("positionChanged", (res, ))
-        self.emit('valueChanged', (res, ))
+        self.update_values()
 
     def getState(self):
         pass

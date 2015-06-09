@@ -21,12 +21,14 @@ implementations of tasks.
 """
 
 import gevent
+
 import traceback
 import logging
 import time
 import queue_model_objects_v1 as queue_model_objects
 import os
-import ShapeHistory as shape_history
+
+#import ShapeHistory as shape_history
 import autoprocessing
 
 #import edna_test_data
@@ -36,7 +38,7 @@ from collections import namedtuple
 from queue_model_enumerables_v1 import COLLECTION_ORIGIN_STR
 from queue_model_enumerables_v1 import CENTRING_METHOD
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
-from BlissFramework.Utils import widget_colors
+#from BlissFramework.Utils import widget_colors
 from HardwareRepository.HardwareRepository import dispatcher
 
 
@@ -322,13 +324,17 @@ class BaseQueueEntry(QueueEntryContainer):
 
         if self.get_data_model().is_executed():
             if self.status == QUEUE_ENTRY_STATUS.SUCCESS:
-                view.setBackgroundColor(widget_colors.LIGHT_GREEN)
+                view.set_background_color(1)
+                #view.set_background_color(widget_colors.LIGHT_GREEN)
             elif self.status == QUEUE_ENTRY_STATUS.WARNING:
-                view.setBackgroundColor(widget_colors.LIGHT_YELLOW)
+                view.set_background_color(2)
+                #view.set_background_color(widget_colors.LIGHT_YELLOW)
             elif self.status == QUEUE_ENTRY_STATUS.FAILED:
-                view.setBackgroundColor(widget_colors.LIGHT_RED)
+                view.set_background_color(3)
+                #view.set_background_color(widget_colors.LIGHT_RED)
         else:
-            view.setBackgroundColor(widget_colors.WHITE)
+            view.set_background_color(0)
+            #view.set_background_color(widget_colors.WHITE)
 
     def stop(self):
         """
@@ -344,7 +350,8 @@ class BaseQueueEntry(QueueEntryContainer):
 
         if view and isinstance(ex, QueueExecutionException):
             if ex.origin is self:
-                view.setBackgroundColor(widget_colors.LIGHT_RED)
+                print "view.set_background_color(widget_colors.LIGHT_RED) - implemenet"
+                #view.set_background_color(widget_colors.LIGHT_RED)
 
     def __str__(self):
         s = '<%s object at %s> [' % (self.__class__.__name__, hex(id(self)))
@@ -405,6 +412,9 @@ class TaskGroupQueueEntry(BaseQueueEntry):
     def post_execute(self):
         BaseQueueEntry.post_execute(self)
 
+class BasketQueueEntry(BaseQueueEntry):
+    def __init__(self, view=None, data_model=None):
+        BaseQueueEntry.__init__(self, view, data_model)
 
 class SampleQueueEntry(BaseQueueEntry):
     """
@@ -545,16 +555,17 @@ class SampleCentringQueueEntry(BaseQueueEntry):
         else:
             msg = "No centred position selected, using current position."
             log.info(msg)
-
             # Create a centred postions of the current postion
             pos_dict = self.diffractometer_hwobj.getPositions()
             cpos = queue_model_objects.CentredPosition(pos_dict)
-            pos = shape_history.Point(None, cpos, None) #, True)
+            #TODO fix thos
+            print "add point to the graphics"
+            #pos = shape_history.Point(None, cpos, None) #, True)
 
         # Get tasks associated with this centring
         tasks = self.get_data_model().get_tasks()
 
-        for task in tasks:
+        """for task in tasks:
             cpos = pos.get_centred_positions()[0]
 
             if pos.qub_point is not None:
@@ -564,7 +575,7 @@ class SampleCentringQueueEntry(BaseQueueEntry):
                 snapshot = self.shape_history.get_snapshot([])
 
             cpos.snapshot_image = snapshot 
-            task.set_centred_positions(cpos)
+            task.set_centred_positions(cpos)"""
 
         self.get_view().setText(1, 'Input accepted')
 
@@ -1090,8 +1101,6 @@ class EnergyScanQueueEntry(BaseQueueEntry):
         energy_scan.result.title = title
         energy_scan.result.data = self.energy_scan_hwobj.get_scan_data()
 
-        #energy_scan.result = sample.crystals[0].energy_scan_result
-
         logging.getLogger("user_level_log").\
             info("Energy scan, result: peak: %.4f, inflection: %.4f" %
                  (sample.crystals[0].energy_scan_result.peak,
@@ -1147,6 +1156,29 @@ class XRFScanQueueEntry(BaseQueueEntry):
             if sample_lims_id == -1:
                 sample_lims_id = None
 
+class XRFScanQueueEntry(BaseQueueEntry):
+    def __init__(self, view=None, data_model=None):
+        BaseQueueEntry.__init__(self, view, data_model)
+        self.xrf_scan_hwobj = None
+        self.session_hwobj = None
+        self.xrf_scan_task = None
+        self._failed = False
+
+    def execute(self):
+        BaseQueueEntry.execute(self)
+
+        if self.xrf_scan_hwobj is not None:
+            xrf_scan = self.get_data_model()
+            self.get_view().setText(1, "Starting xrf scan")
+
+            sample_model = self.get_data_model().\
+                           get_parent().get_parent()
+
+            sample_lims_id = sample_model.lims_id
+            # No sample id, pass None to startEnergyScan
+            if sample_lims_id == -1:
+                sample_lims_id = None
+
             self.xrf_scan_task = \
                 gevent.spawn(self.xrf_scan_hwobj.startXrfSpectrum,
                              xrf_scan.count_time,
@@ -1154,7 +1186,7 @@ class XRFScanQueueEntry(BaseQueueEntry):
                              xrf_scan.path_template.get_prefix(),
                              self.session_hwobj.session_id,
                              sample_lims_id)
-       
+
             self.xrf_scan_task.get()
             self.xrf_scan_hwobj.ready_event.wait()
             self.xrf_scan_hwobj.ready_event.clear()
@@ -1166,6 +1198,7 @@ class XRFScanQueueEntry(BaseQueueEntry):
         self._failed = False
         self.xrf_scan_hwobj = self.beamline_setup.xrf_scan_hwobj
         self.session_hwobj = self.beamline_setup.session_hwobj
+
         qc = self.get_queue_controller()
 
         qc.connect(self.xrf_scan_hwobj, 'xrfScanStatusChanged',
@@ -1222,8 +1255,9 @@ class XRFScanQueueEntry(BaseQueueEntry):
         self._failed = True
         self.get_view().setText(1, "Failed")
         self.status = QUEUE_ENTRY_STATUS.FAILED
-        logging.getLogger("user_level_log").error("XRF spectrum failed.")
-        raise QueueExecutionException("XRF spectrum failed", self)
+        logging.getLogger("user_level_log").error(message.replace('\n', ' '))
+        raise QueueExecutionException(message.replace('\n', ' '), self)
+
 
 class GenericWorkflowQueueEntry(BaseQueueEntry):
     def __init__(self, view=None, data_model=None):

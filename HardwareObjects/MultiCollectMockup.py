@@ -1,11 +1,11 @@
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from AbstractMultiCollect import *
+from gevent.event import AsyncResult
 import logging
 import time
 import os
 import httplib
 import math
-import gevent
 
 
 class MultiCollectMockup(AbstractMultiCollect, HardwareObject):
@@ -13,8 +13,15 @@ class MultiCollectMockup(AbstractMultiCollect, HardwareObject):
         AbstractMultiCollect.__init__(self)
         HardwareObject.__init__(self, name)
         self._centring_status = None
+        self._actual_frame_num = 0
+
+    def execute_command(self, command_name, *args, **kwargs): 
+        wait = kwargs.get("wait", True)
+        cmd_obj = self.getCommandObject(command_name)
+        return cmd_obj(*args, wait=wait)
+        
+    def init(self):
         self.ready_event = None
-        self.actual_frame_num = 0
 
     def execute_command(self, command_name, *args, **kwargs): 
         return
@@ -46,7 +53,7 @@ class MultiCollectMockup(AbstractMultiCollect, HardwareObject):
         return
 
     def do_prepare_oscillation(self, start, end, exptime, npass):
-        self.actual_frame_num = 0
+        self._actual_frame_num = 0
     
     @task
     def oscil(self, start, end, exptime, npass):
@@ -117,11 +124,10 @@ class MultiCollectMockup(AbstractMultiCollect, HardwareObject):
         return
       
     def write_image(self, last_frame):
-        self.actual_frame_num += 1
-        return
+        self._actual_frame_num += 1
 
     def last_image_saved(self):
-        return self.actual_frame_num
+        return self._actual_frame_num
 
     def stop_acquisition(self):
         return 
@@ -130,7 +136,6 @@ class MultiCollectMockup(AbstractMultiCollect, HardwareObject):
         return
 
     def prepare_input_files(self, files_directory, prefix, run_number, process_directory):
-        self.actual_frame_num = 0
         i = 1
         while True:
           xds_input_file_dirname = "xds_%s_run%s_%d" % (prefix, run_number, i)
@@ -271,6 +276,9 @@ class MultiCollectMockup(AbstractMultiCollect, HardwareObject):
     def get_archive_directory(self, directory):
         archive_dir = os.path.join(directory, 'archive')
         return archive_dir
+
+    def set_detector_mode(self, mode):
+        return
 
     @task
     def generate_image_jpeg(self, filename, jpeg_path, jpeg_thumbnail_path):

@@ -57,7 +57,6 @@ class AbstractMultiCollect(object):
         self.current_lims_sample = None
         self.__safety_shutter_close_task = None
 
-
     def setControlObjects(self, **control_objects):
       self.bl_control = BeamlineControl(**control_objects)
   
@@ -168,7 +167,7 @@ class AbstractMultiCollect(object):
 
     @abc.abstractmethod
     def last_image_saved(self):
-      pass
+        pass    
 
     @abc.abstractmethod
     @task

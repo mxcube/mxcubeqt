@@ -32,7 +32,8 @@ class XRFScanParametersWidget(qt.QWidget):
         widget = qtui.QWidgetFactory.create(widget_ui)
         widget.reparent(self, qt.QPoint(0, 0))
         self.position_widget = widget
-        self.position_widget.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
+        self.position_widget.setFixedSize(457, 350) 
+        #self.position_widget.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
 
         self.mca_spectrum = McaSpectrumBrick(self)
         self.mca_spectrum.setSizePolicy(qt.QSizePolicy.Expanding,qt.QSizePolicy.Expanding)
