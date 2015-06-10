@@ -41,12 +41,12 @@ class _stopIdle(qt.QTimer) :
         self.__motors = {}
         self.connect(self,qt.SIGNAL('timeout()'),self.__stopMotor);
     def addStopMotor(self,motor) :
-        self.__motors[motor.specversion] = motor
+        self.__motors[id(motor)] = motor
     def idle(self) :
         if not self.isActive() :
             self.start(0)
     def __stopMotor(self) :
-        for motor in self.__motors.values() :
+        for motor in self.__motors.itervalues() :
             motor.stop()
         self.__motors = {}
             
@@ -232,7 +232,7 @@ class MultiAxisAlignmentBrick(BlissWidget):
                 if hasattr(equipment,'isSampleStage') :
                     for pad in equipment.getAxisList() :
                         self.__createOnePad(pad)
-                elif equipment.__class__.__name__ == 'SpecMotor':
+                elif hasattr(equipment, 'move'): #.__class__.__name__ == 'SpecMotor':
                     self.__createOneAxis(equipment)
                 else :
                     self.__createOnePad(equipment)
