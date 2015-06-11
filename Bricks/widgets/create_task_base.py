@@ -405,6 +405,9 @@ class CreateTaskBase(qt.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
+            self._path_template = copy.deepcopy(self._path_template)
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
 
     def _update_etr(self):
         energy = self._beamline_setup_hwobj._get_energy()
