@@ -1,4 +1,23 @@
 #!/usr/bin/env python 
+
+#  Project: MXCuBE
+#  https://github.com/mxcube.
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
 import gevent
 import time
 import fcntl
@@ -7,25 +26,31 @@ import socket
 import sys
 import os
 import logging
-from optparse import OptionParser
 import traceback
-from qt import *
+from optparse import OptionParser
+
+from PyQt4 import QtCore
+from PyQt4 import QtGui
 
 import BlissFramework
-from BlissFramework import GUISupervisor
-from BlissFramework.Utils import ErrorHandler
-from BlissFramework.Utils import terminal_server
-from BlissFramework.Utils import GUILogHandler
+from BlissFramework import Qt4_GUISupervisor
+from BlissFramework.Utils import Qt4_ErrorHandler
+from BlissFramework.Utils import Qt4_GUILogHandler
+
+#from BlissFramework.Utils import terminal_server
 
 from HardwareRepository import HardwareRepository
 
 _logger = logging.getLogger()
-_GUIhdlr = GUILogHandler.GUILogHandler()
+_GUIhdlr = Qt4_GUILogHandler.GUILogHandler()
 _logger.addHandler(_GUIhdlr)
 
+
 def do_gevent():
-    # can't call gevent.run inside inner event loops (message boxes...)
-    if qApp.loopLevel() == 1:
+    """
+    Descript.  can't call gevent.run inside inner event loops (message boxes...)
+    """
+    if QtCore.QEventLoop():
         try:
           gevent.wait(timeout=0.01)
         except AssertionError:
@@ -33,21 +58,51 @@ def do_gevent():
     else:
         # all that I tried with gevent here fails! => seg fault
         pass
-    
-def run(GUIConfigFile=None):    
+
+class MyCustomEvent(QtCore.QEvent):
+    """
+    Descript. : 
+    """
+
+    def __init__(self, event_type, data):
+        """
+        Descript. : 
+        """
+        QtCore.QEvent.__init__(self, event_type)
+        self.data = data     
+
+def run(GUIConfigFile = None):    
+    """
+    Descript. : 
+    """
+
     defaultHwrServer = 'localhost:hwr'
     userHomeDir = os.path.expanduser("~") #path to user's home dir. (works on Win2K, XP, Unix, Mac...) 
 
     parser = OptionParser(usage = 'usage: %prog <GUI definition file> [options]')
-    parser.add_option('', '--logFile', action = 'store', type = 'string', help = 'Log file', dest = 'logFile', metavar = 'FILE', default = '')
-    parser.add_option('', '--logLevel', action = 'store', type = 'string', help = 'Log level', dest = 'logLevel', default = 'INFO')
-    parser.add_option('', '--bricksDirs', action = 'store', type = 'string', help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
-    parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
-    parser.add_option('', '--hardwareObjectsDirs', action = 'store', type = 'string', help = 'Additional directories for Hardware Objects search path (you can also use the CUSTOM_HARDWARE_OBJECTS_PATH environment variable)', dest = 'hardwareObjectsDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
-    parser.add_option('-d', '', action='store_true', dest="designMode", default=False, help="start GUI in Design mode")
-    parser.add_option('-m', '', action='store_true', dest="showMaximized", default=False, help="maximize main window")	
-    parser.add_option('', '--no-border', action='store_true', dest='noBorder', default=False, help="does not show borders on main window")
-    parser.add_option('-w', '--web-server-port', action='store', type="int", dest='webServerPort', default=0, help="port number for the remote interpreter web application server")
+    parser.add_option('', '--logFile', action = 'store', type = 'string', 
+                      help = 'Log file', dest = 'logFile', metavar = 'FILE', default = '')
+    parser.add_option('', '--logLevel', action = 'store', type = 'string', 
+                      help = 'Log level', dest = 'logLevel', default = 'INFO')
+    parser.add_option('', '--bricksDirs', action = 'store', type = 'string', 
+                      help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', 
+                      dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
+    parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', 
+                      help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, 
+                      metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
+    parser.add_option('', '--hardwareObjectsDirs', action = 'store', type = 'string', 
+                      help = 'Additional directories for Hardware Objects search path (you can also use the CUSTOM_HARDWARE_OBJECTS_PATH environment variable)', 
+                      dest = 'hardwareObjectsDirs', metavar = 'dir1' + os.path.pathsep + 'dir2...dirN', 
+                      default = '')
+    parser.add_option('-d', '', action='store_true', dest="designMode", 
+                      default=False, help="start GUI in Design mode")
+    parser.add_option('-m', '', action='store_true', dest="showMaximized", 
+                      default=False, help="maximize main window")	
+    parser.add_option('', '--no-border', action='store_true', dest='noBorder', 
+                      default=False, help="does not show borders on main window")
+    #parser.add_option('-s', '--syle', action='store', type="string", dest='style', default=0, help="GUI style")
+    parser.add_option('-w', '--web-server-port', action='store', type="int", 
+                      dest='webServerPort', default=0, help="port number for the remote interpreter web application server")
     #parser.add_option('', '--widgetcount', action='store_true', dest='widgetCount', default=False, help="prints debug message at the end about number of widgets left undestroyed")
 
     (opts, args) = parser.parse_args()
@@ -59,10 +114,10 @@ def run(GUIConfigFile=None):
             parser.error('Too many arguments.')
             sys.exit(1)
 
-    if opts.webServerPort:
+    """if opts.webServerPort:
         interpreter = terminal_server.InteractiveInterpreter()
         terminal_server.set_interpreter(interpreter) 
-        gevent.spawn(terminal_server.serve_forever, opts.webServerPort)
+        gevent.spawn(terminal_server.serve_forever, opts.webServerPort)"""
 
     #
     # get config from arguments
@@ -98,7 +153,7 @@ def run(GUIConfigFile=None):
     bricksDirs = filter(None, bricksDirs)
     hoDirs = filter(None, hoDirs)
     
-    app = QApplication([])
+    app = QtGui.QApplication([])
     lockfile = None
 
     if not opts.designMode and GUIConfigFile: 
@@ -189,7 +244,7 @@ def run(GUIConfigFile=None):
     #
     logLevel = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(logLevel)
-    logInfo = 'GUI started (%s)' % (GUIConfigFile or "unnamed")
+    logInfo = 'Qt4 GUI started (%s)' % (GUIConfigFile or "unnamed")
     logInfo += ', HWRSERVER=%s' % hwrServer
     if len(hoDirs) > 0:
         logInfo += ', HODIRS=%s' % os.path.pathsep.join(hoDirs)
@@ -197,28 +252,31 @@ def run(GUIConfigFile=None):
         logInfo += ', BRICKSDIRS=%s' % os.path.pathsep.join(bricksDirs)
     logging.getLogger().info(logInfo)
 
-    QApplication.setDesktopSettingsAware(False) #use default settings
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    QtGui.QApplication.setDesktopSettingsAware(False) #use default settings
+    QtCore.QObject.connect(app, QtCore.SIGNAL("lastWindowClosed()"), app.quit)
    
-    supervisor = GUISupervisor.GUISupervisor(designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
+    supervisor = Qt4_GUISupervisor.GUISupervisor(designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
 
     #BlissFramework.setDebugMode(True)
     #
     # post event for GUI creation
     #
-    app.postEvent(supervisor, QCustomEvent(GUISupervisor.LOAD_GUI_EVENT, GUIConfigFile))
+    #pp.postEvent(supervisor, QtCore.QEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, GUIConfigFile))
+    app.postEvent(supervisor, MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, GUIConfigFile))
         
     #
     # redirect errors to logger
     #
-    ErrorHandler.enableStdErrRedirection()
+    Qt4_ErrorHandler.enableStdErrRedirection()
 
-    timer = QTimer()
-    timer.connect(timer, SIGNAL("timeout()"), do_gevent)
-    timer.start(0)
+    gevent_timer = QtCore.QTimer()
+    gevent_timer.connect(gevent_timer, QtCore.SIGNAL("timeout()"), do_gevent)
+    gevent_timer.start(0)
 
-    
-    app.exec_loop()
+    app.exec_()
+
+
+
     """
     def process_qt_events():
       while True:
