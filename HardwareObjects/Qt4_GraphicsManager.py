@@ -71,22 +71,19 @@ class Qt4_GraphicsManager(HardwareObject):
          
         self.graphics_view.graphics_scene.addItem(self.graphics_camera_frame) 
         self.graphics_view.graphics_scene.addItem(self.graphics_beam_item)
-        self.graphics_view.graphics_scene.addItem(self.graphics_scale_item)
         self.graphics_view.graphics_scene.addItem(self.graphics_omega_reference_item)
         self.graphics_view.graphics_scene.addItem(self.graphics_centring_lines_item) 
-        self.graphics_view.graphics_scene.addItem(self.graphics_mesh_draw_item)
+        #self.graphics_view.graphics_scene.addItem(self.graphics_mesh_draw_item)
+        self.graphics_view.graphics_scene.addItem(self.graphics_scale_item)
 
         self.beam_info_dict = {}
         self.omega_axis_info_dict = {}
-        self.shapes_dict = {}
-        self.selected_shapes = {}
         self.centring_points = []
         self.centring_state = False
         self.mesh_drawing_state = False
         self.point_count = 0
-        self.selected_shapes = {}
 
-        QtCore.QObject.connect(self.graphics_view.scene(), 
+        """QtCore.QObject.connect(self.graphics_view.scene(), 
                                QtCore.SIGNAL('graphicsViewMouseClicked'), 
                                self.graphics_view_mouse_clicked)
         QtCore.QObject.connect(self.graphics_view.scene(),
@@ -94,8 +91,17 @@ class Qt4_GraphicsManager(HardwareObject):
                                self.graphics_view_mouse_released)
         QtCore.QObject.connect(self.graphics_view, 
                                QtCore.SIGNAL('graphicsViewMouseMoved'), 
-                               self.graphics_view_mouse_moved)
+                               self.graphics_view_mouse_moved)"""
 
+        self.graphics_view.scene().mouseClickedSignal.connect(\
+             self.graphics_view_mouse_clicked)
+        self.graphics_view.scene().mouseReleasedSignal.connect(\
+             self.graphics_view_mouse_released)
+        self.graphics_view.mouseMovedSignal.connect(
+             self.graphics_view_mouse_moved)
+        self.graphics_view.keyPressedSignal.connect(
+             self.graphics_view_key_pressed)
+        
     def graphics_view_mouse_clicked(self, x, y): 
         self.emit("graphicsClicked", x, y)
         if self.centring_state:
@@ -117,6 +123,12 @@ class Qt4_GraphicsManager(HardwareObject):
         if (self.mesh_drawing_state and 
             self.graphics_mesh_draw_item.is_draw_mode()):
             self.graphics_mesh_draw_item.set_draw_end_position(x, y)
+
+    def graphics_view_key_pressed(self, key_event):
+        if key_event == "Delete":
+            for item in self.graphics_view.graphics_scene.items():
+                if item.isSelected():
+                    self.delete_shape(item)
 
     def get_graphics_view(self):
         return self.graphics_view
@@ -145,7 +157,11 @@ class Qt4_GraphicsManager(HardwareObject):
         """
         :returns: All the shapes currently handled.
         """
-        return self.shapes_dict.values()
+        shapes_list = []
+        for shape in self.graphics_view.graphics_scene.items():
+            if type(shape) in (GraphicsItemPoint, GraphicsItemLine, GraphicsItemMesh):
+                shapes_list.append(shape)                 
+        return shapes_list
 
     def get_points(self):
         """
@@ -154,7 +170,7 @@ class Qt4_GraphicsManager(HardwareObject):
         current_points = []
 
         for shape in self.get_shapes():
-            if isinstance(shape, GraphicsItemCentredPoint):
+            if isinstance(shape, GraphicsItemPoint):
                 current_points.append(shape)
 
         return current_points
@@ -165,30 +181,20 @@ class Qt4_GraphicsManager(HardwareObject):
 
         :param shape: Shape to add.
         :type shape: Shape object.
-
         """
-        if isinstance(shape, GraphicsItemCentredPoint):
+        self.de_select_all()
+        shape.setSelected(True) 
+
+        if isinstance(shape, GraphicsItemPoint):
             self.point_count += 1
             shape.set_index(self.point_count)
             
         self.graphics_view.graphics_scene.addItem(shape)
-        self.shapes_dict[shape] = shape
 
     def _delete_shape(self, shape):
-        shape.unhighlight()
-
-        if shape in self.selected_shapes:
-            if isinstance(shape, GraphicsItemCentredPoint):
-                self.point_count -= 1   
-            del self.selected_shapes[shape]
-            if callable(self._drawing_event.selection_cb):
-                self._drawing_event.selection_cb(self.selected_shapes.values())
-
-        if shape is self._drawing_event.current_shape:
-            self._drawing_event.current_shape = None
-
-        if callable(self._drawing_event.deletion_cb):
-            self._drawing_event.deletion_cb(shape)
+        if isinstance(shape, GraphicsItemPoint):
+            self.point_count -= 1  
+        self.graphics_view.graphics_scene.removeItem(shape)
 
     def delete_shape(self, shape):
         """
@@ -197,59 +203,29 @@ class Qt4_GraphicsManager(HardwareObject):
         :param shape: The shape to remove
         :type shape: Shape object.
         """
-        related_points = []
-
-        #If a point remove related line first
-        if isinstance(shape, GraphicsItemLine):
+        if isinstance(shape, GraphicsItemPoint):
             for s in self.get_shapes():
                 if isinstance(s, GraphicsItemLine):
-                    
-                    print "fix"
-                    for s_qub_obj in s.get_qub_objects():
-                        if  s_qub_obj in shape.get_qub_objects():
-                            self._delete_shape(s)
-                            related_points.append(s)
-                            break
-
+                    if shape in (s.cp_start, s.cp_start):
+                        self._delete_shape(s)
+                        break
         self._delete_shape(shape)
-        del self.shapes_dict[shape]
-
-        # Delete the related shapes after self._delete_shapes so that
-        # related object still exists when calling delete call back.
-        for point in related_points:
-            del self.shapes_dict[point]
-
-    def move_shape(self, shape, new_positions):
-        """
-        Moves the shape <shape> to the position <new_position>
-
-        :param shape: The shape to move
-        :type shape: Shape
-
-        :param new_position: A tuple (X, Y)
-        :type new_position: <int, int>
-        """
-        self.shapes_dict[shape].move(new_positions)
 
     def clear_all(self):
         """
         Clear the shape history, remove all contents.
         """
-        for shape in self.shapes_dict:
-            self._delete_shape(shape)
-
-        self.shapes_dict.clear()
+        print "clear all TODO"
 
     def de_select_all(self):
         self.graphics_view.graphics_scene.clearSelection()
-        #self._drawing_event.de_select_all()
 
     def select_shape_with_cpos(self, cpos):
-        self._drawing_event.de_select_all()
+        self.de_select_all()
         for shape in self.get_shapes():
-            if isinstance(shape, GraphicsItemCentredPoint):
+            if isinstance(shape, GraphicsItemPoint):
                 if shape.get_centred_positions()[0] == cpos:
-                    self._drawing_event.set_selected(shape, True, call_cb = False)
+                    shape.setSelected(True)
 
     def get_grid(self):
         """
@@ -262,30 +238,13 @@ class Qt4_GraphicsManager(HardwareObject):
     def set_grid_data(self, key, result_data):
         dispatcher.send("set_grid_data", self, key, result_data)
 
-    def select_shape(self, shape):
-        """
-        Select the shape <shape> (programmatically).
-
-        :param shape: The shape to select.
-        :type shape: Shape
-        """
-        self._drawing_event.set_selected(shape, True, call_cb = False)
-
-    def de_select_shape(self, shape):
-        """
-        De-select the shape <shape> (programmatically).
-
-        :param shape: The shape to de-select.
-        :type shape: Shape
-        """
-        if self.is_selected(shape):
-            self._drawing_event.set_selected(shape, False, call_cb = False)
-
-    def is_selected(self, shape):
-        return shape in self.selected_shapes
-
     def get_selected_shapes(self):
-        return self.selected_shapes.itervalues()
+        selected_shapes = []
+        for item in self.graphics_view.graphics_scene.items():
+            if (type(item) in [GraphicsItemPoint, GraphicsItemMesh, GraphicsItemLine] and
+                item.isSelected()):
+                selected_shapes.append(item) 
+        return selected_shapes
 
     def update_beam_position(self, beam_position):
         if beam_position is not None:
@@ -302,8 +261,7 @@ class Qt4_GraphicsManager(HardwareObject):
         if beam_info is not None:
             self.beam_size[0] = beam_info.get("size_x")
             self.beam_size[1] = beam_info.get("size_y")
-            self.beam_shape = beam_info.get("shape")
-            self.graphics_beam_item.set_shape(self.beam_shape == "rectangular")
+            self.graphics_beam_item.set_shape(beam_info.get("shape", "rectangular"))
             if self.pixels_per_mm is not None:
                 self.graphics_beam_item.set_size(self.beam_size[0] * self.pixels_per_mm[0],
                                                  self.beam_size[1] * self.pixels_per_mm[1])
@@ -312,11 +270,15 @@ class Qt4_GraphicsManager(HardwareObject):
         self.graphics_omega_reference_item.set_reference(omega_reference)  
 
     def add_new_centring_point(self, state, centring_status, beam_info):
-        new_point = GraphicsItemCentredPoint(self,200, 200)
+        new_point = GraphicsItemPoint(self,200, 200)
         self.centring_points.append(new_point)
         self.graphics_view.graphics_scene.addItem(new_point)        
 
     def get_snapshot(self, shape):
+        if shape:
+            self.de_select_all()
+            shape.setSelected(True)
+
         image = QtGui.QImage(self.graphics_view.graphics_scene.sceneRect().size().toSize(), 
                              QtGui.QImage.Format_ARGB32)
         image.fill(QtCore.Qt.transparent)
@@ -344,7 +306,7 @@ class GraphicsItem(QtGui.QGraphicsItem):
     """
     Descript. : Base class for shapes.
     """
-    def __init__(self, parent, position_x = 0, position_y = 0):
+    def __init__(self, parent=None, position_x = 0, position_y = 0):
         QtGui.QGraphicsItem.__init__(self)
         rect = QtCore.QRectF(0, 0, 0, 0)
         self.rect = rect
@@ -377,6 +339,8 @@ class GraphicsItemBeam(GraphicsItem):
     def __init__(self, parent, position_x = 0, position_y= 0):
         GraphicsItem.__init__(self, parent, position_x = 0, position_y= 0)
         self.shape_is_rectangle = True
+        self.setFlags(QtGui.QGraphicsItem.ItemIsMovable | \
+                      QtGui.QGraphicsItem.ItemIsSelectable)
 
     def paint(self, painter, option, widget):
         pen = QtGui.QPen(self.style)
@@ -574,7 +538,7 @@ class GraphicsItemCentringLines(GraphicsItem):
         self.coord_y = y 
         self.scene().update()        
 
-class GraphicsItemCentredPoint(GraphicsItem):
+class GraphicsItemPoint(GraphicsItem):
     """
     Descrip. : Centred point class.
     Args.    : parent, centred position (motors position dict, 
@@ -596,8 +560,14 @@ class GraphicsItemCentredPoint(GraphicsItem):
 	self.set_position(position_x, position_y)
         self.index = None
 
+    def get_centred_positions(self):
+        return [self.centred_position]
+
     def set_index(self, index):
         self.index = index  
+
+    def get_index(self):
+        return self.index
 
     def paint(self, painter, option, widget):
         pen = QtGui.QPen(self.style)
@@ -618,26 +588,87 @@ class GraphicsItemCentredPoint(GraphicsItem):
         else:
             painter.drawText(self.rect.right() + 2, self.rect.top(), "#")
 
-    """def mousePressEvent(self, event):
-        position = QtCore.QPointF(event.pos())"""
+    def get_position(self):
+        return self.__position_x, self.__position_y
+
+    def set_position(self, position_x, position_y):
+        self.__position_x = position_x
+        self.__position_y = position_y
+        self.setPos(self.__position_x - 10, self.__position_y - 10)
+
+class GraphicsItemLine(GraphicsItem):
+    """
+    Descrip. : Line class.
+    """
+    def __init__(self, cp_start, cp_end):
+        GraphicsItem.__init__(self)
+
+        self.setFlags(QtGui.QGraphicsItem.ItemIsSelectable)
+        self.index = None
+        self.cp_start = cp_start
+        self.cp_end = cp_end
+
+    def get_centred_positions(self):
+        return [self.cp_start.centred_position, self.cp_end.centred_position]
+
+    def paint(self, painter, option, widget):
+        pen = QtGui.QPen(self.style)
+        pen.setWidth(2)
+
+        if option.state & QtGui.QStyle.State_Selected:
+            pen.setColor(QtCore.Qt.green)
+        else:
+            pen.setColor(QtCore.Qt.yellow)
+        painter.setPen(pen)
+        (start_cp_x, start_cp_y) = self.cp_start.get_position()
+        (end_cp_x, end_cp_y) = self.cp_end.get_position()
+        painter.drawLine(start_cp_x, start_cp_y,
+                         end_cp_x, end_cp_y)
+        if self.index:
+            painter.drawText(self.rect.right() + 2, self.rect.top(), str(self.index))
+        else:
+            painter.drawText(self.rect.right() + 2, self.rect.top(), "#")
+
+    def setSelected(self, state):
+        GraphicsItem.setSelected(self, state)
+        self.cp_start.setSelected(state)
+        self.cp_end.setSelected(state)
+
+    def get_points_index(self):
+        return (self.cp_start.get_index(), self.cp_end.get_index())
 
 class GraphicsView(QtGui.QGraphicsView):
+    mouseMovedSignal = QtCore.pyqtSignal(int, int)
+    keyPressedSignal = QtCore.pyqtSignal(str)
+
     def __init__ (self, parent=None):
         super(GraphicsView, self).__init__(parent)
-
         self.graphics_scene = GraphicsScene(self)
         self.setScene(self.graphics_scene)  
         self.graphics_scene.clearSelection()
         self.setMouseTracking(True)
+        self.setDragMode(QtGui.QGraphicsView.RubberBandDrag)
 
     def mouseMoveEvent(self, event):
         position = QtCore.QPointF(event.pos())
-        self.emit(QtCore.SIGNAL("graphicsViewMouseMoved"), position.x(), position.y())
+        self.mouseMovedSignal.emit(position.x(), position.y())
         self.update()
+ 
+    def keyPressEvent(self, event):
+        key_type = None
+        if event.key() in(QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):  
+            key_type = "Delete"
+        if key_type:
+            self.keyPressedSignal.emit(key_type)
+
 
 class GraphicsScene(QtGui.QGraphicsScene):
+    mouseClickedSignal = QtCore.pyqtSignal(int, int)
+    mouseReleasedSignal = QtCore.pyqtSignal(int, int)
+
     def __init__ (self, parent=None):
         super(GraphicsScene, self).__init__ (parent)
+
 
 class GraphicsCameraFrame(QtGui.QGraphicsPixmapItem):
     def __init__ (self, parent=None):
@@ -645,11 +676,12 @@ class GraphicsCameraFrame(QtGui.QGraphicsPixmapItem):
 
     def mousePressEvent(self, event):
         position = QtCore.QPointF(event.pos())
-        self.scene().emit(QtCore.SIGNAL("graphicsViewMouseClicked"), position.x(), position.y())
+        self.scene().mouseClickedSignal.emit(position.x(), position.y())
+        #self.scene().emit(QtCore.SIGNAL("graphicsViewMouseClicked"), position.x(), position.y())
         self.update()  
 
     def mouseReleaseEvent(self, event):
         position = QtCore.QPointF(event.pos())
-        self.scene().emit(QtCore.SIGNAL("graphicsViewMouseReleased"), position.x(), position.y())
+        self.scene().mouseReleasedSignal.emit(position.x(), position.y())
+        #self.scene().emit(QtCore.SIGNAL("graphicsViewMouseReleased"), position.x(), position.y())
         self.update()
-
