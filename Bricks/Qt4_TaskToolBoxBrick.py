@@ -253,23 +253,15 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         elif 'motors' in centring_status:
             p_dict = dict(centring_status['motors']) 
 
-
         if p_dict:
             cpos = queue_model_objects.CentredPosition(p_dict)
-            #self.position_history.add_centred_position(state, cpos)
-            
-            try:
-                screen_pos = self.diffractometer_hwobj.\
-                             motor_positions_to_screen(cpos.as_dict())
-                point = graphics_manager.Point(self.shape_history_hwobj.get_drawing(), 
-                                         cpos, screen_pos)
-                if point:
-                    self.graphics_manager_hwobj.add_shape(point)
-                    cpos.set_index(point.get_index())
-            except:
-                logging.getLogger('HWR').\
-                    exception('Could not get screen positons for %s' % cpos)
-                traceback.print_exc()
+            screen_pos = self.diffractometer_hwobj.\
+                    motor_positions_to_screen(cpos.as_dict())
+            point = graphics_manager.GraphicsItemPoint( 
+                    cpos, True, screen_pos[0], screen_pos[1])
+            if point:
+                self.graphics_manager_hwobj.add_shape(point)
+                cpos.set_index(point.get_index())
 
     def diffractometer_changed(self, *args):
         """

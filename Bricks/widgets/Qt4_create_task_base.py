@@ -435,6 +435,8 @@ class CreateTaskBase(QtGui.QWidget):
         free_pin_mode = sample.free_pin_mode
         temp_tasks = self._create_task(sample, shape)
 
+        sample_is_mounted = True
+
         if (not fully_automatic):
             if ((not free_pin_mode) and (not sample_is_mounted) or (not shape)):
                 # No centred positions selected, or selected sample not

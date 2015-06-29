@@ -131,12 +131,6 @@ class CreateDiscreteWidget(CreateTaskBase):
                      self.handle_path_conflict)
 
         # Other ---------------------------------------------------------------
-        Qt4_widget_colors.set_widget_color(self._acq_gbox,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self._data_path_gbox,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self._processing_gbox,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def init_models(self):
         """
@@ -240,10 +234,10 @@ class CreateDiscreteWidget(CreateTaskBase):
         Descript. :
         """
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = self._graphics_manager_hwobj.selected_shapes
+        selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
 
         for shape in selected_shapes:
-            if isinstance(shape, graphics_manager.Line):
+            if isinstance(shape, graphics_manager.GraphicsItemCentringLines):
                 result = False
 
         return result
@@ -262,9 +256,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            if isinstance(shape, graphics_manager.Point):
+            if isinstance(shape, graphics_manager.GraphicsItemPoint):
                 snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot([shape.qub_point])
+                           get_snapshot(shape)
 
                 cpos = copy.deepcopy(shape.get_centred_positions()[0])
                 cpos.snapshot_image = snapshot

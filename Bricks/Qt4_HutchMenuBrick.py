@@ -72,7 +72,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.addProperty('icons', 'string', '')
         self.addProperty('label', 'string', 'Sample centring')
 
-        # Signals ------------------------------------------------------------
+        # Signals -------------------------------------------------------------
         self.defineSignal('newCentredPos', ())
         
         # Slots ---------------------------------------------------------------
@@ -207,7 +207,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.beam_info_hwobj = self.getHardwareObject(new_value)
             if self.beam_info_hwobj is not None:
                 self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), self.beam_info_changed)
-                self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed)
+                self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed) 
+                self.beam_info_hwobj.update_values()
         elif property_name == "graphicsManager":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
@@ -306,6 +307,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
         if self.diffractometer_hwobj is not None:
             self.diffractometer_hwobj.refresh_video()
 
+        self.diffractometer_hwobj.update_values()
+        self.beam_info_hwobj.update_values()
+
     def visual_align_clicked(self):
         """
         Descript. : 
@@ -390,36 +394,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         if self.inside_data_collection:
             self.inside_data_collection = False
         beam_info = self.beam_info_hwobj.get_beam_info()	
-	#if beam_info is not None:
-	#    beam_info['size_x'] = beam_info['size_x'] * self.pixels_per_mm[0]
-	#    beam_info['size_y'] = beam_info['size_y'] * self.pixels_per_mm[1]
 
-        p_dict = {}
-        if 'motors' in centring_status and \
-                'extraMotors' in centring_status:
-            p_dict = dict(centring_status['motors'],
-                          **centring_status['extraMotors'])
-        elif 'motors' in centring_status:
-            p_dict = dict(centring_status['motors'])
-
-        if p_dict:
-            cpos = queue_model_objects.CentredPosition(p_dict)
-            try:
-                screen_pos = self.diffractometer_hwobj.\
-                             motor_positions_to_screen(cpos.as_dict())
-
-                point = graphics_manager.GraphicsItemCentredPoint(\
-                        cpos, True, screen_pos[0], screen_pos[1])
-                if point:
-                    self.graphics_manager_hwobj.add_shape(point)
-            except:
-                logging.getLogger('HWR').\
-                    exception('Could not get screen positons for %s' % cpos)
-                traceback.print_exc()
-
-        if self.queue_hwobj is not None:
-            if self.queue_hwobj.is_executing():
-                self.setEnabled(False)
+	if beam_info is not None:
+	    beam_info['size_x'] = beam_info['size_x'] * self.pixels_per_mm[0]
+	    beam_info['size_y'] = beam_info['size_y'] * self.pixels_per_mm[1]
+        self.emit(QtCore.SIGNAL("newCentredPos"), state, centring_status, beam_info)
 
     def centring_snapshots(self, state):
         """
@@ -612,9 +591,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        if (self.diffractometer_hwobj is not None and 
-            self.graphics_manager_hwobj is not None and
-            position is not None):
+        if self.graphics_manager_hwobj and  position:
             self.graphics_manager_hwobj.update_beam_position(position)
 
     def beam_info_changed(self, beam_info):
@@ -623,9 +600,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        if (self.diffractometer_hwobj is not None and
-            self.graphics_manager_hwobj is not None and
-            beam_info is not None):
+        if self.graphics_manager_hwobj and beam_info:
             self.graphics_manager_hwobj.update_beam_info(beam_info)
 
     def zoom_position_changed(self, position, offset):
@@ -644,6 +619,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
+        print omega_reference
         if self.graphics_manager_hwobj is not None:
             self.graphics_manager_hwobj.update_omega_reference(omega_reference)
             

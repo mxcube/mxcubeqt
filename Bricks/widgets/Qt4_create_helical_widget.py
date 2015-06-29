@@ -54,8 +54,8 @@ class CreateHelicalWidget(CreateTaskBase):
         # Graphic elements ----------------------------------------------------
         self._lines_gbox = QtGui.QGroupBox('Lines', self)
         self._lines_list_widget = QtGui.QListWidget(self._lines_gbox)
-        self._lines_list_widget.setFixedWidth(175)
-        self._lines_list_widget.setFixedHeight(50)
+        self._lines_list_widget.setFixedWidth(300)
+        self._lines_list_widget.setFixedHeight(100)
         self._lines_list_widget.setToolTip(\
              "Select the line(s) to perfrom helical scan on")
 
@@ -168,27 +168,31 @@ class CreateHelicalWidget(CreateTaskBase):
             self._path_template = queue_model_objects.PathTemplate()
 
     def add_clicked(self):
-        selected_shapes = self._graphics_manager.selected_shapes.values()
+        selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
 
         if len(selected_shapes) == 2:
-            p1 = selected_shapes[1]
-            p2 = selected_shapes[0]
+            p1 = selected_shapes[0]
+            p2 = selected_shapes[1]
             
-            line = graphics_manager.\
-                   Line(self._graphics_manager.get_drawing(),
-                        p1.qub_point, p2.qub_point,
-                        p1.centred_position, p2.centred_position)
-
+            line = graphics_manager.GraphicsItemLine(p1, p2)
             line.show()
-            self._graphics_manager.add_shape(line)
-            list_box_item = qt.QListBoxText(self._lines_list_widget, 'Line')
-            self._list_item_map[list_box_item] = line
+
+            self._graphics_manager_hwobj.add_shape(line)
+            points_index = line.get_points_index()
+            if points_index:
+                display_name = "Line (points: %d, %d / kappa: %.2f phi: %.2f)" %\
+                       (points_index[0], points_index[1],
+                        p1.centred_position.kappa, p1.centred_position.kappa_phi)
+            else:
+                display_name = "Line (points: #, #)"
+            list_widget_item = QtGui.QListWidgetItem(display_name, self._lines_list_widget)
+            self._list_item_map[list_widget_item] = line
 
             # De select previous items
             for item in self.selected_items():
-                self._lines_list_widget.setSelected(item, False)
-            
-            self._lines_list_widget.setSelected(list_box_item, True)
+                item.setSelected(False)
+
+            list_widget_item.setSelected(True)
         else:
             print "No points selected"
 
@@ -197,9 +201,9 @@ class CreateHelicalWidget(CreateTaskBase):
 
         if selected_items:
             for item in selected_items:
-                self._lines_list_widget.removeItem(self._list_box.index(item))
+                self._lines_list_widget.takeItem(self._lines_list_widget.row(item))
                 line = self._list_item_map[item]
-                self._graphics_manager.delete_shape(line)
+                self._graphics_manager_hwobj.delete_shape(line)
                 del self._list_item_map[item]
 
     # Calback from graphics_manager, called when a shape is deleted
@@ -208,12 +212,14 @@ class CreateHelicalWidget(CreateTaskBase):
             items_to_remove = []
 
             for (list_item, line) in self._list_item_map.iteritems():
+                #if shape
+ 
                 for qub_object in shape.get_qub_objects():
                     if qub_object in line.get_qub_objects():
                         items_to_remove.append((list_item, line))
 
             for (list_item, line) in items_to_remove:
-                self._lines_list_widget.removeItem(self._list_box.index(list_item))
+                self._lines_list_widget.takeItem(self._lines_list_widget.row(list_item))
                 del self._list_item_map[list_item]
 
     def centred_position_selection(self, positions):
@@ -235,8 +241,8 @@ class CreateHelicalWidget(CreateTaskBase):
     def selected_items(self):
         selected_items = []
                 
-        for item_index in range(0, self._lines_list_widget.count()):
-            if self._lines_list_widget.isSelected(item_index):
+        for item_index in range(self._lines_list_widget.count()):
+            if self._lines_list_widget.item(item_index).isSelected():
                 selected_items.append(self._lines_list_widget.item(item_index))
 
         return selected_items
@@ -275,14 +281,15 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def select_shape_with_cpos(self, start_cpos, end_cpos):
-        self._graphics_manager.de_select_all()
+        self._graphics_manager_hwobj.de_select_all()
         selected_line = None
 
-        for shape in self._graphics_manager.get_shapes():
-            if isinstance(shape, graphics_manager.Line):
+        for shape in self._graphics_manager_hwobj.get_shapes():
+            if isinstance(shape, graphics_manager.GraphicsItemLine):
                 if shape.get_centred_positions()[0] == start_cpos and\
                        shape.get_centred_positions()[1] == end_cpos:
-                    self._graphics_manager.select_shape(shape)
+                    self._graphics_manager_hwobj.de_select_all()
+                    shape.setSelected(True)
                     selected_line = shape
 
         #de-select previous selected list items and
@@ -290,9 +297,9 @@ class CreateHelicalWidget(CreateTaskBase):
         for (list_item, shape) in self._list_item_map.iteritems():
 
             if selected_line is shape:
-                self._lines_list_widget.setSelected(list_item, True)
+                list_item.setSelected(True)
             else:
-                self._lines_list_widget.setSelected(list_item, False)
+                list_item.setSelected(False)
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -348,17 +355,14 @@ class CreateHelicalWidget(CreateTaskBase):
     def _create_task(self,  sample, shape):
         data_collections = []
 
-        if isinstance(shape, graphics_manager.Line ):
-            if shape.get_qub_objects() is not None:
-                snapshot = self._graphics_manager.get_snapshot(shape.get_qub_objects())
-            else:
-                snapshot = self._graphics_manager.get_snapshot([])
+        if isinstance(shape, graphics_manager.GraphicsItemLine):
+            snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
 
             # Acquisition for start position
             start_acq = self._create_acq(sample) 
             
             start_acq.acquisition_parameters.\
-                centred_position = copy.deepcopy(shape.start_cpos)
+                centred_position = copy.deepcopy(shape.cp_start.centred_position)
             start_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
 
@@ -368,7 +372,7 @@ class CreateHelicalWidget(CreateTaskBase):
             end_acq = self._create_acq(sample)
 
             end_acq.acquisition_parameters.\
-                centred_position = shape.end_cpos
+                centred_position = shape.cp_end.centred_position
             end_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
 

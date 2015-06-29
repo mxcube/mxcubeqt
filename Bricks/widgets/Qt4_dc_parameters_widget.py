@@ -84,7 +84,7 @@ class DCParametersWidget(QtGui.QWidget):
         _main_hlayout.addWidget(self.position_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
-        #_main_hlayout.addStretch(0)
+        _main_hlayout.addStretch(0)
         self.setLayout(_main_hlayout)
 
         # SizePolicies --------------------------------------------------------
@@ -210,7 +210,7 @@ class DCParametersWidget(QtGui.QWidget):
             image = data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             ration = image.height() / float(image.width())
-            image = image.scaled(300, 300 * ration, QtCore.Qt.KeepAspectRatio)
+            image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio)
             self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()
