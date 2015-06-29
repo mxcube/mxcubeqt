@@ -211,7 +211,7 @@ class GUISupervisor(QtGui.QWidget):
 
         self.framework.show()
             
-        self.framework.newClicked(self.GUIConfigFile)
+        self.framework.new_clicked(self.GUIConfigFile)
         
         return self.framework
              

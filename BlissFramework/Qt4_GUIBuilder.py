@@ -164,7 +164,9 @@ class ToolboxWindow(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
         
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(_refresh_toolbutton, QtCore.SIGNAL("clicked()"), self.refresh_clicked) 
+        QtCore.QObject.connect(_refresh_toolbutton, 
+                               QtCore.SIGNAL("clicked()"), 
+                               self.refresh_clicked) 
 
         # Other ---------------------------------------------------------------
         self.setWindowTitle("Toolbox") 
@@ -174,7 +176,9 @@ class ToolboxWindow(QtGui.QWidget):
         Descript. : Add a new brick tab called 'name'
         """
         newBricksList = MyListView(self._bricks_toolbox)
-        QtCore.QObject.connect(newBricksList, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"), self.brick_selected)
+        QtCore.QObject.connect(newBricksList, 
+                               QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"), 
+                               self.brick_selected)
         self._bricks_toolbox.addItem(newBricksList, name)
         self.bricks_tab_dict[name] = newBricksList
         return newBricksList
@@ -188,7 +192,8 @@ class ToolboxWindow(QtGui.QWidget):
        
         self.bricks_dict = {}
         self.bricks_tab_dict = {}
-        map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + tuple(BlissFramework.getCustomBricksDirs()))
+        map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + \
+             tuple(BlissFramework.getCustomBricksDirs()))
 
     def brickTextLabel(self, brickName):
         """
@@ -238,7 +243,9 @@ class ToolboxWindow(QtGui.QWidget):
             
             if filter(lambda x: filename.endswith(x), [x[0] for x in imp.get_suffixes()]):
                 brickName = filename[:filename.rfind('.')]
-                if not brickName == '__init__' and not brickName in processedBricks:
+                if (not brickName == '__init__' and 
+                    brickName.startswith('Qt4') and
+                    not brickName in processedBricks):
                     processedBricks.append(brickName)
                     dirname = os.path.dirname(full_filename)
                     brick_module_file = None

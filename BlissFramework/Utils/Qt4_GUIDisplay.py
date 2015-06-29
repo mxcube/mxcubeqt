@@ -905,14 +905,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         Descript. :
         """
-        #main window
         if parent is None:
             self.drawPreview(child, 0, [])
-            
-            #newItem = self.addItem(child, self)
-            #self.preview_items.append(newItem)
-            #self.layout.addWidget(newItem) 
-        if True:
+        else:
             for item in self.preview_items:
                 if item.objectName() == parent.name:
                     parent_item = item

@@ -48,7 +48,8 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_items_initialized = None
         self.graphics_scene_size = None
         self.graphics_view = None
-        self.graphics_camera_frame = None
+        self.graphics_camera_frame = None 
+        self.display_beam = None
 
         # Properties ----------------------------------------------------------       
         self.addProperty("graphicsManager", "string", "/Qt4_graphics-manager")
@@ -105,8 +106,7 @@ class Qt4_CameraBrick(BlissWidget):
             except:
                 pass 
         elif property_name == 'displayBeam':              
-            pass
-            #self.graphics_scene_beam_item.set_visible(new_value) 
+            self.display_beam = new_value
         elif property_name == 'displayScale':
             pass
             #self.graphics_scene_scale_item.set_visible(new_value)
