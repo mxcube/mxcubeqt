@@ -48,7 +48,6 @@ def load(icon_name):
         else:
             return icon
 
-
 def getIconPath(icon_name):
     """
     Descript. : Return path to an icon
@@ -65,4 +64,5 @@ def getIconPath(icon_name):
     if path.exists(filename):
         return filename
         
-
+def load_icon(icon_name):
+    return QtGui.QIcon(load(icon_name))

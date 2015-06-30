@@ -170,7 +170,7 @@ class SignalSlotFilter:
             s(*args)
 
 
-class BlissWidget(QtGui.QWidget, Connectable.Connectable):
+class BlissWidget(QtGui.QFrame, Connectable.Connectable):
     (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
      INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
     (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
@@ -554,10 +554,14 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         """
         Descript. :
         """
-        for w in QtGui.QApplication.allWidgets():
-            if isinstance(w, BlissWidget):
-                QtGui.QWhatsThis.remove(w)
-                QtGui.QWhatsThis.add(w, "%s (%s)\n%s" % (w.name(), w.__class__.__name__, w.getHardwareObjectsInfo()))
+        for widget in QtGui.QApplication.allWidgets():
+            if isinstance(widget, BlissWidget):
+                #QtGui.QWhatsThis.remove(w)
+                msg = "%s (%s)\n%s" % (widget.objectName(), 
+                                       widget.__class__.__name__, 
+                                       widget.getHardwareObjectsInfo())
+                widget.setWhatsThis(msg)
+                #QtGui.QWhatsThis.showText(QtGui.QCursor.pos(), msg, widget)
         QtGui.QWhatsThis.enterWhatsThisMode()
 
     @staticmethod
@@ -698,6 +702,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         # add properties shared by all BlissWidgets
         #
         self.addProperty('fontSize', 'string', str(self.font().pointSize()))
+        self.addProperty('frame', 'boolean', False)
         self.addProperty('instanceAllowAlways', 'boolean', False)#, hidden=True)
         self.addProperty('instanceAllowConnected', 'boolean', False)#, hidden=True)
         #
@@ -1011,6 +1016,15 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                         brick["fontSize"] = s
                 
                 self.update()
+        elif property_name == 'frame':
+            try:
+               if new_value:  
+                   self.setFrameStyle(QtGui.QFrame.StyledPanel)
+               else:
+                   self.setFrameStyle(QtGui.QFrame.NoFrame)
+            except:
+               pass
+            self.update() 
         else:
             try:
                 self.propertyChanged(property_name, old_value, new_value)

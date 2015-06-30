@@ -54,9 +54,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.wavelength_limits = None
 
         # Graphic elements ----------------------------------------------------
-        self.main_frame = QtGui.QFrame(self)
-        self.main_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
-        self.group_box = QtGui.QGroupBox("Energy", self.main_frame)
+        self.group_box = QtGui.QGroupBox("Energy", self)
         energy_label = QtGui.QLabel("Current:", self.group_box)
         energy_label.setFixedWidth(75)
         wavelength_label = QtGui.QLabel("Wavelength: ", self.group_box)
@@ -94,16 +92,10 @@ class Qt4_EnergyBrick(BlissWidget):
         self.group_box_layout.setContentsMargins(1, 1, 1, 1) 
         self.group_box.setLayout(self.group_box_layout)
 
-        self.main_frame_layout = QtGui.QVBoxLayout() 
-        self.main_frame_layout.setSpacing(0)
-        self.main_frame_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_frame_layout.addWidget(self.group_box)
-        self.main_frame.setLayout(self.main_frame_layout)   
-
         self.main_layout = QtGui.QVBoxLayout()
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 2, 2)
-        self.main_layout.addWidget(self.main_frame)
+        self.main_layout.addWidget(self.group_box)
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------

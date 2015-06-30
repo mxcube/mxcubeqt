@@ -51,14 +51,12 @@ class CustomMenuBar(QtGui.QWidget):
 
         # Graphic elements ----------------------------------------------------
         self.menu_bar = QtGui.QMenuBar(self) 
-        self.menu_bar.addMenu("File")
-        self.menu_bar.addMenu("Help") 
-        #self.menu_bar.addMenu("Expert mode")
-        #self.menu_bar.addAction(QtGui.QAction('Expert mode', self.menu_bar, checkable=True))
-        action = self.menu_bar.addAction("Expert mode", self.expert_mode_clicked)
-        action.setCheckable(True)
-        #self.menu_bar.setStyleSheet("QMenuBar::item { color: rgb(255, 255, 255); }")
-        #self.expert_mode_checkbox = QtGui.QCheckBox("Expert mode", self)
+        self.file_menu = self.menu_bar.addMenu("File")
+        self.expert_mode_action = self.file_menu.addAction("Expert mode", self.expert_mode_clicked)
+        self.expert_mode_action.setCheckable(True)  
+        self.file_menu.addAction("Quit", self.quit_clicked)
+        self.help_menu = self.menu_bar.addMenu("Help") 
+        self.help_menu.addAction("Whats this", self.whats_this_clicked)
 
         # Layout --------------------------------------------------------------
         _main_hlayout = QtGui.QHBoxLayout()
@@ -93,27 +91,28 @@ class CustomMenuBar(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.expert_mode_checkbox.isChecked():
+        if self.expert_mode_action.isChecked():
             res = QtGui.QInputDialog.getText(self, 
                                              "Switch to expert mode",
                                              "Please enter the password:", 
                                              QtGui.QLineEdit.Password)
             if res[1]:
-                if str(res[0])==self.expert_pwd:
-                    Qt4_widget_colors.set_widget_color(self.expert_mode_checkbox, 
-                                                       Qt4_widget_colors.LIGHT_YELLOW)
+                if str(res[0]) == self.expert_pwd:
+                    #Qt4_widget_colors.set_widget_color(self.expert_mode_action,
+                    #                                   Qt4_widget_colors.LIGHT_YELLOW)
                     self.set_expert_mode(True)
+                    self.expert_mode_action.setChecked(True)
                 else:
-                    self.expert_mode_checkbox.setChecked(False)
+                    self.expert_mode_action.setChecked(False)
                     QtGui.QMessageBox.critical(self, 
                                                "Switch to expert mode", 
                                                "Wrong password!",
                                                QtGui.QMessageBox.Ok)
             else:
-                self.expert_mode_checkbox.setChecked(False)
-        else:
-            Qt4_widget_colors.set_widget_color(self.expert_mode_checkbox, 
-                                               Qt4_widget_colors.LINE_EDIT_ORIGINAL)
+                 self.expert_mode_action.setChecked(False)
+        #else:
+        #    Qt4_widget_colors.set_widget_color(self.expert_mode_action,
+        #                                       Qt4_widget_colors.LINE_EDIT_ORIGINAL)
             self.set_expert_mode(False)
 
     def set_expert_mode(self,state):
@@ -148,19 +147,19 @@ class CustomMenuBar(QtGui.QWidget):
                     except:
                         logging.getLogger().exception("Could not set %s to user mode", w.objectName())
 
-    def whatsthis(self):
+    def whats_this_clicked(self):
         """
         Descript. :
         """
         if self.execution_mode:
             BlissWidget.updateWhatsThis()
 
-    def quit(self):
+    def quit_clicked(self):
         """
         Descript. :
         """
         if self.execution_mode:
-            QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("quit"), ())
+            #QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("quit"), ())
             QtGui.QApplication.quit()
 
 

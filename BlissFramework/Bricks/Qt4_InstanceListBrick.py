@@ -155,19 +155,19 @@ class Qt4_InstanceListBrick(BlissWidget):
         _main_gbox = QtGui.QGroupBox("Current users",self)
 
         self.users_listwidget = QtGui.QListWidget(_main_gbox)
-        self.users_listwidget.setFixedHeight(100)
-        self.give_control_chbox=QtGui.QCheckBox(\
+        self.users_listwidget.setFixedHeight(50)
+        self.give_control_chbox = QtGui.QCheckBox(\
              "Selecting gives control", _main_gbox)
         self.give_control_chbox.setChecked(False)
-        self.allow_timeout_control_chbox=QtGui.QCheckBox(\
+        self.allow_timeout_control_chbox = QtGui.QCheckBox(\
              "Allow timeout control",_main_gbox)
         self.allow_timeout_control_chbox.setChecked(False)
 
-        self.takeControlButton = QtGui.QToolButton(_main_gbox)
-        self.takeControlButton.setUsesTextLabel(True)
-        self.takeControlButton.setText("Take control")
-        self.takeControlButton.setEnabled(True)
-        self.takeControlButton.hide()
+        self.take_control_button = QtGui.QToolButton(_main_gbox)
+        self.take_control_button.setUsesTextLabel(True)
+        self.take_control_button.setText("Take control")
+        self.take_control_button.setEnabled(True)
+        self.take_control_button.hide()
 
         self.ask_control_button = QtGui.QToolButton(_main_gbox)
         self.ask_control_button.setUsesTextLabel(True)
@@ -190,7 +190,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         _my_name_widget_layout = QtGui.QHBoxLayout(self)
         _my_name_widget_layout.addWidget(_my_name_label)
         _my_name_widget_layout.addWidget(self.nickname_ledit)
-        _my_name_widget_layout.setSpacing(2)
+        #_my_name_widget_layout.addStretch(0)
         _my_name_widget_layout.setContentsMargins(0, 0, 0, 0)       
         _my_name_widget.setLayout(_my_name_widget_layout)
 
@@ -198,26 +198,27 @@ class Qt4_InstanceListBrick(BlissWidget):
         _main_gbox_vlayout.addWidget(self.users_listwidget)
         _main_gbox_vlayout.addWidget(self.give_control_chbox)
         _main_gbox_vlayout.addWidget(self.allow_timeout_control_chbox)
-        _main_gbox_vlayout.addWidget(self.takeControlButton)
+        _main_gbox_vlayout.addWidget(self.take_control_button)
         _main_gbox_vlayout.addWidget(self.ask_control_button)
         _main_gbox_vlayout.addWidget(_my_name_widget)
-        _main_gbox_vlayout.setSpacing(1)
+        _main_gbox_vlayout.setSpacing(0)
         _main_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_gbox.setLayout(_main_gbox_vlayout) 
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
-        _main_vlayout.setSpacing(0)
+        _main_vlayout.setSpacing(1)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_vlayout)
         
         # SizePolicies --------------------------------------------------------
-        #self.ask_control_button.setSizePolicy(QtGui.QSizePolicy.Expanding,
-        #                                      QtGui.QSizePolicy.Fixed)
+        #self.take_control_button.setSizePolicy(QtGui.QSizePolicy.Expanding,
+        #                                       QtGui.QSizePolicy.Fixed)
+        
 
         # Qt signal/slot connections ------------------------------------------
         self.users_listwidget.itemPressed.connect(self.user_selected)
-        self.takeControlButton.clicked.connect(self.takeControlClicked)
+        self.take_control_button.clicked.connect(self.takeControlClicked)
         self.ask_control_button.clicked.connect(self.askForControlClicked)
         self.nickname_ledit.returnPressed.connect(self.changeMyName)
 
@@ -270,7 +271,7 @@ class Qt4_InstanceListBrick(BlissWidget):
             try:
                 self.serverIcon=Qt4_Icons.load(icons_list[0])
                 self.clientIcon=Qt4_Icons.load(icons_list[1])
-                self.takeControlButton.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[2])))
+                self.take_control_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[2])))
                 self.ask_control_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[3])))
             except IndexError:
                 pass
@@ -284,14 +285,14 @@ class Qt4_InstanceListBrick(BlissWidget):
         if hutch_opened:
             if not BlissWidget.isInstanceRoleServer():
               logging.getLogger().info("%s: HUTCH IS OPENED, YOU LOSE CONTROL", self.name())
-              self.takeControlButton.setEnabled(False)
+              self.take_control_button.setEnabled(False)
             else:
               logging.getLogger().info("%s: HUTCH IS OPENED, TAKING CONTROL OVER REMOTE USERS", self.name())
               self.instance_server_hwobj.takeControl()
         else:
             if not BlissWidget.isInstanceRoleServer():
               logging.getLogger().info("%s: HUTCH IS CLOSED, YOU ARE ALLOWED TO TAKE CONTROL AGAIN", self.name())
-              self.takeControlButton.setEnabled(True) 
+              self.take_control_button.setEnabled(True) 
 
 
     def setSession(self, session_id, prop_code = None, prop_number=None,prop_id=None,expiration=None,orig_prop_code=None,is_inhouse=None):
@@ -318,15 +319,15 @@ class Qt4_InstanceListBrick(BlissWidget):
             if is_inhouse:
                 BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_INHOUSE)
                 self.ask_control_button.hide()
-                self.takeControlButton.show()
-                self.takeControlButton.setEnabled(BlissWidget.isInstanceRoleServer()) #BlissWidget.isInstanceModeMaster())
+                self.take_control_button.show()
+                self.take_control_button.setEnabled(BlissWidget.isInstanceRoleServer()) #BlissWidget.isInstanceModeMaster())
                 if self.hutch_trigger_hwobj is not None and not BlissWidget.isInstanceModeMaster():
                     hutch_opened = 1-int(self.hutch_trigger_hwobj.getChannelObject("status").getValue())
                     logging.getLogger().info("%s: hutch is %s, %s 'Take control' button", self.name(), hutch_opened and "opened" or "close", hutch_opened and "disabling" or "enabling")
-                    self.takeControlButton.setEnabled(1-hutch_opened)
+                    self.take_control_button.setEnabled(1-hutch_opened)
             else:
                 BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_LOGGED)
-                self.takeControlButton.hide()
+                self.take_control_button.hide()
                 self.ask_control_button.show()
                 self.ask_control_button.setEnabled(not BlissWidget.isInstanceModeMaster())
         else:
@@ -335,7 +336,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                 self.instance_server_hwobj.setProposal(None)
 
             BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_UNKNOWN)
-            self.takeControlButton.hide()
+            self.take_control_button.hide()
             self.ask_control_button.show()
             #self.ask_control_button.setEnabled(BlissWidget.isInstanceRoleServer() and not BlissWidget.isInstanceModeMaster())
             self.ask_control_button.setEnabled(False)
@@ -675,7 +676,7 @@ class Qt4_InstanceListBrick(BlissWidget):
               gevent.spawn_later(1, self.xmlrpc_server.open)
 
             self.in_control=None
-            self.takeControlButton.setEnabled(False)
+            self.take_control_button.setEnabled(False)
             self.ask_control_button.setEnabled(False)
 
             self.users_listwidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
@@ -696,11 +697,11 @@ class Qt4_InstanceListBrick(BlissWidget):
                  if self.hutch_trigger_hwobj is not None:
                     hutch_opened = 1-int(self.hutch_trigger_hwobj.getChannelObject("status").getValue())
                     logging.getLogger().debug("%s: hutch is %s, %s 'Take control' button", self.name(), hutch_opened and "opened" or "close", hutch_opened and "disabling" or "enabling")
-                    self.takeControlButton.setEnabled(1-hutch_opened)
+                    self.take_control_button.setEnabled(1-hutch_opened)
             #elif BlissWidget.isInstanceRoleServer():
             #    self.ask_control_button.setEnabled(True)
             if BlissWidget.isInstanceRoleServer():
-                 self.takeControlButton.setEnabled(True)
+                 self.take_control_button.setEnabled(True)
 
         if not gui_only:
             if have_control:

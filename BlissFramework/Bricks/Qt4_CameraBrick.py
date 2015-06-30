@@ -44,7 +44,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.image_size = []
+        self.use_fixed_size = False
         self.graphics_items_initialized = None
         self.graphics_scene_size = None
         self.graphics_view = None
@@ -60,6 +60,10 @@ class Qt4_CameraBrick(BlissWidget):
         self.addProperty('displayOmegaAxis', 'boolean', True)
 
         # Graphic elements-----------------------------------------------------
+        self.popup_menu = QtGui.QMenu(self)
+        self.popup_menu.addAction("Display histogram", self.display_histogram_toggled)
+        self.popup_menu.addAction("Define histogram", self.define_histogram_clicked)
+        self.popup_menu.popup(QtGui.QCursor.pos())
 
         # Layout --------------------------------------------------------------
         self.main_layout = QtGui.QVBoxLayout() 
@@ -70,7 +74,8 @@ class Qt4_CameraBrick(BlissWidget):
         # Qt signal/slot connections -----------------------------------------
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                           QtGui.QSizePolicy.Fixed)
 
         # Scene elements ------------------------------------------------------
         self.graphics_scene_centring_points = []
@@ -97,21 +102,25 @@ class Qt4_CameraBrick(BlissWidget):
                 self.connect(self.camera_hwobj, QtCore.SIGNAL('imageReceived'), self.image_received)
         elif property_name == 'fixedSize':
             try:
+                self.graphics_scene_fixed_size = new_value.split()
+                self.graphics_scene_fixed_size = map(int, self.graphics_scene_fixed_size)
                 self.use_fixed_size = True
-                scene_size = new_value.split()
-                self.graphics_scene.setSceneRect(0, 0, 
-                                                 int(self.scene_size[0]),
-                                                 int(self.scene_size[1])) 
-                self.graphics_scene_size = scene_size 
             except:
                 pass 
         elif property_name == 'displayBeam':              
             self.display_beam = new_value
         elif property_name == 'displayScale':
-            pass
-            #self.graphics_scene_scale_item.set_visible(new_value)
+            self.display_scale = new_value
+            if self.graphics_manager_hwobj is not None:
+                self.graphics_manager_hwobj.set_scale_visible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def display_histogram_toggled(self):
+        print "ff"
+
+    def define_histogram_clicked(self):
+        print 2
 
     def image_received(self, image):
         """
@@ -131,7 +140,15 @@ class Qt4_CameraBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.graphics_manager_hwobj.set_graphics_scene_size(self.graphics_scene_size)
+        if self.use_fixed_size:
+            scene_size = self.graphics_scene_fixed_size
+        else:
+            scene_size = self.graphics_scene_size
+
+        self.graphics_manager_hwobj.set_graphics_size(scene_size)
         self.graphics_scene_beam_item = self.graphics_manager_hwobj.get_graphics_beam_item()
         self.graphics_scene_scale_item = self.graphics_manager_hwobj.get_scale_item()
         self.graphics_scene_omega_reference_item = self.graphics_manager_hwobj.get_omega_reference_item()
+        self.setFixedSize(scene_size[0] + 5, scene_size[1] + 5)
+
+        print scene_size
