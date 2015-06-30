@@ -78,64 +78,55 @@ class Qt4_HutchMenuBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
        
         # Graphic elements ----------------------------------------------------
-        self.main_frame = QtGui.QFrame()  
-        self.main_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
-         
-        self.button_centre = MenuButton(self.main_frame, "Centre")
+        self.button_centre = MenuButton(self, "Centre")
         self.button_centre.setMinimumSize(QtCore.QSize(75, 50))
 
-        self.button_accept = QtGui.QToolButton(self.main_frame)
+        self.button_accept = QtGui.QToolButton(self)
         self.button_accept.setUsesTextLabel(True)
         self.button_accept.setText("Save")
         self.button_accept.setFixedSize(QtCore.QSize(75, 50))
         self.button_standard_color = \
              self.button_accept.palette().color(QtGui.QPalette.Window)
 
-        self.button_reject = QtGui.QToolButton(self.main_frame)
+        self.button_reject = QtGui.QToolButton(self)
         self.button_reject.setUsesTextLabel(True)
         self.button_reject.setText("Reject")
         self.button_reject.setFixedSize(QtCore.QSize(75, 50))
         self.button_reject.hide()
 
-        self.button_snapshot = QtGui.QToolButton(self.main_frame)
+        self.button_snapshot = QtGui.QToolButton(self)
         self.button_snapshot.setUsesTextLabel(True)
         self.button_snapshot.setText("Snapshot")
         self.button_snapshot.setFixedSize(QtCore.QSize(75, 50))
 
-        self.button_toogle_phase = QtGui.QToolButton(self.main_frame)
+        self.button_toogle_phase = QtGui.QToolButton(self)
         self.button_toogle_phase.setUsesTextLabel(True)
         self.button_toogle_phase.setText("MD phase")
         self.button_toogle_phase.setFixedSize(QtCore.QSize(75, 50))
 
-        self.button_refresh_camera = QtGui.QToolButton(self.main_frame)
+        self.button_refresh_camera = QtGui.QToolButton(self)
         self.button_refresh_camera.setUsesTextLabel(True)
         self.button_refresh_camera.setText("Camera")
         self.button_refresh_camera.setFixedSize(QtCore.QSize(75, 50))
 
-        self.button_visual_align = QtGui.QToolButton(self.main_frame)
+        self.button_visual_align = QtGui.QToolButton(self)
         self.button_visual_align.setUsesTextLabel(True)
         self.button_visual_align.setText("Realign")
         self.button_visual_align.setFixedSize(QtCore.QSize(75, 50))
 
         # Layout -------------------------------------------------------------- 
-        self.main_frame_layout = QtGui.QVBoxLayout()
-        self.main_frame_layout.addWidget(self.button_centre)
-        self.main_frame_layout.addWidget(self.button_accept)
-        self.main_frame_layout.addWidget(self.button_reject)
-        self.main_frame_layout.addWidget(self.button_snapshot)
-        self.main_frame_layout.addWidget(self.button_toogle_phase)
-        self.main_frame_layout.addWidget(self.button_refresh_camera)
-        self.main_frame_layout.addWidget(self.button_visual_align)
-        self.main_frame_layout.addStretch(0)
-        self.main_frame_layout.setSpacing(0)
-        self.main_frame_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_frame.setLayout(self.main_frame_layout)
-
-        main_layout = QtGui.QVBoxLayout()
-        main_layout.addWidget(self.main_frame)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(main_layout)
+        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout.addWidget(self.button_centre)
+        _main_vlayout.addWidget(self.button_accept)
+        _main_vlayout.addWidget(self.button_reject)
+        _main_vlayout.addWidget(self.button_snapshot)
+        _main_vlayout.addWidget(self.button_toogle_phase)
+        _main_vlayout.addWidget(self.button_refresh_camera)
+        _main_vlayout.addWidget(self.button_visual_align)
+        _main_vlayout.addStretch(0)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
         self.connect(self.button_centre, 
@@ -211,10 +202,12 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.beam_info_hwobj.update_values()
         elif property_name == "graphicsManager":
             if self.graphics_manager_hwobj is not None:
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
+                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.graphics_clicked)
+                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsDoubleClicked'), self.graphics_double_clicked)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
             if self.graphics_manager_hwobj is not None:
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.image_clicked)
+                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.graphics_clicked)
+                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsDoubleClicked'), self.graphics_double_clicked)
         elif property_name == "collection":
             self.collect_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'icons':
@@ -408,10 +401,10 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         if state is None:
             self.is_shooting = True
-            self.main_frame.setEnabled(False)
+            self.setEnabled(False)
         else:
             self.is_shooting = False
-            self.main_frame.setEnabled(True)
+            self.setEnabled(True)
 
     def centring_started(self, method, flexible):
         """
@@ -457,7 +450,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.graphics_manager_hwobj.set_centring_state(False)
 
         self.is_moving = False
-        self.main_frame.setEnabled(True)
+        self.setEnabled(True)
         self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
         try:
@@ -516,8 +509,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         self.resetPoints()
 
-    # Handler for clicking the video when doing the 3-click centring
-    def image_clicked(self, x, y):
+    def graphics_clicked(self, x, y):
         """
         Descript. : 
         Args.     : 
@@ -527,7 +519,15 @@ class Qt4_HutchMenuBrick(BlissWidget):
             if (self.current_centring == self.diffractometer_hwobj.MANUAL3CLICK_MODE and
                 self.diffractometer_hwobj.isReady()):
                 points = self.diffractometer_hwobj.image_clicked(x, y)
-                #    self.addPoint(x,y)
+
+    def graphics_double_clicked(self, x, y):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        if self.diffractometer_hwobj is not None:
+            self.diffractometer_hwobj.move_to_coord(x, y)
  
     def addPoint(self, x, y, xi, yi):
         """
@@ -553,7 +553,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        self.main_frame.setEnabled(True)
+        self.setEnabled(True)
 
     def minidiff_not_ready(self):
         """
@@ -562,7 +562,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         if not self.button_centre.is_executing():
-            self.main_frame.setEnabled(False)
+            self.setEnabled(False)
 
     def minidiff_state_changed(self, state):
         """
@@ -573,7 +573,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         if self.button_centre.is_executing():
             return
         try:
-            self.main_frame.setEnabled(state == self.diffractometer_hwobj.phiMotor.READY)
+            self.setEnabled(state == self.diffractometer_hwobj.phiMotor.READY)
         except:
             pass
 
