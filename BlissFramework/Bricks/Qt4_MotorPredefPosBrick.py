@@ -76,6 +76,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.setSizePolicy(QtGui.QSizePolicy.Minimum,
                            QtGui.QSizePolicy.Fixed)
         # Qt signal/slot connections ------------------------------------------
+        self.lstPositions.activated.connect(self.lstPositionsClicked)
 
         # Other ---------------------------------------------------------------
         self.lstPositions.setToolTip("Moves the motor to a predefined position")
@@ -134,7 +135,6 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                     self.label.setText("<i>"+lbl+":</i>")
                 Qt4_widget_colors.set_widget_color(self.lstPositions,
                                                    Qt4_MotorPredefPosBrick.STATE_COLORS[0])
-            else:
                 self.motorStateChanged(self.motor_hwobj.getState())
         elif propertyName=='listIndex':
             self.fillPositions()
@@ -166,18 +166,13 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
             if self.motor_hwobj.isReady():
                 self.motor_hwobj.moveToPosition(self.positions[index-1])
             else:
-                self.lstPositions.setCurrentItem(0)
+                self.lstPositions.setCurrentIndex(0)
 
     def predefinedPositionChanged(self, positionName, offset):
-        self.lstPositions.setCurrentItem(0)
+        self.lstPositions.setCurrentIndex(0)
 
-        for button in self.buttons:
-            button.show()
-            button.setOn(False)
-            
-        for i in range(len(self.positions)):
-            if self.positions[i] == positionName:
-                self.lstPositions.setCurrentItem(i+1)
-                if len(self.buttons) > 0:
-                     self.buttons[i].setOn(True)
-                break
+        if self.positions:
+           for i in range(len(self.positions)):
+               if self.positions[i] == positionName:
+                   self.lstPositions.setCurrentIndex(i+1)
+                   break

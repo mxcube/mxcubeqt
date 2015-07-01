@@ -253,15 +253,15 @@ class Qt4_DuoStateBrick(BlissWidget):
             w=self.fontMetrics().width("Set out")
             icons_list=newValue.split()
             try:
-                self.set_in_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[0])))
+                self.set_in_button.setIcon(Qt4_Icons.load_icon(icons_list[0]))
             except IndexError:
                 self.set_in_button.setText(self['setin'])
-                self.set_in_button.setMinimumWidth(w)
+                #self.set_in_button.setMinimumWidth(w)
             try:
-                self.set_out_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[1])))
+                self.set_out_button.setIcon(Qt4_Icons.load_icon(icons_list[1]))
             except IndexError:
                 self.set_out_button.setText(self['setout'])
-                self.set_out_button.setMinimumWidth(w)
+                #self.set_out_button.setMinimumWidth(w)
 
         elif propertyName=='in':
             if self.wrapper_hwobj is not None:
@@ -273,25 +273,25 @@ class Qt4_DuoStateBrick(BlissWidget):
 
         elif propertyName=='setin':
             icons=self['icons']
-            w=self.fontMetrics().width("Set out")
+            #w=self.fontMetrics().width("Set out")
             icons_list=icons.split()
             try:
                 i=icons_list[0]
             except IndexError:
                 self.set_in_button.setText(newValue)
-                self.set_in_button.setMinimumWidth(w)
+                #self.set_in_button.setMinimumWidth(w)
             help_text=newValue+" the "+self['username'].lower()
             self.set_in_button.setToolTip(help_text)
 
         elif propertyName=='setout':
             icons=self['icons']
-            w=self.fontMetrics().width("Set out")
+            #w=self.fontMetrics().width("Set out")
             icons_list=icons.split()
             try:
                 i=icons_list[1]
             except IndexError:
                 self.set_out_button.setText(newValue)
-                self.set_out_button.setMinimumWidth(w)
+                #self.set_out_button.setMinimumWidth(w)
             help_text=newValue+" the "+self['username'].lower()
             self.set_out_button.setToolTip(help_text)
 

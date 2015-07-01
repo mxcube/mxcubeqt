@@ -47,8 +47,10 @@ class Qt4_CameraBrick(BlissWidget):
         self.use_fixed_size = False
         self.graphics_items_initialized = None
         self.graphics_scene_size = None
+        self.graphics_scene_fixed_size = None
         self.graphics_view = None
-        self.graphics_camera_frame = None 
+        self.graphics_camera_frame = None
+        self.use_fixed_size = None 
         self.display_beam = None
 
         # Properties ----------------------------------------------------------       
@@ -74,8 +76,8 @@ class Qt4_CameraBrick(BlissWidget):
         # Qt signal/slot connections -----------------------------------------
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                           QtGui.QSizePolicy.Fixed)
+        #self.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+        #                   QtGui.QSizePolicy.Fixed)
 
         # Scene elements ------------------------------------------------------
         self.graphics_scene_centring_points = []
@@ -144,11 +146,8 @@ class Qt4_CameraBrick(BlissWidget):
             scene_size = self.graphics_scene_fixed_size
         else:
             scene_size = self.graphics_scene_size
-
-        self.graphics_manager_hwobj.set_graphics_size(scene_size)
+        self.graphics_manager_hwobj.set_graphics_scene_size(scene_size)
         self.graphics_scene_beam_item = self.graphics_manager_hwobj.get_graphics_beam_item()
         self.graphics_scene_scale_item = self.graphics_manager_hwobj.get_scale_item()
         self.graphics_scene_omega_reference_item = self.graphics_manager_hwobj.get_omega_reference_item()
-        self.setFixedSize(scene_size[0] + 5, scene_size[1] + 5)
-
-        print scene_size
+        #self.setFixedSize(scene_size[0] - 10, scene_size[1] - 10)

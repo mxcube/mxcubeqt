@@ -66,11 +66,13 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_widget = QtGui.QWidget(self)
         set_to_label = QtGui.QLabel("Set to: ", self)
         self.new_value_ledit = QtGui.QLineEdit(self.new_value_widget)
+        self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QtGui.QComboBox(self.new_value_widget)
         self.units_combobox.addItems(["keV", chr(197)]) 
         self.stop_button = QtGui.QPushButton(self.new_value_widget)        
         self.stop_button.setIcon(QtGui.QIcon(Qt4_Icons.load("Stop2")))
         self.stop_button.setEnabled(False)
+        self.stop_button.setFixedWidth(25)
  
         # Layout --------------------------------------------------------------
         self.new_value_widget_layout = QtGui.QHBoxLayout(self)
@@ -99,7 +101,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setMaximumWidth(250)
+        #self.setMaximumWidth(250)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)
 
@@ -132,7 +134,6 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
-
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
@@ -186,9 +187,8 @@ class Qt4_EnergyBrick(BlissWidget):
         """
         energy_value_str = self['kevFormatString'] % energy_value
         wavelength_value_str = self['angFormatString'] % wavelength_value
-        
         self.energy_ledit.setText("%s keV" % energy_value_str)
-        self.wavelength_ledit.setText("%s %s" %(wavelength_value, chr(197)))
+        self.wavelength_ledit.setText("%s %s" %(wavelength_value_str, chr(197)))
 
     def current_value_changed(self):
         """
