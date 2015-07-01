@@ -127,13 +127,13 @@ class Qt4_MDApertureBrick(BlissWidget):
         """
         Descript. :
         """
-        self.aperture_hwobj.set_active_position(self.aperture_cbox.currentItem())
+        self.aperture_hwobj.set_active_position(self.aperture_cbox.currentIndex())
 
     def init_aperture_list(self):
         aperture_list = self.aperture_hwobj.get_aperture_list()
         self.aperture_cbox.clear()
         for aperture in aperture_list:
-            self.aperture_cbox.insertItem(aperture)
+            self.aperture_cbox.addItem(aperture)
 
     def apertureChanged(self, activePos, gapSize):
         """
@@ -144,6 +144,6 @@ class Qt4_MDApertureBrick(BlissWidget):
         else:
             self.aperture_cbox.setEnabled(True)
             self.aperture_cbox.blockSignals(True)
-            self.aperture_cbox.setCurrentItem(activePos)
+            self.aperture_cbox.setCurrentIndex(activePos)
             self.aperture_cbox.blockSignals(False)
 

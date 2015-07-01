@@ -273,15 +273,10 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         """
         if self.diffractometer_hwobj.isReady():
             for shape in self.graphics_manager_hwobj.get_shapes():
-
-                new_positions = []
                 for cpos in shape.get_centred_positions():
                     new_x, new_y = self.diffractometer_hwobj.\
                         motor_positions_to_screen(cpos.as_dict())
-
-                    new_positions.append((new_x, new_y))
-
-                shape.move(new_positions)
+                shape.set_position(new_x, new_y)
 
             for shape in self.graphics_manager_hwobj.get_shapes():
                 shape.show()

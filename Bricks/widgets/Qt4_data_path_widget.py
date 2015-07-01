@@ -92,8 +92,6 @@ class DataPathWidget(QtGui.QWidget):
              self.data_path_layout.findChild(QtGui.QLineEdit, 'run_number_ledit'),
              int, QtGui.QIntValidator(0, 1000, self))
 
-        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
-
     def _browse_clicked(self):
         """
         Descript. :

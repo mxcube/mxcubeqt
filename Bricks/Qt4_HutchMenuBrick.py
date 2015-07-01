@@ -239,8 +239,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        if (self.diffractometer_hwobj is not None and
-            self.graphics_manager_hwobj is not None):
+        if self.diffractometer_hwobj is not None:
             self.diffractometer_hwobj.start_centring_method(\
                  self.diffractometer_hwobj.MANUAL3CLICK_MODE)
         else:
@@ -600,7 +599,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        if self.graphics_manager_hwobj and beam_info:
+        if (self.graphics_manager_hwobj and \
+            self.diffractometer_hwobj and beam_info):
+            self.graphics_manager_hwobj.update_beam_info(beam_info)
+            self.pixels_per_mm = self.diffractometer_hwobj.get_pixels_per_mm()
+            self.graphics_manager_hwobj.set_pixels_per_mm(self.pixels_per_mm)
             self.graphics_manager_hwobj.update_beam_info(beam_info)
 
     def zoom_position_changed(self, position, offset):
@@ -611,7 +614,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         if self.graphics_manager_hwobj is not None:
             self.pixels_per_mm = self.diffractometer_hwobj.get_pixels_per_mm()
-            self.graphics_manager_hwobj.update_pixels_per_mm(self.pixels_per_mm) 
+            self.graphics_manager_hwobj.set_pixels_per_mm(self.pixels_per_mm) 
 
     def omega_reference_changed(self, omega_reference):
         """
@@ -619,7 +622,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        print omega_reference
         if self.graphics_manager_hwobj is not None:
             self.graphics_manager_hwobj.update_omega_reference(omega_reference)
             

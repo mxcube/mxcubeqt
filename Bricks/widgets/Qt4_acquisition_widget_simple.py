@@ -333,6 +333,8 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """
         if self._beamline_setup_hwobj is not None:
+            print "Qt4 init_detector_modes - fix"
+            return
             modes_list = self._beamline_setup_hwobj.detector_hwobj.get_detector_modes_list()
             self.acq_widget.detector_mode_combo.clear()
             self.acq_widget.detector_mode_combo.addItems(modes_list)

@@ -120,7 +120,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         """
         if (phase.lower() != "unknown" and
             self.phase_combobox.count() > 0):
-            self.phase_combobox.setCurrentText(phase)
+            self.phase_combobox.setEditText(phase)
             self.phase_combobox.setEnabled(True)
         else:
             self.phase_combobox.setEnabled(False) 

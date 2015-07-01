@@ -65,8 +65,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("queue", "string", "/Qt4_queue")
         self.addProperty("queue_model", "string", "/Qt4_queue-model")
-        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
-        self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
+        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup-break")
+        self.addProperty("xml_rpc_server", "string", "/Qt4_xml_rpc_server")
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_hutch_menu", ())
@@ -213,7 +213,6 @@ class Qt4_TreeBrick(BlissWidget):
             self.dc_tree_widget.confirm_dialog.queue_model_hwobj = self.queue_model_hwobj
             self.connect(self.queue_model_hwobj, 'child_added',
                          self.dc_tree_widget.add_to_view)
-
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
@@ -227,12 +226,10 @@ class Qt4_TreeBrick(BlissWidget):
                              self.sample_load_state_changed)
                 self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
-
             has_shutter_less = bl_setup.detector_has_shutterless()
 
             if has_shutter_less:
                 self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
-
         elif property_name == 'xml_rpc_server':
             xml_rpc_server_hwobj = self.getHardwareObject(new_value)
 

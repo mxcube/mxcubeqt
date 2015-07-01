@@ -83,26 +83,16 @@ class Qt4_GraphicsManager(HardwareObject):
         self.mesh_drawing_state = False
         self.point_count = 0
 
-        """QtCore.QObject.connect(self.graphics_view.scene(), 
-                               QtCore.SIGNAL('graphicsViewMouseClicked'), 
-                               self.graphics_view_mouse_clicked)
-        QtCore.QObject.connect(self.graphics_view.scene(),
-                               QtCore.SIGNAL('graphicsViewMouseReleased'),
-                               self.graphics_view_mouse_released)
-        QtCore.QObject.connect(self.graphics_view, 
-                               QtCore.SIGNAL('graphicsViewMouseMoved'), 
-                               self.graphics_view_mouse_moved)"""
-
         self.graphics_view.scene().mouseClickedSignal.connect(\
-             self.graphics_view_mouse_clicked)
+             self.mouse_clicked)
+        self.graphics_view.scene().mouseDoubleClickedSignal.connect(\
+             self.mouse_double_clicked)
         self.graphics_view.scene().mouseReleasedSignal.connect(\
-             self.graphics_view_mouse_released)
-        self.graphics_view.mouseMovedSignal.connect(
-             self.graphics_view_mouse_moved)
-        self.graphics_view.keyPressedSignal.connect(
-             self.graphics_view_key_pressed)
+             self.mouse_released)
+        self.graphics_view.mouseMovedSignal.connect(self.mouse_moved)
+        self.graphics_view.keyPressedSignal.connect(self.key_pressed)
         
-    def graphics_view_mouse_clicked(self, x, y): 
+    def mouse_clicked(self, x, y): 
         self.emit("graphicsClicked", x, y)
         if self.centring_state:
             self.graphics_centring_lines_item.set_coordinates(x, y)
@@ -114,17 +104,20 @@ class Qt4_GraphicsManager(HardwareObject):
             for graphics_item in self.graphics_view.scene().items():
                 graphics_item.setSelected(False)
 
-    def graphics_view_mouse_released(self, x, y):
+    def mouse_double_clicked(self, x, y): 
+        self.emit("graphicsDoubleClicked", x, y)
+
+    def mouse_released(self, x, y):
         self.graphics_mesh_draw_item.set_draw_mode(False)
 
-    def graphics_view_mouse_moved(self, x, y):
+    def mouse_moved(self, x, y):
         if self.centring_state:
             self.graphics_centring_lines_item.set_coordinates(x, y)
         if (self.mesh_drawing_state and 
             self.graphics_mesh_draw_item.is_draw_mode()):
             self.graphics_mesh_draw_item.set_draw_end_position(x, y)
 
-    def graphics_view_key_pressed(self, key_event):
+    def key_pressed(self, key_event):
         if key_event == "Delete":
             for item in self.graphics_view.graphics_scene.items():
                 if item.isSelected():
@@ -138,7 +131,10 @@ class Qt4_GraphicsManager(HardwareObject):
 
     def set_graphics_scene_size(self, size):
         self.graphics_scene_size = size
-        self.graphics_scale_item.set_position(10, self.graphics_scene_size[1] - 10)
+        self.graphics_scale_item.set_position(10, 
+             self.graphics_scene_size[1] - 10)
+        #@self.graphics_view.setSceneRect(-2, self.graphics_scene_size[0], 
+        #                                self.graphics_scene_size[1])
 
     def get_graphics_beam_item(self):
         return self.graphics_beam_item
@@ -251,7 +247,7 @@ class Qt4_GraphicsManager(HardwareObject):
             self.graphics_beam_item.set_position(beam_position[0],
                                                  beam_position[1])
 
-    def update_pixels_per_mm(self, pixels_per_mm):
+    def set_pixels_per_mm(self, pixels_per_mm):
         if pixels_per_mm is not None:
             self.pixels_per_mm = pixels_per_mm
             self.graphics_beam_item.set_size(self.beam_size[0] * self.pixels_per_mm[0],
@@ -270,7 +266,7 @@ class Qt4_GraphicsManager(HardwareObject):
         self.graphics_omega_reference_item.set_reference(omega_reference)  
 
     def add_new_centring_point(self, state, centring_status, beam_info):
-        new_point = GraphicsItemPoint(self,200, 200)
+        new_point = GraphicsItemPoint(self)
         self.centring_points.append(new_point)
         self.graphics_view.graphics_scene.addItem(new_point)        
 
@@ -341,6 +337,11 @@ class GraphicsItemBeam(GraphicsItem):
         self.shape_is_rectangle = True
         self.setFlags(QtGui.QGraphicsItem.ItemIsMovable | \
                       QtGui.QGraphicsItem.ItemIsSelectable)
+        self.__size_x = 0
+        self.__size_y = 0
+        self.__position_x = position_x
+        self.__position_y = position_y
+        
 
     def paint(self, painter, option, widget):
         pen = QtGui.QPen(self.style)
@@ -351,18 +352,30 @@ class GraphicsItemBeam(GraphicsItem):
             pen.setColor(QtCore.Qt.blue)
         painter.setPen(pen)
         if self.shape_is_rectangle:
-            painter.drawRect(self.rect)
+            painter.drawRect(self.__position_x - self.__size_x / 2,
+                             self.__position_y - self.__size_y / 2,
+                             self.__size_x, self.__size_y)
         else:
-            painter.drawEllipse(self.rect)
+            painter.drawEllipse(self.__position_x - self.__size_x / 2,
+                                self.__position_y - self.__size_y / 2,
+                                self.__size_x, self.__size_y)
         pen.setColor(QtCore.Qt.red) 
         painter.setPen(pen)
-        painter.drawLine(int(self.rect.width() / 2) - 15, int(self.rect.height() / 2),
-                         int(self.rect.width() / 2) + 15, int(self.rect.height() / 2))
-        painter.drawLine(int(self.rect.width() / 2), int(self.rect.height() / 2) - 15, 
-                         int(self.rect.width() / 2), int(self.rect.height() / 2) + 15)  
+        painter.drawLine(self.__position_x - 15, self.__position_y,
+                         self.__position_x + 15, self.__position_y)
+        painter.drawLine(self.__position_x, self.__position_y - 15, 
+                         self.__position_x, self.__position_y + 15)  
 
-    def set_shape(self, is_rectangle):
-        self.shape_is_rectangle = is_rectangle      
+    def set_shape(self, shape):
+        self.shape_is_rectangle = shape == "rectangular"
+
+    def set_position(self, position_x, position_y):
+        self.__position_x = position_x
+        self.__position_y = position_y
+ 
+    def set_size(self, width, height):
+        self.__size_x = width
+        self.__size_y = height
 
 class GraphicsItemMesh(GraphicsItem):
     """
@@ -648,6 +661,8 @@ class GraphicsView(QtGui.QGraphicsView):
         self.graphics_scene.clearSelection()
         self.setMouseTracking(True)
         self.setDragMode(QtGui.QGraphicsView.RubberBandDrag)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
     def mouseMoveEvent(self, event):
         position = QtCore.QPointF(event.pos())
@@ -664,6 +679,7 @@ class GraphicsView(QtGui.QGraphicsView):
 
 class GraphicsScene(QtGui.QGraphicsScene):
     mouseClickedSignal = QtCore.pyqtSignal(int, int)
+    mouseDoubleClickedSignal = QtCore.pyqtSignal(int, int)  
     mouseReleasedSignal = QtCore.pyqtSignal(int, int)
 
     def __init__ (self, parent=None):
@@ -677,11 +693,14 @@ class GraphicsCameraFrame(QtGui.QGraphicsPixmapItem):
     def mousePressEvent(self, event):
         position = QtCore.QPointF(event.pos())
         self.scene().mouseClickedSignal.emit(position.x(), position.y())
-        #self.scene().emit(QtCore.SIGNAL("graphicsViewMouseClicked"), position.x(), position.y())
         self.update()  
+
+    def mouseDoubleClickEvent(self, event):
+        position = QtCore.QPointF(event.pos())
+        self.scene().mouseDoubleClickedSignal.emit(position.x(), position.y())
+        self.update()
 
     def mouseReleaseEvent(self, event):
         position = QtCore.QPointF(event.pos())
         self.scene().mouseReleasedSignal.emit(position.x(), position.y())
-        #self.scene().emit(QtCore.SIGNAL("graphicsViewMouseReleased"), position.x(), position.y())
         self.update()

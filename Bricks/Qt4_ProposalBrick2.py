@@ -415,7 +415,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.setEnabled(self.session_hwobj is not None)
           
         # find if we are using ldap, dbconnection, etc. or not
-        if None in (self.ldap_connection_hwobj, self.lims_hwobj):
+        #if None in (self.ldap_connection_hwobj, self.lims_hwobj):
+        if self.ldap_connection_hwobj is not None: 
             self.login_widget.hide()
             self.login_button.hide()
             self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
@@ -565,8 +566,8 @@ class Qt4_ProposalBrick2(BlissWidget):
             
             return self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
 
-        if self.ldap_connection_hwobj == None:
-            return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
+        #if self.ldap_connection_hwobj == None:
+        #    return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
         if self.lims_hwobj == None:
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
 
