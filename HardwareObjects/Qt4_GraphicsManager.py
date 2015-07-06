@@ -31,6 +31,7 @@ import copy
 import types
 import logging
 import traceback
+from math import sqrt
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
@@ -51,13 +52,36 @@ class Qt4_GraphicsManager(HardwareObject):
     """
     def __init__(self, name):
         HardwareObject.__init__(self, name)
+
+        self.mini_diff_hwobj = None
      
         self.pixels_per_mm = [0, 0]
         self.beam_size = [0, 0]
         self.beam_position = [0, 0]
         self.beam_shape = None
-        self.graphics_scene_width = None
-        self.graphics_scene_height = None
+        self.graphics_scene_size = [0, 0]
+        self.mouse_position = [0, 0] 
+
+        self.beam_info_dict = {}
+        self.omega_axis_info_dict = {}
+        self.centring_points = []
+        self.centring_state = False
+        self.mesh_drawing_state = False
+        self.measure_state = None
+        self.point_count = 0
+
+        self.graphics_view = None
+        self.graphics_camera_frame = None
+        self.graphics_beam_item = None
+        self.graphics_scale_item = None
+        self.graphics_omega_reference_item = None
+        self.graphics_centring_lines_item = None
+        self.graphics_mesh_draw_item = None
+ 
+    def init(self):
+        self.mini_diff_hwobj = self.getObjectByRole("mini-diff")
+        self.pixels_per_mm = self.mini_diff_hwobj.get_pixels_per_mm()
+
         self.graphics_view = GraphicsView()
          
         self.graphics_camera_frame = GraphicsCameraFrame()
@@ -68,6 +92,9 @@ class Qt4_GraphicsManager(HardwareObject):
         self.graphics_centring_lines_item.hide()
         self.graphics_mesh_draw_item = GraphicsItemMesh(self)
         self.graphics_mesh_draw_item.hide()
+        self.graphics_measure_line_item = GraphicsItemMeasureLine(self)
+        self.graphics_measure_line_item.hide()
+        self.graphics_measure_line_item.set_pixels_per_mm(self.pixels_per_mm)
          
         self.graphics_view.graphics_scene.addItem(self.graphics_camera_frame) 
         self.graphics_view.graphics_scene.addItem(self.graphics_beam_item)
@@ -75,13 +102,7 @@ class Qt4_GraphicsManager(HardwareObject):
         self.graphics_view.graphics_scene.addItem(self.graphics_centring_lines_item) 
         #self.graphics_view.graphics_scene.addItem(self.graphics_mesh_draw_item)
         self.graphics_view.graphics_scene.addItem(self.graphics_scale_item)
-
-        self.beam_info_dict = {}
-        self.omega_axis_info_dict = {}
-        self.centring_points = []
-        self.centring_state = False
-        self.mesh_drawing_state = False
-        self.point_count = 0
+        self.graphics_view.graphics_scene.addItem(self.graphics_measure_line_item)
 
         self.graphics_view.scene().mouseClickedSignal.connect(\
              self.mouse_clicked)
@@ -89,39 +110,55 @@ class Qt4_GraphicsManager(HardwareObject):
              self.mouse_double_clicked)
         self.graphics_view.scene().mouseReleasedSignal.connect(\
              self.mouse_released)
+        self.graphics_view.scene().itemDoubleClickedSignal.connect(
+             self.item_double_clicked)
         self.graphics_view.mouseMovedSignal.connect(self.mouse_moved)
         self.graphics_view.keyPressedSignal.connect(self.key_pressed)
+
         
     def mouse_clicked(self, x, y): 
-        self.emit("graphicsClicked", x, y)
+        #elf.emit("graphicsClicked", x, y)
         if self.centring_state:
             self.graphics_centring_lines_item.set_coordinates(x, y)
         elif self.mesh_drawing_state:
             self.graphics_mesh_draw_item.show()
             self.graphics_mesh_draw_item.set_draw_mode(True)
             self.graphics_mesh_draw_item.set_draw_start_position(x, y)
+        elif self.measure_state:
+            QtGui.QApplication.restoreOverrideCursor()
+            self.measure_state = None
         else:
             for graphics_item in self.graphics_view.scene().items():
                 graphics_item.setSelected(False)
+        self.mini_diff_hwobj.image_clicked(x, y)
 
     def mouse_double_clicked(self, x, y): 
-        self.emit("graphicsDoubleClicked", x, y)
+        self.mini_diff_hwobj.move_to_coord(x, y)
+        #elf.emit("graphicsDoubleClicked", x, y)
 
     def mouse_released(self, x, y):
         self.graphics_mesh_draw_item.set_draw_mode(False)
 
     def mouse_moved(self, x, y):
+        self.emit("graphicsMouseMoved", x, y)
+        self.mouse_position = [x, y]
         if self.centring_state:
             self.graphics_centring_lines_item.set_coordinates(x, y)
-        if (self.mesh_drawing_state and 
-            self.graphics_mesh_draw_item.is_draw_mode()):
-            self.graphics_mesh_draw_item.set_draw_end_position(x, y)
+        elif self.mesh_drawing_state:
+            if self.graphics_mesh_draw_item.is_draw_mode():
+                self.graphics_mesh_draw_item.set_draw_end_position(x, y)
+        elif self.measure_state:
+            self.graphics_measure_line_item.set_end_coord(self.mouse_position)
 
     def key_pressed(self, key_event):
         if key_event == "Delete":
             for item in self.graphics_view.graphics_scene.items():
                 if item.isSelected():
                     self.delete_shape(item)
+
+    def item_double_clicked(self, item):
+        if isinstance(item, GraphicsItemPoint):
+            self.mini_diff_hwobj.move_to_centred_position(item.centred_position)
 
     def get_graphics_view(self):
         return self.graphics_view
@@ -133,8 +170,6 @@ class Qt4_GraphicsManager(HardwareObject):
         self.graphics_scene_size = size
         self.graphics_scale_item.set_position(10, 
              self.graphics_scene_size[1] - 10)
-        #@self.graphics_view.setSceneRect(-2, self.graphics_scene_size[0], 
-        #                                self.graphics_scene_size[1])
 
     def get_graphics_beam_item(self):
         return self.graphics_beam_item
@@ -252,6 +287,7 @@ class Qt4_GraphicsManager(HardwareObject):
             self.pixels_per_mm = pixels_per_mm
             self.graphics_beam_item.set_size(self.beam_size[0] * self.pixels_per_mm[0],
                                              self.beam_size[1] * self.pixels_per_mm[1])
+            self.graphics_measure_line_item.set_pixels_per_mm(self.pixels_per_mm)
 
     def update_beam_info(self, beam_info):
         if beam_info is not None:
@@ -297,6 +333,18 @@ class Qt4_GraphicsManager(HardwareObject):
         self.add_shape(self.graphics_mesh_draw_item)
         self.graphics_mesh_draw_item = GraphicsItemMesh(self)
         self.graphics_mesh_draw_item.hide()
+
+    def start_measure(self):
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
+        self.measure_state = True
+        self.graphics_measure_line_item.set_start_coord(self.mouse_position)
+        self.graphics_measure_line_item.show()
+        self.graphics_view.graphics_scene.update()
+
+    def stop_measure(self):
+        self.measure_state = False
+        self.graphics_measure_line_item.hide()
+        self.graphics_view.graphics_scene.update()
   
 class GraphicsItem(QtGui.QGraphicsItem):
     """
@@ -342,7 +390,6 @@ class GraphicsItemBeam(GraphicsItem):
         self.__position_x = position_x
         self.__position_y = position_y
         
-
     def paint(self, painter, option, widget):
         pen = QtGui.QPen(self.style)
         pen.setWidth(1)
@@ -494,6 +541,7 @@ class GraphicsItemScale(GraphicsItem):
         painter.drawLine(0, 0, 150, 0)
         painter.drawLine(0, 0, 0, -50)
 
+
 class GraphicsItemOmegaReference(GraphicsItem):
     """
     Descrip. : 
@@ -550,6 +598,50 @@ class GraphicsItemCentringLines(GraphicsItem):
         self.coord_x = x
         self.coord_y = y 
         self.scene().update()        
+
+class GraphicsItemMeasureLine(GraphicsItem):
+    """
+    Descrip. : 
+    """
+    def __init__(self, parent):
+        GraphicsItem.__init__(self, parent)
+        self.start_x = 0 
+        self.start_y = 0
+        self.end_x = 0
+        self.end_y = 0
+        self.pixels_per_mm = 0
+        self.dist_microns = 0
+
+        self.setFlags(QtGui.QGraphicsItem.ItemIsSelectable)
+
+    def paint(self, painter, option, widget):
+        pen = QtGui.QPen(self.style)
+        pen.setWidth(1)
+        if option.state & QtGui.QStyle.State_Selected:
+            pen.setColor(QtCore.Qt.green)
+        else:
+            pen.setColor(QtCore.Qt.yellow)
+        painter.setPen(pen)
+        painter.drawLine(self.start_x, self.start_y,
+                         self.end_x, self.end_y)
+        painter.drawText(self.end_x + 10, self.end_y + 10, "%.2f microns" % self.dist_microns)
+ 
+    def set_pixels_per_mm(self, pixels_per_mm):
+        self.pixels_per_mm = pixels_per_mm
+
+    def set_start_coord(self, coord):
+        self.start_x = coord[0]
+        self.start_y = coord[1]
+
+    def set_end_coord(self, coord):
+        self.end_x = coord[0]
+        self.end_y = coord[1]
+         
+
+        self.dist_microns = sqrt(pow((self.start_x - self.end_x) / self.pixels_per_mm[0], 2) + \
+                                 pow((self.start_y - self.end_y) / self.pixels_per_mm[1], 2)) * 1000
+        
+        self.scene().update()
 
 class GraphicsItemPoint(GraphicsItem):
     """
@@ -608,6 +700,11 @@ class GraphicsItemPoint(GraphicsItem):
         self.__position_x = position_x
         self.__position_y = position_y
         self.setPos(self.__position_x - 10, self.__position_y - 10)
+
+    def mouseDoubleClickEvent(self, event):
+        position = QtCore.QPointF(event.pos())
+        self.scene().itemDoubleClickedSignal.emit(self)
+        self.update()
 
 class GraphicsItemLine(GraphicsItem):
     """
@@ -681,6 +778,7 @@ class GraphicsScene(QtGui.QGraphicsScene):
     mouseClickedSignal = QtCore.pyqtSignal(int, int)
     mouseDoubleClickedSignal = QtCore.pyqtSignal(int, int)  
     mouseReleasedSignal = QtCore.pyqtSignal(int, int)
+    itemDoubleClickedSignal = QtCore.pyqtSignal(GraphicsItem)
 
     def __init__ (self, parent=None):
         super(GraphicsScene, self).__init__ (parent)

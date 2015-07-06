@@ -201,13 +201,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), self.beam_position_changed) 
                 self.beam_info_hwobj.update_values()
         elif property_name == "graphicsManager":
-            if self.graphics_manager_hwobj is not None:
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.graphics_clicked)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsDoubleClicked'), self.graphics_double_clicked)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
-            if self.graphics_manager_hwobj is not None:
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsClicked'), self.graphics_clicked)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('graphicsDoubleClicked'), self.graphics_double_clicked)
         elif property_name == "collection":
             self.collect_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'icons':
@@ -508,26 +502,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         self.resetPoints()
 
-    def graphics_clicked(self, x, y):
-        """
-        Descript. : 
-        Args.     : 
-        Return    : 
-        """
-        if self.current_centring is not None:
-            if (self.current_centring == self.diffractometer_hwobj.MANUAL3CLICK_MODE and
-                self.diffractometer_hwobj.isReady()):
-                points = self.diffractometer_hwobj.image_clicked(x, y)
-
-    def graphics_double_clicked(self, x, y):
-        """
-        Descript. : 
-        Args.     : 
-        Return    : 
-        """
-        if self.diffractometer_hwobj is not None:
-            self.diffractometer_hwobj.move_to_coord(x, y)
- 
     def addPoint(self, x, y, xi, yi):
         """
         Descript. : 
@@ -645,7 +619,7 @@ class MenuButton(QtGui.QToolButton):
         self.setUsesTextLabel(True)
         self.setText(caption)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        QtCore.QObject.connect(self, QtCore.SIGNAL('clicked()'), self.button_clicked)
+        self.clicked.connect(self.button_clicked)
 
     def set_Icons(self, icon_run, icon_stop):
         """

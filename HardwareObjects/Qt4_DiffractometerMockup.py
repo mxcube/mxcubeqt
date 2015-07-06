@@ -87,6 +87,7 @@ class Qt4_DiffractometerMockup(Equipment):
         self.centring_time = None
         self.user_confirms_centring = None
         self.user_clicked_event = None
+        self.phase_list = None
 
         self.connect(self, 'equipmentReady', self.equipmentReady)
         self.connect(self, 'equipmentNotReady', self.equipmentNotReady)
@@ -137,6 +138,11 @@ class Qt4_DiffractometerMockup(Equipment):
             self.connect(self.beam_info_hwobj, 'beamPosChanged', self.beam_position_changed)
         else:
             logging.getLogger("HWR").debug('Minidiff: Beaminfo is not defined')
+
+        try:
+            self.phase_list = eval(self.getProperty("phaseList"))
+        except:
+            self.phase_list = ['demo']
 
     def getStatus(self):
         """
@@ -342,6 +348,7 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
+        print "minidiff move_to_pos: ", centred_pos 
         time.sleep(1)
    
     def moveToCentredPosition(self, centred_position, wait = False):
@@ -491,6 +498,7 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
+        print "move_to_coord: ", x, y 
         return
 
     def move_motors(self, motors_dict):
@@ -560,3 +568,6 @@ class Qt4_DiffractometerMockup(Equipment):
         self.emit('zoomMotorPredefinedPositionChanged', None, None)
         omega_ref = [100, 0]
         self.emit('omegaReferenceChanged', omega_ref)
+
+    def get_phase_list(self):
+        return self.phase_list
