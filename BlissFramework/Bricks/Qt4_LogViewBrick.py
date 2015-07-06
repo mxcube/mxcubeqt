@@ -130,7 +130,7 @@ class SubmitFeedback(QtGui.QWidget):
 
         self.submitButton.setText('Submit')
         self.submitButton.setUsesTextLabel(True)
-        QtCore.QObject.connect(self.submitButton, QtCore.SIGNAL('clicked()'), self.submitMessage)
+        self.submitButton.clicked.connect(self.submitMessage)
 
         self.message = QtGui.QTextEdit(box1)
 
@@ -224,7 +224,13 @@ class Qt4_LogViewBrick(Qt4_BaseComponents.BlissWidget):
         self.defineSignal('incUnreadMessages',())
         self.defineSignal('resetUnreadMessages',())
 
-        self.color = { logging.NOTSET: 'lightgrey', logging.DEBUG: 'darkgreen', logging.INFO: 'darkblue', logging.WARNING: 'orange', logging.ERROR: 'red', logging.CRITICAL: 'black' }
+        self.color = {logging.NOTSET: 'lightgrey', 
+                      logging.DEBUG: 'darkgreen', 
+                      logging.INFO: 'darkblue', 
+                      logging.WARNING: 'orange', 
+                      logging.ERROR: 'red', 
+                      logging.CRITICAL: 'black' }
+
         self.filterLevel = logging.NOTSET
 
         self.tabs = QtGui.QTabWidget(self)
@@ -313,7 +319,6 @@ class Qt4_LogViewBrick(Qt4_BaseComponents.BlissWidget):
         pass
         
     def propertyChanged(self, propertyName, oldValue, newValue):
-        #print "Qt4_LogViewBrick.propertyChanged",propertyName,oldValue,newValue
         if propertyName == 'level':
             self.filterLevel = logging.NOTSET
 
@@ -400,9 +405,8 @@ class Qt4_LogViewBrick(Qt4_BaseComponents.BlissWidget):
 
         elif propertyName == 'maxLogLines':
             print "maxLogLines - implement"
-           
-            """for l in Qt4_LogViewBrick.LOGS:
-                exec("self.%sLog.setMaxLogLines(%d)" % (l,newValue))"""
+            #for l in Qt4_LogViewBrick.LOGS:
+            #    exec("self.%sLog.setMaxLogLines(%d)" % (l,newValue))
 
         else:
             Qt4_BaseComponents.BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)        

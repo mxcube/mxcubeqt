@@ -120,8 +120,6 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         Descript. :
         """
-
-        print 2
         BlissWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
@@ -230,8 +228,6 @@ class Qt4_InstanceListBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.timeout_timer = QtCore.QTimer(self)
         self.timeout_timer.timeout.connect(self.timeoutApproaching)
-
-        print 3
 
     def propertyChanged(self, propertyName, oldValue, newValue):
         """
@@ -1123,40 +1119,46 @@ class ExternalUserInfoDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self,None)
         self.setWindowTitle('mxCuBE')  # Application name (mxCuBE) is hardwired!!!
 
-        print "ExternalUserInfoDialog - implement"
         return
 
-        self.messageBox=QtGui.QVGroupBox("Your info",self)
-        self.message1=QtGui.QLabel(self.messageBox)
+        # Hardware objects ----------------------------------------------------
+
+        # Internal values -----------------------------------------------------
+
+        # Properties ----------------------------------------------------------
+
+        # Signals -------------------------------------------------------------
+
+        # Slots ---------------------------------------------------------------
+
+        # Graphic elements ----------------------------------------------------
+        self.messageBox = QtGui.QGroupBox("Your info",self) #v
+        self.message1 = QtGui.QLabel(self.messageBox)
         self.message1.setAlignment(QtGui.Qt.AlignCenter)
-        self.message2=QtGui.QLabel("<nobr>Please enter the following information, <u>required</u> for the experimental hall operator:",self.messageBox)
+        self.message2 = QtGui.QLabel("<nobr>Please enter the following information, <u>required</u> for the experimental hall operator:",self.messageBox)
 
-        my_name_widget=QtGui.QWidget(self.messageBox)
-        QtGui.QGridLayout(my_name_widget, 2, 5, 1, 1)
+        my_name_widget = QtGui.QWidget(self.messageBox)
+        #QtGui.QGridLayout(my_name_widget, 2, 5, 1, 1)
 
-        name_label=QtGui.QLabel("Your name:",my_name_widget)
-        my_name_widget.layout().addWidget(name_label, 0, 0)
-        self.nameInput=QtGui.QLineEdit(my_name_widget)
-        my_name_widget.layout().addWidget(self.nameInput,0,1)
-        QtCore.QObject.connect(self.nameInput,SIGNAL('textChanged(const QString &)'), self.validateParameters)
+        name_label = QtGui.QLabel("Your name:",my_name_widget)
+        #my_name_widget.layout().addWidget(name_label, 0, 0)
+        self.nameInput = QtGui.QLineEdit(my_name_widget)
+        #my_name_widget.layout().addWidget(self.nameInput,0,1)
 
         institute_label=QtGui.QLabel("Your institute:",my_name_widget)
         my_name_widget.layout().addWidget(institute_label, 1, 0)
         self.instituteInput=QtGui.QLineEdit(my_name_widget)
         my_name_widget.layout().addWidget(self.instituteInput,1,1)
-        QtCore.QObject.connect(self.instituteInput,SIGNAL('textChanged(const QString &)'), self.validateParameters)
 
         phone_label=QtGui.QLabel("Your telephone:",my_name_widget)
         my_name_widget.layout().addWidget(phone_label, 2, 0)
         self.phoneInput=QtGui.QLineEdit(my_name_widget)
         my_name_widget.layout().addWidget(self.phoneInput,2,1)
-        QtCore.QObject.connect(self.phoneInput,SIGNAL('textChanged(const QString &)'), self.validateParameters)
 
         email_label=QtGui.QLabel("Your email:",my_name_widget)
         my_name_widget.layout().addWidget(email_label, 3, 0)
         self.emailInput=QtGui.QLineEdit(my_name_widget)
         my_name_widget.layout().addWidget(self.emailInput,3,1)
-        QtCore.QObject.connect(self.emailInput,SIGNAL('textChanged(const QString &)'), self.validateParameters)
 
         box2=QtGui.QHBox(my_name_widget)
         QtGui.QLabel("Are there users at the ESRF?",box2)
@@ -1164,23 +1166,34 @@ class ExternalUserInfoDialog(QtGui.QDialog):
         self.radioBox.setFrameShape(self.radioBox.NoFrame)
         self.radioBox.setInsideMargin(0)
         self.radioBox.setInsideSpacing(0)            
-        self.yesBox=QtGui.QRadioButton("Yes",self.radioBox)
-        self.noBox=QtGui.QRadioButton("No",self.radioBox)
+        self.yesBox = QtGui.QRadioButton("Yes",self.radioBox)
+        self.noBox = QtGui.QRadioButton("No",self.radioBox)
 
-        #spacer=QtGui.QWidget(box2)
-        #spacer.setSizePolicy(QtGui.QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.buttonsBox = DialogButtonsBar(self, "Continue", None, None, 
+              self.buttonClicked, 0, DialogButtonsBar.DEFAULT_SPACING)
 
-        #my_name_widget.layout().addMultiCellWidget(box2, 4, 4, 0, 1)
+        # Layout --------------------------------------------------------------
 
-        self.buttonsBox=DialogButtonsBar(self,"Continue",None,None,self.buttonClicked,0,DialogButtonsBar.DEFAULT_SPACING)
+        # SizePolicies --------------------------------------------------------
+        self.messageBox.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
+                                      QtGui.QSizePolicy.Fixed)
 
-        QtGui.QVBoxLayout(self,DialogButtonsBar.DEFAULT_MARGIN,DialogButtonsBar.DEFAULT_SPACING)
-        self.layout().addWidget(self.messageBox)
-        self.layout().addWidget(box2)
-        self.layout().addStretch(0)
-        self.layout().addWidget(self.buttonsBox)
+        # Qt signal/slot connections ------------------------------------------
 
-        self.messageBox.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,QSizePolicy.Fixed)
+        # Other ---------------------------------------------------------------
+        main_layout = QtGui.QVBoxLayout()
+        main_layout.addWidget(self.messageBox)
+        main_layout.addWidget(box2)
+        main_layout.setSpacing(0)
+        main_layout.addWidget(self.buttonsBox)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(main_layout)
+
+        self.nameInput.textChanged.connect(self.validateParameters)
+        self.instituteInput.textChanged.connect(self.validateParameters)
+        self.phoneInput.textChanged.connect(self.validateParameters)
+        self.emailInput.textChanged.connect(self.validateParameters)
+  
 
     def exec_loop(self):
         self.validateParameters()
