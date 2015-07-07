@@ -168,7 +168,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self._path_template = queue_model_objects.PathTemplate()
 
     def add_clicked(self):
-        selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
+        selected_shapes = self._graphics_manager_hwobj.get_selected_points()
 
         if len(selected_shapes) == 2:
             p1 = selected_shapes[0]
@@ -194,7 +194,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
             list_widget_item.setSelected(True)
         else:
-            print "No points selected"
+            print "Select two points to create a helical line."
 
     def remove_clicked(self):
         selected_items = self.selected_items()
@@ -208,19 +208,17 @@ class CreateHelicalWidget(CreateTaskBase):
 
     # Calback from graphics_manager, called when a shape is deleted
     def shape_deleted(self, shape):
-        if isinstance(shape, graphics_manager.Point):
+        if isinstance(shape, graphics_manager.GraphicsItemPoint):
+    
             items_to_remove = []
 
             for (list_item, line) in self._list_item_map.iteritems():
-                #if shape
- 
-                for qub_object in shape.get_qub_objects():
-                    if qub_object in line.get_qub_objects():
-                        items_to_remove.append((list_item, line))
+                if shape in line.get_graphics_points():
+                    items_to_remove.append((list_item, line))
 
             for (list_item, line) in items_to_remove:
                 self._lines_list_widget.takeItem(self._lines_list_widget.row(list_item))
-                del self._list_item_map[list_item]
+                del self._list_item_map[list_item] 
 
     def centred_position_selection(self, positions):
         if len(positions) == 1:
@@ -392,4 +390,3 @@ class CreateHelicalWidget(CreateTaskBase):
             self._path_template.run_number += 1
 
         return data_collections
-                   

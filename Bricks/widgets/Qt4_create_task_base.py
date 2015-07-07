@@ -127,6 +127,9 @@ class CreateTaskBase(QtGui.QWidget):
             logging.getLogger("HWR").warning(msg)
         
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
+        if self._graphics_manager_hwobj: 
+            self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
+
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
 
@@ -508,3 +511,6 @@ class CreateTaskBase(QtGui.QWidget):
             acq.acquisition_parameters.take_snapshots = True
 
         return acq
+
+    def shape_deleted(self, shape):
+        return

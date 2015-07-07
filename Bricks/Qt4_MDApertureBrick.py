@@ -104,7 +104,8 @@ class Qt4_MDApertureBrick(BlissWidget):
 
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.aperture_cbox,
-                                           Qt4_widget_colors.LIGHT_GREEN)
+                                           Qt4_widget_colors.LIGHT_GREEN,
+                                           QtGui.QPalette.Button)
 
     def propertyChanged(self, property, oldValue, newValue):
         """

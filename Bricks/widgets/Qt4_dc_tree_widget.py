@@ -143,8 +143,8 @@ class DataCollectTree(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
         #self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
         #                                     QtGui.QSizePolicy.Expanding))   
-        #self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
-        #                                                        QtGui.QSizePolicy.Expanding))
+        self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
+                                                                QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
@@ -176,6 +176,7 @@ class DataCollectTree(QtGui.QWidget):
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(2)
         self.sample_tree_widget.setColumnWidth(0, 200)
+        self.sample_tree_widget.setColumnWidth(1, 200)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))

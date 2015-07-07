@@ -74,7 +74,8 @@ class Qt4_MDPhaseBrick(BlissWidget):
  
         # Other ---------------------------------------------------------------
         Qt4_widget_colors.set_widget_color(self.phase_combobox,
-                                           Qt4_widget_colors.LIGHT_GREEN)
+                                           Qt4_widget_colors.LIGHT_GREEN,
+                                           QtGui.QPalette.Button)
 
  
     def propertyChanged(self, property, oldValue, newValue):
@@ -84,13 +85,15 @@ class Qt4_MDPhaseBrick(BlissWidget):
         if property == "mnemonic":
             if self.minidiff_hwobj is not None:
                 self.disconnect(self.minidiff_hwobj, QtCore.SIGNAL('minidiffPhaseChanged'), 
-                     self.minidiffPhaseChanged)
+                     self.phase_changed)
             self.minidiff_hwobj = self.getHardwareObject(newValue)
 
             if self.minidiff_hwobj is not None:
+                self.init_phase_list()
+                
                 self.connect(self.minidiff_hwobj, QtCore.SIGNAL('minidiffPhaseChanged'), 
-                     self.minidiffPhaseChanged)
-                self.init_phase_list() 
+                     self.phase_changed)
+                self.minidiff_hwobj.update_values()
         else:
             BlissWidget.propertyChanged(self, property, oldValue, newValue)
 
@@ -114,13 +117,16 @@ class Qt4_MDPhaseBrick(BlissWidget):
         if self.minidiff_hwobj is not None:
             self.minidiff_hwobj.start_set_phase(self.phase_combobox.currentText())
 
-    def minidiffPhaseChanged(self, phase):
+    def phase_changed(self, phase):
         """
         Descript. :
         """
+        print phase, self.phase_combobox.count()
         if (phase.lower() != "unknown" and
             self.phase_combobox.count() > 0):
-            self.phase_combobox.setEditText(phase)
+            #index = self.phase_combobox.findText(phase) 
+            #self.phase_combobox.setEditText(phase)
+            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
             self.phase_combobox.setEnabled(True)
         else:
             self.phase_combobox.setEnabled(False) 

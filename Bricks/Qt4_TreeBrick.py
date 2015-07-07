@@ -143,7 +143,6 @@ class Qt4_TreeBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
         self.sample_changer_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                                                  QtGui.QSizePolicy.Fixed)
-  
 
         # Qt signal/slot connections ------------------------------------------
         self.connect(self.sample_changer_widget.findChild(QtGui.QPushButton, 

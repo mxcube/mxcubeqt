@@ -63,13 +63,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.current_centring = None
         self.reset_methods = None
         self.successful_methods = None
+        self.full_centring_done = None
 
         # Properties ----------------------------------------------------------
         self.addProperty('minidiff', 'string', '')
         self.addProperty('beamInfo', 'string', '')
         self.addProperty('collection', 'string', '')
         self.addProperty('graphicsManager', 'string', '')
-        self.addProperty('icons', 'string', '')
         self.addProperty('label', 'string', 'Sample centring')
 
         # Signals -------------------------------------------------------------
@@ -78,41 +78,39 @@ class Qt4_HutchMenuBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
        
         # Graphic elements ----------------------------------------------------
-        self.button_centre = MenuButton(self, "Centre")
-        self.button_centre.setMinimumSize(QtCore.QSize(75, 50))
-
-        self.button_accept = QtGui.QToolButton(self)
-        self.button_accept.setUsesTextLabel(True)
-        self.button_accept.setText("Save")
-        self.button_accept.setFixedSize(QtCore.QSize(75, 50))
-        self.button_standard_color = \
-             self.button_accept.palette().color(QtGui.QPalette.Window)
-
-        self.button_reject = QtGui.QToolButton(self)
-        self.button_reject.setUsesTextLabel(True)
-        self.button_reject.setText("Reject")
-        self.button_reject.setFixedSize(QtCore.QSize(75, 50))
+        self.button_centre = DuoStateButton(self, "Centre")
+        self.button_centre.set_icons("VCRPlay2", "Delete")
+        self.button_accept = MonoStateButton(self, "Save", "ThumbUp")
+        self.standard_color = self.button_accept.palette().\
+             color(QtGui.QPalette.Window)
+        self.button_reject = MonoStateButton(self, "Reject", "ThumbDown")
         self.button_reject.hide()
+        self.button_snapshot = MonoStateButton(self, "Snapshot", "Camera")
+        self.button_refresh_camera = MonoStateButton(self, "Refresh", "Refresh")
+        self.button_visual_align = MonoStateButton(self, "Align", "Align")
+        self.button_clear_all = MonoStateButton(self, "Clear", "Delete")
+        self.button_auto_center = MonoStateButton(self, "Auto")
 
-        self.button_snapshot = QtGui.QToolButton(self)
-        self.button_snapshot.setUsesTextLabel(True)
-        self.button_snapshot.setText("Snapshot")
-        self.button_snapshot.setFixedSize(QtCore.QSize(75, 50))
+        self.beam_position_groupbox = QtGui.QGroupBox("Beam", self) #v
+        """button_widget = QWidget(self.beam_position_groupbox)
+        button_layout = QGridLayout(button_widget)
 
-        self.button_toogle_phase = QtGui.QToolButton(self)
-        self.button_toogle_phase.setUsesTextLabel(True)
-        self.button_toogle_phase.setText("MD phase")
-        self.button_toogle_phase.setFixedSize(QtCore.QSize(75, 50))
+        move_left_pixmap = Icons.load("left_small.png")
+        move_right_pixmap = Icons.load("right_small.png")
+        move_up_pixmap = Icons.load("up_small.png")
+        move_down_pixmap = Icons.load("down_small.png")
 
-        self.button_refresh_camera = QtGui.QToolButton(self)
-        self.button_refresh_camera.setUsesTextLabel(True)
-        self.button_refresh_camera.setText("Camera")
-        self.button_refresh_camera.setFixedSize(QtCore.QSize(75, 50))
+        self.move_left_button = MonoStateButton(button_widget, None, "up_button")
+        self.move_left_button.setAutoRepeat(True)
+        self.move_right_button = QPushButton(button_widget, "right_button")
+        self.move_right_button.setAutoRepeat(True)
+        self.move_up_button = QPushButton(button_widget, "up_button")
+        self.move_up_button.setAutoRepeat(True)
+        self.move_down_button = QPushButton(button_widget, "down_button")
+        self.move_down_button.setAutoRepeat(True)
 
-        self.button_visual_align = QtGui.QToolButton(self)
-        self.button_visual_align.setUsesTextLabel(True)
-        self.button_visual_align.setText("Realign")
-        self.button_visual_align.setFixedSize(QtCore.QSize(75, 50))
+        self.fast_shutter_opened_pixmap = Icons.load("green_led.png")
+        self.fast_shutter_closed_pixmap = Icons.load("red_led.png")"""
 
         # Layout -------------------------------------------------------------- 
         _main_vlayout = QtGui.QVBoxLayout()
@@ -120,9 +118,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _main_vlayout.addWidget(self.button_accept)
         _main_vlayout.addWidget(self.button_reject)
         _main_vlayout.addWidget(self.button_snapshot)
-        _main_vlayout.addWidget(self.button_toogle_phase)
         _main_vlayout.addWidget(self.button_refresh_camera)
         _main_vlayout.addWidget(self.button_visual_align)
+        _main_vlayout.addWidget(self.button_clear_all)
+        _main_vlayout.addWidget(self.button_auto_center)
+        _main_vlayout.addWidget(self.beam_position_groupbox)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -138,9 +138,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.button_accept.clicked.connect(self.accept_clicked)
         self.button_reject.clicked.connect(self.reject_clicked)
         self.button_snapshot.clicked.connect(self.save_snapshot_clicked)
-        self.button_toogle_phase.clicked.connect(self.toggle_phase_clicked) 
         self.button_refresh_camera.clicked.connect(self.refresh_camera_clicked)
         self.button_visual_align.clicked.connect(self.visual_align_clicked)
+        self.button_clear_all.clicked.connect(self.clear_all_clicked)
 
         # Other ---------------------------------------------------------------
         self.instanceSynchronize("")
@@ -204,28 +204,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
         elif property_name == "collection":
             self.collect_hwobj = self.getHardwareObject(new_value)
-        elif property_name == 'icons':
-            self.set_icons(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
-
-    def set_icons(self, icons):
-        """
-        Descript. : 
-        Args.     : 
-        Return    : 
-        """
-        icons_list = icons.split()
-        try:
-            self.button_centre.set_Icons(icons_list[0], icons_list[1])
-            self.button_accept.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[2])))
-            self.button_snapshot.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[3])))
-            self.button_reject.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[4])))
-            self.button_toogle_phase.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[5])))
-            self.button_refresh_camera.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[6])))
-            self.button_visual_align.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[7])))
-        except IndexError:
-            logging.getLogger().error("HutchMenuBrick: Unable to set icons")            
 
     def centring_started_clicked(self):
         """
@@ -275,15 +255,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.formatType = image_type.lower()
                 self.fileIndex += 1 
 
-    def toggle_phase_clicked(self):
-        """
-        Descript. : 
-        Args.     : 
-        Return    : 
-        """
-        if self.diffractometer_hwobj is not None:
-            self.diffractometer_hwobj.toggle_phase()
-
     def refresh_camera_clicked(self):
         """
         Descript. : 
@@ -303,7 +274,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         if self.diffractometer_hwobj is not None:
-            selected_shapes = self.shape_history_hwobj.selected_shapes.values()
+            selected_shapes = self.graphics_manager_hwobj.selected_shapes.values()
             if len(selected_shapes) == 2:
                 p1 = selected_shapes[0]
                 p2 = selected_shapes[1]
@@ -311,6 +282,14 @@ class Qt4_HutchMenuBrick(BlissWidget):
             else:
                 logging.getLogger("user_level_log").\
                                 error("Select two centred position (CTRL click) to continue")
+
+    def clear_all_clicked(self):
+        """
+        Descript. : Clears all shapes (points, lines and meshes)
+        Args.     : 
+        Return    : 
+        """
+        self.graphics_manager_hwobj.clear_all()
 
     def centring_cancel_clicked(self, reject=False):
         """
@@ -326,11 +305,15 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        Qt4_widget_colors.set_widget_color(self.button_accept, 
-                                           self.button_standard_color)
-        self.button_accept.setEnabled(False)
-        self.button_reject.setEnabled(False)
-        self.diffractometer_hwobj.accept_centring()
+        if self.full_centring_done:
+            Qt4_widget_colors.set_widget_color(self.button_accept, 
+                                               self.standard_color)
+            #self.button_accept.setEnabled(False)
+            self.button_reject.setEnabled(False)
+            self.diffractometer_hwobj.accept_centring()
+            self.full_centring_done = False
+        else:
+            self.diffractometer_hwobj.start_2D_centring()            
 
     def reject_clicked(self):
         """
@@ -339,9 +322,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         Qt4_widget_colors.set_widget_color(self.button_accept, 
-                                           self.button_standard_color)
+                                           self.standard_color)
         self.button_reject.setEnabled(False)
-        self.button_accept.setEnabled(False)
+        #self.button_accept.setEnabled(False)
         self.diffractometer_hwobj.reject_centring()
 
     def centring_moving(self):
@@ -351,7 +334,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         self.is_moving = True
-        self.button_accept.setEnabled(False)
+        #self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
 
     def centring_invalid(self):
@@ -362,7 +345,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(None)
-        self.button_accept.setEnabled(False)
+        #self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
         self.graphics_manager_hwobj.set_centring_state(False)
 
@@ -375,7 +358,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.graphics_manager_hwobj.set_centring_state(False) 
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(centring_status)
-        self.button_accept.setEnabled(False)
+        #self.button_accept.setEnabled(False)
         self.button_reject.setEnabled(False)
         if self.inside_data_collection:
             self.inside_data_collection = False
@@ -426,6 +409,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
+        self.full_centring_done = True
         self.button_centre.command_done()
         if self.current_centring is not None:
             self.current_centring = None
@@ -598,8 +582,22 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         if self.graphics_manager_hwobj is not None:
             self.graphics_manager_hwobj.update_omega_reference(omega_reference)
+
+class MonoStateButton(QtGui.QToolButton):
+
+    def __init__(self, parent, caption, icon=None):
+        QtGui.QToolButton.__init__(self, parent)
+        self.setUsesTextLabel(True)
+        self.setFixedSize(75, 50)
+        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        if caption:
+            self.setText(caption)
+        else:
+            self.setText(self.objectName)
+        if icon:
+            self.setIcon(Qt4_Icons.load_icon(icon))
             
-class MenuButton(QtGui.QToolButton):
+class DuoStateButton(QtGui.QToolButton):
     """
     Descript. : 
     Args.     : 
@@ -618,17 +616,18 @@ class MenuButton(QtGui.QToolButton):
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
         self.setUsesTextLabel(True)
         self.setText(caption)
+        self.setFixedSize(75, 50)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 
-    def set_Icons(self, icon_run, icon_stop):
+    def set_icons(self, icon_run, icon_stop):
         """
         Descript. : 
         Args.     : 
         Return    : 
         """
-        self.run_icon = QtGui.QIcon(Qt4_Icons.load(icon_run))
-        self.stop_icon = QtGui.QIcon(Qt4_Icons.load(icon_stop))
+        self.run_icon = Qt4_Icons.load_icon(icon_run)
+        self.stop_icon = Qt4_Icons.load_icon(icon_stop)
         if self.executing:
             self.setIcon(self.stop_icon)
         else:

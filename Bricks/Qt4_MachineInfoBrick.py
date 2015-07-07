@@ -109,9 +109,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
         self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
-        self.setMaximumWidth(250)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        #self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+        #                   QtGui.QSizePolicy.Fixed)
 
         # Other --------------------------------------------------------------- 
         self.setToolTip("Main information about current, state, " + \
