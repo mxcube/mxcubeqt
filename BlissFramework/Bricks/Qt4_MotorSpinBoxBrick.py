@@ -116,8 +116,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.step_button_icon = Qt4_Icons.load_icon('steps_small')
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
-        
-
         self.step_cbox = QtGui.QComboBox(self.extra_button_box)
         self.step_cbox.setEditable(True)
         self.step_cbox.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_cbox))
@@ -132,13 +130,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.control_box_layout.setContentsMargins(0, 0, 0, 0)
         self.control_box.setLayout(self.control_box_layout)  
 
-        self.main_gbox_layout = QtGui.QHBoxLayout()
-        self.main_gbox_layout.addWidget(self.motor_label) 
-        self.main_gbox_layout.addWidget(self.control_box)
-        self.main_gbox_layout.setSpacing(0)
-        self.main_gbox_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_gbox.setLayout(self.main_gbox_layout) 
-      
         self.extra_button_box_layout = QtGui.QHBoxLayout()
         self.extra_button_box_layout.addWidget(self.stop_button)
         self.extra_button_box_layout.addWidget(self.step_button)
@@ -147,9 +138,16 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.extra_button_box_layout.setContentsMargins(0, 0, 0, 0)
         self.extra_button_box.setLayout(self.extra_button_box_layout)
 
+        self.main_gbox_layout = QtGui.QHBoxLayout()
+        self.main_gbox_layout.addWidget(self.motor_label)
+        self.main_gbox_layout.addWidget(self.control_box)
+        self.main_gbox_layout.addWidget(self.extra_button_box)
+        self.main_gbox_layout.setSpacing(0)
+        self.main_gbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_gbox.setLayout(self.main_gbox_layout)
+
         self.main_layout = QtGui.QHBoxLayout()
         self.main_layout.addWidget(self.main_gbox)
-        self.main_layout.addWidget(self.extra_button_box)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout) 
@@ -206,8 +204,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        Qt4_widget_colors.set_widget_color(self.step_cbox.lineEdit(),
-               Qt4_widget_colors.LINE_EDIT_CHANGED, QtGui.QPalette.Base)
+        Qt4_widget_colors.set_widget_color(self.step_cbox,
+                                           Qt4_widget_colors.LINE_EDIT_CHANGED, 
+                                           QtGui.QPalette.Button)
 
     def step_changed(self, step):
         """
@@ -826,8 +825,10 @@ class SpinBoxEvent(QtCore.QObject):
 
     def eventFilter(self,  obj,  event):
         if event.type() == QtCore.QEvent.KeyPress:
-            if event.key() == QtCore.Qt.Key_Enter:
+            if event.key() in [QtCore.Qt.Key_Enter, 
+                               QtCore.Qt.Key_Return]:
                 self.returnPressedSignal.emit()
+            
         elif event.type() == QtCore.QEvent.MouseButtonRelease:
             self.returnPressedSignal.emit()
         elif event.type() == QtCore.QEvent.ContextMenu:

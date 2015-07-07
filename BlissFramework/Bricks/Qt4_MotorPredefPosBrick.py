@@ -58,12 +58,12 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.label = QtGui.QLabel("motor:", self)
-        self.lstPositions = QtGui.QComboBox(self)
+        self.positions_combo = QtGui.QComboBox(self)
 
         # Layout -------------------------------------------------------------- 
         main_layout = QtGui.QHBoxLayout(self)
         main_layout.addWidget(self.label)
-        main_layout.addWidget(self.lstPositions) 
+        main_layout.addWidget(self.positions_combo) 
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(main_layout)
@@ -76,10 +76,11 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.setSizePolicy(QtGui.QSizePolicy.Minimum,
                            QtGui.QSizePolicy.Fixed)
         # Qt signal/slot connections ------------------------------------------
-        self.lstPositions.activated.connect(self.lstPositionsClicked)
+        self.positions_combo.activated.connect(self.lstPositionsClicked)
 
         # Other ---------------------------------------------------------------
-        self.lstPositions.setToolTip("Moves the motor to a predefined position")
+        self.positions_combo.setToolTip("Moves the motor to a predefined position")
+        
 
     def setToolTip(self,name=None,state=None):
         states=("NOTREADY","UNUSABLE","READY","MOVESTARTED","MOVING","ONLIMIT")
@@ -101,9 +102,10 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
     def motorStateChanged(self, state):
         s = state == self.motor_hwobj.READY 
-        self.lstPositions.setEnabled(s)
-        Qt4_widget_colors.set_widget_color(self.lstPositions, 
-                                           Qt4_MotorPredefPosBrick.STATE_COLORS[state])
+        self.positions_combo.setEnabled(s)
+        Qt4_widget_colors.set_widget_color(self.positions_combo, 
+                                           Qt4_MotorPredefPosBrick.STATE_COLORS[state],
+                                           QtGui.QPalette.Button)
         self.setToolTip(state=state)
 
     def propertyChanged(self,propertyName,oldValue,newValue):
@@ -133,8 +135,9 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                 if self['label']=="":
                     lbl=self.motor_hwobj.username
                     self.label.setText("<i>"+lbl+":</i>")
-                Qt4_widget_colors.set_widget_color(self.lstPositions,
-                                                   Qt4_MotorPredefPosBrick.STATE_COLORS[0])
+                Qt4_widget_colors.set_widget_color(self.positions_combo,
+                                                   Qt4_MotorPredefPosBrick.STATE_COLORS[0],
+                                                   QtGui.QPalette.Button)
                 self.motorStateChanged(self.motor_hwobj.getState())
         elif propertyName=='listIndex':
             self.fillPositions()
@@ -142,7 +145,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
     def fillPositions(self, positions = None): 
-        self.lstPositions.clear()
+        self.positions_combo.clear()
         if self.motor_hwobj is not None:
             if positions is None:
                 positions = self.motor_hwobj.getPredefinedPositionsList()
@@ -153,7 +156,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         for p in positions:
             pos_list=p.split()
             pos_name=pos_list[1]
-            self.lstPositions.addItem(str(pos_name))
+            self.positions_combo.addItem(str(pos_name))
 
         self.positions=positions
 
@@ -166,13 +169,13 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
             if self.motor_hwobj.isReady():
                 self.motor_hwobj.moveToPosition(self.positions[index-1])
             else:
-                self.lstPositions.setCurrentIndex(0)
+                self.positions_combo.setCurrentIndex(0)
 
     def predefinedPositionChanged(self, positionName, offset):
-        self.lstPositions.setCurrentIndex(0)
+        self.positions_combo.setCurrentIndex(0)
 
         if self.positions:
            for i in range(len(self.positions)):
                if self.positions[i] == positionName:
-                   self.lstPositions.setCurrentIndex(i+1)
+                   self.positions_combo.setCurrentIndex(i+1)
                    break

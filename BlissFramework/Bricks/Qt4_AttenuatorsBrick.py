@@ -81,9 +81,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setMaximumWidth(250)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        #self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+        #                   QtGui.QSizePolicy.Fixed)
 
 
         # Qt signal/slot connections ------------------------------------------

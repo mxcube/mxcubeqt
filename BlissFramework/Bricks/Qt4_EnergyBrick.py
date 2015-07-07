@@ -70,7 +70,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.units_combobox = QtGui.QComboBox(self.new_value_widget)
         self.units_combobox.addItems(["keV", chr(197)]) 
         self.stop_button = QtGui.QPushButton(self.new_value_widget)        
-        self.stop_button.setIcon(QtGui.QIcon(Qt4_Icons.load("Stop2")))
+        self.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedWidth(25)
  
@@ -108,16 +108,20 @@ class Qt4_EnergyBrick(BlissWidget):
         # Qt signal/slot connections ------------------------------------------
         self.new_value_ledit.returnPressed.connect(self.current_value_changed)
         self.new_value_ledit.textChanged.connect(self.input_field_changed)
-        self.connect(self.units_combobox, QtCore.SIGNAL("activated(const QString &)"), self.units_changed)
+        self.units_combobox.activated.connect(self.units_changed)
         self.stop_button.clicked.connect(self.stop_clicked)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)
         self.group_box.setChecked(True)
         Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
-                                       Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                       QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(0, 15, 4, self.new_value_ledit)
+                                           Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                                           QtGui.QPalette.Base)
+        Qt4_widget_colors.set_widget_color(self.units_combobox,
+                                           Qt4_widget_colors.LIGHT_GREEN,
+                                           QtGui.QPalette.Button)
+        self.new_value_validator = QtGui.QDoubleValidator(\
+             0, 15, 4, self.new_value_ledit)
         #self.new_value_ledit.setValidator(self.new_value_validator)
      
 

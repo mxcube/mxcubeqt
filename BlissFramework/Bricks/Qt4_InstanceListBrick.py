@@ -154,7 +154,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.users_listwidget = QtGui.QListWidget(_main_gbox)
         self.users_listwidget.setFixedHeight(50)
 
-        self.users_listwidget.setFixedWidth(150)
+        #self.users_listwidget.setFixedWidth(150)
         self.give_control_chbox = QtGui.QCheckBox(\
              "Selecting gives control", _main_gbox)
         self.give_control_chbox.setChecked(False)
@@ -168,18 +168,18 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.take_control_button.setEnabled(True)
         self.take_control_button.hide()
 
-        self.take_control_button.setFixedWidth(50)
+        #self.take_control_button.setFixedWidth(50)
 
         self.ask_control_button = QtGui.QToolButton(_main_gbox)
         self.ask_control_button.setUsesTextLabel(True)
         self.ask_control_button.setText("Ask for control")
         self.ask_control_button.setEnabled(False)
-        self.ask_control_button.setFixedWidth(50)
+        #self.ask_control_button.setFixedWidth(50)
 
         _my_name_widget = QtGui.QWidget(_main_gbox)
         _my_name_label = QtGui.QLabel("My name:", _my_name_widget)
         self.nickname_ledit = NickEditInput(_my_name_widget)
-        self.nickname_ledit.setFixedWidth(50)
+        #self.nickname_ledit.setFixedWidth(50)
 
         reg_exp = QtCore.QRegExp(".+")
         nick_validator = QtGui.QRegExpValidator(reg_exp, self.nickname_ledit)
@@ -217,8 +217,9 @@ class Qt4_InstanceListBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
         #self.take_control_button.setSizePolicy(QtGui.QSizePolicy.Expanding,
         #                                       QtGui.QSizePolicy.Fixed)
+        self.ask_control_button.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                              QtGui.QSizePolicy.Fixed)
         
-
         # Qt signal/slot connections ------------------------------------------
         self.users_listwidget.itemPressed.connect(self.user_selected)
         self.take_control_button.clicked.connect(self.takeControlClicked)

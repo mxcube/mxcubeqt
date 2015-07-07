@@ -160,11 +160,12 @@ class Qt4_CameraBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        pixmap_image = QtGui.QPixmap.fromImage(image)
-        self.graphics_camera_frame.setPixmap(pixmap_image)
-        if self.graphics_items_initialized is None:
-            self.init_graphics_scene_items()
-            self.graphics_items_initialized = True 
+        if self.graphics_manager_hwobj:
+            pixmap_image = QtGui.QPixmap.fromImage(image)
+            self.graphics_camera_frame.setPixmap(pixmap_image)
+            if self.graphics_items_initialized is None:
+                self.init_graphics_scene_items()
+                self.graphics_items_initialized = True 
 
     def mouse_moved(self, x, y):
         self.coord_label.setText("%d : %d" %(x, y))
