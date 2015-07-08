@@ -68,6 +68,10 @@ def emitter(ob):
                 This function enables you to connect to and emit signals 
                 from (almost) any python object with having to subclass QObject.
     """
+    #TODO fix this
+    if ob is None:
+        return 
+
     if ob not in _emitterCache:
         _emitterCache[ob] = _QObject(ho=ob)
     return _emitterCache[ob]
@@ -82,9 +86,8 @@ class InstanceEventFilter(QtCore.QObject):
         while obj is not None:
             if isinstance(obj,BlissWidget):
                 if isinstance(e, QtCore.QContextMenuEvent):
-                    #if obj.shouldFilterEvent():
-                    #    return True
-                    return True
+                    if obj.shouldFilterEvent():
+                        return True
                 elif isinstance(e, QtCore.QMouseEvent):
                     if e.button() == Qt.RightButton:
                         return True
@@ -229,32 +232,28 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
     @staticmethod
     def updateMenuBarColor(enable_checkbox=None):
         """
-        Descript. :
+        Descript. : Not a direct way how to change menubar color
+                    it is now done by changing stylesheet
         """
         color=None
         if BlissWidget._menuBar is not None:
             if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
                 if BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_IMPERSONATE:
-                    color = Qt4_widget_colors.LIGHT_BLUE
+                    color = "lightBlues"
                 else:
-                    color = Qt4_widget_colors.LIGHT_GREEN
+                    color = "lightGreen"
             elif BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE:
                 if BlissWidget._instanceRole == BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
-                    color = Qt4_widget_colors.LIGHT_RED
+                    color = "lightRed"
                 elif BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_UNKNOWN:
-                    color = QtGui.QColor(255, 165, 0)
+                    color = "rgb(255, 165, 0)"
                 else:
-                    color = Qt4_widget_colors.LIGHT_YELLOW
+                    color = "yellow"
+
         if color is not None:
-            BlissWidget._menuBar.setPaletteBackgroundColor(color)
-            children = BlissWidget._menuBar.children() or []
-            for child in children:
-                if isinstance(child,QCheckBox):
-                    child.setPaletteBackgroundColor(color)
-                    if enable_checkbox is not None:
-                        child.setEnabled(enable_checkbox)
-                        if enable_checkbox and child.isChecked():
-                            child.setPaletteBackgroundColor(Qt.yellow)
+            #BlissWidget._menuBar.setPaletteBackgroundColor(color)
+            BlissWidget._menuBar.set_color(color)
+            return
 
     @staticmethod
     def setInstanceMode(mode):
@@ -635,6 +634,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
             widget.setEditorText = new.instancemethod(SpinBoxSetEditorText,widget,widget.__class__)
             widget.editorTextChanged = new.instancemethod(SpinBoxEditorTextChanged,widget,widget.__class__)
             self.connect(widget.lineEdit(), QtCore.SIGNAL('textChanged(const QString &)'), widget.editorTextChanged)
+
         self._widgetEvents.append((widget, widget_name, master_sync))
 
     def instanceSynchronize(self,*args, **kwargs):
@@ -683,7 +683,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         Connectable.Connectable.__init__(self)
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QFrame.__init__(self, parent)
         self.setObjectName(widgetName)
         self.propertyBag = PropertyBag.PropertyBag()
                 
@@ -746,7 +746,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        return repr("<%s: %s>" % (self.__class__, self.objectName))
+        return repr("<%s: %s>" % (self.__class__, self.objectName()))
 
     def connectSignalSlotFilter(self,sender,signal,slot,should_cache):
         """
@@ -782,7 +782,9 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if instanceFilter:
             self.connectSignalSlotFilter(_sender, pysignal and PYSIGNAL(signal) or SIGNAL(signal), slot, shouldCache)
         else:
-            QtCore.QObject.connect(_sender, pysignal and QtCore.SIGNAL(signal) or QtCore.SIGNAL(signal), slot)
+            #TODO fix this without nonetype
+            if _sender:
+                QtCore.QObject.connect(_sender, pysignal and QtCore.SIGNAL(signal) or QtCore.SIGNAL(signal), slot)
 
         # workaround for PyQt lapse
         if hasattr(sender, "connectNotify"):

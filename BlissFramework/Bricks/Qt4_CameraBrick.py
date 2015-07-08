@@ -77,7 +77,7 @@ class Qt4_CameraBrick(BlissWidget):
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.coord_label)
-        _info_widget_hlayout.addSpacing(10)
+        _info_widget_hlayout.addStretch(0)
         _info_widget_hlayout.addWidget(self.info_label)
         _info_widget_hlayout.setSpacing(0)
         _info_widget_hlayout.setContentsMargins(0, 0, 0, 0)
@@ -91,6 +91,8 @@ class Qt4_CameraBrick(BlissWidget):
         # Qt signal/slot connections -----------------------------------------
 
         # SizePolicies --------------------------------------------------------
+        self.info_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                       QtGui.QSizePolicy.Fixed)
 
         # Scene elements ------------------------------------------------------
         self.graphics_scene_centring_points = []
@@ -158,34 +160,29 @@ class Qt4_CameraBrick(BlissWidget):
         """
         Descript. :
         Args.     :
-        Return.   : 
+        Return    : 
         """
         if self.graphics_manager_hwobj:
             pixmap_image = QtGui.QPixmap.fromImage(image)
             self.graphics_camera_frame.setPixmap(pixmap_image)
             if self.graphics_items_initialized is None:
-                self.init_graphics_scene_items()
+                self.set_scene_size()
+                #self.init_graphics_scene_items()
                 self.graphics_items_initialized = True 
 
     def mouse_moved(self, x, y):
-        self.coord_label.setText("%d : %d" %(x, y))
-
-    def init_graphics_scene_items(self): 
         """
         Descript. :
         Args.     :
-        Return.   : 
+        Return    : 
         """
-        self.set_scene_size()
-        self.graphics_scene_beam_item = self.graphics_manager_hwobj.get_graphics_beam_item()
-        self.graphics_scene_scale_item = self.graphics_manager_hwobj.get_scale_item()
-        self.graphics_scene_omega_reference_item = self.graphics_manager_hwobj.get_omega_reference_item()
+        self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" %(x, y))
 
     def set_scene_size(self):
         """
         Descript. :
         Args.     :
-        Return.   : 
+        Return    : 
         """
         if self.use_fixed_size:
             scene_size = self.graphics_scene_fixed_size
@@ -193,3 +190,4 @@ class Qt4_CameraBrick(BlissWidget):
             scene_size = self.graphics_scene_size
         if self.graphics_manager_hwobj:
             self.graphics_manager_hwobj.set_graphics_scene_size(scene_size)
+        #self.graphics_view.setFixedSize(scene_size[0], scene_size[1])

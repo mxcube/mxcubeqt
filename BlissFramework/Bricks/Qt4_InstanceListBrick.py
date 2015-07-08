@@ -408,9 +408,11 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.initName(my_nickname)
             #self.give_control_chbox.setChecked(False)
 
+            print "postEvent:  "
             msg_event = MsgDialogEvent(QtGui.QMessageBox.Information,
                 "Successfully connected to the server application.",
                 self.font().pointSize())
+            print msg_event.isAccepted()
             QtGui.QApplication.postEvent(self, msg_event)
 
     def serverInitialized(self,started,server_id=None):
@@ -461,7 +463,8 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         Descript. :
         """
-        #logging.getLogger().debug("widgetUpdate %s %r %r", timestamp, method, method_args)
+        logging.getLogger().debug("widgetUpdate %s %r %r", timestamp, method, method_args)
+
         if self.instance_server_hwobj.isServer():
             BlissWidget.addEventToCache(timestamp,method,*method_args)
             if not masterSync or BlissWidget.shouldRunEvent():

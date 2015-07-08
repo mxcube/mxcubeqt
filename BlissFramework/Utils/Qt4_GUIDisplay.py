@@ -159,9 +159,14 @@ class CustomMenuBar(QtGui.QWidget):
         Descript. :
         """
         if self.execution_mode:
-            #QtCore.QObject.emit(self.topParent, QtCore.SIGNAL("quit"), ())
             QtGui.QApplication.quit()
 
+    def set_color(self, color):
+        if color:  
+            style_string = """QMenuBar {background-color: %s;}""" % color
+            style_string += """QMenuBar::item {background: %s;}""" %color
+            style_string += """QMenuBar {color: black;}"""
+            self.setStyleSheet(style_string) 
 
 class WindowDisplayWidget(QtGui.QScrollArea):
     """
@@ -630,6 +635,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         self.menu_bar.configure(menu_data, exp_pwd, execution_mode)
         self.menu_bar.show()
+        BlissWidget._menuBar = self.menu_bar
           
         #self.menu_bar = CustomMenuBar(menu_data, exp_pwd, execution_mode)
         #self.layout().addWidget(self.menu_bar)
@@ -668,13 +674,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         Descript. :
         """
         if len(args) > 0:
-          if args[0]:
-            return
-
-        #BlissWidget.menu_bar.set_expert_mode(False)
-        #BlissWidget.menu_bar.expert_mode_checkbox.setChecked(False)
+            if args[0]:
+                return
         self.menu_bar.set_expert_mode(False)
-        #self.menu_bar.expert_mode_checkbox.setChecked(False)
 
     def add_item(self, item_cfg, parent):
         """
@@ -688,8 +690,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             klass = WindowDisplayWidget.items[item_type]
         except KeyError:
             newItem = item_cfg["brick"]
-          
-            #newItem.reparent(parent)
         else:
             newItem = klass(parent, item_cfg["name"], executionMode=self.execution_mode)
             if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox"):
@@ -702,9 +702,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                                                  qtcolor.green(),
                                                  qtcolor.blue())) 
                         newItem.setPalette(newItem_palette)
-                        #newItem.setPaletteBackgroundColor(QtGui.QColor(qtcolor.red(),
-                        #                                            qtcolor.green(),
-                        #                                            qtcolor.blue()))
                     except:
                         logging.getLogger().exception("Could not set color on item %s", item_cfg["name"])
 
@@ -892,13 +889,12 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         remove_item_list = child_name_list
         remove_item_list.append(item_name)
-
         for name in remove_item_list:
             for item_widget in self.preview_items:
                 if item_widget.objectName() == name:
                     self.preview_items.remove(item_widget) 
-                    item_widget.setParent(None)
-        item_widget.deleteLater()
+                    #item_widget.setParent(None)
+                    item_widget.deleteLater()
 
     def add_widget(self, child, parent):
         """
@@ -917,10 +913,32 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             else:   
                 parent_item.layout().addWidget(newItem)
             self.preview_items.append(newItem)
-  
+
+    def move_widget(self, item_name, direction):
+        """
+        Descript. : moves widget in the parent layout up or down
+        """ 
+        for preview_item in self.preview_items:
+            if preview_item.objectName() == item_name:
+                 item = preview_item 
+        if item:         
+            parent_layout = item.parent().layout()
+            current_index = parent_layout.indexOf(item) 
+
+            if direction == "up":
+                new_index = current_index - 1
+            else:          
+                new_index = current_index + 1
+
+            if (new_index <> current_index and \
+                new_index > -1 and \
+                new_index < parent_layout.count()):
+                parent_layout.removeWidget(item)
+                parent_layout.insertWidget(new_index, item)            
+
     def updatePreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
         """
-        Descript. :
+        Descript. : function to select widget in the gui
         """
         if callable(self.__putBackColors):
             self.__putBackColors()
@@ -947,15 +965,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         b = orig_bkgd_color.blue()
         bkgd_color = widget_palette.color(QtGui.QPalette.Window)
         bkgd_color2 = QtGui.QColor()
-        #bkgd_color2.setRgb(255,0,0)
-        #bkgd_color2.setRgb(QtGui.qRgba(bkgd_color.red(), bkgd_color.green(), bkgd_color.blue(), 127))
         bkgd_color2.setRgb(150,150,200)
         widget_palette.setColor(QtGui.QPalette.Background, bkgd_color2)         
         widget.setAutoFillBackground(True)
         widget.setPalette(widget_palette)
 
-        #widet.setPaletteBackgroundColor(bkgd_color2)
-     
         def putBackColors(wref=weakref.ref(widget), bkgd_color=(r,g,b)):
             widget = wref()
             if widget is not None:
@@ -963,9 +977,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 widget_palette = widget.palette()
                 widget_palette.setColor(QtGui.QPalette.Background, QtGui.QColor(*bkgd_color))
                 widget.setPalette(widget_palette)
-                #w.setPaletteBackgroundColor(QtGui.QColor(*bkgd_color))
         self.__putBackColors = putBackColors
-        #qt.QTimer.singleShot(300, putBackColors)
 
     def eventFilter(self, widget, event):
         """
