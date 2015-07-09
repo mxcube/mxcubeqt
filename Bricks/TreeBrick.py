@@ -153,29 +153,6 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_xrf_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
 
-        camera_brick = None
-
-        for w in qt.QApplication.allWidgets():
-            if isinstance(w, BaseComponents.BlissWidget):
-                if "CameraBrick" in str(w.__class__):
-                    camera_brick = w
-                    camera_brick.installEventFilter(self)
-                    break
-
-        # workaround for the remote access problem 
-        # (have to disable video display when DC is running)
-        if BaseComponents.BlissWidget.isInstanceRoleClient():
-            # find the video brick, make sure it is hidden when collecting data
-            # and that it is shown again when DC is finished 
-            def disable_video(w=camera_brick):
-              w.disable_update()
-            self.__disable_video=disable_video
-            def enable_video(w=camera_brick):
-              w.enable_update()
-            self.__enable_video=enable_video
-            dispatcher.connect(self.__disable_video, "collect_started")
-            dispatcher.connect(self.__enable_video, "collect_finished")
-
     def eventFilter(self, _object, event):
         if event.type() == qt.QEvent.MouseButtonPress:
             if event.state() & qt.Qt.ShiftButton:
