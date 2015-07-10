@@ -23,7 +23,8 @@ try:
 except ImportError:
     logging.getLogger().warning("no Hardware Repository client module could be found")
 else:
-    from HardwareRepository import HardwareRepositoryBrowser   
+    print "rework HardwareRepositoryBrowser"
+    #from HardwareRepository import HardwareRepositoryBrowser   
  
 
 class HorizontalSpacer(qt.QWidget):
@@ -1003,8 +1004,12 @@ class HWRWindow(qt.QWidget):
         
 
     def add_hwr_browser(self):
+        print "add_hwr_browser - rework to be compatible with qt3/qt4"
+
+        return 
         try:
-            _hwr_widget = HardwareRepositoryBrowser.HardwareRepositoryBrowser
+            #_hwr_widget = HardwareRepositoryBrowser.HardwareRepositoryBrowser
+            print "add_hwr_browser - rework"
         except AttributeError:
             logging.getLogger().error("No Hardware Repository client found")
         else:

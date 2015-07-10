@@ -29,9 +29,10 @@ logging.getLogger().addHandler(_hdlr)
 #
 # add the GUI Handler
 #
-from Utils import GUILogHandler
-_GUIhdlr = GUILogHandler.GUILogHandler()
-_logger.addHandler(_GUIhdlr)
+#from Utils import Qt4_GUILogHandler
+#_GUIhdlr =Qt4_GUILogHandler.GUILogHandler()
+
+#_logger.addHandler(_GUIhdlr)
 
 
 #
@@ -40,6 +41,15 @@ _logger.addHandler(_GUIhdlr)
 blissframeworkpath = os.path.dirname(__file__)
 sys.path.insert(0, blissframeworkpath)
 
+
+_gui_version = 'qt3'
+
+def set_gui_version(verson_str):
+    global _gui_version
+    _gui_version = verson_str
+
+def get_gui_version():
+    return _gui_version  
 
 def getStdBricksPath():
     stdbrickspkg = __import__('BlissFramework.Bricks', globals(), locals(), [''])
@@ -92,13 +102,15 @@ def setLogFile(filename):
     # log to rotating files
     #
     global _hdlr
-    from logging.handlers import RotatingFileHandler
+    #from logging.handlers import RotatingFileHandler
+    from logging.handlers import TimedRotatingFileHandler
 
     logging.getLogger().info("Logging to file %s" % filename)
 
     _logger.removeHandler(_hdlr)
         
-    _hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 5 files max.
+    #_hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 10 files max.
+    _hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=1)
     os.chmod(filename, 0666)
     _hdlr.setFormatter(_formatter)
     _logger.addHandler(_hdlr)
