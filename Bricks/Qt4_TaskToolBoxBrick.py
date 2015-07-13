@@ -261,7 +261,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
                     cpos, True, screen_pos[0], screen_pos[1])
             if point:
                 self.graphics_manager_hwobj.add_shape(point)
-                cpos.set_index(point.get_index())
+                cpos.set_index(point.index)
 
     def diffractometer_changed(self, *args):
         """

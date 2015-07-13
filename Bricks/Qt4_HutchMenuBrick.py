@@ -39,7 +39,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
     """
     Descript. : HutchMenuBrick is used to perform sample centring
     """ 
-    SNAPSHOT_FORMATS = ('png', 'jpeg')
 
     def __init__(self, *args):
         """
@@ -64,6 +63,10 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.reset_methods = None
         self.successful_methods = None
         self.full_centring_done = None
+        self.directory = "/tmp"
+        self.prefix = "snapshot"
+        self.file_index = 1
+        self.format_type = "png"
 
         # Properties ----------------------------------------------------------
         self.addProperty('minidiff', 'string', '')
@@ -227,25 +230,19 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        formats = ""
-        for image_format in Qt4_HutchMenuBrick.SNAPSHOT_FORMATS:
-            formats += "*.%s " % image_format
-        formats = formats.strip()
-
+        formats = ["*.%s" % unicode(format).lower() for format in \
+                   QtGui.QImageWriter.supportedImageFormats()]
         current_filename = os.path.join(self.directory, self.prefix)
         current_filename = current_filename + '_%d%s%s' % (self.file_index, \
-                           os.path.extsep, self.formatType)
-        filename = str(QtGui.QFileDialog.getSaveFileName(current_filename, \
-            "Images (%s)" % formats, self, None, \
-            "Choose a filename to save under", None, False))
+                           os.path.extsep, self.format_type)
+        filename = str(QtGui.QFileDialog.getSaveFileName(self, "Choose a filename to save under",
+            current_filename, "Image files (%s)" % " ".join(formats)))
+
         if len(filename):
             image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
-                matrix = self.__drawing.matrix()
-                zoom = 1
-                if matrix is not None:
-                    zoom = matrix.m11()
-                img = self.__drawing.getPPP()
+                img = self.graphics_manager_hwobj.get_snapshot([])
+                img.save(filename)
                 logging.getLogger().info("Saving snapshot : %s", filename)
                 #QubImageSave.save(filename, img, self.__drawing.canvas(), zoom, image_type)
             except:
@@ -253,7 +250,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 logging.getLogger().error("HutchMenuBrick: error saving snapshot!")
             else:
                 self.formatType = image_type.lower()
-                self.fileIndex += 1 
+                self.file_index += 1 
 
     def refresh_camera_clicked(self):
         """

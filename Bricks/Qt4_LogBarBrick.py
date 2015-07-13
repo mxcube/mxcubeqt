@@ -43,6 +43,8 @@ class Qt4_LogBarBrick(BlissWidget):
         """
         BlissWidget.__init__(self, *args)
 
+        #self.setObjectName("log_bar_brick") 
+
         # Layout
         self._status_bar_widget = LogBarWidget(self)
         _main_hlayout = QtGui.QHBoxLayout(self)
@@ -55,8 +57,8 @@ class Qt4_LogBarBrick(BlissWidget):
                            QtGui.QSizePolicy.Fixed)
 
         Qt4_GUILogHandler.GUILogHandler().register(self)
-        logger = logging.getLogger("user_level_log")
-        logger.info('Ready')
+        #logger = logging.getLogger("user_level_log")
+        #logger.info('Ready')
 
     def customEvent(self, event):
         """
