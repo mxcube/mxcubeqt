@@ -72,12 +72,9 @@ class CreateHelicalWidget(CreateTaskBase):
         remove_button_tool_tip = "Remove selected line(s)"
         remove_button.setToolTip(remove_button_tool_tip)
 
-        self._acq_gbox = QtGui.QGroupBox('Acquisition', self)
-        self._acq_widget =  AcquisitionWidget(self._acq_gbox,
-                              "acquisition_widget",
-                              layout='vertical',
-                              acq_params=self._acquisition_parameters,
-                              path_template=self._path_template)
+        self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
+             layout='vertical', acq_params=self._acquisition_parameters,
+             path_template=self._path_template)
 
         self._data_path_gbox = QtGui.QGroupBox('Data location', self)
         self._data_path_widget = \
@@ -102,12 +99,6 @@ class CreateHelicalWidget(CreateTaskBase):
         _lines_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
         self._lines_gbox.setLayout(_lines_gbox_gridlayout)
 
-        _acq_gbox_layout = QtGui.QVBoxLayout(self)
-        _acq_gbox_layout.addWidget(self._acq_widget)
-        _acq_gbox_layout.setSpacing(0)
-        _acq_gbox_layout.setContentsMargins(0,0,0,0)
-        self._acq_gbox.setLayout(_acq_gbox_layout)
-
         _data_path_gbox_layout = QtGui.QVBoxLayout(self)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
         _data_path_gbox_layout.setSpacing(0)
@@ -122,7 +113,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self._lines_gbox)
-        _main_vlayout.addWidget(self._acq_gbox)
+        _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._processing_gbox)
         _main_vlayout.addStretch(0)

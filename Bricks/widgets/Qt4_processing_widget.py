@@ -52,47 +52,45 @@ class ProcessingWidget(QtGui.QWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)  
        
-        self.processing_widget.findChild(QtGui.QComboBox, 'space_group_cbox').\
+        self.processing_widget.space_group_cbox.\
             addItems(queue_model_enumerables.XTAL_SPACEGROUPS)
         
         self._model_mib.bind_value_update('cell_a',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'a_ledit'),
+                                          self.processing_widget.a_ledit,
                                           float,
                                           None)
         
         self._model_mib.bind_value_update('cell_alpha',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'alpha_ledit'),
+                                          self.processing_widget.alpha_ledit,
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('cell_b',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'b_ledit'),
+                                          self.processing_widget.b_ledit,
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('cell_beta',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'beta_ledit'),
+                                          self.processing_widget.beta_ledit,
                                           float,
                                           None)  
 
         self._model_mib.bind_value_update('cell_c',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'c_ledit'),
+                                          self.processing_widget.c_ledit,
                                           float,
                                           None)
 
         self._model_mib.bind_value_update('cell_gamma',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'gamma_ledit'),
+                                          self.processing_widget.gamma_ledit,
                                           float,
                                           None)  
         
         self._model_mib.bind_value_update('num_residues',
-                                          self.processing_widget.findChild(QtGui.QLineEdit, 'num_residues_ledit'),
+                                          self.processing_widget.num_residues_ledit,
                                           float,
                                           None)
 
-        self.connect(self.processing_widget.findChild(QtGui.QComboBox, 'space_group_cbox'),
-                     QtCore.SIGNAL("activated(int)"),
-                     self._space_group_change)    
+        self.processing_widget.space_group_cbox.activated.connect(self._space_group_change)    
 
     def _space_group_change(self, index):
         self._model.space_group = queue_model_enumerables.\
@@ -105,7 +103,7 @@ class ProcessingWidget(QtGui.QWidget):
             index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
         
         self._space_group_change(index)
-        self.processing_widget.findChild(QtGui.QComboBox, 'space_group_cbox').setCurrentIndex(index)
+        self.processing_widget.space_group_cbox.setCurrentIndex(index)
 
     def update_data_model(self, model):
         self._model = model

@@ -59,13 +59,12 @@ class RadiationDamageModelWidgetLayout(QtGui.QWidget):
 
     def languageChange(self):
         self.setWindowTitle(self.__tr("RadiationDamageModelWidget"))
-        self.rad_damage_widget.findChild(QtGui.QGroupBox, "main_groupbox").\
-             setTitle(self.__tr("Radiation damage model"))
-        self.rad_damage_widget.findChild(QtGui.QLabel, "beta_over_gray_label").\
+        self.rad_damage_widget.main_groupbox.setTitle(self.__tr("Radiation damage model"))
+        self.rad_damage_widget.beta_over_gray_label.\
              setText(self.__trUtf8("\xce\xb2\xc3\x85\x3c\x73\x75\x70\x3e\x32\x3c\x2f\x73\x75\x70\x3e\x2f\x4d\x47\x79\x3a"))
-        self.rad_damage_widget.findChild(QtGui.QLabel, "gamma_over_gray_label").\
+        self.rad_damage_widget.gamma_over_gray_label.\
              setText(self.__trUtf8("\xce\xb3\x20\x31\x2f\x4d\x47\x79\x3a"))
-        self.rad_damage_widget.findChild(QtGui.QLabel, "sensetivity_label").\
+        self.rad_damage_widget.sensetivity_label.\
              setText(self.__tr("Sensetivity:"))
 
     def __tr(self, s, c = None):

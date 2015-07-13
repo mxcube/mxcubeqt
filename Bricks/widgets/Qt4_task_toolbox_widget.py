@@ -94,6 +94,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self.method_group_box)
+        #self.main_layout.addStretch(0)  
         self.main_layout.addWidget(self.button_box)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -105,8 +106,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.create_task_button, QtCore.SIGNAL("clicked()"),
-                     self.create_task_button_click)
+        self.create_task_button.clicked.connect(self.create_task_button_click)
 
         self.connect(self.tool_box, QtCore.SIGNAL("currentChanged( int )"),
                      self.current_page_changed)

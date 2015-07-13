@@ -302,7 +302,13 @@ class CreateCharWidget(CreateTaskBase):
         """
         Descript. :
         """
-        return CreateTaskBase.approve_creation(self)
+        result = CreateTaskBase.approve_creation(self)
+        selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
+
+        for shape in selected_shapes:
+            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+                result = True
+        return result
         
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
@@ -314,21 +320,19 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot(shape)
+            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            if isinstance(shape, Qt4_GraphicsManager.Point):
+            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
                 snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot([shape.qub_point])
+                           get_snapshot([shape])
 
-                cpos = shape.get_centred_positions()[0]
-                cpos.snapshot_image = snapshot
+                cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                cpos.snapshot_image = snapshot 
 
         char_params = copy.deepcopy(self._char_params)
-
         acq = self._create_acq(sample)
-
         dc = queue_model_objects.\
                 DataCollection([acq], sample.crystals[0],
                                self._processing_parameters)
@@ -336,7 +340,7 @@ class CreateCharWidget(CreateTaskBase):
         # Reference images for characterisations should be taken 90 deg apart
         # this is achived by setting overap to -89
         acq.acquisition_parameters.overlap = -89
-        
+        acq.acquisition_parameters.centred_position = cpos        
         
         dc.acquisitions[0] = acq
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF

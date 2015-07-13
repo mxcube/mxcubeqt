@@ -425,9 +425,9 @@ class CharParametersWidget(QtGui.QWidget):
                 centred_position.snapshot_image:
             image = self._data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
-            image = image.scale(427, 320)
-            self.position_widget.findChild(QtGui.QLabel, "svideo").\
-                 setPixmap(QtGui.QPixmap(image))
+            ration = image.height() / float(image.width())
+            image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio)
+            self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
 
         self.toggle_permitted_range(self._char_params.use_permitted_rotation)
         self.enable_opt_parameters_widget(self._char_params.determine_rad_params)

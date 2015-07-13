@@ -75,9 +75,9 @@ class AcquisitionWidget(QtGui.QWidget):
         if layout == "horizontal":
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
-            self.acq_widget.findChild(QtGui.QCheckBox, 'inverse_beam_cbx').hide()
-            self.acq_widget.findChild(QtGui.QLabel, 'subwedge_size_label').hide()
-            self.acq_widget.findChild(QtGui.QLineEdit, 'subwedge_size_ledit').hide()
+            self.acq_widget.inverse_beam_cbx.hide()
+            self.acq_widget.subwedge_size_label.hide()
+            self.acq_widget.subwedge_size_ledit.hide()
         else:
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
@@ -97,9 +97,9 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget.first_image_ledit.textChanged.connect(self.first_image_ledit_change)
         self.acq_widget.num_images_ledit.textChanged.connect(self.num_images_ledit_change)
 
-        overlap_ledit = self.acq_widget.findChild(QtGui.QLineEdit, 'overlap_ledit')
+        overlap_ledit = self.acq_widget.findChild(QtGui.QLineEdit, "overlap_ledit")
         if overlap_ledit is not None:
-            self.acq_widget.overlap_ledit.textChanged.connect(self.overlap_changed)
+            overlap_ledit.textChanged.connect(self.overlap_changed)
 
         self.acq_widget.subwedge_size_ledit.textChanged.connect(self.subwedge_size_ledit_change)
         self.acq_widget.osc_start_cbox.toggled.connect(self.osc_start_cbox_click)
@@ -110,12 +110,23 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
         self.acq_widget.osc_start_ledit.setEnabled(False)
 
+        self.osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
+        self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
+        self.kappa_validator = QtGui.QDoubleValidator(0, 360, 4, self)
+        self.kappa_phi_validator = QtGui.QDoubleValidator(0, 360, 4, self)
+        self.energy_validator = QtGui.QDoubleValidator(0, 25, 4, self)
+        self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
+        self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
+        self.exp_time_validator = QtGui.QDoubleValidator(0.0001, 10000, 4, self)
+        self.first_img_validator = QtGui.QIntValidator(0, 99999, self)
+        self.num_img_validator = QtGui.QIntValidator(1, 99999, self) 
+
     def osc_start_cbox_click(self, state):
         """
         Descript. :
         """
         self.update_osc_start(self._beamline_setup_hwobj._get_omega_axis_position())
-        self.acq_widget.findChild(QtGui.QLineEdit, 'osc_start_ledit').setEnabled(state)
+        self.acq_widget.osc_start_ledit.setEnabled(state)
 
     def update_osc_start(self, new_value):
         """
@@ -130,12 +141,33 @@ class AcquisitionWidget(QtGui.QWidget):
             self.acq_widget.osc_start_ledit.setText("%.2f" % osc_start_value)
             self._acquisition_parameters.osc_start = osc_start_value
 
+
+    def update_kappa(self, new_value):
+        self.acq_widget.kappa_ledit.setText("%.2f" % float(new_value))
+        #self._acquisition_parameters.kappa = float(new_value)
+
+    def update_kappa_phi(self, new_value):
+        self.acq_widget.kappa_phi_ledit.setText("%.2f" % float(new_value))
+        #self._acquisition_parameters.kappa_phi = float(new_value)
+
     def use_osc_start(self, state):
         """
         Descript. :
         """
         self.acq_widget.osc_start_cbox.setChecked(state)
         self.acq_widget.osc_start_cbox.setDisabled(state)
+
+    def use_kappa(self, state):
+        if self._beamline_setup.diffractometer_hwobj.get_head_type() == \
+           self._beamline_setup.diffractometer_hwobj.PLATE:
+            state = False
+        self.acq_widget_layout.kappa_ledit.setEnabled(state)
+
+    def use_kappa_phi(self, state):
+        if self._beamline_setup.diffractometer_hwobj.get_head_type() == \
+           self._beamline_setup.diffractometer_hwobj.PLATE:
+            state = False
+        self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         """
@@ -147,61 +179,69 @@ class AcquisitionWidget(QtGui.QWidget):
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
             (lower, upper) = limits
-            osc_start_validator = QtGui.QDoubleValidator(lower, upper, 4, self)
-            osc_range_validator = QtGui.QDoubleValidator(lower, upper, 4, self)
-        else:
-            osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
-            osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
+            self.osc_start_validator.setRange(lower, upper, 4)
+            self.osc_range_validator.setRange(lower, upper, 4)
 
         self._acquisition_mib.bind_value_update('osc_start', 
                                                 self.acq_widget.osc_start_ledit,
                                                 float, 
-                                                osc_start_validator)
+                                                self.osc_start_validator)
 
         self._acquisition_mib.bind_value_update('osc_range', 
                                                 self.acq_widget.osc_range_ledit,
                                                 float, 
-                                                osc_range_validator)
+                                                self.osc_range_validator)
+
+        if self.acq_widget.findChild(QtGui.QLineEdit, "kappa_ledit"):
+            if 'kappa' in limits_dict:
+                limits = tuple(map(float, limits_dict['kappa'].split(',')))
+                (lower, upper) = limits
+                self.kappa_validator.setRange(lower, upper, 4)
+            self._acquisition_mib.bind_value_update('kappa', 
+                 self.acq_widget.kappa_ledit, float, self.kappa_validator)
+
+        if self.acq_widget.findChild(QtGui.QLineEdit, "kappa_phi_ledit"):
+            if 'kappa_phi' in limits_dict:
+                limits = tuple(map(float, limits_dict['kappa_phi'].split(',')))
+                (lower, upper) = limits
+                self.kappa_phi_validator.setRange(lower, upper, 4)
+            self._acquisition_mib.bind_value_update('kappa_phi',     
+                 self.acq_widget.kappa_phi_ledit, float, self.kappa_phi_validator)
 
         if 'exposure_time' in limits_dict:
             limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
             (lower, upper) = limits
-            exp_time_valdidator = QtGui.QDoubleValidator(lower, upper, 5, self)
-        else:
-            exp_time_valdidator = QtGui.QDoubleValidator(-0.003, 6000, 5, self)
+            self.exp_time_valdidator.setRange(lower, upper, 5)
         
         self._acquisition_mib.bind_value_update('exp_time', 
                                                 self.acq_widget.exp_time_ledit,
                                                 float, 
-                                                exp_time_valdidator)
+                                                self.exp_time_validator)
 
         if 'number_of_images' in limits_dict:
             limits = tuple(map(int, limits_dict['number_of_images'].split(',')))
             (lower, upper) = limits
-            num_img_valdidator = QtGui.QIntValidator(lower, upper, self)
-            first_img_valdidator = QtGui.QIntValidator(lower, upper, self)
-        else:
-            num_img_valdidator = QtGui.QIntValidator(1, 9999, self)
-            first_img_valdidator = QtGui.QIntValidator(1, 9999, self)
+            self.num_img_valdidator.setRange(lower, upper)
+            self.first_img_valdidator.setRange(lower, upper)
         
         self._acquisition_mib.bind_value_update('first_image', 
                                                 self.acq_widget.first_image_ledit,
                                                 int, 
-                                                first_img_valdidator)
+                                                self.first_img_validator)
 
         self._acquisition_mib.bind_value_update('num_images', 
                                                 self.acq_widget.num_images_ledit,
                                                 int, 
-                                                num_img_valdidator)
+                                                self.num_img_validator)
 
-        num_passes = self.acq_widget.findChild(QtGui.QLineEdit, 'num_passes_ledit')
+        num_passes = self.acq_widget.findChild(QtGui.QLineEdit, "num_passes_ledit")
 
         if num_passes:
             self._acquisition_mib.\
                 bind_value_update('num_passes', num_passes, int,
                                   QtGui.QIntValidator(1, 1000, self))
 
-        overlap_ledit = self.acq_widget.findChild(QtGui.QLineEdit, 'overlap_ledit')
+        overlap_ledit = self.acq_widget.findChild(QtGui.QLineEdit, "overlap_ledit")
 
         if overlap_ledit:
             self._acquisition_mib.\
@@ -212,19 +252,19 @@ class AcquisitionWidget(QtGui.QWidget):
              bind_value_update('energy',
                                self.acq_widget.energy_ledit,
                                float,
-                               QtGui.QDoubleValidator(0, 1000, 4, self))
+                               self.energy_validator)
 
         self._acquisition_mib.\
              bind_value_update('transmission',
                                self.acq_widget.transmission_ledit,
                                float,
-                               QtGui.QDoubleValidator(0, 1000, 2, self))
+                               self.transmission_validator)
 
         self._acquisition_mib.\
              bind_value_update('resolution',
                                self.acq_widget.resolution_ledit,
                                float,
-                               QtGui.QDoubleValidator(0, 1000, 3, self))
+                               self.resolution_validator)
 
         self._acquisition_mib.\
              bind_value_update('inverse_beam',
@@ -238,6 +278,16 @@ class AcquisitionWidget(QtGui.QWidget):
                                bool,
                                None)
 
+        """self.acq_widget_layout.osc_start_ledit.setToolTip(\
+               "Oscillation start limits %0.2f : %0.2f" %(\
+               self.osc_start_validator.bottom(),
+               self.osc_start_validator.top()))
+
+        self.acq_widget_layout.osc_range_ledit.setToolTip(\
+               "Oscillation range limits %0.2f : %0.2f" %(\
+               self.osc_ra_validator.bottom(),
+               self.osc_start_validator.top()))""" 
+
         self.set_tunable_energy(beamline_setup.tunable_wavelength())
 
         has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
@@ -245,10 +295,9 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget.shutterless_cbx.setChecked(has_shutter_less)
 
         if self._beamline_setup_hwobj.disable_num_passes():
-            num_passes = self.acq_widget.findChild(QtGui.QLineEdit, 
-                                                   "num_passes_ledit")
+            num_passes = self.acq_widget.findChild(QtGui.QLineEdit, "num_passes_ledit")
             if num_passes:
-                self.acq_widget.num_passes_ledit.setDisabled(True)
+                num_passes.setDisabled(True)
 
     def first_image_ledit_change(self, new_value):
         """
@@ -409,6 +458,45 @@ class AcquisitionWidget(QtGui.QWidget):
         Descript. :
         """
         self.acq_widget.resolution_ledit.setText("%.3f" % float(resolution))
+
+    def update_energy_limits(self, limits):
+        if limits:
+            self.energy_validator.setBottom(limits[0])
+            self.energy_validator.setTop(limits[1])
+            self.acq_widget_layout.energy_ledit.setToolTip(\
+               "Energy limits %0.3f : %0.3f" %(limits[0], limits[1]))
+            self._acquisition_mib.validate_all()
+
+    def update_transmission_limits(self, limits):
+        if limits:
+            self.transmission_validator.setBottom(limits[0])
+            self.transmission_validator.setTop(limits[1])
+            self.acq_widget_layout.transmission_ledit.setToolTip(\
+               "Transmission limits %0.3f : %0.3f" %(limits[0], limits[1]))
+            self._acquisition_mib.validate_all()
+
+    def update_resolution_limits(self, limits):
+        if limits:
+            self.resolution_validator.setBottom(limits[0])
+            self.resolution_validator.setTop(limits[1])
+            self.acq_widget_layout.resolution_ledit.setToolTip(
+               "Resolution limits %0.3f : %0.3f" %(limits[0], limits[1]))
+            self._acquisition_mib.validate_all()
+
+    def update_detector_exp_time_limits(self, limits):
+        if limits:
+            self.exp_time_validator.setRange(limits[0], limits[1], 4)
+            self.acq_widget_layout.exp_time_ledit.setToolTip(
+               "Exposure time limits %0.3f : %0.3f" %(limits[0], limits[1]))
+            self._acquisition_mib.validate_all()
+
+    def update_osc_range_limits(self, exp_time):
+        osc_range = 40.0 * exp_time
+        self.osc_range_validator.setRange(0, osc_range, 4)
+        self.acq_widget_layout.osc_range_ledit.setToolTip(
+              "Oscillation range limits %0.2f : %0.2f" %(0, osc_range))
+        self._acquisition_mib.validate_all()
+
 
     def update_data_model(self, acquisition_parameters, path_template):
         """

@@ -612,10 +612,9 @@ class DataCollectTree(QtGui.QWidget):
             self.parent().enable_command_menu(True)
             self.parent().enable_task_toolbox(True)
             self.continue_button.setText('Continue')
-            Qt4_widget_colors.set_widget_color(
-                              self.continue_button, 
-                              Qt4_widget_colors.LIGHT_YELLOW, 
-                              QtGui.QPalette.Button)
+            Qt4_widget_colors.set_widget_color(self.continue_button, 
+                                               Qt4_widget_colors.LIGHT_YELLOW, 
+                                               QtGui.QPalette.Button)
         else:
             self.parent().enable_hutch_menu(False)
             self.parent().enable_command_menu(False)

@@ -43,14 +43,10 @@ class ReferenceImageWidget(QtGui.QWidget):
         self.path_widget = DataPathWidget(self.page_widget)
         self.acq_groupbox = QtGui.QGroupBox("Acquisition", self.page_widget)
         self.acq_widget = AcquisitionWidget(self.acq_groupbox, 'horizontal')
-        self.acq_widget.acq_widget.findChild(\
-             QtGui.QCheckBox, 'inverse_beam_cbx').hide()
-        self.acq_widget.acq_widget.findChild(\
-             QtGui.QCheckBox, 'shutterless_cbx').hide()
-        self.acq_widget.acq_widget.findChild(\
-             QtGui.QLabel, 'subwedge_size_label').hide()
-        self.acq_widget.acq_widget.findChild(\
-             QtGui.QLineEdit, 'subwedge_size_ledit').hide()
+        self.acq_widget.acq_widget.inverse_beam_cbx.hide()
+        self.acq_widget.acq_widget.shutterless_cbx.hide()
+        self.acq_widget.acq_widget.subwedge_size_label.hide()
+        self.acq_widget.acq_widget.subwedge_size_ledit.hide()
         #self.acq_widget.acq_widget.setFixedHeight(130)
         self.tool_box.addItem(self.page_widget, "Acquisition parameters")
 

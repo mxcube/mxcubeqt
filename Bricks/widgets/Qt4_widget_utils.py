@@ -112,7 +112,7 @@ class DataModelInputBinder(object):
 
     def bind_value_update(self, field_name, widget, type_fn, validator = None):
         self.bindings[field_name] = (widget, validator, type_fn)
-        
+
         if isinstance(widget, QtGui.QLineEdit):        
             QtCore.QObject.connect(widget, 
                             QtCore.SIGNAL("textChanged(const QString &)"), 
@@ -149,6 +149,17 @@ class DataModelInputBinder(object):
                                                              new_value))
 
             widget.setChecked(bool(getattr(self.__model, field_name)))
+
+        if validator:
+            if isinstance(validator, QtGui.QDoubleValidator):
+                tooltip = "%s limits %.2f : %.2f" % (field_name.replace("_", " ").capitalize(),
+                                                     validator.bottom(),
+                                                     validator.top())
+            else:
+                tooltip = "%s limits %d : %d" % (field_name.replace("_", " ").capitalize(),
+                                                 validator.bottom(),
+                                                 validator.top())
+            widget.setToolTip(tooltip)
 
     def validate_all(self):
         result = []

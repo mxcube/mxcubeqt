@@ -23,7 +23,7 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 import Qt4_queue_item
-import Qt4_GraphicsManager as graphics_manager
+import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
@@ -55,13 +55,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._acq_gbox = QtGui.QGroupBox('Acquisition', self)
-        self._acq_gbox.setObjectName('acq_gbox')
-        self._acq_widget =  AcquisitionWidget(self._acq_gbox,
-                              "acquisition_widget",
-                              layout='vertical',
-                              acq_params=self._acquisition_parameters,
-                              path_template=self._path_template)
+        self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
+             layout='vertical', acq_params=self._acquisition_parameters,
+             path_template=self._path_template)
 
         self._data_path_gbox = QtGui.QGroupBox('Data location', self)
         self._data_path_gbox.setObjectName('data_path_gbox')        
@@ -78,12 +74,6 @@ class CreateDiscreteWidget(CreateTaskBase):
                              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
-        self._acq_gbox_layout = QtGui.QVBoxLayout(self)
-        self._acq_gbox_layout.addWidget(self._acq_widget)
-        self._acq_gbox_layout.setSpacing(0)
-        self._acq_gbox_layout.setContentsMargins(0, 0, 0, 0)
-        self._acq_gbox.setLayout(self._acq_gbox_layout)
-
         self._data_path_gbox_layout = QtGui.QVBoxLayout(self)
         self._data_path_gbox_layout.addWidget(self._data_path_widget)
         self._data_path_gbox_layout.setSpacing(0)
@@ -97,30 +87,31 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_gbox.setLayout(self._processing_gbox_layout)
 
         self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self._acq_gbox)
+        self.main_layout.addWidget(self._acq_widget)
         self.main_layout.addWidget(self._data_path_gbox)
         self.main_layout.addWidget(self._processing_gbox)
-        self.main_layout.addStretch(0)
-        self.main_layout.setSpacing(2)
+        self.main_layout.addSpacing(10)
+        self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self._acq_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        """self._acq_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                       QtGui.QSizePolicy.Fixed)
         self._data_path_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
                            QtGui.QSizePolicy.Expanding)
         self._processing_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
-        self.connect(self._acq_widget, QtCore.SIGNAL('mad_energy_selected'),
-                     self.mad_energy_selected)
+                           QtGui.QSizePolicy.Expanding)"""
         
         # Qt signal/slot connections ------------------------------------------
+        self._processing_gbox.toggled.connect(self._use_processing_toggled)
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
-
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
+
+        self.connect(self._acq_widget, QtCore.SIGNAL('mad_energy_selected'),
+                     self.mad_energy_selected)
 
         self.connect(self._acq_widget,
                      QtCore.SIGNAL("pathTemplateChanged"),
@@ -237,9 +228,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
 
         for shape in selected_shapes:
-            if isinstance(shape, graphics_manager.GraphicsItemCentringLines):
-                result = False
-
+            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+                result = True
         return result
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -252,13 +242,13 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         if not shape:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot([])
+            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            if isinstance(shape, graphics_manager.GraphicsItemPoint):
+            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
                 snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot(shape)
+                           get_snapshot([shape])
 
                 cpos = copy.deepcopy(shape.get_centred_positions()[0])
                 cpos.snapshot_image = snapshot

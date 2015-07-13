@@ -119,15 +119,26 @@ class CreateTaskBase(QtGui.QWidget):
 
         try:
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
+            bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
             bl_setup_hwobj.transmission_hwobj.connect('valueChanged', self.set_transmission)
+            bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
+            bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
             bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+            bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
+            bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
+            bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_mode)
+            bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
+            bl_setup_hwobj.beam_info_hwobj.connect('beamInfoChanged', self.set_beam_info)
+
+            self.set_beam_info(bl_setup_hwobj.beam_info_hwobj.get_beam_info())
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
         
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
+            self._graphics_manager_hwobj.connect('meshCreated', self.mesh_created)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
@@ -139,17 +150,38 @@ class CreateTaskBase(QtGui.QWidget):
         if acq_widget:
             acq_widget.update_osc_start(new_value)
 
-    def _prefix_ledit_change(self, new_value):
+    def update_kappa(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            self.kappa_value = new_value
+            acq_widget.update_kappa(new_value)
+
+    def update_kappa_phi(self, new_value):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            self.kappa_phi_value = new_value
+            acq_widget.update_kappa_phi(new_value)
+
+    def _use_processing_toggled(self, state):
         item = self._current_selected_items[0]
         model = item.get_model()
+        model.run_processing = state
 
-        if self.isEnabled():
-            if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
+
+    def _prefix_ledit_change(self, new_value):
+        if len(self._current_selected_items) > 0:
+            item = self._current_selected_items[0]
+            model = item.get_model()
+
+            if self.isEnabled():
+                if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
                    not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                self._path_template.base_prefix = str(new_value)
-                name = self._path_template.get_prefix()
-                model.set_name(name)
-                item.setText(0, model.get_name())
+                    self._path_template.base_prefix = str(new_value)
+                    name = self._path_template.get_prefix()
+                    model.set_name(name)
+                    item.setText(0, model.get_display_name())
         
     def _run_number_ledit_change(self, new_value):
         item = self._current_selected_items[0]
@@ -160,20 +192,17 @@ class CreateTaskBase(QtGui.QWidget):
                    not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 if str(new_value).isdigit():
                     model.set_number(int(new_value))
-                    item.setText(0, model.get_name())
+                    item.setText(0, model.get_display_name())
 
     def handle_path_conflict(self, widget, new_value):
-        if self._tree_brick is None:
-            #TODO fix this. Signals should be in a correct order
-            return
-
-        self._tree_brick.dc_tree_widget.check_for_path_collisions()
+        if self._tree_brick:
+            self._tree_brick.dc_tree_widget.check_for_path_collisions()
         
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
+            path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
+                            check_for_path_collisions(self._path_template)
 
-        if new_value != '':
-            self._data_path_widget.indicate_path_conflict(path_conflict)                    
+            if new_value != '':
+                self._data_path_widget.indicate_path_conflict(path_conflict)                    
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -235,12 +264,60 @@ class CreateTaskBase(QtGui.QWidget):
         
         if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_resolution(res)
+
+    def set_detector_mode(self, detector_mode):
+        acq_widget = self.get_acquisition_widget()
+
+        if acq_widget:
+            acq_widget.update_detector_mode(detector_mode)
+
+    def set_kappa(self, kappa):
+        acq_widget = self.get_acquisition_widget()
+
+        if self._item_is_group_or_sample() and acq_widget:
+            acq_widget.update_kappa(kappa)
+
+    def set_kappa_phi(self, kappa_phi):
+        acq_widget = self.get_acquisition_widget()
+
+        if self._item_is_group_or_sample() and acq_widget:
+            acq_widget.update_kappa_phi(kappa_phi)
                                                       
     def set_run_number(self, run_number):
         data_path_widget = self.get_data_path_widget()
 
         if data_path_widget:
             data_path_widget.set_run_number(run_number)
+
+    def set_energy_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+            if acq_widget:
+                acq_widget.update_energy_limits(limits)
+
+    def set_transmission_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.update_transmission_limits(limits)
+
+    def set_resolution_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.update_resolution_limits(limits)
+
+    def set_detector_exp_time_limits(self, limits):
+        if limits:
+            acq_widget = self.get_acquisition_widget()
+
+            if acq_widget:
+                acq_widget.update_detector_exp_time_limits(limits)
+
+    def set_beam_info(self, beam_info_dict):
+        pass
 
     def get_default_prefix(self, sample_data_node = None, generic_name = False):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
@@ -365,7 +442,8 @@ class CreateTaskBase(QtGui.QWidget):
 
             # Sample with lims information, use values from lims
             # to set the data path.
-            (data_directory, proc_directory) = self.get_default_directory(sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
+            (data_directory, proc_directory) = self.get_default_directory(\
+                 sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
@@ -513,4 +591,7 @@ class CreateTaskBase(QtGui.QWidget):
         return acq
 
     def shape_deleted(self, shape):
+        return
+
+    def mesh_created(self, mesh):
         return

@@ -18,6 +18,7 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 import Qt4_queue_item
+import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 
 from Qt4_create_task_base import CreateTaskBase
@@ -135,13 +136,12 @@ class CreateXRFScanWidget(CreateTaskBase):
 	if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot([])
+                cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
-                if isinstance(shape, graphics_manager.Point):
-                    snapshot = self._graphics_manager_hwobj.\
-                               get_snapshot([shape.qub_point])
+                if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+                    snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_positions()[0])
                     cpos.snapshot_image = snapshot
