@@ -33,6 +33,8 @@ from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+from HardwareRepository.HardwareRepository import dispatcher
+
 
 __category__ = "Qt4_General"
 
@@ -362,12 +364,24 @@ class Qt4_InstanceListBrick(BlissWidget):
             loc=BlissWidget.INSTANCE_LOCATION_EXTERNAL
         BlissWidget.setInstanceLocation(loc)
 
-        self.connect(QtGui.QApplication.activeWindow(),  
+        #TODO fix this to use activeWindow
+        for widget in QtGui.QApplication.topLevelWidgets():
+            if hasattr(widget, "configuration"):
+                active_window = widget.configuration
+ 
+        self.connect(active_window,  
+                     QtCore.SIGNAL('applicationBrickChanged'), 
+                     self.applicationBrickChanged)
+        self.connect(active_window,  
+                     QtCore.SIGNAL('applicationTabChanged'), 
+                     self.applicationTabChanged)
+
+        """self.connect(QtGui.QApplication.activeWindow(),  
                      QtCore.SIGNAL('applicationBrickChanged'), 
                      self.applicationBrickChanged)
         self.connect(QtGui.QApplication.activeWindow(),  
                      QtCore.SIGNAL('applicationTabChanged'), 
-                     self.applicationTabChanged)
+                     self.applicationTabChanged)"""
 
     def clientInitialized(self,connected,server_id=None,my_nickname=None,quiet=False):
         """
@@ -389,9 +403,6 @@ class Qt4_InstanceListBrick(BlissWidget):
             BlissWidget.setInstanceMode(BlissWidget.INSTANCE_MODE_SLAVE)
 
             server_print=self.instance_server_hwobj.idPrettyPrint(server_id)
-
-
-
             if self.clientIcon is None:
                 item = QtGui.QListWidgetItem(server_print, 
                                              self.users_listwidget)
@@ -408,11 +419,29 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.initName(my_nickname)
             #self.give_control_chbox.setChecked(False)
 
-            print "postEvent:  "
+            camera_brick = None
+
+            for w in QtGui.QApplication.allWidgets():
+                if isinstance(w, BlissWidget):
+                    if "CameraBrick" in str(w.__class__):
+                        camera_brick = w
+                        camera_brick.installEventFilter(self)
+                        break
+
+            # find the video brick, make sure it is hidden when collecting data
+            # and that it is shown again when DC is finished
+            def disable_video(w=camera_brick):
+                w.disable_update()
+            self.__disable_video=disable_video
+            def enable_video(w=camera_brick):
+                w.enable_update()
+            self.__enable_video=enable_video
+            dispatcher.connect(self.__disable_video, "collect_started")
+            dispatcher.connect(self.__enable_video, "collect_finished")
+
             msg_event = MsgDialogEvent(QtGui.QMessageBox.Information,
                 "Successfully connected to the server application.",
                 self.font().pointSize())
-            print msg_event.isAccepted()
             QtGui.QApplication.postEvent(self, msg_event)
 
     def serverInitialized(self,started,server_id=None):
@@ -452,10 +481,11 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.connections={}
         BlissWidget.setInstanceRole(BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING)
         BlissWidget.setInstanceMode(BlissWidget.INSTANCE_MODE_SLAVE)
+
         msg_event=MsgDialogEvent(QtGui.QMessageBox.Warning,\
             "The server application closed the connection!",\
             self.font().pointSize())
-        QtGui.QApplication.postEvent(self,msg_event)
+        QtGui.QApplication.postEvent(self, msg_event)
         QtCore.QTimer.singleShot(Qt4_InstanceListBrick.RECONNECT_TIME,
                                  self.reconnectToServer)
 
@@ -603,7 +633,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         Descript. :
         """
         logging.getLogger().info("Instance role is %s" % Qt4_InstanceListBrick.ROLES[role].replace("_"," ").lower())
-        if role!=BlissWidget.INSTANCE_ROLE_UNKNOWN and not self.isShown():
+        if role!=BlissWidget.INSTANCE_ROLE_UNKNOWN and not self.isVisible():
             self.show()
 
     def newClient(self,client_id):
@@ -868,13 +898,10 @@ class Qt4_InstanceListBrick(BlissWidget):
 
             elif event.type() == MSG_DIALOG_EVENT:
                 msg_dialog = QtGui.QMessageBox("mxCuBE",\
-                    event.msg,event.icon_type, QtGui.QMessageBox.Ok,\
-                    QtGui.QMessageBox.NoButton, QtGui.QMessageBox.NoButton,None)  # Application name (mxCuBE) is hardwired!!!
-                f=msg_dialog.font()
-                f.setPointSize(event.font_size)
-                msg_dialog.setFont(f)
-                msg_dialog.updateGeometry()
-                msg_dialog.show()
+                    event.msg, event.icon_type, QtGui.QMessageBox.Ok,\
+                    QtGui.QMessageBox.NoButton, QtGui.QMessageBox.NoButton, 
+                    self)  # Application name (mxCuBE) is hardwired!!!
+                msg_dialog.exec_()
                 if callable(event.callback):
                     event.callback()
 
@@ -886,11 +913,6 @@ class Qt4_InstanceListBrick(BlissWidget):
                 else:
                     self.externalUserInfoDialog.setMessage(event.msg)
                     msg_dialog=self.externalUserInfoDialog
-                """f=msg_dialog.font()
-                f.setPointSize(event.font_size)
-                msg_dialog.setFont(f)
-                msg_dialog.updateGeometry()"""
-
                 while True:
                     msg_dialog.exec_loop()
                     if event.is_local or event.toaddrs=="":

@@ -68,10 +68,6 @@ def emitter(ob):
                 This function enables you to connect to and emit signals 
                 from (almost) any python object with having to subclass QObject.
     """
-    #TODO fix this
-    if ob is None:
-        return 
-
     if ob not in _emitterCache:
         _emitterCache[ob] = _QObject(ho=ob)
     return _emitterCache[ob]
@@ -85,23 +81,22 @@ class InstanceEventFilter(QtCore.QObject):
         obj=w
         while obj is not None:
             if isinstance(obj,BlissWidget):
-                if isinstance(e, QtCore.QContextMenuEvent):
-                    if obj.shouldFilterEvent():
-                        return True
-                elif isinstance(e, QtCore.QMouseEvent):
-                    if e.button() == Qt.RightButton:
+                if isinstance(e, QtGui.QContextMenuEvent):
+                    #if obj.shouldFilterEvent():
+                    return True
+                elif isinstance(e, QtGui.QMouseEvent):
+                    if e.button() == QtCore.Qt.RightButton:
                         return True
                     elif obj.shouldFilterEvent():
                         return True
-                elif isinstance(e, QtCore.QKeyEvent) or isinstance(e, QtCore.QFocusEvent):
+                elif isinstance(e, QtGui.QKeyEvent) or isinstance(e, QtGui.QFocusEvent):
                     if obj.shouldFilterEvent():
                         return True
                 return QtCore.QObject.eventFilter(self, w, e)
-            #try:
-            if True:
+            try:
                 obj = obj.parent()
-            #except:
-            #    obj=None
+            except:
+                obj=None
         return QtCore.QObject.eventFilter(self, w, e)
 
 
@@ -239,21 +234,19 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if BlissWidget._menuBar is not None:
             if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
                 if BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_IMPERSONATE:
-                    color = "lightBlues"
+                    color = "lightBlue"
                 else:
-                    color = "lightGreen"
+                    color = "rgb(204,255,204)"
             elif BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE:
                 if BlissWidget._instanceRole == BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
-                    color = "lightRed"
+                    color = "rgb(255,204,204)"
                 elif BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_UNKNOWN:
                     color = "rgb(255, 165, 0)"
                 else:
                     color = "yellow"
 
         if color is not None:
-            #BlissWidget._menuBar.setPaletteBackgroundColor(color)
             BlissWidget._menuBar.set_color(color)
-            return
 
     @staticmethod
     def setInstanceMode(mode):
@@ -263,20 +256,18 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         BlissWidget._instanceMode = mode
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                #try:
-                w._instanceModeChanged(mode)
-                #except:
-                #    pass
+                try:
+                    w._instanceModeChanged(mode)
+                except:
+                    pass
         if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
             if BlissWidget._filterInstalled:
-                QtGui.QApplication.removeEventFilter(\
-                      BlissWidget._applicationEventFilter, None)
+                QtGui.QApplication.instance().removeEventFilter(BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = False
                 BlissWidget.synchronizeWithCache() # why?
         else:
             if not BlissWidget._filterInstalled:
-                QtGui.QApplication.installEventFilter(\
-                      BlissWidget._applicationEventFilter, None)
+                QtGui.QApplication.instance().installEventFilter(BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = True
 
         BlissWidget.updateMenuBarColor(BlissWidget._instanceMode == \
@@ -447,10 +438,10 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         BlissWidget._instanceRole = role
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceRoleChanged(role)
-                except:
-                    pass
+                #try:
+                w.instanceRoleChanged(role)
+                #except:
+                #    pass
 
     @staticmethod
     def setInstanceLocation(location):
@@ -462,10 +453,10 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         BlissWidget._instanceLocation = location
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceLocationChanged(location)
-                except:
-                    pass
+                #try:
+                w.instanceLocationChanged(location)
+                #except:
+                #    pass
 
     @staticmethod
     def setInstanceUserId(user_id):
@@ -478,10 +469,10 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceUserIdChanged(user_id)
-                except:
-                    pass
+                #try:
+                w.instanceUserIdChanged(user_id)
+                #except:
+                #    pass
         BlissWidget.updateMenuBarColor()
 
     @staticmethod
@@ -498,10 +489,10 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceMirrorChanged(mirror)
-                except:
-                    pass
+                #try:
+                w.instanceMirrorChanged(mirror)
+                #except:
+                #    pass
 
     def instanceMirrorChanged(self,mirror):
         """
@@ -555,12 +546,10 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         for widget in QtGui.QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
-                #QtGui.QWhatsThis.remove(w)
                 msg = "%s (%s)\n%s" % (widget.objectName(), 
                                        widget.__class__.__name__, 
                                        widget.getHardwareObjectsInfo())
                 widget.setWhatsThis(msg)
-                #QtGui.QWhatsThis.showText(QtGui.QCursor.pos(), msg, widget)
         QtGui.QWhatsThis.enterWhatsThisMode()
 
     @staticmethod
@@ -568,8 +557,14 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
+        #somehow active window is None
+        #TODO fix this
+        for widget in QtGui.QApplication.topLevelWidgets():
+            if hasattr(widget, "configuration"):
+               top_level_widget = widget
+
         if not master_sync or BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.activeWindow().emit(QtCore.SIGNAL('applicationBrickChanged'), 
+            top_level_widget.emit(QtCore.SIGNAL('applicationBrickChanged'), 
                   brick_name, widget_name, method_name, method_args, master_sync)
 
     @staticmethod
@@ -782,9 +777,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if instanceFilter:
             self.connectSignalSlotFilter(_sender, pysignal and PYSIGNAL(signal) or SIGNAL(signal), slot, shouldCache)
         else:
-            #TODO fix this without nonetype
-            if _sender:
-                QtCore.QObject.connect(_sender, pysignal and QtCore.SIGNAL(signal) or QtCore.SIGNAL(signal), slot)
+            QtCore.QObject.connect(_sender, pysignal and QtCore.SIGNAL(signal) or QtCore.SIGNAL(signal), slot)
 
         # workaround for PyQt lapse
         if hasattr(sender, "connectNotify"):

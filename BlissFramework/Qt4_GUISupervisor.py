@@ -252,11 +252,7 @@ class GUISupervisor(QtGui.QWidget):
         if len(self.windows) > 0:
             main_window = self.windows[0]
             main_window.configuration = config
-            print "setActiveWindow: ", main_window
             QtGui.QApplication.setActiveWindow(main_window)
-
-            print QtGui.QApplication.activeWindow()
-            print 1
             if self.noBorder:
                 main_window.move(0, 0)
                 w = QtGui.QApplication.desktop().width()
