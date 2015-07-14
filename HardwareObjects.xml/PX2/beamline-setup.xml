@@ -4,7 +4,7 @@
 
   <!-- Objects directly associatd with hardware -->
   <object href="/Ps_attenuator" role="transmission"/>
-  <object href="/minidiff"      role="diffractometer"/>
+  <object href="/soleil-minidiff"      role="diffractometer"/>
   <object href="/cats"          role="sample_changer"/>    
   <object href="/resolution"    role="resolution"/>
   <object href="/horizontal"    role="horizontal"/>
@@ -15,10 +15,10 @@
   <!-- Software (abstract) concepts -->
   <object href="/shape-history" role="shape_history"/>
   <object href="/session"       role="session"/>
-  <object href="/dbconnection"  role="lims_client" />
+  <object href="/dbconnection-mockup"  role="lims_client" />
   <object href="/data-analysis" role="data_analysis"/>
   <object href="/mxcollect"     role="collect"/>
- 
+  <object href="/soleil-energyscan" role="energyscan"/>
 
   <!--object href="/workflow-mockup" role="workflow"/-->
  

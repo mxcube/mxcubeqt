@@ -4,7 +4,7 @@
    <object href="/obx" role="safety_shutter" />
    <object href="/fastshutter" role="fast_shutter" />
    <object href="/mxlocal" role="beamline_configuration" />
-   <object href="/minidiff" role="diffractometer" />
+   <object href="/soleil-minidiff" role="diffractometer" />
    <object href="/cats" role="sample_changer" />
    <object href="/BLEnergy" role="energy" />
    <object href="/Ps_attenuator" role="transmission" />
@@ -13,7 +13,9 @@
    <object href="/resolution" role="resolution" />
    <object href="/dbconnection" role="dbserver" />
    <object href="/flux" role="flux" />
-   
+   <object href="/beaminfo" role="beam_info" /> 
+   <object href="/detector" role="detector" />
+
    <!-- Following devices are used during datacollection -->
    <adscname>i11-ma-cx1/dt/adsc</adscname>
    <limaadscname>i11-ma-cx1/dt/limaadsc</limaadscname>
@@ -28,7 +30,7 @@
 
    <directory_prefix>PX2</directory_prefix>
    <close_safty_shutter>0</close_safty_shutter>
-   <test_mode>0</test_mode>
+   <test_mode>1</test_mode>
    <take_sample_snapshots>0</take_sample_snapshots>
    <move_detector_flag>1</move_detector_flag>
    <move_resolution_flag>1</move_resolution_flag>
