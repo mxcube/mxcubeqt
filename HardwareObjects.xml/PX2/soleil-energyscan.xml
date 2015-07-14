@@ -1,10 +1,10 @@
 <equipment class="SOLEILEnergyScan">
-    <device hwrid="/BLEnergy" role="energy"/>
-    <device hwrid="/resolution" role="resolution"/>
-    <device hwrid="/Ps_attenuator" role="transmission"/>
-    <device hwrid="/dbconnection-mockup" role="dbserver"/>
-    <device hwrid="/mach" role="machcurrent"/>
-    
+    <device hwrid="/BLEnergy" role="energy" />
+    <device hwrid="/resolution" role="resolution" />
+    <device hwrid="/Ps_attenuator" role="transmission" />
+    <device hwrid="/dbconnection-mockup" role="dbserver" />
+    <device hwrid="/mach" role="machcurrent" />
+    <device hwrid="/cryospy" role="cryostream" />    
     <mad>
         <defaultenergy>
             <energy>12.6595</energy>
