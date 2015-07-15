@@ -329,7 +329,7 @@ class CameraBrick(BlissWidget):
             self.imageReceivedConnected = False
 
     def disable_update(self):
-        self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
+        #self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
         self.update_disabled = True
 
     def enable_update(self):
@@ -416,17 +416,19 @@ class CameraBrick(BlissWidget):
                 self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
                 self.diffractometerHwobj.connect("minidiffStateChanged",
                                                  self.diffractometerChanged)
-                if self.diffractometerHwobj.zoomMotor is not None:
+                if self.diffractometerHwobj.zoomMotor is not None:    
                     zoom = self.diffractometerHwobj.zoomMotor.getPosition()
-                    xSize, ySize = self.diffractometerHwobj.getCalibrationData(zoom)
+                    xSize,ySize = self.diffractometerHwobj.getCalibrationData(zoom)
+                    #xSize,ySize = self.__scaleAction.xPixelSize(), self.__scaleAction.yPixelSize()
                     self.diffractometerHwobj.getBeamInfo(self.__getBeamInfo)
                     beam_pos_x = self.diffractometerHwobj.getBeamPosX()
                     beam_pos_y = self.diffractometerHwobj.getBeamPosY()
- 
+
+
                     self.__gridDialog.set_x_pixel_size(xSize)
                     self.__gridDialog.set_y_pixel_size(ySize)
                     self.__gridDialog.set_beam_position(beam_pos_x, beam_pos_y,
-                                                        self.__beamWidth, self.__beamHeight)
+                                                 self.__beamWidth, self.__beamHeight)
 
     def run(self) :
         chosenActions = []
