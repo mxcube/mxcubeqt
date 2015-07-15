@@ -85,7 +85,7 @@ class McaSpectrumBrick(BlissWidget):
 
             #Not sure how to use this
             #It is not necessary to fit after each setData            
-            #result = self._fit()
+            result = self._fit()
 
             #pyarch file name and directory
             pf = config["legend"].split(".")
