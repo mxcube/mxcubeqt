@@ -1,0 +1,7 @@
+<device class="LimaVideo"> 
+   <type>Prosilica</type> 
+   <address>172.19.10.152</address> 
+   <mirror>(True, False)</mirror> 
+   <imageType>rgb</imageType>	
+   <interval>40</interval>	
+</device>
