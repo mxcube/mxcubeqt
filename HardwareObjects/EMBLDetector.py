@@ -30,21 +30,26 @@ self.hum_treshold
 """
 
 import logging 
-from GenericDetector import GenericDetector
+from AbstractDetector import AbstractDetector
+from HardwareRepository.BaseHardwareObjects import HardwareObject
 
 
-class EMBLDetector(GenericDetector):    
+class EMBLDetector(AbstractDetector, HardwareObject):
     """
     Descript. : Detector class. Contains all information about detector
                 the states are 'OK', and 'BAD'
                 the status is busy, exposing, ready, etc.
                 the physical property is RH for pilatus, P for rayonix
     """
+
+
+
     def __init__(self, name): 
         """
         Descript. :
         """ 
-        GenericDetector.__init__(self, name)
+        AbstractDetector.__init__(self)
+        HardwareObject.__init__(self, name)
 
         self.temperature = 0
         self.humidity = 0
@@ -55,8 +60,6 @@ class EMBLDetector(GenericDetector):
         self.temp_treshold = None
         self.hum_treshold = None   
         self.exp_time_limits = None
-        self.pixel_min = None
-        self.pixel_max = None
 
         self.chan_temperature = None
         self.chan_humidity = None
@@ -116,11 +119,29 @@ class EMBLDetector(GenericDetector):
         
         self.collect_mode_dict = eval(self.getProperty("collectModes"))
 
-    def get_pixel_min(self):
-        return self.pixel_min
+    def get_distance(self):
+        """
+        Descript. : 
+        """
+        if self.distance_motor_hwobj is not None:
+            return self.distance_motor_hwobj.getPosition()
+        else:
+            return self.default_distance
 
-    def get_pixel_max(self):
-        return self.pixel_max
+    def get_distance_limits(self):
+        """
+        Descript. : 
+        """
+        if self.distance_motor_hwobj is not None:
+            return self.distance_motor_hwobj.getLimits()
+        else:
+            return self.default_distance_limits
+
+    def has_shutterless(self):
+        """
+        Descript. :
+        """
+        return self.getProperty("hasShutterless")
 
     def get_collect_name(self):
         """
