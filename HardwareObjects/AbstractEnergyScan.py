@@ -1,8 +1,4 @@
-import os
-import sys
-import time
 import abc
-import logging
 from HardwareRepository.TaskUtils import *
 
 
@@ -13,7 +9,6 @@ class AbstractEnergyScan(object):
         self.data_collect_task = None
         self.scanning = False
 
-    @abc.abstractmethod
     @task
     def open_safety_shutter(self, timeout):
         """
@@ -22,7 +17,6 @@ class AbstractEnergyScan(object):
         pass
 
 
-    @abc.abstractmethod
     @task
     def close_safety_shutter(self, timeout):
         """
@@ -31,7 +25,6 @@ class AbstractEnergyScan(object):
         pass
 
 
-    @abc.abstractmethod
     @task
     def open_fast_shutter(self):
         """
@@ -40,7 +33,6 @@ class AbstractEnergyScan(object):
         pass
 
 
-    @abc.abstractmethod
     @task
     def close_fast_shutter(self):
         """
@@ -49,7 +41,6 @@ class AbstractEnergyScan(object):
 
         pass
 
-    @abc.abstractmethod
     @task
     def energy_scan_hook(self, energy_scan_parameters):
         """
@@ -60,7 +51,6 @@ class AbstractEnergyScan(object):
         pass
 
 
-    @abc.abstractmethod
     @task
     def execute_energy_scan(self, energy_scan_parameters):
         """
@@ -70,7 +60,6 @@ class AbstractEnergyScan(object):
         """       
         pass
 
-    @abc.abstractmethod
     @task
     def get_static_parameters(self, element, edge):
         """
@@ -91,7 +80,6 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def set_mca_roi(self, eroi_min, eroi_max):
         """
@@ -99,7 +87,6 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def calculate_und_gaps(self, energy):
         """
@@ -109,7 +96,6 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def move_undulators(self, undulators):
         """
@@ -118,7 +104,6 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def escan_prepare(self):
         """
@@ -126,7 +111,6 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def choose_attenuation(self, energy_scan_parameters):
         """
@@ -135,7 +119,6 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def move_energy(self, energy):
         """
@@ -143,20 +126,18 @@ class AbstractEnergyScan(object):
         """
         pass
 
-    @abc.abstractmethod
     @task
     def escan_cleanup(self):
         pass
 
-    @abc.abstractmethod
     @task
     def escan_postscan(self):
         """
         set the nesessary equipment in position after the scan
         """
         pass
-              
-    @task
+    
+    @abc.abstractmethod          
     #def do_energy_scan(self, energy_scan_parameters):
     def startEnergyScan(self,element,edge,directory,prefix,session_id=None,blsample_id=None):
 
@@ -206,8 +187,8 @@ class AbstractEnergyScan(object):
         #send finish sucessfully signal to the brick
         self.emit('energyScanFinished', (self.energy_scan_parameters,))
         self.ready_event.set()
-        
-    @task
+    
+    @abc.abstractmethod    
     def doChooch(self, elememt, edge, scanArchiveFilePrefix, scanFilePrefix):
         """
         Use chooch to calculate edge and inflection point
