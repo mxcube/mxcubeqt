@@ -1,8 +1,9 @@
-from HardwareRepository.BaseHardwareObjects import Device
 import logging
+from AbstractMotor import AbstractMotor
+from HardwareRepository.BaseHardwareObjects import Device
 
 
-class MicrodiffMotorMockup(Device):      
+class MicrodiffMotorMockup(AbstractMotor, Device):      
     (NOTINITIALIZED, UNUSABLE, READY, MOVESTARTED, MOVING, ONLIMIT) = (0,1,2,3,4,5)
     EXPORTER_TO_MOTOR_STATE = { "Invalid": NOTINITIALIZED,
                                 "Fault": UNUSABLE,
@@ -12,10 +13,14 @@ class MicrodiffMotorMockup(Device):
                                 "Initializing": NOTINITIALIZED,
                                 "Unknown": UNUSABLE }
 
+    def __init__(self, name):
+        AbstractMotor.__init__(self)
+        Device.__init__(self, name)
+
     def init(self): 
         # this is ugly : I added it to make the centring procedure happy
         self.motorState = MicrodiffMotorMockup.READY
-	self.motorPosition = 10
+	self.motorPosition = 10.124
 
     def connectNotify(self, signal):
         if signal == 'positionChanged':
@@ -56,6 +61,8 @@ class MicrodiffMotorMockup(Device):
 
     def moveRelative(self, relativePosition):
         self.motorPosition = relativePosition
+        self.emit('positionChanged', (self.motorPosition, ))
+        self.emit('stateChanged', (self.motorState, ))
 
     def syncMoveRelative(self, relative_position, timeout=None):
         return self.getPosition()

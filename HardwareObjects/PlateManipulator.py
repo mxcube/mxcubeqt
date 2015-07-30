@@ -162,6 +162,7 @@ class PlateManipulator(SampleChanger):
         self.cmd_move_to_location = self.getCommandObject("startMovePlateToLocation")
         self.chan_current_phase = self.getChannelObject("CurrentPhase")
         self.chan_plate_location = self.getChannelObject("PlateLocation")
+        
         self.chan_state = self.getChannelObject("State")
         if self.chan_state is not None:
             self.chan_state.connectSignal("update", self._onStateChanged)
@@ -222,15 +223,33 @@ class PlateManipulator(SampleChanger):
             if (sample!=selected):
                 self._doSelect(sample)
             self._setLoadedSample(sample)
-        #TODO: Add pre-positioning and image matching
 
     def load_sample(self, sample_location=None):
         """
         Descript. : function to move to plate location.
                     Location is estimated by sample location and reference positions.
         """
-        pos_y = float(sample_location[2]) / (self.num_drops + 1)   
-        self.cmd_move_to_location(sample_location[0], sample_location[1] - 1, self.reference_pos_x, pos_y) 
+        row =  sample_location[0]
+        col =  sample_location[1]
+        drop = sample_location[2]
+
+        pos_y = float(drop) / (self.num_drops + 1)   
+        if self.cmd_move_to_location:
+            self.cmd_move_to_location(row, col - 1, self.reference_pos_x, pos_y) 
+        else:
+            #No actual move cmd defined. Act like a mockup
+            cell = self.getComponentByAddress("%s%d" %(chr(65 + row), col))
+            drop = cell.getComponentByAddress("%s%d:%d" %(chr(65 + row), col, drop))
+            new_sample = drop.getSample()
+            old_sample = self.getLoadedSample()
+            new_sample = drop.getSample()
+            if old_sample != new_sample:
+                if old_sample is not None:
+                    old_sample._setLoaded(False, True)
+                if new_sample is not None:
+                    new_sample._setLoaded(True, True)
+
+            #new_sample._setLoaded(True, True)
         
     def _doUnload(self,sample_slot=None):
         """
@@ -282,6 +301,7 @@ class PlateManipulator(SampleChanger):
         Descript. :
         """
         self._updateState()
+        #TODO remove self._updateLoadedSample and add event to self.chan_plate_location
         self._updateLoadedSample()
 
     def _updateState(self):
@@ -303,11 +323,7 @@ class PlateManipulator(SampleChanger):
         """
         plate_location = None
         if self.chan_plate_location is not None:
-            #If plate location event works this could be removed
             plate_location = self.chan_plate_location.getValue()
-
-        #uncomment next lines for testing
-        plate_location = [2, 2, 2, 2]
 
         if plate_location is not None:
             row = int(plate_location[0])
@@ -318,6 +334,9 @@ class PlateManipulator(SampleChanger):
                 drop_index = self.num_drops
 
             cell = self.getComponentByAddress("%s%d" %(chr(65 + row), col + 1))
+
+            if cell is None:
+                return
             old_sample = self.getLoadedSample()
             drop = cell.getComponentByAddress("%s%d:%d" %(chr(65 + row), col + 1, drop_index))
             new_sample = drop.getSample()

@@ -200,6 +200,7 @@ class Sample(TaskNode):
 
         # A pair <basket_number, sample_number>
         self.location = (None, None)
+        self.location_plate = None
         self.lims_location = (None, None)
 
         # Crystal information
@@ -243,6 +244,17 @@ class Sample(TaskNode):
     def init_from_sc_sample(self, sc_sample):
         self.loc_str = str(sc_sample[1]) + ':' + str(sc_sample[2])
         self.location = (sc_sample[1], sc_sample[2])
+        self.set_name(self.loc_str)
+
+    def init_from_plate_sample(self, plate_sample):
+        """
+        Descript. : location : col, row, index
+        """
+        self.loc_str = "%s:%s:%s" %(chr(65 + int(plate_sample[1])),
+                                    str(plate_sample[2]),
+                                    str(plate_sample[3]))
+        self.location = (int(plate_sample[1]), int(plate_sample[2]), int(plate_sample[3]))
+        self.location_plate = plate_sample[5]
         self.set_name(self.loc_str)
 
     def init_from_lims_object(self, lims_sample):
@@ -347,20 +359,29 @@ class Basket(TaskNode):
     def is_present(self):
         return self.get_is_present()
 
-    def init_from_sc_basket(self, sc_basket):
-        print "init_from_sc_basket... ", sc_basket 
+    def init_from_sc_basket(self, sc_basket, name="Basket"):
+        """
+        TODO Agree on a correct method
         self._basket_object = sc_basket[1] #self.is_present = sc_basket[2]
         self.location = self._basket_object.getCoords() #sc_basket[0]
         if len(self.location) == 2:
             self.name = "Cell %d, puck %d" % self.location
         else:
-            self.name = "Puck %d" % self.location
+            self.name = "Puck %d" % self.location 
+        """
+        self.location = int(sc_basket[0])
+        if name == "Row":
+            self.name = "%s %s" % (name, chr(65 + self.location))
+        else:
+            self.name = "%s %d" % (name, self.location)
+        self._basket_object = sc_basket[1]
 
     def get_name(self):
         return self.name
 
     def get_location(self):
-        return self.location
+        #return int(self.location[0])
+        return self.location 
 
     def get_is_present(self):
         self._basket_object.present
@@ -971,6 +992,10 @@ class PathTemplate(object):
         PathTemplate.archive_base_directory = archive_base_directory
         PathTemplate.archive_folder = archive_folder
 
+    @staticmethod
+    def set_path_template_style(synchotron_name):
+        PathTemplate.synchotron_name = synchotron_name 
+
     def __init__(self):
         object.__init__(self)
 
@@ -1020,26 +1045,32 @@ class PathTemplate(object):
 
     def get_archive_directory(self):
         """
-        Returns the archive directory, for longer term storage.
-
-        :returns: Archive directory.
-        :rtype: str
+        Descript. : Returns the archive directory, for longer term storage.
+                    synchotron_name is set via static function calles from session hwobj
+        Return    : Archive directory. :rtype: str
         """
-        #TODO make this site specifi 
-
+        archive_directory = None 
         folders = self.directory.split('/')
         endstation_name = None
-        
-        if 'visitor' in folders:
-            endstation_name = folders[4]
-            folders[2] = 'store'
-            temp = folders[3]
-            folders[3] = folders[4]
-            folders[4] = temp
+
+        if PathTemplate.synchotron_name == "EMBL": 
+            archive_directory = os.path.join(PathTemplate.archive_base_directory,
+                                             PathTemplate.archive_folder)
+            archive_directory = os.path.join(archive_directory,
+                                             *folders[3:])
         else:
-            endstation_name = folders[2]
-            folders[2] = 'store'
-            folders[3] = endstation_name
+            if 'visitor' in folders:
+                endstation_name = folders[4]
+                folders[2] = 'store'
+                temp = folders[3]
+                folders[3] = folders[4]
+                folders[4] = temp
+            else:
+                endstation_name = folders[2]
+                folders[2] = 'store'
+                folders[3] = endstation_name
+
+            archive_directory = os.path.join(os.path.join(PathTemplate.archive_base_directory, *folders[2:]))
 
         return archive_directory
 

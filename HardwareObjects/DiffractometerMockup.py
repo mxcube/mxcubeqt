@@ -200,6 +200,10 @@ class DiffractometerMockup(Equipment):
     def use_sample_changer(self):
         return True
 
+    def in_plate_mode(self):
+        #TODO head detection should be used to detect if in plate mode 
+	return False
+
     def toggle_fast_shutter(self):
         self.fast_shutter_is_open = not self.fast_shutter_is_open
         self.emit('minidiffShutterStateChanged', (self.fast_shutter_is_open, ))
@@ -567,7 +571,7 @@ class DiffractometerMockup(Equipment):
         """
         Descript. :
         """
-        self.emit('progressMessage', (msg,))
+        self.emit('progressMessage', msg)
 
     def get_centring_status(self):
         """
@@ -614,6 +618,7 @@ class DiffractometerMockup(Equipment):
         """
         Descript. :
         """
+        print "refresh"
         if self.beam_info_hwobj: 
             self.beam_info_hwobj.beam_pos_hor_changed(300) 
             self.beam_info_hwobj.beam_pos_ver_changed(200)

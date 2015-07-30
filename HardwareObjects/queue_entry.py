@@ -425,6 +425,7 @@ class SampleQueueEntry(BaseQueueEntry):
         BaseQueueEntry.__init__(self, view, data_model)
         self.sample_changer_hwobj = None
         self.diffractometer_hwobj = None
+        self.plate_manipulator_hwobj = None 
         self.sample_centring_result = None
 
     def execute(self):
@@ -434,11 +435,17 @@ class SampleQueueEntry(BaseQueueEntry):
 
         # Only execute samples with collections and when sample changer is used
         if len(self.get_data_model().get_children()) != 0 and sc_used:
-            if self.sample_changer_hwobj is not None:
+            if self.diffractometer_hwobj.in_plate_mode():
+                mount_device = self.plate_manipulator_hwobj
+            else:
+                mount_device = self.sample_changer_hwobj
+            if mount_device is not None:
+            #if self.sample_changer_hwobj is not None:
                 log.info("Loading sample " + self._data_model.loc_str)
 
-                sample_mounted = self.sample_changer_hwobj.\
-                                 is_mounted_sample(self._data_model.location)
+                #sample_mounted = self.sample_changer_hwobj.\
+                #                 is_mounted_sample(self._data_model.location)
+                sample_mounted = mount_device.is_mounted_sample(self._data_model.location)
 
                 if not sample_mounted:
                     self.sample_centring_result = gevent.event.AsyncResult()
@@ -474,6 +481,7 @@ class SampleQueueEntry(BaseQueueEntry):
         BaseQueueEntry.pre_execute(self)
         self.sample_changer_hwobj = self.beamline_setup.sample_changer_hwobj
         self.diffractometer_hwobj = self.beamline_setup.diffractometer_hwobj
+        self.plate_manipulator_hwobj = self.beamline_setup.plate_manipulator_hwobj
         self.shape_history = self.beamline_setup.shape_history_hwobj
 
     def post_execute(self):
@@ -548,8 +556,8 @@ class SampleCentringQueueEntry(BaseQueueEntry):
         self.get_queue_controller().pause(True)
         pos = None
 
-        if len(self.shape_history.selected_shapes):
-            pos = self.shape_history.selected_shapes.values()[0]
+        if len(self.shape_history.get_selected_shapes()):
+            pos = self.shape_history.get_selected_shapes()[0]
         #elif len(self.shape_history.shapes):
         #    pos = self.shape_history.shapes.values()[0]
         else:
@@ -558,8 +566,7 @@ class SampleCentringQueueEntry(BaseQueueEntry):
             # Create a centred postions of the current postion
             pos_dict = self.diffractometer_hwobj.getPositions()
             cpos = queue_model_objects.CentredPosition(pos_dict)
-            #TODO fix thos
-            print "add point to the graphics"
+            #TODO fix this to work with Qt4 version
             #pos = shape_history.Point(None, cpos, None) #, True)
 
         # Get tasks associated with this centring
@@ -1351,47 +1358,55 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
     loc = data_model.location
     holder_length = data_model.holder_length
 
-    if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
-       and (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
-        element = '%d:%02d' % loc
-        beamline_setup_hwobj.sample_changer_hwobj.load(sample=element, wait=True)
+    if beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        #no centring if plate used
+        #TODO as a gevent task 
+        if beamline_setup_hwobj.plate_manipulator_hwobj.\
+                 load_sample(sample_location=loc) == False:
+            raise QueueSkippEntryException("Plate manipulator could not load sample", "")
+        else:
+            view.setText(1, "Sample loaded")
     else:
-        if beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
-                                                              sample_location=loc,
-                                                              wait=True) == False:
-            # WARNING: explicit test of False return value.
-            # This is to preserve backward compatibility (load_sample was supposed to return None);
-            # if sample could not be loaded, but no exception is raised, let's skip the sample
-            raise QueueSkippEntryException("Sample changer could not load sample", "")
+        if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
+           and (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
+            element = '%d:%02d' % loc
+            beamline_setup_hwobj.sample_changer_hwobj.load(sample=element, wait=True)
+        else:
+            if beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
+                          sample_location=loc, wait=True) == False:
+                # WARNING: explicit test of False return value.
+                # This is to preserve backward compatibility (load_sample was supposed to return None);
+                # if sample could not be loaded, but no exception is raised, let's skip the sample
+                raise QueueSkippEntryException("Sample changer could not load sample", "")
 
-    dm = beamline_setup_hwobj.diffractometer_hwobj
+        dm = beamline_setup_hwobj.diffractometer_hwobj
 
-    if dm is not None:
-        try:
-            dm.connect("centringAccepted", centring_done_cb)
-            centring_method = view.listView().parent().\
-                              centring_method
-                  
-            if centring_method == CENTRING_METHOD.MANUAL:
-                log.warning("Manual centring used, waiting for" +\
-                            " user to center sample")
-                dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
-            elif centring_method == CENTRING_METHOD.LOOP:
-                dm.startCentringMethod(dm.C3D_MODE)
-                log.warning("Centring in progress. Please save" +\
-                            " the suggested centring or re-center")
-            elif centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
-                log.info("Centring sample, please wait.")
-                dm.startCentringMethod(dm.C3D_MODE)
-            else:
-                dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
+        if dm is not None:
+            try:
+                dm.connect("centringAccepted", centring_done_cb)
+                centring_method = view.listView().parent().\
+                                  centring_method
+                    
+                if centring_method == CENTRING_METHOD.MANUAL:
+                    log.warning("Manual centring used, waiting for" +\
+                                " user to center sample")
+                    dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
+                elif centring_method == CENTRING_METHOD.LOOP:
+                    dm.startCentringMethod(dm.C3D_MODE)
+                    log.warning("Centring in progress. Please save" +\
+                                " the suggested centring or re-center")
+                elif centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
+                    log.info("Centring sample, please wait.")
+                    dm.startCentringMethod(dm.C3D_MODE)
+                else:
+                    dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
 
-            view.setText(1, "Centring !")
-            async_result.get()
-            view.setText(1, "Centring done !")
-            log.info("Centring saved")
-        finally:
-            dm.disconnect("centringAccepted", centring_done_cb)
+                view.setText(1, "Centring !")
+                async_result.get()
+                view.setText(1, "Centring done !")
+                log.info("Centring saved")
+            finally:
+                dm.disconnect("centringAccepted", centring_done_cb)
 
 
 MODEL_QUEUE_ENTRY_MAPPINGS = \
