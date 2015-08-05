@@ -276,7 +276,7 @@ class EnergyScanQueueItem(TaskQueueItem):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
 
-class XRFScanQueueItem(TaskQueueItem):
+class XRFSpectrumQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
@@ -349,7 +349,7 @@ MODEL_VIEW_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueItem,
      queue_model_objects.Characterisation: CharacterisationQueueItem,
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
-     queue_model_objects.XRFScan: XRFScanQueueItem,
+     queue_model_objects.XRFSpectrum: XRFSpectrumQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
      queue_model_objects.Basket: BasketQueueItem,

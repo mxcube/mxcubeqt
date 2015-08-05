@@ -8,7 +8,7 @@ from widgets.create_helical_widget import CreateHelicalWidget
 from widgets.create_discrete_widget import CreateDiscreteWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
-from widgets.create_xrf_scan_widget import CreateXRFScanWidget
+from widgets.create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.create_workflow_widget import CreateWorkflowWidget
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 
@@ -43,14 +43,14 @@ class TaskToolBoxWidget(qt.QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.helical_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
-        self.xrf_scan_page = CreateXRFScanWidget(self.tool_box, "xrf_scan")
+        self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
         self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-        self.tool_box.addItem(self.xrf_scan_page, "XRF Scan")
+        self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         self.tool_box.addItem(self.workflow_page, "Advanced")
 
         self.add_pixmap = Icons.load("add_row.png")
@@ -161,8 +161,8 @@ class TaskToolBoxWidget(qt.QWidget):
                 self.tool_box.setCurrentItem(self.char_page)
             elif isinstance(items[0], queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentItem(self.energy_scan_page)
-            elif isinstance(items[0], queue_item.XRFScanQueueItem):
-                self.tool_box.setCurrentItem(self.xrf_scan_page)
+            elif isinstance(items[0], queue_item.XRFSpectrumQueueItem):
+                self.tool_box.setCurrentItem(self.xrf_spectrum_page)
             elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentItem(self.workflow_page)
 
