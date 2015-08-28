@@ -538,7 +538,12 @@ class ProposalBrick2(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
-    def _do_login(self, proposal_code,proposal_number,proposal_password,beamline_name, impersonate=False):
+    def _do_login(self, proposal_code, proposal_number, proposal_password, beamline_name, impersonate=False):
+        logging.getLogger().debug('ProposalBrick _do_loging: proposal_code %s' % proposal_code)
+        logging.getLogger().debug('ProposalBrick _do_loging: proposal_number %s' % proposal_number)
+        logging.getLogger().debug('ProposalBrick _do_loging: proposal_password %s' % proposal_password)
+        logging.getLogger().debug('ProposalBrick _do_loging: beamline_name %s' % beamline_name)
+        logging.getLogger().debug('ProposalBrick _do_loging: impersonate %s' % impersonate)
         if not impersonate:
             login_name=self.dbConnection.translate(proposal_code,'ldap')+str(proposal_number)
             logging.getLogger().debug('ProposalBrick: querying LDAP...')
@@ -551,9 +556,9 @@ class ProposalBrick2(BlissWidget):
             logging.getLogger().debug("ProposalBrick: password for %s-%s validated" % (proposal_code,proposal_number))
 
         # Get proposal and sessions
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
-        prop=self.dbConnection.getProposal(proposal_code,proposal_number)
-
+        logging.getLogger().debug('ProposalBrick: querying ISPyB database ...')
+        prop=self.dbConnection.getProposal(proposal_code, proposal_number)
+        logging.getLogger().debug("ProposalBrick: prop %s" % (prop))
         # Check if everything went ok
         prop_ok=True
         try:

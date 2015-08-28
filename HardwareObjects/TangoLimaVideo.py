@@ -1,8 +1,9 @@
 """Class for cameras connected to Lima Tango Device Servers
 """
+
+from HardwareRepository import HardwareRepository
 from HardwareRepository import BaseHardwareObjects
 from HardwareRepository import CommandContainer
-from HardwareRepository import HardwareRepository
 from HardwareRepository.HardwareObjects.Camera import JpegType, BayerType, MmapType, RawType, RGBType
 from Qub.CTools import pixmaptools
 import gevent
@@ -63,12 +64,13 @@ class TangoLimaVideo(BaseHardwareObjects.Device):
                                                                   self.scaling)
             if validFlag:
                 return qimage
+        return img_data
 
     def _do_polling(self, sleep_time):
         while True:
             qimage = self._get_last_image()
-   	    self.emit("imageReceived", qimage, qimage.width(), qimage.height(), False)
-
+            #self.emit("imageReceived", qimage, qimage.width(), qimage.height(), False)
+            self.emit("imageReceived", qimage, 300,300,False)
             time.sleep(sleep_time)
 
     def connectNotify(self, signal):
@@ -130,4 +132,30 @@ class TangoLimaVideo(BaseHardwareObjects.Device):
 
     def setExposure(self, exposure):
         self.device.video_exposure = exposure
+
+def test():
+
+    import gevent
+    from HardwareRepository.HardwareRepository import HardwareRepository as hdwrep
+    hwr_directory = os.environ["XML_FILES_PATH"] 
+
+    print hwr_directory
+
+    def imageReceived(image,width,height, force_update=False):
+        print " got one image " ,width, height
+
+    hwr = hdwrep(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    camera = hwr.getHardwareObject("/gc655c")
+    camera.setLive(True)
+    camera.connect("imageReceived", imageReceived)
+
+    while True:
+        gevent.wait(timeout=0.1)
+          
+    
+
+if __name__ == '__main__':
+    test()
 

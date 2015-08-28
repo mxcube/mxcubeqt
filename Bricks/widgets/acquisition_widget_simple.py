@@ -44,9 +44,6 @@ class AcquisitionWidgetSimple(qt.QWidget):
         #
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
 
-        # Default to 2-images
-        self.acq_widget_layout.child('num_images_cbox').setCurrentItem(1)
-
         qt.QObject.connect(self.acq_widget_layout.child('num_images_cbox'),
                            qt.SIGNAL("activated(int)"),
                            self.update_num_images)

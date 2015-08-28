@@ -1,7 +1,7 @@
 <object class="SOLEILISPyBClient">
 
   <ws_root>
-    http://suntest.synchrotron-soleil.fr/ispyb/ispybWS/
+    http://suntest.synchrotron-soleil.fr/ispyb-ws/ispybWS/
   </ws_root>
 
   <ws_username>ab361</ws_username>
@@ -19,7 +19,7 @@
        mxCuBE 1.0 works with the new xml files (ie. cherry picking
        commits from master to 1.0 or merging)
   -->
-  <beamline_name>PX2</beamline_name>
+  <beamline_name>px2</beamline_name>
    <proposals>
      <proposal>
        <code>ifx</code>

@@ -622,6 +622,8 @@ class DataCollectionQueueEntry(BaseQueueEntry):
 
     def post_execute(self):
         BaseQueueEntry.post_execute(self)
+        dc = self.get_data_model()
+        dc.acquisitions[0].acquisition_parameters.secret = " POST SECRET" 
         qc = self.get_queue_controller()
 
         qc.disconnect(self.collect_hwobj, 'collectStarted',

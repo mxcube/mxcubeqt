@@ -50,6 +50,7 @@ class EDNACharacteriseBrick(BlissWidget):
         self.methodBox.insertItem("1 Image")
         self.methodBox.insertItem("2 Images")
         self.methodBox.insertItem("4 Images")
+        self.methodBox.setCurrentIndex(2)
         self.startButton=QPushButton("Start",vbox1)
         QObject.connect(self.startButton,SIGNAL("clicked()"),self.startCharacterisation)
         lw2=QWidget(lw1)

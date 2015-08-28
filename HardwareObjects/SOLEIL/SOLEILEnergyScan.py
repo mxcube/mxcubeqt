@@ -172,7 +172,7 @@ class SOLEILEnergyScan(Equipment):
         self._edge = edge
         logging.getLogger("HWR").debug('EnergyScan: starting energy scan %s, %s' % (self._element, self._edge))
         self.setElement()
-        self.xanes = Xanes.xanes(self, element, edge, directory, prefix, session_id, blsample_id, plot=False, test=False)
+        self.xanes = Xanes.xanes(self, element, edge, directory, prefix, session_id, blsample_id, plot=False, test=True)
         self.scanInfo={"sessionId":session_id,"blSampleId":blsample_id,"element":element,"edgeEnergy":edge}
         if self.fluodetectorHO is not None:
             self.scanInfo['fluorescenceDetector']=self.fluodetectorHO.userName()

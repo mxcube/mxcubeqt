@@ -69,6 +69,8 @@ def take_snapshots(light, light_motor, phi, zoom, drawing):
 
   centredImages.reverse() # snapshot order must be according to positive rotation direction
 
+  logging.getLogger("HWR").info("take_snapshots done. returning %d images" % len(centredImages))
+
   return centredImages
 
 
@@ -310,6 +312,7 @@ class MiniDiffPX2(Equipment):
     def invalidateCentring(self):
         logging.info("Invalidating centring manualCentringProcedure is %s", str(self.currentCentringProcedure) )
         if self.currentCentringProcedure is None and self.centringStatus["valid"]:
+            logging.info("  here.  centringStatus had: %s" % str(self.centringStatus.keys()))
             self.centringStatus={"valid":False}
             self.emitProgressMessage("")
             self.emit('centringInvalid', ())
@@ -679,6 +682,7 @@ class MiniDiffPX2(Equipment):
     def rejectCentring(self):
         if self.currentCentringProcedure:
           self.currentCentringProcedure.kill()
+        logging.getLogger("HWR").debug("MiniDiff: rejecting centring")
         self.centringStatus={"valid":False}
         self.emitProgressMessage("")
         self.emit('centringAccepted', (False,self.getCentringStatus()))
@@ -687,6 +691,7 @@ class MiniDiffPX2(Equipment):
         self.emit('centringMoving', ())
 
     def emitCentringFailed(self):
+        logging.getLogger("HWR").debug("MiniDiff: emitting centring failed")
         self.centringStatus={"valid":False}
         method=self.currentCentringMethod
         self.currentCentringMethod = None
@@ -770,7 +775,12 @@ class MiniDiffPX2(Equipment):
         # if not centring_valid:
         #     logging.getLogger("HWR").error("MiniDiff: you must centre the crystal before taking the snapshots")
         # else:
-        snapshotsProcedure = gevent.spawn(take_snapshots, self.lightWago, self.lightMotor ,self.phiMotor,self.zoomMotor,self._drawing)
+        snapshotsProcedure = gevent.spawn(take_snapshots, 
+                                          self.lightWago, 
+                                          self.lightMotor,
+                                          self.phiMotor, 
+                                          self.zoomMotor, 
+                                          self._drawing)
         self.emit('centringSnapshots', (None,))
         self.emitProgressMessage("Taking snapshots")
         self.centringStatus["images"]=[]
@@ -778,7 +788,6 @@ class MiniDiffPX2(Equipment):
 
         if wait:
           self.centringStatus["images"] = snapshotsProcedure.get()
-
  
     def snapshotsDone(self, snapshotsProcedure):
         self.camera.forceUpdate = False
@@ -801,8 +810,10 @@ class MiniDiffPX2(Equipment):
     def beamPositionCheck(self):
         logging.getLogger("HWR").info("Going to check the beam position at all zooms")
         logging.getLogger("user_level_log").info("Starting beam position check for all zooms")
-        gevent.spawn(self.bpc)
+        #gevent.spawn(self.bpc)
+        self.bpc(wait=False)
     
+    @task
     def bpc(self):
         calib = calibrator.calibrator(fresh=True, save=True)
         logging.getLogger("user_level_log").info("Adjusting camera exposure time for visualisation on the scintillator")
@@ -826,8 +837,10 @@ class MiniDiffPX2(Equipment):
     def apertureAlign(self):
         logging.getLogger("HWR").info("Going to realign the current aperture")
         logging.getLogger("user_level_log").info("Aligning the current aperture")
-        gevent.spawn(self.aa)
-        
+        #gevent.spawn(self.aa)
+        self.aa(wait=False)
+
+    @task     
     def aa(self):
         logging.getLogger("user_level_log").info("Adjusting camera exposure time for visualisation on the scintillator")
         a = scan_and_align.scan_and_align('aperture', display=False)

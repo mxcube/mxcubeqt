@@ -34,6 +34,8 @@
         <sampy>0.0</sampy>
     </resetPosition>
     <device role="camera" hwrid="/gc655c"></device>
+    <!--device role="camera" hwrid="/limacam"></device-->
+    <!--device role="camera" hwrid="/limavideo"></device-->
     <device role="sample_changer" hwrid="/cats"></device>   
     <motors>
         <phi-shutter>

@@ -104,7 +104,7 @@ class SoleilLoginBrick(BlissWidget):
         #font.setPointSize(10)
         #labels_box.setFont(font)
 
-        #self.proposalLabel=QLabel(ProposalBrick2.NOBODY_STR,labels_box)
+        #self.proposalLabel=QLabel(SoleilLoginBrick2.NOBODY_STR,labels_box)
         #self.proposalLabel.setAlignment(Qt.AlignCenter)
 
         self.user_group_layout = QHBox(self.contentsBox, 'group_box')
@@ -167,7 +167,7 @@ class SoleilLoginBrick(BlissWidget):
         self.saved_group = False
         
     def customEvent(self,event):
-        #logging.getLogger().debug("ProposalBrick2: custom event (%s)" % str(event))
+        #logging.getLogger().debug("SoleilLoginBrick2: custom event (%s)" % str(event))
 
         if self.isRunning():
             if event.type() == PROPOSAL_GUI_EVENT:
@@ -175,23 +175,23 @@ class SoleilLoginBrick(BlissWidget):
                     method=event.method
                     arguments=event.arguments
                 except Exception,diag:
-                    logging.getLogger().exception("ProposalBrick2: problem in event! (%s)" % str(diag))
+                    logging.getLogger().exception("SoleilLoginBrick: problem in event! (%s)" % str(diag))
                 except:
-                    logging.getLogger().exception("ProposalBrick2: problem in event!")
+                    logging.getLogger().exception("SoleilLoginBrick: problem in event!")
                 else:
-                    #logging.getLogger().debug("ProposalBrick2: custom event method is %s" % method)
+                    #logging.getLogger().debug("SoleilLoginBrick: custom event method is %s" % method)
                     if callable(method):
                         try:
                             method(*arguments)
                         except Exception,diag:
-                            logging.getLogger().exception("ProposalBrick2: uncaught exception! (%s)" % str(diag))
+                            logging.getLogger().exception("SoleilLoginBrick: uncaught exception! (%s)" % str(diag))
                         except:
-                            logging.getLogger().exception("ProposalBrick2: uncaught exception!")
+                            logging.getLogger().exception("SoleilLoginBrick: uncaught exception!")
                         else:
-                            #logging.getLogger().debug("ProposalBrick2: custom event finished")
+                            #logging.getLogger().debug("SoleilLoginBrick: custom event finished")
                             pass
                     else:
-                        logging.getLogger().warning('ProposalBrick2: uncallable custom event!')
+                        logging.getLogger().warning('SoleilLoginBrick: uncallable custom event!')
 
     # Enabled/disabled the login/logout button
     def setButtonEnabled(self,state):
@@ -200,9 +200,9 @@ class SoleilLoginBrick(BlissWidget):
 
     def impersonateProposal(self,proposal_code,proposal_number):
         if BlissWidget.isInstanceUserIdInhouse():
-            self._do_login(proposal_code, proposal_number, None, self.dbConnection.beamline_name, impersonate=True)
+            self._do_login(proposal_code, proposal_number, None, self.dbConnection.get_beamline_name(), impersonate=True)
         else:
-            logging.getLogger().debug('ProposalBrick2: cannot impersonate unless logged as the inhouse user!')
+            logging.getLogger().debug('SoleilLoginBrick: cannot impersonate unless logged as the inhouse user!')
 
     # Opens the logout dialog (modal); if the answer is OK then logout the user
     def openLogoutDialog(self):
@@ -237,7 +237,7 @@ class SoleilLoginBrick(BlissWidget):
 
         self.session_hwobj.set_user_info( '','','' )
         
-        #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
+        #self.proposalLabel.setText(SoleilLoginBrick.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
        
         # Emit signals clearing the proposal and session
@@ -498,7 +498,13 @@ class SoleilLoginBrick(BlissWidget):
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
 
         #self._do_login(prop_type,prop_number,prop_password, self.dbConnection.beamline_name)
-        self._do_login(username,prop_password, self.dbConnection.beamline_name)
+        logging.getLogger().debug('SoleilLoginBrick login: proposal_code %s' % username)
+        logging.getLogger().debug('SoleilLoginBrick login: prop_password %s' % prop_password)
+        logging.getLogger().debug('SoleilLoginBrick login: self.dbConnection.beamline_name %s' % self.dbConnection.get_beamline_name())
+        #if self.dbConnection.beamline_name == 'Proxima2':
+            #beamline_name = 'proxima2a'
+            #logging.getLogger().debug('SoleilLoginBrick login: beamline_name %s' % beamline_name)
+        self._do_login(username, prop_password, self.dbConnection.get_beamline_name())
 
     def passControl(self,has_control_id):
         pass
@@ -540,12 +546,17 @@ class SoleilLoginBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
-    def _do_login(self, username,proposal_password,beamline_name, impersonate=False):
+    def _do_login(self, username, proposal_password, beamline_name, impersonate=False):
+        logging.getLogger().debug('SoleilLoginBrick _do_login: username %s' % username)
+        logging.getLogger().debug('SoleilLoginBrick _do_login: proposal_password %s' % proposal_password)
+        logging.getLogger().debug('SoleilLoginBrick _do_login: beamline_name %s' % beamline_name)
+        logging.getLogger().debug('SoleilLoginBrick _do_login: impersonate %s' % impersonate)
         if not impersonate:
             #login_name=self.dbConnection.translate(proposal_code,'ldap')+str(proposal_number)
             login_name=username
-            logging.getLogger().debug('ProposalBrick: querying LDAP...')
+            logging.getLogger().debug('SoleilLoginBrick: querying LDAP...')
             ok, msg=self.ldapConnection.login(login_name,proposal_password)
+            logging.getLogger().debug("SoleilLoginBrick: password for %s validated" % (username,))
 
             if not ok:
                 msg="%s." % msg.capitalize()
@@ -557,16 +568,44 @@ class SoleilLoginBrick(BlissWidget):
             gid = userinfo.get('gidNumber','')
             uid = userinfo.get('uidNumber','')
 
-            self.session_hwobj.set_user_info( login_name, uid, gid )
+            if gid and len(gid) > 0:
+                gid = gid[0]
+            else:
+                gid = ''
+            if uid and len(uid) > 0:
+                uid = uid[0]
+            else:
+                uid = ''
+            
+            msg = "SoleilLoginBrick: Searching today's valid session for "
+            msg += "User %s on beamline %s..." % (login_name, beamline_name)
+            logging.getLogger().debug(msg)
+            validsess = self.ldapConnection.find_valid_sessions_for_user(login_name, beamline_name)
+            logging.getLogger().debug("SoleilLoginBrick: validsess: %s" % validsess)
+            if len(validsess) > 0:
+                projuser = validsess[0].username
+            else:
+                projuser = None
+            logging.getLogger().debug("SoleilLoginBrick: Number of valid session found: %d" % len(validsess))
+            logging.getLogger().debug("SoleilLoginBrick: Project users: %s" % (projuser))
 
-            logging.getLogger().debug("ProposalBrick: password for %s validated" % (username,))
+            self.session_hwobj.set_user_info( login_name, uid, gid, projuser )
 
         # Get proposal and sessions
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database)...')
+        logging.getLogger().debug('SoleilLoginBrick: querying ISPyB database ...')
+        
+        logging.getLogger().debug("SoleilLoginBrick: Project users: %s" % (projuser))
+        
         proposal_code = "mx"
-        proposal_number = "2014"
-        prop=self.dbConnection.getProposal(proposal_code,proposal_number)
-
+        logging.getLogger().debug("SoleilLoginBrick: proposal_code: %s" % proposal_code)
+        
+        proposal_number = projuser
+        if proposal_number == None:
+            proposal_number = "2014"
+        logging.getLogger().debug("SoleilLoginBrick: proposal_number: %s" % proposal_number)
+        
+        prop=self.dbConnection.getProposal(proposal_code, proposal_number)
+        logging.getLogger().debug("SoleilLoginBrick: prop: %s" % prop)
         # Check if everything went ok
         prop_ok=True
         try:
@@ -577,7 +616,7 @@ class SoleilLoginBrick(BlissWidget):
             self.ispybDown()
             return
 
-        logging.getLogger().debug('ProposalBrick: got sessions from ISPyB...')
+        logging.getLogger().debug('SoleilLoginBrick: got sessions from ISPyB: % s' % (prop))
 
         proposal=prop['Proposal']
         person=prop['Person']
@@ -588,6 +627,8 @@ class SoleilLoginBrick(BlissWidget):
             sessions=None
 
         # Check if there are sessions in the proposal
+        # TODO: remove most of this code next 30 lines is not needed anymore it
+        #       is in the SOLEILLdapLogin hwobj in find_valid_sessions_for_user()
         todays_session=None
         if sessions is None or len(sessions)==0:
             pass
@@ -597,26 +638,28 @@ class SoleilLoginBrick(BlissWidget):
                 beamline=session['beamlineName']
                 start_date="%s 00:00:00" % session['startDate'].split()[0]
                 end_date="%s 23:59:59" % session['endDate'].split()[0]
-                try:
-                    start_struct=time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
-                except ValueError:
-                    pass
-                else:
-                    try:
-                        end_struct=time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
-                    except ValueError:
-                        pass
-                    else:
-                        start_time=time.mktime(start_struct)
-                        end_time=time.mktime(end_struct)
-                        current_time=time.time()
+                logging.getLogger().debug('SoleilLoginBrick: beamline % s start %s end %s' % (beamline, start_date, end_date))
+                todays_session=sessions[0]
+                #try:
+                #    start_struct=time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
+                #except ValueError:
+                #    pass
+                #else:
+                #    try:
+                #       end_struct=time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
+                #    except ValueError:
+                #        pass
+                #    else:
+                #        start_time=time.mktime(start_struct)
+                #        end_time=time.mktime(end_struct)
+                #        current_time=time.time()
 
-                        # Check beamline name
-                        if beamline==beamline_name:
-                            # Check date
-                            if current_time>=start_time and current_time<=end_time:
-                                todays_session=session
-                                break
+                #        # Check beamline name
+                #        if beamline.lower() == beamline_name.lower():
+                #            # Check date
+                #            if current_time>=start_time and current_time<=end_time:
+                #                todays_session=session
+                #                break
 
         if todays_session is None:
             is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
@@ -651,7 +694,7 @@ class SoleilLoginBrick(BlissWidget):
             localcontact=None
         else:
             session_id=todays_session['sessionId']
-            logging.getLogger().debug('ProposalBrick: getting local contact for %s' % session_id)
+            logging.getLogger().debug('SoleilLoginBrick: getting local contact for %s' % session_id)
             localcontact=self.dbConnection.getSessionLocalContact(session_id)
 
         self.acceptLogin(prop['Proposal'],\

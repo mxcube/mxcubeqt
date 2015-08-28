@@ -359,24 +359,6 @@ class LimaAdscDetector:
     def reset_detector(self):   
         return
 
-    def lastImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
-        logging.info("<SOLEIL MultiCollect> lastImage, xformstatusfile %s " % self.xformstatusfile)
-        line = str(integer) + ' ' + os.path.join(imagePath, fileName)
-        try:
-            f = open( self.xformstatusfile, 'w')
-            f.write('%s\n' % line)
-            f.close()
-        except IOError:
-            import traceback
-            logging.info('Problem writing the last image %s' % (traceback.format_exc()))
-        try:
-            f = open('/927bis/ccd/log/.goimg/goimg.db', 'w')
-            f.write('%s' % os.path.join(imagePath, 'process'))
-            f.close()
-        except IOError:
-            import traceback
-            logging.info('Problem writing goimg.db %s' % (traceback.format_exc()))
-    
     def wait(self, device):
         green_light = False
         k = 0
@@ -576,6 +558,8 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         spec_pars = mxlocalHO["SPEC_PARS"]
         bl_pars = mxlocalHO["BEAMLINE_PARS"]
 
+        self.session_hwo = self.getObjectByRole("session")
+
         try:
           undulators = bcm_pars["undulator"]
         except IndexError:
@@ -623,6 +607,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
 
     @task
     def take_crystal_snapshots(self):
+        logging.info("<SOLEIL MultiCollect> take_crystal_snapshots")
         self.bl_control.diffractometer.takeSnapshots(wait=True)
 
     #TODO: remove this hook!!!
@@ -630,13 +615,6 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
     def data_collection_hook(self, data_collect_parameters):
         # TOFILL    initializeDevices()
         return
-
-    @task
-    def data_collection_cleanup(self):
-        logging.info("<SOLEIL MultiCollect> data_collection_cleanup - close fast shutter")
-        self.mono_turnon()
-        return
-        #self.close_fast_shutter()
 
     @task
     def set_transmission(self, transmission_percent):

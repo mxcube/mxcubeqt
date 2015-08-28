@@ -10,6 +10,8 @@ from PyTango import DeviceProxy
 
 from qt import qApp
 
+import numpy
+
 class TangoDCMotor(Device):
     
     MOVESTARTED    = 0
@@ -76,7 +78,7 @@ class TangoDCMotor(Device):
         self.positionValue = value
         if abs(float(value) - self.old_value ) > self.threshold:
             try:
-                logging.getLogger("HWR").error("%s: TangoDCMotor new position  , %s", self.name(), value)
+                #logging.getLogger("HWR").error("%s: TangoDCMotor new position  , %s", self.name(), value)
                 self.emit('positionChanged', (value,))
                 self.old_value = value
             except:
@@ -113,7 +115,6 @@ class TangoDCMotor(Device):
             logging.getLogger("HWR").info("TangoDCMotor.getLimits: trying to get limits for motor_name %s " % (self.motor_name))
             limits = self.ho.getMotorLimits(self.motor_name) #limitsCommand() # self.ho.getMotorLimits(self.motor_name)
             logging.getLogger("HWR").info("TangoDCMotor.getLimits: Getting limits for %s -- %s " % (self.motor_name, str(limits)))
-            import numpy
             if numpy.inf in limits:
                 limits = numpy.array([-10000, 10000])
         except:

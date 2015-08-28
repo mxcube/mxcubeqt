@@ -6,6 +6,240 @@ from PyTango import DeviceProxy
 import numpy
 import re
 import math
+import subprocess
+
+class LimaAdscDetector:
+    def __init__(self):
+        self.ready = False
+        self.adscdev           = None
+        self.limaadscdev       = None
+        self.xformstatusfile   = None
+        self.first_frame = True
+        self.jpeg_allframes = False
+
+    def initDetector(self, adscname, limaadscname, xformstatusfile):
+        logging.info("<SOLEIL MultiCollect> Initializing LIMA detector")
+        try: 
+           self.adscdev           = DeviceProxy(adscname) 
+           self.limaadscdev       = DeviceProxy(limaadscname) 
+           self.xformstatusfile   = xformstatusfile
+        except:
+           import traceback
+           logging.error("<SOLEIL MultiCollect> Cannot initialize LIMA detector")
+           logging.error( traceback.format_exc() )
+        else:
+           self.ready = True
+
+    @task
+    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment="", lima_overhead=0.):
+        if not self.ready:
+            return
+            
+        self.new_acquisition = True
+        logging.info('Preparing LIMA Detector')
+        #if self.limaadscdev.state().name != 'STANDBY':
+            #self.limaadscdev.Stop()
+            #time.sleep(0.1)
+
+        #if self.adscdev.state().name != 'STANDBY':
+            #time.sleep(0.1)
+        
+        self.wait(self.adscdev)
+        self.wait(self.limaadscdev)
+        
+        self.limaadscdev.exposuretime = (exptime + lima_overhead) * 1e3
+        if (self.limaadscdev.get_timeout_millis() - self.limaadscdev.exposuretime) < 2000:
+            self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposuretime) + 2000)
+        
+        self.wait(self.limaadscdev)
+        self.limaadscdev.write_attribute('nbFrames', number_of_images)
+
+    @task
+    def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
+        if not self.ready:
+          return
+
+        self.imagePath   = os.path.dirname(filename)
+        if not self.imagePath.endswith('/'):
+            self.imagePath += '/'
+        self.fileName   = os.path.basename(filename)
+        self.imageNumber = frame_number
+
+        logging.info("<PX2 LimaAdscDetector> Setting detector filenames")
+        logging.info("     - frame_number: %s", frame_number)
+        logging.info("     - start: %s", start)
+        logging.info("     - jpeg path: %s", jpeg_full_path)
+        logging.info("     - thumb path: %s", jpeg_thumbnail_full_path)
+
+        logging.info('LIMA Detector - set filenames - imagePath is %s / filename is %s' % (self.imagePath, self.fileName))
+        logging.info('   - thumbnail full path %s' % jpeg_thumbnail_full_path )
+        logging.info('   - snapshot full path %s' % jpeg_full_path )
+
+        self.wait(self.adscdev)
+        self.adscdev.write_attribute('imagePath', self.imagePath)
+        self.adscdev.write_attribute('fileName',  os.path.basename(self.fileName))
+       
+    @task
+    def prepare_oscillation(self, start, osc_range, exptime, npass):
+        logging.info("<SOLEIL MultiCollect> prepare_acquisition")
+        if self.ready:
+           head = self.prepareHeader()
+           self.adscdev.SetHeaderParameters( head )
+           #self.limaadscdev.exposureTime = (exptime + 0.6) * 1e3
+           #if self.limaadscdev.exposureTime > 2500:
+               #logging.info("<SOLEIL MultiCollect> prepare_acquisition setting timeout to %s " % (self.limaadscdev.exposureTime + 1500))
+               #self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposureTime + 1500))
+           self.wait(self.adscdev)
+
+        return (start, start+osc_range)
+        
+    @task
+    def do_oscillation(self, start, end, exptime, npass):
+        self.first_frame = True
+        self.new_acquisition = False
+
+        pass
+
+    @task
+    def start_acquisition(self, exptime, npass, first_frame):
+        logging.info("<SOLEIL MultiCollect> start_acquisition")
+        # Comes from   self.limaadscSnap() in original Martin's thread program
+        if not self.ready:
+            return
+        logging.info("<SOLEIL MultiCollect> start_acquisition limaadscdev timeout %s" % self.limaadscdev.get_timeout_millis())
+        self.limaadscdev.Snap()
+        time.sleep(0.05)
+        #while self.limaadscdev.log[-1].find('yat::DEVICE_SNAP_MSG') == -1:
+            #time.sleep(0.05)
+            #self.limaadscdev.Snap()
+        return
+      
+    @task
+    def write_image(self, last_frame, image_filename, jpeg_full_path, jpeg_thumbnail_full_path):
+        start = time.time()
+
+        logging.info("<LimaAdscDetector> write last image, converting jpegs")
+        logging.info("jpeg_full_path %s" % jpeg_full_path)
+        logging.info("jpeg_thumbnail_full_path %s" % jpeg_thumbnail_full_path)
+    
+        self.wait_image_on_disk(image_filename)
+        self.reportLatestImage(integer=last_frame, imagePath=self.imagePath, fileName=image_filename)
+    
+        img_full_path = os.path.join(self.imagePath, image_filename)
+    
+        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        logging.info(" allframes %s / first_frame %s / last_frame %s " % (self.jpeg_allframes, self.first_frame, last_frame))
+
+        if (self.jpeg_allframes or self.first_frame or last_frame):
+
+            if os.path.exists( image_filename ):
+                subprocess.Popen([ self.imgtojpeg, image_filename, jpeg_full_path, '0.4' ])
+                subprocess.Popen([ self.imgtojpeg, image_filename, jpeg_thumbnail_full_path, '0.1' ])
+            else:
+                logging.info("Oopps.  Trying to generate thumbs but image %s is not on disk")
+    
+            self.first_frame = False
+            img_full_path = os.path.join(self.imagePath, image_filename)
+            
+            logging.info("<LimaAdscDetector> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        else:
+            logging.info("<LimaAdscDetector> write last image, skipping %s" % image_filename)
+        
+    def reportLatestImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
+
+        logging.info("<SOLEIL MultiCollect> reporting latest image, xformstatusfile %s " % self.xformstatusfile)
+        line = str(integer) + ' ' + os.path.join(imagePath, fileName)
+        try:
+            f = open( self.xformstatusfile, 'w')
+            f.write('%s\n' % line)
+            f.close()
+        except IOError:
+            logging.info('Problem writing the last image %s' % (traceback.format_exc()))
+
+        try:
+            f = open(self.goimgfile, 'w')
+            f.write('%s' % os.path.join(imagePath, 'process'))
+            f.close()
+        except IOError:
+            import traceback
+            logging.info('Problem writing goimg.db %s' % (traceback.format_exc()))
+
+    def wait_image_on_disk(self, filename,timeout=10.0):
+        start_wait = time.time()
+        logging.info("Waiting for image %s to appear on disk." % filename)
+        while not os.path.exists(filename):
+            dirname = os.path.dirname(filename)
+            if time.time() - start_wait > timeout:
+                logging.info("Giving up waiting for image. Timeout")
+                break
+            logging.info("Content of %s directory is: %s" % (dirname, str(os.listdir(dirname))))
+            time.sleep(0.5)
+        logging.info("Waiting for image %s ended in  %3.2f secs" % (filename, time.time()-start_wait))
+
+    def analyze_thread(self, filename):
+        logging.info.info('Starting Analyze Thread')
+        logging.info.info('filename %s ' % filename)
+        self.athread = threading.Thread(target=self.analyze_image, args=(filename,))
+        self.athread.daemon = True
+        self.athread.start()
+
+    def analyze_image(self, filename):
+        logging.info.info('Analyzing image %s' % filename)
+        while not os.path.exists(filename):
+            time.sleep(0.1)
+        os.system('ssh p10 "rsync -av %s /ramdisk/"' % img_full_path)
+        #os.system('ssh p10 "adxv -sa -jpeg_scale 0.08 %s %s"' % (img_full_path, jpeg_full_path))
+        #os.system('ssh p10 "adxv -sa -jpeg_scale 0.016 %s %s"' % (img_full_path, jpeg_thumbnail_full_path))
+        os.system('ssh p10 "ola.py -f %s"' % filename)
+        
+    @task
+    def stop_acquisition(self):
+        # Comes from   self.limaadscStop() in original Martin's thread program
+        if not self.ready:
+           return
+
+        k = 0
+        while self.limaadscdev.log[-1].find('Acquisition is Stopped.') == -1 and self.limaadscdev.state().name == 'RUNNING' and k < 3:
+            try:
+                k += 1
+                self.limaadscdev.Stop()
+                if k > 1:
+                    logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it.' % k)
+                time.sleep(0.1)
+            except:
+                import traceback
+                logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it. Exception %s' % (k, traceback.format_exc()))
+        return
+
+    @task
+    def reset_detector(self):   
+        return
+
+    def wait(self, device):
+        green_light = False
+        k = 0
+        while green_light is False:
+            try:
+                if device.state().name not in ['STANDBY']:
+                    logging.info("Device %s wait" % device)
+                else:
+                    green_light = True
+                    return
+            except:
+                k += 1
+                import traceback
+                traceback.print_exc()
+                logging.info('Problem occured in wait %s, attempt %s ' % (device, k))
+                logging.info(traceback.print_exc())
+            time.sleep(.1)
+        
+    def waitReady(self, device):
+        while device.state().name in [ 'MOVING', 'RUNNING'] :
+            time.sleep(.1)
+
+    def prepareHeader(self):
+        '''Should return a nice header. Implemented in PX2MultiCollect.py'''
+        return ""
 
 class PX2MultiCollect(SOLEILMultiCollect):
     def __init__(self, name):
@@ -32,14 +266,27 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self.standard_collect = False
         
         self.close_safty_shutter = self.getProperty("close_safty_shutter") 
-        
+
+        self.goimgfile = self.getProperty("goimgfile")
         self.imgtojpeg = self.getProperty("imgtojpeg")
         self._detector.imgtojpeg = self.imgtojpeg
+        self._detector.goimgfile = self.goimgfile
+
+        self.ruche_sync_dir = self.getProperty("ruche_sync_dir")
+
         self.jpegoption = self.getProperty("jpegoption")
+        if self.jpegoption == 'allframes':
+             self._detector.jpeg_allframes = True
+
         self.test_mode = int(self.getProperty("test_mode"))
+        self.take_sample_snapshots = int(self.getProperty("take_sample_snapshots"))
+        self.move_detector_flag = int(self.getProperty("move_detector_flag"))
+        self.move_resolution_flag = int(self.getProperty("move_resolution_flag"))
         self.lima_overhead = float(self.getProperty("lima_overhead"))
+        
         logging.info("<PX2 MultiCollect> lima_overhead %s" % self.lima_overhead)
         self._detector.prepareHeader = self.prepareHeader
+        logging.getLogger("user_level_log").info("initializing PX2MultiCollect")
         SOLEILMultiCollect.init(self)
        
     def prepareHeader(self, X=None, Y=None, D=None):
@@ -253,7 +500,20 @@ class PX2MultiCollect(SOLEILMultiCollect):
         beam_center_x -= 0.21
         beam_center_y -= 0.86
         
-        #
+        #shift beginning Run3 2015
+        beam_center_x += 1.85
+        beam_center_y -= 0
+
+        #shift 2015-07-24 (something wierd happened with mirrors over the week of 2015-06-22 and then again 2015-07-10 -- probably during colimator commissioning)
+        # optimal 1508.45   1527.97
+        # input   1507.5    1527.4
+        # this corresponds to yshift in beamcenter as represented in analysis.py in /927bis/ccd/gitRepos/CollectionStatistics
+        beam_center_x += 0.85 # plus adjusts for shifts up
+        beam_center_y -= 1 # minus adjusts for shifts up
+        #shift 2015-07-25
+        beam_center_x -= 0.28
+        beam_center_y += 2
+        
         beam_center_y *= q
         beam_center_x *= q
         
@@ -519,7 +779,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         return positions
         
     def newWedge(self, imageNums, ScanStartAngle, template, positions):
-        return {'imageNumbers': imageNums, 
+         return {'imageNumbers': imageNums,
                 'startAtAngle': ScanStartAngle, 
                 'template': template, 
                 'positions': positions}
@@ -573,13 +833,26 @@ class PX2MultiCollect(SOLEILMultiCollect):
         logging.info('get_sync_destination %s ' %self.sync_destination )
         os.system('ssh p10 "mkdir -p %s"' % sync_process)
         
-    def synchronize_thread(self, directory, filename):
-        logging.info('Starting Synchronize Thread')
-        logging.info('filename %s ' % filename)
-        self.sthread = threading.Thread(target=self.synchronize_image, args=(directory, filename))
-        self.sthread.daemon = True
-        self.sthread.start()
-        
+    #def synchronize_thread(self, directory, filename):
+        #logging.info('Starting Synchronize Thread')
+        #logging.info('filename %s ' % filename)
+        #self.sthread = threading.Thread(target=self.synchronize_image, args=(directory, filename))
+        #self.sthread.daemon = True
+        #self.sthread.start()
+
+    @task
+    def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
+        self.current_filename = filename
+        self.current_jpeg_full_path = jpeg_full_path
+        self.current_thumb_path = jpeg_thumbnail_full_path
+
+        self._detector.set_detector_filenames(frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path)
+
+    @task
+    def write_image(self, last_frame, jpeg_full_path='/tmp/jfp.jpeg', jpeg_thumbnail_full_path='/tmp/jtfp.jpeg'):
+        self._detector.write_image(last_frame, self.current_filename, self.current_jpeg_full_path, self.current_thumb_path, wait=False)
+
+    @task
     def synchronize_image(self, directory, filename):
         logging.info('Synchronizing image %s' % filename)
         filename = os.path.join(directory, filename)
@@ -605,8 +878,11 @@ class PX2MultiCollect(SOLEILMultiCollect):
         os.system('ssh p10 "rsync -av %s %s"' % (source, self.sync_destination))
         
     def should_i_take_snapshots(self, data_collect_parameters):
+        return True
         if data_collect_parameters['oscillation_sequence'][0]['start_image_number'] != 1:
+            logging.info("<SOLEIL collect>  I will NOT take snapshots")
             return False
+        logging.info("<SOLEIL collect>  I WILL take snapshots")
         return True
         
     @task
@@ -681,6 +957,12 @@ class PX2MultiCollect(SOLEILMultiCollect):
             data_collect_parameters["actualSampleBarcode"] = None
             data_collect_parameters["actualContainerBarcode"] = None
 
+        try:
+            if data_collect_parameters["take_snapshots"] and self.should_i_take_snapshots(data_collect_parameters) and self.take_sample_snapshots == 1:
+                self.take_crystal_snapshots()
+        except KeyError:
+            pass
+        
         centring_info = {}
         try:
             centring_status = self.diffractometer().getCentringStatus()
@@ -689,6 +971,9 @@ class PX2MultiCollect(SOLEILMultiCollect):
         else:
             centring_info = dict(centring_status)
 
+        
+        logging.getLogger("HWR").debug("centring_status: %s" % str(centring_status.keys()))
+        logging.getLogger("HWR").debug("centring_info: %s" % str(centring_info.keys()))
         #Save sample centring positions
         motors = centring_info.get("motors", {})
         logging.info('do_collect motors %s' % motors)
@@ -831,19 +1116,20 @@ class PX2MultiCollect(SOLEILMultiCollect):
           self.set_energy(data_collect_parameters["energy"])
         
         if 'resolution' in data_collect_parameters:
-          resolution = data_collect_parameters["resolution"]["upper"]
-          #self.set_resolution(resolution)
-          self.send_resolution(resolution)
+          if self.move_resolution_flag == 1:
+            resolution = data_collect_parameters["resolution"]["upper"]
+            #self.set_resolution(resolution)
+            self.send_resolution(resolution)
+          else:
+            logging.getLogger("HWR").info("Not changing resolution, if this is not intended, change the move_resolution configuration parameter in ~/mxcube_v2/HardwareObjects.xml/PX2/mxcollect.xml")
         elif 'detdistance' in oscillation_parameters:
-          #self.move_detector(oscillation_parameters["detdistance"])
-          self.send_detector(oscillation_parameters["detdistance"])
+          if self.move_detector_flag == 1:
+            logging.getLogger("HWR").info("Moving the detector")
+            #self.move_detector(oscillation_parameters["detdistance"])
+            self.send_detector(oscillation_parameters["detdistance"])
+          else:
+            logging.getLogger("HWR").info("Not moving the detector, if this is not intended, change the move_detector configuration parameter in ~/mxcube_v2/HardwareObjects.xml/PX2/mxcollect.xml")
          
-        try:
-            if data_collect_parameters["take_snapshots"] and self.should_i_take_snapshots(data_collect_parameters):
-                self.take_crystal_snapshots()
-        except KeyError:
-            pass
-        
         frame = start_image_number
         osc_range = oscillation_parameters["range"]
         exptime = oscillation_parameters["exposure_time"]
@@ -966,7 +1252,11 @@ class PX2MultiCollect(SOLEILMultiCollect):
                        self.do_oscillation(osc_start, osc_end, exptime, npass)
                     self.stop_acquisition()
                     last_frame = start_image_number + nframes - 1
-                    self.write_image(last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
+                    if frame == last_frame:
+                        is_last_frame = True
+                    else:
+                        is_last_frame = False
+                    self.write_image(is_last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
                     
                     # Store image in lims
                     if self.bl_control.lims:
@@ -1004,11 +1294,27 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                                    data_collect_parameters.get("sample_reference", {}).get("spacegroup", ""),
                                                    data_collect_parameters.get("sample_reference", {}).get("cell", ""))
                 
-                self.synchronize_thread(file_location, filename)
+                #self.synchronize_thread(file_location, filename)
+                self.synchronize_image(file_location, filename, wait=False)
                 frame += 1
 
             self.sync_collect(file_location, filename, image_file_template)
             self.finalize_acquisition()
+    @task
+    def data_collection_cleanup(self):
+        logging.info("<PX2 MultiCollect> data_collection_cleanup - turning mono on / data_sync")
+        self.mono_turnon()
+        self.trigger_data_sync()
+        return
+
+    def trigger_data_sync(self):
+        logging.getLogger().info("<PX2 MultiCollect> - triggering data sync ")
+        ruche_info = self.session_hwo.get_ruche_info( self.current_jpeg_full_path )
+
+        sync_file = time.strftime("%Y_%m_%d-%H_%M_%S", time.localtime(time.time()))
+        sync_file_path = os.path.join( self.ruche_sync_dir, sync_file )
+        open(sync_file_path,"w").write( ruche_info )
+
 
 def test():
     import os

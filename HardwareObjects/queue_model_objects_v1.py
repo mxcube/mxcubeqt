@@ -6,6 +6,7 @@ the QueueModel.
 import copy
 import os
 import queue_model_enumerables_v1 as queue_model_enumerables
+import logging
 
 class TaskNode(object):
     """
@@ -700,9 +701,14 @@ class Acquisition(object):
 
 class PathTemplate(object):
     @staticmethod
-    def set_archive_path(archive_base_directory='/927bis/ccd/Database', archive_folder='Archive'):
+    def set_archive_path(archive_base_directory, archive_folder):
         PathTemplate.archive_base_directory = archive_base_directory
         PathTemplate.archive_folder = archive_folder
+        PathTemplate.translate_func = None
+
+    @staticmethod
+    def set_archive_translation(translate_func):
+        PathTemplate.translate_func = translate_func
 
     def __init__(self):
         object.__init__(self)
@@ -719,9 +725,7 @@ class PathTemplate(object):
         self.precision = str()
         self.start_num = int()
         self.num_files = int()
-        self.archive_base_directory='/927bis/ccd/Database'
-        self.archive_folder='Archive'
-        
+
     def get_prefix(self):
         prefix = self.base_prefix
 
@@ -760,22 +764,32 @@ class PathTemplate(object):
         :returns: Archive directory.
         :rtype: str
         """
+        logging.debug("getting archive directory from %s" % self.directory)
+
+        if PathTemplate.translate_func is not None:
+             return PathTemplate.translate_func(self.directory)
+
+        # keep standard translation method if not set
         folders = self.directory.split('/')
         endstation_name = None
+
+        try:
+            folders[2] = PathTemplate.archive_folder
+        except:
+            PathTemplate.archive_folder = "tmp"
         
         if 'visitor' in folders:
             endstation_name = folders[4]
-            folders[2] = self.archive_folder #PathTemplate.archive_folder
+            folders[2] = PathTemplate.archive_folder
             temp = folders[3]
             folders[3] = folders[4]
             folders[4] = temp
         else:
             endstation_name = folders[2]
-            folders[2] = self.archive_folder #PathTemplate.archive_folder
+            folders[2] = PathTemplate.archive_folder
             folders[3] = endstation_name
 
-        archive_directory = os.path.join(os.path.join(self.archive_base_directory, *folders[2:]))
-
+        logging.debug("PathTemplate archive directory is %s" % archive_directory)
         return archive_directory
 
     def get_files_to_be_written(self):

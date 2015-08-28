@@ -328,7 +328,7 @@ class CatsMaintSoleil(Equipment):
         if 'incoherent' in value.lower():
             value = '%s\nThe sample is not present on the gonio although robot thinks it should be.\nThis can happen in three cases:\n1. there was no sample in the specified position in the puck,\n2. the robot could not get it (rare)\n3. the gonio can not detect sample which is present (very rare).\nIf the sample is really not present on the gonio please click "abort" button\n and then "Missing sample" button below to be able to continue.' % value
         if 'trfgtd' in value.lower():
-            value = '%s\nTransfer permission was not granted by the gonio.\n1. Please Abort the trajectory\n2. set gonio to Transfer phase from the pull down menu on the right\n3. Start the load/unload trajectory again.' % s
+            value = '%s\nTransfer permission was not granted by the gonio.\n1. Please Abort the trajectory\n2. set gonio to Transfer phase from the pull down menu on the right\n3. Start the load/unload trajectory again.' % value
         if 'dback' in value.lower():
             value = '%s\nThe detector is too close (less then 180 mm from the sample)\nPlease move it to at least 181 mm.' % value
         if 'remote mode requested' in value.lower():

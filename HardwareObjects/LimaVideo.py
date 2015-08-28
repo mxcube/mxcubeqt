@@ -1,6 +1,8 @@
 """
 Lima video HO to capture images from camera
 """
+from HardwareRepository import HardwareRepository
+
 import time
 import logging
 import gevent
@@ -17,6 +19,7 @@ class LimaVideo(BaseHardwareObjects.Device):
         self.scaling = pixmaptools.LUT.Scaling()
 
     def _init(self):
+        print 'I am in init'
 	self.scalingType = None	
 	self.forceUpdate = False
  	self.camMirror = None
@@ -26,9 +29,13 @@ class LimaVideo(BaseHardwareObjects.Device):
 	self.__gainExists = False
 	self.__gammaExists = False 
 
+	#self.camType = 'prosilica' self.getProperty("type").lower()
+	#self.camAddress = '172.19.10.152' #self.getProperty("address")
+
 	self.camType = self.getProperty("type").lower()
 	self.camAddress = self.getProperty("address")
-	#self.camMirror = eval(self.getProperty("mirror_hor_ver"))
+	self.camMirror = eval(self.getProperty("mirror_hor_ver"))
+	print 'self.camAddress', self.camAddress
 
 	if self.camType == 'prosilica':
 	    from Lima import Prosilica
@@ -41,6 +48,7 @@ class LimaVideo(BaseHardwareObjects.Device):
         try:
 	    self.control = Core.CtControl(self.interface)
 	    self.video = self.control.video()
+	    #self.video.setExposure(40./1000.0) #(self.getProperty("interval")/1000.0)	
 	    self.video.setExposure(self.getProperty("interval")/1000.0)	
 	    self.__imageDimensions = self.camera.getMaxWidthHeight()
         except KeyError:
@@ -50,7 +58,9 @@ class LimaVideo(BaseHardwareObjects.Device):
  	self.setIsReady(True)
 
     def setImageTypeFromXml(self, property_name):
+        #image_type = self.getProperty(property_name) or 'Jpeg'
         image_type = self.getProperty(property_name) or 'Jpeg'
+        #image_type = 'Jpeg'
         if image_type.lower() == 'jpeg':
             self.imgtype = JpegType()
         elif image_type.lower().startswith("bayer:"):
@@ -139,8 +149,8 @@ class LimaVideo(BaseHardwareObjects.Device):
 	     	
     def connectNotify(self, signal):
 	if signal=="imageReceived":
+            #self.__imagePolling = gevent.spawn(self._do_imagePolling, 40./1000.0)
             self.__imagePolling = gevent.spawn(self._do_imagePolling, self.getProperty("interval")/1000.0)
-
     def newImage(self):
 	if self.video.getLive():
  	    image = self.video.getLastImage()
@@ -157,5 +167,64 @@ class LimaVideo(BaseHardwareObjects.Device):
                                                                       self.scaling)
 		if validFlag:
                     #if self.camMirror is not None:
-                    #    qimage = qimage.mirror(self.camMirror[0], self.camMirror[1])     
+                        #qimage = qimage.mirror(self.camMirror[0], self.camMirror[1])     
    	            self.emit("imageReceived", qimage, qimage.width(), qimage.height(), self.forceUpdate)
+   	            
+def test2():
+    #import os
+    #from HardwareRepository import HardwareRepository, BaseHardwareObjects
+    #hwr_directory = os.environ["XML_FILES_PATH"] 
+
+    #print hwr_directory
+    #hwr = HardwareRepository.HardwareRepository(os.path.abspath(hwr_directory))
+    #print 'hwr'
+    #print hwr
+    #hwr.connect()
+
+    #lima = hwr.getHardwareObject("/limavideo")
+    
+    #lima.video.getLive()
+    #image = self.video.getLastImage()
+    #import scipy
+    #print 'image'
+    #print image
+    
+    #scipy.misc.imsave('/tmp/limaimage.png')
+    lima = LimaVideo('prosilica')
+    lima._init()
+    lima.video.getLive()
+    print 'lima.getWidth()', lima.getWidth()
+    print 'lima.getHeight()', lima.getHeight()
+    print 'lima.newImage()', lima.newImage()
+    print 'lima.video.getLive()', lima.video.getLive()
+    import scipy
+    print 'image'
+    image = lima.video.getLastImage()
+    
+    im = image.buffer()
+    print im
+    scipy.misc.imsave('/tmp/limaimage.png', im)
+    
+def test():
+    import gevent
+    from HardwareRepository.HardwareRepository import HardwareRepository as hdwrep
+    import os
+    hwr_directory = os.environ["XML_FILES_PATH"]
+
+    print hwr_directory
+
+    def imageReceived(image,width,height, force_update=False):
+                print " got one image " ,width, height
+
+    hwr = hdwrep(os.path.abspath(hwr_directory))
+    hwr.connect()
+
+    camera = hwr.getHardwareObject("/prosilica")
+    camera.setLive(True)
+    camera.connect("imageReceived", imageReceived)
+
+    while True:
+                gevent.wait(timeout=0.1)
+
+if __name__ == '__main__':
+    test()

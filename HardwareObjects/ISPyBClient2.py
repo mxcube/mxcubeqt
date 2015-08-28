@@ -118,7 +118,7 @@ class ISPyBClient2(HardwareObject):
         try:
             formatter = \
                 logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-            hdlr = logging.FileHandler('/users/blissadm/log/ispyb_client.log')
+            hdlr = logging.FileHandler('/home/experiences/proxima2a/com-proxima2a/MXCuBE_v2_logs/ispyb_client.log')
             hdlr.setFormatter(formatter)
             logger.addHandler(hdlr) 
         except:
@@ -143,6 +143,8 @@ class ISPyBClient2(HardwareObject):
                 global _WS_SCREENING_URL
 
                 _WSDL_ROOT = self.ws_root.strip()
+                logging.debug("ISPyB. _WSDL_ROOT %s" % _WSDL_ROOT)
+                print "ISPyB. _WSDL_ROOT %s" % _WSDL_ROOT
                 _WS_BL_SAMPLE_URL = _WSDL_ROOT + \
                     'ToolsForBLSampleWebService?wsdl'
                 _WS_SHIPPING_URL = _WSDL_ROOT + \
@@ -216,11 +218,11 @@ class ISPyBClient2(HardwareObject):
         return None
 
     def clear_daily_email(self):
-        raise NotImplementedException("Depricated ?")
+        raise NotImplementedException("Deprecated ?")
 
     
     def send_email(self):
-        raise NotImplementedException("Depricated ?")
+        raise NotImplementedException("Deprecated ?")
 
     @trace
     def get_proposal(self, proposal_code, proposal_number):
@@ -244,11 +246,12 @@ class ISPyBClient2(HardwareObject):
             try:         
                 try:
                     person = self._shipping.service.\
-                             findPersonByProposal(proposal_code, 
-                                                  proposal_number)
+                             findPersonByProposal(proposal_code, proposal_number)
                     if not person:
                         person = {}
-
+                    
+                    logging.debug("ISPyB. findPersonByProposal %s" % person)
+                    
                 except WebFault, e:
                     logging.getLogger("ispyb_client").exception(e.message)
                     person = {}
@@ -266,7 +269,8 @@ class ISPyBClient2(HardwareObject):
                                 'Laboratory': {}, 
                                 'Session': {}, 
                                 'status': {'code':'error'}}
-
+                    logging.debug("ISPyB. findProposal %s" % proposal)
+                    
                 except WebFault, e:
                     logging.getLogger("ispyb_client").exception(e.message)
                     proposal = {}
@@ -278,6 +282,7 @@ class ISPyBClient2(HardwareObject):
 
                     if not lab:
                         lab = {}
+                    logging.debug("ISPyB. findLaboratoryByProposal %s" % lab)
                     
                 except WebFault, e:
                     logging.getLogger("ispyb_client").exception(e.message)
@@ -303,7 +308,7 @@ class ISPyBClient2(HardwareObject):
                                 pass
 
                             sessions.append(utf_encode(asdict(session)))
-
+                    logging.debug("ISPyB. findSessionsByProposalAndBeamline %s" % sessions)
                 except WebFault, e:
                     logging.getLogger("ispyb_client").exception(e.message)
                     sessions = []

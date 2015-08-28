@@ -36,16 +36,25 @@ class TangoMachCurrent(Device):
            return None
 
     def getCurrent(self):
-        mach = self.device.read_attribute("current").value
+        try:
+            mach = self.device.read_attribute("current").value
+        except:     
+            mach = -1
         return mach
     def getLifeTime(self):
         lifetime = self.device.read_attribute("lifetime").value
         return lifetime
     def getMessage(self):
-        opmsg  = self.device.read_attribute("operatorMessage").value
+        try:
+            opmsg  = self.device.read_attribute("operatorMessage").value
+        except:
+            opmsg  = "cannot get machine information" 
         return opmsg
     def getFillMode(self):
-        fillmode = self.device.read_attribute("fillingMode").value 
+        try:
+            fillmode = self.device.read_attribute("fillingMode").value 
+        except:
+            fillmode = "N/A"        
         return fillmode
 
     def valueChanged(self, value):

@@ -119,6 +119,16 @@ class xanes(object):
         self.wait(self.ble)
 
     def prepare(self):
+        self.results = {}
+        self.results['timestamp'] = time.time()
+        self.results['prefix'] = self.prefix
+        self.results['element'] = self.element
+        self.results['edge'] = self.edge
+        self.results['peakingTime'] = self.peakingTime
+        self.results['dynamicRange'] = self.dynamicRange
+        self.results['integrationTime'] = self.integrationTime
+        self.results['nbSteps'] = self.nbSteps
+        
         if self.test is False:
             self.initializeDevices()
             logging.info('prepare fluodet is %s ' % self.fluodet)
@@ -126,6 +136,8 @@ class xanes(object):
             self.fluodet.peakingtime = self.peakingTime
             
             self.monoFine.On()
+        else:      
+            return
 
         self.getAbsEm()
         self.setROI()
@@ -140,16 +152,6 @@ class xanes(object):
         self.fluodet.presetvalue = self.integrationTime
         
         self.insertFluoDet()
-        
-        self.results = {}
-        self.results['timestamp'] = time.time()
-        self.results['prefix'] = self.prefix
-        self.results['element'] = self.element
-        self.results['edge'] = self.edge
-        self.results['peakingTime'] = self.peakingTime
-        self.results['dynamicRange'] = self.dynamicRange
-        self.results['integrationTime'] = self.integrationTime
-        self.results['nbSteps'] = self.nbSteps
         
     def cleanUp(self):
         self.saveRaw()
@@ -213,6 +215,7 @@ class xanes(object):
         return 'Ready'
         
     def set_md2_phase(self, phase_name='DataCollection'):
+        if self.test: return
         self.md2.startSetPhase(phase_name)
         while self.md2.currentPhase != phase_name or self.get_state() != 'Ready':
             time.sleep(0.1)

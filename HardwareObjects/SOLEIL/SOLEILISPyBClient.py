@@ -21,18 +21,21 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
 
         self.ws_username = self.getProperty('ws_username')
         self.ws_password = self.getProperty('ws_password')
-
+        
+        #self.ws_username = 'mx20100023' #self.getProperty('ws_username')
+        #self.ws_password = 'tisabet' #self.getProperty('ws_password')
+        
         self.ws_collection = self.getProperty('ws_collection')
         self.ws_shipping = self.getProperty('ws_shipping')
         self.ws_tools = self.getProperty('ws_tools')
         
-        logging.debug("Inititializing SOLEIL ISPyB Client")
+        logging.debug("Initializing SOLEIL ISPyB Client")
         logging.debug("   - using http_proxy = %s " % os.environ['http_proxy'])
 
         try:
 
             if self.ws_root:
-
+                logging.debug("self.ws_root %s" % self.ws_root)
                 try: 
                     self._shipping = self._wsdl_shipping_client()
                     self._collection = self._wsdl_collection_client()
@@ -79,7 +82,7 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
             #import traceback
             #traceback.print_exc()
 
-        self.beamline_name = self.session_hwobj.beamline_name
+        self.beamline_name = self.get_beamline_name()
 
     def translate(self, code, what):  
         """
@@ -87,6 +90,9 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
         or what to send to LDAP, user office database, or the ISPyB database.
         """
         return code
+
+    def get_beamline_name(self):
+        return self.session_hwobj.get_beamline_name()
 
     def _wsdl_shipping_client(self):
         return self._wsdl_client(self.ws_shipping)
@@ -103,9 +109,8 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
         cj = CookieJar()
         url_opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
-        trans = HttpAuthenticated(username = self.ws_username, \
-                                  password = self.ws_password)
-
+        trans = HttpAuthenticated(username = self.ws_username, password = self.ws_password)
+        print '_wsdl_client %s' % service_name, trans
         trans.urlopener = url_opener
         urlbase = service_name + "?wsdl"
         locbase = service_name
@@ -123,6 +128,16 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
     def prepare_collect_for_lims(self, mx_collect_dict):
         # Attention! directory passed by reference. modified in place
 
+        prop = 'EDNA_files_dir' 
+        path = mx_collect_dict[prop] 
+        ispyb_path = self.session_hwobj.path_to_ispyb( path )
+        mx_collect_dict[prop] = ispyb_path
+
+        prop = 'process_directory' 
+        path = mx_collect_dict['fileinfo'][prop] 
+        ispyb_path = self.session_hwobj.path_to_ispyb( path )
+        mx_collect_dict['fileinfo'][prop] = ispyb_path
+
         for i in range(4):
             try: 
                 prop = 'xtalSnapshotFullPath%d' % (i+1)
@@ -136,9 +151,9 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
     def prepare_image_for_lims(self, image_dict):
         for prop in [ 'jpegThumbnailFileFullPath', 'jpegFileFullPath']:
             try:
-	        path = image_dict[prop] 
+                path = image_dict[prop] 
                 ispyb_path = self.session_hwobj.path_to_ispyb( path )
-   	        image_dict[prop] = ispyb_path
+                image_dict[prop] = ispyb_path
             except:
                 pass
 
@@ -150,8 +165,10 @@ def test():
     hwr.connect()
 
     db = hwr.getHardwareObject("/dbconnection")
-
-    info = db.get_proposal("mx","2014")
+    proposal_code = 'mx'
+    proposal_number = '20140088' #'20100023'
+    
+    info = db.get_proposal(proposal_code, proposal_number)# proposal_number)
     print info
  
 if __name__ == '__main__':

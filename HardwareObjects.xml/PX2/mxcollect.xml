@@ -18,7 +18,14 @@
    <adscname>i11-ma-cx1/dt/adsc</adscname>
    <limaadscname>i11-ma-cx1/dt/limaadsc</limaadscname>
    <headername>i11-ma-cx1/ex/header</headername>
+
+   <imgtojpeg>/home/experiences/proxima2a/com-proxima2a/mxcube_v2/bin/adxv_makejpeg</imgtojpeg>
+   <jpegoption>allframes</jpegoption>
+
    <xformstatusfile>/927bis/ccd/.lastImage</xformstatusfile>
+   <goimgfile>/927bis/ccd/log/.goimg/goimg.db</goimgfile>
+   <ruche_sync_dir>/927bis/ccd/archive_spool</ruche_sync_dir>
+
    <mono1name>i11-ma-c03/op/mono1</mono1name>
    <mono1mtrxname>i11-ma-c03/op/mono1-mt_rx</mono1mtrxname>
    <detmttsname>i11-ma-cx1/dt/dtc_ccd.1-mt_ts</detmttsname>
@@ -28,9 +35,9 @@
 
    <directory_prefix>PX2</directory_prefix>
    <close_safty_shutter>0</close_safty_shutter>
-   <test_mode>0</test_mode>
-   <take_sample_snapshots>0</take_sample_snapshots>
-   <move_detector_flag>1</move_detector_flag>
-   <move_resolution_flag>1</move_resolution_flag>
+   <test_mode>1</test_mode>
+   <take_sample_snapshots>1</take_sample_snapshots>
+   <move_detector_flag>0</move_detector_flag>
+   <move_resolution_flag>0</move_resolution_flag>
    <lima_overhead>0.7</lima_overhead>
 </procedure>

@@ -211,7 +211,7 @@ class CreateCharWidget(CreateTaskBase):
         self._path_template.reference_image_prefix = 'ref'
         # The num images drop down default value is 1
         # we would like it to be 2
-        self._acquisition_parameters.num_images = 2
+        #self._acquisition_parameters.num_images = 4
         self._char.characterisation_software =\
             queue_model_enumerables.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
