@@ -320,8 +320,11 @@ class AbstractMultiCollect(object):
             try:
                 os.makedirs(directory)
             except os.error, e:
+                import traceback
+                logging.info('AbstractMulticollect create_directories %s' % traceback.print_exc())
                 if e.errno != errno.EEXIST:
-                    raise
+                    pass
+                    #raise
      
 
     def _take_crystal_snapshots(self, number_of_snapshots):
