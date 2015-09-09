@@ -131,6 +131,8 @@ class TaskToolBoxWidget(qt.QWidget):
                 new_pt = self.tool_box.item(page_index)._path_template
                 previous_pt = self.tool_box.item(self.previous_page_index)._path_template
                 new_pt.directory = previous_pt.directory
+                #issu #91 - carry over file prefix. Remove this comment later
+                new_pt.base_prefix = previous_pt.base_prefix
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
 

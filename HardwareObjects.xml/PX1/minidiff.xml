@@ -1,0 +1,72 @@
+<!-- Q: redundant? -->
+<!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
+<equipment class="MiniDiffPX1">
+    <username>Goniometer</username>
+
+    <wagolight>/lightarm</wagolight>
+    <bstop>/beamstop</bstop>
+    <samplechanger>/cryotong</samplechanger>
+    <px1env>/px1environment</px1env>
+
+    <command type="tango" tangoname="i10-c-cx1/ex/microglide" name="uGlideMoveCmd">AbsoluteMoveInXYZ</command>
+
+    <phiy_direction>-1</phiy_direction>
+    
+    <device role="camera" hwrid="/ge1350c"></device>
+    <device role="obx" hwrid="/obx"></device>
+    <device role="microglide" hwrid="/microglide"></device>
+    <device role="guillotine" hwrid="/guillotine"></device>
+
+    <motors>
+        <phi-shutter>
+            <device role="phi" hwrid="/phi"></device>
+            <device role="phiz" hwrid="/uglidez"></device>
+            <device role="omega" hwrid="/omega"></device>
+            <device role="kappa" hwrid="/kappa"></device>
+        </phi-shutter>
+        <detector>
+            <device role="detdist" hwrid="/detectordistance"></device>
+        </detector>
+        <sample>
+            <device role="zoom" hwrid="/zoom"></device>
+            <device role="light" hwrid="/light"></device>
+            <device role="kappa" hwrid="/kappa"></device>  
+            <device role="kappa_phi" hwrid="/omega"></device>  
+            <device role="sampx" hwrid="/uglidex"></device>
+            <device role="sampy" hwrid="/uglidey"></device>
+        </sample>
+    </motors>
+
+    <referencePosition>
+        <phi delta="0.1">0.0</phi>
+        <phiz delta="0.01">0.0</phiz>
+        <zoom delta="0.01"></zoom>
+        <light delta="0.01"></light>
+        <focus delta="0.01">0.0</focus>
+        <phiy delta="0.01">0.0</phiy>
+        <sampx delta="0.01">0.0</sampx>
+        <sampy delta="0.01">0.0</sampy>
+    </referencePosition>
+
+    <referencePositionWithKappa>
+        <phi delta="0.1">0.0</phi>
+        <phiz delta="0.01">0.0</phiz>
+        <zoom delta="0.01"></zoom>
+        <light delta="0.01"></light>
+        <focus delta="0.01">0.0</focus>
+        <phiy delta="0.01">0.0</phiy>
+        <sampx delta="0.01">0.0</sampx>
+        <sampy delta="0.01">0.0</sampy>
+        <kap1 delta="0.01">0.0</kap1>
+        <kap2 delta="0.01">0.0</kap2>
+    </referencePositionWithKappa>
+
+    <resetPosition>
+        <phiz>0.0</phiz>
+        <focus>0.0</focus>
+        <phiy>0.0</phiy>
+        <sampx>0.0</sampx>
+        <sampy>0.0</sampy>
+    </resetPosition>
+
+</equipment>
