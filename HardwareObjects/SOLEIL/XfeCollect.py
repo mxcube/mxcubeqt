@@ -55,8 +55,11 @@ class XfeCollect(object):
         Ps_v = PyTango.DeviceProxy('i11-ma-c02/ex/fent_v.1')
         Const = PyTango.DeviceProxy('i11-ma-c00/ex/fpconstparser')
 
-        truevalue = (2.0 - math.sqrt(4 - 0.04 * x)) / 0.02
-
+        try:
+            truevalue = (2.0 - math.sqrt(4 - 0.04 * x)) / 0.02
+        except ValueError:
+            logging.debug('ValueError with %s' % x)
+            truevalue = x/2.
         newGapFP_H = math.sqrt(
             (truevalue / 100.0) * Const.FP_Area_FWHM / Const.Ratio_FP_Gap)
         newGapFP_V = newGapFP_H * Const.Ratio_FP_Gap
