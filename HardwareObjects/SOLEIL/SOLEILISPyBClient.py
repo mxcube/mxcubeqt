@@ -166,7 +166,7 @@ def test():
 
     db = hwr.getHardwareObject("/dbconnection")
     proposal_code = 'mx'
-    proposal_number = '20140088' #'20100023'
+    proposal_number = '20100023' #'20140088' #'20100023'
     
     info = db.get_proposal(proposal_code, proposal_number)# proposal_number)
     print info
