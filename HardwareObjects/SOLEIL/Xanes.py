@@ -384,8 +384,17 @@ class xanes(object):
         if abs(self.ble.read_attribute('energy').w_value - self.BleVsEnStrings[energy]) > 0.001:
             print 'setting undulator energy', energy
             print 'self.BleVsEn[energy]', self.BleVsEnStrings[energy]
-            self.ble.write_attribute('energy', self.BleVsEnStrings[energy])
-            self.wait(self.ble)
+            k = 0
+            while k < 5:
+                k += 1
+                try:
+                    self.ble.write_attribute('energy', self.BleVsEnStrings[energy])
+                    self.wait(self.ble)
+                except:
+                    import traceback
+                    logging.debug('writing to beamline energy failed %s-th time' %k)
+                    logging.debug(traceback.print_exc())
+                time.sleep(2)
             if self.undulatorOffset != 0:
                 self.undulator.gap += self.undulatorOffset
                 self.wait(self.undulator)
