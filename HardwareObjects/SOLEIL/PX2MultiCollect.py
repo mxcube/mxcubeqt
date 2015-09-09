@@ -122,7 +122,7 @@ class LimaAdscDetector:
         logging.info("jpeg_full_path %s" % jpeg_full_path)
         logging.info("jpeg_thumbnail_full_path %s" % jpeg_thumbnail_full_path)
     
-        self.wait_image_on_disk(image_filename)
+        self.wait_image_on_disk(image_filename, timeout=15)
         self.reportLatestImage(integer=last_frame, imagePath=self.imagePath, fileName=image_filename)
     
         img_full_path = os.path.join(self.imagePath, image_filename)
@@ -144,6 +144,7 @@ class LimaAdscDetector:
             logging.info("<LimaAdscDetector> write last image, converting jpegs, time spent %s " % str(time.time() - start))
         else:
             logging.info("<LimaAdscDetector> write last image, skipping %s" % image_filename)
+        logging.info("<LimaAdscDetector> write_image time spent %s " % str(time.time() - start))
         
     def reportLatestImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
 
@@ -172,7 +173,7 @@ class LimaAdscDetector:
             if time.time() - start_wait > timeout:
                 logging.info("Giving up waiting for image. Timeout")
                 break
-            logging.info("Content of %s directory is: %s" % (dirname, str(os.listdir(dirname))))
+            #logging.info("Content of %s directory is: %s" % (dirname, str(os.listdir(dirname))))
             time.sleep(0.5)
         logging.info("Waiting for image %s ended in  %3.2f secs" % (filename, time.time()-start_wait))
 
@@ -511,9 +512,13 @@ class PX2MultiCollect(SOLEILMultiCollect):
         beam_center_x += 0.85 # plus adjusts for shifts up
         beam_center_y -= 1 # minus adjusts for shifts up
         #shift 2015-07-25
-        beam_center_x -= 0.28
-        beam_center_y += 2
+        beam_center_x -= 0.28  # yshifts - -> go up
+        beam_center_y += 2     # xshifts + -> go down
         
+        # shift beginning Run4 2015 (2015-09-04)
+        beam_center_x -= 1.61 # go up
+        beam_center_y -= 0.20 # go up
+
         beam_center_y *= q
         beam_center_x *= q
         
@@ -866,6 +871,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         logging.info('sync command %s' % ('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination)))
         os.system('ssh p10 "rsync -av %s %s"' % (filename, self.sync_destination))
     
+    @task
     def sync_collect(self, file_location, last_file, image_file_template):
         logging.info('sync_last_collect')
         last_file = os.path.join(file_location, last_file)
@@ -896,7 +902,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
         # Preparing directory path for images and processing files
         # creating image file template and jpegs files templates
         file_parameters = data_collect_parameters["fileinfo"]
-
         file_parameters["suffix"] = self.bl_config.detector_fileext
         image_file_template = "%(prefix)s_%(run_number)s_%%04d.%(suffix)s" % file_parameters
         file_parameters["template"] = image_file_template
@@ -912,6 +917,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         else:
             jpeg_file_template = None
             jpeg_thumbnail_file_template = None
+        
         # database filling
         logging.info("<PX2MultiCollect> - LIMS is %s" % str(self.bl_control.lims))
         if self.bl_control.lims:
@@ -932,8 +938,12 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 logging.info("<PX2MultiCollect> - problem with connection to LIMS")
                 data_collect_parameters['detector_id'] = 'ADSC Quantum 315r SN927'
                 logging.info(traceback.print_exc())
+        
+        logging.info("<SOLEIL do_collect>  data_collect_parameters after database filling %s" % data_collect_parameters)
+        
         # Creating the directory for images and processing information
         logging.info("<PX2MultiCollect> - Creating directories for images and processing %s %s" % (file_parameters['directory'],file_parameters['process_directory'] ) )
+        file_parameters['process_directory'] = file_parameters['directory'].replace('RAW_DATA', 'PROCESSED_DATA')
         self.create_directories(file_parameters['directory'], file_parameters['process_directory'], os.path.join(file_parameters['directory'], 'process'))
         self.xds_directory, self.mosflm_directory = self.prepare_input_files(file_parameters["directory"], file_parameters["prefix"], file_parameters["run_number"], file_parameters['process_directory'])
         data_collect_parameters['xds_dir'] = self.xds_directory
@@ -1221,6 +1231,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
             self.bl_control.diffractometer.wait()
             
             for start, wedge_size in wedges_to_collect:
+                itt = time.time()
                 k += 1
                 end = start + osc_range
                 collect_position = positions[k-1]
@@ -1256,7 +1267,10 @@ class PX2MultiCollect(SOLEILMultiCollect):
                         is_last_frame = True
                     else:
                         is_last_frame = False
+                    
+                    swi = time.time()
                     self.write_image(is_last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
+                    logging.info("<do_collect> write_image call time spent %s " % str(time.time() - swi))
                     
                     # Store image in lims
                     if self.bl_control.lims:
@@ -1295,10 +1309,12 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                                    data_collect_parameters.get("sample_reference", {}).get("cell", ""))
                 
                 #self.synchronize_thread(file_location, filename)
-                self.synchronize_image(file_location, filename, wait=False)
+                #tsi = time.time()
+                #self.synchronize_image(file_location, filename, wait=False)
+                #logging.info("<do_collect> total synchronize_image time spent %s " % str(time.time() - tsi))
                 frame += 1
-
-            self.sync_collect(file_location, filename, image_file_template)
+                logging.info("<do_collect> total collect_image %s time spent %s " % (filename, str(time.time() - itt)))
+            #self.sync_collect(file_location, filename, image_file_template, wait=False)
             self.finalize_acquisition()
     @task
     def data_collection_cleanup(self):
