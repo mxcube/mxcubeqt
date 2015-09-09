@@ -284,7 +284,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self.move_detector_flag = int(self.getProperty("move_detector_flag"))
         self.move_resolution_flag = int(self.getProperty("move_resolution_flag"))
         self.lima_overhead = float(self.getProperty("lima_overhead"))
-        
+        self.synchronize_flag = int(self.getProperty("synchronize"))
         logging.info("<PX2 MultiCollect> lima_overhead %s" % self.lima_overhead)
         self._detector.prepareHeader = self.prepareHeader
         logging.getLogger("user_level_log").info("initializing PX2MultiCollect")
@@ -1220,7 +1220,9 @@ class PX2MultiCollect(SOLEILMultiCollect):
             self.safe_mono_turnoff()
             
             file_location = file_parameters["directory"]
-            self.get_sync_destination(file_location)
+            
+            if self.synchronize_flag is 1:
+                self.get_sync_destination(file_location)
             
             self.verify_detector_distance()
             self.verify_resolution()
@@ -1242,8 +1244,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 except:
                   jpeg_full_path = None
                   jpeg_thumbnail_full_path = None
-                file_location = file_parameters["directory"]
-                self.get_sync_destination(file_location)
                 file_path  = os.path.join(file_location, filename)
                 
                 logging.info("Frame %d, %7.3f to %7.3f degrees", frame, start, end)
@@ -1310,7 +1310,8 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 
                 #self.synchronize_thread(file_location, filename)
                 #tsi = time.time()
-                #self.synchronize_image(file_location, filename, wait=False)
+                if self.synchronize_flag is 1:
+                    self.synchronize_image(file_location, filename, wait=False)
                 #logging.info("<do_collect> total synchronize_image time spent %s " % str(time.time() - tsi))
                 frame += 1
                 logging.info("<do_collect> total collect_image %s time spent %s " % (filename, str(time.time() - itt)))
