@@ -967,6 +967,12 @@ class CharacterisationQueueEntry(BaseQueueEntry):
     def post_execute(self):
         BaseQueueEntry.post_execute(self)
 
+class AdvancedScanQueueEntry(DataCollectionQueueEntry):
+    """
+    Defines the behaviour of a characterisation
+    """
+    def __init__(self, view=None, data_model=None, view_set_queue_entry=True):
+        DataCollectionQueueEntry.__init__(self, view, data_model, view_set_queue_entry)
 
 class EnergyScanQueueEntry(BaseQueueEntry):
     def __init__(self, view=None, data_model=None):
@@ -1358,35 +1364,40 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
     loc = data_model.location
     holder_length = data_model.holder_length
 
+    # This is a possible solution how to deal with two devices that
+    # can move sample on beam (sample changer, plate holder, in future 
+    # also harvester)
+    # TODO make sample_Changer_one, sample_changer_two
     if beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-        #no centring if plate used
-        #TODO as a gevent task 
-        if beamline_setup_hwobj.plate_manipulator_hwobj.\
-                 load_sample(sample_location=loc) == False:
-            raise QueueSkippEntryException("Plate manipulator could not load sample", "")
-        else:
-            view.setText(1, "Sample loaded")
+        sample_mount_device = beamline_setup_hwobj.plate_manipulator_hwobj
     else:
-        if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
-           and (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
+        sample_mount_device = beamline_setup_hwobj.sample_changer_hwobj
+
+    if hasattr(sample_mount_device, '__TYPE__'):
+        if sample_mount_device.__TYPE__ in ['Marvin','CATS']:
             element = '%d:%02d' % loc
-            beamline_setup_hwobj.sample_changer_hwobj.load(sample=element, wait=True)
-        else:
-            if beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
-                          sample_location=loc, wait=True) == False:
-                # WARNING: explicit test of False return value.
-                # This is to preserve backward compatibility (load_sample was supposed to return None);
-                # if sample could not be loaded, but no exception is raised, let's skip the sample
-                raise QueueSkippEntryException("Sample changer could not load sample", "")
+            sample_mount_device.load(sample=element, wait=True)
+        elif sample_mount_device.__TYPE__ == "PlateManipulator":
+            element = '%s%d:%d' % (chr(65 + loc[0]), loc[1], loc[2])
+            sample_mount_device.load(sample=element, wait=True)
+    else:
+        if sample_mount_device.load_sample(holder_length, sample_location=loc, wait=True) == False:
+            # WARNING: explicit test of False return value.
+            # This is to preserve backward compatibility (load_sample was supposed to return None);
+            # if sample could not be loaded, but no exception is raised, let's skip the sample
+            raise QueueSkippEntryException("Sample changer could not load sample", "")
 
+    if not sample_mount_device.hasLoadedSample():
+        #Disables all related collections
+        view.setOn(False)
+        raise QueueSkippEntryException("Sample not loaded", "")
+    else:
         dm = beamline_setup_hwobj.diffractometer_hwobj
-
         if dm is not None:
             try:
                 dm.connect("centringAccepted", centring_done_cb)
                 centring_method = view.listView().parent().\
                                   centring_method
-                    
                 if centring_method == CENTRING_METHOD.MANUAL:
                     log.warning("Manual centring used, waiting for" +\
                                 " user to center sample")
@@ -1412,6 +1423,7 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
 MODEL_QUEUE_ENTRY_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueEntry,
      queue_model_objects.Characterisation: CharacterisationGroupQueueEntry,
+     queue_model_objects.AdvancedScan: AdvancedScanQueueEntry,
      queue_model_objects.EnergyScan: EnergyScanQueueEntry,
      queue_model_objects.XRFScan: XRFScanQueueEntry,
      queue_model_objects.SampleCentring: SampleCentringQueueEntry,

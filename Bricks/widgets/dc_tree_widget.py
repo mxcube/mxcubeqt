@@ -557,7 +557,7 @@ class DataCollectTree(qt.QWidget):
         if self.queue_hwobj.is_disabled():
             logging.getLogger("user_level_log").\
                 error('Can not start collect, see the tasks marked' +\
-                      ' in the tree and solve the prorblems.')
+                      ' in the tree and solve the problems.')
             
         elif not self.collecting:
             # Unselect selected items.
@@ -876,11 +876,7 @@ class DataCollectTree(qt.QWidget):
                     child_item = child_item.nextSibling()
                 if do_it:
                     item.setOn(False)
-                #item.setText(0, item.get_model().get_display_name())
-                #item.setEnabled(item.get_model().get_is_present())
-                #print 'should %s %s %s %s' % ("open" if item.get_model().get_is_present() else "close", item.get_model(), item.get_model().location, item)
-                #item.setOpen(item.get_model().get_is_present())
- 
+                item.setText(0, item.get_model().get_display_name())
             it += 1
             item = it.current()
 
