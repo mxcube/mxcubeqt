@@ -139,13 +139,16 @@ class ConfirmDialog(qt.QDialog):
 
     def continue_button_click(self):
         for item in self.checked_items:
+            acq_params = None
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
+                acq_params = item.get_model().acquisitions[0].acquisition_parameters
+            elif isinstance(item.get_model(), queue_model_objects.Characterisation):
+                acq_params = item.get_model().reference_image_collection.acquisitions[0].acquisition_parameters
+            if acq_params is None:
+                continue
+            acq_params.take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
+            acq_params.take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
+            acq_params.skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
         
         self.emit(qt.PYSIGNAL("continue_clicked"), (self.sample_items, self.checked_items))
         self.accept()
