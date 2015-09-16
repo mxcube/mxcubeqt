@@ -198,11 +198,11 @@ class DiffractometerMockup(Equipment):
 	self._drawing = drawing
 
     def use_sample_changer(self):
-        return True
+        return False
 
     def in_plate_mode(self):
         #TODO head detection should be used to detect if in plate mode 
-	return False
+	return True
 
     def toggle_fast_shutter(self):
         self.fast_shutter_is_open = not self.fast_shutter_is_open
@@ -635,6 +635,7 @@ class DiffractometerMockup(Equipment):
         """
         Descript. :
         """
+        print "moving to coord: %d %d" %(x ,y) 
         if self.current_phase != "BeamLocation":
             time.sleep(1)
         else:

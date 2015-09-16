@@ -76,6 +76,9 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             self.shape_history.get_drawing_event_handler().\
                 move_to_centred_position_cb = self.diffractometer_hwobj.\
                                               moveToCentredPosition                            
+            self.shape_history.get_drawing_event_handler().\
+                move_to_screen_position_cb = self.diffractometer_hwobj.\
+                                              move_to_coord
         except AttributeError:
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
