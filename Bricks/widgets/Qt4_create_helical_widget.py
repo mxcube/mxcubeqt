@@ -52,26 +52,6 @@ class CreateHelicalWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._lines_gbox = QtGui.QGroupBox('Lines', self)
-        self._lines_list_widget = QtGui.QListWidget(self._lines_gbox)
-        self._lines_list_widget.setFixedWidth(300)
-        self._lines_list_widget.setFixedHeight(100)
-        self._lines_list_widget.setToolTip(\
-             "Select the line(s) to perfrom helical scan on")
-
-        add_button = QtGui.QPushButton("+", self._lines_gbox)
-        add_button.setFixedWidth(20)
-        add_button.setFixedHeight(20)
-        remove_button = QtGui.QPushButton("-", self._lines_gbox)
-        remove_button.setFixedWidth(20)
-        remove_button.setFixedHeight(20)        
-
-        add_button_tool_tip = "Add a line between two saved positions, " \
-                              "CTRL click to select more than one position"
-        add_button.setToolTip(add_button_tool_tip)
-        remove_button_tool_tip = "Remove selected line(s)"
-        remove_button.setToolTip(remove_button_tool_tip)
-
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
@@ -90,15 +70,6 @@ class CreateHelicalWidget(CreateTaskBase):
                              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _lines_gbox_gridlayout = QtGui.QGridLayout(self)
-        _lines_gbox_gridlayout.addWidget(self._lines_list_widget, 0, 0, 2, 1)
-        _lines_gbox_gridlayout.addWidget(add_button, 0, 1)
-        _lines_gbox_gridlayout.addWidget(remove_button, 1, 1) 
-        _lines_gbox_gridlayout.setSpacing(2)
-        _lines_gbox_gridlayout.setColumnStretch(2, 10)
-        _lines_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
-        self._lines_gbox.setLayout(_lines_gbox_gridlayout)
-
         _data_path_gbox_layout = QtGui.QVBoxLayout(self)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
         _data_path_gbox_layout.setSpacing(0)
@@ -112,7 +83,6 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_gbox.setLayout(_processing_gbox_layout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self._lines_gbox)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._processing_gbox)
@@ -124,20 +94,10 @@ class CreateHelicalWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        add_button.clicked.connect(self.add_clicked)
-
-        remove_button.clicked.connect(self.remove_clicked)
-
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
-
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
-
-        QtCore.QObject.connect(self._lines_list_widget, 
-                               QtCore.SIGNAL("selectionChanged()"),
-                               self.list_box_selection_changed)
-
         QtCore.QObject.connect(self._data_path_widget,
                      QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)

@@ -141,7 +141,6 @@ class TaskToolBoxWidget(QtGui.QWidget):
             item.init_data_path_model()
             item.update_selection()
 
-            
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)

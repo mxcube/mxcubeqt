@@ -45,7 +45,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), 'Advanced')
 
         if not name:
-            self.setObjectName("create_advanced_Scan_widget")
+            self.setObjectName("create_advanced_scan_widget")
 
         # Hardware objects ----------------------------------------------------
         self.__mini_diff_hwobj = None
@@ -55,18 +55,15 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self._prev_pos = None
         self._current_pos = None
         self._list_item_map = {}
+        self._advanced_methods = None
+        self._grid_map = {}
+
         self.init_models()
 
-        self.__current_motor_positions = {}
-        self.__list_items = {}
-        self.__grid_list = []
-
-        self.__beam_info = {}
-        self.__spacing = [0, 0]
 
         # Graphic elements ----------------------------------------------------
-        self.mesh_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                               'ui_files/Qt4_mesh_widget_layout.ui'))
+        self._advanced_methods_widget = uic.loadUi(os.path.join(\
+            os.path.dirname(__file__), "ui_files/Qt4_advanced_methods_layout.ui"))
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
@@ -87,7 +84,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self._data_path_gbox.setLayout(self._data_path_gbox_layout)
 
         _main_vlayout = QtGui.QVBoxLayout(self) 
-        _main_vlayout.addWidget(self.mesh_widget)
+        _main_vlayout.addWidget(self._advanced_methods_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addStretch(0)
@@ -106,14 +103,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                      QtCore.SIGNAL("pathTemplateChanged"),
                      self.handle_path_conflict)
 
-        self.mesh_widget.draw_button.clicked.connect(self.draw_button_clicked)
-        self.mesh_widget.remove_button.clicked.connect(self.delete_drawing_clicked)
-        self.mesh_widget.hor_spacing_ledit.textChanged.connect(self.set_hspace)
-        self.mesh_widget.ver_spacing_ledit.textChanged.connect(self.set_vspace)
-        self.mesh_widget.mesh_treewidget.currentItemChanged.connect(\
-             self.mesh_treewidget_current_item_changed)
-        self.mesh_widget.visibility_button.clicked.\
-             connect(self.toggle_visibility_grid)
+        self._acq_widget.use_osc_start(False)
 
     def init_models(self):
         """
@@ -131,6 +121,10 @@ class CreateAdvancedScanWidget(CreateTaskBase):
                 get_default_acquisition_parameters("default_advanced_values")
             self.__mini_diff_hwobj = self._beamline_setup_hwobj.\
                                      diffractometer_hwobj
+            if not self._advanced_methods:
+                self._advanced_methods = self._beamline_setup_hwobj.get_advanced_methods()            
+                for method in self._advanced_methods:
+                    self._advanced_methods_widget.method_combo.addItem(method)
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
@@ -141,16 +135,14 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         """
         result = CreateTaskBase.approve_creation(self)
 
-        treewidget_item = self.mesh_widget.mesh_treewidget.currentItem()
-        if treewidget_item is not None:
-            drawing_mgr = self.__list_items[treewidget_item]
-            key = str(treewidget_item.text(0))
-            selected_grid = drawing_mgr._get_grid(key)[0]
-        else:
-            logging.getLogger("user_level_log").\
-                warning("No grid selected, please select a grid.")
-            selected_grid = None
-        return result and selected_grid
+        method_name = str(self._advanced_methods_widget.method_combo.\
+                currentText()).title().replace(' ', '')
+        if not hasattr(queue_model_objects, method_name):
+            logging.getLogger("user_level_log").error("Advanced method %s not defined" \
+                    % method_name)
+            result = False 
+
+        return result
             
     def update_processing_parameters(self, crystal):
         """
@@ -247,145 +239,20 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         """
         self.__beam_info = beam_info_dict
         
-        """if self.__drawing_mgr is not None:
-            vspace, hspace = self.get_cell_dim()
-            self.__drawing_mgr.set_beam_position(0, 0, self.__beam_size_x, self.__beam_size_y)
-            self.__drawing_mgr.set_cell_width(self.__beam_size_x + hspace)
-            self.__drawing_mgr.set_cell_height(self.__beam_size_y + vspace)
-            self.__drawing_mgr.set_cell_shape(self.__beam_shape == "ellipse")"""
-
-    def draw_button_clicked(self):
-        """
-        Descript. :
-        """
-        self.__spacing = self.get_cell_spacing()
-        self._graphics_manager_hwobj.start_mesh_draw(self.__beam_info, self.__spacing)
-
-    def mesh_created(self, mesh):
-        """
-        Descript. :
-        """
-        mesh_properties = mesh.get_properties()
-        num_lines = mesh_properties.get("num_lines")
-        num_images_per_line = mesh_properties.get("num_images_per_line")
-        info_str_list = QtCore.QStringList()
-        info_str_list.append(mesh_properties.get("name"))
-        info_str_list.append(str(mesh_properties.get("beam_hor") * 1000))
-        info_str_list.append(str(mesh_properties.get("beam_ver") * 1000))
-        info_str_list.append(str(num_lines))
-        info_str_list.append(str(num_images_per_line))
-        treewidget_item = QtGui.QTreeWidgetItem(self.mesh_widget.mesh_treewidget,
-                                                info_str_list)
-        self.__list_items[treewidget_item] = mesh
-        self._acq_widget.acq_widget.num_images_ledit.setText(str(num_lines * num_images_per_line))
-
-        grid_coordinates = mesh.get_corner_coord()
-        self.update_corner_coord(grid_coordinates, mesh)
-        treewidget_item.setSelected(True)
-        self.mesh_widget.mesh_treewidget.setCurrentItem(treewidget_item) 
-
-    def update_corner_coord(self, coordinates, grid=None):
-        """ 
-        Descript. : updates corner points and center point of a grid
-                    if no grid obejct is passed then currently selected grid is updated
-        """
-        if not grid:
-            treewidget_item = self.mesh_widget.mesh_treewidget.selectedItem()
-            grid = self.__list_items[treewidget_item]
-        #if drawing_mgr.in_projection_mode():
-        if grid:
-            # Grid is moved from the drawing position. 
-            # Grid coordinates are updated via corner points
-
-            corner_points = []
-            temp_motor_pos = self.__mini_diff_hwobj.\
-               get_centred_point_from_coord(coordinates[0][0],
-                                            coordinates[0][1], True)
-            corner_points.append(queue_model_objects.CentredPosition(temp_motor_pos))
-
-            temp_motor_pos = self.__mini_diff_hwobj.\
-               get_centred_point_from_coord(coordinates[1][0],
-                                            coordinates[1][1], True)
-            corner_points.append(queue_model_objects.CentredPosition(temp_motor_pos))
-
-            temp_motor_pos = self.__mini_diff_hwobj.\
-               get_centred_point_from_coord(coordinates[2][0],
-                                            coordinates[2][1], True)
-            corner_points.append(queue_model_objects.CentredPosition(temp_motor_pos))
-
-            temp_motor_pos = self.__mini_diff_hwobj.\
-               get_centred_point_from_coord(coordinates[3][0],
-                                            coordinates[3][1], True)
-            corner_points.append(queue_model_objects.CentredPosition(temp_motor_pos))
-            grid.set_motor_pos_corner(corner_points)
-            # Grid is in drawing position, we have to move 
-
-            temp_motor_pos = self.__mini_diff_hwobj.\
-                   get_centred_point_from_coord(abs((coordinates[0][0] +
-                                                     coordinates[1][0]) / 2),
-                                                abs((coordinates[0][1] +
-                                                     coordinates[2][1]) / 2))
-
-            #cpos = self.__mini_diff_hwobj.convert_from_obj_to_name(temp_motor_pos)
-            cpos = queue_model_objects.CentredPosition(temp_motor_pos)
-            grid.set_motor_pos_center(cpos)
-
-
-    def delete_drawing_clicked(self):
-        """
-        Descript. :
-        """
-        if len(self.__list_items):
-            treewidget_item = self.mesh_widget.mesh_treewidget.currentItem()
-
-            self._graphics_manager_hwobj.delete_shape(self.__list_items[treewidget_item])
-            self.mesh_widget.mesh_treewidget.takeTopLevelItem(\
-                 self.mesh_widget.mesh_treewidget.indexOfTopLevelItem(treewidget_item))
-
-            self._acq_widget.acq_widget.num_images_ledit.setText("0")
-
-    def get_cell_spacing(self):
-        hspace = self.mesh_widget.hor_spacing_ledit.text()
-        vspace = self.mesh_widget.ver_spacing_ledit.text()
-        try:
-            vspace = float(vspace)
-        except ValueError:
-            vspace = 0
-        try:
-            hspace = float(hspace)
-        except ValueError:
-            hspace = 0
-
-        return ((hspace/1000, (vspace)/1000))
-
-    def set_vspace(self, vspace):
-        vspace, hspace = self.get_cell_spacing()
-        #self._graphics_manager
-
-    def set_hspace(self, hspace):
-        vspace, hspace = self.get_cell_spacing()
-
-    def set_beam_position(self, beam_c_x, beam_c_y, beam_size_x, beam_size_y):
-        self.__cell_height = int(beam_size_x * self.__y_pixel_size)
-        self.__cell_width = int(beam_size_y * self.__x_pixel_size)
-
-        try:
-            vspace, hspace = self.get_cell_spacing()
-            self.__drawing_mgr.set_cell_width(self.__beam_size_x + hspace)
-            self.__drawing_mgr.set_cell_height(self.__beam_size_y + vspace)
-
-            self.__drawing_mgr.set_beam_position(0, 0, beam_size_x, beam_size_y)
-            #for drawing_mgr in self.__list_items.itervalues():
-            #    drawing_mgr.set_beam_position(beam_c_x, beam_c_y)
-        except:
-            # Drawing manager not set when called
-            pass
+    def shape_created(self, shape, shape_type):
+        if shape_type == "Grid":
+            self._advanced_methods_widget.grid_combo.addItem(shape.get_full_name())            
+            self._grid_map[shape] = self._advanced_methods_widget.grid_combo.count() - 1
+  
+    def shape_deleted(self, shape):
+        if self._grid_map.get(shape):
+            self._advanced_methods_widget.grid_combo.removeItem(self._grid_map[shape])
+            self._grid_map.pop(shape) 
 
     def mesh_treewidget_current_item_changed(self, item, prev_item):
         for index, current_item in enumerate(self.__list_items.iterkeys()):
             mesh = self.__list_items[current_item]
             if current_item == item:
-                print "set_selected" 
                 if mesh.isVisible():
                     self.mesh_widget.visibility_button.setText("Hide")
                 else:
@@ -412,54 +279,3 @@ class CreateAdvancedScanWidget(CreateTaskBase):
 
             else:
                 mesh.setSelected(False)
-
-
-    def toggle_visibility_grid(self):
-        item = self.mesh_widget.mesh_treewidget.currentItem()
-
-        for current_item in self.__list_items.iterkeys():
-            mesh = self.__list_items[current_item]
-            if current_item == item:
-                if mesh.isVisible():
-                    mesh.hide()
-                    self.mesh_widget.visibility_button.setText("Show")
-                else:
-                    mesh.show()
-                    self.mesh_widget.visibility_button.setText("Hide")
-
-    def display_grids(self, display):
-        for drawing_mgr in self.__list_items.values():
-            drawing_mgr.show() if display else drawing_mgr.hide()
-
-    def set_motor_pos(self, motor_pos):
-        for drawing_mgr in self.__list_items.values():
-            drawing_mgr.set_motor_pos_actual(motor_pos)
-        self.current_motor_positions = motor_pos
-
-    def update_grid_corner_points(self):
-        for drawing_mgr in self.__list_items.values():
-            grid_corner_points = drawing_mgr.get_grid_corner_points()[0]
-            grid_coordinates = []
-            for grid_corner_point in grid_corner_points:
-                grid_coordinates.append(self.__mini_diff_hwobj.motor_positions_to_screen(grid_corner_point))
-            drawing_mgr.set_grid_coordinates(grid_coordinates)[0]
-
-    def move_to_center_point(self):
-        treewidget_item = self.mesh_widget.mesh_treewidget.selectedItem()
-        drawing_mgr = self.__list_items[treewidget_item]
-        cpos = drawing_mgr.get_grid_center_point()[0]
-        self.__mini_diff_hwobj.moveToMotorsPositions(cpos)
-
-    def _get_grid_info(self, grid_dict):
-        treewidget_item = self.mesh_widget.mesh_treewidget.selectedItem()
-        if treewidget_item is not None:
-            drawing_mgr = self.__list_items[treewidget_item]
-            key = str(treewidget_item.text(0))
-            grid_dict.update(drawing_mgr._get_grid(key)[0])
-
-    def _set_grid_data(self, key, result_data):
-        for treewidget_item in self.__list_items.keys():
-            if key == str(treewidget_item.text(0)):
-                drawing_mgr = self.__list_items[treewidget_item]
-                drawing_mgr.set_data(result_data)
-                break

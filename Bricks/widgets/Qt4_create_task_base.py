@@ -138,7 +138,7 @@ class CreateTaskBase(QtGui.QWidget):
         
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
-            self._graphics_manager_hwobj.connect('meshCreated', self.mesh_created)
+            self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
@@ -413,7 +413,7 @@ class CreateTaskBase(QtGui.QWidget):
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-                self.get_acquisition_widget().use_osc_start(False)
+                #self.get_acquisition_widget().use_osc_start(False)
 
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
@@ -424,10 +424,16 @@ class CreateTaskBase(QtGui.QWidget):
             self.setDisabled(True)
 
     def _update_etr(self):
+        omega = self._beamline_setup_hwobj._get_omega_axis_position()
+        kappa = self._beamline_setup_hwobj._get_kappa_axis_position()
+        kappa_phi = self._beamline_setup_hwobj._get_kappa_phi_axis_position()
         energy = self._beamline_setup_hwobj._get_energy()
         transmission = self._beamline_setup_hwobj._get_transmission()
         resolution = self._beamline_setup_hwobj._get_resolution()
-                
+    
+        self._acquisition_parameters.osc_start = omega            
+        self._acquisition_parameters.kappa = kappa
+        self._acquisition_parameters.kappa_phi = kappa_phi
         self._acquisition_parameters.energy = energy
         self._acquisition_parameters.transmission = transmission
         self._acquisition_parameters.resolution = resolution
@@ -459,7 +465,7 @@ class CreateTaskBase(QtGui.QWidget):
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-                self.get_acquisition_widget().use_osc_start(False)
+                #self.get_acquisition_widget().use_osc_start(False)
 
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
@@ -593,5 +599,5 @@ class CreateTaskBase(QtGui.QWidget):
     def shape_deleted(self, shape):
         return
 
-    def mesh_created(self, mesh):
+    def shape_created(self, shape, shape_type):
         return

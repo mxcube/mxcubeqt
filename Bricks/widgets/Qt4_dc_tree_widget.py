@@ -111,7 +111,8 @@ class DataCollectTree(QtGui.QWidget):
         self.collect_button.setText("Collect Queue")
         self.collect_button.setFixedWidth(125)
         self.collect_button.setIcon(QtGui.QIcon(self.play_pixmap))
-        Qt4_widget_colors.set_widget_color(self.collect_button, Qt4_widget_colors.LIGHT_GREEN)
+        Qt4_widget_colors.set_widget_color(self.collect_button, 
+            Qt4_widget_colors.LIGHT_GREEN)
 
         self.continue_button = QtGui.QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
@@ -120,7 +121,7 @@ class DataCollectTree(QtGui.QWidget):
         self.continue_button.setToolTip("Pause after current data collection")
 
         self.sample_tree_widget = QtGui.QTreeWidget(self)
-       
+
         # Layout --------------------------------------------------------------
         button_widget_grid_layout = QtGui.QGridLayout(self) 
         button_widget_grid_layout.addWidget(self.up_button, 0, 0)
@@ -141,52 +142,35 @@ class DataCollectTree(QtGui.QWidget):
         self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
-        #self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
-        #                                     QtGui.QSizePolicy.Expanding))   
-        self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
-                                                                QtGui.QSizePolicy.Expanding))
+        self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(\
+             QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
-
         self.down_button.clicked.connect(self.down_click)
-
         self.delete_button.clicked.connect(self.delete_click)
-
         self.collect_button.clicked.connect(self.collect_stop_toggle)
-
         self.sample_tree_widget.itemSelectionChanged.\
              connect(self.sample_tree_widget_selection)
-
-        self.connect(self.sample_tree_widget,
-                     QtCore.SIGNAL("customContextMenuRequested (const QPoint & pos)"),
-                     self.show_context_menu)
-        #tCore.QObject.connect(self.sample_tree_widget, 
-        #                      QtCore.SIGNAL("itemRenamed(QListViewItem *, int , const QString& )"),
-        #                      self.item_renamed)
+        self.sample_tree_widget.contextMenuEvent = self.show_context_menu
         self.sample_tree_widget.itemDoubleClicked.connect(self.item_double_click)
-
         self.sample_tree_widget.itemClicked.connect(self.item_click)
-
         self.connect(self.confirm_dialog, QtCore.SIGNAL("continue_clicked"),
                                self.collect_items)
-
         self.continue_button.clicked.connect(self.continue_button_click)
 
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(2)
-        self.sample_tree_widget.setColumnWidth(0, 200)
+        self.sample_tree_widget.setColumnWidth(0, 300)
         self.sample_tree_widget.setColumnWidth(1, 200)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
+        self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         self.setAttribute(QtCore.Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
-        #self.setFixedWidth(315)
-
         self.collect_button.setDisabled(True)
-        self.setWindowTitle("Data collect")
- 
+
     def eventFilter(self, _object, event):
         """
         Descript. :
@@ -207,35 +191,39 @@ class DataCollectTree(QtGui.QWidget):
         self.down_button.setDisabled(not state)
         self.delete_button.setDisabled(not state)
 
-    def show_context_menu(self, item, point, col):
+    def show_context_menu(self, context_menu_event):
         """
         Descript. :
         """
         menu = QtGui.QMenu(self.sample_tree_widget)
+        item = self.sample_tree_widget.currentItem()
 
         if item:
+            menu.addAction("Rename", self.rename_treewidget_item)
             if isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                menu.insertItem(QtCore.QString("Rename"), self.rename_list_view_item)
-                menu.insertSeparator(1)
-                menu.insertItem(QtCore.QString("Remove"), self.delete_click)
-                menu.popup(point);
+                menu.addSeparator()
+                menu.addAction("Remove", self.delete_click)
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 if not item.get_model().free_pin_mode:
-                    if self.is_mounted_sample_item(item): 
-                        menu.insertItem(QtCore.QString("Un-Mount"), self.unmount_sample)
+                    if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                        self.plate_sample_to_mount = item
+                        menu.addAction("Move", self.mount_sample)
                     else:
-                        menu.insertItem("Mount", self.mount_sample)
-                       
-                menu.insertSeparator(3)
-                menu.insertItem(QtCore.QString("Details"), self.show_details) 
-                menu.popup(point);
+                        if self.is_mounted_sample_item(item):
+                            menu.addAction("Un-Mount", self.unmount_sample)
+                        else:
+                            menu.addAction("Mount", self.mount_sample)
+
+                menu.addSeparator()
+                menu.addAction("Details", self.show_details)
             else:
-                menu.popup(point);
-                menu.insertSeparator(2)
-                menu.insertItem(QtCore.QString("Remove"), self.delete_click)
-                menu.insertSeparator(4)
-                menu.insertItem(QtCore.QString("Details"), self.show_details)
-            
+                menu.addSeparator()
+                menu.addAction("Remove", self.delete_click)
+                menu.addSeparator()
+                menu.addAction("Details", self.show_details)
+            menu.popup(QtGui.QCursor.pos())
+
+        
     def item_double_click(self):
         """
         Descript. :
@@ -288,20 +276,19 @@ class DataCollectTree(QtGui.QWidget):
         #elif len(items) == 0:
         #    self.tree_brick.show_sample_tab()
 
-    def rename_list_view_item(self):
+    def rename_treewidget_item(self):
         """
         Descript. :
         """
         items = self.get_selected_items()
         if len(items) == 1:
-            items[0].setRenameEnabled(0, True);
-            items[0].startRename(0);
-
-    def item_renamed(self, item, col, text):
-        """
-        Descript. :
-        """
-        item.get_model().set_name(text)
+            items[0].setFlags(QtCore.Qt.ItemIsSelectable |
+                              QtCore.Qt.ItemIsEnabled |
+                              QtCore.Qt.ItemIsEditable)
+            self.sample_tree_widget.editItem(items[0])
+            items[0].setFlags(QtCore.Qt.ItemIsSelectable |
+                              QtCore.Qt.ItemIsEnabled)
+            items[0].get_model().set_name(items[0].text(0))
 
     def mount_sample(self):
         """
@@ -444,7 +431,10 @@ class DataCollectTree(QtGui.QWidget):
         
     def add_to_view(self, parent, task):
         """
-        Descript. :
+        Descript. : Adds queue element to the tree. After element has been
+                    added selection of tree is cleared. 
+                    If entry is a collection then it is selected and 
+                    selection callback is raised.
         """
         view_item = None
         parent_tree_item = self.get_item_by_model(parent)
@@ -456,21 +446,21 @@ class DataCollectTree(QtGui.QWidget):
         
         cls = Qt4_queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
 
-        #if parent_tree_item.lastItem():
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
-            #view_item = cls(parent_tree_item, last_item,
-            #                task.get_display_name())
-        #else:
-        #    view_item = cls(parent_tree_item, task.get_display_name())
+        view_item.setExpanded(True)
 
-        if isinstance (task, queue_model_objects.Basket):
-            #TODO fix this 
-            #view_item.setExpanded(task.get_is_present())
-            view_item.setExpanded(True)
-        else:
-            view_item.setExpanded(True)
         self.queue_model_hwobj.view_created(view_item, task)
         self.sample_tree_widget.resizeColumnToContents(0)
+        self.sample_tree_widget.clearSelection()
+        
+        if isinstance (task, queue_model_objects.Basket):
+            #TODO fix this 
+            #view_item.setDisabled(not task.get_is_present())
+            #view_item.setExpanded(task.get_is_present())
+            pass
+        else: 
+            view_item.setSelected(True)
+            self.selection_changed_cb([view_item])
 
     def get_selected_items(self):
         """
@@ -796,7 +786,6 @@ class DataCollectTree(QtGui.QWidget):
             self.delete_click(selected_items = children)
 
         self.check_for_path_collisions()
-
         self.set_first_element() 
 
     def set_first_element(self):

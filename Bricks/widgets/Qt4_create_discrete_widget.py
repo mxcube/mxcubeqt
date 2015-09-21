@@ -96,12 +96,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        """self._acq_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                       QtGui.QSizePolicy.Fixed)
-        self._data_path_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
-        self._processing_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)"""
         
         # Qt signal/slot connections ------------------------------------------
         self._processing_gbox.toggled.connect(self._use_processing_toggled)
@@ -208,7 +202,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                     self._path_template)
-                self.get_acquisition_widget().use_osc_start(True)
+                #self.get_acquisition_widget().use_osc_start(True)
                 if len(dc.acquisitions) == 1:
                     self.select_shape_with_cpos(self._acquisition_parameters.\
                                                 centred_position)
