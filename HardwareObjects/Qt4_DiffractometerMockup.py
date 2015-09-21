@@ -133,8 +133,11 @@ class Qt4_DiffractometerMockup(Equipment):
         self.user_clicked_event = AsyncResult()
 
         self.beam_info_hwobj = self.getObjectByRole("beam_info")
+
         #self.beam_info_hwobj = HardwareRepository.HardwareRepository().\
         #                        getHardwareObject(self.getProperty("beam_info"))
+
+        self.camera_hwobj = self.getObjectByRole("camera")
         if self.beam_info_hwobj is not None:
             self.connect(self.beam_info_hwobj, 'beamPosChanged', self.beam_position_changed)
         else:
@@ -145,11 +148,16 @@ class Qt4_DiffractometerMockup(Equipment):
         except:
             self.phase_list = ['demo']
 
+        self.emit("minidiffStateChanged", 'testState')
+
     def getStatus(self):
         """
         Descript. :
         """
         return "ready"
+
+    def in_plate_mode(self):
+        return True
 
     def manual_centring(self):
         """
@@ -360,7 +368,6 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
-        print "minidiff move_to_pos: ", centred_pos 
         time.sleep(1)
    
     def moveToCentredPosition(self, centred_position, wait = False):
@@ -430,7 +437,6 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
-        print self.current_centring_procedure
         if self.current_centring_procedure is not None:
             curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
             self.centring_status["endTime"] = curr_time
@@ -496,6 +502,7 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
+        self.emit("minidiffStateChanged", 'testState')
         if self.beam_info_hwobj: 
             self.beam_info_hwobj.beam_pos_hor_changed(300) 
             self.beam_info_hwobj.beam_pos_ver_changed(200)
@@ -510,13 +517,12 @@ class Qt4_DiffractometerMockup(Equipment):
         """
         Descript. :
         """
-        print "move_to_coord: ", x, y 
         return
 
     def move_motors(self, motors_dict):
         return
      
-    def start_2D_centring(self):
+    def start_2D_centring(self, coord_x=None, coord_y=None, omega=None):
         """
         Descript. :
         """

@@ -60,15 +60,12 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/Qt4_queue-model")
        
         # Signals ------------------------------------------------------------  
-        self.defineSignal("getView", ())
         self.defineSignal("getTreeBrick",())
-
 
         # Slots ---------------------------------------------------------------
         self.defineSlot("logged_in", ())
         self.defineSlot("set_session", ())
         self.defineSlot("selection_changed",())
-        self.defineSlot("new_centred_position", ())
         self.defineSlot("user_group_saved", ())
 
         # Graphic elements ----------------------------------------------------
@@ -161,14 +158,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
 
             if self.beamline_setup_hwobj:
-                self.diffractometer_hwobj = self.beamline_setup_hwobj.diffractometer_hwobj
-                
-                if self.diffractometer_hwobj:
-                    self.diffractometer_hwobj.connect("minidiffStateChanged",
-                                                      self.diffractometer_changed)
-                    
-                self.graphics_manager_hwobj = self.beamline_setup_hwobj.shape_history_hwobj
-
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                     self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
@@ -182,26 +171,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-
-    def change_pixel_calibration(self, sizex, sizey):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
-        pass
-        #self.task_tool_box_widget.workflow_page.\
-        #    _grid_widget.ChangePixelCalibration(sizex, sizey)
-
-    def change_beam_position(self, x, y):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
-        pass
-        #self.task_tool_box_widget.workflow_page.\
-        #    _grid_widget.ChangeBeamPosition(x, y)
 
     def selection_changed(self, items):
         """
@@ -225,62 +194,3 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             centred_position_selection(selected_positions)
         self.task_tool_box_widget.\
             char_page.centred_position_selection(selected_positions)
-
-    def shape_deleted(self, shape):
-        """
-        Descript. : Callback for the DrawingEvent object called when a shape
-                    is deleted.
-        Args.     :
-        Return    :
-        """
-        self.task_tool_box_widget.helical_page.shape_deleted(shape)
-
-    def new_centred_position(self, state, centring_status):
-        """
-        Descript. : Adds a new centred position, connected to the brick which
-                    handles centring (HutchMenuBrick).
-        Args.     :
-        Return    :
-        """
-        p_dict = {}
-
-        if 'motors' in centring_status and \
-                'extraMotors' in centring_status:
-
-            p_dict = dict(centring_status['motors'], 
-                          **centring_status['extraMotors'])
-
-        elif 'motors' in centring_status:
-            p_dict = dict(centring_status['motors']) 
-
-        if p_dict:
-            cpos = queue_model_objects.CentredPosition(p_dict)
-            screen_pos = self.diffractometer_hwobj.\
-                    motor_positions_to_screen(cpos.as_dict())
-            point = graphics_manager.GraphicsItemPoint( 
-                    cpos, True, screen_pos[0], screen_pos[1])
-            if point:
-                self.graphics_manager_hwobj.add_shape(point)
-                cpos.set_index(point.index)
-
-    def diffractometer_changed(self, *args):
-        """
-        Descript. : Handles diffractometer change events, connected to the 
-                    signal minidiffStateChanged of the diffractometer hardware 
-                    object.
-        Args.     :
-        Return    :
-        """
-        if self.diffractometer_hwobj.isReady():
-            for shape in self.graphics_manager_hwobj.get_shapes():
-                for cpos in shape.get_centred_positions():
-                    new_x, new_y = self.diffractometer_hwobj.\
-                        motor_positions_to_screen(cpos.as_dict())
-                shape.set_position(new_x, new_y)
-
-            for shape in self.graphics_manager_hwobj.get_shapes():
-                shape.show()
-
-        else:
-            for shape in self.graphics_manager_hwobj.get_shapes():
-                shape.hide()
