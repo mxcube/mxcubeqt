@@ -26,9 +26,9 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.current_view = None
 
         # Framework 2 hardware objects
-        self.beamline_config_hwobj = None
         self._lims_hwobj = None
         self.sample_changer = None
+        self.plate_manipulator_hwobj = None
         self.queue_hwobj = None
 
         # Properties
@@ -191,18 +191,29 @@ class TreeBrick(BaseComponents.BlissWidget):
             bl_setup = self.getHardwareObject(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
             self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
+            self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
             self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
+            self.dc_tree_widget.plate_manipulator_hwobj  = self.plate_manipulator_hwobj
             self.session_hwobj = bl_setup.session_hwobj
             self._lims_hwobj = bl_setup.lims_client_hwobj
 
             if self.sample_changer_hwobj is not None:
-                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+                self.connect(self.sample_changer_hwobj,
+                             SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
+                self.connect(self.sample_changer_hwobj,
+                             SampleChanger.INFO_CHANGED_EVENT,
+                             self.set_sample_pin_icon)
+
+            if self.plate_manipulator_hwobj is not None:
+                self.connect(self.plate_manipulator_hwobj,
+                             SampleChanger.STATE_CHANGED_EVENT,
+                             self.sample_load_state_changed)
+                self.connect(self.plate_manipulator_hwobj,
+                             SampleChanger.INFO_CHANGED_EVENT,
                              self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
-
             if has_shutter_less:
                 self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
 
@@ -222,7 +233,7 @@ class TreeBrick(BaseComponents.BlissWidget):
 
          self.session_hwobj.set_session_start_date(start_date)
 
-    def logged_in(self, logged_in):
+    def logged_in_old_version(self, logged_in):
         """
         Connected to the signal loggedIn of ProposalBrick2.
         The signal is emitted when a user was succesfully logged in.
@@ -250,6 +261,43 @@ class TreeBrick(BaseComponents.BlissWidget):
         #  if not self.sample_changer_hwobj.hasLoadedSample():
 
         self.dc_tree_widget.sample_list_view_selection()
+
+    def logged_in(self, logged_in):
+        """
+        Connected to the signal loggedIn of ProposalBrick2.
+        The signal is emitted when a user was succesfully logged in.
+        """
+        self.enable_collect(logged_in)
+
+        plate_sample_content = None
+        sc_basket_content = None
+        sc_sample_content = None
+
+        if not logged_in:
+            self.dc_tree_widget.populate_free_pin()
+            self.sample_changer_widget.child('filter_cbox').setCurrentItem(2)
+            self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(False)
+
+            sc_basket_content, sc_sample_content = self.get_sc_content()
+            if sc_basket_content and sc_sample_content:
+                sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                       sc_basket_content, sc_sample_content)
+
+            self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
+            self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+
+            if self.dc_tree_widget.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                plate_sample_content = self.get_plate_content()
+                self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(True)
+                if plate_sample_content:
+                     self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(True)
+                     plate_row_list, plate_sample_list = self.dc_tree_widget.\
+                        samples_from_plate_content(plate_sample_content)
+                     self.dc_tree_widget.populate_plate_view(plate_row_list, plate_sample_list)
+                     self.sample_changer_widget.child('filter_cbox').setCurrentItem(3)
+
+        self.dc_tree_widget.sample_list_view_selection()
+        self.dc_tree_widget.set_sample_pin_icon()
 
     def enable_collect(self, state):
         """
@@ -404,6 +452,19 @@ class TreeBrick(BaseComponents.BlissWidget):
                      " the sample changer is turned on. Using free pin mode")
 
         return sc_basket_content, sc_sample_content
+
+    def get_plate_content(self):
+        """
+        """
+        plate_sample_content = []
+        for sample in self.plate_manipulator_hwobj.getSampleList():
+            row_index = sample.getCell().getRowIndex()
+            col_index = sample.getCell().getCol()
+            coords = sample.getCoords()
+            matrix = sample.getID() or ""
+            vial_index = ":".join(map(str, coords[1:]))
+            plate_sample_content.append((matrix, row_index, col_index, coords[1], 0, coords))
+        return plate_sample_content
 
     def status_msg_changed(self, msg, color):
         """

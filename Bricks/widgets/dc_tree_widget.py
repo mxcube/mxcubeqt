@@ -32,12 +32,14 @@ class DataCollectTree(qt.QWidget):
 
         # HW-Object set by TreeBrick
         self.sample_changer_hwobj = None
+        self.plate_manipulator_hwobj = None
         self.hl_motor_hwobj = None
         self.tree_brick = self.parent()
 
         self.sample_item_list = []
         self.collect_tree_task = None
         self.user_stopped = False
+        self.plate_sample_to_mount = None
         
         # Callbacks TODO:Document better
         self.selection_changed_cb = None
@@ -180,10 +182,14 @@ class DataCollectTree(qt.QWidget):
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
                 if not item.get_model().free_pin_mode:
-                    if self.is_mounted_sample_item(item): 
-                        menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
+                    if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                        self.plate_sample_to_mount = item
+                        menu.insertItem(qt.QString("Move"), self.mount_sample)
                     else:
-                        menu.insertItem(qt.QString("Mount"), self.mount_sample)
+                        if self.is_mounted_sample_item(item): 
+                            menu.insertItem(qt.QString("Unmount"), self.unmount_sample)
+                        else:
+                            menu.insertItem(qt.QString("Mount"), self.mount_sample)
                        
                 menu.insertSeparator(3)
                 menu.insertItem(qt.QString("Details"), self.show_details) 
@@ -246,8 +252,12 @@ class DataCollectTree(qt.QWidget):
         gevent.spawn(self.mount_sample_task)
 
     def mount_sample_task(self):
-        items = self.get_selected_items()
-        
+        #items = self.get_selected_items()
+        if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+            items = [self.plate_sample_to_mount]
+        else:
+            items = self.get_selected_items()       
+ 
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
@@ -288,16 +298,22 @@ class DataCollectTree(qt.QWidget):
 
             location = items[0].get_model().location
 
-            if hasattr(self.beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
-               and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
-                self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
+            #Estimate if minidiff is in plate mode
+            #This could be done also in a different way
+	    
+            if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                self.plate_manipulator_hwobj._doUnload()
             else:
-                if 'SC3' in self.beamline_setup_hwobj.sample_changer_hwobj.__class__.__name__:
-                  self.beamline_setup_hwobj.sample_changer_hwobj.\
-                      unload(22, sample_location = location, wait = False)
+                if hasattr(self.beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
+                   and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
+                    self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
                 else:
-                  self.beamline_setup_hwobj.sample_changer_hwobj.\
-                      unload_sample(22, sample_location = location, wait = False)
+                    if 'SC3' in self.beamline_setup_hwobj.sample_changer_hwobj.__class__.__name__:
+                      self.beamline_setup_hwobj.sample_changer_hwobj.\
+                          unload(22, sample_location = location, wait = False)
+                    else:
+                      self.beamline_setup_hwobj.sample_changer_hwobj.\
+                          unload_sample(22, sample_location = location, wait = False)
 
             items[0].setOn(False)
             items[0].set_mounted_style(False)
@@ -323,7 +339,8 @@ class DataCollectTree(qt.QWidget):
         self.selection_changed_cb(items)
         checked_items = self.get_checked_items()
         self.collect_button.setDisabled(len(checked_items) == 0)
-        self.set_first_element()
+
+        #self.set_first_element()
 
     def add_empty_task_node(self):
         samples = self.get_selected_samples()
@@ -422,6 +439,13 @@ class DataCollectTree(qt.QWidget):
          return False
 
     def filter_sample_list(self, option):
+        if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER \
+          and self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+            logging.getLogger("user_level_log").\
+                error("Unable to use sample changer if plate manipulator used.")
+            #TODO remove sample changer option if plate used
+            return
+
         self.sample_list_view.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
@@ -431,8 +455,14 @@ class DataCollectTree(qt.QWidget):
             self.queue_model_hwobj.select_model('ispyb')
             self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
-            loaded_sample = self.sample_changer_hwobj.\
-                                 getLoadedSample()
+            if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                loaded_sample = self.plate_manipulator_hwobj.\
+                                     getLoadedSample()
+            else:
+                loaded_sample = self.sample_changer_hwobj.\
+                                     getLoadedSample()
+            #loaded_sample = self.sample_changer_hwobj.\
+            #                     getLoadedSample()
             try:
                 loaded_sample_loc = loaded_sample.getCoords()
             except:
@@ -440,17 +470,26 @@ class DataCollectTree(qt.QWidget):
 
             it = qt.QListViewItemIterator(self.sample_list_view)
             item = it.current()
+            visible_parent = None
         
             while item:
                 if isinstance(item, queue_item.SampleQueueItem):
-                    if item.get_model().location == loaded_sample_loc:
-                        item.setSelected(True)
-                        item.setVisible(True)
+                    if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                        item_location = item.get_model().location_plate
+                    else:
+                        item_location = item.get_model().location
+                    if item_location == loaded_sample_loc:
+                        selected_item = item 
+                        visible_parent = item.parent()
                     else:
                         item.setVisible(False)
+                        if item.parent():
+                            item.parent().setEnabled(False)
 
                 it += 1
                 item = it.current()
+            if visible_parent:
+                visible_parent.setEnabled(True)
 
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
             self.sample_list_view.clear()
@@ -461,10 +500,13 @@ class DataCollectTree(qt.QWidget):
             #self.sample_list_view.setDisabled(True)
             self.beamline_setup_hwobj.set_plate_mode(True)
             self.confirm_dialog.set_plate_mode(True)       
+            self.sample_list_view.clear()
+            self.queue_model_hwobj.select_model('plate')
+            self.set_sample_pin_icon()
 
         self.sample_list_view_selection()
         
-    def set_centring_method(self, method_number):       
+    def set_centring_method(self, method_number):
         self.centring_method = method_number
 
         try:
@@ -516,7 +558,7 @@ class DataCollectTree(qt.QWidget):
         if self.queue_hwobj.is_disabled():
             logging.getLogger("user_level_log").\
                 error('Can not start collect, see the tasks marked' +\
-                      ' in the tree and solve the prorblems.')
+                      ' in the tree and solve the problems.')
             
         elif not self.collecting:
             # Unselect selected items.
@@ -549,10 +591,23 @@ class DataCollectTree(qt.QWidget):
         if isinstance(item, queue_item.SampleQueueItem):
             if item.get_model().free_pin_mode == True:
                 result = True
-            elif not self.sample_changer_hwobj.hasLoadedSample():
-                result = False
-            elif item.get_model().location == self.sample_changer_hwobj.getLoadedSample().getCoords():
-                result = True
+            #elif not self.sample_changer_hwobj.hasLoadedSample():
+            #    result = False
+            #elif item.get_model().location == self.sample_changer_hwobj.getLoadedSample().getCoords():
+            #    result = True
+            elif self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                if self.plate_manipulator_hwobj is not None:
+                    if not self.plate_manipulator_hwobj.hasLoadedSample():
+                       result = False
+                    elif item.get_model().location_plate == self.plate_manipulator_hwobj.\
+                             getLoadedSample().getCoords():
+                       result = True
+            elif self.sample_changer_hwobj is not None:
+                if not self.sample_changer_hwobj.hasLoadedSample():
+                    result = False
+                elif item.get_model().location == self.sample_changer_hwobj.\
+                        getLoadedSample().getCoords():
+                    result = True
 
         return result
 
@@ -697,13 +752,29 @@ class DataCollectTree(qt.QWidget):
         sample_list = []
         for basket_info in sc_basket_content:
             basket = queue_model_objects.Basket()
-            basket.init_from_sc_basket(basket_info)
+            basket.init_from_sc_basket(basket_info, "Puck")
             basket_list.append(basket)
         for sample_info in sc_sample_content:
             sample = queue_model_objects.Sample()
             sample.init_from_sc_sample(sample_info)
             sample_list.append(sample)
         return basket_list, sample_list
+
+    def samples_from_plate_content(self, plate_sample_content):
+        row_list = []
+        sample_list = []
+        actual_row_index = -1
+        for sample_info in plate_sample_content:
+            if actual_row_index < sample_info[1]:
+                row = queue_model_objects.Basket()
+                row_info = [sample_info[1], None]
+                row.init_from_sc_basket(row_info, "Row")
+                row_list.append(row)
+                actual_row_index = sample_info[1]
+            sample = queue_model_objects.Sample()
+            sample.init_from_plate_sample(sample_info)
+            sample_list.append(sample)
+        return row_list, sample_list
 
     def samples_from_lims(self, lims_sample_list):
         barcode_samples = {}
@@ -736,6 +807,28 @@ class DataCollectTree(qt.QWidget):
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
 
+    def populate_plate_view(self, row_list, sample_list):
+        self.queue_hwobj.clear()
+        self.queue_model_hwobj.clear_model('plate')
+        self.sample_list_view.clear()
+        self.queue_model_hwobj.select_model('plate')
+        #TODO introduce new way of organization
+        # now basket code is reused, but other types should be introduced
+        #Basket class could be defined as a container class with name (baske, row...)      
+
+        for row in row_list:
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+                                             get_model_root(), row)
+            #row.set_enabled(False)
+            row.clear_sample_list()
+            for sample in sample_list:
+                 if sample.location[0] == row.get_location():
+                     row.add_sample(sample)
+                     self.queue_model_hwobj.add_child(row, sample)
+                     #sample.set_enabled(False)
+
+        self.set_sample_pin_icon()
+
     def populate_list_view(self, basket_list, sample_list):
         self.queue_hwobj.clear()
         self.queue_model_hwobj.clear_model('ispyb')
@@ -747,7 +840,8 @@ class DataCollectTree(qt.QWidget):
             basket.set_enabled(False)
             basket.clear_sample_list()
             for sample in sample_list:
-                if sample.location[0] == basket.get_location():
+                #TODO check index 
+                if int(sample.location[0]) == basket.get_location():
                      basket.add_sample(sample)
                      self.queue_model_hwobj.add_child(basket, sample)
                      sample.set_enabled(False)
@@ -782,10 +876,6 @@ class DataCollectTree(qt.QWidget):
                     child_item = child_item.nextSibling()
                 if do_it:
                     item.setOn(False)
-                #item.setText(0, item.get_model().get_display_name())
-                #item.setEnabled(item.get_model().get_is_present())
-                #print 'should %s %s %s %s' % ("open" if item.get_model().get_is_present() else "close", item.get_model(), item.get_model().location, item)
-                #item.setOpen(item.get_model().get_is_present())
  
             it += 1
             item = it.current()
@@ -814,3 +904,4 @@ class DataCollectTree(qt.QWidget):
 
         return conflict
         
+
