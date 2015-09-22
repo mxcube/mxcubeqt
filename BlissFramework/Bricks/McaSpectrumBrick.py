@@ -10,7 +10,6 @@
 #
 """
 [Name] McaSpectrumBrick
-
 [Description]
 The McaSpectrumBrick allows to display Mca Spectrum obtained in SPEC.
 If configured, it will take into account the energy calibration factors and
@@ -106,6 +105,8 @@ class McaSpectrumBrick(BlissWidget):
             raise
 
     def _fit(self):
+        if self.mcafit.isHidden():
+            self.mcafit.show()
         return self.mcafit.fit()
 
     def _configure(self,config):
