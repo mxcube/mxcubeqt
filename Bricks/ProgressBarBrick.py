@@ -80,7 +80,7 @@ class ProgressBarBrick(BlissWidget):
     def propertyChanged(self, propertyName, oldValue, newValue):
         if propertyName=='appearance':
             if newValue=='simple':
-                self.container_hbox.setFrameShape(self.containerBox.NoFrame)
+                self.container_hbox.setFrameShape(self.container_hbox.NoFrame)
                 self.container_hbox.setInsideMargin(0)
                 self.container_hbox.setInsideSpacing(0)            
                 self.time_total_label.hide()
@@ -88,7 +88,7 @@ class ProgressBarBrick(BlissWidget):
                 self.time_remaining_label.hide()
                 self.time_remaining_value_label.hide()
             elif newValue=='normal':
-                self.container_hbox.setFrameShape(self.containerBox.GroupBoxPanel)
+                self.container_hbox.setFrameShape(self.container_hbox.GroupBoxPanel)
                 self.container_hbox.setInsideMargin(4)
                 self.container_hbox.setInsideSpacing(2)
                 self.time_total_label.show()

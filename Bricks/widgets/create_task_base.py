@@ -405,6 +405,9 @@ class CreateTaskBase(qt.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
+            self._path_template = copy.deepcopy(self._path_template)
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
 
     def _update_etr(self):
         energy = self._beamline_setup_hwobj._get_energy()
@@ -476,8 +479,9 @@ class CreateTaskBase(qt.QWidget):
                     pos = positions[0]
                     if isinstance(pos, shape_history.Point):
                         cpos = pos.get_centred_positions()[0]
-                        self._acq_widget.update_kappa(cpos.kappa)
-                        self._acq_widget.update_kappa_phi(cpos.kappa_phi)
+                        if cpos.kappa is not None:
+                            self._acq_widget.update_kappa(cpos.kappa)
+                            self._acq_widget.update_kappa_phi(cpos.kappa_phi)
                         if isinstance(item, queue_item.TaskQueueItem):
                             snapshot = self._shape_history.get_snapshot([pos.qub_point])
                             cpos.snapshot_image = snapshot

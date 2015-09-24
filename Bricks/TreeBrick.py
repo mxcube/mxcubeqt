@@ -34,6 +34,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         # Properties
         self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("queue", "string", "/queue")
+        self.addProperty("default_centring_method", "integer", 1)
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
@@ -162,7 +163,9 @@ class TreeBrick(BaseComponents.BlissWidget):
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'holder_length_motor':
             self.dc_tree_widget.hl_motor_hwobj = self.getHardwareObject(new_value)
-
+        elif property_name == 'default_centring_method':
+            self.sample_changer_widget.child('centring_cbox').setCurrentItem(new_value)
+            self.dc_tree_widget.set_centring_method(new_value)
         elif property_name == 'queue':            
             self.queue_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
