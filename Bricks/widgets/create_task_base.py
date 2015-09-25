@@ -479,8 +479,9 @@ class CreateTaskBase(qt.QWidget):
                     pos = positions[0]
                     if isinstance(pos, shape_history.Point):
                         cpos = pos.get_centred_positions()[0]
-                        self._acq_widget.update_kappa(cpos.kappa)
-                        self._acq_widget.update_kappa_phi(cpos.kappa_phi)
+                        if cpos.kappa is not None:
+                            self._acq_widget.update_kappa(cpos.kappa)
+                            self._acq_widget.update_kappa_phi(cpos.kappa_phi)
                         if isinstance(item, queue_item.TaskQueueItem):
                             snapshot = self._shape_history.get_snapshot([pos.qub_point])
                             cpos.snapshot_image = snapshot
