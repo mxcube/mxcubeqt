@@ -8,9 +8,12 @@ import os
 import tempfile
 
 try:
-  import lucid
+  import lucid2 as lucid
 except ImportError:
-  logging.warning("lucid cannot load: automatic centring is disabled")
+  try:
+      import lucid
+  except ImportError:
+      logging.warning("Could not find autocentring library, automatic centring is disabled")
 
 
 def multiPointCentre(z,phis) :
@@ -207,9 +210,15 @@ def start_auto(camera,  centring_motors_dict,
 def find_loop(camera, pixelsPerMm_Hor, chi_angle, msg_cb, new_point_cb):
   snapshot_filename = os.path.join(tempfile.gettempdir(), "mxcube_sample_snapshot.png")
   camera.takeSnapshot(snapshot_filename, bw=True)
-
+  
   info, x, y = lucid.find_loop(snapshot_filename, debug=False,pixels_per_mm_horizontal=pixelsPerMm_Hor, chi_angle=chi_angle)
   
+  try:
+    x = float(x)
+    y = float(y)
+  except Exception:
+    return -1, -1
+ 
   if callable(msg_cb):
     msg_cb("Loop found: %s (%d, %d)" % (info, x, y))
   if callable(new_point_cb):
@@ -238,7 +247,8 @@ def auto_center(camera,
                 msg_cb("No loop detected, aborting")
             return
     
-    for k in range(2):
+    # Number of lucid2 runs increased to 3 (Olof June 26th 2015)
+    for k in range(3):
       if callable(msg_cb):
             msg_cb("Doing automatic centring")
             
@@ -254,11 +264,12 @@ def auto_center(camera,
             x, y = find_loop(camera, pixelsPerMm_Hor, chi_angle, msg_cb, new_point_cb) 
             #logging.info("in autocentre, x=%f, y=%f",x,y)
             if x < 0 or y < 0:
-              for i in range(1,5):
-                logging.debug("loop not found - moving back")
-                phi.syncMoveRelative(-20)
-                xold, yold = x, y
+              for i in range(1,18):
+                #logging.info("loop not found - moving back %d" % i)
+                phi.syncMoveRelative(5)
                 x, y = find_loop(camera, pixelsPerMm_Hor, chi_angle, msg_cb, new_point_cb)
+                if -1 in (x, y):
+                    continue
                 if x >=0:
                   if y < imgHeight/2:
                     y = 0
@@ -272,12 +283,10 @@ def auto_center(camera,
                         new_point_cb((x,y))
                     user_click(x,y,wait=True)
                     break
-                if i == 4:
-                  logging.debug("loop not found - trying with last coordinates")
-                  if callable(new_point_cb):
-                      new_point_cb((xold,yold))
-                  user_click(xold, yold, wait=True)
-              phi.syncMoveRelative(i*20)
+              if -1 in (x,y):
+                centring_greenlet.kill()
+                raise RuntimeError("Could not centre sample automatically.")
+              phi.syncMoveRelative(-i*5)
             else:
               user_click(x,y,wait=True)
 

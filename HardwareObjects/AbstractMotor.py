@@ -33,7 +33,9 @@ class AbstractMotor(object):
                                 "Moving": MOVING,
                                 "Created": NOTINITIALIZED,
                                 "Initializing": NOTINITIALIZED,
-                                "Unknown": UNUSABLE }
+                                "Unknown": UNUSABLE,
+                                "LowLim": ONLIMIT,
+                                "HighLim": ONLIMIT }
 
     def __init__(self):
         """

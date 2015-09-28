@@ -347,12 +347,13 @@ class DrawingEvent(QubDrawingEvent):
         Checks if a shape is selected and 'moves to' the selected
         position.
         """
-        clicked_shape = None
         for shape in self.qub_helper.get_shapes():
             modifier = shape.get_hit(x, y)
 
             if modifier:
                 clicked_shape = shape
+                self.move_to_centred_position_cb(clicked_shape.\
+                                         get_centred_positions()[0])
                 break
 
         if (clicked_shape is not None and
