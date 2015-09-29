@@ -120,9 +120,12 @@ class ResolutionBrick(BlissWidget):
             self.mmHistory=[]
             available_units=[]
             self.resolutionMotor=self.getHardwareObject(newValue)
-            self.detectorMotor=self.resolutionMotor.dtox
-            self.energyHObj = self.resolutionMotor.energy
+            self.detectorMotor = None
+            self.energyHObj = None
             if self.resolutionMotor is not None:
+                self.detectorMotor=self.resolutionMotor.dtox
+                self.energyHObj = self.resolutionMotor.energy
+
                 self.units.insertItem(chr(197))
                 available_units.append('Ang')
 
