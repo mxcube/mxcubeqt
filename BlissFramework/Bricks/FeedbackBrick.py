@@ -85,12 +85,15 @@ class FeedbackBrick(BaseComponents.BlissWidget):
         msg_date = email.Utils.formatdate(localtime=True)
         
         try:
-            frombl = os.environ['SMIS_BEAMLINE_NAME']
-            #user = os.environ['SMIS_BEAMLINE_NAME']
-            #frombl = user.replace(' ','-')
+            frombl = os.environ['BEAMLINENAME'].lower()
         except (KeyError,TypeError,ValueError,AttributeError):
             frombl = 'unknown-beamline'
-        fromaddr = "%s@esrf.fr" % frombl
+
+        try:
+            local_user = os.environ['USER'].lower()
+        except (KeyError,TypeError,ValueError,AttributeError):
+            local_user = 'unknown_user'
+        fromaddr = "%s@esrf.fr" % local_user
 
         try:
             smtp = smtplib.SMTP('smtp', smtplib.SMTP_PORT)
@@ -105,7 +108,7 @@ class FeedbackBrick(BaseComponents.BlissWidget):
             else:
                 prop_str="%s-%s" % (self.currentProposal[0],self.currentProposal[1])
 
-            subj="[BEAMLINE FEEDBACK] %s in %s (%s)" % (prop_str,frombl,BlissFramework.loggingName)
+            subj="[BEAMLINE FEEDBACK] %s on %s (%s)" % (prop_str,frombl,BlissFramework.loggingName)
             email_msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
                 fromaddr, 
                 toaddrs,
