@@ -523,6 +523,10 @@ class PX2MultiCollect(SOLEILMultiCollect):
         beam_center_x -= 0.2
         beam_center_y -= 0.5
         
+        # shift 2015-10-01
+        beam_center_x += 0.25 #yshifts
+        beam_center_y += 0.41 #xshifts
+        
         beam_center_y *= q
         beam_center_x *= q
         
