@@ -299,21 +299,12 @@ class xanes(object):
         self.wait(Attenuator)
 
     def getEdgefromXabs(self, element, edge):
-        edge = edge.upper()
         logging.info('getEdgefromXabs element %s edge %s' % (element, edge))
         
-        if edge == 'L':
-            edge = 'L'
-            roi_center = McMaster[element]['edgeEnergies'][edge + '-alpha']
-        elif edge == 'K':
-            roi_center = McMaster[element]['edgeEnergies'][edge + '-alpha']
-        else:
-            if element == 'Pt':
-                edge = 'L3'
-                roi_center = McMaster[element]['edgeEnergies'][edge]
-            else:
-                roi_center = McMaster[element]['edgeEnergies'][edge]
+        edge = edge.upper()
+        roi_center = McMaster[element]['edgeEnergies'][ '%s-alpha' % edge[0] ]
         e_edge = McMaster[element]['edgeEnergies'][edge]
+        
         return e_edge, roi_center
 
     def _pointsToStrings(self, points):
