@@ -36,7 +36,7 @@
    <!-- Flags controlling various aspects of data collection -->
    <close_safty_shutter>0</close_safty_shutter>
    <test_mode>0</test_mode>
-   <take_sample_snapshots>0</take_sample_snapshots>
+   <take_sample_snapshots>1</take_sample_snapshots>
    <move_detector_flag>1</move_detector_flag>
    <move_resolution_flag>1</move_resolution_flag>
    <lima_overhead>0.7</lima_overhead>
