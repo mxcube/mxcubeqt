@@ -356,7 +356,7 @@ class GUISupervisor(QtGui.QWidget):
                 
             if self.configuration.isBrick(item):
                 if i == 0:
-                    item.brick['fontSize'] = 11
+                    item.brick['fontSize'] = 9
                 else:
                     item.brick['fontSize']=int(item.brick['fontSize'])+i
             else:

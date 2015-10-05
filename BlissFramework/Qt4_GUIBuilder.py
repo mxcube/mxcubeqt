@@ -343,11 +343,13 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
         """
         Descript. :
         """
+        print "QT4_GUIBuilder.. property_changed", args 
         try:
             cb = self.__property_changed_cb[self.properties_table.propertyBag]
         except KeyError, err:
             return
         else:
+            print cb
             cb(*args)
             
     def addProperties(self, propertyBag, property_changed_cb):
@@ -1152,6 +1154,8 @@ class GUIPreviewWindow(QtGui.QWidget):
             caption = container_cfg["properties"]["caption"]
             s = caption and " - %s" % caption or ""
             self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
+
+        print "drawWindow..."
         self.window_preview.drawPreview(container_cfg, window_id, container_ids, selected_item)
 
     def updateWindow(self, container_cfg, window_id, container_ids, selected_item):
@@ -1162,6 +1166,8 @@ class GUIPreviewWindow(QtGui.QWidget):
             caption = container_cfg["properties"]["caption"]
             s = caption and " - %s" % caption or ""
             self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
+
+        print "updateWindow..."
         self.window_preview.updatePreview(container_cfg, window_id, container_ids, selected_item)
 
     def add_window_widget(self, window_cfg):

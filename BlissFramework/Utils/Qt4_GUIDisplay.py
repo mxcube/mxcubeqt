@@ -712,7 +712,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 newItem.layout().setMargin(item_cfg["properties"]["margin"])
                 frame_style = QtGui.QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"]!="default":
-                    frame_style = getattr(QtGui.QFrame, item_cfg["properties"]["frameshape"].capitalize())
+                    frame_style = getattr(QtGui.QFrame, item_cfg["properties"]["frameshape"])
                 if item_cfg["properties"]["shadowstyle"]!="default":
                     frame_style = frame_style | getattr(QtGui.QFrame, item_cfg["properties"]["shadowstyle"].capitalize())
                 if frame_style != QtGui.QFrame.NoFrame:

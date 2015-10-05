@@ -94,8 +94,8 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.main_gbox_vlayout = QtGui.QVBoxLayout()
         self.main_gbox_vlayout.addWidget(self.state_label)
         self.main_gbox_vlayout.addWidget(self.buttons_widget)
-        self.main_gbox_vlayout.setSpacing(1)
-        self.main_gbox_vlayout.setContentsMargins(0, 2, 0, 0)
+        self.main_gbox_vlayout.setSpacing(2)
+        self.main_gbox_vlayout.setContentsMargins(0, 2, 2, 2)
         self.main_gbox.setLayout(self.main_gbox_vlayout)
 
         main_layout = QtGui.QVBoxLayout()

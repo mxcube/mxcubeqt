@@ -41,10 +41,10 @@ def load(icon_name):
     try:
         icon = QtGui.QPixmap(filename)
     except:
-        return QtGui.QPixmap(path.join(ICONS_DIR, 'esrf_logo.png'))
+        return QtGui.QPixmap(path.join(ICONS_DIR, 'brick.png'))
     else:
         if icon.isNull():
-            return QtGui.QPixmap(path.join(ICONS_DIR, 'esrf_logo.png'))
+            return QtGui.QPixmap(path.join(ICONS_DIR, 'brick.png'))
         else:
             return icon
 
@@ -66,3 +66,6 @@ def getIconPath(icon_name):
         
 def load_icon(icon_name):
     return QtGui.QIcon(load(icon_name))
+
+def load_pixmap(icon_name):
+    return load(icon_name)
