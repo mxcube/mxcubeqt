@@ -26,19 +26,7 @@ from PyQt4 import uic
 from BlissFramework.Utils import Qt4_widget_colors
 from PyMca import QPeriodicTable
 
-PERIODIC_ELEMENTS = [['H', '', '', '', '', '', '', '', '', '', '', '', '',
-                      '', '', '', '', '', 'He'],
-                     ['Li', 'Be', '', '', '', '', '', '', '', '', '', '',
-                      '', 'B', 'C', 'N', 'O', 'F', 'Ne'],
-                     ['Na', 'Mg', '', '', '', '', '', '', '', '', '', '',
-                      '', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar'],
-                     ['K',  'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe','Co', 
-                      'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se','Br', 'Kr'], 
-                     ['Rb', 'Sr', 'Y',  'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 
-                      'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn','Sb', 'Te', 'I', 'Xe'], 
-                     ['Cs', 'Ba', 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 
-                      'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn'], 
-                     ['Fr', 'Ra', 'Lr', 'Rf', 'Db', 'Sg','Bh', 'Hs', 'Mt']]
+EDGE_LIST = ["L1", "L2", "L3"]
 
 class PeriodicTableWidget(QtGui.QWidget):
     """
@@ -55,52 +43,66 @@ class PeriodicTableWidget(QtGui.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-
         self.periodic_table = CustomPeriodicTable(self)
+        self.periodic_table.setFixedSize(470, 230)
 
-        _main_gbox = QtGui.QGroupBox("Periodic table", self)
-        #self.periodic_table = QtGui.QTableWidget(7, 19, _main_gbox)
+        self.edge_widget = QtGui.QWidget(self)
+        edge_label = QtGui.QLabel("Edge:", self.edge_widget)
+        self.edge_combo = QtGui.QComboBox(self.edge_widget)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_vlayout = QtGui.QVBoxLayout(self)
-        _main_gbox_vlayout.addWidget(self.periodic_table)
-        _main_gbox_vlayout.setSpacing(0)
-        _main_gbox_vlayout.setContentsMargins(2, 2, 0, 0)
-        _main_gbox.setLayout(_main_gbox_vlayout)
+        _edge_hlayout = QtGui.QHBoxLayout(self)
+        _edge_hlayout.addStretch(0)
+        _edge_hlayout.addWidget(edge_label)
+        _edge_hlayout.addWidget(self.edge_combo)  
+        self.edge_widget.setLayout(_edge_hlayout)
 
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(_main_gbox)
-        self.main_layout.addStretch(0)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout)  
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.periodic_table, QtCore.Qt.AlignHCenter)
+        _main_vlayout.addWidget(self.edge_widget)
+        _main_vlayout.addStretch(0)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(_main_vlayout)  
 
         # SizePolicies --------------------------------------------------------
-        self.periodic_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                          QtGui.QSizePolicy.Fixed)
-        self.periodic_table.setFixedSize(450, 300)
+        #self.periodic_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
+        #                                  QtGui.QSizePolicy.Fixed)
+        #self.periodic_table.setFixedSize(470, 230)
+        #self.setFixedHeight(232)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.periodic_table,
-                     QtCore.SIGNAL("edgeSelected"),
-                     self.edge_selected)
+        self.periodic_table.edgeSelectedSignal.connect(self.edge_selected)
+        self.edge_combo.activated.connect(self.edge_combo_activated)
 
         # Other ---------------------------------------------------------------
-        #self.prepare_periodic_table()
+        for edge in EDGE_LIST:
+            self.edge_combo.addItem(edge)
+        self.edge_widget.setEnabled(False)
         self.selected_element = None
         self.selected_edge = "L3"
 
     def edge_selected(self, element, edge):
-        self.selected_element = element
-        self.selected_edge = edge
-
+        self.selected_element = str(element)
+        self.selected_edge = str(edge)
+        self.edge_widget.setEnabled(edge != "K")
+        #if edge == "L":
+        #    self.edge_combo.setCurrentIndex(0)
+        #    self.edge_combo_activated(0)
+        
     def set_current_element_edge(self, element, edge):
         self.periodic_table.tableElementChanged(element, edge)
 
     def get_selected_element_edge(self):
         return self.selected_element, self.selected_edge
+
+    def edge_combo_activated(self, item_index):
+        self.selected_edge = str(self.edge_combo.currentText())
+        self.periodic_table.tableElementChanged(self.selected_element, self.selected_edge)
   
 class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
+    edgeSelectedSignal = QtCore.pyqtSignal(str, str)
+
     def __init__(self, *args):
         QPeriodicTable.QPeriodicTable.__init__(self, *args)
 
@@ -138,7 +140,8 @@ class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
             name = self.elements_dict[symbol][4]
             txt = "%s - %s (%s,%s)" % (symbol, energy, index, name)
             self.eltLabel.setText(txt)
-            self.emit(QtCore.SIGNAL('edgeSelected'), symbol, energy)
+            #self.emit(QtCore.SIGNAL('edgeSelected'), symbol, energy)
+            self.edgeSelectedSignal.emit(symbol ,energy)
             self.emit(QtCore.SIGNAL("widgetSynchronize"), symbol, energy)
 
     def setElements(self,elements):

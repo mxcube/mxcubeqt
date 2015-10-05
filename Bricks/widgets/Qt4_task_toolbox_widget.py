@@ -107,9 +107,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
         # Qt signal/slot connections ------------------------------------------
         self.create_task_button.clicked.connect(self.create_task_button_click)
-
-        self.connect(self.tool_box, QtCore.SIGNAL("currentChanged( int )"),
-                     self.current_page_changed)
+        self.tool_box.currentChanged.connect(self.current_page_changed)
 
         # Other ---------------------------------------------------------------   
 
@@ -137,7 +135,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
-            item = self.tool_box.item(i)
+            item = self.tool_box.widget(i)
             item.init_data_path_model()
             item.update_selection()
 

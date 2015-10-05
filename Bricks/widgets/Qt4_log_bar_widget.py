@@ -34,8 +34,8 @@ class LogBarWidget(QtGui.QWidget):
             self.setObjectName(name)
 
         self.text_edit = QtGui.QTextEdit(self)
-        self.text_edit.setMinimumSize(QtCore.QSize(0, 100))
-        self.text_edit.setMaximumSize(QtCore.QSize(32767, 100))
+        #self.text_edit.setMinimumSize(QtCore.QSize(0, 100))
+        #self.text_edit.setMaximumSize(QtCore.QSize(32767, 100))
         self.text_edit.setAcceptRichText(True)
         #self.text_edit.setTextFormat(QtGui.QTextEdit.RichText)
         self.text_edit.setReadOnly(True)
@@ -45,6 +45,8 @@ class LogBarWidget(QtGui.QWidget):
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_hlayout) 
+
+        self.set_fixed_height(100)
 
     def toggle_background_color(self):
         gevent.spawn(self._toggle_background_color)
@@ -58,4 +60,6 @@ class LogBarWidget(QtGui.QWidget):
 
     def set_background_color(self, qt_color):
         self.text_edit.setTextBackgroundColor(qt_color) 
-            
+
+    def set_fixed_height(self, height):
+        self.text_edit.setFixedHeight(height)            

@@ -71,9 +71,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self._periodic_table_widget)
         self.main_layout.addWidget(self._data_path_gbox)
-        self.main_layout.addStretch(0)
-        self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+        self.main_layout.addStretch(0)
         self.setLayout(self.main_layout) 
 
         # SizePolicies --------------------------------------------------------
@@ -81,9 +81,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
-
-        self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("pathTemplateChanged"),
+        self._data_path_widget.pathTemplateChangedSignal.connect(
                      self.handle_path_conflict)
 
     def init_models(self):

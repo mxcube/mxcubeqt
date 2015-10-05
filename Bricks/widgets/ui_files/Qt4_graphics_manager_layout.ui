@@ -284,11 +284,6 @@
            <string>Coordinate</string>
           </property>
          </column>
-         <column>
-          <property name="text">
-           <string>Motor positions</string>
-          </property>
-         </column>
         </widget>
        </item>
        <item row="1" column="0">
@@ -492,6 +487,9 @@
                <width>70</width>
                <height>32767</height>
               </size>
+             </property>
+             <property name="inputMask">
+              <string/>
              </property>
              <property name="text">
               <string>0</string>

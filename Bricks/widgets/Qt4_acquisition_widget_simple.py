@@ -78,38 +78,29 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         # Qt signal/slot connections ------------------------------------------
         self.acq_widget.num_images_cbox.activated.connect(self.update_num_images)
         self.acq_widget.detector_mode_combo.activated.connect(self.detector_mode_changed)
-        self.acq_widget.osc_start_cbox.toggled.connect(self.osc_start_cbox_click)
 
         # Other ---------------------------------------------------------------
         self.energy_validator = QtGui.QDoubleValidator(0, 25, 5, self)
         self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
         self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
         self.exp_time_validator = QtGui.QDoubleValidator(0, 10000, 5, self)
-        self.acq_widget.osc_start_ledit.setEnabled(False)
-        self.acq_widget.kappa_ledit.setEnabled(False)
-        self.acq_widget.kappa_phi_ledit.setEnabled(False) 
+        #self.acq_widget.osc_start_ledit.setEnabled(False)
+        #self.acq_widget.kappa_ledit.setEnabled(False)
+        #self.acq_widget.kappa_phi_ledit.setEnabled(False) 
         self.acq_widget.num_images_cbox.setCurrentIndex(1)
 
-
-    def osc_start_cbox_click(self, state):
-        """
-        Descript. :
-        """
-        self.update_osc_start(self._beamline_setup_hwobj._get_omega_axis_position())
-        self.acq_widget.osc_start_ledit.setEnabled(state)
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if not self.acq_widget.osc_start_cbox.isChecked():
-            osc_start_value = 0
-            try:
-                osc_start_value = round(float(new_value), 2)
-            except TypeError:
-                pass
-            self.acq_widget.osc_start_ledit.setText("%.2f" % osc_start_value)
-            self._acquisition_parameters.osc_start = osc_start_value
+        osc_start_value = 0
+        try:
+           osc_start_value = round(float(new_value), 2)
+        except TypeError:
+           pass
+        self.acq_widget.osc_start_ledit.setText("%.2f" % osc_start_value)
+        self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
         """
@@ -260,7 +251,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
                                int,
                                None)
 
-        #self.acq_widget.osc_start_cbox.toggled.connnect(self.osc_start_cbox_click)
         self.set_tunable_energy(beamline_setup.tunable_wavelength())
 
     def set_energy(self, energy, wav):
@@ -391,8 +381,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        self.acq_widget.osc_start_cbox.setChecked(state)
-        self.acq_widget.osc_start_cbox.setDisabled(state)
+        self.acq_widget.osc_start_ledit.setEnabled(state)
 
     def check_parameter_conflict(self):
         """

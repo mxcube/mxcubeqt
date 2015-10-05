@@ -93,8 +93,9 @@ class CreateCharWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
-        _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.addStretch(0)
         self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
@@ -139,20 +140,14 @@ class CreateCharWidget(CreateTaskBase):
                               QtGui.QDoubleValidator(0.0, 1000, 2, self))
         
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
-
+        self._data_path_widget.pathTemplateChangedSignal.connect(\
+             self.handle_path_conflict)
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
-
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
-
         self._vertical_dimension_widget.space_group_ledit.activated.\
              connect(self._space_group_change)
-
-        self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("pathTemplateChanged"),
-                     self.handle_path_conflict)
-
         #self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
         #             self.use_induced_burn)
 

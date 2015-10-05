@@ -33,6 +33,8 @@ from BlissFramework.Utils import Qt4_widget_colors
 
 class DataPathWidget(QtGui.QWidget):
 
+    pathTemplateChangedSignal = QtCore.pyqtSignal()
+
     def __init__(self, parent = None, name = '', fl = 0, data_model = None, 
                  layout = None):
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -115,9 +117,7 @@ class DataPathWidget(QtGui.QWidget):
         self.data_path_layout.file_name_value_label.setText(file_name)"""
         
         self.update_file_name()
-        self.emit(QtCore.SIGNAL('pathTemplateChanged'),
-                  self.data_path_layout.prefix_ledit,
-                  new_value)
+        self.pathTemplateChangedSignal.emit()
 
     def _run_number_ledit_change(self, new_value):
         """
@@ -127,9 +127,7 @@ class DataPathWidget(QtGui.QWidget):
             self.set_run_number(new_value)
 
             self.update_file_name()
-            self.emit(QtCore.SIGNAL('pathTemplateChanged'),
-                      self.data_path_layout.run_number_ledit,
-                      new_value)
+            self.pathTemplateChangedSignal.emit()
 
     def _folder_ledit_change(self, new_value):        
         """
@@ -153,9 +151,7 @@ class DataPathWidget(QtGui.QWidget):
         Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
                                            Qt4_widget_colors.WHITE)
 
-        self.emit(QtCore.SIGNAL('pathTemplateChanged'),
-                  self.data_path_layout.folder_ledit,
-                  new_value)
+        self.pathTemplateChangedSignal.emit()
 
     def update_file_name(self):
         """

@@ -63,11 +63,8 @@ class CreateHelicalWidget(CreateTaskBase):
                            data_model=self._path_template,
                            layout='vertical')
 
-        self._processing_gbox = QtGui.QGroupBox('Processing', self)
-        self._processing_gbox.setObjectName('processing_gbox')
-        self._processing_widget = \
-            ProcessingWidget(self._processing_gbox,
-                             data_model=self._processing_parameters)
+        self._processing_widget = ProcessingWidget(self,
+             data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
         _data_path_gbox_layout = QtGui.QVBoxLayout(self)
@@ -76,16 +73,10 @@ class CreateHelicalWidget(CreateTaskBase):
         _data_path_gbox_layout.setContentsMargins(0,0,0,0)
         self._data_path_gbox.setLayout(_data_path_gbox_layout)
 
-        _processing_gbox_layout = QtGui.QVBoxLayout(self)
-        _processing_gbox_layout.addWidget(self._processing_widget)
-        _processing_gbox_layout.setSpacing(0)
-        _processing_gbox_layout.setContentsMargins(0,0,0,0)
-        self._processing_gbox.setLayout(_processing_gbox_layout)
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
-        _main_vlayout.addWidget(self._processing_gbox)
+        _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0,0,0,0)
@@ -98,9 +89,10 @@ class CreateHelicalWidget(CreateTaskBase):
              connect(self._prefix_ledit_change)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
-        QtCore.QObject.connect(self._data_path_widget,
-                     QtCore.SIGNAL("pathTemplateChanged"),
-                     self.handle_path_conflict)
+        self._data_path_widget.pathTemplateChangedSignal.connect(\
+             self.handle_path_conflict)
+        self._processing_widget.enableProcessingSignal.connect(\
+             self._enable_processing_toggled)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -117,59 +109,6 @@ class CreateHelicalWidget(CreateTaskBase):
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
-
-    def add_clicked(self):
-        selected_shapes = self._graphics_manager_hwobj.get_selected_points()
-
-        if len(selected_shapes) == 2:
-            p1 = selected_shapes[0]
-            p2 = selected_shapes[1]
-            
-            line = graphics_manager.GraphicsItemLine(p1, p2)
-            line.show()
-
-            self._graphics_manager_hwobj.add_shape(line)
-            points_index = line.get_points_index()
-            if points_index:
-                display_name = "Line (points: %d, %d / kappa: %.2f phi: %.2f)" %\
-                       (points_index[0], points_index[1],
-                        p1.centred_position.kappa, p1.centred_position.kappa_phi)
-            else:
-                display_name = "Line (points: #, #)"
-            list_widget_item = QtGui.QListWidgetItem(display_name, self._lines_list_widget)
-            self._list_item_map[list_widget_item] = line
-
-            # De select previous items
-            for item in self.selected_items():
-                item.setSelected(False)
-
-            list_widget_item.setSelected(True)
-        else:
-            print "Select two points to create a helical line."
-
-    def remove_clicked(self):
-        selected_items = self.selected_items()
-
-        if selected_items:
-            for item in selected_items:
-                self._lines_list_widget.takeItem(self._lines_list_widget.row(item))
-                line = self._list_item_map[item]
-                self._graphics_manager_hwobj.delete_shape(line)
-                del self._list_item_map[item]
-
-    # Calback from graphics_manager, called when a shape is deleted
-    def shape_deleted(self, shape):
-        if isinstance(shape, graphics_manager.GraphicsItemPoint):
-    
-            items_to_remove = []
-
-            for (list_item, line) in self._list_item_map.iteritems():
-                if shape in line.get_graphics_points():
-                    items_to_remove.append((list_item, line))
-
-            for (list_item, line) in items_to_remove:
-                self._lines_list_widget.takeItem(self._lines_list_widget.row(list_item))
-                del self._list_item_map[list_item] 
 
     def centred_position_selection(self, positions):
         if len(positions) == 1:

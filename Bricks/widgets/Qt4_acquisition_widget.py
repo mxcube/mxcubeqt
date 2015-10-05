@@ -36,6 +36,9 @@ class AcquisitionWidget(QtGui.QWidget):
     """
     Descript. :
     """
+  
+    acqParametersChangedSignal = QtCore.pyqtSignal()
+
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
                  path_template = None, layout = 'horizontal'):
         """
@@ -75,9 +78,6 @@ class AcquisitionWidget(QtGui.QWidget):
         if layout == "horizontal":
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
-            self.acq_widget.inverse_beam_cbx.hide()
-            self.acq_widget.subwedge_size_label.hide()
-            self.acq_widget.subwedge_size_ledit.hide()
         else:
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
@@ -118,6 +118,7 @@ class AcquisitionWidget(QtGui.QWidget):
         self.exp_time_validator = QtGui.QDoubleValidator(0.0001, 10000, 4, self)
         self.first_img_validator = QtGui.QIntValidator(0, 99999, self)
         self.num_img_validator = QtGui.QIntValidator(1, 99999, self) 
+        self.disable_inverse_beam(True)
 
     def update_osc_start(self, new_value):
         """
@@ -291,8 +292,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if str(new_value).isdigit():
             self._path_template.start_num = int(new_value)
             widget = self.acq_widget.first_image_ledit
-            self.emit(QtCore.SIGNAL('pathTemplateChanged'),
-                      widget, new_value)
+            self.acqParametersChangedSignal.emit()
 
     def num_images_ledit_change(self, new_value):
         """
@@ -301,8 +301,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if str(new_value).isdigit():
             self._path_template.num_files = int(new_value)
             widget = self.acq_widget.num_images_ledit
-            self.emit(QtCore.SIGNAL('pathTemplateChanged'),
-                      widget, new_value)
+            self.acqParametersChangedSignal.emit()
 
     def overlap_changed(self, new_value):
         """
@@ -517,14 +516,9 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if state:
-            self.acq_widget.inverse_beam_cbx.hide()
-            self.acq_widget.subwedge_size_label.hide()
-            self.acq_widget.subwedge_size_ledit.hide()
-        else:
-            self.acq_widget.inverse_beam_cbx.show()
-            self.acq_widget.subwedge_size_label.show()
-            self.acq_widget.subwedge_size_ledit.show()
+        self.acq_widget.inverse_beam_cbx.setDisabled(state)
+        self.acq_widget.subwedge_size_label.setDisabled(state)
+        self.acq_widget.subwedge_size_ledit.setDisabled(state)
 
     def hide_aperture(self, state):
         """

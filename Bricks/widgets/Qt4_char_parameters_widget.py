@@ -433,11 +433,12 @@ class CharParametersWidget(QtGui.QWidget):
         self.enable_opt_parameters_widget(self._char_params.determine_rad_params)
         self.enable_maximum_res_ledit(self._char_params.use_aimed_resolution)
         self.enable_aimed_mult_ledit(self._char_params.use_aimed_multiplicity)
-       
+      
         item = self.char_type_widget.charact_type_tbox.\
                widget(self._char_params.experiment_type)
-       
-        self.char_type_widget.charact_type_tbox.setCurrentWidget(item)
+        print item 
+        if item:
+            self.char_type_widget.charact_type_tbox.setCurrentWidget(item)
         self.char_type_widget.toggle_time_dose()
         crystal = self._char.reference_image_collection.crystal
         self.acq_widget.set_energies(crystal.energy_scan_result)

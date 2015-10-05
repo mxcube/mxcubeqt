@@ -29,6 +29,9 @@ from widgets.Qt4_widget_utils import DataModelInputBinder
 
 
 class ProcessingWidget(QtGui.QWidget):
+
+    enableProcessingSignal = QtCore.pyqtSignal(bool)
+
     def __init__(self, parent = None, name = None, fl = 0, data_model = None):
 
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -90,7 +93,11 @@ class ProcessingWidget(QtGui.QWidget):
                                           float,
                                           None)
 
-        self.processing_widget.space_group_cbox.activated.connect(self._space_group_change)    
+        self.processing_widget.space_group_cbox.activated.connect(\
+             self._space_group_change)    
+        self.processing_widget.main_groupbox.toggled.connect(
+             self._processing_enable_toggled)
+ 
 
     def _space_group_change(self, index):
         self._model.space_group = queue_model_enumerables.\
@@ -109,3 +116,6 @@ class ProcessingWidget(QtGui.QWidget):
         self._model = model
         self._model_mib.set_model(model)
         self._set_space_group(model.space_group)
+
+    def _processing_enable_toggled(self, state):
+        self.enableProcessingSignal.emit(state)

@@ -64,6 +64,7 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
         _main_gridlayout.addWidget(self.dose_ledit, 0, 2)
         _main_gridlayout.addWidget(self.time_ledit, 1, 2)
         _main_gridlayout.addWidget(self.radiation_damage_cbx, 2, 0, 1, 2)  
+        _main_gridlayout.setColumnStretch(4, 0)
         self.setLayout(_main_gridlayout) 
 
         # SizePolicies --------------------------------------------------------

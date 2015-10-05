@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>344</width>
-    <height>110</height>
+    <width>475</width>
+    <height>128</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -63,6 +63,12 @@
            <height>0</height>
           </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
           <string>Mode:</string>
          </property>
@@ -70,16 +76,18 @@
        </item>
        <item>
         <widget class="QComboBox" name="filter_cbox">
-         <item>
-          <property name="text">
-           <string>Sample changer</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Mounted sample</string>
-          </property>
-         </item>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <item>
           <property name="text">
            <string>Manually mounted</string>
@@ -87,7 +95,17 @@
          </item>
          <item>
           <property name="text">
+           <string>Sample changer</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Plate</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mounted sample</string>
           </property>
          </item>
         </widget>
@@ -115,13 +133,13 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>110</width>
+           <width>120</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>110</width>
+           <width>120</width>
            <height>16777215</height>
           </size>
          </property>
@@ -148,6 +166,12 @@
            <height>0</height>
           </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
           <string>Centring:</string>
          </property>
@@ -155,6 +179,18 @@
        </item>
        <item>
         <widget class="QComboBox" name="centring_cbox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32767</width>
+           <height>32767</height>
+          </size>
+         </property>
          <property name="toolTip">
           <string>&lt;B&gt;Manual&lt;/B&gt; 3-Click centring &lt;BR&gt; &lt;B&gt;Semi Automatic&lt;/B&gt; - Gives the possibility to confirm centring &lt;BR&gt; &lt;B&gt;Fully Automatic&lt;/B&gt; - Continues without waiting for confirmation</string>
          </property>
@@ -188,10 +224,77 @@
          </property>
         </spacer>
        </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QPushButton" name="synch_button">
+        <widget class="QLabel" name="synch_label">
+         <property name="minimumSize">
+          <size>
+           <width>70</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Sync</string>
+          <string>Sync:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="synch_combo">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32767</width>
+           <height>32767</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ISPyB</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>CRIMS</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="tree_options">
+         <property name="text">
+          <string>Tree options</string>
          </property>
         </widget>
        </item>

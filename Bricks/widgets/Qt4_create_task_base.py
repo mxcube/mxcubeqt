@@ -164,11 +164,10 @@ class CreateTaskBase(QtGui.QWidget):
             self.kappa_phi_value = new_value
             acq_widget.update_kappa_phi(new_value)
 
-    def _use_processing_toggled(self, state):
+    def _enable_processing_toggled(self, state):
         item = self._current_selected_items[0]
         model = item.get_model()
         model.run_processing = state
-
 
     def _prefix_ledit_change(self, new_value):
         if len(self._current_selected_items) > 0:
@@ -194,15 +193,13 @@ class CreateTaskBase(QtGui.QWidget):
                     model.set_number(int(new_value))
                     item.setText(0, model.get_display_name())
 
-    def handle_path_conflict(self, widget, new_value):
+    def handle_path_conflict(self):
         if self._tree_brick:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
         
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                             check_for_path_collisions(self._path_template)
-
-            if new_value != '':
-                self._data_path_widget.indicate_path_conflict(path_conflict)                    
+            self._data_path_widget.indicate_path_conflict(path_conflict)                    
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -596,7 +593,7 @@ class CreateTaskBase(QtGui.QWidget):
 
         return acq
 
-    def shape_deleted(self, shape):
+    def shape_deleted(self, shape, shape_type):
         return
 
     def shape_created(self, shape, shape_type):

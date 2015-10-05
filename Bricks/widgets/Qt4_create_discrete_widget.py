@@ -67,11 +67,8 @@ class CreateDiscreteWidget(CreateTaskBase):
                            data_model=self._path_template,
                            layout='vertical')
 
-        self._processing_gbox = QtGui.QGroupBox('Processing', self)
-        self._processing_gbox.setObjectName('processing_gbox')
-        self._processing_widget = \
-            ProcessingWidget(self._processing_gbox,
-                             data_model=self._processing_parameters)
+        self._processing_widget = ProcessingWidget(self,
+             data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
         self._data_path_gbox_layout = QtGui.QVBoxLayout(self)
@@ -80,25 +77,18 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
         self._data_path_gbox.setLayout(self._data_path_gbox_layout)
 
-        self._processing_gbox_layout = QtGui.QVBoxLayout(self)
-        self._processing_gbox_layout.addWidget(self._processing_widget)
-        self._processing_gbox_layout.setSpacing(0)
-        self._processing_gbox_layout.setContentsMargins(0, 0, 0, 0)
-        self._processing_gbox.setLayout(self._processing_gbox_layout)
-
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self._acq_widget)
-        self.main_layout.addWidget(self._data_path_gbox)
-        self.main_layout.addWidget(self._processing_gbox)
-        self.main_layout.addSpacing(10)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self._acq_widget)
+        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._processing_widget)
+        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.addStretch(0)
+        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
         
         # Qt signal/slot connections ------------------------------------------
-        self._processing_gbox.toggled.connect(self._use_processing_toggled)
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
@@ -107,13 +97,20 @@ class CreateDiscreteWidget(CreateTaskBase):
         self.connect(self._acq_widget, QtCore.SIGNAL('mad_energy_selected'),
                      self.mad_energy_selected)
 
-        self.connect(self._acq_widget,
-                     QtCore.SIGNAL("pathTemplateChanged"),
-                     self.handle_path_conflict)
+        #self.connect(self._acq_widget,
+        #             QtCore.SIGNAL("pathTemplateChanged"),
+        #             self.handle_path_conflict)
+        
+        self._acq_widget.acqParametersChangedSignal.connect(\
+             self.handle_path_conflict)
+        self._data_path_widget.pathTemplateChangedSignal.connect(\
+             self.handle_path_conflict)
+        self._processing_widget.enableProcessingSignal.connect(\
+             self._enable_processing_toggled)
 
-        self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("pathTemplateChanged"),
-                     self.handle_path_conflict)
+        #self.connect(self._data_path_widget,
+        #             QtCore.SIGNAL("pathTemplateChanged"),
+        #             self.handle_path_conflict)
 
         # Other ---------------------------------------------------------------
 

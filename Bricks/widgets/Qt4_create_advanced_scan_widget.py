@@ -99,8 +99,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
              connect(self._prefix_ledit_change)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
-        self.connect(self._data_path_widget,
-                     QtCore.SIGNAL("pathTemplateChanged"),
+        self._data_path_widget.pathTemplateChangedSignal.connect(\
                      self.handle_path_conflict)
 
         self._acq_widget.use_osc_start(False)
@@ -244,7 +243,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self._advanced_methods_widget.grid_combo.addItem(shape.get_full_name())            
             self._grid_map[shape] = self._advanced_methods_widget.grid_combo.count() - 1
   
-    def shape_deleted(self, shape):
+    def shape_deleted(self, shape, shape_type):
         if self._grid_map.get(shape):
             self._advanced_methods_widget.grid_combo.removeItem(self._grid_map[shape])
             self._grid_map.pop(shape) 
