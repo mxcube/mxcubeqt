@@ -18,6 +18,8 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
+from PyQt4 import QtCore
+from PyQt4.QtWebKit import QWebView
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
@@ -57,7 +59,7 @@ class Qt4_CharParametersBrick(BlissWidget):
         self.toggle_page_button = QtGui.QPushButton('View Results', self)
         self.toggle_page_button.setFixedWidth(100)
 
-        self.results_view = QtGui.QTextBrowser(self)
+        self.results_view = QWebView(self)
         self.stacked_widget.addWidget(self.parameters_widget)
         self.stacked_widget.addWidget(self.results_view)
 
@@ -90,18 +92,14 @@ class Qt4_CharParametersBrick(BlissWidget):
         char = item.get_model()
 
         if char.is_executed():
-            self.stack.raiseWidget(self.results_view)
+            self.stacked_widget.setCurrentWidget(self.results_view)
             self.toggle_page_button.setText("View parameters")
             self.parameters_widget.set_enabled(False)
 
             if char.html_report:
-                if self.results_view.mimeSourceFactory().\
-                       data(char.html_report) == None:
-                    self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
-                else:
-                    self.results_view.setSource(char.html_report)
+                self.results_view.load(QtCore.QUrl(char.html_report))
             else:
-                self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
+                self.results_view.setHtml("<center><h1>Characterisation failed</h1></center>") 
         else:
             self.parameters_widget.set_enabled(True)
             self.stacked_widget.setCurrentWidget(self.parameters_widget)
@@ -114,11 +112,11 @@ class Qt4_CharParametersBrick(BlissWidget):
         """
         Descript. :
         """
-        if self.stack.visibleWidget() is self.parameters_widget:
-            self.stack.raiseWidget(self.results_view)
+        if self.stacked_widget.currentWidget() is self.parameters_widget:
+            self.stacked_widget.setCurrentWidget(self.results_view)
             self.toggle_page_button.setText("View parameters")
         else:
-            self.stack.raiseWidget(self.parameters_widget)
+            self.stacked_widget.setCurrentWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
     def propertyChanged(self, property_name, old_value, new_value):

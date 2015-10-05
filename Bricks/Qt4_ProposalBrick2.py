@@ -216,7 +216,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                                                QtGui.QPalette.Base)  
             msg = 'User group set to: %s' % str(self.user_group_ledit.text())
             logging.getLogger("user_level_log").info(msg)
-            self.emit(QtCore.SIGNAL("user_group_saved"), self.user_group_ledit.text())
+            self.emit(QtCore.SIGNAL("userGroupSaved"), self.user_group_ledit.text())
         else:
             msg = 'User group not valid, please enter a valid user group'
             logging.getLogger("user_level_log").info(msg)
@@ -491,7 +491,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        print "refuse" 
         if message is not None:
             if stat is False:
                 icon = QtGui.QMessageBox.Critical
@@ -573,7 +572,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.user_group_ledit.setText('')
         self.setEnabled(False)
 
-        print "login..."
         if self.login_as_user:
             print "login as user"    
         else:
@@ -702,7 +700,6 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.select_proposal(prop)
 
     def proposal_combo_activated(self, item_index):
-        print "combo changed..."
         self.select_proposal(self.proposals[item_index])
 
     def select_proposal(self, selected_proposal):
@@ -710,10 +707,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         proposal = selected_proposal['Proposal']
         person = selected_proposal['Person']
         laboratory = selected_proposal['Laboratory']
-        try:
-            sessions = selected_proposal['Session']
-        except KeyError:
-            sessions = None
+        sessions = selected_proposal.get('Sessions')
 
         # Check if there are sessions in the proposal
         todays_session = None

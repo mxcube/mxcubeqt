@@ -71,6 +71,13 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         _groupbox_vlayout.addWidget(self.manager_widget)
         _groupbox_vlayout.setSpacing(0)
         _groupbox_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.main_groupbox.setLayout(_groupbox_vlayout)
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.main_groupbox)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
         self.main_groupbox.toggled.connect(\
@@ -102,6 +109,19 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.manager_widget.shapes_treewidget.customContextMenuRequested.\
              connect(self.show_shape_treewidget_popup)
 
+        self.manager_widget.hor_spacing_ledit.textChanged.connect(\
+             self.grid_spacing_changed)
+        self.manager_widget.ver_spacing_ledit.textChanged.connect(\
+             self.grid_spacing_changed)
+        self.manager_widget.move_left_button.clicked.connect(\
+             self.grid_move_left_clicked)
+        self.manager_widget.move_right_button.clicked.connect(\
+             self.grid_move_right_clicked)
+        self.manager_widget.move_up_button.clicked.connect(\
+             self.grid_move_up_clicked)
+        self.manager_widget.move_down_button.clicked.connect(\
+             self.grid_move_down_clicked) 
+ 
         # SizePolicies --------------------------------------------------------
 
         # Other --------------------------------------------------------------- 
@@ -143,25 +163,48 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         info_str_list.append(str(shape.index))
         if shape_type == "Point":
             info_str_list.append(str(shape.get_position())) 
-            motor_pos_str = str(shape.get_centred_positions()[0].as_str())
-            info_str_list.append(motor_pos_str)
-            self.__point_map[shape] = QtGui.QTreeWidgetItem(\
+            self.manager_widget.point_treewidget.clearSelection()
+            point_treewidget_item = QtGui.QTreeWidgetItem(\
                  self.manager_widget.point_treewidget, info_str_list)
+            point_treewidget_item.setSelected(True)
+            self.__point_map[shape] = point_treewidget_item
         elif shape_type == "Line":
             (start_index, end_index) = shape.get_points_index()
             info_str_list.append("Point %d" % start_index)
             info_str_list.append("Point %d" % end_index)
-            self.__line_map[shape] = QtGui.QTreeWidgetItem(\
+            self.manager_widget.line_treewidget.clearSelection()
+            line_treewidget_item = QtGui.QTreeWidgetItem(\
                  self.manager_widget.line_treewidget, info_str_list)
+            line_treewidget_item.setSelected(True)
+            self.__line_map[shape] = line_treewidget_item
         elif shape_type == "Grid":
-            self.__grid_map[shape] = QtGui.QTreeWidgetItem(\
+            self.manager_widget.grid_treewidget.clearSelection()
+            grid_treewidget_item = QtGui.QTreeWidgetItem(\
                  self.manager_widget.grid_treewidget, info_str_list)
+            grid_treewidget_item.setSelected(True)
+            self.__grid_map[shape] = grid_treewidget_item
 
-    def shape_deleted(self, shape):
+    def shape_deleted(self, shape, shape_type):
         item_index = self.manager_widget.shapes_treewidget.indexOfTopLevelItem(\
               self.__shape_map[shape])
         self.__shape_map.pop(shape)
         self.manager_widget.shapes_treewidget.takeTopLevelItem(item_index) 
+        if shape_type == "Point":
+            item_index = self.manager_widget.point_treewidget.indexOfTopLevelItem(\
+              self.__point_map[shape])
+            self.__point_map.pop(shape)
+            self.manager_widget.point_treewidget.takeTopLevelItem(item_index)
+        elif shape_type == "Line":
+            item_index = self.manager_widget.line_treewidget.indexOfTopLevelItem(\
+              self.__line_map[shape])
+            self.__line_map.pop(shape)
+            self.manager_widget.line_treewidget.takeTopLevelItem(item_index)
+        elif shape_type == "Grid":
+            item_index = self.manager_widget.grid_treewidget.indexOfTopLevelItem(\
+              self.__grid_map[shape])
+            self.__grid_map.pop(shape)
+            self.manager_widget.grid_treewidget.takeTopLevelItem(item_index)
+
         self.toggle_buttons_enabled()
 
     def shape_selected(self, shape, selected_state):
@@ -175,7 +218,6 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             self.__grid_map[shape].setSelected(selected_state)
 
     def centring_in_progress_changed(self, centring_in_progress):
-        print centring_in_progress
         if centring_in_progress:
             self.manager_widget.create_point_start_button.setIcon(\
              Qt4_Icons.load_icon("Delete"))
@@ -240,10 +282,10 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         menu = QtGui.QMenu(self.manager_widget.shapes_treewidget)
 
     def get_spacing(self):
-        spacing = (0, 0)
+        spacing = [0, 0]
         try:
-           spacing[0] = float(self.manager_widget.hor_spacing_ledit.text())
-           spacing[1] = float(self.manager_widget.hor_spacing_ledit.text())
+           spacing[0] = float(self.manager_widget.hor_spacing_ledit.text()) / 1000.0
+           spacing[1] = float(self.manager_widget.ver_spacing_ledit.text()) / 1000.0
         except:
            pass 
         return spacing
@@ -260,3 +302,28 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
     def shape_treewiget_current_item_changed(self, current_item, previous_item):
         self.manager_widget.change_color_button.setEnabled(current_item is not None)
 
+    def grid_spacing_changed(self, value):
+        spacing = self.get_spacing()
+        for grid_treewidget_item in self.manager_widget.grid_treewidget.selectedItems():
+            grid_item = self.__grid_map.keys()[self.__grid_map.values().\
+                        index(grid_treewidget_item)]
+            grid_item.set_spacing(spacing) 
+
+    def grid_move_left_clicked(self):
+        self.move_selected_grids("left")
+
+    def grid_move_right_clicked(self):
+        self.move_selected_grids("right")
+
+    def grid_move_up_clicked(self):
+        self.move_selected_grids("up")
+   
+    def grid_move_down_clicked(self):
+        self.move_selected_grids("down")
+
+    def move_selected_grids(self, direction):
+        spacing = self.get_spacing()
+        for grid_treewidget_item in self.manager_widget.grid_treewidget.selectedItems():
+            grid_item = self.__grid_map.keys()[self.__grid_map.values().\
+                        index(grid_treewidget_item)]
+            grid_item.move_by_pix(direction)

@@ -52,8 +52,10 @@ class Qt4_TreeBrick(BlissWidget):
 
         # Hardware objects ----------------------------------------------------
         self.beamline_config_hwobj = None
+        self.session_hwobj = None
         self.lims_hwobj = None
-        self.sample_changer_hwobj = None
+        self.sample_changer_one_hwobj = None
+        self.sample_changer_two_hwobj = None
         self.queue_hwobj = None
 
         # Internal variables --------------------------------------------------
@@ -67,6 +69,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/Qt4_queue-model")
         self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup-break")
         self.addProperty("xml_rpc_server", "string", "/Qt4_xml_rpc_server")
+        self.addProperty("scOneName", "string", "Sample changer")
+        self.addProperty("scTwoName", "string", "Plate")
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_hutch_menu", ())
@@ -109,7 +113,6 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSlot("get_tree_brick",())
         self.defineSlot("get_selected_samples", ())
 
-        
         #self.defineSlot("get_mounted_sample", ())
         #self.defineSlot("new_centred_position", ())
         #self.defineSlot("add_dcg", ())
@@ -120,9 +123,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                      "widgets/ui_files/Qt4_sample_changer_widget_layout.ui"))
 
-        self.refresh_pixmap = Qt4_Icons.load("Refresh2.png")
-        self.sample_changer_widget.synch_button.setIcon(QtGui.QIcon(self.refresh_pixmap))
-        self.sample_changer_widget.synch_button.setText("Synch ISPyB")
+        #self.refresh_pixmap = Qt4_Icons.load("Refresh2.png")
+        #self.sample_changer_widget.synch_button.setIcon(QtGui.QIcon(self.refresh_pixmap))
+        #self.sample_changer_widget.synch_button.setText("Synch ISPyB")
 
         self.dc_tree_widget = DataCollectTree(self)
         self.dc_tree_widget.selection_changed_cb = self.selection_changed
@@ -145,14 +148,11 @@ class Qt4_TreeBrick(BlissWidget):
         # Qt signal/slot connections ------------------------------------------
         self.sample_changer_widget.details_button.clicked.\
              connect(self.toggle_sample_changer_tab)
-
         self.sample_changer_widget.filter_cbox.activated.\
-             connect(self.dc_tree_widget.filter_sample_list)
-        
+             connect(self.mount_mode_combo_changed)
         self.sample_changer_widget.centring_cbox.activated.\
              connect(self.dc_tree_widget.set_centring_method)
-
-        self.sample_changer_widget.synch_button.clicked.\
+        self.sample_changer_widget.synch_combo.currentIndexChanged.\
              connect(self.refresh_sample_list)
 
         # Other --------------------------------------------------------------- 
@@ -209,16 +209,24 @@ class Qt4_TreeBrick(BlissWidget):
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
-            self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
-            self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
+            self.dc_tree_widget.active_sample_changer_hwobj = bl_setup.sample_changer_hwobj
+            self.sample_changer_one_hwobj = bl_setup.sample_changer_one_hwobj
+            self.sample_changer_two_hwobj = bl_setup.sample_changer_two_hwobj
+
             self.session_hwobj = bl_setup.session_hwobj
             self.lims_hwobj = bl_setup.lims_client_hwobj
 
-            if self.sample_changer_hwobj is not None:
-                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+            if self.sample_changer_one_hwobj is not None:
+                self.connect(self.sample_changer_one_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
+                self.connect(self.sample_changer_one_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
+            if self.sample_changer_two_hwobj is not None:
+                self.connect(self.sample_changer_two_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+                             self.sample_load_state_changed)
+                self.connect(self.sample_changer_two_hwobj, SampleChanger.INFO_CHANGED_EVENT,
+                             self.set_sample_pin_icon)
+
             has_shutter_less = bl_setup.detector_has_shutterless()
 
             if has_shutter_less:
@@ -232,6 +240,10 @@ class Qt4_TreeBrick(BlissWidget):
 
                 self.connect(xml_rpc_server_hwobj, 'start_queue',
                              self.dc_tree_widget.collect_items)
+        elif property_name == 'scOneName':
+              self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
+        elif property_name == 'scTwoName':
+              self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
 
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,
@@ -245,25 +257,51 @@ class Qt4_TreeBrick(BlissWidget):
         """
         Descript. :Connected to the signal loggedIn of ProposalBrick2.
                    The signal is emitted when a user was succesfully logged in.
+                   At first free-pin mode is created
+                   Then it tries to initialize two sample changers and create
+                   two associated queue models.
         """
         self.enable_collect(logged_in)
         
         if not logged_in:
+            self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
-            sc_basket_content, sc_sample_content = self.get_sc_content()
-            if sc_basket_content and sc_sample_content:
-                sc_basket_list, sc_sample_list = \
-                 self.dc_tree_widget.samples_from_sc_content(\
-                 sc_basket_content, sc_sample_content)
-                self.dc_tree_widget.populate_tree_widget(sc_basket_list, \
-                 sc_sample_list)
-            self.sample_changer_widget.filter_cbox.setCurrentIndex(0)
+          
+            if self.sample_changer_one_hwobj: 
+                sc_basket_content, sc_sample_content = self.get_sc_content(\
+                    self.sample_changer_one_hwobj)
+                if sc_basket_content and sc_sample_content:
+                    sc_basket_list, sc_sample_list = self.dc_tree_widget.\
+                         samples_from_sc_content(sc_basket_content, sc_sample_content)
+                    self.dc_tree_widget.sample_mount_method = 1
+                    self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
+                         self.dc_tree_widget.sample_mount_method)
+                    self.dc_tree_widget.active_sample_changer_hwobj = \
+                         self.sample_changer_one_hwobj
+   
+            if self.sample_changer_two_hwobj:        
+                sc_basket_content, sc_sample_content = self.get_sc_content(\
+                    self.sample_changer_two_hwobj)
+                if sc_basket_content and sc_sample_content:
+                    sc_basket_list, sc_sample_list = self.dc_tree_widget.\
+                         samples_from_sc_content(sc_basket_content, sc_sample_content)
+                    self.dc_tree_widget.sample_mount_method = 2
+                    self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
+                         self.dc_tree_widget.sample_mount_method)    
+                    self.dc_tree_widget.active_sample_changer_hwobj = \
+                         self.sample_changer_two_hwobj
 
-        if not self.sample_changer_hwobj.hasLoadedSample():
-            self.dc_tree_widget.filter_sample_list(2)
-            self.sample_changer_widget.filter_cbox.setCurrentIndex(2)
+            #if self.dc_tree_widget.sample_mount_method > 0:
+            #self.sample_changer_widget.synch_combo.setEnabled()
+            #self.sample_changer_widget.synch_label.setEnabled(True)
+
+            self.sample_changer_widget.filter_cbox.setCurrentIndex(\
+                 self.dc_tree_widget.sample_mount_method)
+            self.dc_tree_widget.filter_sample_list(\
+                 self.dc_tree_widget.sample_mount_method)
 
         self.dc_tree_widget.sample_tree_widget_selection()
+        self.dc_tree_widget.set_sample_pin_icon()
 
     def enable_collect(self, state):
         """
@@ -330,80 +368,82 @@ class Qt4_TreeBrick(BlissWidget):
         #import pdb;pdb.set_trace()
         return barcode_samples, l_samples
 
-    def refresh_sample_list(self):
+    def refresh_sample_list(self, current_index):
         """
         Retrives sample information from ISPyB and populates the sample list
         accordingly.
         """
-        lims_client = self.lims_hwobj
-        samples = lims_client.get_samples(self.session_hwobj.proposal_id,
-                                          self.session_hwobj.session_id)
-        sample_list = []
-        
-        if samples:
-            (barcode_samples, location_samples) = \
-                self.dc_tree_widget.samples_from_lims(samples)
+        if current_index == 0:
+            self.dc_tree_widget.filter_sample_list(\
+                 self.dc_tree_widget.sample_mount_method) 
+        elif current_index == 1: 
+            lims_client = self.lims_hwobj
+            samples = lims_client.get_samples(self.session_hwobj.proposal_id,
+                                              self.session_hwobj.session_id)
+            sample_list = []
+          
+            if samples:
+                (barcode_samples, location_samples) = \
+                    self.dc_tree_widget.samples_from_lims(samples)
+                sc_basket_content, sc_sample_content = self.get_sc_content(\
+                  self.dc_tree_widget.active_sample_changer_hwobj)
+                sc_basket_list, sc_sample_list = self.dc_tree_widget.\
+                  samples_from_sc_content(sc_basket_content, sc_sample_content)
 
-            """sc_content = self.get_sc_content()
-            sc_sample_list = self.dc_tree_widget.\
-                             samples_from_sc_content(sc_content)"""
-            sc_basket_content, sc_sample_content = self.get_sc_content()
-            sc_basket_list, sc_sample_list = self.dc_tree_widget.\
-             samples_from_sc_content(sc_basket_content, sc_sample_content)
-
-            #IK TODO
-            basket_list = sc_basket_list
+                basket_list = sc_basket_list
            
-            for sc_sample in sc_sample_list:
-                # Get the sample in lims with the barcode
-                # sc_sample.code
-                lims_sample = barcode_samples.get(sc_sample.code)
+                for sc_sample in sc_sample_list:
+                    # Get the sample in lims with the barcode
+                    # sc_sample.code
+                    lims_sample = barcode_samples.get(sc_sample.code)
 
-                # There was a sample with that barcode
-                if lims_sample:
-                    if lims_sample.lims_location == sc_sample.location:
-                        logging.getLogger("user_level_log").\
-                            warning("Found sample in ISPyB for location %s" % str(sc_sample.location))
-                        sample_list.append(lims_sample)
-                    else:
-                        logging.getLogger("user_level_log").\
-                            warning("The sample with the barcode (%s) exists"+\
-                                    " in LIMS but the location does not mat" +\
-                                    "ch. Sample changer location: %s, LIMS " +\
-                                    "location %s" % (sc_sample.code,
-                                                     sc_sample.location,
-                                                     lims_sample.lims_location))
-                        sample_list.append(sc_sample)
-                else: # No sample with that barcode, continue with location
-                    lims_sample = location_samples.get(sc_sample.location)
+                    # There was a sample with that barcode
                     if lims_sample:
-                        if lims_sample.lims_code:
-                            logging.getLogger("user_level_log").\
-                                warning("The sample has a barcode in LIMS, but "+\
-                                        "the SC has no barcode information for "+\
-                                        "this sample. For location: %s" % str(sc_sample.location))
-                            sample_list.append(lims_sample)
-                        else:
+                        if lims_sample.lims_location == sc_sample.location:
                             logging.getLogger("user_level_log").\
                                 warning("Found sample in ISPyB for location %s" % str(sc_sample.location))
                             sample_list.append(lims_sample)
-                    else:
-                        if lims_sample:
-                            if lims_sample.lims_location != None:
-                                logging.getLogger("user_level_log").\
-                                    warning("No barcode was provided in ISPyB "+\
-                                            "which makes it impossible to verify if"+\
-                                            "the locations are correct, assuming "+\
-                                            "that the positions are correct.")
-                                sample_list.append(lims_sample)
                         else:
                             logging.getLogger("user_level_log").\
-                                warning("No sample in ISPyB for location %s" % str(sc_sample.location))
+                                warning("The sample with the barcode (%s) exists"+\
+                                        " in LIMS but the location does not mat" +\
+                                        "ch. Sample changer location: %s, LIMS " +\
+                                        "location %s" % (sc_sample.code,
+                                                         sc_sample.location,
+                                                         lims_sample.lims_location))
                             sample_list.append(sc_sample)
+                    else: # No sample with that barcode, continue with location
+                        lims_sample = location_samples.get(sc_sample.location)
+                        if lims_sample:
+                            if lims_sample.lims_code:
+                                logging.getLogger("user_level_log").\
+                                    warning("The sample has a barcode in LIMS, but "+\
+                                            "the SC has no barcode information for "+\
+                                            "this sample. For location: %s" % str(sc_sample.location))
+                                sample_list.append(lims_sample)
+                            else:
+                                logging.getLogger("user_level_log").\
+                                    warning("Found sample in ISPyB for location %s" % str(sc_sample.location))
+                                sample_list.append(lims_sample)
+                        else:
+                            if lims_sample:
+                                if lims_sample.lims_location != None:
+                                    logging.getLogger("user_level_log").\
+                                        warning("No barcode was provided in ISPyB "+\
+                                                "which makes it impossible to verify if"+\
+                                                "the locations are correct, assuming "+\
+                                                "that the positions are correct.")
+                                    sample_list.append(lims_sample)
+                            else:
+                                logging.getLogger("user_level_log").\
+                                    warning("No sample in ISPyB for location %s" % str(sc_sample.location))
+                                sample_list.append(sc_sample)
+            self.dc_tree_widget.populate_tree_widget(basket_list, sample_list, 
+                 self.dc_tree_widget.sample_mount_method)
+        elif current_index == 2:
+            print "sync with crims"
 
-            self.dc_tree_widget.populate_tree_widget(basket_list, sample_list)
-
-    def get_sc_content(self):
+    def get_sc_content(self, sample_changer):
         """
         Gets the 'raw' data from the sample changer.
         
@@ -411,32 +451,30 @@ class Qt4_TreeBrick(BlissWidget):
         """
         sc_basket_content = []
         sc_sample_content = []
-
-        #try:
         if True:
-            for basket in self.sample_changer_hwobj.getBasketList():
+        #try:
+            for basket in sample_changer.getBasketList():
                 basket_index = basket.getIndex()
                 basket_code = basket.getID() or ""
                 is_present = basket.isPresent()
                 sc_basket_content.append((basket_index+1, basket)) #basket_code, is_present))
 
-            for sample in self.sample_changer_hwobj.getSampleList():
+            for sample in sample_changer.getSampleList():
                 matrix = sample.getID() or ""
                 basket_index = sample.getContainer().getIndex()
                 vial_index = sample.getIndex()
                 basket_code = sample.getContainer().getID() or ""
-
+                #
                 sc_sample_content.append((matrix, basket_index+1, vial_index+1, basket_code, 0))
-        else:
-        #except Exception:
+        """ 
+        except Exception:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
                      " the sample changer is turned on. Using free pin mode")
-            sc_basket_content = [(0, '', False)]
-            sc_sample_content = [('', -1, -1, '', 1)]
-
-
+            sc_basket_content = None
+            sc_sample_content = None
+        """
         return sc_basket_content, sc_sample_content
 
 
@@ -658,6 +696,11 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.emit(QtCore.SIGNAL("populate_workflow_tab"), item, running)
+
+    def mount_mode_combo_changed(self, index):
+        self.dc_tree_widget.filter_sample_list(index)
+        self.sample_changer_widget.synch_combo.setEnabled(index > 0)
+        self.sample_changer_widget.synch_label.setEnabled(index > 0)
         
     def toggle_sample_changer_tab(self): 
         """
@@ -705,8 +748,9 @@ class Qt4_TreeBrick(BlissWidget):
         """
         Descript. :
         """
-        directory = self.session_hwobj.get_base_image_directory()
-        self.emit(QtCore.SIGNAL("set_directory"), directory)
+        if self.session_hwobj:
+            directory = self.session_hwobj.get_base_image_directory()
+            self.emit(QtCore.SIGNAL("set_directory"), directory)
 
     def emit_set_prefix(self, item):
         """

@@ -19,8 +19,8 @@
 
 import logging
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import QtCore
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -33,119 +33,134 @@ __category__ = "Qt4_Task"
 
 
 class VialView(QtGui.QWidget):
-    (VIAL_UNKNOWN,VIAL_NONE,VIAL_NOBARCODE,VIAL_BARCODE,VIAL_AXIS,VIAL_ALREADY_LOADED,VIAL_NOBARCODE_LOADED)=(0,1,2,3,4,5,6)
-    def __init__(self,vial_index,*args):
-        QtGui.QWidget.__init__(self,*args)
-        self.vialIndex=vial_index
-        self.setFixedSize(20,16)
-        self.pixmapUnknown=Icons.load("sample_unknown")
-        self.pixmapNoBarcode=Icons.load("sample_nobarcode.png")
-        self.pixmapBarcode=Icons.load("sample_barcode.png")
-        self.pixmapAxis=Icons.load("sample_axis.png")
-        self.pixmapAlreadyLoaded=Icons.load("sample_already_loaded.png")
-        self.pixmapAlreadyLoadedNoBarcode=Icons.load("sample_already_loaded2.png")
-        self.pixmaps=[self.pixmapUnknown,None,self.pixmapNoBarcode,self.pixmapBarcode,self.pixmapAxis,self.pixmapAlreadyLoaded, self.pixmapAlreadyLoadedNoBarcode]
-        self.vialState=VialView.VIAL_UNKNOWN
-        self.vialCode=""
+
+    (VIAL_UNKNOWN, VIAL_NONE, VIAL_NOBARCODE, VIAL_BARCODE, VIAL_AXIS,
+     VIAL_ALREADY_LOADED,VIAL_NOBARCODE_LOADED) = (0, 1, 2, 3, 4, 5, 6)
+
+    def __init__(self,vial_index, *args):
+        QtGui.QWidget.__init__(self, *args)
+        self.vialIndex = vial_index
+        self.setFixedSize(20, 16)
+        self.pixmapUnknown = Qt4_Icons.load_pixmap("sample_unknown")
+        self.pixmapNoBarcode = Qt4_Icons.load_pixmap("sample_nobarcode.png")
+        self.pixmapBarcode = Qt4_Icons.load_pixmap("sample_barcode.png")
+        self.pixmapAxis = Qt4_Icons.load_pixmap("sample_axis.png")
+        self.pixmapAlreadyLoaded = Qt4_Icons.load_pixmap("sample_already_loaded.png")
+        self.pixmapAlreadyLoadedNoBarcode = Qt4_Icons.load_pixmap("sample_already_loaded2.png")
+        self.pixmaps = [self.pixmapUnknown, None, self.pixmapNoBarcode, 
+                        self.pixmapBarcode, self.pixmapAxis, 
+                        self.pixmapAlreadyLoaded, 
+                        self.pixmapAlreadyLoadedNoBarcode]
+        self.vialState = VialView.VIAL_UNKNOWN
+        self.vialCode = ""
     def setVial(self,vial_state):
-        self.vialState=vial_state[0]
+        self.vialState = vial_state[0]
         try:
-            self.vialCode=vial_state[1]
+            self.vialCode = vial_state[1]
         except:
-            self.vialCode=""
-        self.setEnabled(self.vialState!=VialView.VIAL_NONE)
+            self.vialCode = ""
+        self.setEnabled(self.vialState != VialView.VIAL_NONE)
         self.setToolTip(self.vialCode)
         self.update()
+
     def paintEvent(self,event):
         if self.vialState is not None:
             painter = QtGui.QPainter(self)
-            painter.setBrush(QtCoreQt.NoBrush)
-            px=self.pixmaps[self.vialState]
+            painter.setBrush(QtCore.Qt.NoBrush)
+            px = self.pixmaps[self.vialState]
             if px is not None:
-                painter.drawPixmap(2,0,px)
+                painter.drawPixmap(2, 0, px)
+
     def getVial(self):
         return self.vialState
+
     def getCode(self):
         return self.vialCode
+
     def mouseDoubleClickEvent(self,e):
-        self.emit(PYSIGNAL("doubleClicked"),(self.vialIndex,))
+        self.emit(QtCore.SIGNAL("doubleClicked"), self.vialIndex)
 
 class VialNumberView(QtGui.QLabel):
+
     def __init__(self,vial_index,parent):
-        QtGui.QWidget.__init__(self,str(vial_index),parent)
-        self.vialIndex=vial_index
-    def mouseDoubleClickEvent(self,e):
-        self.emit(PYSIGNAL("doubleClicked"),(self.vialIndex,))
-    def setVial(self,vial_state):
-        state=vial_state[0]
+        QtGui.QWidget.__init__(self, str(vial_index), parent)
+        self.vialIndex = vial_index
+
+    def mouseDoubleClickEvent(self, event):
+        self.emit(QtCore.SIGNAL("doubleClicked"), self.vialIndex)
+
+    def setVial(self, vial_state):
+        state = vial_state[0]
         try:
-            code=vial_state[1]
+            code = vial_state[1]
         except:
-            code=""
+            code = ""
         self.setToolTip(code)
 
 
 class SampleBox(QtGui.QWidget):
     def __init__(self, *args):
         QtGui.QWidget.__init__(self, *args)
-         
         self.setMouseTracking(True)
-        self.__bkg = self.paletteBackgroundColor()
-        self.__light=self.palette().active().light()
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-    def mouseMoveEvent(self, e):
-        QtGui.QWidget.mouseMoveEvent(self, e)
-        self.setPaletteBackgroundColor(self.__light)
+    def mouseMoveEvent(self, event):
+        QtGui.QWidget.mouseMoveEvent(self, event)
+        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.LINE_EDIT_CHANGED)
 
-    def enterEvent(self, e):
-        QtGui.QWidget.enterEvent(self, e)
-        self.setPaletteBackgroundColor(self.__light)
+    def enterEvent(self, event):
+        QtGui.QWidget.enterEvent(self, event)
+        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.LINE_EDIT_CHANGED)
 
-
-    def leaveEvent(self, e):
-        QtGui.QWidget.leaveEvent(self, e)
-        self.setPaletteBackgroundColor(self.__bkg)
-
+    def leaveEvent(self, event):
+        QtGui.QWidget.leaveEvent(self, event)
+        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.BUTTON_ORIGINAL)
 
 class SamplesView(QtGui.QWidget):
     SAMPLE_COUNT = 10
     CURRENT_VIAL_COLOR = QtCore.Qt.gray
 
-    def __init__(self,parent,basket_index):
-        QtGui.QWidget.__init__(self,parent)
+    def __init__(self, parent, basket_index):
+        QtGui.QWidget.__init__(self, parent)
 
-        self.basketIndex=basket_index
-        #QHBoxLayout(self)
+        self.basket_index = basket_index
+        self.vials = []
+        self.numbers = []
+        self.loaded_vial = None
+        self.current_location = None
+        self.standard_color = None
 
-        self.vials=[]
-        self.numbers=[]
-        self.loadedVial=None
+        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout.setSpacing(0)
+        _main_hlayout.setContentsMargins(0, 0, 0, 0)
+
         for i in range(SamplesView.SAMPLE_COUNT):
-            sample_box=SampleBox(self)
-            label=VialNumberView(i+1,sample_box)
+            sample_box = SampleBox(self)
+            label = VialNumberView(i + 1, sample_box)
             label.setVial([VialView.VIAL_UNKNOWN])
             label.setAlignment(QtCore.Qt.AlignHCenter)
             self.numbers.append(label)
 
-            w=VialView(i+1,sample_box)
+            w = VialView(i + 1, sample_box)
             w.setVial([VialView.VIAL_UNKNOWN])
             self.vials.append(w)
 
-            self.layout().addWidget(sample_box)
+            sample_box.layout().addWidget(label)
+            sample_box.layout().addWidget(w)
+            _main_hlayout.addWidget(sample_box)
 
-            QtCore.QObject.connect(label, QtCore.SIGNAL("doubleClicked"),self.loadSample)
+            QtCore.QObject.connect(label, QtCore.SIGNAL("doubleClicked"),self.loadSample) 
             QtCore.QObject.connect(w, QtCore.SIGNAL("doubleClicked"),self.loadSample)
-
-        self.currentLocation=None
-        self.standardColor=None
 
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)
 
-    def loadSample(self,vial_index):
-        state=self.vials[vial_index-1].getVial()
-        if state!=VialView.VIAL_AXIS:
-            self.emit(PYSIGNAL("loadThisSample"),(self.basketIndex,vial_index))
+    def loadSample(self, vial_index):
+        state = self.vials[vial_index - 1].getVial()
+        if state != VialView.VIAL_AXIS:
+            self.emit(QtCore.SIGNAL("load_this_sample"), self.basket_index, vial_index)
 
     def clearMatrices(self):
         for v in self.vials:
@@ -153,65 +168,53 @@ class SamplesView(QtGui.QWidget):
         for n in self.numbers:
             n.setVial([VialView.VIAL_UNKNOWN])
 
-    def setMatrices(self,vial_states):
+    def setMatrices(self, vial_states):
         i=0
         for v in self.vials:
             try:
-                state=vial_states[i]
+                state = vial_states[i]
             except IndexError:
-                state=[VialView.VIAL_UNKNOWN]
+                state = [VialView.VIAL_UNKNOWN]
             v.setVial(state)
             self.numbers[i].setVial(state)
-            i+=1
+            i += 1
 
-    """
-    def setLoadedVial(self,vial_index=None):
-        if vial_index is None and self.loadedVial is not None:
-            loaded_vial_index=self.loadedVial[0]
-            loaded_vial_state=self.loadedVial[1]
-            code=self.vials[loaded_vial_index-1].getCode()
-            self.vials[loaded_vial_index-1].setVial([loaded_vial_state,code])
-            self.loadedVial=None
-        elif vial_index is not None:
-            state=self.vials[vial_index-1].getVial()
-            code=self.vials[vial_index-1].getCode()
-            self.vials[vial_index-1].setVial([VialView.VIAL_AXIS,code])
-            self.loadedVial=[vial_index,state]
-    """
-
-    def setCurrentVial(self,location=None):
-        if self.standardColor is None:
-            self.standardColor=self.numbers[0].paletteBackgroundColor()
-        if self.currentLocation is not None and self.currentLocation[0]==self.basketIndex:
-            self.vials[self.currentLocation[1]-1].setPaletteBackgroundColor(self.standardColor)
-            self.numbers[self.currentLocation[1]-1].setPaletteBackgroundColor(self.standardColor)
-        if location is not None and location[0]==self.basketIndex:
+    def setCurrentVial(self, location = None):
+        if self.standard_color is None:
+            self.standard_color = self.numbers[0].paletteBackgroundColor()
+        if self.current_location is not None and self.currentLocation[0] == self.basket_index:
+            self.vials[self.current_location[1]-1].setPaletteBackgroundColor(self.standard_color)
+            self.numbers[self.current_location[1]-1].setPaletteBackgroundColor(self.standard_color)
+        if location is not None and location[0] == self.basket_index:
             self.vials[location[1]-1].setPaletteBackgroundColor(SamplesView.CURRENT_VIAL_COLOR)
             self.numbers[location[1]-1].setPaletteBackgroundColor(SamplesView.CURRENT_VIAL_COLOR)
-        self.currentLocation=location
+        self.current_location = location
 
 class BasketView(QtGui.QWidget):
-    def __init__(self,parent,basket_index):
-        QtGui.QWidget.__init__(self,parent)
+    def __init__(self, parent, basket_index):
+        QtGui.QWidget.__init__(self, parent)
 
-        #self.contentsBox = QVGroupBox("Basket %s" % basket_index,self)
-        self.contentsBox = Qtgui.QGroupBox("Basket %s" % basket_index,self)
-        self.contentsBox.setCheckable(True)
         self.basket_index = basket_index
-        self.samplesView=SamplesView(self.contentsBox,basket_index)
-        self.contentsBox.setInsideMargin(4)
-        self.contentsBox.setInsideSpacing(2)
-        QtCore.QObject.connect(self.samplesView, QtCore.SIGNAL("loadThisSample"),self.loadThisSample)
-        QtCore.QObject.connect(self.contentsBox, Qtcore.SIGNAL("toggled(bool)"), self.toggleBasketPresence)
 
-        self.contentsBox.setSizePolicy(QtGui.QSizePolicy.Minimum, Qtgui.QSizePolicy.Minimum)
- 
+        #self.contents_widget = QVGroupBox("Basket %s" % basket_index,self)
+        self.contents_widget = QtGui.QGroupBox("Basket %s" % basket_index, self)
+        self.contents_widget.setCheckable(True)
+        self.samplesView = SamplesView(self.contents_widget, basket_index)
+
+        _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
+        _contents_widget_vlayout.addWidget(self.samplesView)
+
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.contentsBox)
-        self.setLayout(_main_vlayout)
+        _main_vlayout.addWidget(self.contents_widget)
 
+        self.contents_widget.setSizePolicy(QtGui.QSizePolicy.Minimum, 
+                                           QtGui.QSizePolicy.Minimum)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)    
+
+        QtCore.QObject.connect(self.samplesView, QtCore.SIGNAL("loadThisSample"),self.load_this_sample)
+        self.contents_widget.toggled.connect(self.toggleBasketPresence)
+
 
     def clearMatrices(self):
         self.samplesView.clearMatrices()
@@ -224,85 +227,87 @@ class BasketView(QtGui.QWidget):
         self.samplesView.setLoadedVial(vial_index)
     """
 
-    def setCurrentVial(self,location=None):
+    def setCurrentVial(self, location=None):
         return
         self.samplesView.setCurrentVial(location)
 
-    def setUnselectable(self,state):
-        self.contentsBox.setCheckable(not state)
+    def setUnselectable(self, state):
+        self.contents_widget.setCheckable(not state)
 
     def isChecked(self):
-        if self.contentsBox.isCheckable():
-            return self.contentsBox.isChecked()
+        if self.contents_widget.isCheckable():
+            return self.contents_widget.isChecked()
         return None
 
-    def setChecked(self,state):
-        if self.contentsBox.isCheckable():
-            self.contentsBox.setChecked(state)
+    def setChecked(self, state):
+        if self.contents_widget.isCheckable():
+            self.contents_widget.setChecked(state)
             return state
         return None
 
-    def loadThisSample(self,basket_index,vial_index):
-        self.emit(PYSIGNAL("loadThisSample"),(basket_index,vial_index))
+    def load_this_sample(self, basket_index, vial_index):
+        self.emit(QtCore.SIGNAL("load_this_sample"), basket_index, vial_index)
 
     def setState(self, state):
         self.setEnabled(SC_STATE_GENERAL.get(state, False))
 
     def toggleBasketPresence(self, on):
-        self.emit(PYSIGNAL("basketPresence"), (self.basket_index, on))
+        self.emit(QtCore.SIGNAL("basketPresence"), self.basket_index, on)
 
 
 class CurrentView(QtGui.QWidget):
-    def __init__(self,title,parent):
-        QtGui.QWidget.__init__(self,parent)
+    def __init__(self, title, parent):
+        QtGui.QWidget.__init__(self, parent)
 
-        #self.standardColor=None
-        self.standardColor = QtCore.Qt.white
+        #self.standard_color=None
+        self.standard_color = QtCore.Qt.white
         self.currentSelection=1
-        self.title=title
+        self.title = title
 
-        #self.contentsBox = QVGroupBox(title,self)
-        self.contentsBox = QtGui.QGroupBox(title,self)
-        self.contentsBox.setInsideMargin(4)
-        self.contentsBox.setInsideSpacing(2)
-        self.contentsBox.setAlignment(QtCore.Qt.AlignHCenter)
-
+        self.contents_widget = QtGui.QGroupBox(title, self)
+        self.contents_widget_hlayout = QtGui.QHBoxLayout(self.contents_widget) 
+        self.contents_widget_hlayout.setContentsMargins(0, 0, 0, 0)
+        self.contents_widget_hlayout.setSpacing(0)
+        self.contents_widget.setAlignment(QtCore.Qt.AlignHCenter)
         self.commandsWidget=[]
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.contentsBox)
-        self.setLayout(_main_vlayout) 
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.addWidget(self.contents_widget)
 
-    def selectionTextChanged(self,txt):
-        if self.standardColor is None:
-            self.standardColor=self.selected.editor().paletteBackgroundColor()
-        if txt==str(self.currentSelection):
-            if self.standardColor is not None:
-                self.selected.editor().setPaletteBackgroundColor(self.standardColor)
-            state=True
+    def selectionTextChanged(self, txt):
+        if self.standard_color is None:
+            self.standard_color = Qt4_widget_colors.WHITE
+        if txt == str(self.currentSelection):
+            if self.standard_color is not None:
+                self.selected_spinbox.editor().setPaletteBackgroundColor(self.standard_color)
+        #    state = True
         else:
-            self.selected.editor().setPaletteBackgroundColor(QtCore.Qt.yellow)
-            state=False
+            Qt4_widget_colors.set_widget_color(self.selected_spinbox.lineEdit(),
+                                               Qt4_widget_colors.LIGHT_YELLOW)
+        #    state = False
 
-    def selectedChanged(self,val):
-        self.currentSelection=val
-        if self.standardColor is not None:
-            self.selected.editor().setPaletteBackgroundColor(self.standardColor)
-        self.emit(PYSIGNAL("selectedChanged"),(val,))
+    def selectedChanged(self, val):
+        self.currentSelection = val
+        if self.standard_color is not None:
+            Qt4_widget_colors.set_widget_color(self.selected_spinbox.lineEdit(), 
+                                               self.standard_color)
+        self.emit(QtCore.SIGNAL("selectedChanged"), val)
 
-    def setMatrixCode(self,code):
-        if code is None or code=="":
-            self.contentsBox.setTitle(self.title)
+    def setMatrixCode(self, code):
+        if code is None or code == "":
+            self.contents_widget.setTitle(self.title)
         else:
-            self.contentsBox.setTitle("%s (%s)" % (self.title,code))
+            self.contents_widget.setTitle("%s (%s)" % (self.title, code))
 
-    def setSelected(self,val):
-        self.currentSelection=val
-        self.selected.blockSignals(True)
-        self.selected.editor().blockSignals(True)
-        self.selected.setValue(val)
-        self.selected.editor().blockSignals(False)
-        self.selected.blockSignals(False)
+    def setSelected(self, val):
+        self.currentSelection = val
+        self.selected_spinbox.blockSignals(True)
+        self.selected_spinbox.lineEdit().blockSignals(True)
+        self.selected_spinbox.setValue(val)
+        self.selected_spinbox.lineEdit().blockSignals(False)
+        self.selected_spinbox.blockSignals(False)
 
     def setState(self,state):
         enabled=SC_STATE_GENERAL.get(state, False)
@@ -310,92 +315,100 @@ class CurrentView(QtGui.QWidget):
             wid.setEnabled(enabled)
 
 class CurrentBasketView(CurrentView):
-    def __init__(self,parent):
-        CurrentView.__init__(self,"Current basket",parent)
+    def __init__(self, parent):
+        CurrentView.__init__(self, "Current basket", parent)
 
-        self.commandsBox = Qtgui.QWidget(self.contentsBox)
-        #QtQGridLayout(self.commandsBox, 1, 3, 0, 2)
+        self.position_label = QtGui.QLabel("Position:", self.contents_widget)
+        self.selected_spinbox = QtGui.QSpinBox(self.contents_widget)
+        #self.selected_spinbox.setWrapping(True)
+        #self.selected_spinbox.editor().setAlignment(QWidget.AlignRight)
 
-        self.positionLabel=QLabel("Position:",self.commandsBox)
-        self.commandsBox.layout().addWidget(self.positionLabel, 0, 0)
-        self.selected=QSpinBox(1,5,1,self.commandsBox)
-        self.selected.setWrapping(True)
-        self.commandsBox.layout().addWidget(self.selected,0,1)
-        self.selected.editor().setAlignment(QWidget.AlignRight)
-        QObject.connect(self.selected, SIGNAL("valueChanged(int)"), self.selectedChanged)
-        QObject.connect(self.selected.editor(), SIGNAL("textChanged(const QString &)"), self.selectionTextChanged)
+        self.scan_basket_button = QtGui.QToolButton(self.contents_widget)
+        self.scan_basket_button.setText("Scan")
 
-        self.buttonScan=QToolButton(self.commandsBox)
-        self.buttonScan.setTextLabel("Scan")
-        self.buttonScan.setUsesTextLabel(True)
-        self.buttonScan.setTextPosition(QToolButton.BesideIcon)
-        QObject.connect(self.buttonScan,SIGNAL("clicked()"),self.scanBasket)
-        self.commandsBox.layout().addWidget(self.buttonScan,0,2)
+        self.commandsWidget.append(self.scan_basket_button)
+        self.commandsWidget.append(self.position_label)
+        self.commandsWidget.append(self.selected_spinbox)
 
-        self.commandsWidget.append(self.buttonScan)
-        self.commandsWidget.append(self.positionLabel)
-        self.commandsWidget.append(self.selected)
+        self.contents_widget_hlayout.addWidget(self.position_label)
+        self.contents_widget_hlayout.addWidget(self.selected_spinbox)
+        self.contents_widget_hlayout.addWidget(self.scan_basket_button)
+
+        self.selected_spinbox.valueChanged.connect(self.selectedChanged)
+        self.selected_spinbox.lineEdit().textChanged.connect(self.selectionTextChanged)
+        self.scan_basket_button.clicked.connect(self.scanBasket)
 
     def setIcons(self,scan_one_icon):
-        self.buttonScan.setPixmap(Icons.load(scan_one_icon))
+        self.scan_basket_button.setIcon(Qt4_Icons.load(scan_one_icon))
 
     def scanBasket(self):
-        self.emit(PYSIGNAL("scanBasket"),())
+        self.emit(QtCore.SIGNAL("scanBasket"))
 
 class CurrentSampleView(CurrentView):
     def __init__(self,parent):
-        CurrentView.__init__(self,"Current sample",parent)
+        CurrentView.__init__(self, "Current sample", parent)
 
-        self.loadedMatrixCode=None
-        self.loadedLocation=None
+        self.loaded_matrix_code = None
+        self.loaded_location = None
+        self.load_icon = None
+        self.unload_icon = None
 
-        self.loadIcon=None
-        self.unloadIcon=None
+        _current_sample_view_widget = QtGui.QWidget(self.contents_widget)
 
-        self.stateBox=QHGroupBox(self.contentsBox)
-        self.stateBox.setInsideMargin(4)
-        self.stateBox.setInsideSpacing(2)
-        self.stateLabel=QLabel(self.stateBox)
-        self.stateLabel.setAlignment(Qt.AlignHCenter)
+        self.state_label = QtGui.QLabel("unknown", _current_sample_view_widget)
+        self.state_label.setAlignment(QtCore.Qt.AlignHCenter)
 
-        self.commandsBox=QWidget(self.contentsBox)
-        QGridLayout(self.commandsBox, 1, 3, 0, 2)
+        self.commands_widget = QtGui.QWidget(_current_sample_view_widget)
+        self.position_label = QtGui.QLabel("Position:",self.commands_widget)
+        self.selected_spinbox = QtGui.QSpinBox(self.commands_widget)
+        self.selected_spinbox.setRange(1, 10)
+        self.selected_spinbox.setSingleStep(1)
+        self.selected_spinbox.setWrapping(True)
+        self.selected_spinbox.lineEdit().setAlignment(QtCore.Qt.AlignRight)
 
-        self.positionLabel=QLabel("Position:",self.commandsBox)
-        self.commandsBox.layout().addWidget(self.positionLabel, 0, 0)
-        self.selected=QSpinBox(1,10,1,self.commandsBox)
-        self.selected.setWrapping(True)
-        self.commandsBox.layout().addWidget(self.selected,0,1)
-        self.selected.editor().setAlignment(QWidget.AlignRight)
-        QObject.connect(self.selected, SIGNAL("valueChanged(int)"), self.selectedChanged)
-        QObject.connect(self.selected.editor(), SIGNAL("textChanged(const QString &)"), self.selectionTextChanged)
+        self.holderLengthLabel = QtGui.QLabel("Holder length:", self.commands_widget)
+        self.holderLength = QtGui.QSpinBox(self.commands_widget)
+        self.holderLength.setRange(19, 26)
+        self.holderLength.setSingleStep(1)
+        self.holderLength.lineEdit().setAlignment(QtCore.Qt.AlignRight)
+        self.holderLengthUnit = QtGui.QLabel("mm", self.commands_widget)
+        self.holderLength.setEnabled(False)
+        self.holderLengthUnit.setEnabled(False)
+        self.holderLengthLabel.setEnabled(False)
 
-        self.holderLengthLabel=QLabel("Holder length:",self.commandsBox)
-        self.commandsBox.layout().addWidget(self.holderLengthLabel, 1, 0)
-        self.holderLength=QSpinBox(19,26,1,self.commandsBox)
-        self.commandsBox.layout().addWidget(self.holderLength,1,1)
-        self.holderLength.editor().setAlignment(QWidget.AlignRight)
-        self.holderLengthUnit=QLabel("mm",self.commandsBox)
-        self.commandsBox.layout().addWidget(self.holderLengthUnit, 1, 2)
-        self.holderLength.hide()
-        self.holderLengthUnit.hide()
-        self.holderLengthLabel.hide()
-
-        self.buttonLoad=QToolButton(self.commandsBox)
-        self.buttonLoad.setTextLabel("Mount sample")
-        self.buttonLoad.setUsesTextLabel(True)
-        self.buttonLoad.setTextPosition(QToolButton.BesideIcon)
-        #QObject.connect(self.buttonLoad,SIGNAL("clicked()"),self.buttonClicked)
-        self.commandsBox.layout().addMultiCellWidget(self.buttonLoad, 2, 2, 0, 2)
+        self.buttonLoad = QtGui.QToolButton(self.commands_widget)
+        self.buttonLoad.setText("Mount sample")
+        #self.buttonLoad.setTextPosition(QToolButton.BesideIcon)
         self.buttonLoad.hide()
+
+        _commands_widget_gridlayout = QtGui.QGridLayout(self.commands_widget)
+        _commands_widget_gridlayout.addWidget(self.position_label, 0, 0)
+        _commands_widget_gridlayout.addWidget(self.selected_spinbox, 0, 1)
+        _commands_widget_gridlayout.addWidget(self.holderLengthLabel, 1, 0)
+        _commands_widget_gridlayout.addWidget(self.holderLength,1, 1)
+        _commands_widget_gridlayout.addWidget(self.holderLengthUnit, 1, 2)
+        #_commands_widget_gridlayout.addWidget(self.buttonLoad, 2, 0, 2, 2)
+        #self.commands_widget.setLayout(_commands_widget_gridlayout)
+
+        _current_sample_view_widget_vlayout = QtGui.QVBoxLayout(_current_sample_view_widget)
+        _current_sample_view_widget_vlayout.addWidget(self.state_label)
+        _current_sample_view_widget_vlayout.addWidget(self.commands_widget)
+        _current_sample_view_widget_vlayout.setSpacing(0)
+        _current_sample_view_widget_vlayout.setContentsMargins(0, 0, 0, 0)
+        #_current_sample_view_widget.setLayout(_current_sample_view_widget_vlayout)
+
+        self.contents_widget_hlayout.addWidget(_current_sample_view_widget)
+
+        self.selected_spinbox.valueChanged.connect(self.selectedChanged)
+        self.selected_spinbox.lineEdit().textChanged.connect(self.selectionTextChanged)
 
         self.commandsWidget.append(self.holderLengthLabel)
         self.commandsWidget.append(self.holderLength)
         self.commandsWidget.append(self.holderLengthUnit)
         self.commandsWidget.append(self.buttonLoad)
-        self.commandsWidget.append(self.selected)
-        self.commandsWidget.append(self.positionLabel)
-        self.commandsWidget.append(self.stateBox)
+        self.commandsWidget.append(self.selected_spinbox)
+        self.commandsWidget.append(self.position_label)
+        self.commandsWidget.append(self.state_label)
 
     def setHolderLength(self,length):
         self.holderLength.setValue(length)
@@ -418,205 +431,231 @@ class CurrentSampleView(CurrentView):
             self.holderLengthUnit.show()
 
     def setLoaded(self,state):
-        matrix=self.loadedMatrixCode
+        matrix=self.loaded_matrix_code
         if not matrix:
-            if self.loadedLocation is not None:
-                matrix="%d:%02d" % (self.loadedLocation[0],self.loadedLocation[1])
+            if self.loaded_location is not None:
+                matrix = "%d:%02d" % (self.loaded_location[0], self.loaded_location[1])
             else:
-                matrix="sample"
+                matrix = "sample"
 
         if state is None:
             self.holderLengthLabel.setEnabled(True)
             self.holderLength.setEnabled(True)
             self.holderLengthUnit.setEnabled(True)
-            self.buttonLoad.setTextLabel("Mount %s" % matrix)
+            self.buttonLoad.setText("Mount %s" % matrix)
             self.setStateColor('UNKNOWN')
             self.setStateMsg("Unknown mounting state")
-            if self.loadIcon is not None:        
-                self.buttonLoad.setPixmap(self.loadIcon)
+            if self.load_icon is not None:        
+                self.buttonLoad.setIcon(self.load_icon)
         elif state:
             self.holderLengthLabel.setEnabled(False)
             self.holderLength.setEnabled(False)
             self.holderLengthUnit.setEnabled(False)
-            self.buttonLoad.setTextLabel("Unmount %s" % matrix)
+            self.buttonLoad.setText("Unmount %s" % matrix)
             self.setStateColor('LOADED')
             self.setStateMsg("Sample is mounted")
-            if self.unloadIcon is not None:
-                self.buttonLoad.setPixmap(self.unloadIcon)
+            if self.unload_icon is not None:
+                self.buttonLoad.setIcon(self.unload_icon)
         else:
             self.holderLengthLabel.setEnabled(True)
             self.holderLength.setEnabled(True)
             self.holderLengthUnit.setEnabled(True)
-            self.buttonLoad.setTextLabel("Mount %s" % matrix)
+            self.buttonLoad.setText("Mount %s" % matrix)
             self.setStateColor('UNLOADED')
             self.setStateMsg("No mounted sample")
-            if self.loadIcon is not None:        
-                self.buttonLoad.setPixmap(self.loadIcon)
+            if self.load_icon is not None:        
+                self.buttonLoad.setIcon(self.load_icon)
 
     def setStateMsg(self,msg):
         if msg is None:
             msg=""
-        self.stateLabel.setText(msg)
-        self.emit(PYSIGNAL("sample_changer_state"), (msg,))
+        self.state_label.setText(msg)
+        self.emit(QtCore.SIGNAL("sample_changer_state"), (msg,))
 
     def setStateColor(self,state):
         color = SC_SAMPLE_COLOR.get(state)
         if color  is None:
-            color = QWidget.paletteBackgroundColor(self)
+            color = Qt4_widget_colors.LINE_EDIT_ORIGINAL
         else:
-            self.stateLabel.setPaletteBackgroundColor(color)
+            Qt4_widget_colors.set_widget_color(self.state_label, color)
 
     def setIcons(self,load_icon,unload_icon):
-        self.loadIcon=Icons.load(load_icon)
-        self.unloadIcon=Icons.load(unload_icon)
-        txt=str(self.buttonLoad.textLabel()).split()[0]
-        if txt=="Mount":
-            self.buttonLoad.setPixmap(self.loadIcon)
-        elif txt=="Unmount":
-            self.buttonLoad.setPixmap(self.unloadIcon)
+        self.load_icon = Qt4_Icons.load_icon(load_icon)
+        self.unload_icon = Qt4_Icons.load_icon(unload_icon)
+        txt=str(self.buttonLoad.text()).split()[0]
+        if txt == "Mount":
+            self.buttonLoad.setIcon(self.load_icon)
+        elif txt == "Unmount":
+            self.buttonLoad.setIcon(self.unload_icon)
 
     def setLoadedMatrixCode(self,code):
         #print "SampleSelection.setLoadedMatrixCode",code
-        self.loadedMatrixCode=code
-        txt=str(self.buttonLoad.textLabel()).split()[0]
+        self.loaded_matrix_code=code
+        txt=str(self.buttonLoad.text()).split()[0]
         if code is None:
-            self.buttonLoad.setTextLabel("%s sample" % txt)
+            self.buttonLoad.setText("%s sample" % txt)
         else:
-            self.buttonLoad.setTextLabel("%s %s" % (txt,code))
+            self.buttonLoad.setText("%s %s" % (txt,code))
 
     def setLoadedLocation(self,location):
         #print "SampleSelection.setLoadedLocation",location
-        self.loadedLocation=location
-        if not self.loadedMatrixCode and location:
-            txt=str(self.buttonLoad.textLabel()).split()[0]
-            self.buttonLoad.setTextLabel("%s %d:%02d" % (txt,location[0],location[1]))
+        self.loaded_location=location
+        if not self.loaded_matrix_code and location:
+            txt=str(self.buttonLoad.text()).split()[0]
+            self.buttonLoad.setText("%s %d:%02d" % (txt,location[0],location[1]))
 
     #def buttonClicked(self):
     #    holder_len=self.getHolderLength()
     #    txt=str(self.buttonLoad.textLabel()).split()[0]
     #    if txt=="Mount":
-    #        self.emit(PYSIGNAL("loadSample"),(holder_len,))
+    #        self.emit(QtCore.SIGNAL("loadSample"),(holder_len,))
     #    elif txt=="Unmount":
-    #        self.emit(PYSIGNAL("unloadSample"),(holder_len,self.loadedMatrixCode,self.loadedLocation))
+    #        self.emit(QtCore.SIGNAL("unloadSample"),(holder_len,self.loaded_matrix_code,self.loaded_location))
 
 class StatusView(QtGui.QWidget):
     def __init__(self,parent):
         QtGui.QWidget.__init__(self, parent)
 
-        self.contentsBox= QtGui.QGroupBox("Unknown",self) #vertical
+        # Hardware objects ----------------------------------------------------
 
-        #self.contentsBox.setInsideMargin(4)
-        #self.contentsBox.setInsideSpacing(2)
-        #self.contentsBox.setAlignment(Qt.AlignHCenter)
+        # Internal variables --------------------------------------------------
+        self.in_expert_mode=False
+        self.last_sc_in_use=False
 
-        self.box1=QHBox(self.contentsBox, 'content_box')
+        # Properties ----------------------------------------------------------
 
-        self.lblStatus = QLabel("",self.box1)
-        self.lblStatus.setAlignment(Qt.AlignCenter)
-        flags=self.lblStatus.alignment()|Qt.WordBreak
-        self.lblStatus.setAlignment(flags)
+        # Signals ------------------------------------------------------------
 
-        self.buttonReset = QToolButton(self.box1)
-        self.buttonReset.setTextLabel("Reset")
-        self.buttonReset.setUsesTextLabel(True)
-        self.buttonReset.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
-        self.buttonReset.setEnabled(False)
-        QObject.connect(self.buttonReset,SIGNAL("clicked()"),self.resetSampleChanger)
+        # Slots --------------------------------------------------------------
 
-        self.box2=QVBox(self.contentsBox)
-        self.scCanLoad=QRadioButton("Sample changer can load/unload",self.box2)
-        QObject.connect(self.scCanLoad,SIGNAL("clicked()"),self.sampleChangerMoveToLoadingPos)
-        self.minidiffCanMove=QRadioButton("Minidiff motors can move",self.box2)
-        QObject.connect(self.minidiffCanMove,SIGNAL("clicked()"),self.minidiffGetControl)
+        # Graphic elements ----------------------------------------------------
+        self.contents_widget = QtGui.QGroupBox("Unknown", self)
+        self.box1 = QtGui.QWidget(self.contents_widget)
 
-        #self.contentsBox.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)    
-        QVBoxLayout(self)
-        self.layout().addWidget(self.contentsBox)
+        self.status_label = QtGui.QLabel("", self.box1)
+        self.status_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.inExpert=False
-        self.lastSCInUse=False
+        #flags=self.status_label.alignment()|QtCore.Qt.WordBreak
+        #self.status_label.setAlignment(flags)
+
+        self.reset_button = QtGui.QToolButton(self.box1)
+        self.reset_button.setText("Reset")
+        self.reset_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                        QtGui.QSizePolicy.Fixed)
+        self.reset_button.setEnabled(False)
+
+        self.sc_can_load_radiobutton = QtGui.QRadioButton(\
+             "Sample changer can load/unload", self.contents_widget)
+        self.minidiff_can_move_radiobutton = QtGui.QRadioButton(\
+             "Minidiff motors can move", self.contents_widget)
+
+        # Layout --------------------------------------------------------------
+        _box1_hlayout = QtGui.QHBoxLayout(self.box1)
+        _box1_hlayout.addWidget(self.status_label)
+        _box1_hlayout.addWidget(self.reset_button)
+        _box1_hlayout.setSpacing(0)
+        _box1_hlayout.setContentsMargins(0,0,0,0)
+
+        _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
+        _contents_widget_vlayout.addWidget(self.box1)
+        _contents_widget_vlayout.addWidget(self.sc_can_load_radiobutton)
+        _contents_widget_vlayout.addWidget(self.minidiff_can_move_radiobutton)
+        _contents_widget_vlayout.setSpacing(0)
+        _contents_widget_vlayout.setContentsMargins(0,0,0,0) 
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.contents_widget)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+
+        # SizePolicies --------------------------------------------------------
+
+        # Qt signal/slot connections ------------------------------------------
+        self.reset_button.clicked.connect(self.resetSampleChanger)
+        self.sc_can_load_radiobutton.clicked.connect(self.sampleChangerMoveToLoadingPos)
+        self.minidiff_can_move_radiobutton.clicked.connect(self.minidiffGetControl)
 
     def setIcons(self,reset_icon):
-        self.buttonReset.setPixmap(Icons.load(reset_icon))
+        self.reset_button.setIcon(Qt4_Icons.load_icon(reset_icon))
 
     def setStatusMsg(self, status):
         #print "SAMPLE CHANGER MSG IS",status
-        QToolTip.add(self.lblStatus,status)
+        self.status_label.setToolTip(status)
         status = status.strip()
-        self.lblStatus.setText(status)
-        color = self.lblStatus.paletteBackgroundColor()
-        self.emit(PYSIGNAL("status_msg_changed"), (status, color))
+        self.status_label.setText(status)
+        self.emit(QtCore.SIGNAL("status_msg_changed"), (status, Qt4_widget_colors.LINE_EDIT_ORIGINAL))
 
     def setState(self,state):
         #logging.getLogger().debug('SampleChangerBrick2: state changed (%s)' % state)
         color = SC_STATE_COLOR.get(state, None)
         if color is None:
-            color = QWidget.paletteBackgroundColor(self)
+            color = Qt4_widget_colors.LINE_EDIT_ORIGINAL
         else:
-            self.lblStatus.setPaletteBackgroundColor(color)
+            Qt4_widget_colors.set_widget_color(self.status_label, color)
 
         state_str = SampleChangerState.tostring(state)
-        self.contentsBox.setTitle(state_str)
+        self.contents_widget.setTitle(state_str)
         
         enabled=SC_STATE_GENERAL.get(state, False)
-        self.lblStatus.setEnabled(enabled)
+        self.status_label.setEnabled(enabled)
         if state==SampleChangerState.Fault:
-            self.buttonReset.setEnabled(True)
+            self.reset_button.setEnabled(True)
         else:
-            self.buttonReset.setEnabled(enabled and self.inExpert)
-        self.box2.setEnabled(enabled)
+            self.reset_button.setEnabled(enabled and self.in_expert_mode)
+        self.sc_can_load_radiobutton.setEnabled(enabled)
+        self.minidiff_can_move_radiobutton.setEnabled(enabled)
 
     def setExpertMode(self,state):
-        self.inExpert=state
-        self.buttonReset.setEnabled(state)
-        self.minidiffCanMove.setEnabled(state)
+        self.in_expert_mode=state
+        self.reset_button.setEnabled(state)
+        self.minidiff_can_move_radiobutton.setEnabled(state)
         if state:
-            self.scCanLoad.setEnabled(self.lastSCInUse)
+            self.sc_can_load_radiobutton.setEnabled(self.last_sc_in_use)
         else:
-            self.scCanLoad.setEnabled(False)
+            self.sc_can_load_radiobutton.setEnabled(False)
 
     def hideOperationalControl(self,is_microdiff):
         if is_microdiff:
-            self.scCanLoad.hide()
-            self.minidiffCanMove.hide()
+            self.sc_can_load_radiobutton.hide()
+            self.minidiff_can_move_radiobutton.hide()
         else:
-            self.scCanLoad.show()
-            self.minidiffCanMove.show()
+            self.sc_can_load_radiobutton.show()
+            self.minidiff_can_move_radiobutton.show()
 
     def setSampleChangerUseStatus(self,in_use):
-        self.lastSCInUse=in_use
-        self.scCanLoad.setEnabled(in_use and self.inExpert)
+        self.last_sc_in_use=in_use
+        self.sc_can_load_radiobutton.setEnabled(in_use and self.in_expert_mode)
 
     def setSampleChangerLoadStatus(self,can_load):
-        self.setSampleChangerUseStatus(self.lastSCInUse)
-        self.scCanLoad.setChecked(can_load)
+        self.setSampleChangerUseStatus(self.last_sc_in_use)
+        self.sc_can_load_radiobutton.setChecked(can_load)
 
     def setMinidiffStatus(self,can_move):
-        self.minidiffCanMove.setEnabled(self.inExpert)
-        self.minidiffCanMove.setChecked(can_move)
+        self.minidiff_can_move_radiobutton.setEnabled(self.in_expert_mode)
+        self.minidiff_can_move_radiobutton.setChecked(can_move)
 
     def resetSampleChanger(self):
-        self.emit(PYSIGNAL("resetSampleChanger"),())
+        self.emit(QtCore.SIGNAL("resetSampleChanger"),())
 
     def sampleChangerMoveToLoadingPos(self):
-        if not self.scCanLoad.isChecked():
-            self.scCanLoad.setChecked(True)
+        if not self.sc_can_load_radiobutton.isChecked():
+            self.sc_can_load_radiobutton.setChecked(True)
             return
-        self.scCanLoad.setEnabled(False)
-        self.minidiffCanMove.setEnabled(False)
-        self.scCanLoad.setChecked(False)
-        self.minidiffCanMove.setChecked(False)
-        self.emit(PYSIGNAL("sampleChangerToLoadingPosition"),())
+        self.sc_can_load_radiobutton.setEnabled(False)
+        self.minidiff_can_move_radiobutton.setEnabled(False)
+        self.sc_can_load_radiobutton.setChecked(False)
+        self.minidiff_can_move_radiobutton.setChecked(False)
+        self.emit(QtCore.SIGNAL("sampleChangerToLoadingPosition"),())
 
     def minidiffGetControl(self):
-        if not self.minidiffCanMove.isChecked():
-            self.minidiffCanMove.setChecked(True)
+        if not self.minidiff_can_move_radiobutton.isChecked():
+            self.minidiff_can_move_radiobutton.setChecked(True)
             return
-        self.scCanLoad.setEnabled(False)
-        self.minidiffCanMove.setEnabled(False)
-        self.scCanLoad.setChecked(False)
-        self.minidiffCanMove.setChecked(False)
-        self.emit(PYSIGNAL("minidiffGetControl"),())
+        self.sc_can_load_radiobutton.setEnabled(False)
+        self.minidiff_can_move_radiobutton.setEnabled(False)
+        self.sc_can_load_radiobutton.setChecked(False)
+        self.minidiff_can_move_radiobutton.setChecked(False)
+        self.emit(QtCore.SIGNAL("minidiffGetControl"),())
 
 class SCCheckBox(QtGui.QCheckBox):
     def setMyState(self,state):
@@ -630,42 +669,46 @@ class ScanBasketsView(QtGui.QWidget):
     def __init__(self,parent):
         QtGui.QWidget.__init__(self,parent)
 
-        self.scanAllIcon = None
-        self.standardColor=None
+        self.scan_all_icon = None
+        self.standard_color = None
+ 
+        self.commandsWidget = []
 
-        self.commandsWidget=[]
+        self.scan_all_baskets_button = QtGui.QToolButton(self)
+        self.scan_all_baskets_button.setText("Scan selected baskets")
+        #self.scan_all_baskets_button.setUsesTextLabel(True)
+        #self.scan_all_baskets_button.setTextPosition(QToolButton.BesideIcon)
 
-        self.buttonScanAll=QToolButton(self)
-        self.buttonScanAll.setTextLabel("Scan selected baskets")
-        self.buttonScanAll.setUsesTextLabel(True)
-        self.buttonScanAll.setTextPosition(QToolButton.BesideIcon)
-        QObject.connect(self.buttonScanAll,SIGNAL("clicked()"),self.scanAllBaskets)
+        self.buttonSelect = QtGui.QToolButton(self)
+        self.buttonSelect.setText("Select")
+        #self.buttonSelect.setUsesTextLabel(True)
+        #self.buttonSelect.setTextPosition(QToolButton.BesideIcon)
+        self.buttonSelect.setEnabled(False)
+        self.buttonSelect.setSizePolicy(QtGui.QSizePolicy.Fixed,
+                                        QtGui.QSizePolicy.Fixed)
 
-        self.buttonSelect=QToolButton(self)
-        self.buttonSelect.setTextLabel("Select")
-        self.buttonSelect.setUsesTextLabel(True)
-        self.buttonSelect.setTextPosition(QToolButton.BesideIcon)
-        self.buttonSelect.hide()
-        self.buttonSelect.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
-        QObject.connect(self.buttonSelect,SIGNAL("clicked()"), self.selectBasketsSamples)
-
-        self.commandsWidget.append(self.buttonScanAll)
+        self.commandsWidget.append(self.scan_all_baskets_button)
         self.commandsWidget.append(self.buttonSelect)
 
-        QHBoxLayout(self)
-        self.layout().addWidget(self.buttonScanAll)
-        self.layout().addWidget(self.buttonSelect)
+        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout.addWidget(self.scan_all_baskets_button)
+        _main_hlayout.addWidget(self.buttonSelect)
+        _main_hlayout.setSpacing(0)
+        _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
-    def setIcons(self,scan_all_icon,scan_select):
-        self.scanAllIcon=Icons.load(scan_all_icon)
-        self.buttonScanAll.setPixmap(self.scanAllIcon)
-        self.buttonSelect.setPixmap(Icons.load(scan_select))
+        self.scan_all_baskets_button.clicked.connect(self.scanAllBaskets)
+        self.buttonSelect.clicked.connect(self.selectBasketsSamples)
+
+    def setIcons(self, scan_all_icon, scan_select):
+        self.scan_all_icon = Qt4_Icons.load(scan_all_icon)
+        self.scan_all_baskets_button.setIcon(self.scan_all_icon)
+        self.buttonSelect.setIcon(Qt4_Icons.load(scan_select))
 
     def scanAllBaskets(self):
-        self.emit(PYSIGNAL("scanAllBaskets"),())
+        self.emit(QtCore.SIGNAL("scanAllBaskets"))
 
     def selectBasketsSamples(self):
-        self.emit(PYSIGNAL("selectBasketsSamples"), ())
+        self.emit(QtCore.SIGNAL("selectBasketsSamples"))
 
     def setState(self,state):
         enabled=SC_STATE_GENERAL.get(state, False)
@@ -683,6 +726,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         self.addProperty("mnemonic", "string", "")
+        self.addProperty("basketCount", "integer", 5)
         self.addProperty("defaultHolderLength", "integer", 22)
         self.addProperty("icons", "string", "")
         self.addProperty("showSelectButton", "boolean", False)
@@ -697,83 +741,83 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.defineSlot('setSession',())
         self.defineSlot('setCollecting',())
 
-        self.sampleChanger = None
+        self.sample_changer_hwobj = None
+        self.in_expert_mode = None
+        self.basket_count = None
+        self.baskets = [] 
+        self.last_basket_checked = ()
 
-        self.inExpert=None
-        self.lastBasketChecked=()
+        self.contents_widget = QtGui.QWidget(self)
+        self.status = StatusView(self.contents_widget)
+        self.switch_to_sample_transfer_button = QtGui.QPushButton(\
+             "Switch to Sample Transfer mode", self.contents_widget)
+        self.current_basket_view = CurrentBasketView(self.contents_widget)
+        self.current_sample_view = CurrentSampleView(self.contents_widget)
 
-        #self.contentsBox=QVBox(self)
-        #self.contentsBox.setSpacing(10)
-        
-        #self.contentsBox.setInsideMargin(4)
-        #self.contentsBox.setInsideSpacing(2)
-
-        _mount_label = QtGui.QLabel("<b><i>NEW: Mount/unmount samples by right-clicking on the data collection tree on the left</b></i>", self)
-        self.status=StatusView(self)
-        self.switch_to_sample_transfer_button = QtGui.QPushButton("Switch to Sample Transfer mode", self)
-        self.currentBasket=CurrentBasketView(self)
-        self.currentSample=CurrentSampleView(self)
-        #VerticalSpacer(self.contentsBox)
         self.sc_contents_gbox = QtGui.QGroupBox("Contents", self)
-        #self.sc_contents_gbox.setInsideMargin(4)
-        #self.sc_contents_gbox.setInsideSpacing(2)
-        #self.sc_contents_gbox.setAlignment(Qt.AlignHCenter)
-        self.reset_baskets_samples_button = QtGui.QPushButton("Reset sample changer contents", self.sc_contents_gbox)
-        QtCore.QObject.connect(self.reset_baskets_samples_button, QtCore.SIGNAL("clicked()"), self.resetBasketsSamplesInfo)
-
-        self.basket1=BasketView(self.sc_contents_gbox,1)
-        self.basket2=BasketView(self.sc_contents_gbox,2)
-        self.basket3=BasketView(self.sc_contents_gbox,3)
-        self.basket4=BasketView(self.sc_contents_gbox,4)
-        self.basket5=BasketView(self.sc_contents_gbox,5)
-        self.baskets=(self.basket1,self.basket2,self.basket3,self.basket4,self.basket5)
+        self.sc_contents_gbox.setAlignment(QtCore.Qt.AlignHCenter)
+        self.reset_baskets_samples_button = QtGui.QPushButton(\
+             "Reset sample changer contents", self.sc_contents_gbox)
  
-        for i in range(5):
-          QtCore.QObject.connect(self.baskets[i], QtCore.SIGNAL("loadThisSample"),self.loadThisSample)
-          self.baskets[i].setChecked(False)
-          self.baskets[i].setEnabled(False)
+        self.double_click_loads_cbox = SCCheckBox("Double-click loads the sample",self.sc_contents_gbox)
+        self.double_click_loads_cbox.setEnabled(False)
+        self.scan_baskets_view = ScanBasketsView(self.sc_contents_gbox)
 
-        self.doubleClickLoads=SCCheckBox("Double-click loads the sample",self.sc_contents_gbox)
-        self.doubleClickLoads.hide()
-
-        self.scanBaskets=ScanBasketsView(self.sc_contents_gbox)
-
-        self.currentSample.setStateMsg("Unknown smart magnet state")
-        self.currentSample.setStateColor("UNKNOWN")
+        self.current_sample_view.setStateMsg("Unknown smart magnet state")
+        self.current_sample_view.setStateColor("UNKNOWN")
         self.status.setStatusMsg("Unknown sample changer status")
         self.status.setState("UNKNOWN")
 
-        self.basketsSamplesSelectionDialog = BasketsSamplesSelection(self)
+        #self.basketsSamplesSelectionDialog = BasketsSamplesSelection(self)
 
-        VerticalSpacer(self.contentsBox)
-        QVBoxLayout(self)
-        self.layout().addWidget(self.contentsBox)
+        self.sc_contents_gbox_vlayout = QtGui.QVBoxLayout(self.sc_contents_gbox)
+        self.sc_contents_gbox_vlayout.addWidget(self.reset_baskets_samples_button)
+        self.sc_contents_gbox_vlayout.addWidget(self.double_click_loads_cbox)
+        self.sc_contents_gbox_vlayout.addWidget(self.scan_baskets_view) 
+        self.sc_contents_gbox_vlayout.setSpacing(0)
+        self.sc_contents_gbox_vlayout.setContentsMargins(0, 0, 0, 0) 
 
-        QObject.connect(self.status,PYSIGNAL("sampleChangerToLoadingPosition"),self.sampleChangerToLoadingPosition)
-        QObject.connect(self.status,PYSIGNAL("minidiffGetControl"),self.minidiffGetControl)
-        QObject.connect(self.status,PYSIGNAL("resetSampleChanger"),self.resetSampleChanger)
-        QObject.connect(self.switch_to_sample_transfer_button, SIGNAL("clicked()"), self.switchToSampleTransferMode)
+        _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
+        _contents_widget_vlayout.addWidget(self.status)
+        _contents_widget_vlayout.addWidget(self.switch_to_sample_transfer_button)
+        _contents_widget_vlayout.addWidget(self.current_basket_view)
+        _contents_widget_vlayout.addWidget(self.current_sample_view)
+        _contents_widget_vlayout.addWidget(self.sc_contents_gbox)
+        _contents_widget_vlayout.setSpacing(0)
+        _contents_widget_vlayout.addStretch(0)
+        _contents_widget_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.contents_widget.setLayout(_contents_widget_vlayout)
+
+        self.main_vlayout = QtGui.QVBoxLayout(self)
+        self.main_vlayout.addWidget(self.contents_widget)
+        self.main_vlayout.setSpacing(0)
+        self.main_vlayout.setContentsMargins(0, 0, 0, 0)
+        
+        self.reset_baskets_samples_button.clicked.connect(self.resetBasketsSamplesInfo)
+
+        """
+        QObject.connect(self.status,QtCore.SIGNAL("sampleChangerToLoadingPosition"),self.sample_changer_hwobjToLoadingPosition)
+        QObject.connect(self.status,QtCore.SIGNAL("minidiffGetControl"),self.minidiffGetControl)
+        QObject.connect(self.status,QtCore.SIGNAL("resetSampleChanger"),self.resetSampleChanger)
+        QObject.connect(self.switch_to_sample_transfer_button, QtCore.SIGNAL("clicked()"), self.switchToSampleTransferMode)
  
-        QObject.connect(self.currentBasket,PYSIGNAL("selectedChanged"),self.changeBasket)
-        QObject.connect(self.currentBasket,PYSIGNAL("scanBasket"),self.scanBasket)
+        QObject.connect(self.current_basket_view,QtCore.SIGNAL("selectedChanged"),self.changeBasket)
+        QObject.connect(self.current_basket_view,QtCore.SIGNAL("scanBasket"),self.scanBasket)
 
-        QObject.connect(self.currentSample,PYSIGNAL("selectedChanged"),self.changeSample)
-        QObject.connect(self.currentSample,PYSIGNAL("loadSample"),self.loadSample)
-        QObject.connect(self.currentSample,PYSIGNAL("unloadSample"),self.unloadSample)
+        QObject.connect(self.current_sample_view,QtCore.SIGNAL("selectedChanged"),self.changeSample)
+        QObject.connect(self.current_sample_view,QtCore.SIGNAL("loadSample"),self.loadSample)
+        QObject.connect(self.current_sample_view,QtCore.SIGNAL("unloadSample"),self.unloadSample)
 
-        QObject.connect(self.scanBaskets,PYSIGNAL("scanAllBaskets"),self.scanAllBaskets)
-        QObject.connect(self.scanBaskets,PYSIGNAL("selectBasketsSamples"),self.selectBasketsSamples)
-        QObject.connect(self.status, PYSIGNAL("status_msg_changed"), self.status_msg_changed)
+        QObject.connect(self.scanBaskets,QtCore.SIGNAL("scanAllBaskets"),self.scanAllBaskets)
+        QObject.connect(self.scanBaskets,QtCore.SIGNAL("selectBasketsSamples"),self.selectBasketsSamples)
+        QObject.connect(self.status, QtCore.SIGNAL("status_msg_changed"), self.status_msg_changed)
         
         self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
-        self.contentsBox.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
+        self.contents_widget.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
+        """
 
-    def propertyChanged(self, propertyName, oldValue, newValue):
-
-        BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
-        return
-
-        if propertyName == 'icons':
+    def propertyChanged(self, property_name, oldValue, newValue):
+        if property_name == 'icons':
             icons_list=newValue.split()
 
             try:
@@ -782,68 +826,77 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                 pass
 
             try:
-                self.currentBasket.setIcons(icons_list[1])
+                self.current_basket_view.setIcons(icons_list[1])
             except IndexError:
                 pass
 
             try:
-                self.scanBaskets.setIcons(icons_list[2],icons_list[3])
+                self.scan_baskets_view.setIcons(icons_list[2],icons_list[3])
             except IndexError:
                 pass
 
             try:
-                self.currentSample.setIcons(icons_list[5],icons_list[6])
+                self.current_sample_view.setIcons(icons_list[5],icons_list[6])
             except IndexError:
                 pass
-
-        elif propertyName == 'mnemonic':
-            self.sampleChanger = self.getHardwareObject(newValue)
-            if self.sampleChanger is not None:
-                self.connect(self.sampleChanger, SampleChanger.STATUS_CHANGED_EVENT, self.sampleChangerStatusChanged)
-                self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT, self.sampleChangerStateChanged)
-                self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, self.infoChanged)
-                self.connect(self.sampleChanger, SampleChanger.SELECTION_CHANGED_EVENT, self.selectionChanged)
-                #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
-                #self.connect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
-                #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
-                self.connect(self.sampleChanger, SampleChanger.LOADED_SAMPLE_CHANGED_EVENT, self.loadedSampleChanged)
+        elif property_name == 'basketCount':
+            self.basket_count = newValue
+           
+            for basket_index in range(self.basket_count):
+                temp_basket = BasketView(self.sc_contents_gbox, basket_index)
+                QtCore.QObject.connect(temp_basket, QtCore.SIGNAL("load_this_sample"),self.load_this_sample)
+                temp_basket.setChecked(False)
+                temp_basket.setEnabled(False)
+                self.baskets.append(temp_basket)
+                self.sc_contents_gbox_vlayout.addWidget(temp_basket)
+        elif property_name == 'mnemonic':
+            self.sample_changer_hwobj = self.getHardwareObject(newValue)
+            if self.sample_changer_hwobj is not None:
+                self.connect(self.sample_changer_hwobj, SampleChanger.STATUS_CHANGED_EVENT, self.sc_status_changed)
+                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT, self.sc_state_changed)
+                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, self.infoChanged)
+                self.connect(self.sample_changer_hwobj, SampleChanger.SELECTION_CHANGED_EVENT, self.selectionChanged)
+                #self.connect(self.sample_changer_hwobj, QtCore.SIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
+                #self.connect(self.sample_changer_hwobj, QtCore.SIGNAL("minidiffCanMove"), self.minidiff_can_move_radiobutton)
+                #self.connect(self.sample_changer_hwobj, QtCore.SIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
+                self.connect(self.sample_changer_hwobj, SampleChanger.LOADED_SAMPLE_CHANGED_EVENT, self.loadedSampleChanged)
                  
-                #self.currentSample.hideHolderLength(self.sampleChanger.isMicrodiff())
-                #self.status.hideOperationalControl(self.sampleChanger.isMicrodiff())
-                self.sampleChangerStatusChanged(self.sampleChanger.getStatus())
-                self.sampleChangerStateChanged(self.sampleChanger.getState())
+                #self.current_sample_view.hideHolderLength(self.sample_changer_hwobj.isMicrodiff())
+                #self.status.hideOperationalControl(self.sample_changer_hwobj.isMicrodiff())
+                self.sc_status_changed(self.sample_changer_hwobj.getStatus())
+                self.sc_state_changed(self.sample_changer_hwobj.getState())
                 self.infoChanged()
                 self.selectionChanged()
-                #self.sampleChangerInUse(self.sampleChanger.sampleChangerInUse())
-                #self.sampleChangerCanLoad(self.sampleChanger.sampleChangerCanLoad())
-                #self.minidiffCanMove(self.sampleChanger.minidiffCanMove())
-                self.loadedSampleChanged(self.sampleChanger.getLoadedSample())
-                #self.basketTransferModeChanged(self.sampleChanger.getBasketTransferMode())
-        elif propertyName == 'showSelectButton':
-            self.scanBaskets.showSelectButton(newValue)
+                #self.sample_changer_hwobjInUse(self.sampleChanger.sampleChangerInUse())
+                #self.sample_changer_hwobjCanLoad(self.sampleChanger.sampleChangerCanLoad())
+                #self.minidiff_can_move_radiobutton(self.sample_changer_hwobj.minidiffCanMove())
+                self.loadedSampleChanged(self.sample_changer_hwobj.getLoadedSample())
+                #self.basketTransferModeChanged(self.sample_changer_hwobj.getBasketTransferMode())
+        elif property_name == 'showSelectButton':
+            self.scan_baskets_view.showSelectButton(newValue)
             for basket in self.baskets:
                 basket.setUnselectable(newValue)
-        elif propertyName == 'defaultHolderLength':
-            self.currentSample.setHolderLength(newValue)
-        elif propertyName == 'doubleClickLoads':
-            self.doubleClickLoads.setChecked(False) #newValue)
+        elif property_name == 'defaultHolderLength':
+            self.current_sample_view.setHolderLength(newValue)
+        #elif property_name == 'doubleClickLoads':
+        #    self.double_click_loads_cbox.setChecked(False) #newValue)
         else:
-            BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
+            BlissWidget.propertyChanged(self,property_name,oldValue,newValue)
 
     def status_msg_changed(self, msg, color):
-        self.emit(PYSIGNAL("status_msg_changed"), (msg, color))
+        self.emit(QtCore.SIGNAL("status_msg_changed"), (msg, color))
 
     def selectionChanged(self):
-        sample = self.sampleChanger.getSelectedSample()
-        basket = self.sampleChanger.getSelectedComponent()
+        sample = self.sample_changer_hwobj.getSelectedSample()
+        basket = self.sample_changer_hwobj.getSelectedComponent()
         if sample is None:
-            self.currentSample.setSelected(0)
+            self.current_sample_view.setSelected(0)
         else:
-            self.currentSample.setSelected(sample.getIndex()+1)
+            self.current_sample_view.setSelected(sample.getIndex()+1)
         if basket is None:
-            self.currentBasket.setSelected(0)
+            self.current_basket_view.setSelected(0)
         else:
-            self.currentBasket.setSelected(basket.getIndex()+1)
+            self.current_basket_view.setSelected(basket.getIndex()+1)
 
     def instanceModeChanged(self,mode):
         if mode==BlissWidget.INSTANCE_MODE_SLAVE:
@@ -853,12 +906,12 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.switch_to_sample_transfer_button.setEnabled(basket_transfer)
 
     def switchToSampleTransferMode(self):
-        self.sampleChanger.changeMode(SampleChangerMode.Normal, wait=False)
+        self.sample_changer_hwobj.changeMode(SampleChangerMode.Normal, wait=False)
 
     def loadedSampleChanged(self,sample):
         if sample is None:
             # get current location in SC
-            sample = self.sampleChanger.getSelectedSample()
+            sample = self.sample_changer_hwobj.getSelectedSample()
             loaded = False
         else:
             loaded = True
@@ -871,36 +924,36 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             barcode = sample.getID()
             location = sample.getCoords()
  
-        self.currentSample.setLoadedMatrixCode(barcode)
-        self.currentSample.setLoadedLocation(location)
-        self.currentSample.setLoaded(loaded)
+        self.current_sample_view.setLoadedMatrixCode(barcode)
+        self.current_sample_view.setLoadedLocation(location)
+        self.current_sample_view.setLoaded(loaded)
 
         if loaded:
-            self.emit(PYSIGNAL("sampleGotLoaded"),())
+            self.emit(QtCore.SIGNAL("sampleGotLoaded"),())
 
 
     def setCollecting(self,enabled_state):
         self.setEnabled(enabled_state)
 
     def resetSampleChanger(self):
-        self.sampleChanger.reset()
+        self.sample_changer_hwobj.reset()
 
     def resetBasketsSamplesInfo(self):
-        self.sampleChanger.clearInfo()
+        self.sample_changer_hwobj.clearInfo()
  
     def setSession(self,session_id):
         pass
 
     def setExpertMode(self,state):
-        self.inExpert=state
-        if self.sampleChanger is not None:
+        self.in_expert_mode=state
+        if self.sample_changer_hwobj is not None:
             self.status.setExpertMode(state)
 
     def run(self):
-        if self.inExpert is not None:
-            self.setExpertMode(self.inExpert)
+        if self.in_expert_mode is not None:
+            self.setExpertMode(self.in_expert_mode)
         try:
-            self.matrixCodesChanged(self.sampleChanger.getMatrixCodes())
+            self.matrixCodesChanged(self.sample_changer_hwobj.getMatrixCodes())
         except:
             pass
 
@@ -915,20 +968,20 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         pass
 
     def sampleUnloadFail(self,state):
-        self.sampleChangerStateChanged(state)
+        self.sample_changer_hwobjStateChanged(state)
 
-    def sampleChangerStatusChanged(self,status):
+    def sc_status_changed(self,status):
         self.status.setStatusMsg(status)
 
-    def sampleChangerStateChanged(self, state, previous_state=None):
+    def sc_state_changed(self, state, previous_state=None):
         logging.getLogger().debug('SampleChangerBrick3: state changed (%s)' % state)
         self.status.setState(state)
-        self.currentBasket.setState(state)
-        self.currentSample.setState(state)
+        self.current_basket_view.setState(state)
+        self.current_sample_view.setState(state)
         for basket in self.baskets:
             basket.setState(state)
-        #self.doubleClickLoads.setMyState(state)
-        self.scanBaskets.setState(state)
+        #self.double_click_loads_cbox.setMyState(state)
+        self.scan_baskets_view.setState(state)
         self.reset_baskets_samples_button.setEnabled(SC_STATE_GENERAL.get(state, False))
 
     def sampleChangerCanLoad(self,can_load):
@@ -941,42 +994,41 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.status.setMinidiffStatus(can_move)
 
     def sampleChangerToLoadingPosition(self):
-        if not self.sampleChanger.sampleChangerToLoadingPosition():
-            self.status.setSampleChangerLoadStatus(self.sampleChanger.sampleChangerCanLoad())
+        if not self.sample_changer_hwobj.sampleChangerToLoadingPosition():
+            self.status.setSampleChangerLoadStatus(self.sample_changer_hwobj.sampleChangerCanLoad())
 
     def minidiffGetControl(self):
-        if not self.sampleChanger.minidiffGetControl():
-            self.status.setMinidiffStatus(self.sampleChanger.minidiffCanMove())
+        if not self.sample_changer_hwobj.minidiffGetControl():
+            self.status.setMinidiffStatus(self.sample_changer_hwobj.minidiffCanMove())
 
     def changeBasket(self,basket_number):
         address = SC3.Basket.getBasketAddress(basket_number)
-        self.sampleChanger.select(address, wait=False)
+        self.sample_changer_hwobj.select(address, wait=False)
 
     def changeSample(self,sample_number):
-        basket_index = self.sampleChanger.getSelectedComponent().getIndex()
+        basket_index = self.sample_changer_hwobj.getSelectedComponent().getIndex()
         basket_number = basket_index + 1
         address = SC3.Pin.getSampleAddress(basket_number, sample_number)
-        self.sampleChanger.select(address, wait=False) 
+        self.sample_changer_hwobj.select(address, wait=False) 
 
-    def loadThisSample(self,basket_index,vial_index):
-        return
-        if self.doubleClickLoads.isChecked():
+    def load_this_sample(self,basket_index,vial_index):
+        if self.double_click_loads_cbox.isChecked():
             sample_loc=(basket_index,vial_index)
-            holder_len=self.currentSample.getHolderLength()
-            self.sampleChanger.load(holder_len,None,sample_loc,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
+            holder_len=self.current_sample_view.getHolderLength()
+            self.sample_changer_hwobj.load(holder_len,None,sample_loc,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
 
     def loadSample(self,holder_len):
-        self.sampleChanger.load(holder_len,None,None,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
+        self.sample_changer_hwobj.load(holder_len,None,None,self.sampleLoadSuccess,self.sampleLoadFail, wait=False)
 
     def unloadSample(self,holder_len,matrix_code,location):
         if matrix_code:
             location=None
-        self.sampleChanger.unload(holder_len,matrix_code,location,self.sampleUnloadSuccess,self.sampleUnloadFail,wait=False)
+        self.sample_changer_hwobj.unload(holder_len,matrix_code,location,self.sampleUnloadSuccess,self.sampleUnloadFail,wait=False)
 
     def clearMatrices(self):
         for basket in self.baskets:
             basket.clearMatrices()
-        self.emit(PYSIGNAL("scanBasketUpdate"),(None,))
+        self.emit(QtCore.SIGNAL("scanBasketUpdate"),(None,))
 
     def sampleChangerContentsChanged(self, baskets):
         self.clearMatrices()
@@ -990,49 +1042,57 @@ class Qt4_SampleChangerBrick3(BlissWidget):
 
     def scanBasket(self):
         if not self['showSelectButton']:
-            self.baskets[self.currentBasket.selected.value()-1].setChecked(True)
-        self.sampleChanger.scan(self.sampleChanger.getSelectedComponent(), recursive=True, wait=False)
+            self.baskets[self.current_basket_view.selected.value()-1].setChecked(True)
+        self.sample_changer_hwobj.scan(self.sampleChanger.getSelectedComponent(), recursive=True, wait=False)
 
     def scanAllBaskets(self):
         baskets_to_scan = []
         for i, basket_checkbox in enumerate(self.baskets):
           baskets_to_scan.append(SC3.Basket.getBasketAddress(i+1) if basket_checkbox.isChecked() else None)
          
-        self.sampleChanger.scan(filter(None, baskets_to_scan), recursive=True, wait=False)
+        self.sample_changer_hwobj.scan(filter(None, baskets_to_scan), recursive=True, wait=False)
 
     def infoChanged(self):
-        baskets = self.sampleChanger.getComponents()
-        
+        baskets_at_sc = self.sample_changer_hwobj.getComponents()        
         presences = []
-        for basket in baskets:
-            presences.append([[VialView.VIAL_UNKNOWN]]*10 if basket.isPresent() else [[VialView.VIAL_NONE]]*10)
+        for basket in baskets_at_sc:
+            presences.append([[VialView.VIAL_UNKNOWN]] * 10 if \
+               basket.isPresent() else [[VialView.VIAL_NONE]]*10)
      
-        for sample in self.sampleChanger.getSampleList():
+        for sample in self.sample_changer_hwobj.getSampleList():
             matrix = sample.getID() or ""
             basket_index = sample.getContainer().getIndex()
             vial_index = sample.getIndex()   
             basket_code = sample.getContainer().getID()  
             if sample.isPresent():
-              if matrix:
-                presences[basket_index][vial_index]=[VialView.VIAL_ALREADY_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_BARCODE,matrix]
-              else:
-                presences[basket_index][vial_index]=[VialView.VIAL_NOBARCODE_LOADED, matrix] if sample.hasBeenLoaded() else [VialView.VIAL_NOBARCODE,matrix]
+                if matrix:
+                    if sample.hasBeenLoaded():
+                        presences[basket_index][vial_index] = \
+                            [VialView.VIAL_ALREADY_LOADED, matrix] 
+                    else:
+                        presences[basket_index][vial_index] = \
+                            [VialView.VIAL_BARCODE, matrix]
+                else:
+                    if sample.hasBeenLoaded(): 
+                        presences[basket_index][vial_index] = \
+                           [VialView.VIAL_NOBARCODE_LOADED, matrix]
+                    else:
+                        presences[basket_index][vial_index] = \
+                           [VialView.VIAL_NOBARCODE, matrix]
             else:     
-               presences[basket_index][vial_index]=[VialView.VIAL_NONE, ""]
+                presences[basket_index][vial_index] = [VialView.VIAL_NONE, ""]
             if sample.isLoaded():
-               presences[basket_index][vial_index]=[VialView.VIAL_AXIS,matrix]
+                presences[basket_index][vial_index] = [VialView.VIAL_AXIS, matrix]
 
-        for i, basket in enumerate(self.baskets):
-            presence=presences[i]
-            basket.setMatrices(presence)
-        
-        #self.emit(PYSIGNAL("scanBasketUpdate"),(cleared_matrix_codes,))
+        for basket_index in range(len(presences)):
+            presence = presences[basket_index]
+            self.baskets[basket_index].setMatrices(presence)
 
     def selectBasketsSamples(self):
         retval=self.basketsSamplesSelectionDialog.exec_loop()
 
         if retval == QDialog.Accepted:
-            self.sampleChanger.resetBasketsInformation()
+            self.sample_changer_hwobj.resetBasketsInformation()
 
             for basket, samples in self.basketsSamplesSelectionDialog.result.iteritems():
                 for i in range(10):
@@ -1041,7 +1101,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                 for sample in samples:
                     input[1]=sample
                     input[2]=1
-                    self.sampleChanger.setBasketSampleInformation(input)
+                    self.sample_changer_hwobj.setBasketSampleInformation(input)
 
 class HorizontalSpacer(QtGui.QWidget):
     def __init__(self,*args):
@@ -1086,10 +1146,10 @@ class BasketsSamplesSelection(QtGui.QDialog):
             self.txtPresentSamples[-1].setText("1-10")
             self.samplesBoxes[-1].show()
         
-        QObject.connect(self.txtPresentBaskets, SIGNAL("textChanged(const QString&)"), self.presentBasketsChanged)
-        QObject.connect(self.cmdResetContents, SIGNAL("clicked()"), self.resetContents)
-        QObject.connect(self.cmdOk, SIGNAL("clicked()"), self.setSampleChangerContents)
-        QObject.connect(self.cmdCancel, SIGNAL("clicked()"), self.reject)
+        QObject.connect(self.txtPresentBaskets, QtCore.SIGNAL("textChanged(const QString&)"), self.presentBasketsChanged)
+        QObject.connect(self.cmdResetContents, QtCore.SIGNAL("clicked()"), self.resetContents)
+        QObject.connect(self.cmdOk, QtCore.SIGNAL("clicked()"), self.setSampleChangerContents)
+        QObject.connect(self.cmdCancel, QtCore.SIGNAL("clicked()"), self.reject)
 
         QVBoxLayout(self, 5, 5)
         self.layout().addWidget(self.cmdResetContents)

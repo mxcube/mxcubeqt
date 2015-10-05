@@ -293,13 +293,10 @@ class BasketQueueItem(QueueItem):
     In principle is just a group of samples (for example puck)
     """
     def __init__(self, *args, **kwargs):
-        #kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
-        #kwargs['deletable'] = False
         QueueItem.__init__(self, *args, **kwargs)
 
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        #kwargs['controller'] = qt.QCheckListItem.CheckBoxController
         kwargs['deletable'] = True
         
         QueueItem.__init__(self, *args, **kwargs)
@@ -343,70 +340,6 @@ class GenericWorkflowQueueItem(TaskQueueItem):
 class SampleCentringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
-
-
-#
-# Functional API for QListItems
-#
-def perform_on_children(node, cond, fun):
-    if isinstance(node, QtGui.QTreeWidget): 
-        child = node.topLevelItem(0) 
-    else:
-        child = node.child(0)
-    result = []
-
-    while child:
-        if isinstance(child, QueueItem):
-            if cond(child):
-                res = fun(child)
-                if res:
-                    result.append(res)
-
-            result.extend(perform_on_children(child, cond, fun))
-
-        #child = child.treeWidget().itemBelow(child) 
-
-        if child.parent():
-            parent = child.parent()
-            child_index = parent.indexOfChild(child)
-            child = parent.child(child_index + 1)
-        else:
-            child = None
-
-    return result    
-
-def is_selected(node):
-    return node.isSelected()
-
-def is_selected_sample(node):
-    return node.isSelected() and isinstance(node, SampleQueueItem)
-
-def is_selected_dc(node):
-    return node.isSelected() and isinstance(node, DataCollectionQueueItem)
-
-def is_selected_task_node(node):
-    return node.isSelected() and isinstance(node, DataCollectionGroupQueueItem)
-
-def is_selected_task(node):
-    return node.isSelected() and isinstance(node, TaskQueueItem)
-
-def is_task(node):
-    return isinstance(node, TaskQueueItem)
-
-def is_sample(node):
-    return isinstance(node, SampleQueueItem)
-
-def get_item(node):
-    return node
-
-def is_child_on(node):
-    return node.checkState(0) > 0
-
-def is_checked(node):
-    return node.checkState(0) > 0
-
-def print_text(node):
-    print "Executing node: " + node.text()
 
 
 MODEL_VIEW_MAPPINGS = \
