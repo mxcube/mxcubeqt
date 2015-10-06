@@ -37,8 +37,7 @@ class myimage:
         return self.imgcopy
 
 
-def take_snapshots(light, light_motor, phi, zoom, drawing):
-  logging.getLogger("HWR").info("MiniDiffPX2: take_snapshots")
+def take_snapshots(nbImage, light, light_motor, phi, zoom, drawing):
   centredImages = []
 
   if light is not None:
@@ -61,16 +60,12 @@ def take_snapshots(light, light_motor, phi, zoom, drawing):
     while light.getWagoState()!="in":
       time.sleep(0.5)
 
-  for i in range(4):
-     logging.getLogger("HWR").info("MiniDiff: taking snapshot #%d", i+1)
+  for i in range(nbImage):
      centredImages.append((phi.getPosition(),str(myimage(drawing))))
      phi.syncMoveRelative(-90)
      time.sleep(2)
 
   centredImages.reverse() # snapshot order must be according to positive rotation direction
-
-  logging.getLogger("HWR").info("take_snapshots done. returning %d images" % len(centredImages))
-
   return centredImages
 
 
@@ -765,7 +760,7 @@ class MiniDiffPX2(Equipment):
            time.sleep(0.1)
 
 
-    def takeSnapshots(self, wait=False):
+    def takeSnapshots(self, nbImage, wait=False):
         self.camera.forceUpdate = True
         
         # try:
@@ -775,7 +770,8 @@ class MiniDiffPX2(Equipment):
         # if not centring_valid:
         #     logging.getLogger("HWR").error("MiniDiff: you must centre the crystal before taking the snapshots")
         # else:
-        snapshotsProcedure = gevent.spawn(take_snapshots, 
+        snapshotsProcedure = gevent.spawn(take_snapshots,
+                                          nbImage,
                                           self.lightWago, 
                                           self.lightMotor,
                                           self.phiMotor, 
