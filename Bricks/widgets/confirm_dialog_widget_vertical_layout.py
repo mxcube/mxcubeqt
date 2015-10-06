@@ -16,7 +16,7 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
     def __init__(self,parent = None,name = None,fl = 0):
         QWidget.__init__(self,parent,name,fl)
 
-        self.snapshots_list = [4,1,2,0]
+        self.snapshots_list = [4,2,1,0]
 
         if not name:
             self.setName("ConfirmDialogWidgetVerticalLayout")
@@ -45,18 +45,17 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
         cbx_layout.addWidget(self.skip_existing_images_cbx)
 
 
-	take_snapshots_layout = QHBoxLayout(None,0,3,"snapshots_layout")
-
-	self.take_snapshots_label = QLabel(self.summary_gbox, "take_snaphots_label")
-	take_snapshots_layout.addWidget(self.take_snapshots_label)
+     	take_snapshots_layout = QHBoxLayout(None,0,3,"snapshots_layout")
+        self.take_snapshots_label = QLabel(self.summary_gbox, "take_snaphots_label")
+        take_snapshots_layout.addWidget(self.take_snapshots_label)
 
         self.take_snapshots_cbox = QComboBox(self.summary_gbox, "take_snapshosts_cbox")
-	take_snapshots_layout.addWidget(self.take_snapshots_cbox)
-
-	take_snapshots_hspacer = QSpacerItem(1,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        self.take_snapshots_cbox.setCurrentItem(3)
+        take_snapshots_layout.addWidget(self.take_snapshots_cbox)
+        take_snapshots_hspacer = QSpacerItem(1,20,QSizePolicy.Expanding,QSizePolicy.Minimum)
         take_snapshots_layout.addItem(take_snapshots_hspacer)
-
-	cbx_layout.addLayout(take_snapshots_layout)
+        
+        cbx_layout.addLayout(take_snapshots_layout)
 
         self.missing_one_cbx = QCheckBox(self.summary_gbox,"missing_one_cbx")
         cbx_layout.addWidget(self.missing_one_cbx)
@@ -98,11 +97,11 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
         self.summary_label.setText(self.__tr("<summary label>"))
         self.force_dark_cbx.setText(self.__tr("Force dark current"))
         self.skip_existing_images_cbx.setText(self.__tr("Skip already collected images"))
-	self.take_snapshots_label.setText(self.__tr("Number of crystal snapshots:"))
-
-	self.take_snapshots_cbox.clear()
+        self.take_snapshots_label.setText(self.__tr("Number of crystal snapshots:"))
+        
+        self.take_snapshots_cbox.clear()
         for i in self.snapshots_list:
-          self.take_snapshots_cbox.insertItem(self.__tr(str(i)))
+            self.take_snapshots_cbox.insertItem(self.__tr(str(i)))
 		
         self.missing_one_cbx.setText(self.__tr("Missing box one"))
         self.missing_two_cbx.setText(self.__tr("Missing box two"))
@@ -122,4 +121,5 @@ if __name__ == "__main__":
     w = ConfirmDialogWidgetVerticalLayout()
     a.setMainWidget(w)
     w.show()
-    a.exec_loop()
+    a.e
+    xec_loop()
