@@ -48,6 +48,7 @@ class LimaAdscDetector:
         self.wait(self.limaadscdev)
         
         self.limaadscdev.exposuretime = (exptime + lima_overhead) * 1e3
+        #bj.getState() DISABLE
         if (self.limaadscdev.get_timeout_millis() - self.limaadscdev.exposuretime) < 2000:
             self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposuretime) + 2000)
         
@@ -103,7 +104,7 @@ class LimaAdscDetector:
     @task
     def start_acquisition(self, exptime, npass, first_frame):
         logging.info("<SOLEIL MultiCollect> start_acquisition")
-        # Comes from   self.limaadscSnap() in original Martin's thread program
+        # Comes from   self.lenergy_obj.getState() DISABLEimaadscSnap() in original Martin's thread program
         if not self.ready:
             return
         logging.info("<SOLEIL MultiCollect> start_acquisition limaadscdev timeout %s" % self.limaadscdev.get_timeout_millis())
@@ -280,6 +281,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
              self._detector.jpeg_allframes = True
 
         self.test_mode = int(self.getProperty("test_mode"))
+        # A VERIFIER
         self.take_sample_snapshots = int(self.getProperty("take_sample_snapshots"))
         self.move_detector_flag = int(self.getProperty("move_detector_flag"))
         self.move_resolution_flag = int(self.getProperty("move_resolution_flag"))
@@ -579,7 +581,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self.linearFinal = positions['2']
         if step is not None:
             self.linearStep = step
-        
+        #energy_obj.getState() DISABLE
     def set_grid(self, onmode, positions=None):
         logging.info("<PX2 MultiCollect> set grid")
         self.grid = onmode
@@ -611,8 +613,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
         
         center = numpy.array(center)
         nbsteps = numpy.array(nbsteps)
-        lengths = numpy.array(lengths)
-        
+        lengths = numpy.array(lengthsenergy_obj.getState())
         stepsizes = lengths / nbsteps
         
         print 'center', center
@@ -890,14 +891,14 @@ class PX2MultiCollect(SOLEILMultiCollect):
         print 'sync_collect'
         print 'excuting command', 'ssh p10 "rsync -av %s %s"' % (source, self.sync_destination)
         os.system('ssh p10 "rsync -av %s %s"' % (source, self.sync_destination))
-        
-    def should_i_take_snapshots(self, data_collect_parameters):
-        return True
-        if data_collect_parameters['oscillation_sequence'][0]['start_image_number'] != 1:
-            logging.info("<SOLEIL collect>  I will NOT take snapshots")
-            return False
-        logging.info("<SOLEIL collect>  I WILL take snapshots")
-        return True
+    #modif test sans should    
+    #def should_i_take_snapshots(self, data_collect_parameters):
+    #    return True
+    #    if data_collect_parameters['oscillation_sequence'][0]['start_image_number'] != 1:
+    #        logging.info("<SOLEIL collect>  I will NOT take snapshots")
+    #        return False
+    #    logging.info("<SOLEIL collect>  I WILL take snapshots")
+    #    return True
         
     @task
     def do_collect(self, owner, data_collect_parameters, in_multicollect=False):
@@ -976,8 +977,13 @@ class PX2MultiCollect(SOLEILMultiCollect):
             data_collect_parameters["actualContainerBarcode"] = None
 
         try:
-            if data_collect_parameters["take_snapshots"] and self.should_i_take_snapshots(data_collect_parameters) and self.take_sample_snapshots == 1:
-                self.take_crystal_snapshots()
+            if data_collect_parameters["take_snapshots"]: 
+                #and self.should_i_take_snapshots(data_collect_parameters) and self.take_sample_snapshots == 1:
+                #self.take_crystal_snapshots()
+                self.take_crystal_snapshots(data_collect_parameters["take_snapshots"])
+                #bj.getState() DISABLE
+            else :
+                self.diffractometer().centringStatus['images'] = []
         except KeyError:
             pass
         
@@ -988,7 +994,6 @@ class PX2MultiCollect(SOLEILMultiCollect):
             pass
         else:
             centring_info = dict(centring_status)
-
         
         logging.getLogger("HWR").debug("centring_status: %s" % str(centring_status.keys()))
         logging.getLogger("HWR").debug("centring_info: %s" % str(centring_info.keys()))
