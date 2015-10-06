@@ -769,6 +769,10 @@ class HutchMenuBrick(BlissWidget):
 	self.updateBeam(True)
 
     def beamInfoChanged(self, beam_info):
+        try:
+          self.beam_position = self.beamInfo.get_beam_position()
+        except:
+          pass
         self.beam_size = (beam_info["size_x"], beam_info["size_y"])
         self.beam_shape = beam_info["shape"]
         self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
