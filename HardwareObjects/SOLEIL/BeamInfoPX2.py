@@ -40,7 +40,7 @@ class BeamInfoPX2(Equipment):
         Equipment.__init__(self, *args)
 
         self.beam_position = [None, None] # [329, 246] #[None, None]
-        self.beam_size     = [None, None] #[0.010, 0.005] #[None, None]
+        #eam_info_dict['size_y'] = valueself.beam_size     = [None, None] #[0.010, 0.005] #[None, None]
         self.shape         = 'rectangular'
 
         self.beam_info_dict  = {'size_x': None, 'size_y': None, 'shape': self.shape}
@@ -102,13 +102,15 @@ class BeamInfoPX2(Equipment):
 
 
     def beamSizeXChanged(self, value):
-        logging.getLogger().info('beamSizeX changed. It is %s ' % value)
-        self.beam_size[0] = value
+        logging.getLogger().info('Connected channel update beamSizeX changed. It is %s ' % value)
+        #self.beam_size[0] = value
+        self.beam_info_dict['size_x'] = value
         self.sizeUpdated() 
 
     def beamSizeYChanged(self, value):
-        logging.getLogger().info('beamSizeY changed. It is %s ' % value)
-        self.beam_size[1] = value
+        logging.getLogger().info('Connected channel update beamSizeY changed. It is %s ' % value)
+        #self.beam_size[1] = value
+        self.beam_info_dict['size_y'] = value
         self.sizeUpdated() 
 
     def beamPosXChanged(self, value):
@@ -139,18 +141,19 @@ class BeamInfoPX2(Equipment):
         #except:
            #logging.getLogger().info('not handled')
             
-    def sizeUpdated(self):
+    def sizeUpdated2(self):
+        #not used
         self.beam_info_dict['size_x'] = 0.010
         self.beam_info_dict['size_y'] = 0.005
         self.emit("beamInfoChanged", (self.beam_info_dict, ))
 
-    def sizeUpdated2(self):
-        # not used
-        if None in self.beam_size:
-             return
-        self.beam_info_dict['size_x'] = self.beam_size[0]
-        self.beam_info_dict['size_y'] = self.beam_size[1]
-        self.emit("beamInfoChanged", (self.beam_info_dict, ))
+    def sizeUpdated(self):
+        self.beam_info_dict['size_x'] = 0.010
+        self.beam_info_dict['size_y'] = 0.005
+        if self.beam_info_dict['size_x'] != None and  self.beam_info_dict['size_y'] != None:
+            #self.beam_info_dict['size_x'] = self.beam_size[0]
+            #self.beam_info_dict['size_y'] = self.beam_size[1]
+            self.emit("beamInfoChanged", (self.beam_info_dict, ))
 
     def positionUpdated(self):
         self.emit("beamPosChanged", (self.beam_position, ))
