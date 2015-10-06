@@ -88,6 +88,7 @@ class DataPathWidget(qt.QWidget):
             self.set_directory(d)
 
     def _prefix_ledit_change(self, new_value):
+        self.data_path_widget_layout.child('run_number_ledit').setText(str(1))
         self._data_model.base_prefix = str(new_value)
         file_name = self._data_model.get_image_file_name()
         file_name = file_name.replace('%' + self._data_model.precision + 'd',
