@@ -118,7 +118,7 @@ class LimaPilatusDetector:
            self.xformstatusfile   = xformstatusfile
         except:
            import traceback
-           logging.error("<SOLEIL MultiCollect> Cannot initialize LIMA detector")
+           logging.error("<SOLEIL Mulenergy_obj.getState() DISABLEtiCollect> Cannot initialize LIMA detector")
            logging.error( traceback.format_exc() )
             
         else:
@@ -174,7 +174,7 @@ class LimaPilatusDetector:
     def do_oscillation(self, start, end, exptime, npass):
       if self.shutterless:
           if self.new_acquisition:
-              # only do this once per collect
+              # only do this once per collectenergy_obj.getState() DISABLE
               npass = 1
               exptime = self.shutterless_exptime
               end = start + self.shutterless_range
@@ -606,9 +606,11 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         self.bl_config = SOLEILBeamlineConfig(**configuration_parameters)
 
     @task
-    def take_crystal_snapshots(self):
-        logging.info("<SOLEIL MultiCollect> take_crystal_snapshots")
-        self.bl_control.diffractometer.takeSnapshots(wait=True)
+    def take_crystal_snapshots(self,nbImage):
+        if isinstance (nbImage, bool):
+            if number_of_snapshot :
+                nbImage = 0
+        self.bl_control.diffractometer.takeSnapshots(nbImage, wait=True)
 
     #TODO: remove this hook!!!
     @task
@@ -737,7 +739,8 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         while self.bl_control.safety_shutter.getShutterState() == 'closed':
             time.sleep(0.1)
             if (time.time() - t0) > 8:
-                logging.getLogger("user_level_log").error("Cannot open safety shutter. Please check before restarting data collection")
+                logging.getLogger("user_level_log").error("Cannot open safety shutter. Please checg before restarting data collection")
+                #bj.getState() DISABLE
                 break
 
 
