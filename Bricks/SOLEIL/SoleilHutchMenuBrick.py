@@ -89,7 +89,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         self.defineSlot('setSample',())
         #self.defineSlot('enableAutoStartLoopCentring', ())
         self.defineSlot('getSnapshot',())
-        
+        """
         self.sampleCentreBox=QVBox(self)
         #self.sampleCentreBox.setInsideMargin(11)
         #self.sampleCentreBox.setInsideSpacing(0)
@@ -150,7 +150,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         #self.buttonToogleMDPhase.hide()
 
         #HorizontalSpacer3(self.sampleCentreBox)
-
+        """
         self.centringButtons=[]
         self.defaultBackgroundColor=None
         self.insideDataCollection=False        
@@ -168,7 +168,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         # Layout
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         QHBoxLayout(self)        
-        self.layout().addWidget(self.sampleCentreBox)
+        #self.layout().addWidget(self.sampleCentreBox)
 
         self.instanceSynchronize("")
 
@@ -179,7 +179,7 @@ class SoleilHutchMenuBrick(BlissWidget):
             MiniDiff.MiniDiff.C3D_MODE:self.automaticCentreSuccessful}
             #MiniDiff.MiniDiff.MOVE_TO_BEAM_MODE:self.moveToBeamSuccessful}
         
-        self.sampleCentreBox.hide()
+        #self.sampleCentreBox.hide()
 
         self.sampleCentreBox = QHBox(self)
         self.buttonsBox=QHBox(self.sampleCentreBox)
@@ -221,7 +221,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         self.buttonSnapshot.setMinimumSize(QSize(50,40))
         self.buttonSnapshot.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         QObject.connect(self.buttonSnapshot,SIGNAL('clicked()'),self.saveSnapshot)
-
+        
         self.buttonBeamPosition = QToolButton(self.sampleCentreBox)
         self.buttonBeamPosition.setUsesTextLabel(True)
         self.buttonBeamPosition.setTextLabel("BeamPosition")
@@ -770,7 +770,8 @@ class SoleilHutchMenuBrick(BlissWidget):
 
     # Update both zoom and slits when started
     def run(self):
-        logging.getLogger().info("HucthMenuBrick runs")
+        beam_info = self.beamInfo.get_beam_info()
+        logging.getLogger().info("HucthMenuBrick connect to BeamInfo_hwo >>>>>>>>>>>> %s" % beam_info)
         if self.minidiff is not None:
             zoom=self.minidiff.zoomMotor
             if zoom is not None:
@@ -805,8 +806,7 @@ class SoleilHutchMenuBrick(BlissWidget):
             self.__rectangularBeam.setSlitboxSize(0,0)
             self.__rectangularBeam.setColor(Qt.red)
             self.__rectangularBeam.setSlitboxPen(QPen(Qt.blue))
-            #self.beam_position = self.beamInfo.get_beam_position()
-            
+                        
             logging.getLogger().info("HutchMenuBrick rectangular beam OK")
             
             self.__beam, _ = QubAddDrawing(self.__drawing, QubContainerDrawingMgr, QubCanvasBeam) 
@@ -896,17 +896,17 @@ class SoleilHutchMenuBrick(BlissWidget):
                  logging.getLogger().info("rectangle drawn at position %s " % str(self.beam_position))
                  #self.__rectangularBeam.set_xMid_yMid(beam_x,beam_y)
               except AttributeError:
-                 import traceback
-                 logging.getLogger().info("update beam failed 1" + traceback.format_exc())
+                 #import traceback
+                 #logging.getLogger().info("update beam failed 1" + traceback.format_exc())
                  pass
               try:
                  self.__beam.move(self.beam_position[0], self.beam_position[1])
                  self._drawBeam()
               except AttributeError:
-                logging.getLogger().info("update beam failed 2")
-                import traceback
-                logging.getLogger().info("update beam failed 2" + traceback.format_exc())
-    
+                #import traceback
+                #logging.getLogger().info("update beam failed 2" + traceback.format_exc())
+                pass
+
     def beamPosChanged(self, position):
         logging.getLogger().info("hutch menu brick. Beam position chagned.  It is %s" % str(position))
         self.beam_position = position
