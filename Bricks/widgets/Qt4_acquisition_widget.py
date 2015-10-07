@@ -82,11 +82,10 @@ class AcquisitionWidget(QtGui.QWidget):
             self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
         # Layout --------------------------------------------------------------
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self.acq_widget)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout)
+        __main_vlayout = QtGui.QVBoxLayout(self)
+        __main_vlayout.addWidget(self.acq_widget)
+        __main_vlayout.setSpacing(0)
+        __main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
@@ -423,7 +422,7 @@ class AcquisitionWidget(QtGui.QWidget):
             if energy != 0:
                 self.set_energy(energy, 0)
 
-            self.emit(QtCore.SIGNAL('mad_energy_selected'), name, energy, True)
+            self.emit(QtCore.SIGNAL('madEnergySelected'), name, energy, True)
 
     def set_energy(self, energy, wav):
         """

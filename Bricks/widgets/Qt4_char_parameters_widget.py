@@ -307,8 +307,6 @@ class CharParametersWidget(QtGui.QWidget):
              connect(self._run_number_ledit_change)
         self.vertical_dimension_widget.space_group_ledit.activated.\
              connect(self._space_group_change)
-        #QtCore.QObject.connect(QtGui.QApplication, QtCore.SIGNAL('tab_changed'),
-        #                   self.tab_changed)
 
     def _space_group_change(self, index):
         """

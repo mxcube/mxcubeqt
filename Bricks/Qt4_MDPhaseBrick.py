@@ -55,11 +55,12 @@ class Qt4_MDPhaseBrick(BlissWidget):
         self.phase_combobox = QtGui.QComboBox(self.group_box)
 
         # Layout --------------------------------------------------------------
-        _group_box_layout = QtGui.QVBoxLayout(self)
-        _group_box_layout.addWidget(self.phase_combobox)
-        _group_box_layout.setSpacing(0)
-        _group_box_layout.setContentsMargins(0, 0, 0, 0)
-        self.group_box.setLayout(_group_box_layout)
+        _group_box_vlayout = QtGui.QVBoxLayout(self)
+        _group_box_vlayout.addWidget(self.phase_combobox)
+        _group_box_vlayout.addStretch()
+        _group_box_vlayout.setSpacing(0)
+        _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.group_box.setLayout(_group_box_vlayout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
@@ -75,8 +76,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         Qt4_widget_colors.set_widget_color(self.phase_combobox,
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
-
+                                           QtGui.QPalette.Window)
  
     def propertyChanged(self, property, oldValue, newValue):
         """
@@ -105,7 +105,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         phase_list = self.minidiff_hwobj.get_phase_list()
         if len(phase_list) > 0:
            for phase in phase_list:
-               self.phase_combobox.addItem(phase)            
+               self.phase_combobox.addItem(phase)           
            self.setEnabled(True)
         else:
            self.setEnabled(False)
@@ -121,7 +121,6 @@ class Qt4_MDPhaseBrick(BlissWidget):
         """
         Descript. :
         """
-        print phase, self.phase_combobox.count()
         if (phase.lower() != "unknown" and
             self.phase_combobox.count() > 0):
             #index = self.phase_combobox.findText(phase) 

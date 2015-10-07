@@ -77,16 +77,16 @@ class Qt4_HutchMenuBrick(BlissWidget):
         # Graphic elements ----------------------------------------------------
         self.centre_button = DuoStateButton(self, "Centre")
         self.centre_button.set_icons("VCRPlay2", "Delete")
-        self.accept_button = MonoStateButton(self, "Save", "ThumbUp", (70, 50))
+        self.accept_button = MonoStateButton(self, "Save", "ThumbUp")
         self.standard_color = self.accept_button.palette().\
              color(QtGui.QPalette.Window)
-        self.reject_button = MonoStateButton(self, "Reject", "ThumbDown", (70, 50))
+        self.reject_button = MonoStateButton(self, "Reject", "ThumbDown")
         self.reject_button.hide()
-        self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera", (70, 50))
-        self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh", (70, 50))
-        self.visual_align_button = MonoStateButton(self, "Align", "Align", (70, 50))
-        self.clear_all_button = MonoStateButton(self, "Clear", "Delete", (70, 50))
-        self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2", (70, 50))
+        self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
+        self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
+        self.visual_align_button = MonoStateButton(self, "Align", "Align")
+        self.clear_all_button = MonoStateButton(self, "Clear", "Delete")
+        self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
 
         self.beam_position_widget = QtGui.QWidget(self)
         _move_mark_label = QtGui.QLabel("Beam mark", self.beam_position_widget)
@@ -131,12 +131,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.centre_button, 
-                     QtCore.SIGNAL("executeCommand"), 
-                     self.centring_started_clicked)
-        self.connect(self.centre_button, 
-                     QtCore.SIGNAL("cancelCommand"), 
-                     self.centring_cancel_clicked)
+        self.centre_button.commandExecuteSignal.connect(self.centre_button_clicked)
         self.accept_button.clicked.connect(self.accept_clicked)
         self.reject_button.clicked.connect(self.reject_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
@@ -180,13 +175,17 @@ class Qt4_HutchMenuBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    def centring_started_clicked(self):
+    def centre_button_clicked(self, state):
         """
         Descript. : 
         Args.     : 
         Return    : 
         """
-        self.graphics_manager_hwobj.start_centring(tree_click=True)
+        if state:
+            self.graphics_manager_hwobj.start_centring(tree_click = True)
+        else:
+            self.graphics_manager_hwobj.cancel_centring(reject = False)
+            self.accept_button.setEnabled(True)
 
     def save_snapshot_clicked(self):
         """
@@ -241,15 +240,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         self.graphics_manager_hwobj.clear_all()
 
-    def centring_cancel_clicked(self, reject=False):
-        """
-        Descript. : 
-        Args.     : 
-        Return    : 
-        """
-        self.graphics_manager_hwobj.cancel_centring(reject = reject)
-        self.accept_button.setEnabled(True)
-
     def accept_clicked(self):
         """
         Descript. : 
@@ -289,7 +279,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.is_shooting = False
             self.setEnabled(True)
 
-    def centring_started(self, method, flexible):
+    def centring_started(self):
         """
         Descript. : 
         Args.     : 
@@ -301,7 +291,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.emit(QtCore.SIGNAL("centringStarted"), ())
         self.centre_button.command_started()
         self.accept_button.setEnabled(False)
-        self.reject_button.setEnabled(False)
+        self.reject_button.setEnabled(True)
 
     def centring_successful(self, method, centring_status):
         """
@@ -362,7 +352,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
 class MonoStateButton(QtGui.QToolButton):
 
-    def __init__(self, parent, caption=None, icon=None, fixed_size=None):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(60, 45)):
         QtGui.QToolButton.__init__(self, parent)
         self.setUsesTextLabel(True)
         if fixed_size: 
@@ -379,6 +369,8 @@ class DuoStateButton(QtGui.QToolButton):
     Args.     : 
     Return    : 
     """
+    commandExecuteSignal = QtCore.pyqtSignal(bool)
+
     def __init__(self, parent, caption):
         """
         Descript. : 
@@ -386,13 +378,13 @@ class DuoStateButton(QtGui.QToolButton):
         Return    : 
         """
         QtGui.QToolButton.__init__(self, parent)
-        self.executing = None
+        self.executing = False
         self.run_icon = None
         self.stop_icon = None
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
         self.setUsesTextLabel(True)
         self.setText(caption)
-        self.setFixedSize(70, 50)
+        self.setFixedSize(60, 45)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 
@@ -415,11 +407,9 @@ class DuoStateButton(QtGui.QToolButton):
         Args.     : 
         Return    : 
         """
-        if self.executing:
-            self.emit(QtCore.SIGNAL('cancelCommand'), ())
-        else:
-            self.setEnabled(False)
-            self.emit(QtCore.SIGNAL('executeCommand'), ())
+        self.commandExecuteSignal.emit(not self.executing)
+        #if not self.executing:
+        #    self.setEnabled(False)
 
     def command_started(self):
         """

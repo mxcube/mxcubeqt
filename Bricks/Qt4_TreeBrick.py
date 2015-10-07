@@ -31,7 +31,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from HardwareRepository.HardwareRepository import dispatcher
 from widgets.Qt4_dc_tree_widget import DataCollectTree
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
-
+from widgets.Qt4_tree_options_dialog import TreeOptionsDialog
 
 __category__ = 'Qt4_General'
 
@@ -132,6 +132,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.run_cb = self.run
         #self.dc_tree_widget.clear_centred_positions_cb = \
         #    self.clear_centred_positions
+        self.tree_options_dialog = TreeOptionsDialog(self, 'Tree options Dialog')
+        self.tree_options_dialog.setModal(True)
 
         # Layout --------------------------------------------------------------
         main_layout = QtGui.QVBoxLayout(self)
@@ -139,7 +141,6 @@ class Qt4_TreeBrick(BlissWidget):
         main_layout.addWidget(self.dc_tree_widget)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0) 
-        self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
         self.sample_changer_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
@@ -154,6 +155,8 @@ class Qt4_TreeBrick(BlissWidget):
              connect(self.dc_tree_widget.set_centring_method)
         self.sample_changer_widget.synch_combo.currentIndexChanged.\
              connect(self.refresh_sample_list)
+        self.sample_changer_widget.tree_options_button.clicked.connect(\
+             self.open_tree_options_dialog)
 
         # Other --------------------------------------------------------------- 
         self.enable_collect(False)
@@ -442,6 +445,12 @@ class Qt4_TreeBrick(BlissWidget):
                  self.dc_tree_widget.sample_mount_method)
         elif current_index == 2:
             print "sync with crims"
+
+    def open_tree_options_dialog(self):
+        if self.tree_options_dialog.sample_listview is None:
+            self.tree_options_dialog.set_filter_lists(\
+                 self.dc_tree_widget.sample_tree_widget)
+        self.tree_options_dialog.show()
 
     def get_sc_content(self, sample_changer):
         """
@@ -748,9 +757,8 @@ class Qt4_TreeBrick(BlissWidget):
         """
         Descript. :
         """
-        if self.session_hwobj:
-            directory = self.session_hwobj.get_base_image_directory()
-            self.emit(QtCore.SIGNAL("set_directory"), directory)
+        directory = self.session_hwobj.get_base_image_directory()
+        self.emit(QtCore.SIGNAL("set_directory"), directory)
 
     def emit_set_prefix(self, item):
         """

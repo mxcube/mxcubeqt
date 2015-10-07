@@ -62,7 +62,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_groupbox = QtGui.QGroupBox("Shapes", self)
+        self.main_groupbox = QtGui.QGroupBox("Graphics items", self)
         self.manager_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
             'widgets/ui_files/Qt4_graphics_manager_layout.ui'))
 
@@ -104,8 +104,10 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.manager_widget.create_grid_auto_button.clicked.connect(\
              self.create_grid_auto_button_clicked)
 
-        self.manager_widget.shapes_treewidget.currentItemChanged.connect(\
-             self.shape_treewiget_current_item_changed)
+        #self.manager_widget.shapes_treewidget.currentItemChanged.connect(\
+        #     self.shape_treewiget_current_item_changed)
+        self.manager_widget.shapes_treewidget.itemClicked.connect(\
+             self.shape_treewiget_item_clicked)
         self.manager_widget.shapes_treewidget.customContextMenuRequested.\
              connect(self.show_shape_treewidget_popup)
 
@@ -125,6 +127,11 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
 
         # Other --------------------------------------------------------------- 
+        # by default manager is closed
+        self.main_groupbox.setCheckable(True)
+        self.main_groupbox.setChecked(False)
+        self.main_groupbox_toggled(False)
+        self.main_groupbox.setToolTip("Click to open/close graphic item manager")
 
     def propertyChanged(self, property, oldValue, newValue):
         """
@@ -148,6 +155,11 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property, oldValue, newValue)
 
     def shape_created(self, shape, shape_type):
+        """ 
+        Descript. : adds information about shape in all shapes treewidget
+                    and depending on shape type also information to
+                    treewidget of all points/lines/grids
+        """
         info_str_list = QtCore.QStringList()
         info_str_list.append(str(self.manager_widget.shapes_treewidget.topLevelItemCount() + 1))
         info_str_list.append(shape.get_display_name())
@@ -227,7 +239,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
 
     def main_groupbox_toggled(self, is_on):
         if is_on:
-            self.setFixedHeight(self.original_height)
+            self.setFixedHeight(self.__original_height)
         else:
             self.setFixedHeight(20)
   
@@ -299,7 +311,10 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.manager_widget.hide_all_button.setEnabled(len(self.__shape_map) > 0)
         self.manager_widget.clear_all_button.setEnabled(len(self.__shape_map) > 0)
  
-    def shape_treewiget_current_item_changed(self, current_item, previous_item):
+    def shape_treewiget_item_clicked(self, current_item, column): 
+        for key, value in self.__shape_map.iteritems():
+            if value == current_item:
+                key.toggle_selected()
         self.manager_widget.change_color_button.setEnabled(current_item is not None)
 
     def grid_spacing_changed(self, value):

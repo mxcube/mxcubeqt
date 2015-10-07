@@ -454,9 +454,9 @@ class DataCollectTree(QtGui.QWidget):
             #view_item.setExpanded(task.get_is_present())
             #view_item.setOn(False)
             pass
-        else: 
-            view_item.setSelected(True)
-            self.selection_changed_cb([view_item])
+        #else: 
+        #    view_item.setSelected(True)
+        #    self.selection_changed_cb([view_item])
 
     def get_selected_items(self):
         """

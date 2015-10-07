@@ -98,9 +98,6 @@ class XRFScanParametersWidget(QtGui.QWidget):
                                                QtGui.QSizePolicy.Expanding)
         _top_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
                                   QtGui.QSizePolicy.Fixed)
-        #self.mca_spectrum_widget.setMinimumHeight(800)
-        #self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-        #                   QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------ 
         self.data_path_widget.data_path_layout.prefix_ledit.\
@@ -111,9 +108,6 @@ class XRFScanParametersWidget(QtGui.QWidget):
 
         self.count_time_ledit.textChanged.connect(self._count_time_ledit_change)
         
-        #QtCore.QObject.connect(.qApp, qt.PYSIGNAL('tab_changed'),
-        #                   self.tab_changed)
-
         # Other ---------------------------------------------------------------
         Qt4_widget_colors.set_widget_color(self.other_parameters_gbox,
                                            Qt4_widget_colors.GROUP_BOX_GRAY)

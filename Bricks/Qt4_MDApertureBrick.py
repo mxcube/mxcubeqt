@@ -84,11 +84,12 @@ class Qt4_MDApertureBrick(BlissWidget):
         self.aperture_cbox.setMinimumWidth(100)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_gridlayout = QtGui.QGridLayout(self.main_gbox)
-        _main_gbox_gridlayout.addWidget(self.aperture_cbox, 0, 0)
-        _main_gbox_gridlayout.setSpacing(0)
-        _main_gbox_gridlayout.setContentsMargins(0, 0, 0, 0)
-        self.main_gbox.setLayout(_main_gbox_gridlayout)  
+        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
+        _main_gbox_vlayout.addWidget(self.aperture_cbox)
+        _main_gbox_vlayout.addStretch()
+        _main_gbox_vlayout.setSpacing(0)
+        _main_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
+        self.main_gbox.setLayout(_main_gbox_vlayout)  
 
         _main_vlayout = QtGui.QVBoxLayout()
         _main_vlayout.addWidget(self.main_gbox)
@@ -105,7 +106,7 @@ class Qt4_MDApertureBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.aperture_cbox,
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
+                                           QtGui.QPalette.Window)
 
     def propertyChanged(self, property, oldValue, newValue):
         """
