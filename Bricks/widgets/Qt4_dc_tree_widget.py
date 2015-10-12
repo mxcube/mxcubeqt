@@ -16,6 +16,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#
+#  Please user PEP 0008 -- "Style Guide for Python Code" to format code
+#  https://www.python.org/dev/peps/pep-0008/
 
 import logging
 import gevent
@@ -159,15 +162,13 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.contextMenuEvent = self.show_context_menu
         self.sample_tree_widget.itemDoubleClicked.connect(self.item_double_click)
         self.sample_tree_widget.itemClicked.connect(self.item_click)
-        self.connect(self.confirm_dialog, 
-                     QtCore.SIGNAL("continue_clicked"),
-                     self.collect_items)
+        self.confirm_dialog.continueClickedSignal.connect(self.collect_items)
         self.continue_button.clicked.connect(self.continue_button_click)
 
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(2)
-        self.sample_tree_widget.setColumnWidth(0, 50)
-        self.sample_tree_widget.setColumnWidth(1, 200)
+        self.sample_tree_widget.setColumnWidth(0, 250)
+        self.sample_tree_widget.header().setDefaultSectionSize(250)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
@@ -440,12 +441,12 @@ class DataCollectTree(QtGui.QWidget):
 
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
         view_item.setExpanded(True)
-        view_item.setFirstColumnSpanned(True)
+        #view_item.setFirstColumnSpanned(True)
         #if view_item.parent():
         #    view_item.parent().setOn(True)
 
         self.queue_model_hwobj.view_created(view_item, task)
-        self.sample_tree_widget.resizeColumnToContents(0)
+        #self.sample_tree_widget.resizeColumnToContents(0)
         self.sample_tree_widget.clearSelection()
        
         if isinstance(task, queue_model_objects.Basket):
@@ -686,7 +687,7 @@ class DataCollectTree(QtGui.QWidget):
         self.user_stopped = False
         self.delete_button.setEnabled(False)
         self.enable_sample_changer_widget(False)
-        
+        print 1    
         self.collecting = True
         self.collect_button.setText(" Stop   ")
         Qt4_widget_colors.set_widget_color(
@@ -694,10 +695,12 @@ class DataCollectTree(QtGui.QWidget):
                           Qt4_widget_colors.LIGHT_RED,
                           QtGui.QPalette.Button)
         self.collect_button.setIcon(QtGui.QIcon(self.stop_pixmap))
+        print 2 
         self.parent().enable_hutch_menu(False)
         self.run_cb()
-        
+        print 3
         try:
+            print 4
             self.queue_hwobj.execute()
         except Exception, e:
             raise e
@@ -797,7 +800,7 @@ class DataCollectTree(QtGui.QWidget):
             #item = it.current()
             item = it.value()
             if item.get_model().free_pin_mode:
-                self.sample_list_view.topLevelItem(0).setSelected(True)
+                self.sample_tree_widget.topLevelItem(0).setSelected(True)
                 #self.sample_tree_widget.setSelected(self.sample_list_view.firstChild(), True)
 
     def down_click(self):

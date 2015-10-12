@@ -55,6 +55,7 @@ class ConfirmDialog(QtGui.QDialog):
     """
     Descript. :
     """
+    continueClickedSignal = QtCore.pyqtSignal(list, list)
 
     def __init__(self, parent = None, name = None, flags = 0):
         """
@@ -86,13 +87,10 @@ class ConfirmDialog(QtGui.QDialog):
         self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(self.dialog_layout_widget.continue_button,
-                               QtCore.SIGNAL("clicked()"),
-                               self.continue_button_click)
-
-        QtCore.QObject.connect(self.dialog_layout_widget.cancel_button,
-                               QtCore.SIGNAL("clicked()"),
-                               self.cancel_button_click)
+        self.dialog_layout_widget.continue_button.clicked.connect(\
+             self.continue_button_click)
+        self.dialog_layout_widget.cancel_button.clicked.connect(\
+             self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
 
@@ -199,7 +197,8 @@ class ConfirmDialog(QtGui.QDialog):
                 item.get_model().acquisitions[0].acquisition_parameters.\
                     skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isChecked()
         
-        self.emit(QtCore.SIGNAL("continue_clicked"), self.sample_items, self.checked_items)
+        self.continueClickedSignal.emit(self.sample_items, self.checked_items)
+        #self.emit(QtCore.SIGNAL("continue_clicked"), self.sample_items, self.checked_items)
         self.accept()
 
 

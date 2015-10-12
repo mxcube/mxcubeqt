@@ -1139,9 +1139,10 @@ class BasketsSamplesSelection(QtGui.QDialog):
         buttons_box.layout().addWidget(self.cmdOk, 0, 1)
         buttons_box.layout().addWidget(self.cmdCancel, 1, 1)
 
-        for i in range(5):
+        #TODO
+        for i in range(10):
             self.samplesBoxes.append(QHBox(samples_group, 'sample_group'))
-            QLabel("Basket %s :" % str(i+1), self.samplesBoxes[-1])
+            QtGui.QLabel("Basket %s :" % str(i+1), self.samplesBoxes[-1])
             self.txtPresentSamples.append(QLineEdit(self.samplesBoxes[-1]))
             self.txtPresentSamples[-1].setText("1-10")
             self.samplesBoxes[-1].show()

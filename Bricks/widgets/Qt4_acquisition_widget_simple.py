@@ -303,7 +303,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         if limits:
             self.resolution_validator.setBottom(limits[0])
             self.resolution_validator.setTop(limits[1])
-            self.acq_widget.resolution_ledit.setToolTp(
+            self.acq_widget.resolution_ledit.setToolTip(
                "Resolution limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
@@ -323,25 +323,24 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """
         if self._beamline_setup_hwobj is not None:
-            print "Qt4 init_detector_modes - fix"
-            return
-            modes_list = self._beamline_setup_hwobj.detector_hwobj.get_detector_modes_list()
-            self.acq_widget.detector_mode_combo.clear()
-            self.acq_widget.detector_mode_combo.addItems(modes_list)
+            modes_list = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
+            if (len(modes_list) > 0 and
+                self.acq_widget.detector_mode_combo.count() == 0):
+                self.acq_widget.detector_mode_combo.\
+                     insertStrList(modes_list)
+            else:
+                self.acq_widget.detector_mode_combo.\
+                     setDisabled(True)
 
     def update_detector_mode(self, detector_mode):
-        """
-        Descript. :
-        """
-        self.acq_widget.detector_mode_combo.setCurrentItem(detector_mode)
-        
+        if self.acq_widget.detector_mode_combo.count() > 0:
+            self.acq_widgetdetector_mode_combo.\
+                 setCurrentItem(detector_mode)
+
     def detector_mode_changed(self, detector_mode):
-        """
-        Descript. :
-        """
         if self._beamline_setup_hwobj is not None:
-            self._beamline_setup_hwobj.detector_hwobj.set_detector_mode(detector_mode)
-    
+            self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(detector_mode)
+ 
     def update_data_model(self, acquisition_parameters, path_template):
         """
         Descript. :
@@ -350,26 +349,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self._acquisition_mib.set_model(acquisition_parameters)
         self._path_template = path_template
         self.update_num_images(None, acquisition_parameters.num_images)
-
-    """def get_resolution_limits(self):
-        if self._beamline_setup_hwobj is not None:
-            limits = self._beamline_setup_hwobj.resolution_hwobj.getLimits()
-            return limits
-
-    def get_energy_limits(self):
-        if self._beamline_setup_hwobj is not None:
-            limits = self._beamline_setup_hwobj.energy_hwobj.getEnergyLimits()
-            return limits
-
-    def get_exposure_time_limits(self):
-        if self._beamline_setup_hwobj is not None:
-            exposure_time_limits = self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
-            return exposure_time_limits
-
-    def get_transmission_limits(self):
-        if self._beamline_setup_hwobj is not None:
-            limits = self._beamline_setup_hwobj.transmission_hwobj.get_transmission_limits()
-            return limits"""
 
     def set_tunable_energy(self, state):
         """
