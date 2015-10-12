@@ -164,9 +164,7 @@ class ToolboxWindow(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
         
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(_refresh_toolbutton, 
-                               QtCore.SIGNAL("clicked()"), 
-                               self.refresh_clicked) 
+        _refresh_toolbutton.clicked.connect(self.refresh_clicked) 
 
         # Other ---------------------------------------------------------------
         self.setWindowTitle("Toolbox") 
@@ -176,9 +174,7 @@ class ToolboxWindow(QtGui.QWidget):
         Descript. : Add a new brick tab called 'name'
         """
         newBricksList = MyListView(self._bricks_toolbox)
-        QtCore.QObject.connect(newBricksList, 
-                               QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"), 
-                               self.brick_selected)
+        newBricksList.itemDoubleClicked.connect(self.brick_selected)
         self._bricks_toolbox.addItem(newBricksList, name)
         self.bricks_tab_dict[name] = newBricksList
         return newBricksList
@@ -343,13 +339,11 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
         """
         Descript. :
         """
-        print "QT4_GUIBuilder.. property_changed", args 
         try:
             cb = self.__property_changed_cb[self.properties_table.propertyBag]
         except KeyError, err:
             return
         else:
-            print cb
             cb(*args)
             
     def addProperties(self, propertyBag, property_changed_cb):
@@ -382,7 +376,7 @@ class ToolButton(QtGui.QToolButton):
             self.setUsesTextLabel(True)
 
         if callback is not None:
-            QtCore.QObject.connect(self, QtCore.SIGNAL("clicked()"), callback)
+            self.clicked.connect(callback)
 
         if tooltip is not None:
             self.setToolTip(tooltip) 
@@ -489,12 +483,9 @@ class GUIEditorWindow(QtGui.QWidget):
         _tools_widget.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
-        self.connect(self.tree_widget, QtCore.SIGNAL('itemSelectionChanged()'), 
-                     self.item_selected)
-        self.connect(self.tree_widget, QtCore.SIGNAL('itemDoubleClicked(QTreeWidgetItem *, int)'), 
-                     self.item_double_clicked)
-        self.connect(self.tree_widget, QtCore.SIGNAL('itemChanged(QTreeWidgetItem *, int)'), 
-                     self.item_changed)
+        self.tree_widget.itemSelectionChanged.connect(self.item_selected)
+        self.tree_widget.itemDoubleClicked.connect(self.item_double_clicked)
+        self.tree_widget.itemChanged.connect(self.item_changed)
         self.connect(self.tree_widget, QtCore.SIGNAL('dragdrop'), 
                      self.item_drag_dropped)
         self.connect(self.tree_widget, QtCore.SIGNAL('contextMenuRequested'), 
@@ -1155,7 +1146,6 @@ class GUIPreviewWindow(QtGui.QWidget):
             s = caption and " - %s" % caption or ""
             self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
 
-        print "drawWindow..."
         self.window_preview.drawPreview(container_cfg, window_id, container_ids, selected_item)
 
     def updateWindow(self, container_cfg, window_id, container_ids, selected_item):
@@ -1167,7 +1157,6 @@ class GUIPreviewWindow(QtGui.QWidget):
             s = caption and " - %s" % caption or ""
             self.window_preview_box.setTitle("Window preview: %s%s" % (container_cfg["name"], s))
 
-        print "updateWindow..."
         self.window_preview.updatePreview(container_cfg, window_id, container_ids, selected_item)
 
     def add_window_widget(self, window_cfg):

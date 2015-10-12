@@ -116,13 +116,10 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             else:
                 self.item(row, 1).setCheckState(QtCore.Qt.Unchecked)
         elif prop.getType() == 'combo':
-        
             choicesList = QtCore.QStringList()
             choices = prop.getChoices()
             for choice in choices:
                 choicesList.append(choice)
-            
-
             newPropertyItem = ComboBoxTableItem(self, row, 1, choicesList)
             newPropertyItem.setCurrentIndex(newPropertyItem.findText(prop.getUserValue()))
             self.setCellWidget(row, 1, newPropertyItem)
@@ -139,7 +136,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 tempTableItem = QtGui.QTableWidgetItem(str(prop.getUserValue()))  
             self.setItem(row, 1, tempTableItem)
 
-    def OnCellChanged(self, col, row):
+    def OnCellChanged(self, row, col):
         """
         Descript. :
         """
@@ -290,7 +287,7 @@ class ComboBoxTableItem(QtGui.QComboBox):
     Descript. :
     """
 
-    def __init__(self, parent, col, row, items_list = None):
+    def __init__(self, parent, row, col, items_list = None):
         """ 
         Descript. :
         """
@@ -313,7 +310,7 @@ class FileTableItem(QtGui.QWidget):
     Descript. :
     """
 
-    def __init__(self, parent, col, row, filename, file_filter):
+    def __init__(self, parent, row, col, filename, file_filter):
         """
         Descript. :
         """
@@ -369,7 +366,7 @@ class ColorTableItem(QtGui.QWidget):
     Descript. :
     """
 
-    def __init__(self, parent, col, row, color):
+    def __init__(self, parent, row, col, color):
         """
         Descript. :
         """

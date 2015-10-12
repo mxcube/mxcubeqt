@@ -54,7 +54,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.display_beam = None
 
         # Properties ----------------------------------------------------------       
-        self.addProperty("graphicsManager", "string", "/Qt4_graphics-manager")
+        self.addProperty("mnemonic", "string", "/Qt4_graphics-manager")
         self.addProperty("fixedSize", "string", "")
         self.addProperty('displayBeam', 'boolean', True)
         self.addProperty('displayScale', 'boolean', True)
@@ -82,19 +82,18 @@ class Qt4_CameraBrick(BlissWidget):
         self.popup_menu.addAction("Define histogram", 
                                   self.define_histogram_clicked)
         self.popup_menu.addSeparator()
-        self.popup_menu.addAction(Qt4_Icons.load_icon("Point"),
-                                  "Create centring point",
-                                  self.create_centring_point_clicked)
-        self.popup_menu.addAction(Qt4_Icons.load_icon("Line"),
-                                  "Create helical line",
+        self.popup_menu.addAction("Create point with 3 clicks",
+                                  self.create_point_click_clicked)
+        self.popup_menu.addAction("Create point on current position",
+                                  self.create_point_current_clicked)
+        self.popup_menu.addAction("Create line",
                                   self.create_line_clicked)
-        self.popup_menu.addAction(Qt4_Icons.load_icon("GridDrag"),
-                                  "Create grid with drag and drop",
+        self.popup_menu.addAction("Create grid with drag and drop",
                                   self.create_grid_drag_clicked)
-        self.popup_menu.addAction(Qt4_Icons.load_icon("GridClick"),
-                                  "Create grid with 2 click",
+        self.popup_menu.addAction("Create grid with 2 click",
                                   self.create_grid_drag_clicked)
-
+        self.popup_menu.addAction("Create automatic grid",
+                                  self.create_grid_auto_clicked)
         self.popup_menu.popup(QtGui.QCursor.pos())
 
         # Layout --------------------------------------------------------------
@@ -126,16 +125,34 @@ class Qt4_CameraBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if property_name == "graphicsManager":
+        if property_name == "mnemonic":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(self.graphics_manager_hwobj, 
                                 QtCore.SIGNAL('graphicsMouseMoved'),  
                                 self.mouse_moved)
+                self.disconnect(self.graphics_manager_hwobj,
+                                QtCore.SIGNAL('measureDistanceStateChanged'),
+                                self.measure_distance_state_changed)
+                self.disconnect(self.graphics_manager_hwobj,
+                                QtCore.SIGNAL('measureAngleStateChanged'),
+                                self.measure_angle_state_changed)
+                self.disconnect(self.graphics_manager_hwobj,
+                                QtCore.SIGNAL('measureAreaStateChanged'),
+                                self.measure_area_state_changed)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value)
             if self.graphics_manager_hwobj is not None:
                 self.connect(self.graphics_manager_hwobj, 
                              QtCore.SIGNAL('graphicsMouseMoved'), 
                              self.mouse_moved)
+                self.connect(self.graphics_manager_hwobj,
+                                QtCore.SIGNAL('measureDistanceStateChanged'),
+                                self.measure_distance_state_changed)
+                self.connect(self.graphics_manager_hwobj,
+                             QtCore.SIGNAL('measureAngleStateChanged'),
+                             self.measure_angle_state_changed)
+                self.connect(self.graphics_manager_hwobj,
+                             QtCore.SIGNAL('measureAreaStateChanged'),
+                             self.measure_area_state_changed)
                 self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
                 self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 
                 self.main_layout.addWidget(self.graphics_view) 
@@ -186,21 +203,16 @@ class Qt4_CameraBrick(BlissWidget):
             self.graphics_manager_hwobj.stop_measure_area()
 
     def display_histogram_toggled(self):
-        print "ff"
+        return
 
     def define_histogram_clicked(self):
-        print 2
+        return
 
-    def mouse_moved(self, x, y):
-        """
-        Descript. :
-        Args.     :
-        Return    : 
-        """
-        self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" %(x, y))
+    def create_point_click_clicked(self):
+        self.graphics_manager_hwobj.start_centring(tree_click=True)
 
-    def create_centring_point_clicked(self):
-        self.graphics_manager_hwobj.create_point()
+    def create_point_current_clicked(self):
+        self.graphics_manager_hwobj.start_centring(tree_click=False)
 
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
@@ -211,3 +223,28 @@ class Qt4_CameraBrick(BlissWidget):
     def create_grid_click_clicked(self):
         self.graphics_manager_hwobj.create_grid_click()
  
+    def create_grid_auto_clicked(self):
+        self.graphics_manager_hwobj.create_grid_auto()
+
+    def mouse_moved(self, x, y):
+        """
+        Descript. :
+        Args.     :
+        Return    : 
+        """
+        self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" %(x, y))
+
+    def measure_distance_state_changed(self, state):
+        self.measure_distance_action.setChecked(state)
+        self.measure_angle_action.setChecked(False)
+        self.measure_area_action.setChecked(False)
+
+    def measure_angle_state_changed(self, state):
+        self.measure_distance_action.setChecked(False)
+        self.measure_angle_action.setChecked(state)
+        self.measure_area_action.setChecked(False)
+
+    def measure_area_state_changed(self, state):
+        self.measure_distance_action.setChecked(False)
+        self.measure_angle_action.setChecked(False)
+        self.measure_area_action.setChecked(state)

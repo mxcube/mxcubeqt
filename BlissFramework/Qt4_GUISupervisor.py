@@ -363,7 +363,7 @@ class GUISupervisor(QtGui.QWidget):
                 prop = item.properties.properties.get('fontSize', None)
                 if prop is not None:
                     if i == 0:
-                        prop.setValue(11)
+                        prop.setValue(9)
                     else:
                         prop.setValue(prop.getValue()+i)
                     w = widgets_dict[item.name]
