@@ -43,10 +43,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         Descript. :
         """
 
-        CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), "Standart")
+        CreateTaskBase.__init__(self, parent, name, 
+            QtCore.Qt.WindowFlags(fl), "Standart")
 
         if not name:
             self.setObjectName("Qt4_create_discrete_widget")
+        self.init_models()
 
         # Hardware objects ----------------------------------------------------
 

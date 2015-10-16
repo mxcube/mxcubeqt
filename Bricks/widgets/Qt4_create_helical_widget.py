@@ -41,17 +41,20 @@ class CreateHelicalWidget(CreateTaskBase):
 
         if not name:
             self.setObjectName("create_helical_widget")
+        self.init_models() 
          
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.init_models()
-        self._prev_pos = None
-        self._current_pos = None
-        self._list_item_map = {}
-        self.init_models()
+        self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
+        self._lines_widget = QtGui.QWidget(self)
+        line_label = QtGui.QLabel("Line:", self)
+        self._lines_combo = QtGui.QComboBox(self)
+        self._lines_combo.setEnabled(False)
+        self._lines_combo.setFixedWidth(270)
+
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
@@ -67,20 +70,26 @@ class CreateHelicalWidget(CreateTaskBase):
              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _data_path_gbox_layout = QtGui.QVBoxLayout(self)
+        _lines_widget_hlayout = QtGui.QHBoxLayout(self._lines_widget)
+        _lines_widget_hlayout.addWidget(line_label)
+        _lines_widget_hlayout.addWidget(self._lines_combo)
+        _lines_widget_hlayout.setSpacing(2)
+        _lines_widget_hlayout.addStretch(0)
+        _lines_widget_hlayout.setContentsMargins(0,0,0,0)
+
+        _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
         _data_path_gbox_layout.setSpacing(0)
         _data_path_gbox_layout.setContentsMargins(0,0,0,0)
-        self._data_path_gbox.setLayout(_data_path_gbox_layout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0,0,0,0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
 
@@ -93,6 +102,8 @@ class CreateHelicalWidget(CreateTaskBase):
              self.handle_path_conflict)
         self._processing_widget.enableProcessingSignal.connect(\
              self._enable_processing_toggled)
+
+        # Other ---------------------------------------------------------------
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -110,40 +121,19 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
 
-    def centred_position_selection(self, positions):
-        if len(positions) == 1:
-            self._prev_pos = positions[0]
-            
-        elif len(positions) == 2:
+    def shape_created(self, shape, shape_type):
+        if shape_type == "Line":
+            self._lines_combo.addItem(shape.get_full_name())
+            self._lines_combo.setEnabled(True)
+            self._lines_map[shape] = self._lines_combo.count() - 1
+         
 
-            for pos in positions:
-                if pos != self._prev_pos:
-                    self._current_pos = pos
-        else:
-            self._prev_pos = None
-            self._current_pos = None
-
-    def list_box_selection_changed(self):
-        self.show_selected_lines()
-
-    def selected_items(self):
-        selected_items = []
-                
-        for item_index in range(self._lines_list_widget.count()):
-            if self._lines_list_widget.item(item_index).isSelected():
-                selected_items.append(self._lines_list_widget.item(item_index))
-
-        return selected_items
-        
-    def show_selected_lines(self):
-        selected_items = self.selected_items()
-
-        for list_item in self._list_item_map.keys():
-            line = self._list_item_map[list_item]
-            if list_item in selected_items:
-                self._graphics_manager.select_shape(line)
-            else:
-                self._graphics_manager.de_select_shape(line)
+    def shape_deleted(self, shape, shape_type):
+        if self._lines_map.get(shape):
+            self._lines_combo.removeItem(self._lines_map[shape])
+            self._lines_map.pop(shape)
+        if self._lines_combo.count() == 0:
+            self._lines_combo.setEnabled(False)
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)

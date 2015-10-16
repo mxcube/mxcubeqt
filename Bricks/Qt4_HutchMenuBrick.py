@@ -82,9 +82,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
              color(QtGui.QPalette.Window)
         self.reject_button = MonoStateButton(self, "Reject", "ThumbDown")
         self.reject_button.hide()
+        self.create_line_button = MonoStateButton(self, "Line", "Line")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
+        self.select_all_button = MonoStateButton(self, "Select all", "Check")
         self.clear_all_button = MonoStateButton(self, "Clear", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
 
@@ -119,9 +121,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _main_vlayout.addWidget(self.centre_button)
         _main_vlayout.addWidget(self.accept_button)
         _main_vlayout.addWidget(self.reject_button)
+        _main_vlayout.addWidget(self.create_line_button)
         _main_vlayout.addWidget(self.snapshot_button)
         _main_vlayout.addWidget(self.refresh_camera_button)
         _main_vlayout.addWidget(self.visual_align_button)
+        _main_vlayout.addWidget(self.select_all_button)
         _main_vlayout.addWidget(self.clear_all_button)
         _main_vlayout.addWidget(self.auto_center_button)
         _main_vlayout.addWidget(self.beam_position_widget)
@@ -134,9 +138,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.centre_button.commandExecuteSignal.connect(self.centre_button_clicked)
         self.accept_button.clicked.connect(self.accept_clicked)
         self.reject_button.clicked.connect(self.reject_clicked)
+        self.create_line_button.clicked.connect(self.create_line_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
         self.refresh_camera_button.clicked.connect(self.refresh_camera_clicked)
         self.visual_align_button.clicked.connect(self.visual_align_clicked)
+        self.select_all_button.clicked.connect(self.select_all_clicked)
         self.clear_all_button.clicked.connect(self.clear_all_clicked)
         self.auto_center_button.clicked.connect(self.auto_center_clicked)
         _move_left_button.clicked.connect(self.move_left_clicked)
@@ -232,13 +238,21 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         self.graphics_manager_hwobj.start_visual_align()
 
+    def select_all_clicked(self):
+        """
+        Descript. : Clears all shapes (points, lines and meshes)
+        Args.     : 
+        Return    : 
+        """
+        self.graphics_manager_hwobj.select_all_points()
+
     def clear_all_clicked(self):
         """
         Descript. : Clears all shapes (points, lines and meshes)
         Args.     : 
         Return    : 
         """
-        self.graphics_manager_hwobj.clear_all()
+        self.graphics_manager_hwobj.clear_all() 
 
     def accept_clicked(self):
         """
@@ -330,7 +344,10 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.reject_button.setEnabled(False)
         if self.collect_hwobj is not None:
             self.collect_hwobj.setCentringStatus(centring_status)
-        self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
+        #self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
+
+    def create_line_clicked(self):
+        self.graphics_manager_hwobj.create_line()
 
     def diffractometer_ready_changed(self, is_ready):
         self.setEnabled(is_ready)

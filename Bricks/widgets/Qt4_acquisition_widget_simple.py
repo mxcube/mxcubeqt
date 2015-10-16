@@ -244,13 +244,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
                                float,
                                self.resolution_validator)
  
-        self.init_detector_modes()
-        self._acquisition_mib.\
-             bind_value_update('detector_mode',
-                               self.acq_widget.detector_mode_combo,
-                               int,
-                               None)
-
         self.set_tunable_energy(beamline_setup.tunable_wavelength())
 
     def set_energy(self, energy, wav):
@@ -323,14 +316,20 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """
         if self._beamline_setup_hwobj is not None:
-            modes_list = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
+            modes_list = self._beamline_setup_hwobj._get_roi_modes()
             if (len(modes_list) > 0 and
                 self.acq_widget.detector_mode_combo.count() == 0):
                 self.acq_widget.detector_mode_combo.\
                      insertStrList(modes_list)
+                self.acq_widget.detector_mode_combo.\
+                     setEnabled(True)
+                self._acquisition_mib.bind_value_update('detector_mode',
+                               self.acq_widget.detector_mode_combo,
+                               int,
+                               None)
             else:
                 self.acq_widget.detector_mode_combo.\
-                     setDisabled(True)
+                     setEnabled(False)
 
     def update_detector_mode(self, detector_mode):
         if self.acq_widget.detector_mode_combo.count() > 0:

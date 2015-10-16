@@ -493,20 +493,26 @@ class AcquisitionWidget(QtGui.QWidget):
             num_image_limit = 99999
 
         self.num_img_validator.setTop(num_image_limit)
-        qt.QToolTip.add(self.acq_widgetnum_images_ledit,
+        self.acq_widget.num_images_ledit.setToolTip(\
               "Number of frames limit : %d" % num_image_limit)
         self._acquisition_mib.validate_all()
 
     def init_detector_modes(self):
         if self._beamline_setup_hwobj is not None:
-            modes_list = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
+            modes_list = self._beamline_setup_hwobj._get_roi_modes()
             if (len(modes_list) > 0 and
-                self.acq_widget_layout.detector_mode_combo.count() == 0):
-                self.acq_widget_layout.detector_mode_combo.\
+                self.acq_widget.detector_mode_combo.count() == 0):
+                self.acq_widget.detector_mode_combo.\
                      insertStrList(modes_list)
+                self.acq_widget.detector_mode_combo.\
+                     setEnabled(True)
+                self._acquisition_mib.bind_value_update('detector_mode',
+                               self.acq_widget.detector_mode_combo,
+                               int,
+                               None)
             else:
-                self.acq_widget_layout.detector_mode_combo.\
-                     setDisabled(True)
+                self.acq_widget.detector_mode_combo.\
+                     setEnabled(False)
 
     def update_detector_mode(self, detector_mode):
         if self.acq_widget.detector_mode_combo.count() > 0:

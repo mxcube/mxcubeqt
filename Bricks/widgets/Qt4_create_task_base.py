@@ -78,8 +78,8 @@ class CreateTaskBase(QtGui.QWidget):
 
         if bl_setup is not None:
             if self._acq_widget:
-                self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
+                self._acq_widget.init_detector_modes()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
@@ -126,9 +126,6 @@ class CreateTaskBase(QtGui.QWidget):
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
             bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
-            bl_setup_hwobj.beam_info_hwobj.connect('beamInfoChanged', self.set_beam_info)
-
-            self.set_beam_info(bl_setup_hwobj.beam_info_hwobj.get_beam_info())
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
@@ -309,9 +306,6 @@ class CreateTaskBase(QtGui.QWidget):
 
             if acq_widget:
                 acq_widget.update_detector_exp_time_limits(limits)
-
-    def set_beam_info(self, beam_info_dict):
-        pass
 
     def get_default_prefix(self, sample_data_node = None, generic_name = False):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)

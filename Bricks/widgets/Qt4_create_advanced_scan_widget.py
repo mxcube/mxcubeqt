@@ -48,18 +48,11 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             self.setObjectName("create_advanced_scan_widget")
 
         # Hardware objects ----------------------------------------------------
-        self.__mini_diff_hwobj = None
  
         # Internal variables --------------------------------------------------
         self.init_models()
-        self._prev_pos = None
-        self._current_pos = None
-        self._list_item_map = {}
         self._advanced_methods = None
         self._grid_map = {}
-
-        self.init_models()
-
 
         # Graphic elements ----------------------------------------------------
         self._advanced_methods_widget = uic.loadUi(os.path.join(\
@@ -118,8 +111,6 @@ class CreateAdvancedScanWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_advanced_values")
-            self.__mini_diff_hwobj = self._beamline_setup_hwobj.\
-                                     diffractometer_hwobj
             if not self._advanced_methods:
                 self._advanced_methods = self._beamline_setup_hwobj.get_advanced_methods()            
                 for method in self._advanced_methods:
@@ -232,12 +223,6 @@ class CreateAdvancedScanWidget(CreateTaskBase):
 
         return data_collections            
 
-    def set_beam_info(self, beam_info_dict):
-        """
-        Descript. :
-        """
-        self.__beam_info = beam_info_dict
-        
     def shape_created(self, shape, shape_type):
         if shape_type == "Grid":
             self._advanced_methods_widget.grid_combo.addItem(shape.get_full_name())            
