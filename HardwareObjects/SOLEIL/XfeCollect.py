@@ -92,12 +92,10 @@ class XfeCollect(object):
         self.ble.write_attribute('energy', self.thEdge + 0.01)
         self.wait(self.ble)
             
-    def getEdgefromXabs(self, el, edge):
+    def getEdgefromXabs(self, element, edge):
         edge = edge.upper()
-        roi_center = McMaster[el]['edgeEnergies'][edge + '-alpha']
-        if edge == 'L':
-            edge = 'L3'
-        e_edge = McMaster[el]['edgeEnergies'][edge]
+        roi_center = McMaster[element]['edgeEnergies'][ '%s-alpha' % edge[0] ]
+        e_edge = McMaster[element]['edgeEnergies'][edge]
         return (e_edge, roi_center)    
         
     def optimizeTransmission(self, element, edge):
