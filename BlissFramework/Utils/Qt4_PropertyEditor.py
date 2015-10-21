@@ -47,7 +47,6 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         self.setColumnCount(3)
         self.setSelectionMode(QtGui.QTableWidget.NoSelection)
 
-        
         self.setHorizontalHeaderLabels([self.trUtf8('Properties'),  
                                         self.trUtf8('Values'), 
                                         self.trUtf8('')])
@@ -55,7 +54,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.propertyBag = None
 
-        QtCore.QObject.connect(self, QtCore.SIGNAL('cellChanged(int, int)'), self.OnCellChanged)
+        self.cellChanged.connect(self.OnCellChanged)
         
     def clear(self):
         """
@@ -82,6 +81,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             self.setRowCount(len(self.propertyBag))
            
             i = 0
+            self.setRowCount(len(self.propertyBag))
             for prop in self.propertyBag:
                 prop._editor = weakref.ref(self)
                 
@@ -89,19 +89,19 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                     continue
 
                 tempTableItem = QtGui.QTableWidgetItem(prop.getName())
+                tempTableItem.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.blockSignals(True) 
-               
                 self.setItem(i, 0, tempTableItem)
                 self.setWidgetFromProperty(i, prop)
                 self.blockSignals(False)
                 
                 validationPanel = ValidationTableItem(self)
                 self.setCellWidget(i, 2, validationPanel)
-                self.connect(validationPanel.OK, QtCore.SIGNAL('clicked()'), self.OnValidateClick)
-                self.connect(validationPanel.Cancel, QtCore.SIGNAL('clicked()'), self.OnInvalidateClick)
-                self.connect(validationPanel.Reset, QtCore.SIGNAL('clicked()'), self.OnResetClick)
+                validationPanel.OK.clicked.connect(self.OnValidateClick)
+                validationPanel.Cancel.clicked.connect(self.OnInvalidateClick)
+                validationPanel.Reset.clicked.connect(self.OnResetClick)
                 i += 1
-            self.setRowCount(i)
+            #self.setRowCount(i)
         self.resizeColumnsToContents()    
         
     def setWidgetFromProperty(self, row, prop):
@@ -141,8 +141,10 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         Descript. :
         """
         col += 1
+
         item_property = self.propertyBag.getProperty(str(self.item(row, 0).text()))
         oldValue = item_property.getUserValue()
+
         if item_property.getType() == 'boolean':
             item_property.setValue(self.item(row, 1).checkState())
         elif item_property.getType() == 'combo':
@@ -162,6 +164,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 self.item(row, 1).setText('')
             else:
                 self.item(row, 1).setText(str(item_property.getUserValue()))
+
         if not oldValue == item_property.getUserValue():
             self.emit(QtCore.SIGNAL('propertyChanged'), item_property.getName(), 
                       oldValue, item_property.getUserValue())
@@ -284,7 +287,7 @@ class ComboBoxTableItem(QtGui.QComboBox):
     Descript. :
     """
 
-    def __init__(self, parent, col, row, items_list = None):
+    def __init__(self, parent, row, col, items_list = None):
         """ 
         Descript. :
         """
@@ -307,7 +310,7 @@ class FileTableItem(QtGui.QWidget):
     Descript. :
     """
 
-    def __init__(self, parent, col, row, filename, file_filter):
+    def __init__(self, parent, row, col, filename, file_filter):
         """
         Descript. :
         """
@@ -363,7 +366,7 @@ class ColorTableItem(QtGui.QWidget):
     Descript. :
     """
 
-    def __init__(self, parent, col, row, color):
+    def __init__(self, parent, row, col, color):
         """
         Descript. :
         """
@@ -383,8 +386,8 @@ class ColorTableItem(QtGui.QWidget):
         main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(main_layout)
 
-        QtCore.QObject.connect(self.cmdChangeColor, QtCore.SIGNAL('clicked()'), self.cmdChangeColorClicked)
-        QtCore.QObject.connect(self.cmdResetColor, QtCore.SIGNAL('clicked()'), self.cmdResetColorClicked)
+        self.cmdChangeColor.clicked.connect(self.cmdChangeColorClicked)
+        self.cmdResetColor.clicked.connect(self.cmdResetColorClicked)
         self.setColor(color)
 
         #main_layout = QtGui.QVBoxLayout()

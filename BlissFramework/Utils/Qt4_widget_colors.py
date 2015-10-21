@@ -18,18 +18,20 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
+from PyQt4 import QtCore
+
+#Basic core colors
+WHITE = QtCore.Qt.white
+GRAY =  QtCore.Qt.gray
+LIGHT_GRAY = QtCore.Qt.lightGray
+DARK_GRAY = QtCore.Qt.darkGray
+GREEN = QtCore.Qt.green
 
 LIGHT_GREEN = QtGui.QColor(204,255,204)
 LIGHT_RED = QtGui.QColor(255,204,204)
 LIGHT_YELLOW = QtGui.QColor(12)
 LIGHT_BLUE = QtGui.QColor(10,170,255)
-LIGHT_GRAY = QtGui.QColor(240, 240, 240)
 SKY_BLUE = QtGui.QColor(122,175,220)
-DARK_GRAY = QtGui.QColor(4)
-WHITE = QtGui.QColor(255, 255, 255)
-GRAY =  QtGui.QColor(5)
-GREEN = QtGui.QColor(8)
-
 
 LINE_EDIT_ORIGINAL = QtGui.QColor(0, 0, 12)
 LINE_EDIT_ACTIVE = QtGui.QColor(204,255,204)
@@ -37,9 +39,7 @@ LINE_EDIT_CHANGED =  QtGui.QColor(255,165,0)
 LINE_EDIT_ERROR = QtGui.QColor(255,204,204)
 
 BUTTON_ORIGINAL = QtGui.QColor(242, 241, 240)
-
 GROUP_BOX_GRAY = QtGui.QColor(230, 230, 230)
-
 QUEUE_ENTRY_COLORS = [WHITE, LIGHT_GREEN, LIGHT_YELLOW, LIGHT_RED]
 
 
@@ -50,6 +50,6 @@ def set_widget_color(widget, color, color_role =None):
     if color_role is None:
         color_role = QtGui.QPalette.Window
     widget_palette = widget.palette()
-    widget_palette.setColor(color_role,color)
+    widget_palette.setColor(color_role, color)
     widget.setAutoFillBackground(True) 
     widget.setPalette(widget_palette)

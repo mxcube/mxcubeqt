@@ -66,7 +66,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_widget = QtGui.QWidget(self)
         set_to_label = QtGui.QLabel("Set to: ", self)
         self.new_value_ledit = QtGui.QLineEdit(self.new_value_widget)
-        self.new_value_ledit.setMaximumWidth(60)
+        #self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QtGui.QComboBox(self.new_value_widget)
         self.units_combobox.addItems(["keV", chr(197)]) 
         self.stop_button = QtGui.QPushButton(self.new_value_widget)        
