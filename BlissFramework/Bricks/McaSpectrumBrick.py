@@ -64,10 +64,13 @@ class McaSpectrumBrick(BlissWidget):
                 self._configure(config)
                 configured = True
 
-            data = numpy.array(data)
+            if data[0].size == 2:
+                x = numpy.array(data[:,0]) * 1.0
+                y = numpy.array(data[:,1])
+            else:
+                x = data[0] *1.0
+                y = data[1]
 
-            x = numpy.array(data[0]) * 1.0
-            y = numpy.array(data[1])
             xmin = float(config["min"])
             xmax = float(config["max"])
 
@@ -88,7 +91,10 @@ class McaSpectrumBrick(BlissWidget):
             pf = config["legend"].split(".")
             pd = pf[0].split("/")
             outfile = pd[-1]
-            outdir = config['htmldir']
+            try:
+                outdir = config['htmldir']
+            except:
+                outdir,_ = config['legend'].split("//")
             sourcename = config['legend']
 
             if configured and result:
