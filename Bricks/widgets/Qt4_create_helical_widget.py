@@ -49,11 +49,8 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
-        self._lines_widget = QtGui.QWidget(self)
-        line_label = QtGui.QLabel("Line:", self)
-        self._lines_widget = QtGui.QListWidget(self)
-        self._lines_widget.setEnabled(False)
-        self._lines_widget.setFixedWidth(270)
+        _lines_groupbox = QtGui.QGroupBox("Line", self)
+        self._lines_listwidget = QtGui.QListWidget(_lines_groupbox)
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
@@ -70,12 +67,11 @@ class CreateHelicalWidget(CreateTaskBase):
              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _lines_widget_hlayout = QtGui.QHBoxLayout(self._lines_widget)
-        _lines_widget_hlayout.addWidget(line_label)
-        _lines_widget_hlayout.addWidget(self._lines_widget)
-        _lines_widget_hlayout.setSpacing(2)
-        _lines_widget_hlayout.addStretch(0)
-        _lines_widget_hlayout.setContentsMargins(0,0,0,0)
+        _lines_groupbox_vlayout = QtGui.QVBoxLayout(_lines_groupbox)
+        _lines_groupbox_vlayout.addWidget(self._lines_listwidget)
+        _lines_groupbox_vlayout.setSpacing(2)
+        _lines_groupbox_vlayout.addStretch(0)
+        _lines_groupbox_vlayout.setContentsMargins(0,0,0,0)
 
         _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
@@ -83,7 +79,7 @@ class CreateHelicalWidget(CreateTaskBase):
         _data_path_gbox_layout.setContentsMargins(0,0,0,0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self._lines_widget)
+        _main_vlayout.addWidget(_lines_groupbox)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._processing_widget)
@@ -123,26 +119,25 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
-            self._lines_widget.addItem(shape.get_full_name())
-            self._lines_widget.setEnabled(True)
-            self._lines_map[shape] = self._lines_widget.count() - 1
-         
+            self._lines_listwidget.addItem(shape.get_full_name())
+            self._lines_listwidget.setEnabled(True)
+            self._lines_map[shape] = self._lines_listwidget.count() - 1
 
     def shape_deleted(self, shape, shape_type):
         if self._lines_map.get(shape):
-            self._lines_widget.removeItem(self._lines_map[shape])
+            self._lines_listwidget.removeItem(self._lines_map[shape])
             self._lines_map.pop(shape)
-        if self._lines_widget.count() == 0:
-            self._lines_widget.setEnabled(False)
+        if self._lines_listwidget.count() == 0:
+            self._lines_listwidget.setEnabled(False)
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
    
-        if len(self._lines_widget.selectedItems) == 0:
+        if len(self._lines_listwidget.selectedItems()) == 0:
             logging.getLogger("user_level_log").\
                 warning("No lines selected, please select one or more lines.")
 
-        return base_result and len(self._lines_widget.selectedItems) > 0
+        return base_result and len(self._lines_listwidget.selectedItems()) > 0
             
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
@@ -234,9 +229,11 @@ class CreateHelicalWidget(CreateTaskBase):
 
             # Acquisition for start position
             start_acq = self._create_acq(sample) 
-            
+           
+            start_graphical_point, end_graphical_point = \
+                shape.get_graphical_points() 
             start_acq.acquisition_parameters.\
-                centred_position = copy.deepcopy(shape.cp_start.centred_position)
+                centred_position = copy.deepcopy(start_graphical_point.get_centred_position())
             start_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
 
@@ -246,7 +243,7 @@ class CreateHelicalWidget(CreateTaskBase):
             end_acq = self._create_acq(sample)
 
             end_acq.acquisition_parameters.\
-                centred_position = shape.cp_end.centred_position
+                centred_position = copy.deepcopy(end_graphical_point.get_centred_position())
             end_acq.acquisition_parameters.centred_position.\
                 snapshot_image = snapshot
 
