@@ -64,9 +64,10 @@ class McaSpectrumWidget(BlissWidget):
         self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
         self.mcafit_widget.dismissButton.hide()
        
-        main_vlayout = QtGui.QVBoxLayout(self)
-        main_vlayout.addWidget(self.mcafit_widget)  
-        self.setLayout(main_vlayout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.mcafit_widget)  
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
     def setData(self, data, calib, config):
         try:
@@ -98,6 +99,8 @@ class McaSpectrumWidget(BlissWidget):
             outdir = config['htmldir']
             sourcename = config['legend']
 
+            result = self._fit()
+           
 
             if configured:
                 report = McaAdvancedFit.QtMcaAdvancedFitReport.\

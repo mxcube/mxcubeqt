@@ -56,26 +56,28 @@ class XRFScanParametersWidget(QtGui.QWidget):
                                              self.other_parameters_gbox)
 	self.count_time_ledit = QtGui.QLineEdit(self.other_parameters_gbox)
 	self.count_time_ledit.setFixedWidth(50)
+        self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", \
+             self.other_parameters_gbox)
+        self.adjust_transmission_cbox.hide()
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.mca_spectrum_widget = McaSpectrumWidget(self)
  
         # Layout -------------------------------------------------------------
-        self.other_parameters_gbox_layout = QtGui.QHBoxLayout(self)
-        self.other_parameters_gbox_layout.addWidget(self.count_time_label)  
-        self.other_parameters_gbox_layout.addWidget(self.count_time_ledit)
-        self.other_parameters_gbox_layout.addStretch(0)
-        self.other_parameters_gbox_layout.setSpacing(2)
-        self.other_parameters_gbox_layout.setContentsMargins(3, 3, 3, 3)
-        self.other_parameters_gbox.setLayout(self.other_parameters_gbox_layout)
+        _other_parameters_gbox_hlayout = QtGui.QHBoxLayout(self.other_parameters_gbox)
+        _other_parameters_gbox_hlayout.addWidget(self.count_time_label)  
+        _other_parameters_gbox_hlayout.addWidget(self.count_time_ledit)
+        _other_parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
+        _other_parameters_gbox_hlayout.addStretch(0)
+        _other_parameters_gbox_hlayout.setSpacing(2)
+        _other_parameters_gbox_hlayout.setContentsMargins(3, 3, 3, 3)
 
-        _parameters_widget_layout = QtGui.QVBoxLayout()
+        _parameters_widget_layout = QtGui.QVBoxLayout(_parameters_widget)
         _parameters_widget_layout.addWidget(self.data_path_widget)
         _parameters_widget_layout.addWidget(self.other_parameters_gbox)
         _parameters_widget_layout.addStretch(0)
         _parameters_widget_layout.setSpacing(2)
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
-        _parameters_widget.setLayout(_parameters_widget_layout)
 
         _top_widget_layout = QtGui.QHBoxLayout(_top_widget)
         _top_widget_layout.addWidget(_parameters_widget)
@@ -83,14 +85,11 @@ class XRFScanParametersWidget(QtGui.QWidget):
         _top_widget_layout.setSpacing(2)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
         
-        _top_widget.setLayout(_top_widget_layout) 
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.mca_spectrum_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
        
         # SizePolicies -------------------------------------------------------
         self.position_widget.setFixedSize(457, 350)

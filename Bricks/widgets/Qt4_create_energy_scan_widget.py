@@ -152,9 +152,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 # centred positions for the shapes
                 if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
                     snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot([shape])
+                           get_snapshot(shape)
 
-                    cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                    cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot
 
             path_template = self._create_path_template(sample, self._path_template)

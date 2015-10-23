@@ -70,12 +70,13 @@ class ScanPlotWidget(QtGui.QWidget):
         _main_vlayout.addWidget(self.lblTitle)
         _main_vlayout.addWidget(self.lblPosition)
         _main_vlayout.addWidget(self.graph)
-        self.setLayout(_main_vlayout)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
     def setRealTimePlot(self, isRealTime):
         self.isRealTimePlot = isRealTime 
 
-    def newScanStarted(self, scanParameters):
+    def start_new_scan(self, scanParameters):
         self.graph.clearcurves()
         self.isScanning = True
         self.lblTitle.setText('<nobr><b>%s</b></nobr>' % scanParameters['title'])
@@ -91,7 +92,7 @@ class ScanPlotWidget(QtGui.QWidget):
         self.graph.replot()
         self.graph.setTitle("Energy scan started. Waiting values...")
         
-    def newScanPoint(self, x, y):
+    def add_new_plot_value(self, x, y):
         self.xdata.append(x)
         for label,ydata,yvalue in zip(self.ylabel.split(),self.ydatas,str(y).split()) :
             ydata.append(float(yvalue))
@@ -103,7 +104,7 @@ class ScanPlotWidget(QtGui.QWidget):
         if signalDict['event'] == 'MouseAt' and self.isScanning:
             self.lblPosition.setText("(X: %0.2f, Y: %0.2f)" % (signalDict['x'], signalDict['y']))
 
-    def plotResults(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl,
+    def plot_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl,
                         rm, chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
 	self.graph.clearcurves()	
         self.graph.setTitle(title)
@@ -112,7 +113,7 @@ class ScanPlotWidget(QtGui.QWidget):
         self.graph.replot()
 	self.isScanning = False
 
-    def plotScanCurve(self, scan_data):
+    def plot_scan_curve(self, scan_data):
         self.graph.clearcurves()
         self.graph.setTitle("Energy scan finished")
         self.lblTitle.setText("")
@@ -127,5 +128,5 @@ class ScanPlotWidget(QtGui.QWidget):
         self.lblTitle.setText("")
         self.lblPosition.setText("")
 
-    def scanFinished(self):
+    def scan_finished(self):
         self.graph.setTitle("Energy scan finished") 

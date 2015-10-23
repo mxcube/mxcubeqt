@@ -191,12 +191,12 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         selected_grid_info = None
         treewidget_item = self.mesh_widget.mesh_treewidget.selectedItem()
         if treewidget_item is not None:
-            drawing_mgr = self.__list_items[treewidget_item]
+            grid_object = self.__list_items[treewidget_item]
             key = str(treewidget_item.text(0))
-            selected_grid_info = drawing_mgr._get_grid(key)[0]
+            #selected_grid_info = drawing_mgr._get_grid(key)[0]
 
-        if selected_grid_info:
-            snapshot = self._graphics_manager.get_snapshot([])
+        if grid_object:
+            snapshot = self._graphics_manager.get_snapshot(grid_object)
             acq = self._create_acq(sample)
             cpoint = selected_grid_info.get("centred_point")
             #cpos = self._beamline_setup_hwobj.diffractometer_hwobj.convert_from_obj_to_name(cpoint)

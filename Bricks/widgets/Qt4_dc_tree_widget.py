@@ -66,7 +66,6 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_model_hwobj = None
         self.beamline_setup_hwobj = None
         self.active_sample_changer_hwobj = None
-        self.hl_motor_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.collecting = False
@@ -130,7 +129,7 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget = QtGui.QTreeWidget(self)
 
         # Layout --------------------------------------------------------------
-        button_widget_grid_layout = QtGui.QGridLayout(self) 
+        button_widget_grid_layout = QtGui.QGridLayout(self.button_widget) 
         button_widget_grid_layout.addWidget(self.up_button, 0, 0)
         button_widget_grid_layout.addWidget(self.down_button, 0, 1)
         button_widget_grid_layout.addWidget(self.collect_button, 1, 0, 1, 2)
@@ -139,14 +138,12 @@ class DataCollectTree(QtGui.QWidget):
         button_widget_grid_layout.setColumnStretch(2, 1)
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
-        self.button_widget.setLayout(button_widget_grid_layout)
         
         main_layout = QtGui.QVBoxLayout(self)
         main_layout.addWidget(self.sample_tree_widget)
         main_layout.addWidget(self.button_widget)
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(1) 
-        self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
         self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(\
@@ -162,6 +159,8 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.contextMenuEvent = self.show_context_menu
         self.sample_tree_widget.itemDoubleClicked.connect(self.item_double_click)
         self.sample_tree_widget.itemClicked.connect(self.item_click)
+        self.sample_tree_widget.itemChanged.connect(self.item_changed)
+
         self.confirm_dialog.continueClickedSignal.connect(self.collect_items)
         self.continue_button.clicked.connect(self.continue_button_click)
 
@@ -241,6 +240,17 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         self.check_for_path_collisions()
+
+    def item_changed(self, item, column):
+        """
+        Descript. : As there is no signal when item is checked/unchecked
+                    it is necessary to update item based on QTreeWidget
+                    signal itemChanged. 
+                    Item check state is updated when checkbox is toggled
+                    (to avoid update when text is changed)                    
+        """
+        if item.checkState(0) != item.get_previous_check_state():
+            item.update_check_state()        
 
     def context_collect_item(self):
         """
@@ -440,24 +450,14 @@ class DataCollectTree(QtGui.QWidget):
         cls = Qt4_queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
 
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
-        view_item.setExpanded(True)
-        #view_item.setFirstColumnSpanned(True)
-        #if view_item.parent():
-        #    view_item.parent().setOn(True)
+
+        if isinstance(task, queue_model_objects.Basket):
+            view_item.setExpanded(task.get_is_present() == True)
+        else:
+            view_item.setExpanded(True) 
 
         self.queue_model_hwobj.view_created(view_item, task)
-        #self.sample_tree_widget.resizeColumnToContents(0)
-        self.sample_tree_widget.clearSelection()
-       
-        if isinstance(task, queue_model_objects.Basket):
-            #TODO fix this 
-            #view_item.setDisabled(not task.get_is_present())
-            #view_item.setExpanded(task.get_is_present())
-            #view_item.setOn(False)
-            pass
-        #else: 
-        #    view_item.setSelected(True)
-        #    self.selection_changed_cb([view_item])
+        self.collect_button.setDisabled(False)
 
     def get_selected_items(self):
         """
@@ -687,7 +687,6 @@ class DataCollectTree(QtGui.QWidget):
         self.user_stopped = False
         self.delete_button.setEnabled(False)
         self.enable_sample_changer_widget(False)
-        print 1    
         self.collecting = True
         self.collect_button.setText(" Stop   ")
         Qt4_widget_colors.set_widget_color(
@@ -695,12 +694,11 @@ class DataCollectTree(QtGui.QWidget):
                           Qt4_widget_colors.LIGHT_RED,
                           QtGui.QPalette.Button)
         self.collect_button.setIcon(QtGui.QIcon(self.stop_pixmap))
-        print 2 
         self.parent().enable_hutch_menu(False)
         self.run_cb()
-        print 3
+
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.BusyCursor))
         try:
-            print 4
             self.queue_hwobj.execute()
         except Exception, e:
             raise e
@@ -709,6 +707,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
+        QtGui.QApplication.restoreOverrideCursor()
         self.queue_hwobj.stop()
         self.queue_stop_handler()
 
@@ -716,6 +715,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
+        QtGui.QApplication.restoreOverrideCursor()
         self.user_stopped = True
         self.queue_execution_completed(None)
                
@@ -723,6 +723,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
+        QtGui.QApplication.restoreOverrideCursor() 
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(QtGui.QIcon(self.play_pixmap))
@@ -759,7 +760,7 @@ class DataCollectTree(QtGui.QWidget):
 
         if not isinstance(selected_items, list):
             selected_items = self.get_selected_items()
-        
+
         for item in selected_items:
             parent = item.parent()
             if item.deletable:
@@ -788,7 +789,6 @@ class DataCollectTree(QtGui.QWidget):
             self.delete_click(selected_items = children)
 
         self.check_for_path_collisions()
-        self.set_first_element() 
 
     def set_first_element(self):
         """

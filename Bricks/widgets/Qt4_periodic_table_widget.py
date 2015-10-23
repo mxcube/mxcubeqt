@@ -63,7 +63,6 @@ class PeriodicTableWidget(QtGui.QWidget):
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)  
 
         # SizePolicies --------------------------------------------------------
         #self.periodic_table.setSizePolicy(QtGui.QSizePolicy.Fixed,

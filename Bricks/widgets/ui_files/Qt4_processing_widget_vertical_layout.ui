@@ -378,6 +378,13 @@
           </item>
          </layout>
         </item>
+        <item>
+         <widget class="QCheckBox" name="run_processing_cbox">
+          <property name="text">
+           <string>Run processing after collection</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>

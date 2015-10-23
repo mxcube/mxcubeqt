@@ -78,6 +78,7 @@ class CreateTaskBase(QtGui.QWidget):
 
         if bl_setup is not None:
             if self._acq_widget:
+                self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
                 self._acq_widget.init_detector_modes()
         else:
@@ -406,7 +407,6 @@ class CreateTaskBase(QtGui.QWidget):
 
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
-
             self.setDisabled(False)
 
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):

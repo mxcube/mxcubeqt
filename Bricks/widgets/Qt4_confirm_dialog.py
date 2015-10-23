@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import logging
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -160,7 +161,6 @@ class ConfirmDialog(QtGui.QDialog):
                 for file_path in file_paths:
                     (dir_name, f_name) = os.path.split(file_path)
                     sample_name = current_sample_item.get_model().get_display_name()
-
                     if sample_name is '':
                         sample_name = current_sample_item.get_model().loc_str
 

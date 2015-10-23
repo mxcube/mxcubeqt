@@ -27,9 +27,7 @@ import queue_model_objects_v1 as queue_model_objects
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget
-from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
-
-#from widgets.Qt4_scan_plot_widget import ScanPlotWidget
+from widgets.Qt4_scan_plot_widget import ScanPlotWidget
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -61,16 +59,10 @@ class EnergyScanParametersWidget(QtGui.QWidget):
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.position_widget.setFixedSize(450, 340)        
 
-        self.scan_plot_widget = TwoAxisPlotWidget(self)
-        self.scan_plot_widget.set_real_time_plot(True)
-        self.result_plot_widget = TwoAxisPlotWidget(self)
-
-        """self.scan_plot_widget = ScanPlotWidget(self)
+        self.scan_plot_widget = ScanPlotWidget(self)
         self.scan_plot_widget.setRealTimePlot(True)
         self.result_plot_widget = ScanPlotWidget(self)
         self.result_plot_widget.setRealTimePlot(False)
-        self.scan_plot_widget.setFixedHeight(200)
-        self.result_plot_widget.setFixedHeight(200)"""
  
         # Layout -------------------------------------------------------------
         _parameters_widget_layout = QtGui.QVBoxLayout()
@@ -194,4 +186,4 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.result_plot_widget.plot_results(pk, fppPeak, fpPeak, 
               ip, fppInfl, fpInfl, rm, chooch_graph_x, chooch_graph_y1, 
               chooch_graph_y2, title)
-        self.scan_plot_widget.plot_finished()
+        self.scan_plot_widget.scan_finished()

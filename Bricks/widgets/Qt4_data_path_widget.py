@@ -64,11 +64,10 @@ class DataPathWidget(QtGui.QWidget):
                                 "ui_files/Qt4_data_path_widget_horizontal_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self.data_path_layout)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.data_path_layout)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # Qt signal/slot connections ------------------------------------------ 
         self.data_path_layout.prefix_ledit.textChanged.connect(self._prefix_ledit_change)

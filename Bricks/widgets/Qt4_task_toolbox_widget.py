@@ -31,7 +31,7 @@ from widgets.Qt4_create_discrete_widget import CreateDiscreteWidget
 from widgets.Qt4_create_helical_widget import CreateHelicalWidget
 from widgets.Qt4_create_char_widget import CreateCharWidget
 from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
-from widgets.Qt4_create_xrf_scan_widget import CreateXRFScanWidget
+from widgets.Qt4_create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.Qt4_create_advanced_scan_widget import CreateAdvancedScanWidget
 
 
@@ -62,14 +62,14 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
-        self.xrf_scan_page = CreateXRFScanWidget(self.tool_box, "xrf_scan")  
+        self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")  
         self.advanced_scan_page = CreateAdvancedScanWidget(self.tool_box, "advanced_scan")
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-        self.tool_box.addItem(self.xrf_scan_page, "XRF Scan")
+        self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         self.tool_box.addItem(self.advanced_scan_page, "Advanced")
 
         self.button_box = QtGui.QWidget(self)
@@ -79,26 +79,23 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.create_task_button.setToolTip(msg)
         
         # Layout --------------------------------------------------------------
-        self.method_group_box_layout = QtGui.QVBoxLayout(self)
-        self.method_group_box_layout.addWidget(self.tool_box)
-        self.method_group_box_layout.setSpacing(0)
-        self.method_group_box_layout.setContentsMargins(0, 0, 0, 0)
-        self.method_group_box.setLayout(self.method_group_box_layout)
+        _method_group_box_vlayout = QtGui.QVBoxLayout(self.method_group_box)
+        _method_group_box_vlayout.addWidget(self.tool_box)
+        _method_group_box_vlayout.setSpacing(0)
+        _method_group_box_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.button_box_layout = QtGui.QHBoxLayout(self)
-        self.button_box_layout.addStretch(0)
-        self.button_box_layout.addWidget(self.create_task_button)
-        self.button_box_layout.setSpacing(0)
-        self.button_box_layout.setContentsMargins(0, 0, 0, 0)
-        self.button_box.setLayout(self.button_box_layout)
+        _button_box_hlayout = QtGui.QHBoxLayout(self.button_box)
+        _button_box_hlayout.addStretch(0)
+        _button_box_hlayout.addWidget(self.create_task_button)
+        _button_box_hlayout.setSpacing(0)
+        _button_box_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.main_layout = QtGui.QVBoxLayout(self)
-        self.main_layout.addWidget(self.method_group_box)
-        #self.main_layout.addStretch(0)  
-        self.main_layout.addWidget(self.button_box)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout) 
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.method_group_box)
+        #_main_vlayout.addStretch(0)  
+        _main_vlayout.addWidget(self.button_box)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
         self.setSizePolicy(QtGui.QSizePolicy.Expanding,
@@ -144,7 +141,6 @@ class TaskToolBoxWidget(QtGui.QWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
-        #import pdb;pdb.set_trace()
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).ispyb_logged_in(logged_in)
             
@@ -156,9 +152,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
             # Get the directory form the previous page and update 
             # the new page with the direcotry and run_number from the old.
-            # IFF sample or group selected.
-            if isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem) or\
-                    isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
+            # IF sample, basket group selected.
+            if type(tree_item) in (Qt4_queue_item.DataCollectionGroupQueueItem, \
+                                  Qt4_queue_item.SampleQueueItem, \
+                                  Qt4_queue_item.BasketQueueItem):
                 new_pt = self.tool_box.widget(page_index)._path_template
                 previous_pt = self.tool_box.widget(self.previous_page_index)._path_template
                 new_pt.directory = previous_pt.directory
@@ -181,7 +178,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 if self.tool_box.currentWidget() == self.energy_scan_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, Qt4_queue_item.XRFScanQueueItem):
-                if self.tool_box.currentWidget() == self.xrf_scan_page:
+                if self.tool_box.currentWidget() == self.xrf_spectrum_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, Qt4_queue_item.GenericWorkflowQueueItem):
                 if self.tool_box.currentWidget() == self.workflow_page:
@@ -214,7 +211,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentWidget(self.energy_scan_page)
             elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
-                self.tool_box.setCurrentWidget(self.xrf_scan_page)
+                self.tool_box.setCurrentWidget(self.xrf_spectrum_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
 

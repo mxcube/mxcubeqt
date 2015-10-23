@@ -51,9 +51,9 @@ class CreateHelicalWidget(CreateTaskBase):
         # Graphic elements ----------------------------------------------------
         self._lines_widget = QtGui.QWidget(self)
         line_label = QtGui.QLabel("Line:", self)
-        self._lines_combo = QtGui.QComboBox(self)
-        self._lines_combo.setEnabled(False)
-        self._lines_combo.setFixedWidth(270)
+        self._lines_widget = QtGui.QListWidget(self)
+        self._lines_widget.setEnabled(False)
+        self._lines_widget.setFixedWidth(270)
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
@@ -72,7 +72,7 @@ class CreateHelicalWidget(CreateTaskBase):
         # Layout --------------------------------------------------------------
         _lines_widget_hlayout = QtGui.QHBoxLayout(self._lines_widget)
         _lines_widget_hlayout.addWidget(line_label)
-        _lines_widget_hlayout.addWidget(self._lines_combo)
+        _lines_widget_hlayout.addWidget(self._lines_widget)
         _lines_widget_hlayout.setSpacing(2)
         _lines_widget_hlayout.addStretch(0)
         _lines_widget_hlayout.setContentsMargins(0,0,0,0)
@@ -123,30 +123,26 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
-            self._lines_combo.addItem(shape.get_full_name())
-            self._lines_combo.setEnabled(True)
-            self._lines_map[shape] = self._lines_combo.count() - 1
+            self._lines_widget.addItem(shape.get_full_name())
+            self._lines_widget.setEnabled(True)
+            self._lines_map[shape] = self._lines_widget.count() - 1
          
 
     def shape_deleted(self, shape, shape_type):
         if self._lines_map.get(shape):
-            self._lines_combo.removeItem(self._lines_map[shape])
+            self._lines_widget.removeItem(self._lines_map[shape])
             self._lines_map.pop(shape)
-        if self._lines_combo.count() == 0:
-            self._lines_combo.setEnabled(False)
+        if self._lines_widget.count() == 0:
+            self._lines_widget.setEnabled(False)
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
-    
-        selected_lines = False
-        
-        if self.selected_items():
-            selected_lines = True
-        else:
+   
+        if len(self._lines_widget.selectedItems) == 0:
             logging.getLogger("user_level_log").\
                 warning("No lines selected, please select one or more lines.")
 
-        return base_result and selected_lines 
+        return base_result and len(self._lines_widget.selectedItems) > 0
             
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
