@@ -44,13 +44,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
         """
         Descript. :
         """
-        # All subclasses should have the following
-        # data attributes.
-        self.deletable = kwargs.pop('deletable', False)
-        controller = kwargs.pop('controller', None)
-        args = args + (controller, )
-
         QtGui.QTreeWidgetItem.__init__(self, args[0], args[2])
+        self.deletable = kwargs.pop('deletable', False)
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
@@ -58,90 +53,57 @@ class QueueItem(QtGui.QTreeWidgetItem):
         self._queue_entry = None
         self._data_model = None
         self._checkable = True
+        self._previous_check_state = False
         self._font_is_bold = False
         self.setText(1, '')         
 
-    def activate(self):
+    def setOn(self, state):
         """
-        Inherited from QCheckListitem, called whenever the user presses the 
-        mouse on this item or presses Space on it. 
-        """
+        Descript. : Backward compatability, because QueueManager and other
+                    hwobj are using this method to change state 
+        """ 
         if self._checkable:
-            QtGui.QCheckListItem.activate(self)
-
-    def stateChange(self, state):
-        """
-        Descript. :
-        """
-        if self._checkable:
-            QtGui.QCheckListItem.stateChange(self, state)
-            # The QCheckListItem is somewhat tricky:
-            # state = 0     The item is unchecked.
-            #
-            # state = 1     The item is checked but
-            #               not all of the children
-            #
-            # state = 2     The item and all its children are
-            #               checked.
-            #
-            # However the state passed by stateChanged are a boolean
-            # we have to use the state() member to get the actual state.
-            # Great !
-
-            if self._queue_entry:
-                if self.checkState() > 0:
-                    self._queue_entry.set_enabled(True)                
-                else:
-                    self._queue_entry.set_enabled(False)
-
-            if self._data_model:
-                if self.checkState() > 0:
-                    self._data_model.set_enabled(True)                
-                else:
-                    self._data_model.set_enabled(False)
+            if state:
+                check_state = QtCore.Qt.Checked
+            else:
+                check_state = QtCore.Qt.Unchecked
+            self.setCheckState(0, check_state)
         else:
-            self.setOn(False)
-            
-    def paintEvent(self, painter, color_group, column, width, align):
+            self.setCheckState(0, QtCore.Qt.Unchecked)
+
+    def setCheckState(self, column, check_state):
         """
-        Inherited from QCheckListItem, called before this item is drawn
-        on the screen.
+        Descript. : sets check state for item and all children and parent
+                    if they exist
+        """    
+        self._previous_check_state = self.checkState(0) 
+        if isinstance(self, DataCollectionGroupQueueItem):
+            self._checkable = False
+            if self.childCount() == 0:
+                self._checkable = True
+            else:
+                for index in range(self.childCount()):
+                    if self.child(index)._checkable:
+                        self._checkable = True
+                        break
+        if not self._checkable:
+            check_state = QtCore.Qt.Unchecked  
+        QtGui.QTreeWidgetItem.setCheckState(self, column, check_state)
+        if self._queue_entry:
+            self._queue_entry.set_enabled(check_state > 0)
+        if self._data_model:
+            self._data_model.set_enabled(check_state > 0)
 
-        The qt3 documentation has more information about this method that
-        can be worth reading.
+    def update_check_state(self):
         """
-        #try:
-        if True:
-            painter.save()
-            f = painter.font()
-            f.setBold(self._font_is_bold)
-            painter.setFont(f)
-             
-            color_group = qt.QColorGroup(color_group)
-            color_group.setColor(qt.QColorGroup.Text, self.brush.color())
-            color_group.setBrush(qt.QColorGroup.Text, self.brush)
-            color_group.setColor(qt.QColorGroup.Base, self.bg_brush.color())
-
-            qt.QCheckListItem.paintCell(self, painter, color_group, 
-                                     column, width, align)
-        #finally:
-        #    painter.restore()
-
-    def paintFocus(self, painter, color_group, rect):
+        Descript. : in qt3 method was called stateChanged.
         """
-        Inherited from QCheckListItem, called when the item get focus.
-
-        The qt3 documentation has more information about this method that
-        can be worth reading.
-        """
-
-        color_group.setColor(qt.QColorGroup.Text, self.brush.color())
-        color_group.setBrush(qt.QColorGroup.Text, self.brush)
-
-        qt.QCheckListItem.paintFocus(self, painter, color_group, rect)
-
-        color_group.setColor(qt.QColorGroup.Text, self.normal_brush.color())
-        color_group.setBrush(qt.QColorGroup.Text, self.normal_brush)
+        self.setCheckState(0, self.checkState(0))
+        if type(self) in (SampleQueueItem, DataCollectionGroupQueueItem):
+            for index in range(self.childCount()):
+                self.child(index).setCheckState(0, self.checkState(0))  
+        if isinstance(self.parent(), SampleQueueItem):
+            self.parent().setCheckState(0, self.checkState(0))
 
     def move_item(self, after):
         """
@@ -170,8 +132,6 @@ class QueueItem(QtGui.QTreeWidgetItem):
 
         if self.treeWidget():
             self.treeWidget().updateGeometry()
-        #if self.listView():
-        #    self.listView().triggerUpdate()
 
     def set_background_color(self, color_index):
         self.previous_bg_brush = self.background(0)
@@ -198,38 +158,17 @@ class QueueItem(QtGui.QTreeWidgetItem):
         :returns: The last item of this child.
         :rtype: QueueItem
         """
-        """sibling = self.child(0)
-        last_child = None
-
-        while(sibling):
-            last_child = sibling
-            sibling = sibling.treeWidget().itemBelow(sibling)
-            #sibling = sibling.nextSibling()
-        return last_child"""
         if self.childCount() > 0: 
             return self.child(self.childCount())
-
-    def setOn(self, state):
-        if self._checkable: 
-            if state:
-                check_state = QtCore.Qt.Checked
-            else:
-                check_state = QtCore.Qt.Unchecked
-            QtGui.QTreeWidgetItem.setCheckState(self, 0, check_state)
-
-            if self._queue_entry:
-                self._queue_entry.set_enabled(state)
-
-            if self._data_model:
-                self._data_model.set_enabled(state)
-        else:
-            QtGui.QTreeWidgetItem.setCheckState(self, 0, QtCore.Qt.Unchecked)
 
     def set_checkable(self, state):
         self._checkable = state
 
     def set_queue_entry(self, queue_entry):
         self._queue_entry = queue_entry
+
+    def get_previous_check_state(self):
+        return self._previous_check_state
 
     def get_queue_entry(self):
         return self._queue_entry

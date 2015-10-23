@@ -28,9 +28,9 @@ from widgets.Qt4_data_path_widget import DataPathWidget
 __category__ = 'Qt4_TaskToolbox_Tabs'
 
 
-class CreateXRFScanWidget(CreateTaskBase):
+class CreateXRFSpectrumWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
-        CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), 'XRF-scan')
+        CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), 'XRFSpectrum')
  
         if name is not None:
             self.setObjectName(name)
@@ -141,7 +141,7 @@ class CreateXRFScanWidget(CreateTaskBase):
                 if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
                     snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
 
-                    cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                    cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot
 
             path_template = self._create_path_template(sample, self._path_template)
@@ -157,12 +157,3 @@ class CreateXRFScanWidget(CreateTaskBase):
                 info("No count time specified.") 
 
         return data_collections
-
-
-if __name__ == "__main__":
-    app = qt.QApplication(sys.argv)
-    qt.QObject.connect(app, qt.SIGNAL("lastWindowClosed()"), app, qt.SLOT("quit()"))
-    widget = CreateXRFScanWidget()
-    app.setMainWidget(widget)
-    widget.show()
-    app.exec_loop()

@@ -83,6 +83,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.reject_button = MonoStateButton(self, "Reject", "ThumbDown")
         self.reject_button.hide()
         self.create_line_button = MonoStateButton(self, "Line", "Line")
+        self.create_grid_button = MonoStateButton(self, "Grid", "GridDrag")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
@@ -106,7 +107,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _move_down_button.setAutoRepeat(True)
 
         # Layout -------------------------------------------------------------- 
-        _beam_position_widget_gridlayout = QtGui.QGridLayout()
+        _beam_position_widget_gridlayout = QtGui.QGridLayout(self.beam_position_widget)
         _beam_position_widget_gridlayout.addWidget(_move_mark_label, 0, 0, 1, 3, QtCore.Qt.AlignHCenter)
         _beam_position_widget_gridlayout.addWidget(_move_left_button, 2, 0)
         _beam_position_widget_gridlayout.addWidget(_move_up_button, 1, 1)
@@ -115,13 +116,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _beam_position_widget_gridlayout.setHorizontalSpacing(0)
         _beam_position_widget_gridlayout.setVerticalSpacing(0)
         _beam_position_widget_gridlayout.setContentsMargins(0, 0, 0, 0)
-        self.beam_position_widget.setLayout(_beam_position_widget_gridlayout)
 
-        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.centre_button)
         _main_vlayout.addWidget(self.accept_button)
         _main_vlayout.addWidget(self.reject_button)
         _main_vlayout.addWidget(self.create_line_button)
+        _main_vlayout.addWidget(self.create_grid_button)
         _main_vlayout.addWidget(self.snapshot_button)
         _main_vlayout.addWidget(self.refresh_camera_button)
         _main_vlayout.addWidget(self.visual_align_button)
@@ -132,13 +133,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
         self.centre_button.commandExecuteSignal.connect(self.centre_button_clicked)
         self.accept_button.clicked.connect(self.accept_clicked)
         self.reject_button.clicked.connect(self.reject_clicked)
         self.create_line_button.clicked.connect(self.create_line_clicked)
+        self.create_grid_button.clicked.connect(self.create_grid_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
         self.refresh_camera_button.clicked.connect(self.refresh_camera_clicked)
         self.visual_align_button.clicked.connect(self.visual_align_clicked)
@@ -201,13 +202,19 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         formats = ["*.%s" % unicode(format).lower() for format in \
                    QtGui.QImageWriter.supportedImageFormats()]
+
         current_filename = os.path.join(self.directory, self.prefix)
         current_filename = current_filename + '_%d%s%s' % (self.file_index, \
                            os.path.extsep, self.format_type)
-        filename = str(QtGui.QFileDialog.getSaveFileName(self, "Choose a filename to save under",
+
+        #dialog = QtGui.QFileDialog(self, "Open Directory", current_filename)
+        #dialog.exec()  
+
+        filename = QtCore.QString(QtGui.QFileDialog.getSaveFileName(\
+            self, "Choose a filename to save under",
             current_filename, "Image files (%s)" % " ".join(formats)))
 
-        if len(filename):
+        if not filename.isEmpty():
             image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
                 img = self.graphics_manager_hwobj.get_snapshot([])
@@ -349,6 +356,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
 
+    def create_grid_clicked(self):
+        self.graphics_manager_hwobj.create_grid_drag()
+
     def diffractometer_ready_changed(self, is_ready):
         self.setEnabled(is_ready)
 
@@ -434,7 +444,8 @@ class DuoStateButton(QtGui.QToolButton):
         Args.     : 
         Return    : 
         """
-        Qt4_widget_colors.set_widget_color(self, QtCore.Qt.yellow)
+        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.LIGHT_YELLOW,
+            QtGui.QPalette.Button) 
         if self.stop_icon is not None:
             self.setIcon(self.stop_icon)
         self.executing = True
@@ -455,7 +466,8 @@ class DuoStateButton(QtGui.QToolButton):
         Return    : 
         """
         self.executing = False
-        Qt4_widget_colors.set_widget_color(self, self.standard_color)
+        Qt4_widget_colors.set_widget_color(self, self.standard_color,
+            QtGui.QPalette.Button)
         if self.run_icon is not None:
             self.setIcon(self.run_icon)
         self.setEnabled(True)

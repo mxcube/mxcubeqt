@@ -573,7 +573,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.setEnabled(False)
 
         if self.login_as_user:
-            print "login as user"    
+            print "login as user... implement this"    
         else:
             prop_type = str(self.proposal_type_combox.currentText())
             prop_number = str(self.proposal_number_ledit.text())

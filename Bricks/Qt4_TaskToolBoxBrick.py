@@ -97,6 +97,8 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         if self.session_hwobj.session_id:
             self.setEnabled(True)
 
+
+
         tree_brick = {}
         self.emit(QtCore.SIGNAL("getTreeBrick"), tree_brick)
         self.tree_brick = tree_brick.get('tree_brick', None)
@@ -144,8 +146,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.session_hwobj.set_user_group('')
 
         self.setEnabled(logged_in)
-        #self.task_tool_box_widget.ispyb_logged_in(logged_in)
-        
+        self.task_tool_box_widget.ispyb_logged_in(logged_in)
     
     def propertyChanged(self, property_name, old_value, new_value):
         """

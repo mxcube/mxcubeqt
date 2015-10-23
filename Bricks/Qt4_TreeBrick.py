@@ -368,7 +368,6 @@ class Qt4_TreeBrick(BlissWidget):
             l_sample.init_from_sc_sample([new_location])
             l_sample.set_name(name)
 
-        #import pdb;pdb.set_trace()
         return barcode_samples, l_samples
 
     def refresh_sample_list(self, current_index):

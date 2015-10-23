@@ -50,7 +50,6 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         # Properties ----------------------------------------------------------
         self.addProperty('mnemonic', 'string', '/Qt4_graphics-manager')
         self.addProperty('targetMenu', 'combo', ("menuBar", "toolBar", "both"), "menuBar")
-        self.addProperty('menuPosition', 'integer', 1)
 
         # Signals ------------------------------------------------------------
 
@@ -68,55 +67,62 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
 
     def run(self):
         self.tools_menu = QtGui.QMenu("Graphics tools", self)
-        self.measure_distance_action = self.tools_menu.addAction(
+        _measure_menu = self.tools_menu.addMenu("Measure")
+
+        self.measure_distance_action = _measure_menu.addAction(
              Qt4_Icons.load_icon("measure_distance"),
-             "Measure distance", 
+             "Distance", 
              self.measure_distance_clicked)
         self.measure_distance_action.setCheckable(True)
-        self.measure_angle_action = self.tools_menu.addAction(
+        self.measure_angle_action = _measure_menu.addAction(
              Qt4_Icons.load_icon("measure_angle"),
-             "Measure angle", 
+             "Angle", 
              self.measure_angle_clicked)
         self.measure_angle_action.setCheckable(True)
-        self.measure_area_action = self.tools_menu.addAction(
+        self.measure_area_action = _measure_menu.addAction(
              Qt4_Icons.load_icon("measure_area"),
-             "Measure area", 
+             "Area", 
              self.measure_area_clicked) 
         self.measure_area_action.setCheckable(True)
 
-        self.tools_menu.addSeparator()
-        self.create_point_click_action = self.tools_menu.addAction(
+        _create_menu = self.tools_menu.addMenu("Create")
+        self.create_point_click_action = _create_menu.addAction(
              Qt4_Icons.load_icon("VCRPlay2"),
-             "Create point with 3 clicks",
+             "Centring point with 3 clicks",
              self.create_point_click_clicked)
-        self.create_point_current_action = self.tools_menu.addAction(
+        self.create_point_current_action = _create_menu.addAction(
              Qt4_Icons.load_icon("ThumpUp"),
-             "Create point on current position", 
+             "Centring point on current position", 
              self.create_point_current_clicked)
-        self.create_line_action = self.tools_menu.addAction(
+        self.create_line_action = _create_menu.addAction(
              Qt4_Icons.load_icon("Line.png"),
-             "Create line",
+             "Helical line",
              self.create_line_clicked)
-        self.create_grid_drag_action = self.tools_menu.addAction(
+        self.create_grid_drag_action = _create_menu.addAction(
              Qt4_Icons.load_icon("GridDrag"),
-             "Create grid with drag and drop",
+             "Grid with drag and drop",
              self.create_grid_drag_clicked)
-        self.create_grid_click_action = self.tools_menu.addAction(
+        self.create_grid_click_action = _create_menu.addAction(
              Qt4_Icons.load_icon("GridClick"),
-             "Create grid with 2 clicks",
+             "Grid with 2 clicks",
              self.create_grid_click_clicked) 
-        self.create_grid_auto_action = self.tools_menu.addAction(
+        self.create_grid_auto_action = _create_menu.addAction(
              Qt4_Icons.load_icon("GridAuto"),
-             "Create auto grid",
+             "Automatic grid",
              self.create_grid_auto_clicked) 
+      
+        self.move_beam_mark_action = self.tools_menu.addAction(
+             "Move beam mark",
+             self.move_beam_mark_clicked)
 
         if self.target_menu == "menuBar":
-            BlissWidget._menuBar.addMenu(self.tools_menu)
+            BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
         elif self.target_menu == "toolBar":
             for action in self.tools_menu.actions():
                 BlissWidget._toolBar.addAction(action)
         else:
-            BlissWidget._menuBar.addMenu(self.tools_menu)
+         
+            BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
             toolbar_actions = []
             for action in self.tools_menu.actions():
                 BlissWidget._toolBar.addAction(action)
@@ -204,3 +210,5 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
     def create_grid_auto_clicked(self):
         self.graphics_manager_hwobj.create_grid_auto()
     
+    def move_beam_mark_clicked(self):
+        self.graphics_manager_hwobj.start_move_beam_mark()

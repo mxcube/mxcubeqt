@@ -42,7 +42,8 @@ class Qt4_XRFScanParametersBrick(BlissWidget):
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.xrf_scan_widget)
-        self.setLayout(_main_vlayout) 
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         self.defineSlot("populate_xrf_widget", ({}))
 
