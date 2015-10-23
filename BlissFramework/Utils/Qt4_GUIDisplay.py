@@ -17,10 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import new
 import logging
 import weakref
-import new
+import platform
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -29,6 +29,9 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, LabelCfg, WindowCfg, ContainerCfg, TabCfg
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
+
+
+__version__ = '2.1'
 
 
 class CustomMenuBar(QtGui.QMenuBar):
@@ -69,6 +72,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.expert_mode_action.setCheckable(True) 
         self.help_menu = self.addMenu("Help") 
         self.help_menu.addAction("Whats this", self.whats_this_clicked)
+        self.help_menu.addAction("About", self.about_clicked) 
 
         # Layout --------------------------------------------------------------
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
@@ -164,6 +168,14 @@ class CustomMenuBar(QtGui.QMenuBar):
         """
         if self.execution_mode:
             BlissWidget.updateWhatsThis()
+
+    def about_clicked(self):
+        QtGui.QMessageBox.about(self, "About MXCuBE",
+                 """<b>MXCuBE v %s </b> 
+                 <p>Macromolecular Xtallography Customized Beamline Environment<p>
+                 Python %s - Qt %s - PyQt %s on %s"""%(__version__, 
+                 platform.python_version(),
+                 QtCore.QT_VERSION_STR, QtCore.PYQT_VERSION_STR, platform.system()))
 
     def quit_clicked(self):
         """
@@ -757,6 +769,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                         newItem.setFrameStyle(frame_style)
                     except:
                         logging.getLogger().exception("Could not set frame style on item %s", item_cfg["name"])
+                if item_cfg["properties"]["fixedwidth"] > -1: 
+                    newItem.setFixedWidth(item_cfg["properties"]["fixedwidth"])
+                if item_cfg["properties"]["fixedheight"] > -1: 
+                    newItem.setFixedHeight(item_cfg["properties"]["fixedheight"])
             elif item_type == "icon":
                 img = QtGui.QPixmap()
                 if img.load(item_cfg["properties"]["filename"]):

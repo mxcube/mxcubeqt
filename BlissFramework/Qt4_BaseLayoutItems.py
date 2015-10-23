@@ -115,6 +115,8 @@ class ContainerCfg(_CfgItem):
         self.properties.addProperty("vsizepolicy", "combo", ("fixed", "expanding", "default"), "default")
         self.properties.addProperty("frameshape", "combo", ("Box", "Panel", "StyledPanel", "HLine", "VLine", "default"), "default")
         self.properties.addProperty("shadowstyle", "combo", ("plain", "raised", "sunken", "default"), "default")
+        self.properties.addProperty("fixedwidth", "integer", -1)   
+        self.properties.addProperty("fixedheight", "integer", -1) 
 
     def addChild(self, item):
         """

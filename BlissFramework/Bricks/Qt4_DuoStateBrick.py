@@ -84,31 +84,28 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.set_out_button.setCheckable(True)
 
         # Layout -------------------------------------------------------------- 
-        _buttons_widget_hlayout = QtGui.QHBoxLayout()
+        _buttons_widget_hlayout = QtGui.QHBoxLayout(self.buttons_widget)
         _buttons_widget_hlayout.addWidget(self.set_in_button)
         _buttons_widget_hlayout.addWidget(self.set_out_button)
         _buttons_widget_hlayout.setSpacing(0)
         _buttons_widget_hlayout.setContentsMargins(0, 0, 0, 0)
-        self.buttons_widget.setLayout(_buttons_widget_hlayout)
 
-        _main_gbox_vlayout = QtGui.QVBoxLayout()
+        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
         _main_gbox_vlayout.addWidget(self.state_label)
         _main_gbox_vlayout.addWidget(self.buttons_widget)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(0, 4, 4, 0)
-        self.main_gbox.setLayout(_main_gbox_vlayout)
 
-        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.set_in_button.toggled.connect(self.setIn)
-        self.set_out_button.toggled.connect(self.setOut)
+        self.set_in_button.toggled.connect(self.set_in)
+        self.set_out_button.toggled.connect(self.set_out)
 
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(QtGui.QLabel.AlignCenter)
@@ -125,20 +122,20 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.buttons_widget.hide()
 
         
-    def setIn(self,state):
+    def set_in(self, state):
         if state:
             self.wrapper_hwobj.setIn()
         else:
             self.set_in_button.blockSignals(True)
-            self.set_in_button.setState(QPushButton.On)
+            self.set_in_button.setState(QtGui.QPushButton.On)
             self.set_in_button.blockSignals(False)
 
-    def setOut(self,state):
+    def set_out(self, state):
         if state:
             self.wrapper_hwobj.setOut()
         else:
             self.set_out_button.blockSignals(True)
-            self.set_out_button.setState(QPushButton.On)
+            self.set_out_button.setState(QtGui.QPushButton.On)
             self.set_out_button.blockSignals(False)
 
     def updateLabel(self,label):

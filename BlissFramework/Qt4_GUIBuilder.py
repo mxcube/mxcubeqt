@@ -1103,9 +1103,10 @@ class GUIPreviewWindow(QtGui.QWidget):
         self.window_preview_box_layout.addWidget(self.window_preview)
         self.window_preview_box.setLayout(self.window_preview_box_layout)
 
-        self._main_vlayout = QtGui.QVBoxLayout()
-        self._main_vlayout.addWidget(self.window_preview_box) 
-        self.setLayout(self._main_vlayout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.window_preview_box) 
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setSpacing(2) 
 
         QtCore.QObject.connect(self.window_preview, QtCore.SIGNAL("itemClicked"), self.preview_item_clicked) 
         self.resize(630,480)
@@ -1123,9 +1124,10 @@ class GUIPreviewWindow(QtGui.QWidget):
         self.window_preview_box_layout.addWidget(self.window_preview)
         self.window_preview_box.setLayout(self.window_preview_box_layout)
 
-        self._main_vlayout = QtGui.QVBoxLayout()
-        self._main_vlayout.addWidget(self.window_preview_box)
-        self.setLayout(self._main_vlayout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.window_preview_box)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setSpacing(0)
         QtCore.QObject.connect(self.window_preview, QtCore.SIGNAL("itemClicked"), self.preview_item_clicked)
 
         self.resize(650,480)
