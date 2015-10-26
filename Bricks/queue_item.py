@@ -241,6 +241,13 @@ class BasketQueueItem(QueueItem):
         kwargs['controller'] = qt.QCheckListItem.CheckBoxController
         kwargs['deletable'] = False
         QueueItem.__init__(self, *args, **kwargs)
+#AK            
+class BasketFlexQueueItem(QueueItem):
+    def __init__(self, *args, **kwargs):
+        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
+        kwargs['deletable'] = False
+        self.mounted_style = False
+        QueueItem.__init__(self, *args, **kwargs)
             
 
 class TaskQueueItem(QueueItem):
@@ -353,6 +360,7 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
      queue_model_objects.Basket: BasketQueueItem,
+     queue_model_objects.BasketNode: BasketFlexQueueItem, 
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

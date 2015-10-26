@@ -3,6 +3,8 @@ from sample_changer.GenericSampleChanger import SampleChangerState, SampleChange
 
 SC_STATE_COLOR = { SampleChangerState.Fault: widget_colors.LIGHT_RED,
                    SampleChangerState.Ready: widget_colors.LIGHT_GREEN,
+                   "Ready": widget_colors.LIGHT_GREEN,
+                   "Running": widget_colors.LIGHT_YELLOW,
                    SampleChangerState.StandBy: widget_colors.LIGHT_GREEN,
                    SampleChangerState.Moving: widget_colors.LIGHT_YELLOW,
                    SampleChangerState.Unloading: widget_colors.LIGHT_YELLOW,
@@ -19,7 +21,8 @@ SC_STATE_COLOR = { SampleChangerState.Fault: widget_colors.LIGHT_RED,
                    SampleChangerState.Unknown: None}
 
 SC_STATE_GENERAL = { SampleChangerState.Ready: True,
-                     SampleChangerState.Alarm: True }
+                     SampleChangerState.Alarm: True,
+                     "Ready": True }
 
 SC_SAMPLE_COLOR = { "LOADED": widget_colors.LIGHT_GREEN,
                     "UNLOADED": widget_colors.DARK_GRAY,

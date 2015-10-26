@@ -30,6 +30,10 @@ class SampleChangerState:
     Fault       = 14
     Initializing= 15
     Closing     = 16
+    #AK
+    Defreasing     = 17
+    UncorrectRobotPosition     = 18
+
 
     STATE_DESC = { Ready: "Ready",
                    Loaded:"Loaded",
@@ -46,6 +50,8 @@ class SampleChangerState:
                    ChangingMode:"Changing Mode",
                    StandBy:"StandBy",
                    Initializing:"Initializing",
+                   Defreasing:"Defreasing",
+                   UncorrectRobotPosition:"Uncorrect Robot Position",
                    Closing:"Closing" }
 
     @staticmethod
@@ -76,6 +82,7 @@ class SampleChanger(Container,Equipment):
     LOADED_SAMPLE_CHANGED_EVENT="loadedSampleChanged"
     SELECTION_CHANGED_EVENT="selectionChanged"    
     TASK_FINISHED_EVENT="taskFinished"
+    EXCEPTION_EVENT="exception"
     
                 
     def __init__(self,type,scannable, *args, **kwargs):

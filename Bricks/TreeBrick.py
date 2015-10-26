@@ -8,6 +8,8 @@ from collections import namedtuple
 from BlissFramework import Icons, BaseComponents
 from HardwareRepository.HardwareRepository import dispatcher
 from sample_changer_helper import *
+from sample_changer.Flex import *
+from qt import *
 
 from widgets.dc_tree_widget import DataCollectTree
 
@@ -24,6 +26,9 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.current_cpos = None
         self.__collection_stopped = False 
         self.current_view = None
+        self.__MODE_FLEX__ = "flex"  #AK
+        self.currentMode = None  #AK
+
 
         # Framework 2 hardware objects
         self._lims_hwobj = None
@@ -36,6 +41,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("queue", "string", "/queue")
         self.addProperty("default_centring_method", "integer", 1)
         self.addProperty("queue_model", "string", "/queue-model")
+        self.addProperty("flex_queue_model", "string", "/flex-queue-model") #AK
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
 
@@ -50,6 +56,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         # From SampleChangerBrick3, signal emitted when
         # the status of the hwobj changes.
         self.defineSlot("status_msg_changed", ())
+        self.defineSignal("filter_cbox_changed", ()) #AK
 
         # From sample changer hwobj, emitted when the
         # load state changes.
@@ -76,6 +83,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.defineSignal("hide_energy_scan_tab",())
         self.defineSignal("hide_xrf_spectrum_tab",())
         self.defineSignal("hide_workflow_tab", ())
+        self.defineSignal("hide_flex_tab", ()) #AK
 
         # Populating the tabs with data
         self.defineSignal("populate_parameter_widget", ())
@@ -152,6 +160,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,))  #AK
 
     def eventFilter(self, _object, event):
         if event.type() == qt.QEvent.MouseButtonPress:
@@ -216,6 +225,23 @@ class TreeBrick(BaseComponents.BlissWidget):
                              SampleChanger.INFO_CHANGED_EVENT,
                              self.set_sample_pin_icon)
 
+#AK
+            self.bl_sample_changer_hwobj = bl_setup.sample_changer_hwobj
+            self.dc_tree_widget.bl_sample_changer_hwobj = self.bl_sample_changer_hwobj
+            self.flex_hwobj = bl_setup.flex_hwobj
+            self.dc_tree_widget.flex_hwobj = self.flex_hwobj
+
+            if self.flex_hwobj is not None:
+                self.connect(self.flex_hwobj, SampleChanger.STATUS_CHANGED_EVENT,
+                             self.refresh_Flex_Status)
+                self.connect(self.flex_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+                             self.refresh_Flex_State)
+                self.connect(self.flex_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
+                             self.refresh_Flex_Info)
+                self.connect(self.flex_hwobj, SampleChanger.EXCEPTION_EVENT, 
+                             self.dc_tree_widget.flex_Exception)
+
+#FAK
             has_shutter_less = bl_setup.detector_has_shutterless()
             if has_shutter_less:
                 self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
@@ -235,6 +261,38 @@ class TreeBrick(BaseComponents.BlissWidget):
                     is_inhouse = None):
 
          self.session_hwobj.set_session_start_date(start_date)
+
+#AK
+    def setSC_hwobj(self, sc_hwobj):
+        """
+        """
+        self.sample_changer_hwobj = sc_hwobj
+        sc_basket_content, sc_sample_content = self.get_sc_content()
+        sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                                                    sc_basket_content, sc_sample_content)
+        if (isinstance(sc_hwobj,Flex)):
+			self.dc_tree_widget.populate_flex_view(sc_sample_list)
+        else:
+			self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
+
+    def filter_cbox_changed(self, newValue):
+		self.currentMode=newValue
+		self.refresh_sample_changer_tab()
+		self.emit(PYSIGNAL("filter_cbox_changed"), (newValue,)) 
+		
+    def refresh_Flex_Status(self, value):
+		self.dc_tree_widget.refresh_Status(value)
+		 
+    def refresh_Flex_State(self, value, former):
+		self.dc_tree_widget.refresh_State(value, former)
+		self.sample_load_state_changed(value, former)
+		 
+    def refresh_Flex_Info(self):
+		self.dc_tree_widget.refresh_Flex_ListView()
+		self.sample_load_state_changed("")
+		self.set_sample_pin_icon()
+		 
+#FAK
 
     def logged_in_old_version(self, logged_in):
         """
@@ -285,9 +343,9 @@ class TreeBrick(BaseComponents.BlissWidget):
             if sc_basket_content and sc_sample_content:
                 sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
                        sc_basket_content, sc_sample_content)
-
-            self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
-            self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+                self.dc_tree_widget.populate_flex_view(sc_sample_list) #AK
+                self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
+                self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
 
             if self.dc_tree_widget.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 plate_sample_content = self.get_plate_content()
@@ -433,7 +491,8 @@ class TreeBrick(BaseComponents.BlissWidget):
         sc_basket_content = []
         sc_sample_content = []
       
-        try: 
+        #try:
+        if True: 
             for basket in self.sample_changer_hwobj.getBasketList():
                 basket_index = basket.getIndex()
                 basket_code = basket.getID() or ""
@@ -446,9 +505,11 @@ class TreeBrick(BaseComponents.BlissWidget):
                 basket_index = str(coords[0])
                 vial_index = ":".join(map(str, coords[1:]))
                 basket_code = sample.getContainer().getID() or ""
+                sState=sample.getState() #AK           
             
                 sc_sample_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
-        except:
+        else:
+	#except:
             logging.getLogger("user_level_log").\
                 info("Could not connect to sample changer,"  + \
                      " unable to list contents. Make sure that" + \
@@ -511,6 +572,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
 
     def show_sample_tab(self, item):
         self.sample_changer_widget.child('details_button').setText("Show SC-details")
@@ -524,6 +586,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
 
     def show_dcg_tab(self):
         self.sample_changer_widget.child('details_button').setText("Show SC-details")
@@ -535,6 +598,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
 
     def populate_parameters_tab(self, item = None):
         self.emit(qt.PYSIGNAL("populate_parameter_widget"),
@@ -550,6 +614,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
         self.populate_parameters_tab(item)
 
     def show_edna_tab(self, item):
@@ -562,6 +627,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
         self.populate_edna_parameters_tab(item)
 
     def populate_edna_parameters_tab(self, item):
@@ -578,6 +644,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (False,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
@@ -593,6 +660,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (False,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (True,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
         self.populate_xrf_spectrum_tab(item)
 
     def populate_xrf_spectrum_tab(self, item):
@@ -611,6 +679,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.emit(qt.PYSIGNAL("hide_energy_scan_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_xrf_spectrum_tab"), (True,))
         self.emit(qt.PYSIGNAL("hide_workflow_tab"), (False,))
+        self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
 
         running = self.queue_hwobj.is_executing() 
         self.populate_workflow_tab(item, running=running)
@@ -618,10 +687,22 @@ class TreeBrick(BaseComponents.BlissWidget):
     def populate_workflow_tab(self, item, running = False):
         self.emit(qt.PYSIGNAL("populate_workflow_tab"), (item, running))
         
+#AK
+    def refresh_sample_changer_tab(self): 
+
+        if self.current_view == self.sample_changer_widget:
+            if self.currentMode==self.__MODE_FLEX__: 
+		self.emit(qt.PYSIGNAL("hide_flex_tab"), (False,)) #AK
+		self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+            else:
+		self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (False,))
+		self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
+#FAK
     def toggle_sample_changer_tab(self): 
         if self.current_view == self.sample_changer_widget:
             self.current_view = None
             self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+            self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
             self.dc_tree_widget.sample_list_view_selection()
             self.sample_changer_widget.child('details_button').setText("Show SC-details")
 
@@ -629,7 +710,12 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.current_view = self.sample_changer_widget
             self.emit(qt.PYSIGNAL("hide_dc_parameters_tab"), (True,))
             self.emit(qt.PYSIGNAL("hide_dcg_tab"), (True,))
-            self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (False,))
+            if self.currentMode==self.__MODE_FLEX__: 
+		self.emit(qt.PYSIGNAL("hide_flex_tab"), (False,)) #AK
+		self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (True,))
+            else:
+		self.emit(qt.PYSIGNAL("hide_sample_changer_tab"), (False,))
+		self.emit(qt.PYSIGNAL("hide_flex_tab"), (True,)) #AK
             self.sample_changer_widget.child('details_button').setText("Hide SC-details")
             self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         
@@ -675,3 +761,13 @@ class TreeBrick(BaseComponents.BlissWidget):
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
         
         self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
+
+#######AK
+    def getDataCollectTree(self):
+	if self.currentMode==self.__MODE_FLEX__:
+	    dct=DataCollectTree(self)
+	else: dct=DataCollectTree(self)  
+	print "getDataCollectTree: "+str(dct    )
+	return dct
+
+

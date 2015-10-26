@@ -14,10 +14,11 @@ class BeamlineSetup(HardwareObject):
         HardwareObject.__init__(self, name)
         self._object_by_path = {}
         self._plate_mode = False
+        self._flex_mode = False #AK
 
         # For hardware objects that we would like to access as:
         # self.<role_name>_hwrobj. Just to make it more elegant syntactically.
-        self._role_list = ['transmission', 'diffractometer', 'sample_changer','plate_manipulator',
+        self._role_list = ['transmission', 'diffractometer', 'sample_changer','plate_manipulator','flex',
                            'resolution', 'shape_history', 'session', 'beam_info',
                            'data_analysis', 'workflow', 'lims_client',
                            'omega_axis', 'kappa_axis', 'kappa_phi_axis',
@@ -75,6 +76,23 @@ class BeamlineSetup(HardwareObject):
                 raise KeyError('Invalid path')
 
         return value
+
+    def set_flex_mode(self, state):
+        """
+        Sets flex mode, if crystal flex are used instead of ordinary sample
+        pints
+
+        :param state: True if flex is used False if pin is used.
+        :type state: bool
+        """
+        self._flex_mode = state
+
+    def in_flex_mode(self):
+        """
+        :returns: True if flex are used otherwise False
+        :rtype: bool
+        """
+        return self._flex_mode
 
     def set_plate_mode(self, state):
         """

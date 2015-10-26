@@ -187,6 +187,7 @@ class Sample(TaskNode):
     def __init__(self):
         TaskNode.__init__(self)
 
+        self.state = "" #AK
         self.code = str()
         self.lims_code = str()
         self.holder_length = 22.0
@@ -230,6 +231,11 @@ class Sample(TaskNode):
 
     def get_name(self):
         return self._name
+
+#AK
+    def get_state(self):
+        return self.state
+
 
     def get_display_name(self):
         name = self.name
@@ -342,6 +348,15 @@ class Sample(TaskNode):
         processing_params.protein_acronym = self.crystals[0].protein_acronym
 
         return processing_params
+
+#AK
+class BasketNode(TaskNode):
+    def __init__(self,name):
+        TaskNode.__init__(self)
+        self.name = 'Puck:'
+	self.loc_str = name
+#FAK
+
 
 class Basket(TaskNode):
     """

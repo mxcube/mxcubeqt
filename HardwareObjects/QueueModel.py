@@ -19,9 +19,15 @@ class QueueModel(HardwareObject):
         self._free_pin_model._node_id = 0
         self._plate_model = queue_model_objects.RootNode()
         self._plate_model._node_id = 0
+	#AK
+        self._flex_model = queue_model_objects.RootNode()
+        self._flex_model._node_id = 0
+        self._flex_model.sampleChangerRole = 'flex'
+
 
         self._models = {'ispyb': self._ispyb_model,
                         'free-pin': self._free_pin_model,
+                        'flex': self._flex_model,
                         'plate': self._plate_model}
 
         self._selected_model = self._ispyb_model
@@ -236,7 +242,7 @@ class QueueModel(HardwareObject):
 
         if isinstance(task_model, queue_model_objects.Sample):
             self.queue_hwobj.enqueue(qe)
-        elif not isinstance(task_model, queue_model_objects.Basket):
+        elif not (isinstance(task_model, queue_model_objects.Basket) or isinstance(task_model, queue_model_objects.BasketNode)): #AK
         #else:
             view_item.parent().get_queue_entry().enqueue(qe)
 

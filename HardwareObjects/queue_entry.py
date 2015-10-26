@@ -509,6 +509,24 @@ class SampleQueueEntry(BaseQueueEntry):
     def _set_background_color(self):
         BaseQueueEntry._set_background_color(self)
 
+#AK BasketFlexQueueEntry
+class BasketFlexQueueEntry(BaseQueueEntry):
+    def __init__(self, view=None, data_model=None):
+        BaseQueueEntry.__init__(self, view, data_model)
+
+    def execute(self):
+        BaseQueueEntry.execute(self)
+        self.get_view().setText(1, 'Sleeping 5 s')
+        time.sleep(5)
+
+    def pre_execute(self):
+        BaseQueueEntry.pre_execute(self)
+
+    def post_execute(self):
+        BaseQueueEntry.post_execute(self)
+#FAK
+
+
 class BasketQueueEntry(BaseQueueEntry):
     def __init__(self, view=None, data_model=None):
         BaseQueueEntry.__init__(self, view, data_model)
@@ -1323,6 +1341,8 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
     # TODO make sample_Changer_one, sample_changer_two
     if beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
         sample_mount_device = beamline_setup_hwobj.plate_manipulator_hwobj
+    elif (beamline_setup_hwobj.in_flex_mode()):  #AK
+        sample_mount_device = beamline_setup_hwobj.flex_hwobj
     else:
         sample_mount_device = beamline_setup_hwobj.sample_changer_hwobj
 
@@ -1333,6 +1353,14 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
         elif sample_mount_device.__TYPE__ == "PlateManipulator":
             element = '%s%d:%d' % (chr(65 + loc[0]), loc[1], loc[2])
             sample_mount_device.load(sample=element, wait=True)
+        elif (beamline_setup_hwobj.in_flex_mode()):  #AK
+		try:
+			beamline_setup_hwobj.flex_hwobj.load_sample(holder_length,
+                                                              sample_location=loc,
+                                                              wait=True)
+		except Exception as e:
+			raise e
+			goOn=False
         else:
             if sample_mount_device.load_sample(holder_length, sample_location=loc, wait=True) == False:
                 # WARNING: explicit test of False return value.
@@ -1380,5 +1408,6 @@ MODEL_QUEUE_ENTRY_MAPPINGS = \
      queue_model_objects.SampleCentring: SampleCentringQueueEntry,
      queue_model_objects.Sample: SampleQueueEntry,
      queue_model_objects.Basket: BasketQueueEntry,
+     queue_model_objects.BasketNode: BasketFlexQueueEntry,
      queue_model_objects.TaskGroup: TaskGroupQueueEntry,
      queue_model_objects.Workflow: GenericWorkflowQueueEntry}

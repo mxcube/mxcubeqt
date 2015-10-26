@@ -11,11 +11,19 @@ from BlissFramework.Utils import widget_colors
 from widgets.confirm_dialog import ConfirmDialog
 from queue_model_enumerables_v1 import CENTRING_METHOD
 
-SCFilterOptions = namedtuple('SCFilterOptions', 
-                             ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE'])
+from qt import *
+#AK
+filterOptions=['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE', 'FLEX']
+SCFilterOptions = namedtuple('SCFilterOptions', filterOptions) #AK
 
-SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
+SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3, 4) #AK
 
+SC_State_Color = {"in_puck":widget_colors.WHITE, "on_gonio":widget_colors.LIGHT_BLUE, "mounting":widget_colors.LIGHT_GREEN, "unmounting":widget_colors.LIGHT_RED, "unknown":widget_colors.GRAY, \
+                   "recovery_puck":widget_colors.GRAY,"blacklisted":widget_colors.DARK_GRAY, "stucked_on_gripper":widget_colors.RED}
+class flexException(Exception):
+    def __init__(self, message = None, level = "0"):
+        self.message=message
+	self.level=level
 
 class DataCollectTree(qt.QWidget):
     def __init__(self, parent = None, name = "data_collect", 
@@ -35,6 +43,10 @@ class DataCollectTree(qt.QWidget):
         self.plate_manipulator_hwobj = None
         self.hl_motor_hwobj = None
         self.tree_brick = self.parent()
+        self.bl_sample_changer_hwobj = None #AK
+        self.flex_hwobj = None #AK
+        self.flexState = "FSTATE" #AK
+        self.flexStatus = "FStatus" #AK
 
         self.sample_item_list = []
         self.collect_tree_task = None
@@ -107,11 +119,23 @@ class DataCollectTree(qt.QWidget):
         self.sample_list_view.setRootIsDecorated(1)
         self.sample_list_view.setSelected(self.sample_list_view.firstChild(), True)
         
+ #AK FLEX       
+        self.flexLabel=qt.QLabel(self,"mode")
+        self.flexLabel.setText("Sample Changer")
+        self.flexLabel.show()
+
+        self.flexLabel2=qt.QLabel(self,"flexLabel2")
+        self.setStatusMsg("")
+        self.flexLabel2.show()
+
         layout = qt.QVBoxLayout(self,0,0, 'main_layout')
+
         button_layout = qt.QHBoxLayout(None, 0, 0, 'button_layout')
         button_layout.addWidget(self.up_button)
         button_layout.addWidget(self.down_button)
         layout.setSpacing(10)
+        layout.addWidget(self.flexLabel) #AK
+        layout.addWidget(self.flexLabel2)  #AK
         layout.addWidget(self.sample_list_view)
         self.buttons_grid_layout = qt.QGridLayout(2, 5)
         layout.addLayout(self.buttons_grid_layout)
@@ -186,7 +210,7 @@ class DataCollectTree(qt.QWidget):
                         self.plate_sample_to_mount = item
                         menu.insertItem(qt.QString("Move"), self.mount_sample)
                     else:
-                        if self.is_mounted_sample_item(item): 
+                        if self.is_mounted_sample_item(item)  and self.canLoadUnload(item): 
                             menu.insertItem(qt.QString("Unmount"), self.unmount_sample)
                         else:
                             menu.insertItem(qt.QString("Mount"), self.mount_sample)
@@ -201,6 +225,13 @@ class DataCollectTree(qt.QWidget):
                 menu.insertSeparator(4)
                 menu.insertItem(qt.QString("Details"), self.show_details)
             
+#AK
+    def canLoadUnload(self, item):
+		if not self.beamline_setup_hwobj.in_flex_mode():
+			return True
+		else:
+			return  (item.get_model().get_state() in ("on_gonio", "in_puck", "")) and self.flexStatus=="Ready"
+#FAK		
     def item_double_click(self):
         self.show_details()
 
@@ -306,6 +337,11 @@ class DataCollectTree(qt.QWidget):
                 if hasattr(self.beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
                    and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
                     self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
+                elif hasattr(self.sample_changer_hwobj, '__TYPE__')\
+                   and (self.sample_changer_hwobj.__TYPE__ == 'FLEX'):
+                    self.sample_changer_hwobj.\
+                      unload_sample(22, sample_location = location, wait = False)
+                  #self.tree_brick.filter_cbox_changed("flex")
                 else:
                     if 'SC3' in self.beamline_setup_hwobj.sample_changer_hwobj.__class__.__name__:
                       self.beamline_setup_hwobj.sample_changer_hwobj.\
@@ -391,6 +427,9 @@ class DataCollectTree(qt.QWidget):
 
         if isinstance (task, queue_model_objects.Basket):
             view_item.setOpen(False) #task.get_is_present())
+        elif (cls is queue_item.BasketFlexQueueItem):
+	   view_item.setOpen(False)
+	   view_item.setOn(False)
         else:
             view_item.setOpen(True)
                 
@@ -448,11 +487,34 @@ class DataCollectTree(qt.QWidget):
         self.sample_list_view.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
+#AK
+        logging.getLogger("user_level_log").\
+                            warning("Set mode to: "+filterOptions[option])    
  
+ 
+
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
+            self.flexLabel.setText("Sample Changer")
+            self.showFlex(False)
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('ispyb')
+            self.sample_changer_hwobj=self.bl_sample_changer_hwobj
+	    self.beamline_setup_hwobj.sample_changer_hwobj=self.sample_changer_hwobj
+            self.tree_brick.setSC_hwobj(self.sample_changer_hwobj)
             self.set_sample_pin_icon()
+            self.tree_brick.filter_cbox_changed("sc")
+
+        elif option == SC_FILTER_OPTIONS.FLEX:
+            self.flexLabel.setText("Flex")
+            self.showFlex(True)
+            self.sample_list_view.clear()
+            self.queue_model_hwobj.select_model('flex')
+            self.sample_changer_hwobj=self.flex_hwobj
+            self.beamline_setup_hwobj.set_flex_mode(True)
+            self.tree_brick.setSC_hwobj(self.sample_changer_hwobj)
+            self.set_sample_pin_icon()
+            self.tree_brick.filter_cbox_changed("flex")
+#FAK
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 loaded_sample = self.plate_manipulator_hwobj.\
@@ -491,10 +553,14 @@ class DataCollectTree(qt.QWidget):
                 visible_parent.setEnabled(True)
 
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
+            self.showFlex(False) #AK
+            self.flexLabel.setText("FreePin") #AK
             self.sample_list_view.clear()
             self.queue_model_hwobj.select_model('free-pin')
             self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.PLATE:
+            self.showFlex(False) #AK
+            self.flexLabel.setText("Plate") #AK
             #self.sample_list_view.clear()
             #self.sample_list_view.setDisabled(True)
             self.beamline_setup_hwobj.set_plate_mode(True)
@@ -902,4 +968,216 @@ class DataCollectTree(qt.QWidget):
 
         return conflict
         
+#AK   -------------------- FLEX--------------------     
+    def populate_flex_view(self, sample_list):
+        #print "populate_flex_view"
+        self.queue_hwobj.clear()
+        self.queue_model_hwobj.clear_model('flex')
+        self.sample_list_view.clear()
+        self.queue_model_hwobj.select_model('flex')
+        curBasketId=0
+        for sample in sample_list:
+            sample.set_enabled(False)
+	    (basketId, sampleId)=sample.location
+	    #print (basketId, sampleId)
+	    #print sample, sample.location
+	    if (basketId != curBasketId):
+		curBasketId=basketId
+		basketNode=queue_model_objects.BasketNode(str(curBasketId))
+		basketNode.set_enabled(False)
+		try:
+			basketNode.name=self.flex_hwobj.getComponentById(curBasketId).__STYPE__
+		except:
+			pass
+		self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+												 get_model_root(), basketNode)
+            self.queue_model_hwobj.add_child(basketNode, sample)
+        self.set_sample_pin_icon()
+        self.initFlexMsg()
+        
+    def ak_clicktest(self):
+		self.flex_hwobj.test()
+	
+    def flex_reload_puck(self, pId):
+        items = self.get_selected_items()
+        if len(items) == 1:
+            item = items[0]
+            logging.getLogger("user_level_log").info("Reloading Puck "+item.get_model().loc_str)
+            self.flex_hwobj.reloadPuck(item.get_model().loc_str)
+        return
+		
+    def flex_scan_click(self):
+		self.flex_hwobj.scanSamples(True)
+		logging.getLogger("user_level_log").info("Flex Scanning ")
+		#nbPucks=self.flex_hwobj.initWithPresentSamples()
+		self.initFlexMsg()
+		self.tree_brick.setSC_hwobj(self.flex_hwobj)
+		self.tree_brick.filter_cbox_changed("flex")
+		return
+		
+    def refresh_State(self, value, former):
+		"""
+          Callback on flex.STATE_CHANGED_EVENT
+		"""
+		self.flexState=value
+		self.setFlexMsg()
+		return
+		
+    def refresh_Status(self, value):
+		"""
+		Callback on flex.STATUS_CHANGED_EVENT
+		"""
+		self.flexStatus=value
+		"""
+		if value=="Ready":
+			self.enableFlex(True)
+		elif value=="Parked":
+			self.flex_scan_button.setEnabled(True)
+			self.flex_park_button.setEnabled(False)
+			self.flex_init_button.setEnabled(True)
+		elif value=="Uncorrect Robot Position":
+			self.flex_scan_button.setEnabled(True)
+			self.flex_park_button.setEnabled(False)
+			self.flex_init_button.setEnabled(True)
+		else:
+			self.enableFlex(False)
+		"""
+			
+			
+		self.setFlexMsg()
+		return
+		
+    def flex_park_click(self):
+		logging.getLogger("user_level_log").info("Robot parking")
+		self.flex_hwobj.parkRobot()
+		#self.enable_collect(False)
+		#gevent.spawn(self.flex_hwobj.parkRobot())
+		#gevent.spawn(self.pollFlex)
+		#gevent.sleep(0.1)
+		#self.enable_collect(True)
+		return
+
+    def flex_init_click(self):
+		logging.getLogger("user_level_log").info("Robot initialisation")
+		#self.enable_collect(False)
+		self.flex_hwobj.initRobot()
+		#gevent.spawn(self.flex_hwobj.initRobot())
+		#gevent.spawn(self.pollFlex)
+		#gevent.sleep(0.1)
+		#self.enable_collect(True)
+		return
+
+    def populate_flex_view(self, sample_list):
+        #print "populate_flex_view"
+        self.queue_hwobj.clear()
+        self.queue_model_hwobj.clear_model('flex')
+        self.sample_list_view.clear()
+        self.queue_model_hwobj.select_model('flex')
+        curBasketId=0
+        for sample in sample_list:
+            sample.set_enabled(False)
+	    (basketId, sampleId)=sample.location
+	    #print (basketId, sampleId)
+	    #print sample, sample.location
+	    if (basketId != curBasketId):
+		curBasketId=basketId
+		basketNode=queue_model_objects.BasketNode(str(curBasketId))
+		basketNode.set_enabled(False)
+		try:
+			basketNode.name=self.flex_hwobj.getComponentById(curBasketId).__STYPE__
+		except:
+			pass
+		self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+												 get_model_root(), basketNode)
+            self.queue_model_hwobj.add_child(basketNode, sample)
+        self.set_sample_pin_icon()
+        self.initFlexMsg()
+        
+    def flex_Exception(self, msg):
+        """
+        Callback on flex.EXCEPTION_EVENT
+        """
+        self.setFlexError(msg)
+
+        
+    def refresh_Flex_ListView(self):
+        """
+        Callback on flex.INFO_CHANGED_EVENT
+        """
+        #print "AK Refreshing listView"
+        it = qt.QListViewItemIterator(self.sample_list_view)
+        item = it.current()
+        while item:
+            if self.is_mounted_sample_item(item):
+                item.setSelected(True)
+                item.set_mounted_style(True)
+                self.sample_list_view_selection()
+            elif isinstance(item, queue_item.SampleQueueItem):
+                item.set_mounted_style(False)
+            if isinstance(item, queue_item.SampleQueueItem):
+					flexSample=self.flex_hwobj.getSampleByCoords(item.get_model().location)
+					if flexSample:
+						item.get_model().state=flexSample.state
+					s=item.get_model().get_state()
+					if item.text(1).lower()!="loading sample":
+						if s in ("in_puck", ""):
+							s=""
+						item.setText(1, s)
+						if s not in ("xxx", ""):
+							item.setBackgroundColor(SC_State_Color[s])
+
+			
+            it += 1
+            item = it.current()
+
+    def showFlex(self, state):
+		if state:
+			self.flexLabel.show()
+			self.flexLabel2.show()
+			"""
+			self.flex_scan_button.show()
+			self.flex_park_button.show()
+			self.flex_init_button.show()
+			"""
+			self.flexLabel.setText(self.flex_hwobj.getStatus())
+		else:
+			self.flexLabel.hide()
+			self.flexLabel2.hide()
+			"""
+			self.flex_scan_button.hide()
+			self.flex_park_button.hide()
+			self.flex_init_button.hide()
+			"""
+			
+    def enableFlex(self, state):
+		if state:
+			self.flex_scan_button.setEnabled(True)
+			self.flex_park_button.setEnabled(True)
+			self.flex_init_button.setEnabled(True)
+		else:
+			self.flex_scan_button.setEnabled(False)
+			self.flex_park_button.setEnabled(False)
+			self.flex_init_button.setEnabled(False)
+
+    def setFlexError(self, status):
+        if status!="":
+			logging.getLogger("user_level_log").info("Robot ERROR "+status)
+        self.setStatusMsg(status)
+
+    def setStatusMsg(self, status):
+        QToolTip.add(self.flexLabel2,status)
+        self.flexLabel2.setText(status.strip())
+        color = self.flexLabel2.paletteBackgroundColor()
+        #self.emit(PYSIGNAL("status_msg_changed"), (status, color))
+
+    def setFlexMsg(self):
+        #self.flexLabel.setText(self.flexState+" : "+self.flexStatus)
+        self.flexLabel.setText(self.flexStatus)
+ 
+    def initFlexMsg(self):
+		self.flexState=self.flex_hwobj.readFlexAtttribut("State")
+		self.flexStatus=self.flex_hwobj.readFlexAtttribut("Status")
+		self.setFlexMsg()
+       
+#FAK
 

@@ -20,9 +20,16 @@ class Sample(Component):
         self.loaded = False
         self.has_been_loaded = False         
         self._leaf = True
-    
+        self.state="" #AK    
     #########################           PUBLIC           #########################
     
+    def getState(self): #AK
+        """
+        Returns if the sample is currently loaded for data collection 
+        :rtype: bool
+        """        
+        return self.state
+
     def isLoaded(self):
         """
         Returns if the sample is currently loaded for data collection 
