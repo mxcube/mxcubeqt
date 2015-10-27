@@ -50,9 +50,6 @@ def set_widget_color(widget, color, color_role =None):
     if color_role is None:
         color_role = QtGui.QPalette.Window
     widget_palette = widget.palette()
-    widget_palette.setColor(QtGui.QPalette.Active,
-                            #QtGui.QPalette.Window,
-                            color_role,
-                            color)
+    widget_palette.setColor(color_role,color)
     widget.setAutoFillBackground(True) 
     widget.setPalette(widget_palette)

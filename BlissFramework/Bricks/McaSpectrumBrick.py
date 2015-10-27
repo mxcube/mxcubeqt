@@ -10,7 +10,6 @@
 #
 """
 [Name] McaSpectrumBrick
-
 [Description]
 The McaSpectrumBrick allows to display Mca Spectrum obtained in SPEC.
 If configured, it will take into account the energy calibration factors and
@@ -34,18 +33,18 @@ the fit configuration file well as
 
 """
 
-__category__ = 'Spec'
+__category__ = 'MCA'
 
 
 import logging
 from qt import *
 from BlissFramework.BaseComponents import BlissWidget
-#from BlissFramework import Icons
-#import Icons
-#print Icons.__file__
 from PyMca import McaAdvancedFit
-import numpy.oldnumeric as Numeric
-from PyMca import ConfigDict
+import numpy
+try:
+    from PyMca5.PyMca import ConfigDict
+except ImportError:
+    from PyMca import ConfigDict
 
 class McaSpectrumBrick(BlissWidget):
     def __init__(self, *args):
@@ -64,16 +63,15 @@ class McaSpectrumBrick(BlissWidget):
             if config["file"] is not None:
                 self._configure(config)
                 configured = True
-            #TODO what is the data format? 
-            data = Numeric.array(data)
 
-            x = Numeric.array(data[:,0]).astype(Numeric.Float)
-            y = Numeric.array(data[:,1]).astype(Numeric.Float)
+            data = numpy.array(data)
+
+            x = numpy.array(data[0]) * 1.0
+            y = numpy.array(data[1])
             xmin = float(config["min"])
             xmax = float(config["max"])
 
-            #self.mcafit.refreshWidgets()
-            calib = Numeric.ravel(calib).tolist()
+            calib = numpy.ravel(calib).tolist()
             kw = {}
             kw.update(config)
             kw['xmin'] = xmin
@@ -83,10 +81,9 @@ class McaSpectrumBrick(BlissWidget):
             self.mcafit._energyAxis = False
             self.mcafit.toggleEnergyAxis()
 
-            #Not sure how to use this
-            #It is not necessary to fit after each setData            
-            #result = self._fit()
+            result = self._fit()
 
+            self.mcafit.refreshWidgets()
             #pyarch file name and directory
             pf = config["legend"].split(".")
             pd = pf[0].split("/")
@@ -94,13 +91,12 @@ class McaSpectrumBrick(BlissWidget):
             outdir = config['htmldir']
             sourcename = config['legend']
 
-            if configured:
+            if configured and result:
                 report = McaAdvancedFit.QtMcaAdvancedFitReport.\
                          QtMcaAdvancedFitReport(None, outfile=outfile, 
                                                 outdir=outdir,fitresult=result, 
                                                 sourcename=sourcename, 
-                                                plotdict = {'logy' : False}, 
-                                                table=2)
+                                                plotdict = {'logy' : False})
 
                 text = report.getText()
                 report.writeReport(text=text)
@@ -109,6 +105,8 @@ class McaSpectrumBrick(BlissWidget):
             raise
 
     def _fit(self):
+        if self.mcafit.isHidden():
+            self.mcafit.show()
         return self.mcafit.fit()
 
     def _configure(self,config):
@@ -123,10 +121,11 @@ class McaSpectrumBrick(BlissWidget):
             d['concentrations']['flux'] = float(config['flux'])
         if config.has_key('time'):
             d['concentrations']['time'] = float(config['time'])
+
         self.mcafit.mcafit.configure(d)
 
     def clear(self):
-        x = Numeric.array([0]).astype(Numeric.Float)
-        y = Numeric.array([0]).astype(Numeric.Float)
+        x = numpy.array([0])
+        y = numpy.array([0])
         self.mcafit.setdata(x, y)
         

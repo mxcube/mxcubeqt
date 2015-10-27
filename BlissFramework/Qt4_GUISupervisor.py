@@ -211,7 +211,7 @@ class GUISupervisor(QtGui.QWidget):
 
         self.framework.show()
             
-        self.framework.newClicked(self.GUIConfigFile)
+        self.framework.new_clicked(self.GUIConfigFile)
         
         return self.framework
              
@@ -253,7 +253,6 @@ class GUISupervisor(QtGui.QWidget):
             main_window = self.windows[0]
             main_window.configuration = config
             QtGui.QApplication.setActiveWindow(main_window)
-
             if self.noBorder:
                 main_window.move(0, 0)
                 w = QtGui.QApplication.desktop().width()
@@ -326,7 +325,7 @@ class GUISupervisor(QtGui.QWidget):
                     window.show()
 
         if BlissWidget._menuBar:
-            BlissWidget._menuBar.setExpertMode(False)
+            BlissWidget._menuBar.set_expert_mode(False)
         
         return main_window
                 

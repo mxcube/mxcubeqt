@@ -549,6 +549,7 @@ class mySpinBox(QSpinBox):
     CHANGED_COLOR = QColor(255,165,0)
     def __init__(self,parent):    
         QSpinBox.__init__(self,parent)
+        self.internalChange = False
         self.decimalPlaces=1
         self.__moving = False
         self.colorGroupDict={}
@@ -561,7 +562,7 @@ class mySpinBox(QSpinBox):
         self.setEnabled(not moving)
         self.__moving = moving
     def textChanged(self):
-        if self.__moving:
+        if self.__moving or self.internalChange:
           return
         else:
           self.setEditorBackgroundColor(mySpinBox.CHANGED_COLOR)
@@ -575,7 +576,10 @@ class mySpinBox(QSpinBox):
         return QSpinBox.rangeChange(self)
     def setValue(self, value):
         if type(value)==type(0.0):
-            return QSpinBox.setValue(self, self.d2i(value))
+            self.internalChange = True
+            QSpinBox.setValue(self, self.d2i(value))
+            self.internalChange = False
+            return 
         else:
             return self.setValue(self.i2d(value)) 
     def value(self):

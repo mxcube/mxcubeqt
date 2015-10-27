@@ -54,9 +54,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.wavelength_limits = None
 
         # Graphic elements ----------------------------------------------------
-        self.main_frame = QtGui.QFrame(self)
-        self.main_frame.setFrameStyle(QtGui.QFrame.StyledPanel)
-        self.group_box = QtGui.QGroupBox("Energy", self.main_frame)
+        self.group_box = QtGui.QGroupBox("Energy", self)
         energy_label = QtGui.QLabel("Current:", self.group_box)
         energy_label.setFixedWidth(75)
         wavelength_label = QtGui.QLabel("Wavelength: ", self.group_box)
@@ -68,11 +66,13 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_widget = QtGui.QWidget(self)
         set_to_label = QtGui.QLabel("Set to: ", self)
         self.new_value_ledit = QtGui.QLineEdit(self.new_value_widget)
+        self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QtGui.QComboBox(self.new_value_widget)
         self.units_combobox.addItems(["keV", chr(197)]) 
         self.stop_button = QtGui.QPushButton(self.new_value_widget)        
-        self.stop_button.setIcon(QtGui.QIcon(Qt4_Icons.load("Stop2")))
+        self.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
+        self.stop_button.setFixedWidth(25)
  
         # Layout --------------------------------------------------------------
         self.new_value_widget_layout = QtGui.QHBoxLayout(self)
@@ -94,36 +94,34 @@ class Qt4_EnergyBrick(BlissWidget):
         self.group_box_layout.setContentsMargins(1, 1, 1, 1) 
         self.group_box.setLayout(self.group_box_layout)
 
-        self.main_frame_layout = QtGui.QVBoxLayout() 
-        self.main_frame_layout.setSpacing(0)
-        self.main_frame_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_frame_layout.addWidget(self.group_box)
-        self.main_frame.setLayout(self.main_frame_layout)   
-
         self.main_layout = QtGui.QVBoxLayout()
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 2, 2)
-        self.main_layout.addWidget(self.main_frame)
+        self.main_layout.addWidget(self.group_box)
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setMaximumWidth(250)
+        #self.setMaximumWidth(250)
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.new_value_ledit.returnPressed.connect(self.current_value_changed)
         self.new_value_ledit.textChanged.connect(self.input_field_changed)
-        self.connect(self.units_combobox, QtCore.SIGNAL("activated(const QString &)"), self.units_changed)
+        self.units_combobox.activated.connect(self.units_changed)
         self.stop_button.clicked.connect(self.stop_clicked)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)
         self.group_box.setChecked(True)
         Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
-                                       Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                       QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(0, 15, 4, self.new_value_ledit)
+                                           Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                                           QtGui.QPalette.Base)
+        Qt4_widget_colors.set_widget_color(self.units_combobox,
+                                           Qt4_widget_colors.LIGHT_GREEN,
+                                           QtGui.QPalette.Button)
+        self.new_value_validator = QtGui.QDoubleValidator(\
+             0, 15, 4, self.new_value_ledit)
         #self.new_value_ledit.setValidator(self.new_value_validator)
      
 
@@ -140,7 +138,6 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
-
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
@@ -194,9 +191,8 @@ class Qt4_EnergyBrick(BlissWidget):
         """
         energy_value_str = self['kevFormatString'] % energy_value
         wavelength_value_str = self['angFormatString'] % wavelength_value
-        
         self.energy_ledit.setText("%s keV" % energy_value_str)
-        self.wavelength_ledit.setText("%s %s" %(wavelength_value, chr(197)))
+        self.wavelength_ledit.setText("%s %s" %(wavelength_value_str, chr(197)))
 
     def current_value_changed(self):
         """

@@ -164,7 +164,9 @@ class ToolboxWindow(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
         
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(_refresh_toolbutton, QtCore.SIGNAL("clicked()"), self.refresh_clicked) 
+        QtCore.QObject.connect(_refresh_toolbutton, 
+                               QtCore.SIGNAL("clicked()"), 
+                               self.refresh_clicked) 
 
         # Other ---------------------------------------------------------------
         self.setWindowTitle("Toolbox") 
@@ -174,7 +176,9 @@ class ToolboxWindow(QtGui.QWidget):
         Descript. : Add a new brick tab called 'name'
         """
         newBricksList = MyListView(self._bricks_toolbox)
-        QtCore.QObject.connect(newBricksList, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"), self.brick_selected)
+        QtCore.QObject.connect(newBricksList, 
+                               QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"), 
+                               self.brick_selected)
         self._bricks_toolbox.addItem(newBricksList, name)
         self.bricks_tab_dict[name] = newBricksList
         return newBricksList
@@ -188,7 +192,8 @@ class ToolboxWindow(QtGui.QWidget):
        
         self.bricks_dict = {}
         self.bricks_tab_dict = {}
-        map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + tuple(BlissFramework.getCustomBricksDirs()))
+        map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + \
+             tuple(BlissFramework.getCustomBricksDirs()))
 
     def brickTextLabel(self, brickName):
         """
@@ -238,7 +243,9 @@ class ToolboxWindow(QtGui.QWidget):
             
             if filter(lambda x: filename.endswith(x), [x[0] for x in imp.get_suffixes()]):
                 brickName = filename[:filename.rfind('.')]
-                if not brickName == '__init__' and not brickName in processedBricks:
+                if (not brickName == '__init__' and 
+                    brickName.startswith('Qt4') and
+                    not brickName in processedBricks):
                     processedBricks.append(brickName)
                     dirname = os.path.dirname(full_filename)
                     brick_module_file = None
@@ -1044,16 +1051,10 @@ class GUIEditorWindow(QtGui.QWidget):
                     item_index = oldParentItem.indexOfChild(item)
                     oldParentItem.takeChild(item_index)
                     if new_parent_item == oldParentItem:
-                        oldParentItem.insertChild(item_index - 1, item)
-                        """itemAbove = self.tree_widget.itemAbove(item)
-                        while (itemAbove.parent() != new_parent_item):
-                            itemAbove=itemAbove.itemAbove()
-                        itemAbove.moveItem(item)"""
+                        item_index -= 1
+                        oldParentItem.insertChild(item_index, item)
                     else:
                         new_parent_item.insertChild(0, item)
-                        """oldParentItem.takeItem(item)
-                        new_parent_item.insertItem(item)
-                        item.moveItem(oldParentItem.itemAbove())"""
             else:
                 newParent = self.configuration.moveDown(item_name)
             
@@ -1064,10 +1065,9 @@ class GUIEditorWindow(QtGui.QWidget):
                     item_index = oldParentItem.indexOfChild(item) 
                     oldParentItem.takeChild(item_index)
                     if new_parent_item == oldParentItem:
-                        oldParentItem.insertChild(item_index + 1, item)
-                        #item.moveItem(item.nextSibling())
+                        item_index += 1
+                        oldParentItem.insertChild(item_index, item)
                     else:
-                        #oldParentItem.takeItem(item)
                         new_parent_item.addChild(item)
 
             if newParent is not None:
@@ -1076,6 +1076,7 @@ class GUIEditorWindow(QtGui.QWidget):
             #item.setSelected(True)
             self.tree_widget.setCurrentItem(item)
             self.tree_widget.scrollToItem(item, QtGui.QAbstractItemView.EnsureVisible)
+            self.emit(QtCore.SIGNAL("moveWidget"), item_name, direction)
 
     def move_up_clicked(self):
         """
@@ -1181,6 +1182,11 @@ class GUIPreviewWindow(QtGui.QWidget):
         """
         self.window_preview.add_widget(item_widget, parent_widget)
 
+    def move_item_widget(self, item_widget, direction):
+        """
+        Descript. :
+        """
+        self.window_preview.move_widget(item_widget, direction)
 
 class HWRWindow(QtGui.QWidget):
     """
@@ -1338,6 +1344,8 @@ class GUIBuilder(QtGui.QMainWindow):
                      self.gui_preview_window.add_item_widget)
         self.connect(self.gui_editor_window, QtCore.SIGNAL("removeWidget"), 
                      self.gui_preview_window.remove_item_widget)
+        self.connect(self.gui_editor_window, QtCore.SIGNAL("moveWidget"),
+                     self.gui_preview_window.move_item_widget)
         self.connect(self.gui_preview_window, QtCore.SIGNAL("previewItemClicked"), 
                      self.gui_editor_window.selectItem)
         self.connect(self.gui_editor_window, QtCore.SIGNAL("showProperyEditorWindow"), 
@@ -1460,7 +1468,7 @@ class GUIBuilder(QtGui.QMainWindow):
                     return True
                 else:
                     QtGui.QApplication.restoreOverrideCursor()
-                    QtGui.QMessageBox.warning(self, "Error", "Could not save configuration to file %s !" % self.filename, qt.QMessageBox.Ok)
+                    QtGui.QMessageBox.warning(self, "Error", "Could not save configuration to file %s !" % self.filename, QtGui.QMessageBox.Ok)
 
                     return False
             else:

@@ -81,24 +81,22 @@ class InstanceEventFilter(QtCore.QObject):
         obj=w
         while obj is not None:
             if isinstance(obj,BlissWidget):
-                if isinstance(e, QtCore.QContextMenuEvent):
+                if isinstance(e, QtGui.QContextMenuEvent):
                     #if obj.shouldFilterEvent():
-                    #    return True
                     return True
-                elif isinstance(e, QtCore.QMouseEvent):
-                    if e.button() == Qt.RightButton:
+                elif isinstance(e, QtGui.QMouseEvent):
+                    if e.button() == QtCore.Qt.RightButton:
                         return True
                     elif obj.shouldFilterEvent():
                         return True
-                elif isinstance(e, QtCore.QKeyEvent) or isinstance(e, QtCore.QFocusEvent):
+                elif isinstance(e, QtGui.QKeyEvent) or isinstance(e, QtGui.QFocusEvent):
                     if obj.shouldFilterEvent():
                         return True
                 return QtCore.QObject.eventFilter(self, w, e)
-            #try:
-            if True:
+            try:
                 obj = obj.parent()
-            #except:
-            #    obj=None
+            except:
+                obj=None
         return QtCore.QObject.eventFilter(self, w, e)
 
 
@@ -170,7 +168,7 @@ class SignalSlotFilter:
             s(*args)
 
 
-class BlissWidget(QtGui.QWidget, Connectable.Connectable):
+class BlissWidget(QtGui.QFrame, Connectable.Connectable):
     (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
      INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
     (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
@@ -229,32 +227,26 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
     @staticmethod
     def updateMenuBarColor(enable_checkbox=None):
         """
-        Descript. :
+        Descript. : Not a direct way how to change menubar color
+                    it is now done by changing stylesheet
         """
         color=None
         if BlissWidget._menuBar is not None:
             if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
                 if BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_IMPERSONATE:
-                    color = Qt4_widget_colors.LIGHT_BLUE
+                    color = "lightBlue"
                 else:
-                    color = Qt4_widget_colors.LIGHT_GREEN
+                    color = "rgb(204,255,204)"
             elif BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE:
                 if BlissWidget._instanceRole == BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING:
-                    color = Qt4_widget_colors.LIGHT_RED
+                    color = "rgb(255,204,204)"
                 elif BlissWidget._instanceUserId == BlissWidget.INSTANCE_USERID_UNKNOWN:
-                    color = QtGui.QColor(255, 165, 0)
+                    color = "rgb(255, 165, 0)"
                 else:
-                    color = Qt4_widget_colors.LIGHT_YELLOW
+                    color = "yellow"
+
         if color is not None:
-            BlissWidget._menuBar.setPaletteBackgroundColor(color)
-            children = BlissWidget._menuBar.children() or []
-            for child in children:
-                if isinstance(child,QCheckBox):
-                    child.setPaletteBackgroundColor(color)
-                    if enable_checkbox is not None:
-                        child.setEnabled(enable_checkbox)
-                        if enable_checkbox and child.isChecked():
-                            child.setPaletteBackgroundColor(Qt.yellow)
+            BlissWidget._menuBar.set_color(color)
 
     @staticmethod
     def setInstanceMode(mode):
@@ -264,20 +256,18 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         BlissWidget._instanceMode = mode
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                #try:
-                w._instanceModeChanged(mode)
-                #except:
-                #    pass
+                try:
+                    w._instanceModeChanged(mode)
+                except:
+                    pass
         if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
             if BlissWidget._filterInstalled:
-                QtGui.QApplication.removeEventFilter(\
-                      BlissWidget._applicationEventFilter, None)
+                QtGui.QApplication.instance().removeEventFilter(BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = False
                 BlissWidget.synchronizeWithCache() # why?
         else:
             if not BlissWidget._filterInstalled:
-                QtGui.QApplication.installEventFilter(\
-                      BlissWidget._applicationEventFilter, None)
+                QtGui.QApplication.instance().installEventFilter(BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = True
 
         BlissWidget.updateMenuBarColor(BlissWidget._instanceMode == \
@@ -448,10 +438,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         BlissWidget._instanceRole = role
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceRoleChanged(role)
-                except:
-                    pass
+                #try:
+                w.instanceRoleChanged(role)
+                #except:
+                #    pass
 
     @staticmethod
     def setInstanceLocation(location):
@@ -463,10 +453,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         BlissWidget._instanceLocation = location
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceLocationChanged(location)
-                except:
-                    pass
+                #try:
+                w.instanceLocationChanged(location)
+                #except:
+                #    pass
 
     @staticmethod
     def setInstanceUserId(user_id):
@@ -479,10 +469,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
 
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceUserIdChanged(user_id)
-                except:
-                    pass
+                #try:
+                w.instanceUserIdChanged(user_id)
+                #except:
+                #    pass
         BlissWidget.updateMenuBarColor()
 
     @staticmethod
@@ -499,10 +489,10 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
 
         for w in QtGui.QApplication.allWidgets():
             if isinstance(w, BlissWidget):
-                try:
-                    w.instanceMirrorChanged(mirror)
-                except:
-                    pass
+                #try:
+                w.instanceMirrorChanged(mirror)
+                #except:
+                #    pass
 
     def instanceMirrorChanged(self,mirror):
         """
@@ -554,10 +544,12 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         """
         Descript. :
         """
-        for w in QtGui.QApplication.allWidgets():
-            if isinstance(w, BlissWidget):
-                QtGui.QWhatsThis.remove(w)
-                QtGui.QWhatsThis.add(w, "%s (%s)\n%s" % (w.name(), w.__class__.__name__, w.getHardwareObjectsInfo()))
+        for widget in QtGui.QApplication.allWidgets():
+            if isinstance(widget, BlissWidget):
+                msg = "%s (%s)\n%s" % (widget.objectName(), 
+                                       widget.__class__.__name__, 
+                                       widget.getHardwareObjectsInfo())
+                widget.setWhatsThis(msg)
         QtGui.QWhatsThis.enterWhatsThisMode()
 
     @staticmethod
@@ -565,8 +557,14 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         """
         Descript. :
         """
+        #somehow active window is None
+        #TODO fix this
+        for widget in QtGui.QApplication.topLevelWidgets():
+            if hasattr(widget, "configuration"):
+               top_level_widget = widget
+
         if not master_sync or BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.activeWindow().emit(QtCore.SIGNAL('applicationBrickChanged'), 
+            top_level_widget.emit(QtCore.SIGNAL('applicationBrickChanged'), 
                   brick_name, widget_name, method_name, method_args, master_sync)
 
     @staticmethod
@@ -631,6 +629,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
             widget.setEditorText = new.instancemethod(SpinBoxSetEditorText,widget,widget.__class__)
             widget.editorTextChanged = new.instancemethod(SpinBoxEditorTextChanged,widget,widget.__class__)
             self.connect(widget.lineEdit(), QtCore.SIGNAL('textChanged(const QString &)'), widget.editorTextChanged)
+
         self._widgetEvents.append((widget, widget_name, master_sync))
 
     def instanceSynchronize(self,*args, **kwargs):
@@ -679,7 +678,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         Descript. :
         """
         Connectable.Connectable.__init__(self)
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QFrame.__init__(self, parent)
         self.setObjectName(widgetName)
         self.propertyBag = PropertyBag.PropertyBag()
                 
@@ -698,6 +697,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         # add properties shared by all BlissWidgets
         #
         self.addProperty('fontSize', 'string', str(self.font().pointSize()))
+        self.addProperty('frame', 'boolean', False)
         self.addProperty('instanceAllowAlways', 'boolean', False)#, hidden=True)
         self.addProperty('instanceAllowConnected', 'boolean', False)#, hidden=True)
         #
@@ -741,7 +741,7 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
         """
         Descript. :
         """
-        return repr("<%s: %s>" % (self.__class__, self.objectName))
+        return repr("<%s: %s>" % (self.__class__, self.objectName()))
 
     def connectSignalSlotFilter(self,sender,signal,slot,should_cache):
         """
@@ -1011,6 +1011,15 @@ class BlissWidget(QtGui.QWidget, Connectable.Connectable):
                         brick["fontSize"] = s
                 
                 self.update()
+        elif property_name == 'frame':
+            try:
+               if new_value:  
+                   self.setFrameStyle(QtGui.QFrame.StyledPanel)
+               else:
+                   self.setFrameStyle(QtGui.QFrame.NoFrame)
+            except:
+               pass
+            self.update() 
         else:
             try:
                 self.propertyChanged(property_name, old_value, new_value)

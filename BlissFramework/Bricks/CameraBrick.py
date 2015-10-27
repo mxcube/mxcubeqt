@@ -329,7 +329,7 @@ class CameraBrick(BlissWidget):
             self.imageReceivedConnected = False
 
     def disable_update(self):
-        self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
+        #self.__imageReceived(DISABLED_JPEG,DISABLED_WIDTH,DISABLED_HEIGHT)
         self.update_disabled = True
 
     def enable_update(self):
@@ -412,8 +412,8 @@ class CameraBrick(BlissWidget):
         elif property == 'fix : height': self.__fixHeight = newValue
         elif property == "diffractometer":
             self.diffractometerHwobj = self.getHardwareObject(newValue)
-            self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
             if self.diffractometerHwobj is not None:
+                self.__previous_pos_dict = self.diffractometerHwobj.getPositions()
                 self.diffractometerHwobj.connect("minidiffStateChanged",
                                                  self.diffractometerChanged)
                 if self.diffractometerHwobj.zoomMotor is not None:    
