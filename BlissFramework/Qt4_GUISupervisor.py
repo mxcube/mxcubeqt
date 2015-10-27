@@ -356,14 +356,14 @@ class GUISupervisor(QtGui.QWidget):
                 
             if self.configuration.isBrick(item):
                 if i == 0:
-                    item.brick['fontSize'] = 11
+                    item.brick['fontSize'] = 9
                 else:
                     item.brick['fontSize']=int(item.brick['fontSize'])+i
             else:
                 prop = item.properties.properties.get('fontSize', None)
                 if prop is not None:
                     if i == 0:
-                        prop.setValue(11)
+                        prop.setValue(9)
                     else:
                         prop.setValue(prop.getValue()+i)
                     w = widgets_dict[item.name]

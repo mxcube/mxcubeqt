@@ -62,23 +62,21 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         self.transmission_ledit = QtGui.QLineEdit(self.group_box)
         self.transmission_ledit.setReadOnly(True)
         set_to_label = QtGui.QLabel("Set to:", self.group_box)
-        self.newTransmission = QtGui.QLineEdit(self.group_box)
+        self.new_value_ledit = QtGui.QLineEdit(self.group_box)
 
         # Layout --------------------------------------------------------------
-        self.group_box_layout = QtGui.QGridLayout()
-        self.group_box_layout.addWidget(current_label, 0, 0)
-        self.group_box_layout.addWidget(self.transmission_ledit, 0, 1)
-        self.group_box_layout.addWidget(set_to_label, 1, 0)
-        self.group_box_layout.addWidget(self.newTransmission, 1, 1)
-        self.group_box_layout.setSpacing(0)
-        self.group_box_layout.setContentsMargins(1, 1, 1, 1)
-        self.group_box.setLayout(self.group_box_layout)
+        _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
+        _group_box_gridlayout.addWidget(current_label, 0, 0)
+        _group_box_gridlayout.addWidget(self.transmission_ledit, 0, 1)
+        _group_box_gridlayout.addWidget(set_to_label, 1, 0)
+        _group_box_gridlayout.addWidget(self.new_value_ledit, 1, 1)
+        _group_box_gridlayout.setSpacing(0)
+        _group_box_gridlayout.setContentsMargins(1, 1, 1, 1)
 
-        self.main_layout = QtGui.QVBoxLayout()
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 2, 2)
-        self.main_layout.addWidget(self.group_box)
-        self.setLayout(self.main_layout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 2, 2)
+        _main_vlayout.addWidget(self.group_box)
 
         # SizePolicies --------------------------------------------------------
         #self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
@@ -86,17 +84,17 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
 
         # Qt signal/slot connections ------------------------------------------
-        self.newTransmission.returnPressed.connect(self.current_value_changed)
-        self.newTransmission.textChanged.connect(self.input_field_changed)
+        self.new_value_ledit.returnPressed.connect(self.current_value_changed)
+        self.new_value_ledit.textChanged.connect(self.input_field_changed)
 
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)
         self.group_box.setChecked(True)
-        Qt4_widget_colors.set_widget_color(self.newTransmission,
+        Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                        Qt4_widget_colors.LINE_EDIT_ACTIVE,
                                        QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(0, 100, 2, self.newTransmission)
-        self.instanceSynchronize("newTransmission")
+        self.new_value_validator = QtGui.QDoubleValidator(0, 100, 2, self.new_value_ledit)
+        #self.instanceSynchronize("newTransmission")
         
     def propertyChanged(self, property_value, old_value, new_value):
         """
@@ -133,11 +131,11 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Return.   : 
         """
         if input_field_text == "":
-            Qt4_widget_colors.set_widget_color(self.newTransmission,
+            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                                Qt4_widget_colors.LINE_EDIT_ACTIVE,
                                                QtGui.QPalette.Base)
         else:
-            Qt4_widget_colors.set_widget_color(self.newTransmission,
+            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                                Qt4_widget_colors.LINE_EDIT_CHANGED,
                                                QtGui.QPalette.Base)
 
@@ -147,8 +145,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.attenuators_hwobj.setTransmission(float(self.newTransmission.text()))
-        self.newTransmission.setText("") 
+        self.attenuators_hwobj.setTransmission(float(self.new_value_ledit.text()))
+        self.new_value_ledit.setText("") 
 
     def connected(self):
         """
@@ -174,10 +172,11 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         """
         return
 
-    def transmission_value_changed(self, transmission_value):
+    def transmission_value_changed(self, new_value):
         """
         Descript. :
         Args.     :
         Return.   : 
         """
-        self.transmission_ledit.setText(str(transmission_value))
+        new_values_str = self['formatString'] % new_value
+        self.transmission_ledit.setText("%s%%" % new_values_str)

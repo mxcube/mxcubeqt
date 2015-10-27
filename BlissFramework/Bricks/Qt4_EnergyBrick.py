@@ -66,7 +66,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_widget = QtGui.QWidget(self)
         set_to_label = QtGui.QLabel("Set to: ", self)
         self.new_value_ledit = QtGui.QLineEdit(self.new_value_widget)
-        self.new_value_ledit.setMaximumWidth(60)
+        #self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QtGui.QComboBox(self.new_value_widget)
         self.units_combobox.addItems(["keV", chr(197)]) 
         self.stop_button = QtGui.QPushButton(self.new_value_widget)        
@@ -75,30 +75,27 @@ class Qt4_EnergyBrick(BlissWidget):
         self.stop_button.setFixedWidth(25)
  
         # Layout --------------------------------------------------------------
-        self.new_value_widget_layout = QtGui.QHBoxLayout(self)
-        self.new_value_widget_layout.addWidget(self.new_value_ledit)
-        self.new_value_widget_layout.addWidget(self.units_combobox)
-        self.new_value_widget_layout.addWidget(self.stop_button)
-        self.new_value_widget_layout.setSpacing(0)
-        self.new_value_widget_layout.setContentsMargins(0, 0, 0, 0)
-        self.new_value_widget.setLayout(self.new_value_widget_layout) 
+        _new_value_widget_hlayout = QtGui.QHBoxLayout(self.new_value_widget)
+        _new_value_widget_hlayout.addWidget(self.new_value_ledit)
+        _new_value_widget_hlayout.addWidget(self.units_combobox)
+        _new_value_widget_hlayout.addWidget(self.stop_button)
+        _new_value_widget_hlayout.setSpacing(0)
+        _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.group_box_layout = QtGui.QGridLayout()
-        self.group_box_layout.addWidget(energy_label, 0, 0)
-        self.group_box_layout.addWidget(self.energy_ledit, 0, 1) 
-        self.group_box_layout.addWidget(wavelength_label, 1, 0)
-        self.group_box_layout.addWidget(self.wavelength_ledit, 1, 1)
-        self.group_box_layout.addWidget(set_to_label, 2, 0) 
-        self.group_box_layout.addWidget(self.new_value_widget, 2, 1)
-        self.group_box_layout.setSpacing(0)
-        self.group_box_layout.setContentsMargins(1, 1, 1, 1) 
-        self.group_box.setLayout(self.group_box_layout)
+        _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
+        _group_box_gridlayout.addWidget(energy_label, 0, 0)
+        _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1) 
+        _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
+        _group_box_gridlayout.addWidget(self.wavelength_ledit, 1, 1)
+        _group_box_gridlayout.addWidget(set_to_label, 2, 0) 
+        _group_box_gridlayout.addWidget(self.new_value_widget, 2, 1)
+        _group_box_gridlayout.setSpacing(0)
+        _group_box_gridlayout.setContentsMargins(1, 1, 1, 1) 
 
-        self.main_layout = QtGui.QVBoxLayout()
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 2, 2)
-        self.main_layout.addWidget(self.group_box)
-        self.setLayout(self.main_layout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 2, 2)
+        _main_vlayout.addWidget(self.group_box)
 
         # SizePolicies --------------------------------------------------------
         #self.setMaximumWidth(250)
@@ -242,7 +239,8 @@ class Qt4_EnergyBrick(BlissWidget):
         if value_limits is not None:
             self.new_value_validator.setRange(value_limits[0], value_limits[1], 2)    
             self.new_value_ledit.setValidator(self.new_value_validator)
-            self.new_value_ledit.setToolTip("%s : %s" %(tool_tip, value_limits))
+            self.new_value_ledit.setToolTip("%s %.2f : %.2f" % \
+                 (tool_tip, value_limits[0], value_limits[1]))
    
     def stop_clicked(self):
         """

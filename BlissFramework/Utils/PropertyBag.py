@@ -122,9 +122,7 @@ class ComboProperty(Property):
         self.setChoices(choices)
 
         Property.__init__(self, propertyName, defaultValue)
-
         self.type = 'combo'
-        
 
     def addChoice(self, choice):
         self.choices.append(str(choice))

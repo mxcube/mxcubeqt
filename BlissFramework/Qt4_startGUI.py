@@ -273,6 +273,10 @@ def run(GUIConfigFile = None):
     gevent_timer.connect(gevent_timer, QtCore.SIGNAL("timeout()"), do_gevent)
     gevent_timer.start(0)
 
+    app.setOrganizationName("MXCuBE")
+    app.setOrganizationDomain("https://github.com/mxcube")
+    app.setApplicationName("MXCuBE")
+    #app.setWindowIcon(QIcon("images/icon.png"))
     app.exec_()
 
 

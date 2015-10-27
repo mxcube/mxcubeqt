@@ -35,10 +35,10 @@ __category__ = 'Qt4_General'
 class Qt4_DuoStateBrick(BlissWidget):
 
     STATES = {
-        'unknown': (None, True, True, False, False),
-        'disabled': (Qt4_widget_colors.LIGHT_RED, False, False, False, False),
+        'unknown': (Qt4_widget_colors.LIGHT_GRAY, True, True, False, False),
+        'disabled': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
         'error': (Qt4_widget_colors.LIGHT_RED, True, True, False, False),
-        'out': (Qt4_widget_colors.LIGHT_GRAY, True, True, False, True),
+        'out': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
         'moving': (Qt4_widget_colors.LIGHT_YELLOW, False, False, None, None),
         'in': (Qt4_widget_colors.LIGHT_GREEN, True, True, True, False),
         'automatic': (Qt4_widget_colors.WHITE, True, True, False, False)
@@ -75,7 +75,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox("none", self)
         self.main_gbox.setAlignment(QtGui.QLabel.AlignCenter)
-        self.state_label = QtGui.QLabel('<b> </b>', self.main_gbox)
+        self.state_label = QtGui.QLabel('<b>unknown</b>', self.main_gbox)
 
         self.buttons_widget = QtGui.QWidget(self.main_gbox)
         self.set_in_button = QtGui.QPushButton("Set in", self.buttons_widget)
@@ -84,31 +84,28 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.set_out_button.setCheckable(True)
 
         # Layout -------------------------------------------------------------- 
-        self.buttons_widget_hlayout = QtGui.QHBoxLayout()
-        self.buttons_widget_hlayout.addWidget(self.set_in_button)
-        self.buttons_widget_hlayout.addWidget(self.set_out_button)
-        self.buttons_widget_hlayout.setSpacing(0)
-        self.buttons_widget_hlayout.setContentsMargins(0, 0, 0, 0)
-        self.buttons_widget.setLayout(self.buttons_widget_hlayout)
+        _buttons_widget_hlayout = QtGui.QHBoxLayout(self.buttons_widget)
+        _buttons_widget_hlayout.addWidget(self.set_in_button)
+        _buttons_widget_hlayout.addWidget(self.set_out_button)
+        _buttons_widget_hlayout.setSpacing(0)
+        _buttons_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.main_gbox_vlayout = QtGui.QVBoxLayout()
-        self.main_gbox_vlayout.addWidget(self.state_label)
-        self.main_gbox_vlayout.addWidget(self.buttons_widget)
-        self.main_gbox_vlayout.setSpacing(1)
-        self.main_gbox_vlayout.setContentsMargins(0, 2, 0, 0)
-        self.main_gbox.setLayout(self.main_gbox_vlayout)
+        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
+        _main_gbox_vlayout.addWidget(self.state_label)
+        _main_gbox_vlayout.addWidget(self.buttons_widget)
+        _main_gbox_vlayout.setSpacing(2)
+        _main_gbox_vlayout.setContentsMargins(0, 4, 4, 0)
 
-        main_layout = QtGui.QVBoxLayout()
-        main_layout.addWidget(self.main_gbox)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(main_layout)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.main_gbox)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.set_in_button.toggled.connect(self.setIn)
-        self.set_out_button.toggled.connect(self.setOut)
+        self.set_in_button.toggled.connect(self.set_in)
+        self.set_out_button.toggled.connect(self.set_out)
 
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(QtGui.QLabel.AlignCenter)
@@ -125,20 +122,20 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.buttons_widget.hide()
 
         
-    def setIn(self,state):
+    def set_in(self, state):
         if state:
             self.wrapper_hwobj.setIn()
         else:
             self.set_in_button.blockSignals(True)
-            self.set_in_button.setState(QPushButton.On)
+            self.set_in_button.setState(QtGui.QPushButton.On)
             self.set_in_button.blockSignals(False)
 
-    def setOut(self,state):
+    def set_out(self, state):
         if state:
             self.wrapper_hwobj.setOut()
         else:
             self.set_out_button.blockSignals(True)
-            self.set_out_button.setState(QPushButton.On)
+            self.set_out_button.setState(QtGui.QPushButton.On)
             self.set_out_button.blockSignals(False)
 
     def updateLabel(self,label):
@@ -205,13 +202,6 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.buttons_widget.show()
         else:
             self.buttons_widget.hide()
-
-    def run(self):
-        if self.wrapper_hwobj is None:
-            self.main_gbox.hide()
-
-    def stop(self):
-        self.main_gbox.show()
 
     def propertyChanged(self,propertyName,oldValue,newValue):
         if propertyName=='mnemonic':

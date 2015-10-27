@@ -18,7 +18,6 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import types
-import pprint
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -64,7 +63,6 @@ class _CfgItem:
             #
             prop_name = item_property.getName()
             if prop_name in self.properties.properties:
-                #print prop_name, property.getUserValue()
                 self.properties.getProperty(prop_name).setValue(item_property.getUserValue())
             elif item_property.hidden:
                 self.properties[item_property.getName()] = item_property
@@ -115,8 +113,10 @@ class ContainerCfg(_CfgItem):
         self.properties.addProperty("color", "color", None)
         self.properties.addProperty("hsizepolicy", "combo", ("fixed", "expanding", "default"), "default")
         self.properties.addProperty("vsizepolicy", "combo", ("fixed", "expanding", "default"), "default")
-        self.properties.addProperty("frameshape", "combo", ("box", "panel", "default"), "default")
+        self.properties.addProperty("frameshape", "combo", ("Box", "Panel", "StyledPanel", "HLine", "VLine", "default"), "default")
         self.properties.addProperty("shadowstyle", "combo", ("plain", "raised", "sunken", "default"), "default")
+        self.properties.addProperty("fixedwidth", "integer", -1)   
+        self.properties.addProperty("fixedheight", "integer", -1) 
 
     def addChild(self, item):
         """
@@ -204,12 +204,9 @@ class WindowCfg(ContainerCfg):
         Descript. :
         """
         if not hasattr(self, "_menuEditor"):
-            # backward compatibility!
             self._menuEditor=None
-            
-        if self._menuEditor is None or type(self._menuEditor)==types.StringType:
+        if self._menuEditor is None or type(self._menuEditor) == types.StringType:
             self._menuEditor = MenuEditor(None, self.name)
-            
         return self._menuEditor
     
         

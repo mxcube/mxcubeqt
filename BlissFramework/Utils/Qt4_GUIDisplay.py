@@ -17,10 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import new
 import logging
 import weakref
-import new
+import platform
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -31,17 +31,21 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
 
 
-class CustomMenuBar(QtGui.QWidget):
+__version__ = '2.1'
+
+
+class CustomMenuBar(QtGui.QMenuBar):
     """
     Descript. :
     """
+    viewToolBarSignal = QtCore.pyqtSignal(bool)
 
     def __init__(self, parent):
         """
         Descript. : parent *must* be the window ; it contains a centralWidget 
                     in its viewport
         """
-        QtGui.QWidget.__init__(self)
+        QtGui.QMenuBar.__init__(self)
 
         # Internal values -----------------------------------------------------        
         self.parent = parent
@@ -50,23 +54,27 @@ class CustomMenuBar(QtGui.QWidget):
         self.execution_mode = None
 
         # Graphic elements ----------------------------------------------------
-        self.menu_bar = QtGui.QMenuBar(self) 
-        self.file_menu = self.menu_bar.addMenu("File")
-        self.expert_mode_action = self.file_menu.addAction("Expert mode", self.expert_mode_clicked)
+        #self.menubar = QtGui.QMenuBar(self) 
+        self.file_menu = self.addMenu("File")
+        self.expert_mode_action = self.file_menu.addAction("Expert mode", 
+             self.expert_mode_clicked)
         self.expert_mode_action.setCheckable(True)  
         self.file_menu.addAction("Quit", self.quit_clicked)
-        self.help_menu = self.menu_bar.addMenu("Help") 
+
+        self.view_menu = self.addMenu("View")
+        self.view_toolbar_action = self.view_menu.addAction("Toolbar", 
+             self.view_toolbar_clicked)
+        self.view_toolbar_action.setCheckable(True)
+        self.view_graphics_manager_action = self.view_menu.addAction(\
+             "Graphics manager", self.view_graphics_manager_clicked)
+        self.view_graphics_manager_action.setCheckable(True)
+
+        self.expert_mode_action.setCheckable(True) 
+        self.help_menu = self.addMenu("Help") 
         self.help_menu.addAction("Whats this", self.whats_this_clicked)
+        self.help_menu.addAction("About", self.about_clicked) 
 
         # Layout --------------------------------------------------------------
-        _main_hlayout = QtGui.QHBoxLayout()
-        _main_hlayout.addWidget(self.menu_bar)
-        #_main_hlayout.addStretch(0) 
-        #_main_hlayout.addWidget(self.expert_mode_checkbox)
-        _main_hlayout.setSpacing(0)
-        _main_hlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_hlayout) 
-
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)
 
@@ -78,6 +86,13 @@ class CustomMenuBar(QtGui.QWidget):
 
         # Other ---------------------------------------------------------------
         self.expert_mode_checkboxStdColor=None
+
+    def get_menu_bar(self):
+        """
+        Returns. : current menu bar. Method used by other widgets that
+                   inserts action in menu bar
+        """
+        return self.menubar
 
     def configure(self, menu_data, expert_pwd, execution_mode):
         """
@@ -154,6 +169,14 @@ class CustomMenuBar(QtGui.QWidget):
         if self.execution_mode:
             BlissWidget.updateWhatsThis()
 
+    def about_clicked(self):
+        QtGui.QMessageBox.about(self, "About MXCuBE",
+                 """<b>MXCuBE v %s </b> 
+                 <p>Macromolecular Xtallography Customized Beamline Environment<p>
+                 Python %s - Qt %s - PyQt %s on %s"""%(__version__, 
+                 platform.python_version(),
+                 QtCore.QT_VERSION_STR, QtCore.PYQT_VERSION_STR, platform.system()))
+
     def quit_clicked(self):
         """
         Descript. :
@@ -166,7 +189,28 @@ class CustomMenuBar(QtGui.QWidget):
             style_string = """QMenuBar {background-color: %s;}""" % color
             style_string += """QMenuBar::item {background: %s;}""" %color
             style_string += """QMenuBar {color: black;}"""
-            self.setStyleSheet(style_string) 
+            self.setStyleSheet(style_string)
+
+    def view_toolbar_clicked(self):
+        self.viewToolBarSignal.emit(self.view_toolbar_action.isChecked())
+
+    def view_graphics_manager_clicked(self): 
+        pass
+
+class CustomToolBar(QtGui.QToolBar):
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent):
+        """
+        Descript. : parent *must* be the window ; it contains a centralWidget 
+                    in its viewport
+        """
+        QtGui.QToolBar.__init__(self)
+
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                           QtGui.QSizePolicy.Fixed)
 
 class WindowDisplayWidget(QtGui.QScrollArea):
     """
@@ -601,50 +645,55 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.preview_items = []
         self.currentWindow = None
         self.setWindowTitle("GUI preview")
-        self.menu_bar = None
-       
-        self.centralWidget = QtGui.QWidget(self.widget())
-        #self.centralWidget.setObjectName("deee")
-        self.centralWidget_layout = QtGui.QVBoxLayout() 
-        self.centralWidget_layout.setSpacing(0)
-        self.centralWidget_layout.setContentsMargins(0, 0, 0, 0)
-        self.centralWidget.setLayout(self.centralWidget_layout)
-        self.centralWidget.show()
+ 
+        self.central_widget = QtGui.QWidget(self.widget())
+        #self.central_widget.setObjectName("deee")
+        self.central_widget_layout = QtGui.QVBoxLayout() 
+        self.central_widget_layout.setSpacing(0)
+        self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_widget.setLayout(self.central_widget_layout)
+        self.central_widget.show()
 
-        self.menu_bar = CustomMenuBar(self)
-        self.menu_bar.hide()
-        self.status_bar = QtGui.QStatusBar(self)
-        self.status_bar.hide()
+        self.toolbar = CustomToolBar(self)
+        self.toolbar.hide()
+        self.menubar = CustomMenuBar(self)
+        self.menubar.hide()
+        self.statusbar = QtGui.QStatusBar(self)
+        self.statusbar.hide()
 
         _main_vlayout = QtGui.QVBoxLayout()
-        _main_vlayout.addWidget(self.menu_bar)
-        _main_vlayout.addWidget(self.centralWidget)
-        _main_vlayout.addWidget(self.status_bar) 
+        _main_vlayout.addWidget(self.menubar)
+        _main_vlayout.addWidget(self.toolbar)
+        _main_vlayout.addWidget(self.central_widget)
+        _main_vlayout.addWidget(self.statusbar) 
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        #self.setWidget(self.centralWidget)
-
-        #main_layout.addWidget(self.menu_bar) 
-        #main_layout.addWidget(self.centralWidget)
         self.setLayout(_main_vlayout)
+
+        self.menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
+ 
+
+    def view_toolbar_toggled(self, state):
+        if state:
+            self.toolbar.show()
+        else:
+            self.toolbar.hide()
 
     def set_menu_bar(self, menu_data, exp_pwd, execution_mode):
         """
         Descript. :
         """
-        self.menu_bar.configure(menu_data, exp_pwd, execution_mode)
-        self.menu_bar.show()
-        BlissWidget._menuBar = self.menu_bar
-          
-        #self.menu_bar = CustomMenuBar(menu_data, exp_pwd, execution_mode)
-        #self.layout().addWidget(self.menu_bar)
+        self.menubar.configure(menu_data, exp_pwd, execution_mode)
+        self.menubar.show()
+        BlissWidget._menuBar = self.menubar
+        BlissWidget._toolBar = self.toolbar
 
     def set_status_bar(self):
         """
         Descript. :
         """
-        self.status_bar.show()	
+        self.statusbar.show()	
 
     def show(self, *args):
         """
@@ -666,7 +715,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         Descript. :
         """
-        ret=QtGui.QWidget.setWindowTitle(self, *args)
+        ret = QtGui.QWidget.setWindowTitle(self, *args)
         return ret
 
     def exitExpertMode(self, *args):
@@ -676,7 +725,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if len(args) > 0:
             if args[0]:
                 return
-        self.menu_bar.set_expert_mode(False)
+        self.menubar.set_expert_mode(False)
 
     def add_item(self, item_cfg, parent):
         """
@@ -712,7 +761,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 newItem.layout().setMargin(item_cfg["properties"]["margin"])
                 frame_style = QtGui.QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"]!="default":
-                    frame_style = getattr(QtGui.QFrame, item_cfg["properties"]["frameshape"].capitalize())
+                    frame_style = getattr(QtGui.QFrame, item_cfg["properties"]["frameshape"])
                 if item_cfg["properties"]["shadowstyle"]!="default":
                     frame_style = frame_style | getattr(QtGui.QFrame, item_cfg["properties"]["shadowstyle"].capitalize())
                 if frame_style != QtGui.QFrame.NoFrame:
@@ -720,6 +769,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                         newItem.setFrameStyle(frame_style)
                     except:
                         logging.getLogger().exception("Could not set frame style on item %s", item_cfg["name"])
+                if item_cfg["properties"]["fixedwidth"] > -1: 
+                    newItem.setFixedWidth(item_cfg["properties"]["fixedwidth"])
+                if item_cfg["properties"]["fixedheight"] > -1: 
+                    newItem.setFixedHeight(item_cfg["properties"]["fixedheight"])
             elif item_type == "icon":
                 img = QtGui.QPixmap()
                 if img.load(item_cfg["properties"]["filename"]):
@@ -825,11 +878,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             # remove all bricks and destroy all other items
             #previewItems = self.preview_items[self.currentWindow]
             #self.preview_items = []
-            self.centralWidget.close()
-            self.centralWidget = QtGui.QWidget(self.viewport())
+            self.central_widget.close()
+            self.central_widget = QtGui.QWidget(self.viewport())
             self.central_widget_layout = QtGui.QVBoxLayout()
-            self.centralWidget.setLayout(self.central_widget_layout)
-            self.centralWidget.show()
+            self.central_widget.setLayout(self.central_widget_layout)
+            self.central_widget.show()
 
         self.currentWindow = window_id
         self.containerNum = -1
@@ -837,11 +890,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         try:
             parent = previewItems[container_ids[0]][0]
         except:
-            parent = self.centralWidget
+            parent = self.central_widget
         else:
             pass
 
-        #self.preview_items.append(self.centralWidget)
+        #self.preview_items.append(self.central_widget)
         
         # reparent bricks to prevent them from being deleted,
         # and remove them from the previewItems list 
