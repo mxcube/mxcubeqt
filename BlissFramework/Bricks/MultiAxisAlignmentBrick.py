@@ -232,7 +232,7 @@ class MultiAxisAlignmentBrick(BlissWidget):
                 if hasattr(equipment,'isSampleStage') :
                     for pad in equipment.getAxisList() :
                         self.__createOnePad(pad)
-                elif equipment.__class__.__name__ == 'SpecMotor':
+                elif equipment.__class__.__name__.endswith('Motor'):
                     self.__createOneAxis(equipment)
                 else :
                     self.__createOnePad(equipment)
