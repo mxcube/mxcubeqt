@@ -86,31 +86,34 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         self.measure_area_action.setCheckable(True)
 
         _create_menu = self.tools_menu.addMenu("Create")
-        self.create_point_click_action = _create_menu.addAction(
-             Qt4_Icons.load_icon("VCRPlay2"),
-             "Centring point with 3 clicks",
-             self.create_point_click_clicked)
-        self.create_point_current_action = _create_menu.addAction(
-             Qt4_Icons.load_icon("ThumpUp"),
-             "Centring point on current position", 
-             self.create_point_current_clicked)
-        self.create_line_action = _create_menu.addAction(
-             Qt4_Icons.load_icon("Line.png"),
-             "Helical line",
-             self.create_line_clicked)
-        self.create_grid_drag_action = _create_menu.addAction(
-             Qt4_Icons.load_icon("GridDrag"),
-             "Grid with drag and drop",
-             self.create_grid_drag_clicked)
-        self.create_grid_click_action = _create_menu.addAction(
-             Qt4_Icons.load_icon("GridClick"),
-             "Grid with 2 clicks",
-             self.create_grid_click_clicked) 
-        self.create_grid_auto_action = _create_menu.addAction(
-             Qt4_Icons.load_icon("GridAuto"),
-             "Automatic grid",
-             self.create_grid_auto_clicked) 
-      
+        aa_action = _create_menu.addAction(Qt4_Icons.load_icon("VCRPlay2"),
+             "Centring point with 3 clicks", self.create_point_click_clicked)
+        aa_action.setShortcut("Ctrl+1")
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("ThumpUp"),
+             "Centring point on current position", self.create_point_current_clicked)
+        temp_action.setShortcut("Ctrl+2")
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("Line.png"),
+             "Helical line",self.create_line_clicked)
+        temp_action.setShortcut("Ctrl+3")
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridDrag"),
+             "Grid with drag and drop", self.create_grid_drag_clicked)
+        temp_action.setShortcut("Ctrl+4")
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridClick"),
+             "Grid with 2 clicks", self.create_grid_click_clicked) 
+        temp_action.setShortcut("Ctrl+5")
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridAuto"),
+             "Automatic grid", self.create_grid_auto_clicked) 
+        temp_action.setShortcut("Ctrl+6")
+        temp_action = self.tools_menu.addAction("Select all centring points",
+             self.select_all_points_clicked)
+        temp_action.setShortcut("Ctrl+7")
+        temp_action = self.tools_menu.addAction("Deselect all items",
+             self.deselect_all_items_clicked)
+        temp_action.setShortcut("Ctrl+8")
+        temp_action = self.tools_menu.addAction("Clear all items",
+             self.clear_all_items_clicked)
+        temp_action.setShortcut("Ctrl+9")
+
         self.move_beam_mark_action = self.tools_menu.addAction(
              "Move beam mark",
              self.move_beam_mark_clicked)
@@ -212,3 +215,12 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
     
     def move_beam_mark_clicked(self):
         self.graphics_manager_hwobj.start_move_beam_mark()
+
+    def select_all_points_clicked(self):
+        self.graphics_manager_hwobj.select_all_points()
+
+    def deselect_all_items_clicked(self):
+        self.graphics_manager_hwobj.de_select_all() 
+
+    def clear_all_items_clicked(self):
+        self.graphics_manager_hwobj.clear_all()

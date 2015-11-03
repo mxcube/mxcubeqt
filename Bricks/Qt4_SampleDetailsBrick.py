@@ -59,29 +59,22 @@ class Qt4_SampleDetailsBrick(BlissWidget):
         self.crystal_widget = uic.loadUi(os.path.join(
                             os.path.dirname(__file__),
                             "widgets/ui_files/Qt4_crystal_widget_layout.ui"))
-        Qt4_widget_colors.set_widget_color(self.crystal_widget,
-                                           Qt4_widget_colors.LIGHT_GRAY)
         self.sample_info_widget = uic.loadUi(
                                 os.path.join(os.path.dirname(__file__),
                                 "widgets/ui_files/Qt4_sample_info_widget_layout.ui"))
-        Qt4_widget_colors.set_widget_color(self.sample_info_widget,
-                                           Qt4_widget_colors.LIGHT_GRAY)        
 
         # Layout --------------------------------------------------------------
-        _info_widget_hlayout = QtGui.QHBoxLayout(self)
+        _info_widget_hlayout = QtGui.QHBoxLayout(_info_widget)
         _info_widget_hlayout.addWidget(self.sample_info_widget)
         _info_widget_hlayout.addWidget(self.crystal_widget)
         _info_widget_hlayout.addStretch(0)
-        _info_widget.setLayout(_info_widget_hlayout)
 
         _main_hlayout = QtGui.QVBoxLayout(self)
         _main_hlayout.addWidget(_info_widget)
         _main_hlayout.addStretch(0)
         _main_hlayout.setSpacing(0)
-        
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        self.setLayout(_main_hlayout)  
 
         # SizePolicies --------------------------------------------------------
 

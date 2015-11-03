@@ -29,7 +29,7 @@ from sample_changer import SC3
 from Qt4_sample_changer_helper import *
 
 
-__category__ = "Qt4_Task"
+__category__ = "Sample changer"
 
 
 class VialView(QtGui.QWidget):

@@ -76,7 +76,6 @@ class Qt4_ProgressBarBrick(BlissWidget):
 
     def set_progress_step(self, step):
         self.progress_bar.setValue(step)
-        print step
         if step == self.progress_bar.maximum():
             self.stop_progress()
 

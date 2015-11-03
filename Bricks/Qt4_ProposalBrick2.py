@@ -137,17 +137,16 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.saved_group = True 
 
         # Layout --------------------------------------------------------------
-        _user_group_widget_hlayout = QtGui.QHBoxLayout(self)
+        _user_group_widget_hlayout = QtGui.QHBoxLayout(self.user_group_widget)
         _user_group_widget_hlayout.setSpacing(2)
         #_user_group_widget_hlayout.addWidget(self.title_label)
         _user_group_widget_hlayout.addWidget(self.user_group_label) 
         _user_group_widget_hlayout.addWidget(self.user_group_ledit)
         _user_group_widget_hlayout.addWidget(self.user_group_save_button)
         _user_group_widget_hlayout.setContentsMargins(0, 0, 0, 0)
-        self.user_group_widget.setLayout(_user_group_widget_hlayout)
         self.user_group_widget.hide()
 
-        _login_as_proposal_widget_layout = QtGui.QHBoxLayout(self)
+        _login_as_proposal_widget_layout = QtGui.QHBoxLayout(self.login_as_proposal_widget)
         _login_as_proposal_widget_layout.addWidget(code_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_type_combox)
         _login_as_proposal_widget_layout.addWidget(dash_label)
@@ -158,25 +157,24 @@ class Qt4_ProposalBrick2(BlissWidget):
         _login_as_proposal_widget_layout.addWidget(self.logout_button)
         _login_as_proposal_widget_layout.setSpacing(2)
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
-        self.login_as_proposal_widget.setLayout(_login_as_proposal_widget_layout) 
 
-        _login_as_user_widget_layout = QtGui.QHBoxLayout(self)
+        _login_as_user_widget_layout = QtGui.QHBoxLayout(self.login_as_user_widget)
         _login_as_user_widget_layout.addWidget(proposal_label)
         _login_as_user_widget_layout.addWidget(self.proposal_combo)
         _login_as_user_widget_layout.setSpacing(2)
         _login_as_user_widget_layout.setContentsMargins(0, 0, 0, 0)
-        self.login_as_user_widget.setLayout(_login_as_user_widget_layout)
 
         _main_vlayout = QtGui.QHBoxLayout(self)
         _main_vlayout.addWidget(self.login_as_proposal_widget)
         _main_vlayout.addWidget(self.login_as_user_widget)
+        _main_vlayout.addSpacing(10)
         _main_vlayout.addWidget(self.user_group_widget)
-        _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                           QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.proposal_password_ledit.returnPressed.connect(self.login)
@@ -198,8 +196,6 @@ class Qt4_ProposalBrick2(BlissWidget):
                                            Qt4_widget_colors.LIGHT_RED,
                                            QtGui.QPalette.Base)
  
-        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
-
     def save_group(self):
         """
         Descript. :
@@ -334,7 +330,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.session_hwobj.proposal_number = None 	
 
     # Sets the current session; changes from login mode to logout mode
-    def setProposal(self, proposal, person, laboratory, session, localcontact):
+    def setProposal(self, proposal, session):
         """
         Descript. :
         """
@@ -352,10 +348,11 @@ class Qt4_ProposalBrick2(BlissWidget):
         # Store info in the brick
         self.proposal = proposal
         self.session = session
-        self.person = person
-        self.laboratory = laboratory
+        #self.person = person
+        #self.laboratory = laboratory
 
         code = proposal["code"].lower()
+
         if code == "":
             #self.proposalLabel.setText("<nobr><i>%s</i>" % personFullName(person))
             session_id = ""
@@ -367,6 +364,8 @@ class Qt4_ProposalBrick2(BlissWidget):
                  (proposal["code"],
                   str(proposal["number"]),
                   proposal["title"])
+            logging.getLogger("user_level_log").debug(msg)  
+
             codes_list = self["codes"].split()
             if code not in codes_list:
                 codes = self["codes"] + " " + code
@@ -382,6 +381,8 @@ class Qt4_ProposalBrick2(BlissWidget):
                 comments = session['comments']
             except KeyError:
                 comments = None
+
+            """
             person_name = personFullName(person)
             if laboratory.has_key('name'):
                 person_name = person_name + " " + laboratory['name']
@@ -392,6 +393,9 @@ class Qt4_ProposalBrick2(BlissWidget):
                        (person_name,start_date,end_date,localcontact_name)
             else:
                 header = "%s Dates: %s to %s" % (person_name, start_date, end_date)
+            """
+            #Not implemented in REST
+            header = ""
 
             # Set interface info and signal the new session
             proposal_text = "%s-%s" % (proposal['code'], proposal['number'])
@@ -510,12 +514,13 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         self.setEnabled(True)
 
-    def acceptLogin(self, proposal_dict, person_dict, lab_dict, session_dict, contact_dict):
+    def acceptLogin(self, proposal_dict, session_dict):
         """
         Descript. :
         """
-        self.setProposal(proposal_dict, person_dict, lab_dict, 
-                         session_dict, contact_dict)
+        #self.setProposal(proposal_dict, person_dict, lab_dict, 
+        #                 session_dict, contact_dict)
+        self.setProposal(proposal_dict, session_dict)
         self.setEnabled(True)
 
     def ispybDown(self):
@@ -545,21 +550,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         pers_dict = {'familyName' : locallogin_person}
         lab_dict = {'name':'EMBL-HH'}
         cont_dict = {'familyName' : 'local contact'}
-        self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
-
-    def askForNewSession(self):
-        """
-        Descript. :
-        """
-        create_session_dialog = QtGui.QMessageBox("Create session", \
-            "Unable to find an appropriate session.\nPress OK to create one for today.", \
-            QtGui.QMessageBox.Question, 
-            QtGui.QMessageBox.Ok, 
-            QtGui.QMessageBox.Cancel,
-            QtGui.QMessageBox.NoButton,
-            self)
-        answer = create_session_dialog.exec_()
-        return answer == QtGui.QMessageBox.Ok
+        #self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
+        self.acceptLogin(prop_dict, ses_dict)
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
@@ -603,7 +595,8 @@ class Qt4_ProposalBrick2(BlissWidget):
                 cont_dict = {'familyName' : 'local contact'}
                 logging.getLogger().debug("ProposalBrick: local login password validated")
              
-                return self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
+                #return self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
+                return self.acceptLogin(prop_dict, ses_dict)
 
             if self.ldap_connection_hwobj == None:
                 return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
@@ -705,10 +698,9 @@ class Qt4_ProposalBrick2(BlissWidget):
     def select_proposal(self, selected_proposal):
         beamline_name = self.lims_hwobj.beamline_name
         proposal = selected_proposal['Proposal']
-        person = selected_proposal['Person']
-        laboratory = selected_proposal['Laboratory']
-        sessions = selected_proposal.get('Sessions')
-
+        #person = selected_proposal['Person']
+        #laboratory = selected_proposal['Laboratory']
+        sessions = selected_proposal['Sessions']
         # Check if there are sessions in the proposal
         todays_session = None
         if sessions is None or len(sessions) == 0:
@@ -766,7 +758,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             new_session_dict['scheduled'] = 0
             new_session_dict['nbShifts'] = 3
             new_session_dict['comments'] = "Session created by the BCM"
-            session_id = self.lims_hwobj.createSession(new_session_dict)
+            session_id = self.lims_hwobj.create_session(new_session_dict)
             new_session_dict['sessionId'] = session_id
 
             todays_session = new_session_dict
@@ -774,13 +766,14 @@ class Qt4_ProposalBrick2(BlissWidget):
         else:
             session_id = todays_session['sessionId']
             logging.getLogger().debug('ProposalBrick: getting local contact for %s' % session_id)
-            localcontact = self.lims_hwobj.getSessionLocalContact(session_id)
+            localcontact = self.lims_hwobj.get_session_local_contact(session_id)
 
-        self.acceptLogin(selected_proposal['Proposal'], 
-                         selected_proposal['Person'], 
-                         selected_proposal['Laboratory'],
-                         todays_session, 
-                         localcontact)
+        #self.acceptLogin(selected_proposal['Proposal'], 
+        #                 selected_proposal['Person'], 
+        #                 selected_proposal['Laboratory'],
+        #                 todays_session, 
+        #                 localcontact)
+        self.acceptLogin(selected_proposal['Proposal'], todays_session)
     
     def _do_login_as_user(self, user_name):
         logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
@@ -793,8 +786,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         else: 
             self.proposal_combo.clear()
             for proposal in self.proposals:
-                self.proposal_combo.addItem("%s%s - %s" % (proposal["Proposal"]["code"],
-                     str(proposal["Proposal"]["number"]), proposal["Proposal"]["title"]))
+                code = proposal["Proposal"]["code"]
+                number = proposal["Proposal"]["number"] 
+                title = proposal["Proposal"]["title"]
+                self.proposal_combo.addItem("%s%s - %s" % (code, str(number), title))
             if len(self.proposals) > 1:
                 proposal_to_select = self.select_todays_proposal(self.proposals)
                 self.select_proposal(self.proposals[proposal_to_select])
@@ -811,33 +806,30 @@ class Qt4_ProposalBrick2(BlissWidget):
                   If no session found then returns first proposal
         """
         for prop_index, proposal in enumerate(proposal_list):
-            sessions = proposal.get('Sessions', [])
-
+            sessions = proposal['Sessions']
             if len(sessions) > 0:
                 # Check for today's session
                 for session in sessions:
-                    beamline=session['beamlineName']
-                    start_date="%s 00:00:00" % session['startDate'].split()[0]
-                    end_date="%s 23:59:59" % session['endDate'].split()[0]
-
+                    beamline = session['beamlineName']
+                    start_date = "%s 00:00:00" % session['startDate'].split()[0]
+                    end_date = "%s 23:59:59" % session['endDate'].split()[0]
                     try:
-                        start_struct=time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
+                        start_struct = time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
                     except ValueError:
                         pass
                     else:
                         try:
-                            end_struct=time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
+                            end_struct = time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
                         except ValueError:
                             pass
                         else:
-                            start_time=time.mktime(start_struct)
-                            end_time=time.mktime(end_struct)
-                            current_time=time.time()
-
+                            start_time = time.mktime(start_struct)
+                            end_time = time.mktime(end_struct)
+                            current_time = time.time()
                             # Check beamline name
-                            if beamline== self.lims_hwobj.beamline_name:
+                            if beamline == self.lims_hwobj.beamline_name:
                                 # Check date
-                                if current_time>=start_time and current_time<=end_time:
+                                if current_time >= start_time and current_time <= end_time:
                                     return prop_index
 
         return 0 
