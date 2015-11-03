@@ -51,6 +51,8 @@ class CreateHelicalWidget(CreateTaskBase):
         # Graphic elements ----------------------------------------------------
         _lines_groupbox = QtGui.QGroupBox("Line", self)
         self._lines_listwidget = QtGui.QListWidget(_lines_groupbox)
+        self._lines_listwidget.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+        self._lines_listwidget.setMinimumHeight(70)
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
@@ -71,12 +73,12 @@ class CreateHelicalWidget(CreateTaskBase):
         _lines_groupbox_vlayout.addWidget(self._lines_listwidget)
         _lines_groupbox_vlayout.setSpacing(2)
         _lines_groupbox_vlayout.addStretch(0)
-        _lines_groupbox_vlayout.setContentsMargins(0,0,0,0)
+        _lines_groupbox_vlayout.setContentsMargins(0, 4, 0, 0)
 
         _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
         _data_path_gbox_layout.setSpacing(0)
-        _data_path_gbox_layout.setContentsMargins(0,0,0,0)
+        _data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(_lines_groupbox)
@@ -85,7 +87,7 @@ class CreateHelicalWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
@@ -98,6 +100,8 @@ class CreateHelicalWidget(CreateTaskBase):
              self.handle_path_conflict)
         self._processing_widget.enableProcessingSignal.connect(\
              self._enable_processing_toggled)
+        self._lines_listwidget.itemSelectionChanged.connect(\
+             self.lines_listwidget_selection_changed)
 
         # Other ---------------------------------------------------------------
 
@@ -120,15 +124,16 @@ class CreateHelicalWidget(CreateTaskBase):
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
             self._lines_listwidget.addItem(shape.get_full_name())
-            self._lines_listwidget.setEnabled(True)
-            self._lines_map[shape] = self._lines_listwidget.count() - 1
+            new_item = self._lines_listwidget.item(self._lines_listwidget.count() - 1)
+            new_item.setSelected(True)
+            self._lines_map[shape] = new_item
 
     def shape_deleted(self, shape, shape_type):
         if self._lines_map.get(shape):
-            self._lines_listwidget.removeItem(self._lines_map[shape])
+            shape_index = self._lines_listwidget.indexFromItem(\
+                 self._lines_map[shape])
+            self._lines_listwidget.removeItem(shape_index.row())
             self._lines_map.pop(shape)
-        if self._lines_listwidget.count() == 0:
-            self._lines_listwidget.setEnabled(False)
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
@@ -263,3 +268,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self._path_template.run_number += 1
 
         return data_collections
+
+    def lines_listwidget_selection_changed(self):
+        for shape, list_item in self._lines_map.iteritems():
+            shape.setSelected(list_item.isSelected())

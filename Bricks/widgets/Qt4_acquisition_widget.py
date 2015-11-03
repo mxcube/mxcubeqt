@@ -76,36 +76,36 @@ class AcquisitionWidget(QtGui.QWidget):
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         if layout == "horizontal":
-            self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+            self.acq_widget_layout = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
         else:
-            self.acq_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+            self.acq_widget_layout = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                 "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
         # Layout --------------------------------------------------------------
         __main_vlayout = QtGui.QVBoxLayout(self)
-        __main_vlayout.addWidget(self.acq_widget)
+        __main_vlayout.addWidget(self.acq_widget_layout)
         __main_vlayout.setSpacing(0)
         __main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.acq_widget.energies_combo.activated.connect(self.energy_selected)
-        self.acq_widget.mad_cbox.toggled.connect(self.use_mad)
-        self.acq_widget.inverse_beam_cbx.toggled.connect(self.set_use_inverse_beam)
-        self.acq_widget.first_image_ledit.textChanged.connect(self.first_image_ledit_change)
-        self.acq_widget.num_images_ledit.textChanged.connect(self.num_images_ledit_change)
+        self.acq_widget_layout.energies_combo.activated.connect(self.energy_selected)
+        self.acq_widget_layout.mad_cbox.toggled.connect(self.use_mad)
+        self.acq_widget_layout.inverse_beam_cbx.toggled.connect(self.set_use_inverse_beam)
+        self.acq_widget_layout.first_image_ledit.textChanged.connect(self.first_image_ledit_change)
+        self.acq_widget_layout.num_images_ledit.textChanged.connect(self.num_images_ledit_change)
 
-        overlap_ledit = self.acq_widget.findChild(QtGui.QLineEdit, "overlap_ledit")
+        overlap_ledit = self.acq_widget_layout.findChild(QtGui.QLineEdit, "overlap_ledit")
         if overlap_ledit is not None:
             overlap_ledit.textChanged.connect(self.overlap_changed)
 
-        self.acq_widget.subwedge_size_ledit.textChanged.connect(self.subwedge_size_ledit_change)
+        self.acq_widget_layout.subwedge_size_ledit.textChanged.connect(self.subwedge_size_ledit_change)
 
         # Other --------------------------------------------------------------- 
-        self.acq_widget.subwedge_size_ledit.setDisabled(True)
-        self.acq_widget.energies_combo.setDisabled(True)
-        self.acq_widget.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
+        self.acq_widget_layout.subwedge_size_ledit.setDisabled(True)
+        self.acq_widget_layout.energies_combo.setDisabled(True)
+        self.acq_widget_layout.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
         self.osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
         self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
@@ -128,29 +128,32 @@ class AcquisitionWidget(QtGui.QWidget):
            osc_start_value = round(float(new_value), 2)
         except TypeError:
            pass
-        self.acq_widget.osc_start_ledit.setText("%.2f" % osc_start_value)
+        self.acq_widget_layout.osc_start_ledit.setText("%.2f" % osc_start_value)
         self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
-        self.acq_widget.kappa_ledit.setText("%.2f" % float(new_value))
+        self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
         #self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
-        self.acq_widget.kappa_phi_ledit.setText("%.2f" % float(new_value))
+        self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
         #self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
-        self.acq_widget.osc_start_ledit.setEnabled(state)
+        self.acq_widget_layout.osc_start_label.setEnabled(state)
+        self.acq_widget_layout.osc_start_ledit.setEnabled(state)
 
     def use_kappa(self, state):
-        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-            state = False
-        self.acq_widget.kappa_ledit.setEnabled(state)
+        #if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        #    state = False
+        self.acq_widget_layout.kappa_label.setEnabled(state)
+        self.acq_widget_layout.kappa_ledit.setEnabled(state)
 
     def use_kappa_phi(self, state):
-        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-            state = False
-        self.acq_widget.kappa_phi_ledit.setEnabled(state)
+        #if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        #    state = False
+        self.acq_widget_layout.kappa_phi_label.setEnabled(state)
+        self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         """
@@ -166,30 +169,30 @@ class AcquisitionWidget(QtGui.QWidget):
             self.osc_range_validator.setRange(lower, upper, 4)
 
         self._acquisition_mib.bind_value_update('osc_start', 
-                                                self.acq_widget.osc_start_ledit,
+                                                self.acq_widget_layout.osc_start_ledit,
                                                 float, 
                                                 self.osc_start_validator)
 
         self._acquisition_mib.bind_value_update('osc_range', 
-                                                self.acq_widget.osc_range_ledit,
+                                                self.acq_widget_layout.osc_range_ledit,
                                                 float, 
                                                 self.osc_range_validator)
 
-        if self.acq_widget.findChild(QtGui.QLineEdit, "kappa_ledit"):
+        if self.acq_widget_layout.findChild(QtGui.QLineEdit, "kappa_ledit"):
             if 'kappa' in limits_dict:
                 limits = tuple(map(float, limits_dict['kappa'].split(',')))
                 (lower, upper) = limits
                 self.kappa_validator.setRange(lower, upper, 4)
             self._acquisition_mib.bind_value_update('kappa', 
-                 self.acq_widget.kappa_ledit, float, self.kappa_validator)
+                 self.acq_widget_layout.kappa_ledit, float, self.kappa_validator)
 
-        if self.acq_widget.findChild(QtGui.QLineEdit, "kappa_phi_ledit"):
+        if self.acq_widget_layout.findChild(QtGui.QLineEdit, "kappa_phi_ledit"):
             if 'kappa_phi' in limits_dict:
                 limits = tuple(map(float, limits_dict['kappa_phi'].split(',')))
                 (lower, upper) = limits
                 self.kappa_phi_validator.setRange(lower, upper, 4)
             self._acquisition_mib.bind_value_update('kappa_phi',     
-                 self.acq_widget.kappa_phi_ledit, float, self.kappa_phi_validator)
+                 self.acq_widget_layout.kappa_phi_ledit, float, self.kappa_phi_validator)
 
         if 'exposure_time' in limits_dict:
             limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
@@ -197,7 +200,7 @@ class AcquisitionWidget(QtGui.QWidget):
             self.exp_time_valdidator.setRange(lower, upper, 5)
         
         self._acquisition_mib.bind_value_update('exp_time', 
-                                                self.acq_widget.exp_time_ledit,
+                                                self.acq_widget_layout.exp_time_ledit,
                                                 float, 
                                                 self.exp_time_validator)
 
@@ -208,23 +211,23 @@ class AcquisitionWidget(QtGui.QWidget):
             self.first_img_valdidator.setRange(lower, upper)
         
         self._acquisition_mib.bind_value_update('first_image', 
-                                                self.acq_widget.first_image_ledit,
+                                                self.acq_widget_layout.first_image_ledit,
                                                 int, 
                                                 self.first_img_validator)
 
         self._acquisition_mib.bind_value_update('num_images', 
-                                                self.acq_widget.num_images_ledit,
+                                                self.acq_widget_layout.num_images_ledit,
                                                 int, 
                                                 self.num_img_validator)
 
-        num_passes = self.acq_widget.findChild(QtGui.QLineEdit, "num_passes_ledit")
+        num_passes = self.acq_widget_layout.findChild(QtGui.QLineEdit, "num_passes_ledit")
 
         if num_passes:
             self._acquisition_mib.\
                 bind_value_update('num_passes', num_passes, int,
                                   QtGui.QIntValidator(1, 1000, self))
 
-        overlap_ledit = self.acq_widget.findChild(QtGui.QLineEdit, "overlap_ledit")
+        overlap_ledit = self.acq_widget_layout.findChild(QtGui.QLineEdit, "overlap_ledit")
 
         if overlap_ledit:
             self._acquisition_mib.\
@@ -233,40 +236,40 @@ class AcquisitionWidget(QtGui.QWidget):
 
         self._acquisition_mib.\
              bind_value_update('energy',
-                               self.acq_widget.energy_ledit,
+                               self.acq_widget_layout.energy_ledit,
                                float,
                                self.energy_validator)
 
         self._acquisition_mib.\
              bind_value_update('transmission',
-                               self.acq_widget.transmission_ledit,
+                               self.acq_widget_layout.transmission_ledit,
                                float,
                                self.transmission_validator)
 
         self._acquisition_mib.\
              bind_value_update('resolution',
-                               self.acq_widget.resolution_ledit,
+                               self.acq_widget_layout.resolution_ledit,
                                float,
                                self.resolution_validator)
 
         self._acquisition_mib.\
              bind_value_update('inverse_beam',
-                               self.acq_widget.inverse_beam_cbx,
+                               self.acq_widget_layout.inverse_beam_cbx,
                                bool,
                                None)
 
         self._acquisition_mib.\
              bind_value_update('shutterless',
-                               self.acq_widget.shutterless_cbx,
+                               self.acq_widget_layout.shutterless_cbx,
                                bool,
                                None)
 
-        """self.acq_widget.osc_start_ledit.setToolTip(\
+        """self.acq_widget_layout.osc_start_ledit.setToolTip(\
                "Oscillation start limits %0.2f : %0.2f" %(\
                self.osc_start_validator.bottom(),
                self.osc_start_validator.top()))
 
-        self.acq_widget.osc_range_ledit.setToolTip(\
+        self.acq_widget_layout.osc_range_ledit.setToolTip(\
                "Oscillation range limits %0.2f : %0.2f" %(\
                self.osc_ra_validator.bottom(),
                self.osc_start_validator.top()))""" 
@@ -274,11 +277,11 @@ class AcquisitionWidget(QtGui.QWidget):
         self.set_tunable_energy(beamline_setup.tunable_wavelength())
 
         has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
-        self.acq_widget.shutterless_cbx.setEnabled(has_shutter_less)
-        self.acq_widget.shutterless_cbx.setChecked(has_shutter_less)
+        self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
+        self.acq_widget_layout.shutterless_cbx.setChecked(has_shutter_less)
 
         if self._beamline_setup_hwobj.disable_num_passes():
-            num_passes = self.acq_widget.findChild(QtGui.QLineEdit, "num_passes_ledit")
+            num_passes = self.acq_widget_layout.findChild(QtGui.QLineEdit, "num_passes_ledit")
             if num_passes:
                 num_passes.setDisabled(True)
 
@@ -288,7 +291,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if str(new_value).isdigit():
             self._path_template.start_num = int(new_value)
-            widget = self.acq_widget.first_image_ledit
+            widget = self.acq_widget_layout.first_image_ledit
             self.acqParametersChangedSignal.emit()
 
     def num_images_ledit_change(self, new_value):
@@ -297,7 +300,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if str(new_value).isdigit():
             self._path_template.num_files = int(new_value)
-            widget = self.acq_widget.num_images_ledit
+            widget = self.acq_widget_layout.num_images_ledit
             self.acqParametersChangedSignal.emit()
 
     def overlap_changed(self, new_value):
@@ -316,19 +319,19 @@ class AcquisitionWidget(QtGui.QWidget):
                 pass
 
             if new_value != 0:
-                self.acq_widget.shutterless_cbx.setEnabled(False)
-                self.acq_widget.shutterless_cbx.setChecked(False)
+                self.acq_widget_layout.shutterless_cbx.setEnabled(False)
+                self.acq_widget_layout.shutterless_cbx.setChecked(False)
                 self._acquisition_parameters.shutterless = False
             else:
-                self.acq_widget.shutterless_cbx.setEnabled(True)
-                self.acq_widget.shutterless_cbx.setChecked(True)
+                self.acq_widget_layout.shutterless_cbx.setEnabled(True)
+                self.acq_widget_layout.shutterless_cbx.setChecked(True)
                 self._acquisition_parameters.shutterless = True
 
     def use_mad(self, state):
         """
         Descript. :
         """
-        self.acq_widget.energies_combo.setEnabled(state)
+        self.acq_widget_layout.energies_combo.setEnabled(state)
         if state:
             (name, energy) = self.get_mad_energy()
 
@@ -348,21 +351,21 @@ class AcquisitionWidget(QtGui.QWidget):
         Descript. :
         """
         if state:
-            self.acq_widget.subwedge_size_ledit.setEnabled(True)
+            self.acq_widget_layout.subwedge_size_ledit.setEnabled(True)
         else:
-            self.acq_widget.subwedge_size_ledit.setDisabled(True)
+            self.acq_widget_layout.subwedge_size_ledit.setDisabled(True)
 
     def use_inverse_beam(self):
         """
         Descript. :
         """
-        return self.acq_widget.inverse_beam_cbx.checkState == QtCore.Qt.Checked
+        return self.acq_widget_layout.inverse_beam_cbx.checkState == QtCore.Qt.Checked
 
     def get_num_subwedges(self):
         """
         Descript. :
         """
-        return int(self.acq_widget.subwedge_size_ledit.text())
+        return int(self.acq_widget_layout.subwedge_size_ledit.text())
 
     def subwedge_size_ledit_change(self, new_value):
         """
@@ -370,18 +373,18 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if int(new_value) > self._acquisition_parameters.num_images:
             Qt4_widget_colors.set_widget_color(\
-                 self.acq_widget.subwedge_size_ledit,
+                 self.acq_widget_layout.subwedge_size_ledit,
                  Qt4_widget_colors.LIGHT_RED)
         else:
             Qt4_widget_colors.set_widget_color(
-                 self.acq_widget.subwedge_size_ledit,
+                 self.acq_widget_layout.subwedge_size_ledit,
                  Qt4_widget_colors.WHITE)
 
     def get_mad_energy(self):
         """
         Descript. :
         """
-        energy_str = str(self.acq_widget.energies_combo.currentText())
+        energy_str = str(self.acq_widget_layout.energies_combo.currentText())
         (name, value) = energy_str.split(':')
         
         name = name.strip()
@@ -394,7 +397,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        self.acq_widget.energies_combo.clear()
+        self.acq_widget_layout.energies_combo.clear()
 
         inflection = ('ip: %.4f' % energy_scan_result.inflection) if \
                      energy_scan_result.inflection else 'ip: -'
@@ -408,14 +411,14 @@ class AcquisitionWidget(QtGui.QWidget):
         second_remote = ('rm2: %.4f' % energy_scan_result.second_remote) if \
                         energy_scan_result.second_remote else 'rm2: -'
 
-        self.acq_widget.energies_combo.\
+        self.acq_widget_layout.energies_combo.\
              addItems([inflection, peak, first_remote, second_remote])
 
     def energy_selected(self, index):
         """
         Descript. :
         """
-        if self.acq_widget.mad_cbox.isChecked():
+        if self.acq_widget_layout.mad_cbox.isChecked():
             (name, energy) = self.get_mad_energy()
             if energy != 0:
                 self.set_energy(energy, 0)
@@ -426,25 +429,25 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        self.acq_widget.energy_ledit.setText("%.4f" % float(energy))
+        self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
 
     def update_transmission(self, transmission):
         """
         Descript. :
         """
-        self.acq_widget.transmission_ledit.setText("%.2f" % float(transmission))
+        self.acq_widget_layout.transmission_ledit.setText("%.2f" % float(transmission))
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        self.acq_widget.resolution_ledit.setText("%.3f" % float(resolution))
+        self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
         if limits:
             self.energy_validator.setBottom(limits[0])
             self.energy_validator.setTop(limits[1])
-            self.acq_widget.energy_ledit.setToolTip(\
+            self.acq_widget_layout.energy_ledit.setToolTip(\
                "Energy limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
@@ -452,7 +455,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if limits:
             self.transmission_validator.setBottom(limits[0])
             self.transmission_validator.setTop(limits[1])
-            self.acq_widget.transmission_ledit.setToolTip(\
+            self.acq_widget_layout.transmission_ledit.setToolTip(\
                "Transmission limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
@@ -460,28 +463,28 @@ class AcquisitionWidget(QtGui.QWidget):
         if limits:
             self.resolution_validator.setBottom(limits[0])
             self.resolution_validator.setTop(limits[1])
-            self.acq_widget.resolution_ledit.setToolTip(
+            self.acq_widget_layout.resolution_ledit.setToolTip(
                "Resolution limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
     def update_detector_exp_time_limits(self, limits):
         if limits:
             self.exp_time_validator.setRange(limits[0], limits[1], 4)
-            self.acq_widget.exp_time_ledit.setToolTip(
+            self.acq_widget_layout.exp_time_ledit.setToolTip(
                "Exposure time limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
     def update_osc_range_limits(self, exp_time):
         osc_range = 40.0 * exp_time
         self.osc_range_validator.setRange(0, osc_range, 4)
-        self.acq_widget.osc_range_ledit.setToolTip(
+        self.acq_widget_layout.osc_range_ledit.setToolTip(
               "Oscillation range limits %0.2f : %0.2f" %(0, osc_range))
         self._acquisition_mib.validate_all()
 
     def update_num_image_limits(self):
         try:
-           osc_start = float(self.acq_widget.osc_start_ledit.text())
-           osc_range = float(self.acq_widget.osc_range_ledit.text())
+           osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
+           osc_range = float(self.acq_widget_layout.osc_range_ledit.text())
         except ValueError:
            return
 
@@ -493,7 +496,7 @@ class AcquisitionWidget(QtGui.QWidget):
             num_image_limit = 99999
 
         self.num_img_validator.setTop(num_image_limit)
-        self.acq_widget.num_images_ledit.setToolTip(\
+        self.acq_widget_layout.num_images_ledit.setToolTip(\
               "Number of frames limit : %d" % num_image_limit)
         self._acquisition_mib.validate_all()
 
@@ -501,22 +504,22 @@ class AcquisitionWidget(QtGui.QWidget):
         if self._beamline_setup_hwobj is not None:
             modes_list = self._beamline_setup_hwobj._get_roi_modes()
             if (len(modes_list) > 0 and
-                self.acq_widget.detector_mode_combo.count() == 0):
-                self.acq_widget.detector_mode_combo.\
+                self.acq_widget_layout.detector_mode_combo.count() == 0):
+                self.acq_widget_layout.detector_mode_combo.\
                      insertStrList(modes_list)
-                self.acq_widget.detector_mode_combo.\
+                self.acq_widget_layout.detector_mode_combo.\
                      setEnabled(True)
                 self._acquisition_mib.bind_value_update('detector_mode',
-                               self.acq_widget.detector_mode_combo,
+                               self.acq_widget_layout.detector_mode_combo,
                                int,
                                None)
             else:
-                self.acq_widget.detector_mode_combo.\
+                self.acq_widget_layout.detector_mode_combo.\
                      setEnabled(False)
 
     def update_detector_mode(self, detector_mode):
-        if self.acq_widget.detector_mode_combo.count() > 0:
-            self.acq_widgetdetector_mode_combo.\
+        if self.acq_widget_layout.detector_mode_combo.count() > 0:
+            self.acq_widget_layoutdetector_mode_combo.\
                  setCurrentItem(detector_mode)
 
     def detector_mode_changed(self, detector_mode):
@@ -537,29 +540,29 @@ class AcquisitionWidget(QtGui.QWidget):
         if mad:
             mad_prefix = self._path_template.mad_prefix
             index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
-            self.acq_widget.energies_combo.setCurrentIndex(index)
-            self.acq_widget.mad_cbox.setChecked(True)
-            self.acq_widget.energies_combo.setEnabled(True)
+            self.acq_widget_layout.energies_combo.setCurrentIndex(index)
+            self.acq_widget_layout.mad_cbox.setChecked(True)
+            self.acq_widget_layout.energies_combo.setEnabled(True)
         else:
-            self.acq_widget.mad_cbox.setChecked(False)
-            self.acq_widget.energies_combo.setEnabled(False)
-            self.acq_widget.energies_combo.setCurrentIndex(0)
+            self.acq_widget_layout.mad_cbox.setChecked(False)
+            self.acq_widget_layout.energies_combo.setEnabled(False)
+            self.acq_widget_layout.energies_combo.setCurrentIndex(0)
 
     def set_tunable_energy(self, state):
         """
         Descript. :
         """
-        self.acq_widget.energy_ledit.setEnabled(state)
-        self.acq_widget.mad_cbox.setEnabled(state)
-        self.acq_widget.energies_combo.setEnabled(state)
+        self.acq_widget_layout.energy_ledit.setEnabled(state)
+        self.acq_widget_layout.mad_cbox.setEnabled(state)
+        self.acq_widget_layout.energies_combo.setEnabled(state)
 
     def disable_inverse_beam(self, state):
         """
         Descript. :
         """
-        self.acq_widget.inverse_beam_cbx.setDisabled(state)
-        self.acq_widget.subwedge_size_label.setDisabled(state)
-        self.acq_widget.subwedge_size_ledit.setDisabled(state)
+        self.acq_widget_layout.inverse_beam_cbx.setDisabled(state)
+        self.acq_widget_layout.subwedge_size_label.setDisabled(state)
+        self.acq_widget_layout.subwedge_size_ledit.setDisabled(state)
 
     def hide_aperture(self, state):
         """
@@ -567,8 +570,8 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         pass
         #if state:
-        #    self.acq_widget.findChild('aperture_ledit').show()
-        #    self.acq_widget.findChild('aperture_cbox').show()
+        #    self.acq_widget_layout.findChild('aperture_ledit').show()
+        #    self.acq_widget_layout.findChild('aperture_cbox').show()
         #else:
-        #    self.acq_widget.findChild('aperture_ledit').hide()
-        #    self.acq_widget.findChild('aperture_cbox').hide()
+        #    self.acq_widget_layout.findChild('aperture_ledit').hide()
+        #    self.acq_widget_layout.findChild('aperture_cbox').hide()

@@ -147,7 +147,7 @@ class DataCollectTree(QtGui.QWidget):
 
         # SizePolicies --------------------------------------------------------
         self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(\
-             QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
+             QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
@@ -274,6 +274,7 @@ class DataCollectTree(QtGui.QWidget):
         items = self.get_selected_items()
         if len(items) == 1:
             item = items[0]
+            print item
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.tree_brick.show_sample_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
@@ -286,7 +287,7 @@ class DataCollectTree(QtGui.QWidget):
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
 	    elif isinstance(item, Qt4_queue_item.XRFScanQueueItem):
-                self.tree_brick.show_xrf_scan_tab(item)
+                self.tree_brick.show_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tree_brick.show_workflow_tab(item)
         #elif len(items) == 0:
@@ -323,8 +324,9 @@ class DataCollectTree(QtGui.QWidget):
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
-                    queue_entry.mount_sample(self.beamline_setup_hwobj, items[0],
-                                             items[0].get_model(), self.centring_done,
+                    queue_entry.mount_sample(self.active_sample_changer_hwobj, 
+                                             self.beamline_setup_hwobj,
+                                             items[0], items[0].get_model(), self.centring_done,
                                              self.sample_centring_result)
                 except Exception as e:
                     items[0].setText(1, "Error loading")

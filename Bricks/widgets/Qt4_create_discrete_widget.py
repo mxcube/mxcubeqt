@@ -233,18 +233,13 @@ class CreateDiscreteWidget(CreateTaskBase):
         """
         tasks = []
 
-        if not shape:
-            cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
+        if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+            snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
+            cpos = copy.deepcopy(shape.get_centred_position())
+            cpos.snapshot_image = snapshot
         else:
-            # Shapes selected and sample is mounted, get the
-            # centred positions for the shapes
-            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
-                snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot(shape)
-
-                cpos = copy.deepcopy(shape.get_centred_position())
-                cpos.snapshot_image = snapshot
+            cpos = queue_model_objects.CentredPosition()
+            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot() 
 
         if self._acq_widget.use_inverse_beam():
             total_num_images = self._acquisition_parameters.num_images

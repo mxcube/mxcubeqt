@@ -32,7 +32,7 @@ from widgets.Qt4_create_helical_widget import CreateHelicalWidget
 from widgets.Qt4_create_char_widget import CreateCharWidget
 from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.Qt4_create_xrf_spectrum_widget import CreateXRFSpectrumWidget
-from widgets.Qt4_create_advanced_scan_widget import CreateAdvancedScanWidget
+from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
 
 
 class TaskToolBoxWidget(QtGui.QWidget):
@@ -63,14 +63,14 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")  
-        self.advanced_scan_page = CreateAdvancedScanWidget(self.tool_box, "advanced_scan")
+        self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
-        self.tool_box.addItem(self.advanced_scan_page, "Advanced")
+        self.tool_box.addItem(self.advanced_page, "Advanced")
 
         self.button_box = QtGui.QWidget(self)
         self.create_task_button = QtGui.QPushButton("  Add to queue", self.button_box)
@@ -166,9 +166,6 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                     if self.tool_box.currentWidget() == self.helical_page:
                         self.create_task_button.setEnabled(True)
-                elif data_collection.experiment_type == EXPERIMENT_TYPE.MESH:
-                    if self.tool_box.currentWidget() == self.advanced_scan_page:
-                        self.create_task_button.setEnabled(True)
                 elif self.tool_box.currentWidget() == self.discrete_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, Qt4_queue_item.CharacterisationQueueItem):
@@ -183,7 +180,9 @@ class TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(tree_item, Qt4_queue_item.GenericWorkflowQueueItem):
                 if self.tool_box.currentWidget() == self.workflow_page:
                     self.create_task_button.setEnabled(True)
-
+            elif isinstance(tree_item, Qt4_queue_item.AdvancedQueueItem):
+                if self.tool_box.currentWidget() == self.advanced_page:
+                    self.create_task_button.setEnabled(True)
 
             self.tool_box.widget(page_index).selection_changed(tree_items)
             self.previous_page_index = page_index
@@ -201,7 +200,6 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
-
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                     self.tool_box.setCurrentWidget(self.helical_page)
                 else:
@@ -214,6 +212,8 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 self.tool_box.setCurrentWidget(self.xrf_spectrum_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
+            elif isinstance(items[0], Qt4_queue_item.AdvancedQueueItem):
+                self.tool_box.setCurrentWidget(self.advanced_page)
 
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)

@@ -36,7 +36,7 @@ from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 
 
-class CreateAdvancedScanWidget(CreateTaskBase):
+class CreateAdvancedWidget(CreateTaskBase):
     """
     Descript. :
     """
@@ -45,7 +45,7 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), 'Advanced')
 
         if not name:
-            self.setObjectName("create_advanced_scan_widget")
+            self.setObjectName("create_advanced_widget")
 
         # Hardware objects ----------------------------------------------------
  
@@ -65,9 +65,8 @@ class CreateAdvancedScanWidget(CreateTaskBase):
         self._data_path_gbox = QtGui.QGroupBox('Data location', self)
         self._data_path_gbox.setObjectName('data_path_gbox')
         self._data_path_widget = DataPathWidget(self._data_path_gbox,
-                                   'create_dc_path_widget',
-                                   data_model = self._path_template,
-                                   layout = 'vertical')
+             'create_dc_path_widget', data_model = self._path_template,
+             layout = 'vertical')
 
         # Layout --------------------------------------------------------------
         _data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
@@ -154,37 +153,33 @@ class CreateAdvancedScanWidget(CreateTaskBase):
             sample_model = tree_item.get_model()
             #self._processing_parameters = sample_model.processing_parameters
             #self._processing_widget.update_data_model(self._processing_parameters)
-        elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
-            data_collection = tree_item.get_model()
-
-            if data_collection.experiment_type == EXPERIMENT_TYPE.MESH:
-                if tree_item.get_model().is_executed():
-                    self.setDisabled(True)
-                else:
-                    self.setDisabled(False)
-
-                sample_data_model = self.get_sample_item(tree_item).get_model()
-                self._acq_widget.disable_inverse_beam(True)
-
-                self._path_template = data_collection.get_path_template()
-                self._data_path_widget.update_data_model(self._path_template)
-
-                self._acquisition_parameters = data_collection.acquisitions[0].acquisition_parameters
-                self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                    self._path_template)
-                self.get_acquisition_widget().use_osc_start(True)
-            else:
+        elif isinstance(tree_item, Qt4_queue_item.AdvancedQueueItem):
+            advanced = tree_item.get_model()
+            if tree_item.get_model().is_executed():
                 self.setDisabled(True)
+            else:
+                self.setDisabled(False)
+
+            # sample_data_model = self.get_sample_item(tree_item).get_model()
+            #self._acq_widget.disable_inverse_beam(True)
+
+            print 1
+
+            
+            return
+            self._path_template = advanced.get_path_template()
+            self._data_path_widget.update_data_model(self._path_template)
+
+            data_collection = advanced.reference_image_collection
+
+            self._acquisition_parameters = data_collection.acquisitions[0].\
+                                           acquisition_parameters
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                               self._path_template)
+            self.get_acquisition_widget().use_osc_start(True)
         else:
             self.setDisabled(True)
 
-        if isinstance(tree_item, Qt4_queue_item.SampleQueueItem) or \
-           isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem) or \
-           isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
-
-            #self._processing_widget.update_data_model(self._processing_parameters)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
   
     def _create_task(self,  sample, shape):
         """
