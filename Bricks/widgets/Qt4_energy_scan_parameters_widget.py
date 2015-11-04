@@ -108,13 +108,6 @@ class EnergyScanParametersWidget(QtGui.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        Qt4_widget_colors.set_widget_color(self.periodic_table_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self.position_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self.data_path_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-
     def _prefix_ledit_change(self, new_value):
         self.energy_scan_model.set_name(str(new_value))
         self._tree_view_item.setText(0, self.energy_scan_model.get_name())

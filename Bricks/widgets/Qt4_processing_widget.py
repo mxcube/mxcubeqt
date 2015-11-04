@@ -53,7 +53,6 @@ class ProcessingWidget(QtGui.QWidget):
         self.main_layout.addWidget(self.processing_widget)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout)  
        
         self.processing_widget.space_group_cbox.\
             addItems(queue_model_enumerables.XTAL_SPACEGROUPS)

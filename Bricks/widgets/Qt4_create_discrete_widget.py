@@ -73,11 +73,10 @@ class CreateDiscreteWidget(CreateTaskBase):
              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_layout = QtGui.QVBoxLayout(self)
+        self._data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
         self._data_path_gbox_layout.addWidget(self._data_path_widget)
         self._data_path_gbox_layout.setSpacing(0)
         self._data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
-        self._data_path_gbox.setLayout(self._data_path_gbox_layout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
@@ -86,7 +85,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         _main_vlayout.setContentsMargins(0,0,0,0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.addStretch(0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
         
@@ -95,24 +93,15 @@ class CreateDiscreteWidget(CreateTaskBase):
              connect(self._prefix_ledit_change)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
-
-        self.connect(self._acq_widget, QtCore.SIGNAL('mad_energy_selected'),
-                     self.mad_energy_selected)
-
-        #self.connect(self._acq_widget,
-        #             QtCore.SIGNAL("pathTemplateChanged"),
-        #             self.handle_path_conflict)
-        
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
         self._data_path_widget.pathTemplateChangedSignal.connect(\
              self.handle_path_conflict)
+
+        self._acq_widget.acqParametersChangedSignal.connect(\
+             self.handle_path_conflict)
+        self._acq_widget.madEnergySelectedSignal.connect(\
+             self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
              self._enable_processing_toggled)
-
-        #self.connect(self._data_path_widget,
-        #             QtCore.SIGNAL("pathTemplateChanged"),
-        #             self.handle_path_conflict)
 
         # Other ---------------------------------------------------------------
 
@@ -142,31 +131,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_parameters.cell_c = crystal.cell_c
         self._processing_parameters.cell_gamma = crystal.cell_gamma
         self._processing_widget.update_data_model(self._processing_parameters)
-
-    def mad_energy_selected(self, name, energy, state):
-        """
-        Descript. :
-        """
-        item = self._current_selected_items[0]
-        model = item.get_model()
-        
-        if state:
-            self._path_template.mad_prefix = name
-        else:
-            self._path_template.mad_prefix = ''
-
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-            get_next_run_number(self._path_template)
-
-        data_path_widget = self.get_data_path_widget()
-        data_path_widget.set_run_number(run_number)
-        data_path_widget.set_prefix(self._path_template.base_prefix)
-
-        if self.isEnabled():
-            if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
-                   not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                model.set_name(self._path_template.get_prefix())
-                item.setText(0, model.get_name())
 
     def single_item_selection(self, tree_item):
         """

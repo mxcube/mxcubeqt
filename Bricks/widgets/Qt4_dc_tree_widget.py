@@ -274,14 +274,10 @@ class DataCollectTree(QtGui.QWidget):
         items = self.get_selected_items()
         if len(items) == 1:
             item = items[0]
-            print item
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.tree_brick.show_sample_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                if item.get_model().is_mesh_scan():
-                    self.tree_brick.show_advanced_scan_tab(item)
-                else:
-                    self.tree_brick.show_datacollection_tab(item)
+                self.tree_brick.show_datacollection_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 self.tree_brick.show_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
@@ -290,6 +286,8 @@ class DataCollectTree(QtGui.QWidget):
                 self.tree_brick.show_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tree_brick.show_workflow_tab(item)
+            elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
+                self.tree_brick.show_advanced_tab(item)
         #elif len(items) == 0:
         #    self.tree_brick.show_sample_tab()
 
@@ -441,16 +439,15 @@ class DataCollectTree(QtGui.QWidget):
                     If entry is a collection then it is selected and 
                     selection callback is raised.
         """
-        view_item = None
+        view_item = None 
         parent_tree_item = self.get_item_by_model(parent)
 
         if parent_tree_item is self.sample_tree_widget:
             last_item = self.last_top_level_item()
         else:
             last_item = parent_tree_item.lastItem()
-        
-        cls = Qt4_queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
 
+        cls = Qt4_queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
 
         if isinstance(task, queue_model_objects.Basket):

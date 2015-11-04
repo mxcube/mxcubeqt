@@ -192,12 +192,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
         Called by the parent widget when selection in the tree changes.
         """
         if len(items) == 1:
-            
             if isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(False)
             else:
                 self.create_task_button.setEnabled(True)
-
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:

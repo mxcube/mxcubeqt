@@ -189,13 +189,20 @@ class ConfirmDialog(QtGui.QDialog):
         Descript. :
         """
         for item in self.checked_items:
+            acq_parameters = None 
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    take_dark_current = self.dialog_layout_widget.force_dark_cbx.isChecked()
-                item.get_model().acquisitions[0].acquisition_parameters.\
-                    skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isChecked()
+                acq_parameters = item.get_model().acquisitions[0].acquisition_parameters
+            elif isinstance(item.get_model(), queue_model_objects.Advanced):
+                acq_parameters = item.get_model().reference_image_collection.\
+                     acquisitions[0].acquisition_parameters 
+            
+            if acq_parameters: 
+                acq_parameters.take_snapshots = int(self.dialog_layout_widget.\
+                    take_snapshots_cbox.currentText())
+                acq_parameters.take_dark_current = self.dialog_layout_widget.\
+                    force_dark_cbx.isChecked()
+                acq_parameters.skip_existing_images = self.dialog_layout_widget.\
+                    skip_existing_images_cbx.isChecked()
         
         self.continueClickedSignal.emit(self.sample_items, self.checked_items)
         #self.emit(QtCore.SIGNAL("continue_clicked"), self.sample_items, self.checked_items)

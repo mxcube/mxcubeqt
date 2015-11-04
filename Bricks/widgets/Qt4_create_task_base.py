@@ -191,7 +191,6 @@ class CreateTaskBase(QtGui.QWidget):
     def handle_path_conflict(self):
         if self._tree_brick:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
-        
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                             check_for_path_collisions(self._path_template)
             self._data_path_widget.indicate_path_conflict(path_conflict)                    
@@ -349,7 +348,6 @@ class CreateTaskBase(QtGui.QWidget):
             elif len(items) > 1:                
                 sample_items = []
 
-                
                 # Allow mutiple selections on sample items, only.
                 for item in items:
                     if isinstance(item, Qt4_queue_item.SampleQueueItem):
@@ -579,9 +577,7 @@ class CreateTaskBase(QtGui.QWidget):
         acq.path_template = self._create_path_template(sample, path_template)
 
         if bl_setup.in_plate_mode():
-            acq.acquisition_parameters.take_snapshots = False
-        else:
-            acq.acquisition_parameters.take_snapshots = True
+            acq.acquisition_parameters.take_snapshots = 0
 
         return acq
 
@@ -590,3 +586,28 @@ class CreateTaskBase(QtGui.QWidget):
 
     def shape_created(self, shape, shape_type):
         return
+
+    def mad_energy_selected(self, name, energy, state):
+        """
+        Descript. :
+        """
+        item = self._current_selected_items[0]
+        model = item.get_model()
+
+        if state:
+            self._path_template.mad_prefix = name
+        else:
+            self._path_template.mad_prefix = ''
+
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            get_next_run_number(self._path_template)
+
+        data_path_widget = self.get_data_path_widget()
+        data_path_widget.set_run_number(run_number)
+        data_path_widget.set_prefix(self._path_template.base_prefix)
+
+        if self.isEnabled():
+            if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
+                   not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                model.set_name(self._path_template.get_prefix())
+                item.setText(0, model.get_name())

@@ -82,25 +82,34 @@ class CreateCharWidget(CreateTaskBase):
         gbox.setPalette(p);
 
         # Layout --------------------------------------------------------------
-        _data_path_gbox_layout = QtGui.QVBoxLayout(self)
+        _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
         _data_path_gbox_layout.setSpacing(0)
-        _data_path_gbox_layout.setContentsMargins(0,0,0,0)
-        self._data_path_gbox.setLayout(_data_path_gbox_layout)
+        _data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self) 
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
-        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.addStretch(0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self._data_path_widget.pathTemplateChangedSignal.connect(\
+             self.handle_path_conflict)
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
+             connect(self._prefix_ledit_change)
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
+
+        self._vertical_dimension_widget.space_group_ledit.activated.\
+             connect(self._space_group_change)
+        #self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
+        #             self.use_induced_burn)
 
         # Other ---------------------------------------------------------------
         self._char_params_mib.bind_value_update(
@@ -140,16 +149,6 @@ class CreateCharWidget(CreateTaskBase):
                               QtGui.QDoubleValidator(0.0, 1000, 2, self))
         
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._vertical_dimension_widget.space_group_ledit.activated.\
-             connect(self._space_group_change)
-        #self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
-        #             self.use_induced_burn)
 
     def use_induced_burn(self, state):
         """
@@ -220,9 +219,6 @@ class CreateCharWidget(CreateTaskBase):
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         
-          
-        return 
-    
         self._path_template.reference_image_prefix = 'ref'
         # The num images drop down default value is 1
         # we would like it to be 2
@@ -321,9 +317,9 @@ class CreateCharWidget(CreateTaskBase):
             # centred positions for the shapes
             if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
                 snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot([shape])
+                           get_snapshot(shape)
 
-                cpos = copy.deepcopy(shape.get_centred_positions()[0])
+                cpos = copy.deepcopy(shape.get_centred_position())
                 cpos.snapshot_image = snapshot 
 
         char_params = copy.deepcopy(self._char_params)

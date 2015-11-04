@@ -59,25 +59,23 @@ class DCParametersWidget(QtGui.QWidget):
 
         # Graphic elements ----------------------------------------------------
         _dc_parameters_widget = QtGui.QWidget(self)
-        self.caution_pixmap = Qt4_Icons.load("Caution2.png")
-        self.path_widget = DataPathWidget(_dc_parameters_widget)
-        self.acq_widget = AcquisitionWidget(_dc_parameters_widget, 
+        self._data_path_widget = DataPathWidget(_dc_parameters_widget)
+        self._acq_widget = AcquisitionWidget(_dc_parameters_widget, 
                                             layout = 'horizontal')
-        #self.acq_widget.setFixedHeight(170)
-        self.processing_widget = ProcessingWidget(_dc_parameters_widget)
+        #self._acq_widget.setFixedHeight(170)
+        self._processing_widget = ProcessingWidget(_dc_parameters_widget)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         #self.position_widget.setMinimumSize(310, 210)
         
         # Layout --------------------------------------------------------------
-        _dc_parameters_widget_layout = QtGui.QVBoxLayout(self)
-        _dc_parameters_widget_layout.addWidget(self.path_widget)
-        _dc_parameters_widget_layout.addWidget(self.acq_widget)
-        _dc_parameters_widget_layout.addWidget(self.processing_widget)
+        _dc_parameters_widget_layout = QtGui.QVBoxLayout(_dc_parameters_widget)
+        _dc_parameters_widget_layout.addWidget(self._data_path_widget)
+        _dc_parameters_widget_layout.addWidget(self._acq_widget)
+        _dc_parameters_widget_layout.addWidget(self._processing_widget)
         _dc_parameters_widget_layout.setSpacing(2)
-        _dc_parameters_widget_layout.addStretch(0)
+        _dc_parameters_widget_layout.addStretch(10)
         _dc_parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
-        _dc_parameters_widget.setLayout(_dc_parameters_widget_layout)
 
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
@@ -85,37 +83,23 @@ class DCParametersWidget(QtGui.QWidget):
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.addStretch(0)
-        self.setLayout(_main_hlayout)
 
         # SizePolicies --------------------------------------------------------
         
 
         # Qt signal/slot connections ------------------------------------------
-        self.path_widget.data_path_layout.prefix_ledit.textChanged.connect(
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
                      self._prefix_ledit_change)
-        self.path_widget.data_path_layout.run_number_ledit.textChanged.connect( 
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect( 
                      self._run_number_ledit_change)
-        self.connect(self.acq_widget, QtCore.SIGNAL('mad_energy_selected'),
-                     self.mad_energy_selected)
-        self.connect(self.acq_widget,
-                     QtCore.SIGNAL("path_template_changed"),
-                     self.handle_path_conflict)
-
-        #QtCore.QObject.connect(QtGui.QApplication, QtCore.SIGNAL('tab_changed'),
-        #                       self.tab_changed)
+        self._acq_widget.madEnergySelectedSignal.connect(self.mad_energy_selected)
+        self._acq_widget.acqParametersChangedSignal.connect(\
+             self.acq_parameters_changed)
 
         # Other ---------------------------------------------------------------
-        Qt4_widget_colors.set_widget_color(self.path_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self.acq_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self.processing_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
-        Qt4_widget_colors.set_widget_color(self.position_widget,
-                                           Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def set_beamline_setup(self, bl_setup):
-        self.acq_widget.set_beamline_setup(bl_setup)
+        self._acq_widget.set_beamline_setup(bl_setup)
         self._beamline_setup_hwobj = bl_setup
 
     def _prefix_ledit_change(self, new_value):
@@ -129,17 +113,15 @@ class DCParametersWidget(QtGui.QWidget):
             self._data_collection.set_number(int(new_value))
             self._tree_view_item.setText(0, self._data_collection.get_name())
 
-    def handle_path_conflict(self, widget, new_value):
+    def acq_parameters_changed(self):
         if self._tree_view_item is None:
             #TODO fix this
             return 
-
         dc_tree_widget = self._tree_view_item.listView().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
         path_conflict = self.queue_model_hwobj.\
                         check_for_path_collisions(path_template)
-
         if new_value != '':
             if path_conflict:
                 logging.getLogger("user_level_log").\
@@ -164,8 +146,8 @@ class DCParametersWidget(QtGui.QWidget):
         run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
           get_next_run_number(path_template)
 
-        self.path_widget.set_run_number(run_number)
-        self.path_widget.set_prefix(path_template.base_prefix)
+        self._data_path_widget.set_run_number(run_number)
+        self._data_path_widget.set_prefix(path_template.base_prefix)
         model = self._tree_view_item.get_model()
         model.set_name(path_template.get_prefix())
         self._tree_view_item.setText(0, model.get_name())
@@ -175,9 +157,9 @@ class DCParametersWidget(QtGui.QWidget):
             self.populate_parameter_widget(self._tree_view_item)
 
     def set_enabled(self, state):
-        self.acq_widget.setEnabled(state)
-        self.path_widget.setEnabled(state)
-        self.processing_widget.setEnabled(state)
+        self._acq_widget.setEnabled(state)
+        self._data_path_widget.setEnabled(state)
+        self._processing_widget.setEnabled(state)
 
     def populate_widget(self, item):
         data_collection = item.get_model()
@@ -190,17 +172,17 @@ class DCParametersWidget(QtGui.QWidget):
         # on that both models upto date, we need to refactor this part
         # so that both models are set before taking ceratin actions.
         # This workaround, works for the time beeing.
-        self.path_widget._data_model = data_collection.acquisitions[0].path_template
+        self._data_path_widget._data_model = data_collection.acquisitions[0].path_template
 
-        self.acq_widget.set_energies(data_collection.crystal.energy_scan_result)
-        self.acq_widget.update_data_model(data_collection.acquisitions[0].\
+        self._acq_widget.set_energies(data_collection.crystal.energy_scan_result)
+        self._acq_widget.update_data_model(data_collection.acquisitions[0].\
                                           acquisition_parameters,
                                           data_collection.acquisitions[0].\
                                           path_template)
-        self.path_widget.update_data_model(data_collection.\
+        self._data_path_widget.update_data_model(data_collection.\
                                            acquisitions[0].path_template)
         
-        self.processing_widget.update_data_model(data_collection.\
+        self._processing_widget.update_data_model(data_collection.\
                                                  processing_parameters)
 
         if data_collection.acquisitions[0].acquisition_parameters.\

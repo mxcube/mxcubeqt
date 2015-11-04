@@ -38,6 +38,7 @@ class AcquisitionWidget(QtGui.QWidget):
     """
   
     acqParametersChangedSignal = QtCore.pyqtSignal()
+    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, int)
 
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
                  path_template = None, layout = 'horizontal'):
@@ -338,13 +339,11 @@ class AcquisitionWidget(QtGui.QWidget):
             if energy != 0:
                 self.set_energy(energy, 0)
 
-            self.emit(QtCore.SIGNAL('mad_energy_selected'),
-                      name, energy, state)
+            self.madEnergySelectedSignal.emit(name, energy, state)
         else:
             self.set_energy(self.previous_energy, 0)
             energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-            self.emit(QtCore.SIGNAL('mad_energy_selected'),
-                      '', self.previous_energy, state)
+            self.madEnergySelectedSignal.emit('', self.previous_energy, state)
 
     def set_use_inverse_beam(self, state):
         """
@@ -423,7 +422,7 @@ class AcquisitionWidget(QtGui.QWidget):
             if energy != 0:
                 self.set_energy(energy, 0)
 
-            self.emit(QtCore.SIGNAL('madEnergySelected'), name, energy, True)
+            self.madEnergySelectedSignal.emit(name, energy, True)
 
     def set_energy(self, energy, wav):
         """

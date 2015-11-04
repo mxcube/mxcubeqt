@@ -92,16 +92,23 @@ class CreateHelicalWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self._lines_listwidget.itemSelectionChanged.connect(\
+             self.lines_listwidget_selection_changed)
+
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
         self._data_path_widget.pathTemplateChangedSignal.connect(\
              self.handle_path_conflict)
+
+        self._acq_widget.madEnergySelectedSignal.connect(\
+             self.mad_energy_selected)
+        self._acq_widget.acqParametersChangedSignal.connect(\
+             self.handle_path_conflict)
+
         self._processing_widget.enableProcessingSignal.connect(\
              self._enable_processing_toggled)
-        self._lines_listwidget.itemSelectionChanged.connect(\
-             self.lines_listwidget_selection_changed)
 
         # Other ---------------------------------------------------------------
 

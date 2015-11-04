@@ -25,9 +25,9 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
 
-import queue_model_objects_v1 as queue_model_objects 
 import Qt4_queue_item
-import Qt4_GraphicsManager as graphics_manager
+import Qt4_GraphicsManager
+import queue_model_objects_v1 as queue_model_objects
 
 from Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget
@@ -91,8 +91,14 @@ class CreateAdvancedWidget(CreateTaskBase):
              connect(self._run_number_ledit_change)
         self._data_path_widget.pathTemplateChangedSignal.connect(\
              self.handle_path_conflict)
+
+        self._acq_widget.acqParametersChangedSignal.connect(\
+             self.handle_path_conflict)
+        self._acq_widget.madEnergySelectedSignal.connect(\
+             self.mad_energy_selected)
+
         self._advanced_methods_widget.grid_listwidget.currentItemChanged.\
-             connect(self.grid_listwidget_current_item_changed)
+             connect(self.grid_listwidget_item_selection_changed)
 
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
@@ -106,6 +112,13 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         CreateTaskBase.init_models(self)
+        self._init_models()
+
+    def _init_models(self):
+        """
+        Descript. :
+        """
+        self._advanced = queue_model_objects.Advanced()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
@@ -115,13 +128,36 @@ class CreateAdvancedWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_advanced_values")
+
             if not self._advanced_methods:
                 self._advanced_methods = self._beamline_setup_hwobj.get_advanced_methods()            
                 for method in self._advanced_methods:
                     self._advanced_methods_widget.method_combo.addItem(method)
+            try:
+                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
+                transmission = round(float(transmission), 1)
+            except AttributeError:
+                transmission = 0
+
+            try:
+                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
+                resolution = round(float(resolution), 3)
+            except AttributeError:
+                resolution = 0
+
+            try:
+                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
+                energy = round(float(energy), 4)
+            except AttributeError:
+                energy = 0
+
+            self._acquisition_parameters.resolution = resolution
+            self._acquisition_parameters.energy = energy
+            self._acquisition_parameters.transmission = transmission
+
+            self.grid_listwidget_item_selection_changed()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
 
     def approve_creation(self):
         """
@@ -147,12 +183,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         Descript. :
         """
-        CreateTaskBase.single_item_selection(self, tree_item)
 
+        CreateTaskBase.single_item_selection(self, tree_item)
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-            sample_model = tree_item.get_model()
-            #self._processing_parameters = sample_model.processing_parameters
-            #self._processing_widget.update_data_model(self._processing_parameters)
+            self._init_models()
+            self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                self._path_template)            
         elif isinstance(tree_item, Qt4_queue_item.AdvancedQueueItem):
             advanced = tree_item.get_model()
             if tree_item.get_model().is_executed():
@@ -163,10 +199,6 @@ class CreateAdvancedWidget(CreateTaskBase):
             # sample_data_model = self.get_sample_item(tree_item).get_model()
             #self._acq_widget.disable_inverse_beam(True)
 
-            print 1
-
-            
-            return
             self._path_template = advanced.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
@@ -179,7 +211,8 @@ class CreateAdvancedWidget(CreateTaskBase):
             self.get_acquisition_widget().use_osc_start(True)
         else:
             self.setDisabled(True)
-
+        #if self._advanced_methods_widget.grid_listwidget.count() > 0:
+        #    self._advanced_methods_widget.grid_listwidget.clearSelection() 
   
     def _create_task(self,  sample, shape):
         """
@@ -188,7 +221,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         data_collections = []
         shape = self.get_selected_grid()
 
-        if isinstance(shape, graphics_manager.GraphicsItemGrid): 
+        if isinstance(shape, Qt4_GraphicsManager.GraphicsItemGrid): 
             snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
             grid_properties = shape.get_properties()
 
@@ -209,25 +242,27 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_number(acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
 
-            exp_type = self._advanced_methods_widget.method_combo.currentText()
+            exp_type = str(self._advanced_methods_widget.method_combo.currentText())
             advanced = queue_model_objects.Advanced(exp_type, dc, 
                   shape, sample.crystals[0])
 
             data_collections.append(advanced)
             self._path_template.run_number += 1
 
-        return data_collections            
+            return data_collections            
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Grid":
+            self._advanced_methods_widget.grid_listwidget.clearSelection()
             self._advanced_methods_widget.grid_listwidget.addItem(shape.get_full_name())            
             new_item = self._advanced_methods_widget.grid_listwidget.item(\
                 self._advanced_methods_widget.grid_listwidget.count() - 1)
             self._grid_map[shape] = new_item
-            #new_item.setSelected(True)
+            new_item.setSelected(True)
+            
             self._advanced_methods_widget.grid_listwidget.setCurrentItem(new_item)
             shape.setSelected(True)
-            self.grid_listwidget_current_item_changed(new_item)
+            self.grid_listwidget_item_selection_changed()
   
     def shape_deleted(self, shape, shape_type):
         if self._grid_map.get(shape):
@@ -236,9 +271,9 @@ class CreateAdvancedWidget(CreateTaskBase):
             self._advanced_methods_widget.grid_listwidget.takeItem(shape_index.row())
             self._grid_map.pop(shape) 
 
-    def grid_listwidget_current_item_changed(self, item):
+    def grid_listwidget_item_selection_changed(self):
         for grid, listwidget_item in self._grid_map.iteritems():
-            if listwidget_item == item:
+            if listwidget_item.isSelected():
                 grid_properties = grid.get_properties() 
                 cell_count = grid_properties.get("num_lines") * \
                              grid_properties.get("num_images_per_line")

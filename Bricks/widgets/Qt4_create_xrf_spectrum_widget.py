@@ -54,19 +54,17 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.count_time_ledit.setMaximumWidth(75)
 
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_vlayout = QtGui.QVBoxLayout(self)
+        self._data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
         self._data_path_gbox_vlayout.addWidget(self._data_path_widget)
         self._data_path_gbox_vlayout.setSpacing(0)
         self._data_path_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-        self._data_path_gbox.setLayout(self._data_path_gbox_vlayout)
 
-        _parameters_gbox_hlayout = QtGui.QHBoxLayout(self)
+        _parameters_gbox_hlayout = QtGui.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
         _parameters_gbox_hlayout.addWidget(self.count_time_ledit)
         _parameters_gbox_hlayout.addStretch(0)
         _parameters_gbox_hlayout.setSpacing(2)
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
-        _parameters_gbox.setLayout(_parameters_gbox_hlayout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
 	_main_vlayout.addWidget(self._data_path_gbox)
@@ -74,7 +72,6 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.addStretch(0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
 
@@ -82,7 +79,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
         self._data_path_widget.pathTemplateChangedSignal.connect(\
-                     self.handle_path_conflict)
+             self.handle_path_conflict)
 
         # Other ---------------------------------------------------------------
 
