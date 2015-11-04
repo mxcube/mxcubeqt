@@ -25,7 +25,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
 
 
-__category__ = 'Qt4_Task'
+__category__ = 'Task'
 
 
 class Qt4_CharParametersBrick(BlissWidget):
@@ -68,7 +68,6 @@ class Qt4_CharParametersBrick(BlissWidget):
         _main_vlayout.addWidget(self.stacked_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.addWidget(self.toggle_page_button)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies -------------------------------------------------------
 

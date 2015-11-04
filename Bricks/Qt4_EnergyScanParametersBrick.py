@@ -23,7 +23,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_energy_scan_parameters_widget import EnergyScanParametersWidget
 
 
-__category__ = 'Qt4_Task'
+__category__ = 'Task'
 
 
 class Qt4_EnergyScanParametersBrick(BlissWidget):
@@ -42,7 +42,6 @@ class Qt4_EnergyScanParametersBrick(BlissWidget):
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.energy_scan_widget)
-        self.setLayout(_main_vlayout) 
 
         # Qt-Slots
         self.defineSlot("populate_parameter_widget", ({}))

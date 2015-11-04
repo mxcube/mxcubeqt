@@ -25,7 +25,7 @@ from widgets.Qt4_dc_parameters_widget import DCParametersWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_Task'
+__category__ = 'Task'
 
 
 class Qt4_DCParametersBrick(BlissWidget):
@@ -69,7 +69,6 @@ class Qt4_DCParametersBrick(BlissWidget):
         _main_vlayout.addWidget(self.stacked_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.addWidget(self.toggle_page_button)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies -------------------------------------------------------
 
@@ -85,9 +84,9 @@ class Qt4_DCParametersBrick(BlissWidget):
         """
         Descript. :
         """
-        self.parameters_widget.path_widget._base_image_dir = \
+        self.parameters_widget._data_path_widget._base_image_dir = \
             self.session_hwobj.get_base_image_directory()
-        self.parameters_widget.path_widget._base_process_dir = \
+        self.parameters_widget._data_path_widget._base_process_dir = \
             self.session_hwobj.get_base_process_directory()
 
         data_collection = item.get_model()

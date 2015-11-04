@@ -282,6 +282,7 @@ class SampleCentringQueueItem(TaskQueueItem):
 
 class AdvancedQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
+        print args, kwargs
         TaskQueueItem.__init__(self, *args, **kwargs)
 
 

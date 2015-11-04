@@ -23,7 +23,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_xrf_scan_parameters_widget import XRFScanParametersWidget
 
 
-__category__ = 'Qt4_Task'
+__category__ = 'Task'
 
 
 class Qt4_XRFScanParametersBrick(BlissWidget):

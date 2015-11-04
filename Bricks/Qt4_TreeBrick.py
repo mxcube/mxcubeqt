@@ -99,7 +99,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("populate_energy_scan_widget", ())
         self.defineSignal("populate_xrf_spectrum_widget", ())
         self.defineSignal("populate_workflow_tab", ())
-        self.defineSignal("populate_advanced_tab", ())
+        self.defineSignal("populate_advanced_widget", ())
 
         # Handle selection
         self.defineSignal("selection_changed",())
@@ -685,9 +685,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_xrf_spectrum_tab"), True)
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.emit(QtCore.SIGNAL("hide_advanced_tab"), False)
-        self.populate_advanced_tab(item)
+        self.populate_advanced_widget(item)
 
-    def populate_advanced_tab(self, item):
+    def populate_advanced_widget(self, item):
         """
         Descript. :
         """
@@ -773,8 +773,7 @@ class Qt4_TreeBrick(BlissWidget):
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.populate_workflow_tab(item)
             elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
-                self.populate_advanced_tab(item)
-
+                self.populate_advanced_widget(item)
 
         self.emit(QtCore.SIGNAL("selection_changed"), items)
 
