@@ -130,8 +130,8 @@ class CreateTaskBase(QtGui.QWidget):
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
-        
-        self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
+       
+        self._graphics_manager_hwobj = bl_setup_hwobj.graphics_manager_hwobj
         if self._graphics_manager_hwobj: 
             self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)

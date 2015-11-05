@@ -388,7 +388,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
 class MonoStateButton(QtGui.QToolButton):
 
-    def __init__(self, parent, caption=None, icon=None, fixed_size=(60, 45)):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(70, 50)):
         QtGui.QToolButton.__init__(self, parent)
         self.setUsesTextLabel(True)
         if fixed_size: 
@@ -420,7 +420,7 @@ class DuoStateButton(QtGui.QToolButton):
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
         self.setUsesTextLabel(True)
         self.setText(caption)
-        self.setFixedSize(60, 45)
+        self.setFixedSize(70, 50)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 
