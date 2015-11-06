@@ -221,7 +221,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         data_collections = []
         shape = self.get_selected_grid()
 
-        if isinstance(shape, Qt4_GraphicsManager.GraphicsItemGrid): 
+        if shape is not None:
             snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
             grid_properties = shape.get_properties()
 

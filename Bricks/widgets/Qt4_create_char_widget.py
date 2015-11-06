@@ -47,7 +47,7 @@ class CreateCharWidget(CreateTaskBase):
         """
 
         CreateTaskBase.__init__(self, parent, name, fl, 'Characterisation')
-        self.setName("create_char_widget")
+        self.setObjectName("create_char_widget")
 
         # Hardware objects ----------------------------------------------------
 
