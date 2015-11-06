@@ -59,6 +59,7 @@ class XRFScanParametersWidget(QtGui.QWidget):
         self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", \
              self.other_parameters_gbox)
         self.adjust_transmission_cbox.hide()
+        _snapshot_widget = QtGui.QWidget(self)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.mca_spectrum_widget = McaSpectrumWidget(self)
@@ -79,9 +80,15 @@ class XRFScanParametersWidget(QtGui.QWidget):
         _parameters_widget_layout.setSpacing(2)
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
+        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
+        _snapshots_vlayout.addWidget(self.position_widget)
+        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
+        _snapshots_vlayout.setSpacing(2)
+        _snapshots_vlayout.addStretch(0)
+
         _top_widget_layout = QtGui.QHBoxLayout(_top_widget)
         _top_widget_layout.addWidget(_parameters_widget)
-        _top_widget_layout.addWidget(self.position_widget)
+        _top_widget_layout.addWidget(_snapshot_widget)
         _top_widget_layout.setSpacing(2)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
         

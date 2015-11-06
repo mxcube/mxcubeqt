@@ -41,8 +41,7 @@ class ReferenceImageWidget(QtGui.QWidget):
         self.tool_box = QtGui.QToolBox(self.group_box)
         self.page_widget = QtGui.QWidget(self.tool_box)
         self.path_widget = DataPathWidget(self.page_widget)
-        self.acq_groupbox = QtGui.QGroupBox("Acquisition", self.page_widget)
-        self.acq_widget = AcquisitionWidget(self.acq_groupbox, 'horizontal')
+        self.acq_widget = AcquisitionWidget(self.page_widget, 'horizontal')
         self.acq_widget.acq_widget_layout.inverse_beam_cbx.hide()
         self.acq_widget.acq_widget_layout.shutterless_cbx.hide()
         self.acq_widget.acq_widget_layout.subwedge_size_label.hide()
@@ -51,14 +50,9 @@ class ReferenceImageWidget(QtGui.QWidget):
         self.tool_box.addItem(self.page_widget, "Acquisition parameters")
 
         # Layout --------------------------------------------------------------
-        _acq_groupbox_layout = QtGui.QVBoxLayout(self.acq_groupbox)
-        _acq_groupbox_layout.addWidget(self.acq_widget)
-        _acq_groupbox_layout.setSpacing(0)
-        _acq_groupbox_layout.setContentsMargins(0, 0, 0, 0)
-
         _page_widget_layout = QtGui.QVBoxLayout(self.page_widget)
         _page_widget_layout.addWidget(self.path_widget)
-        _page_widget_layout.addWidget(self.acq_groupbox)
+        _page_widget_layout.addWidget(self.acq_widget)
         _page_widget_layout.addStretch(0)
         _page_widget_layout.setSpacing(0)
         _page_widget_layout.setContentsMargins(0, 0, 0, 0)  
@@ -72,5 +66,3 @@ class ReferenceImageWidget(QtGui.QWidget):
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-
-        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY) 

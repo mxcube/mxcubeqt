@@ -46,7 +46,6 @@ class OptimisationParametersWidgetLayout(QtGui.QWidget):
         _main_vlayout.addWidget(self.opt_param_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
 
         # Size policies -------------------------------------------------------
 
@@ -54,13 +53,15 @@ class OptimisationParametersWidgetLayout(QtGui.QWidget):
         self.languageChange()
         #self.resize(QtCore.QSize(603,190).expandedTo(self.minimumSizeHint()))
         self.setAttribute(QtCore.Qt.WA_WState_Polished)
-        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def languageChange(self):
         self.setWindowTitle(self.__tr("OptimisationParametersWidget"))
         self.opt_param_widget.main_groupbox.\
              setTitle(self.__tr("Optimization parameters"))
-        self.opt_param_widget.aimed_i_over_sigma_label.setText(self.__trUtf8("\x41\x69\x6d\x65\x64\x20\x49\x2f\xcf\x83\x20\x61\x74\x20\x68\x69\x67\x68\x65\x73\x74\x20\x72\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x3a"))
+        self.opt_param_widget.aimed_i_over_sigma_label.setText(\
+              self.__trUtf8("\x41\x69\x6d\x65\x64\x20\x49\x2f\xcf\x83\x20" +\
+                            "\x61\x74\x20\x68\x69\x67\x68\x65\x73\x74\x20" +\
+                            "\x72\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x3a"))
         self.opt_param_widget.aimed_completeness_label.\
              setText(self.__tr("Aimed completeness:"))
         self.opt_param_widget.maximum_res_cbx.\

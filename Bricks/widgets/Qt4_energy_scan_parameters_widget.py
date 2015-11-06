@@ -55,6 +55,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.data_path_widget = DataPathWidget(_parameters_widget)
         self.data_path_widget.data_path_layout.file_name_label.setText('')
         self.data_path_widget.data_path_layout.file_name_value_label.hide()
+        _snapshot_widget = QtGui.QWidget(self)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.position_widget.setFixedSize(450, 340)        
@@ -73,9 +74,15 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
         _parameters_widget.setLayout(_parameters_widget_layout)
 
+        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
+        _snapshots_vlayout.addWidget(self.position_widget)
+        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
+        _snapshots_vlayout.setSpacing(2)
+        _snapshots_vlayout.addStretch(0)
+
         _top_widget_hlayout = QtGui.QHBoxLayout(self)
         _top_widget_hlayout.addWidget(_parameters_widget)
-        _top_widget_hlayout.addWidget(self.position_widget)
+        _top_widget_hlayout.addWidget(_snapshot_widget)
         _top_widget_hlayout.addStretch(0)
         _top_widget_hlayout.setSpacing(2)
         _top_widget_hlayout.setContentsMargins(0, 0, 0, 0)
@@ -103,9 +110,6 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.data_path_widget.data_path_layout.run_number_ledit.\
              textChanged.connect(self._run_number_ledit_change)
         
-        #qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
-        #                   self.tab_changed)
-
         # Other ---------------------------------------------------------------
 
     def _prefix_ledit_change(self, new_value):

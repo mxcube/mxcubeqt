@@ -47,9 +47,7 @@ class CreateCharWidget(CreateTaskBase):
         """
 
         CreateTaskBase.__init__(self, parent, name, fl, 'Characterisation')
-
-        if not name:
-            self.setName("create_char_widget")
+        self.setName("create_char_widget")
 
         # Hardware objects ----------------------------------------------------
 
@@ -74,12 +72,6 @@ class CreateCharWidget(CreateTaskBase):
         
         self._char_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_characterise_simple_widget_vertical_layout.ui')) 
-
-        gbox =  self._char_widget.findChild(QtGui.QGroupBox, "characterisation_gbox")
-        p = gbox.palette();
-        p.setColor(QtGui.QPalette.Window, QtCore.Qt.red);
-        p.setColor(QtGui.QPalette.Highlight, QtCore.Qt.red);
-        gbox.setPalette(p);
 
         # Layout --------------------------------------------------------------
         _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
@@ -309,18 +301,16 @@ class CreateCharWidget(CreateTaskBase):
         """
         tasks = []
 
-        if not shape:
+        if not shape or not isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
-                snapshot = self._graphics_manager_hwobj.\
-                           get_snapshot(shape)
-
-                cpos = copy.deepcopy(shape.get_centred_position())
-                cpos.snapshot_image = snapshot 
+            snapshot = self._graphics_manager_hwobj.\
+                        get_snapshot(shape)
+            cpos = copy.deepcopy(shape.get_centred_position())
+            cpos.snapshot_image = snapshot 
 
         char_params = copy.deepcopy(self._char_params)
         acq = self._create_acq(sample)

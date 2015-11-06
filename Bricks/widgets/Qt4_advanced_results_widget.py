@@ -40,14 +40,21 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self._half_widget_size = 900
 
         # Graphic elements ----------------------------------------------------
+        _snapshot_widget = QtGui.QWidget(self)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.heat_map_widget = HeatMapWidget(self)
 
         # Layout --------------------------------------------------------------
+        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
+        _snapshots_vlayout.addWidget(self.position_widget)
+        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
+        _snapshots_vlayout.setSpacing(0)
+        _snapshots_vlayout.addStretch(0)
+
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(self.heat_map_widget)
-        _main_hlayout.addWidget(self.position_widget)
+        _main_hlayout.addWidget(_snapshot_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.addStretch(0)
@@ -60,12 +67,13 @@ class AdvancedResultsWidget(QtGui.QWidget):
 
     def set_beamline_setup(self, bl_setup):
         self._beamline_setup_hwobj = bl_setup
-        self.data_analysis_hwobj = self._beamline_setup_hwobj.data_analysis_hwobj
-        if self.data_analysis_hwobj is not None:
-            self.data_analysis_hwobj.connect('processingSetResult', self.set_processing_results)
+        self._parallel_processing_hwobj = self._beamline_setup_hwobj.parallel_processing_hwobj
+        if self._parallel_processing_hwobj is not None:
+            self._parallel_processing_hwobj.connect('paralleProcessingResults', self.set_processing_results)
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
     def populate_widget(self, item):
+        print item
         advanced = item.get_model()
         data_collection = advanced.reference_image_collection
 
@@ -77,7 +85,7 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self.heat_map_widget.set_associated_grid(associated_grid)
      
         if executed: 
-            processing_results = data_collection.get_processing_results()
+            processing_results = advanced.get_processing_results()
             if processing_results is not None: 
                 self.heat_map_widget.set_results(processing_results, True)    
 

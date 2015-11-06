@@ -51,7 +51,8 @@ class CreateHelicalWidget(CreateTaskBase):
         # Graphic elements ----------------------------------------------------
         _lines_groupbox = QtGui.QGroupBox("Line", self)
         self._lines_listwidget = QtGui.QListWidget(_lines_groupbox)
-        self._lines_listwidget.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+        self._lines_listwidget.setSelectionMode(\
+              QtGui.QAbstractItemView.MultiSelection)
         self._lines_listwidget.setMinimumHeight(70)
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
@@ -167,16 +168,15 @@ class CreateHelicalWidget(CreateTaskBase):
 
         for shape in self._graphics_manager_hwobj.get_shapes():
             if isinstance(shape, graphics_manager.GraphicsItemLine):
-                if shape.get_centred_positions()[0] == start_cpos and\
-                       shape.get_centred_positions()[1] == end_cpos:
+                (line_start_cpos, line_end_cpos) = shape.get_centred_positions() 
+                if line_start_cpos == start_cpos and line_end_cpos == end_cpos:
                     self._graphics_manager_hwobj.de_select_all()
                     shape.setSelected(True)
                     selected_line = shape
 
         #de-select previous selected list items and
         #select the current shape (Line).
-        for (list_item, shape) in self._list_item_map.iteritems():
-
+        for (list_item, shape) in self._lines_map.iteritems():
             if selected_line is shape:
                 list_item.setSelected(True)
             else:

@@ -140,12 +140,16 @@ class HeatMapWidget(QtGui.QWidget):
                        "Right click to open menu."
         self._heat_map_plot.setToolTip(tooltip_text) 
 
-        self._heat_map_popup_menu.addAction("Reset zoom", self._heat_map_plot.zoomReset)
+        self._heat_map_popup_menu.addAction(\
+             "Reset zoom", self._heat_map_plot.zoomReset)
         self._heat_map_popup_menu.addSeparator()
-        self._heat_map_popup_menu.addAction("Move to position", self.move_to_position_clicked)
-        self._heat_map_popup_menu.addAction("Create centring point", self.create_centring_point_clicked)
+        self._heat_map_popup_menu.addAction(\
+             "Move to position", self.move_to_position_clicked)
+        self._heat_map_popup_menu.addAction(\
+             "Create centring point", self.create_centring_point_clicked)
         self._heat_map_popup_menu.addSeparator()
-        self._heat_map_popup_menu.addAction("Open image in ADXV", self.display_image_clicked)
+        self._heat_map_popup_menu.addAction(\
+             "Open image in ADXV", self.display_image_clicked)
         self._heat_map_plot.contextMenuEvent = self.open_heat_map_popup_menu
 
         score_types = ["Score", "Spots num", "Int aver.", "Resolution"]
@@ -159,9 +163,13 @@ class HeatMapWidget(QtGui.QWidget):
         self._threshold_slider.setFixedWidth(200)
         self._threshold_slider.setTracking(False)
 
+        font = self._best_pos_table.font()
+        font.setPointSize(8)
+        self._best_pos_table.setFont(font)
         self._best_pos_table.setEditTriggers(\
              QtGui.QAbstractItemView.NoEditTriggers)
         self._best_pos_table.setColumnCount(9)
+        self._best_pos_table.horizontalHeader().setStretchLastSection(True)
      
         self._best_pos_table.setHorizontalHeaderItem(0, \
             QtGui.QTableWidgetItem("No."))
@@ -465,21 +473,27 @@ class HeatMapWidget(QtGui.QWidget):
         Descript. : Displays 10 (if exists) best positions, estimated
                     by fast processing.
         """
-        self._best_pos_table.setNumRows(len(self.__results["best_positions"]))
+        self._best_pos_table.setRowCount(len(self.__results["best_positions"]))
         for row in range(len(self.__results["best_positions"])):
-            self._best_pos_table.setText(row, 0, str(self.__results["best_positions"][row].get("index") + 1))       
-            self._best_pos_table.setText(row, 1, str(self.__results["best_positions"][row].get("score"))) 
-            self._best_pos_table.setText(row, 2, str(self.__results["best_positions"][row].get("spots_num")))
-            self._best_pos_table.setText(row, 3, str(self.__results["best_positions"][row].get("spots_int_aver")))
-            self._best_pos_table.setText(row, 4, str(self.__results["best_positions"][row].get("spots_resolution")))
-            self._best_pos_table.setText(row, 5, str(self.__results["best_positions"][row].get("filename")))
-            self._best_pos_table.setText(row, 6, str(self.__results["best_positions"][row].get("col")))
-            self._best_pos_table.setText(row, 7, str(self.__results["best_positions"][row].get("row")))
+            self._best_pos_table.setItem(row, 0, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("index") + 1)))  
+            self._best_pos_table.setItem(row, 1, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("score"))))
+            self._best_pos_table.setItem(row, 2, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("spots_num"))))
+            self._best_pos_table.setItem(row, 3, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("spots_int_aver"))))
+            self._best_pos_table.setItem(row, 4, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("spots_resolution"))))
+            self._best_pos_table.setItem(row, 5, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("filename"))))
+            self._best_pos_table.setItem(row, 6, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("col"))))
+            self._best_pos_table.setItem(row, 7, QtGui.QTableWidgetItem(\
+                 str(self.__results["best_positions"][row].get("row"))))
             if self.__results["best_positions"][row]["cpos"]:
-                self._best_pos_table.setText(row, 8, self.__results["best_positions"][row]["cpos"].as_str())
-        for col in range(8):
-            self._best_pos_table.adjustColumn(col)
-            
+                self._best_pos_table.setItem(row, 8, QtGui.QTableWidgetItem(\
+                   self.__results["best_positions"][row]["cpos"].as_str()))
 
     def move_to_best_position_clicked(self):
         if self._best_pos_table.currentRow() > -1:

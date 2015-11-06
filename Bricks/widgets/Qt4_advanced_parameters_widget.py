@@ -54,6 +54,7 @@ class AdvancedParametersWidget(QtGui.QWidget):
         self._acq_widget = AcquisitionWidget(_dc_parameters_widget,
                                             layout = 'horizontal')
         #self._acq_widget.setFixedHeight(170)
+        _snapshot_widget = QtGui.QWidget(self)
         self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
 
@@ -65,21 +66,26 @@ class AdvancedParametersWidget(QtGui.QWidget):
         _dc_parameters_widget_layout.addStretch(0)
         _dc_parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
+        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
+        _snapshots_vlayout.addWidget(self.position_widget)
+        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
+        _snapshots_vlayout.setSpacing(2)
+        _snapshots_vlayout.addStretch(0)
+
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
-        _main_hlayout.addWidget(self.position_widget)
+        _main_hlayout.addWidget(_snapshot_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.addStretch(0)
-
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
                      self._prefix_ledit_change)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
                      self._run_number_ledit_change)
-        #self._acq_widget.madEnergy_selected'),
-        #             self.mad_energy_selected)
+        self._acq_widget.madEnergySelectedSignal.connect(\
+             self.mad_energy_selected)
         self._acq_widget.acqParametersChangedSignal.connect(\
              self.handle_path_conflict)
 

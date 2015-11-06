@@ -37,9 +37,7 @@ class CharTypeWidget(QtGui.QWidget):
         Descript. :
         """
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
-
-        if not name:
-            self.setObjectName("CharTypeWidget")
+        self.setObjectName("char_type_widget")
 
         # Hardware objects ----------------------------------------------------
 
@@ -63,19 +61,17 @@ class CharTypeWidget(QtGui.QWidget):
         self.charact_type_tbox.addItem(self.rad_damage_page, "Radiation damage")
 
         # Layout --------------------------------------------------------------
-        _charact_type_gbox_vlayout = QtGui.QVBoxLayout(self)
+        _charact_type_gbox_vlayout = QtGui.QVBoxLayout(self.charact_type_gbox)
         _charact_type_gbox_vlayout.addWidget(self.charact_type_tbox)
         _charact_type_gbox_vlayout.addStretch(0)
         _charact_type_gbox_vlayout.setSpacing(0)
         _charact_type_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.charact_type_gbox.setLayout(_charact_type_gbox_vlayout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.charact_type_gbox)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
 
@@ -88,9 +84,9 @@ class CharTypeWidget(QtGui.QWidget):
              self._toggle_time_dose)
 
         # Other ---------------------------------------------------------------
-        self._toggle_time_dose(self.routine_dc_page.dose_time_bgroup.checkedId())
+        self._toggle_time_dose(\
+             self.routine_dc_page.dose_time_bgroup.checkedId())
 
-        Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def enable_time_ledit(self, state):
         """

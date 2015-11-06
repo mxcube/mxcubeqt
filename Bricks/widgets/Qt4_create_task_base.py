@@ -131,7 +131,7 @@ class CreateTaskBase(QtGui.QWidget):
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
        
-        self._graphics_manager_hwobj = bl_setup_hwobj.graphics_manager_hwobj
+        self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
             self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
@@ -233,8 +233,7 @@ class CreateTaskBase(QtGui.QWidget):
             if isinstance(item, Qt4_queue_item.SampleQueueItem) or \
                 isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                     result = True
-        return True            
-        #return result
+        return result
 
     def set_energy(self, energy, wavelength):         
         if self._item_is_group_or_sample() and energy:

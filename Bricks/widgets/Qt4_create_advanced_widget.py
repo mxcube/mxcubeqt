@@ -227,7 +227,8 @@ class CreateAdvancedWidget(CreateTaskBase):
 
             acq = self._create_acq(sample)
             acq.acquisition_parameters.centred_position = shape.get_centred_position()
-            acq.acquisition_parameters.mesh_range = shape.get_grid_range_mm()
+            acq.acquisition_parameters.mesh_range = [grid_properties["dx_mm"],
+                                                     grid_properties["dy_mm"]]
             acq.acquisition_parameters.num_lines = grid_properties["num_lines"]
             acq.acquisition_parameters.num_images = grid_properties["num_lines"] * \
                                                     grid_properties["num_images_per_line"]
