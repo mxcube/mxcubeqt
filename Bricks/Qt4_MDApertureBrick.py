@@ -137,15 +137,15 @@ class Qt4_MDApertureBrick(BlissWidget):
         for aperture in aperture_list:
             self.aperture_cbox.addItem(aperture)
 
-    def apertureChanged(self, activePos, gapSize):
+    def apertureChanged(self, pos_index, size):
         """
         Descript. :
         """
-        if activePos is None:
+        if pos_index is None:
             self.aperture_cbox.setEnabled(False)
         else:
             self.aperture_cbox.setEnabled(True)
             self.aperture_cbox.blockSignals(True)
-            self.aperture_cbox.setCurrentIndex(activePos)
+            self.aperture_cbox.setCurrentIndex(pos_index)
             self.aperture_cbox.blockSignals(False)
 
