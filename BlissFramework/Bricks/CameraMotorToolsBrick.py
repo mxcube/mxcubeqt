@@ -548,9 +548,16 @@ class CameraMotorToolsBrick(BlissWidget):
                 (y, z) = drawingMgr.point()
                 
                 self.drawingMgr.stopDrawing()
-                
-                movetoy = - (self.YBeam - y) * self.YSize
-                movetoz = - (self.ZBeam - z) * self.ZSize
+
+                sign = 1
+                if self.horMotHwo.unit < 0:
+                    sign = -1
+                movetoy = - sign*(self.YBeam - y) * self.YSize
+
+                sign = 1
+                if self.verMotHwo.unit < 0:
+                    sign = -1
+                movetoz = - sign*(self.ZBeam - z) * self.ZSize
                 
                 self.motorArrived = 0
             
@@ -583,8 +590,15 @@ class CameraMotorToolsBrick(BlissWidget):
         
         drawingMgr.stopDrawing()
 
-        movetoy = horMotorPos - (beamY - y) * YSize
-        movetoz = verMotorPos - (beamZ - z) * ZSize
+        sign = 1
+        if self.horMotHwo.unit < 0:
+            sign = -1
+        movetoy = horMotorPos - sign*(beamY - y) * YSize
+
+        sign = 1
+        if self.verMotHwo.unit < 0:
+            sign = -1
+        movetoz = verMotorPos - sign*(beamZ - z) * ZSize
 
         self.motorArrived = 0
         
