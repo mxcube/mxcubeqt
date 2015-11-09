@@ -43,7 +43,7 @@ class LightCtrlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
     def lightButtonOffClicked(self):
         #self.lightOffButton.setDown(True)
         if self.actuatorLight is not None:
-            if self.actuatorLight.getActuatorState()!="out":
+            if self.actuatorLight.getActuatorState(True) != "out":
                 if self.motor is not None:
                     try:
                         self.lightSavedPosition=self.motor.getPosition()
@@ -65,7 +65,7 @@ class LightCtrlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
     def lightButtonOnClicked(self):
         #self.lightOnButton.setDown(True)
         if self.actuatorLight is not None:
-            if self.actuatorLight.getActuatorState()!="in":
+            if self.actuatorLight.getActuatorState(True)!="in":
                 self.actuatorLightStateChanged('unknown')
                 self.actuatorLight.actuatorIn()
                 if self.lightSavedPosition is not None and self.motor is not None:
@@ -99,7 +99,7 @@ class LightCtrlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
             self.actuatorLight=self.getHardwareObject(newValue)
             if self.actuatorLight is not None:
                 self.connect(self.actuatorLight,PYSIGNAL('actuatorStateChanged'),self.actuatorLightStateChanged)
-                self.actuatorLightStateChanged(self.actuatorLight.getActuatorState())
+                self.actuatorLightStateChanged(self.actuatorLight.getActuatorState(True))
         elif property=='actuatoricons':
             icons_list=newValue.split()
             try:
