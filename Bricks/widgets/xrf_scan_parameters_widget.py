@@ -97,13 +97,6 @@ class XRFScanParametersWidget(qt.QWidget):
         self.other_parameters_gbox.setEnabled(not executed)    
         self.mca_spectrum.setEnabled(executed)        
  
-        if executed:
-            result = self.xrf_scan.get_scan_result()
-            if not None in (result.mca_data, result.mca_calib, result.mca_config):
-                self.mca_spectrum.setData(result.mca_data, result.mca_calib, result.mca_config) 
-        else:
-            self.mca_spectrum.clear()
-
         image = self.xrf_scan.centred_position.snapshot_image
         if image:
             try:
