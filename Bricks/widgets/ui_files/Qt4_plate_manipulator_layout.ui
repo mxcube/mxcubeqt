@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>740</width>
-    <height>558</height>
+    <height>721</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -161,6 +161,12 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -256,6 +262,9 @@
          <height>400</height>
         </size>
        </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAsNeeded</enum>
+       </property>
        <column>
         <property name="text">
          <string>Element</string>
@@ -336,7 +345,14 @@
       </layout>
      </item>
      <item>
-      <widget class="QGraphicsView" name="xtal_image_graphicsview"/>
+      <widget class="QGraphicsView" name="xtal_image_graphicsview">
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer">

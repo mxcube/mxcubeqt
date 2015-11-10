@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>131</height>
+    <height>117</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,25 @@
        <property name="title">
         <string>Characterisation</string>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
        <layout class="QHBoxLayout">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QVBoxLayout">
           <item>

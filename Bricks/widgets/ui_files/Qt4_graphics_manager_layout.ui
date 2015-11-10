@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>916</width>
-    <height>406</height>
+    <width>521</width>
+    <height>407</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,15 +40,15 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="all_shapes_page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>912</width>
-        <height>282</height>
+        <width>540</width>
+        <height>270</height>
        </rect>
       </property>
       <attribute name="label">
@@ -64,7 +64,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="rowone_hbox">
          <property name="spacing">
-          <number>2</number>
+          <number>6</number>
          </property>
          <item>
           <widget class="QLabel" name="display_label">
@@ -165,6 +165,9 @@
          <property name="selectionMode">
           <enum>QAbstractItemView::MultiSelection</enum>
          </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
          <column>
           <property name="text">
            <string>No.</string>
@@ -173,11 +176,6 @@
          <column>
           <property name="text">
            <string>Type</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Coordinates</string>
           </property>
          </column>
          <column>
@@ -254,8 +252,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>912</width>
-        <height>282</height>
+        <width>517</width>
+        <height>283</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -270,18 +268,16 @@
         <number>0</number>
        </property>
        <property name="spacing">
-        <number>2</number>
+        <number>6</number>
        </property>
        <item row="0" column="0">
         <widget class="QTreeWidget" name="point_treewidget">
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
          <column>
           <property name="text">
            <string>Index</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Coordinate</string>
           </property>
          </column>
         </widget>
@@ -339,8 +335,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>912</width>
-        <height>282</height>
+        <width>517</width>
+        <height>283</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -355,7 +351,7 @@
         <number>0</number>
        </property>
        <property name="spacing">
-        <number>2</number>
+        <number>6</number>
        </property>
        <item row="0" column="0">
         <widget class="QTreeWidget" name="line_treewidget">
@@ -363,6 +359,9 @@
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
          </property>
          <column>
           <property name="text">
@@ -384,7 +383,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
-          <number>2</number>
+          <number>6</number>
          </property>
          <item>
           <widget class="QPushButton" name="create_line_button">
@@ -419,8 +418,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>912</width>
-        <height>282</height>
+        <width>517</width>
+        <height>283</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -435,7 +434,7 @@
         <number>0</number>
        </property>
        <property name="spacing">
-        <number>2</number>
+        <number>6</number>
        </property>
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="_2">
@@ -553,12 +552,16 @@
             <widget class="QPushButton" name="move_left_button">
              <property name="maximumSize">
               <size>
-               <width>23</width>
-               <height>23</height>
+               <width>27</width>
+               <height>27</height>
               </size>
              </property>
              <property name="text">
-              <string>L</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>../../../BlissFramework/Icons/Left2.png</normaloff>../../../BlissFramework/Icons/Left2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -569,12 +572,16 @@
             <widget class="QPushButton" name="move_up_button">
              <property name="maximumSize">
               <size>
-               <width>23</width>
-               <height>23</height>
+               <width>27</width>
+               <height>27</height>
               </size>
              </property>
              <property name="text">
-              <string>U</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>../../../BlissFramework/Icons/Up2.png</normaloff>../../../BlissFramework/Icons/Up2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -592,12 +599,16 @@
             <widget class="QPushButton" name="move_right_button">
              <property name="maximumSize">
               <size>
-               <width>23</width>
-               <height>23</height>
+               <width>27</width>
+               <height>27</height>
               </size>
              </property>
              <property name="text">
-              <string>R</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>../../../BlissFramework/Icons/Right2.png</normaloff>../../../BlissFramework/Icons/Right2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -614,12 +625,16 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>23</width>
-               <height>23</height>
+               <width>27</width>
+               <height>27</height>
               </size>
              </property>
              <property name="text">
-              <string>D</string>
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>../../../BlissFramework/Icons/Down2.png</normaloff>../../../BlissFramework/Icons/Down2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -673,6 +688,9 @@
            <italic>false</italic>
            <bold>false</bold>
           </font>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
          </property>
          <column>
           <property name="text">
@@ -729,45 +747,16 @@
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="grid_create_hlayout">
          <property name="spacing">
-          <number>2</number>
+          <number>6</number>
          </property>
          <item>
-          <widget class="QLabel" name="grid_create_label">
+          <widget class="QPushButton" name="draw_grid_button">
            <property name="text">
-            <string>Create new grid: </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="create_grid_drag_button">
-           <property name="text">
-            <string>Drag and drop</string>
+            <string>Draw</string>
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../../BlissFramework/Icons/GridDrag.png</normaloff>../../../BlissFramework/Icons/GridDrag.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="create_grid_click_button">
-           <property name="text">
-            <string>2 Click</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../BlissFramework/Icons/GridClick.png</normaloff>../../../BlissFramework/Icons/GridClick.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="create_grid_auto_button">
-           <property name="text">
-            <string>Automatic</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../BlissFramework/Icons/GridAuto.png</normaloff>../../../BlissFramework/Icons/GridAuto.png</iconset>
+             <normaloff>../../../BlissFramework/Icons/Grid.png</normaloff>../../../BlissFramework/Icons/Grid.png</iconset>
            </property>
           </widget>
          </item>
@@ -786,6 +775,16 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="remove_grid_button">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Remove</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
