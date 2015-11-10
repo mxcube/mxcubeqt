@@ -850,9 +850,10 @@ class DataCollectTree(QtGui.QWidget):
             item = selected_items[0]
 
             if isinstance(item, Qt4_queue_item.QueueItem): 
-                older_sibling = self.previous_sibling(item)
-                if older_sibling :
-                    older_sibling.move_item(item)
+                #older_sibling = self.previous_sibling(item)
+                older_sibling = self.sample_tree_widget.itemAbove(item)
+                if older_sibling:
+                    older_sibling.move_item_before(item)
 
     def samples_from_sc_content(self, sc_basket_content, sc_sample_content):
         """

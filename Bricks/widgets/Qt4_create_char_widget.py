@@ -103,6 +103,8 @@ class CreateCharWidget(CreateTaskBase):
         #self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
         #             self.use_induced_burn)
 
+        self._char_widget.characterisation_gbox.toggled.connect(\
+             self.characterisation_gbox_toggled)
         # Other ---------------------------------------------------------------
         self._char_params_mib.bind_value_update(
              'opt_sad', self._char_widget.optimised_sad_cbx,
@@ -332,8 +334,14 @@ class CreateCharWidget(CreateTaskBase):
                       path_template.get_prefix())
         char.set_number(dc.acquisitions[0].\
                         path_template.run_number)
+        char.run_characterisation = self._char_widget.characterisation_gbox.isChecked()
 
         tasks.append(char)
         self._path_template.run_number += 1
 
         return tasks
+
+    def characterisation_gbox_toggled(self, state):
+        print state
+        if self._char:
+            self._char.run_characterisation = state

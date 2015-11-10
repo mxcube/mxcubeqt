@@ -38,7 +38,7 @@ class AcquisitionWidget(QtGui.QWidget):
     """
   
     acqParametersChangedSignal = QtCore.pyqtSignal()
-    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, int)
+    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, bool)
 
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
                  path_template = None, layout = 'horizontal'):
@@ -77,11 +77,13 @@ class AcquisitionWidget(QtGui.QWidget):
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         if layout == "horizontal":
-            self.acq_widget_layout = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
+            self.acq_widget_layout = uic.loadUi(os.path.join(\
+                 os.path.dirname(__file__),
+                 "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
         else:
-            self.acq_widget_layout = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
+            self.acq_widget_layout = uic.loadUi(os.path.join(\
+                 os.path.dirname(__file__),
+                 "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
         # Layout --------------------------------------------------------------
         __main_vlayout = QtGui.QVBoxLayout(self)
         __main_vlayout.addWidget(self.acq_widget_layout)
@@ -91,17 +93,24 @@ class AcquisitionWidget(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.acq_widget_layout.energies_combo.activated.connect(self.energy_selected)
-        self.acq_widget_layout.mad_cbox.toggled.connect(self.use_mad)
-        self.acq_widget_layout.inverse_beam_cbx.toggled.connect(self.set_use_inverse_beam)
-        self.acq_widget_layout.first_image_ledit.textChanged.connect(self.first_image_ledit_change)
-        self.acq_widget_layout.num_images_ledit.textChanged.connect(self.num_images_ledit_change)
+        self.acq_widget_layout.energies_combo.activated.connect(\
+             self.energy_selected)
+        self.acq_widget_layout.mad_cbox.toggled.connect(\
+             self.use_mad)
+        self.acq_widget_layout.inverse_beam_cbx.toggled.connect(\
+             self.set_use_inverse_beam)
+        self.acq_widget_layout.first_image_ledit.textChanged.connect(\
+             self.first_image_ledit_change)
+        self.acq_widget_layout.num_images_ledit.textChanged.connect(\
+             self.num_images_ledit_change)
 
-        overlap_ledit = self.acq_widget_layout.findChild(QtGui.QLineEdit, "overlap_ledit")
+        overlap_ledit = self.acq_widget_layout.findChild(\
+            QtGui.QLineEdit, "overlap_ledit")
         if overlap_ledit is not None:
             overlap_ledit.textChanged.connect(self.overlap_changed)
 
-        self.acq_widget_layout.subwedge_size_ledit.textChanged.connect(self.subwedge_size_ledit_change)
+        self.acq_widget_layout.subwedge_size_ledit.textChanged.connect(\
+             self.subwedge_size_ledit_change)
 
         # Other --------------------------------------------------------------- 
         self.acq_widget_layout.subwedge_size_ledit.setDisabled(True)
@@ -338,7 +347,6 @@ class AcquisitionWidget(QtGui.QWidget):
 
             if energy != 0:
                 self.set_energy(energy, 0)
-
             self.madEnergySelectedSignal.emit(name, energy, state)
         else:
             self.set_energy(self.previous_energy, 0)
@@ -358,7 +366,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        return self.acq_widget_layout.inverse_beam_cbx.checkState == QtCore.Qt.Checked
+        return self.acq_widget_layout.inverse_beam_cbx.isChecked()
 
     def get_num_subwedges(self):
         """
@@ -370,14 +378,21 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if int(new_value) > self._acquisition_parameters.num_images:
-            Qt4_widget_colors.set_widget_color(\
-                 self.acq_widget_layout.subwedge_size_ledit,
-                 Qt4_widget_colors.LIGHT_RED)
-        else:
+        accept_input = False
+        if str(new_value).isdigit() and \
+           int(new_value) < self._acquisition_parameters.num_images:
+            accept_input = True
+
+        if accept_input:
             Qt4_widget_colors.set_widget_color(
                  self.acq_widget_layout.subwedge_size_ledit,
-                 Qt4_widget_colors.WHITE)
+                 Qt4_widget_colors.WHITE,
+                 QtGui.QPalette.Base)
+        else:
+            Qt4_widget_colors.set_widget_color(\
+                 self.acq_widget_layout.subwedge_size_ledit,
+                 Qt4_widget_colors.LIGHT_RED,
+                 QtGui.QPalette.Base) 
 
     def get_mad_energy(self):
         """
@@ -388,7 +403,7 @@ class AcquisitionWidget(QtGui.QWidget):
         
         name = name.strip()
         value = value.strip()
-        value = 0 if (value == '-') else value
+        value = 0 if (value == '-') else float(value)
 
         return (name, value)
 

@@ -158,21 +158,26 @@ class ConfirmDialog(QtGui.QDialog):
                 file_paths = path_template.get_files_to_be_written()
                 num_images += len(file_paths)
 
+                file_exists = False
                 for file_path in file_paths:
-                    (dir_name, f_name) = os.path.split(file_path)
-                    sample_name = current_sample_item.get_model().get_display_name()
-                    if sample_name is '':
-                        sample_name = current_sample_item.get_model().loc_str
-
-                    #last_item =  self.dialog_layout_widget.file_tree_widget.lastItem()
-                    last_item = self.dialog_layout_widget.file_tree_widget.topLevelItem(\
-                                (self.dialog_layout_widget.file_tree_widget.topLevelItemCount() - 1)) 
-
-                    file_treewidgee_item = FileTreeWidgetItem(self.dialog_layout_widget.file_tree_widget,
-                                            last_item, sample_name, dir_name, f_name)
-
                     if os.path.isfile(file_path):
+                        (dir_name, f_name) = os.path.split(file_path)
+                        sample_name = current_sample_item.get_model().get_display_name()
+                        if sample_name is '':
+                            sample_name = current_sample_item.get_model().loc_str
+
+                        last_item = self.dialog_layout_widget.file_tree_widget.topLevelItem(\
+                                    (self.dialog_layout_widget.file_tree_widget.topLevelItemCount() - 1)) 
+
+                        file_treewidgee_item = FileTreeWidgetItem(self.dialog_layout_widget.file_tree_widget,
+                                                last_item, sample_name, dir_name, f_name)
                         file_treewidgee_item.set_brush(QtGui.QBrush(QtCore.Qt.red))
+                        file_exists = True
+
+        self.dialog_layout_widget.file_exists_label.setEnabled(file_exists)
+        self.dialog_layout_widget.file_tree_widget.setEnabled(file_exists)
+        self.dialog_layout_widget.interleave_cbx.setEnabled(len(checked_items) > 3)
+        self.dialog_layout_widget.interleave_image_num.setEnabled(len(checked_items) > 3)
 
         num_samples = len(self.sample_items)
         num_collections = len(collection_items)
@@ -189,11 +194,16 @@ class ConfirmDialog(QtGui.QDialog):
         Descript. :
         """
         for item in self.checked_items:
+            item_model = item.get_model()
             acq_parameters = None 
-            if isinstance(item.get_model(), queue_model_objects.DataCollection):
-                acq_parameters = item.get_model().acquisitions[0].acquisition_parameters
-            elif isinstance(item.get_model(), queue_model_objects.Advanced):
-                acq_parameters = item.get_model().reference_image_collection.\
+          
+
+            if isinstance(item_model, queue_model_objects.DataCollection):
+                acq_parameters = item_model.acquisitions[0].acquisition_parameters
+                item_model.interleave = self.dialog_layout_widget.\
+                     interleave_cbx.isChecked()
+            elif isinstance(item_model, queue_model_objects.Advanced):
+                acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters 
             
             if acq_parameters: 
@@ -203,6 +213,7 @@ class ConfirmDialog(QtGui.QDialog):
                     force_dark_cbx.isChecked()
                 acq_parameters.skip_existing_images = self.dialog_layout_widget.\
                     skip_existing_images_cbx.isChecked()
+                
         
         self.continueClickedSignal.emit(self.sample_items, self.checked_items)
         #self.emit(QtCore.SIGNAL("continue_clicked"), self.sample_items, self.checked_items)

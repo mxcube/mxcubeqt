@@ -144,6 +144,8 @@ class DCParametersWidget(QtGui.QWidget):
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
 
+        print 1
+        print type(name)
         if state:
             path_template.mad_prefix = name
         else:

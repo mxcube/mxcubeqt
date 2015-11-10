@@ -594,7 +594,7 @@ class CreateTaskBase(QtGui.QWidget):
         model = item.get_model()
 
         if state:
-            self._path_template.mad_prefix = name
+            self._path_template.mad_prefix = str(name)
         else:
             self._path_template.mad_prefix = ''
 

@@ -17,11 +17,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+import os
 import copy
+import logging
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import uic
 
 import Qt4_queue_item
 import Qt4_GraphicsManager as graphics_manager
@@ -49,11 +51,8 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
-        _lines_groupbox = QtGui.QGroupBox("Line", self)
-        self._lines_listwidget = QtGui.QListWidget(_lines_groupbox)
-        self._lines_listwidget.setSelectionMode(\
-              QtGui.QAbstractItemView.MultiSelection)
-        self._lines_listwidget.setMinimumHeight(70)
+        self._lines_widget = uic.loadUi(os.path.join(\
+            os.path.dirname(__file__), "ui_files/Qt4_helical_line_widget_layout.ui"))
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
@@ -70,19 +69,13 @@ class CreateHelicalWidget(CreateTaskBase):
              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _lines_groupbox_vlayout = QtGui.QVBoxLayout(_lines_groupbox)
-        _lines_groupbox_vlayout.addWidget(self._lines_listwidget)
-        _lines_groupbox_vlayout.setSpacing(2)
-        _lines_groupbox_vlayout.addStretch(0)
-        _lines_groupbox_vlayout.setContentsMargins(0, 4, 0, 0)
-
         _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
         _data_path_gbox_layout.addWidget(self._data_path_widget)
         _data_path_gbox_layout.setSpacing(0)
         _data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(_lines_groupbox)
+        _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_gbox)
         _main_vlayout.addWidget(self._processing_widget)
@@ -93,8 +86,12 @@ class CreateHelicalWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._lines_listwidget.itemSelectionChanged.connect(\
-             self.lines_listwidget_selection_changed)
+        self._lines_widget.lines_treewidget.itemSelectionChanged.connect(\
+             self.lines_treewidget_selection_changed)
+        self._lines_widget.create_line_button.clicked.connect(\
+             self.create_line_button_clicked)
+        self._lines_widget.remove_line_button.clicked.connect(\
+             self.remove_line_button_clicked)  
 
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
@@ -131,26 +128,37 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
-            self._lines_listwidget.addItem(shape.get_full_name())
-            new_item = self._lines_listwidget.item(self._lines_listwidget.count() - 1)
-            new_item.setSelected(True)
-            self._lines_map[shape] = new_item
+            self._lines_widget.lines_treewidget.clearSelection()
+            info_str_list = QtCore.QStringList()
+            info_str_list.append(shape.get_display_name())
+            info_str_list.append("%d" % shape.get_points_index()[0])
+            info_str_list.append("%d" % shape.get_points_index()[1])
+            
+            lines_treewidget_item = QtGui.QTreeWidgetItem(\
+                self._lines_widget.lines_treewidget,
+                info_str_list)
+            lines_treewidget_item.setSelected(True)
+            self._lines_map[shape] = lines_treewidget_item
+
+            self.lines_treewidget_selection_changed()
 
     def shape_deleted(self, shape, shape_type):
         if self._lines_map.get(shape):
-            shape_index = self._lines_listwidget.indexFromItem(\
-                 self._lines_map[shape])
-            self._lines_listwidget.removeItem(shape_index.row())
+            shape_index = self._lines_widget.lines_treewidget.\
+                 indexFromItem(self._lines_map[shape])
+            self._lines_widget.lines_treewidget.\
+                 takeTopLevelItem(shape_index.row())
             self._lines_map.pop(shape)
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
    
-        if len(self._lines_listwidget.selectedItems()) == 0:
+        if len(self._lines_widget.lines_treewidget.selectedItems()) == 0:
             logging.getLogger("user_level_log").\
                 warning("No lines selected, please select one or more lines.")
-
-        return base_result and len(self._lines_listwidget.selectedItems()) > 0
+            return False
+        else:
+            return base_result
             
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
@@ -276,6 +284,18 @@ class CreateHelicalWidget(CreateTaskBase):
 
         return data_collections
 
-    def lines_listwidget_selection_changed(self):
+    def lines_treewidget_selection_changed(self):
         for shape, list_item in self._lines_map.iteritems():
             shape.setSelected(list_item.isSelected())
+
+    def create_line_button_clicked(self):
+        self._graphics_manager_hwobj.create_line()
+
+    def remove_line_button_clicked(self):
+        line_object_to_delete = None
+        for line, treewidget_item in self._lines_map.iteritems():
+            if treewidget_item.isSelected():
+                line_to_delete = line
+                break
+        if line_to_delete:
+            self._graphics_manager_hwobj.delete_shape(line_to_delete)

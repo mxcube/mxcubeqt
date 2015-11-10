@@ -97,8 +97,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
 
-        self._advanced_methods_widget.grid_listwidget.currentItemChanged.\
-             connect(self.grid_listwidget_item_selection_changed)
+        self._advanced_methods_widget.grid_treewidget.itemSelectionChanged.\
+             connect(self.grid_treewidget_item_selection_changed)
+        self._advanced_methods_widget.draw_grid_button.clicked.\
+             connect(self.draw_grid_button_clicked)
+        self._advanced_methods_widget.remove_grid_button.clicked.\
+             connect(self.remove_grid_button_clicked)
 
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
@@ -155,7 +159,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             self._acquisition_parameters.energy = energy
             self._acquisition_parameters.transmission = transmission
 
-            self.grid_listwidget_item_selection_changed()
+            self.grid_treewidget_item_selection_changed()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
@@ -167,7 +171,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         method_name = str(self._advanced_methods_widget.method_combo.\
                 currentText()).title().replace(' ', '')
-        if len(self._advanced_methods_widget.grid_listwidget.selectedItems()) == 0:
+        if len(self._advanced_methods_widget.grid_treewidget.selectedItems()) == 0:
             logging.getLogger("user_level_log").error("No grid selected")
             result = False 
 
@@ -211,8 +215,8 @@ class CreateAdvancedWidget(CreateTaskBase):
             self.get_acquisition_widget().use_osc_start(True)
         else:
             self.setDisabled(True)
-        #if self._advanced_methods_widget.grid_listwidget.count() > 0:
-        #    self._advanced_methods_widget.grid_listwidget.clearSelection() 
+        #if self._advanced_methods_widget.grid_treewidget.count() > 0:
+        #    self._advanced_methods_widget.grid_treewidget.clearSelection() 
   
     def _create_task(self,  sample, shape):
         """
@@ -254,45 +258,83 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Grid":
-            self._advanced_methods_widget.grid_listwidget.clearSelection()
-            self._advanced_methods_widget.grid_listwidget.addItem(shape.get_full_name())            
-            new_item = self._advanced_methods_widget.grid_listwidget.item(\
-                self._advanced_methods_widget.grid_listwidget.count() - 1)
-            self._grid_map[shape] = new_item
-            new_item.setSelected(True)
+            self._advanced_methods_widget.grid_treewidget.clearSelection()
+            grid_properties = shape.get_properties()
+            info_str_list = QtCore.QStringList()
+            info_str_list.append(grid_properties["name"])
+            info_str_list.append("%d" % grid_properties["beam_x"])
+            info_str_list.append("%d" % grid_properties["beam_y"])
+            info_str_list.append("%d" % grid_properties["num_lines"])
+            info_str_list.append("%d" % grid_properties["num_images_per_line"])
+
+            grid_treewidget_item = QtGui.QTreeWidgetItem(\
+                self._advanced_methods_widget.grid_treewidget,
+                info_str_list)
+            grid_treewidget_item.setSelected(True)
+            self._grid_map[shape] = grid_treewidget_item
+
+            self.grid_treewidget_item_selection_changed()
             
-            self._advanced_methods_widget.grid_listwidget.setCurrentItem(new_item)
-            shape.setSelected(True)
-            self.grid_listwidget_item_selection_changed()
-  
     def shape_deleted(self, shape, shape_type):
         if self._grid_map.get(shape):
-            shape_index = self._advanced_methods_widget.grid_listwidget.\
-                 indexFromItem(self._grid_map[shape])
-            self._advanced_methods_widget.grid_listwidget.takeItem(shape_index.row())
+            treewidget_item_modelindex = self._advanced_methods_widget.\
+                 grid_treewidget.indexFromItem(self._grid_map[shape])
+            self._advanced_methods_widget.grid_treewidget.takeTopLevelItem(\
+                 treewidget_item_modelindex.row())
             self._grid_map.pop(shape) 
 
-    def grid_listwidget_item_selection_changed(self):
-        for grid, listwidget_item in self._grid_map.iteritems():
-            if listwidget_item.isSelected():
-                grid_properties = grid.get_properties() 
-                cell_count = grid_properties.get("num_lines") * \
-                             grid_properties.get("num_images_per_line")
-                self._acq_widget.acq_widget_layout.num_images_ledit.setText("%d" % cell_count)
-                self._acq_widget.acq_widget_layout.first_image_ledit.\
-                     setText("%d" % grid_properties.get("first_image_num"))
-                centred_point = grid.get_centred_position()
+    def grid_treewidget_item_selection_changed(self):
+        self._advanced_methods_widget.remove_grid_button.setEnabled(False)
+        for grid_object, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                grid_properties = grid_object.get_properties() 
+                cell_count = grid_properties["num_lines"] * \
+                             grid_properties["num_images_per_line"]
+                self._acq_widget.acq_widget_layout.num_images_ledit.setText(\
+                     "%d" % cell_count)
+                self._acq_widget.acq_widget_layout.first_image_ledit.setText(\
+                     "%d" % grid_properties["first_image_num"])
+                centred_point = grid_object.get_centred_position()
                 self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
                      "%.2f" % float(centred_point.phi))
                 self._acq_widget.acq_widget_layout.kappa_ledit.setText(\
                      "%.2f" % float(centred_point.kappa))
                 self._acq_widget.acq_widget_layout.kappa_phi_ledit.setText(\
                      "%.2f" % float(centred_point.kappa_phi))
-                grid.setSelected(True) 
+                self._advanced_methods_widget.hor_spacing_ledit.setText(\
+                     "%.2f" % float(grid_properties["xOffset"]))
+                self._advanced_methods_widget.ver_spacing_ledit.setText(\
+                     "%.2f" % float(grid_properties["yOffset"]))
+                grid_object.setSelected(True) 
+                self._advanced_methods_widget.remove_grid_button.setEnabled(True)
             else:
-                grid.setSelected(False)
+                grid_object.setSelected(False)
 
     def get_selected_grid(self):
-        for grid, listwidget_item in self._grid_map.iteritems():
-            if listwidget_item.isSelected():
-                return grid 
+        for grid_object, grid_treewidget_item in self._grid_map.iteritems():
+            if grid_treewidget_item.isSelected():
+                return grid_object
+
+    def draw_grid_button_clicked(self):
+        self._graphics_manager_hwobj.create_grid(self.get_spacing())
+
+    def remove_grid_button_clicked(self):
+        grid_to_delete = None 
+        for grid, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                grid_to_delete = grid
+                break
+        if grid_to_delete:
+            self._graphics_manager_hwobj.delete_shape(grid_to_delete)                
+
+    def get_spacing(self):
+        spacing = [0, 0]
+        try:
+           spacing[0] = float(self._advanced_methods_widget.\
+               hor_spacing_ledit.text())
+           spacing[1] = float(self._advanced_methods_widget.\
+               ver_spacing_ledit.text())
+        except:
+           pass
+        return spacing
+
