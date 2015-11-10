@@ -30,7 +30,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_Graphics'
+__category__ = 'Graphics'
 
 
 class Qt4_GraphicsManagerBrick(BlissWidget):
@@ -97,12 +97,8 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
              self.create_point_accept_button_clicked)
         self.manager_widget.create_line_button.clicked.connect(\
              self.create_line_button_clicked)
-        self.manager_widget.create_grid_drag_button.clicked.connect(\
-             self.create_grid_drag_button_clicked)
-        self.manager_widget.create_grid_click_button.clicked.connect(\
-             self.create_grid_click_button_clicked)
-        self.manager_widget.create_grid_auto_button.clicked.connect(\
-             self.create_grid_auto_button_clicked)
+        self.manager_widget.draw_grid_button.clicked.connect(\
+             self.draw_grid_button_clicked)
 
         #self.manager_widget.shapes_treewidget.currentItemChanged.connect(\
         #     self.shape_treewiget_current_item_changed)
@@ -131,7 +127,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.main_groupbox.setCheckable(True)
         self.main_groupbox.setChecked(False)
         self.main_groupbox_toggled(False)
-        self.main_groupbox.setToolTip("Click to open/close graphic item manager")
+        self.main_groupbox.setToolTip("Click to open/close item manager")
 
     def propertyChanged(self, property, oldValue, newValue):
         """
@@ -163,7 +159,6 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         info_str_list = QtCore.QStringList()
         info_str_list.append(str(self.manager_widget.shapes_treewidget.topLevelItemCount() + 1))
         info_str_list.append(shape.get_display_name())
-        info_str_list.append("0, 0")
         info_str_list.append(str(True))
         info_str_list.append(str(True))
         info_str_list.append(str(shape.used_count)) 
@@ -228,6 +223,8 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             self.__line_map[shape].setSelected(selected_state)
         if self.__grid_map.get(shape):
             self.__grid_map[shape].setSelected(selected_state)
+        self.manager_widget.change_color_button.setEnabled(\
+             len(self.graphics_manager_hwobj.get_selected_shapes()) > 0)
 
     def centring_in_progress_changed(self, centring_in_progress):
         if centring_in_progress:
@@ -246,18 +243,8 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
     def change_color_clicked(self):
         color = QtGui.QColorDialog.getColor()
         if color.isValid():
-            for item in self.get_selected_shapes():
+            for item in self.graphics_manager_hwobj.get_selected_shapes():
                 item.set_base_color(color)
-
-    def get_selected_shapes(self):
-        #Probably there is much easier way to do thos
-        selected_shapes = []
-        for item_index in range(self.manager_widget.shapes_treewidget.topLevelItemCount()):
-            tree_widget_item = self.manager_widget.shapes_treewidget.topLevelItem(item_index)
-            shape = [key for key, value in self.__shape_map.iteritems() if value == tree_widget_item][0]
-            if not shape in selected_shapes:
-                selected_shapes.append(shape)
-        return selected_shapes
 
     def display_all_button_clicked(self):
         for shape, treewidget_item in self.__shape_map.iteritems():
@@ -281,35 +268,35 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
     def create_line_button_clicked(self):
         self.graphics_manager_hwobj.create_line()
 
-    def create_grid_drag_button_clicked(self):
-        self.graphics_manager_hwobj.create_grid_drag(self.get_spacing())
+    def draw_grid_button_clicked(self):
+        self.graphics_manager_hwobj.create_grid(self.get_spacing())
 
-    def create_grid_click_button_clicked(self):
-        pass
-
-    def create_grid_auto_button_clicked(self):
-        pass
-    
     def show_shape_treewidget_popup(self, item, point, col):
         menu = QtGui.QMenu(self.manager_widget.shapes_treewidget)
 
     def get_spacing(self):
         spacing = [0, 0]
         try:
-           spacing[0] = float(self.manager_widget.hor_spacing_ledit.text()) / 1000.0
-           spacing[1] = float(self.manager_widget.ver_spacing_ledit.text()) / 1000.0
+           spacing[0] = float(self.manager_widget.hor_spacing_ledit.text())
+           spacing[1] = float(self.manager_widget.ver_spacing_ledit.text())
         except:
            pass 
         return spacing
 
     def toggle_buttons_enabled(self):
-        self.manager_widget.display_points_cbox.setEnabled(len(self.__shape_map) > 0)
-        self.manager_widget.display_lines_cbox.setEnabled(len(self.__shape_map) > 0)
-        self.manager_widget.display_grids_cbox.setEnabled(len(self.__shape_map) > 0)
+        self.manager_widget.display_points_cbox.\
+             setEnabled(len(self.__shape_map) > 0)
+        self.manager_widget.display_lines_cbox.\
+             setEnabled(len(self.__shape_map) > 0)
+        self.manager_widget.display_grids_cbox.\
+             setEnabled(len(self.__shape_map) > 0)
 
-        self.manager_widget.display_all_button.setEnabled(len(self.__shape_map) > 0)
-        self.manager_widget.hide_all_button.setEnabled(len(self.__shape_map) > 0)
-        self.manager_widget.clear_all_button.setEnabled(len(self.__shape_map) > 0)
+        self.manager_widget.display_all_button.\
+             setEnabled(len(self.__shape_map) > 0)
+        self.manager_widget.hide_all_button.\
+             setEnabled(len(self.__shape_map) > 0)
+        self.manager_widget.clear_all_button.\
+             setEnabled(len(self.__shape_map) > 0)
  
     def shape_treewiget_item_clicked(self, current_item, column): 
         for key, value in self.__shape_map.iteritems():

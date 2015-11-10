@@ -62,22 +62,21 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         Qt4_widget_colors.set_widget_color(self.state_label,
                                            self.STATES['unknown']) 
         self.state_label.setAlignment(QtGui.QLabel.AlignCenter)
-        self.unlock_door_button = QtGui.QPushButton(Qt4_Icons.load_icon("EnterHutch"),
+        self.unlock_door_button = QtGui.QPushButton(\
+             Qt4_Icons.load_icon("EnterHutch"),
              "Unlock", self.main_groupbox)
 
         # Layout -------------------------------------------------------------- 
-        _main_gbox_vlayout = QtGui.QVBoxLayout()
+        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_groupbox)
         _main_gbox_vlayout.addWidget(self.state_label)
         _main_gbox_vlayout.addWidget(self.unlock_door_button)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(0, 4, 4, 0)
-        self.main_groupbox.setLayout(_main_gbox_vlayout)
 
-        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_groupbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
 
@@ -117,7 +116,6 @@ class Qt4_DoorInterlockBrick(BlissWidget):
             if self.door_interlock_hwobj is not None:
                 self.connect(self.door_interlock_hwobj, QtCore.SIGNAL('doorInterlockStateChanged'), self.state_changed)
                 self.state_changed(self.door_interlock_hwobj.getState())
-            print self.door_interlock_hwobj
             self.setDisabled(self.door_interlock_hwobj is None)
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)

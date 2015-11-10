@@ -42,13 +42,12 @@ class Qt4_PlateBrick(BlissWidget):
         self.plate_manipulator_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.navigation_label_pixmap = None
         self.num_cols = None
         self.num_rows = None
         self.num_drops = None
         self.current_location = None
         self.plate_content = None
-        self.xtal_listview_map = None
+        self.xtal_map = None
 
         # Properties ----------------------------------------------------------
         self.addProperty("mnemonic", "string", "")
@@ -78,21 +77,25 @@ class Qt4_PlateBrick(BlissWidget):
 
         self.plate_widget.sample_table.itemDoubleClicked.connect(\
              self.sample_table_double_clicked)
-
-        #qt.QObject.connect(self.plate_widget.xtal_treewidget, 
-        #                   qt.SIGNAL('selectionChanged(QListViewItem *)'), 
-        #                   self.xtal_selected)
+        self.plate_widget.xtal_treewidget.currentItemChanged.connect(\
+             self.xtal_treewidget_current_item_changed)
         # Other ---------------------------------------------------------------
-        self.navigation_graphicsscene = QtGui.QGraphicsScene(\
-             self.plate_widget.navigation_graphicsview)
-        self.navigation_item = NavigationItem(self.navigation_graphicsscene)
+        self.navigation_graphicsscene = QtGui.QGraphicsScene(self)
+        self.plate_widget.navigation_graphicsview.setScene(\
+             self.navigation_graphicsscene)
+        self.navigation_item = NavigationItem(self)
+        #self.navigation_item.mouseDoubleClickedSignal.connect(\
+        #     self.navigation_item_double_clicked)
         self.navigation_graphicsscene.addItem(self.navigation_item)
         self.navigation_graphicsscene.update()
  
-        self.xtal_image_graphicsscene = QtGui.QGraphicsScene(\
-             self.plate_widget.xtal_image_graphicsview)
-        self.xtal_image_pixmap = QtGui.QGraphicsPixmapItem()
-        self.xtal_image_graphicsscene.addItem(self.xtal_image_pixmap)
+        self.xtal_image_graphicsscene = QtGui.QGraphicsScene(self)
+        self.plate_widget.xtal_image_graphicsview.setScene(\
+             self.xtal_image_graphicsscene)
+        self.xtal_image_pixmap = QtGui.QPixmap()  
+        self.xtal_image_graphics_pixmap = QtGui.QGraphicsPixmapItem()
+        self.xtal_image_graphicsscene.addItem(\
+             self.xtal_image_graphics_pixmap)
 
         self.plate_widget.sample_table.setEditTriggers(\
              QtGui.QAbstractItemView.NoEditTriggers)
@@ -108,7 +111,7 @@ class Qt4_PlateBrick(BlissWidget):
                                 self.refresh_plate_location)
             self.plate_manipulator_hwobj = self.getHardwareObject(newValue)
             if self.plate_manipulator_hwobj:
-                self.init_plate_view(self.plate_manipulator_hwobj.get_plate_info())
+                self.init_plate_view()
                 #self.connect(self.plate_manipulator_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                 #             self.sample_load_state_changed)
                 self.connect(self.plate_manipulator_hwobj, 
@@ -125,7 +128,7 @@ class Qt4_PlateBrick(BlissWidget):
         Descript. : when user double clicks on plate table then sample in
                     corresponding cell is loaded
         """
-        item = "%s%d:%d" %(chr(65 + table_item.row()), table_item.column() + 1, 1) 
+        item = [table_item.row(), table_item.column()]
         self.plate_manipulator_hwobj.load(item)
 
     def search_button_clicked(self):
@@ -137,7 +140,7 @@ class Qt4_PlateBrick(BlissWidget):
             self.plate_content = self.plate_manipulator_hwobj.sync_with_crims(\
                  self.plate_widget.barcode_ledit.text())
             if self.plate_content:
-                self.xtal_listview_map = {}
+                self.xtal_map = {}
                 self.refresh_plate_content()
             else:
                 self.clear_view()
@@ -148,41 +151,32 @@ class Qt4_PlateBrick(BlissWidget):
         self.xtal_image_label.setPixmap(self.xtal_image_label_pixmap)
 
     def move_to_xtal_clicked(self):
-        xtal_item = self.xtal_listview_map.get(\
+        xtal_item = self.xtal_map.get(\
               self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
-            self.plate_manipulator_hwobj._doLoad(xtal_item), 
+            self.plate_manipulator_hwobj.load(xtal_item), 
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):
         if self.plate_manipulator_hwobj:
             self.plate_manipulator_hwobj.abort()
   
-    def xtal_selected(self, xtal_treewidget_item):
-        xtal_item = self.xtal_listview_map.get(xtal_treewidget_item)
-        xtal_image_string = None
-        if xtal_item:
-            xtal_image_string = xtal_item.getImage()
-
-        self.xtal_image_label_pixmap.fill(qt.Qt.white)
+    def xtal_treewidget_current_item_changed(self, current_item):
+        xtal_item = self.xtal_map.get(current_item)
+        xtal_image_string = xtal_item.getImage()
         if xtal_image_string:
-             self.xtal_image_label_pixmap.loadFromData(xtal_image_string)
-             xtal_image_width = self.xtal_image_label_pixmap.width()
-             xtal_image_height = self.xtal_image_label_pixmap.height()
-             self.xtal_image_label.setFixedWidth(xtal_image_width)
-             self.xtal_image_label.setFixedHeight(xtal_image_height)
-             pos_x = int(xtal_image_width * xtal_item.offsetX)
-             pos_y = int(xtal_image_height * xtal_item.offsetY)
-
-             self.xtal_image_painter.setBrush(QtGui.QBrush(\
-                  QtGui.QColor(0, 0, 150), QtCore.Qt.SolidPattern))
-             self.xtal_image_painter.setPen(QtGui.QPen(\
-                  QtCore.Qt.yellow, 1, QtCore.Qt.SolidLine))
-             self.xtal_image_painter.drawLine(0, pos_y,
-                  self.xtal_image_label_pixmap.width(), pos_y)
-             self.xtal_image_painter.drawLine(pos_x, 0, 
-                  pos_x, self.xtal_image_label_pixmap.height())
-        self.xtal_image_label.setPixmap(self.xtal_image_label_pixmap)
+            #self.xtal_image_label_pixmap.loadFromData(xtal_image_string)
+            self.xtal_image_pixmap.loadFromData(xtal_image_string)
+            self.xtal_image_graphics_pixmap.setPixmap(self.xtal_image_pixmap)
+            return
+            
+            xtal_image_width = self.xtal_image_label_pixmap.width()
+            xtal_image_height = self.xtal_image_label_pixmap.height()
+            self.xtal_image_label.setFixedWidth(xtal_image_width)
+            self.xtal_image_label.setFixedHeight(xtal_image_height)
+            pos_x = int(xtal_image_width * xtal_item.offsetX)
+            pos_y = int(xtal_image_height * xtal_item.offsetY)
+            self.xtal_image_label.set_image(xtal_image)
 
     def refresh_plate_content(self):
         self.plate_widget.xtal_treewidget.clear()
@@ -192,7 +186,9 @@ class Qt4_PlateBrick(BlissWidget):
         root_item = QtGui.QTreeWidgetItem(self.plate_widget.xtal_treewidget,
                                           info_str_list)
         root_item.setExpanded(True)
-        for xtal in self.plate_content.Plate.Xtal:
+        print "refresh"
+        for xtal in self.plate_content.Plate.xtal_list:
+            print xtal
             xtal_address = "%s:%d" % (xtal.Row, xtal.Column + 1)
             cell_treewidget_item = None
             #cell_treewidget_item = self.plate_widget.xtal_treewidget.\
@@ -211,7 +207,8 @@ class Qt4_PlateBrick(BlissWidget):
             xtal_treewidget_item = QtGui.QTreeWidgetItem(\
                  cell_treewidget_item, info_str_list)
             #self.plate_widget.xtal_treewidget.ensureItemVisible(xtal_treewidget_item) 
-            self.xtal_listview_map[xtal_treewidget_item] = xtal
+            self.xtal_map[xtal_treewidget_item] = xtal
+
             self.plate_widget.sample_table.item(\
                  ord(xtal.Row.upper()) - ord('A'), xtal.Column - 1).\
                  setBackground(Qt4_widget_colors.LIGHT_GREEN)
@@ -254,10 +251,12 @@ class Qt4_PlateBrick(BlissWidget):
             #self.plate_widget.xtal_treewidget.setCurrentItem(\
             #     self.xtal_.firstChild())
 
-    def init_plate_view(self, plate_info):
+    def init_plate_view(self):
         """
         Descript. : initalizes plate info
         """
+        plate_info = self.plate_manipulator_hwobj.get_plate_info()
+
         self.num_cols = plate_info.get("num_cols", 12)
         self.num_rows = plate_info.get("num_rows", 8)
         self.num_drops = plate_info.get("num_drops", 3)
@@ -287,16 +286,30 @@ class Qt4_PlateBrick(BlissWidget):
         self.plate_widget.sample_table.setFixedHeight(table_height)
         self.plate_widget.navigation_graphicsview.setFixedHeight(table_height)
         self.navigation_item.set_size(120, table_height)
+        #self.navigation_graphicsscene.setSceneRect(0, 0, 116, table_height - 4)
+        self.navigation_item.set_num_drops_per_cell(\
+             self.plate_manipulator_hwobj.get_num_drops_per_cell())
         self.refresh_plate_location()
 
+    def navigation_item_double_clicked(self, pos_x, pos_y):
+        self.plate_manipulator_hwobj.move_to_xy(pos_x, pos_y)
+
 class NavigationItem(QtGui.QGraphicsItem):
+
     def __init__(self, parent=None):
         QtGui.QGraphicsItem.__init__(self)
+
+        self.parent = parent
         self.rect = QtCore.QRectF(0, 0, 0, 0)
+        self.setPos(0, 0)
         self.setMatrix = QtGui.QMatrix()
+ 
+        self.__num_drops = None
+        self.__navigation_posx = None
+        self.__navigation_posy = None
     
     def boundingRect(self):
-        return self.rect.adjusted(-2, -2, 2, 2)
+        return self.rect.adjusted(0, 0, 0, 0)
 
     def set_size(self, width, height):
         self.rect.setWidth(width)
@@ -307,10 +320,31 @@ class NavigationItem(QtGui.QGraphicsItem):
         pen.setWidth(1)
         pen.setColor(QtCore.Qt.black)
         painter.setPen(pen)
-        painter.drawRect(2, 2, 20, 20)  
-        painter.drawRect(self.rect) 
-  
-   
+        if self.__num_drops:
+            for drop_index in range(self.__num_drops):
+                pos_y = float(drop_index + 1) / (self.__num_drops + 1) * \
+                     self.scene().height()
+                painter.drawLine(58, pos_y - 2, 62, pos_y + 2)
+                painter.drawLine(62, pos_y - 2, 58, pos_y + 2)             
+        pen.setColor(QtCore.Qt.blue)
+        painter.setPen(pen)
+        if self.__navigation_posx and self.__navigation_posy:
+            painter.drawLine(self.__navigation_posx - 10, self.__navigation_posy, 
+                             self.__navigation_posx + 10, self.__navigation_posy)
+            painter.drawLine(self.__navigation_posx, self.__navigation_posy - 10, 
+                             self.__navigation_posx, self.__navigation_posy + 10)
+
     def set_navigation_pos(self, pos_x, pos_y):
-        self.navigation_posx = pos_x
-        self.navigation_posy = pos_y
+        self.__navigation_posx = pos_x
+        self.__navigation_posy = pos_y
+        self.scene().update()
+ 
+    def set_num_drops_per_cell(self, num_drops):
+        self.__num_drops = num_drops 
+ 
+    def mouseDoubleClickEvent(self, event):
+        position = QtCore.QPointF(event.pos())
+        #this is ugly.
+        self.parent.navigation_item_double_clicked(\
+              position.x() / self.scene().width(), 
+              position.y() / self.scene().height())

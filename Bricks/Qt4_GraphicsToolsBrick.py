@@ -98,12 +98,6 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridDrag"),
              "Grid with drag and drop", self.create_grid_drag_clicked)
         temp_action.setShortcut("Ctrl+4")
-        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridClick"),
-             "Grid with 2 clicks", self.create_grid_click_clicked) 
-        temp_action.setShortcut("Ctrl+5")
-        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridAuto"),
-             "Automatic grid", self.create_grid_auto_clicked) 
-        temp_action.setShortcut("Ctrl+6")
         temp_action = self.tools_menu.addAction("Select all centring points",
              self.select_all_points_clicked)
         temp_action.setShortcut("Ctrl+7")
@@ -207,12 +201,6 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
     def create_grid_drag_clicked(self):
         self.graphics_manager_hwobj.create_grid_drag()
 
-    def create_grid_click_clicked(self):
-        self.graphics_manager_hwobj.create_grid_click()
-
-    def create_grid_auto_clicked(self):
-        self.graphics_manager_hwobj.create_grid_auto()
-    
     def move_beam_mark_clicked(self):
         self.graphics_manager_hwobj.start_move_beam_mark()
 

@@ -56,6 +56,10 @@ class QueueItem(QtGui.QTreeWidgetItem):
         self._previous_check_state = False
         self._font_is_bold = False
         self.setText(1, '')         
+ 
+    def listView(self):
+        #remove this
+        return self.treeWidget()
 
     def setOn(self, state):
         """
@@ -205,6 +209,8 @@ class SampleQueueItem(QueueItem):
             bold_fond = self.font(1)
             bold_fond.setBold(True)
             self.setFont(1, bold_fond)
+            if self.parent():
+                self.parent().setExpanded(True)
         else:
             self.setIcon(0, QtGui.QIcon())
 

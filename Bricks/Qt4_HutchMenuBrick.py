@@ -83,7 +83,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.reject_button = MonoStateButton(self, "Reject", "ThumbDown")
         self.reject_button.hide()
         self.create_line_button = MonoStateButton(self, "Line", "Line")
-        self.create_grid_button = MonoStateButton(self, "Grid", "GridDrag")
+        self.draw_grid_button = MonoStateButton(self, "Grid", "Grid")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
@@ -122,7 +122,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _main_vlayout.addWidget(self.accept_button)
         _main_vlayout.addWidget(self.reject_button)
         _main_vlayout.addWidget(self.create_line_button)
-        _main_vlayout.addWidget(self.create_grid_button)
+        _main_vlayout.addWidget(self.draw_grid_button)
         _main_vlayout.addWidget(self.snapshot_button)
         _main_vlayout.addWidget(self.refresh_camera_button)
         _main_vlayout.addWidget(self.visual_align_button)
@@ -139,7 +139,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.accept_button.clicked.connect(self.accept_clicked)
         self.reject_button.clicked.connect(self.reject_clicked)
         self.create_line_button.clicked.connect(self.create_line_clicked)
-        self.create_grid_button.clicked.connect(self.create_grid_clicked)
+        self.draw_grid_button.clicked.connect(self.draw_grid_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
         self.refresh_camera_button.clicked.connect(self.refresh_camera_clicked)
         self.visual_align_button.clicked.connect(self.visual_align_clicked)
@@ -158,7 +158,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.reject_button.setToolTip("Reject centring")
         self.create_line_button.setToolTip("Create helical line between \n" + \
              "two points (Ctrl+3)")
-        self.create_grid_button.setToolTip("Create grid with drag and drop (Ctrl+4)")
+        self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+4)")
         self.select_all_button.setToolTip("Select all centring points (Ctrl+7)")
         self.clear_all_button.setToolTip("Clear all items (Ctrl+8)")
         #self.instanceSynchronize("")
@@ -365,8 +365,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
 
-    def create_grid_clicked(self):
-        self.graphics_manager_hwobj.create_grid_drag()
+    def draw_grid_clicked(self):
+        self.graphics_manager_hwobj.create_grid()
 
     def diffractometer_ready_changed(self, is_ready):
         self.setEnabled(is_ready)

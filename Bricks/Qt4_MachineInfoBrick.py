@@ -89,7 +89,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
         self.cryo_value_label.setFont(bold_font)
         self.cryo_value_label.setAlignment(QtCore.Qt.AlignCenter)
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.current_label)
         _main_vlayout.addWidget(self.current_value_label)
         _main_vlayout.addWidget(self.state_text_label)
@@ -106,11 +106,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
         _main_vlayout.addWidget(self.cryo_value_label)
         _main_vlayout.setSpacing(1)
         _main_vlayout.setContentsMargins(1, 1, 1, 1)
-        self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
-        #self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-        #                   QtGui.QSizePolicy.Fixed)
 
         # Other --------------------------------------------------------------- 
         self.setToolTip("Main information about current, state, " + \
