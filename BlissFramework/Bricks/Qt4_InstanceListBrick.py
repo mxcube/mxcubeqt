@@ -192,14 +192,13 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.externalUserInfoDialog=ExternalUserInfoDialog()
 
         # Layout --------------------------------------------------------------
-        _my_name_widget_layout = QtGui.QHBoxLayout(self)
+        _my_name_widget_layout = QtGui.QHBoxLayout(_my_name_widget)
         _my_name_widget_layout.addWidget(_my_name_label)
         _my_name_widget_layout.addWidget(self.nickname_ledit)
         #_my_name_widget_layout.addStretch(0)
         _my_name_widget_layout.setContentsMargins(0, 0, 0, 0)       
-        _my_name_widget.setLayout(_my_name_widget_layout)
 
-        _main_gbox_vlayout = QtGui.QVBoxLayout(self)
+        _main_gbox_vlayout = QtGui.QVBoxLayout(_main_gbox)
         _main_gbox_vlayout.addWidget(self.users_listwidget)
         _main_gbox_vlayout.addWidget(self.give_control_chbox)
         _main_gbox_vlayout.addWidget(self.allow_timeout_control_chbox)
@@ -208,13 +207,11 @@ class Qt4_InstanceListBrick(BlissWidget):
         _main_gbox_vlayout.addWidget(_my_name_widget)
         _main_gbox_vlayout.setSpacing(0)
         _main_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-        _main_gbox.setLayout(_main_gbox_vlayout) 
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
         _main_vlayout.setSpacing(1)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
         
         # SizePolicies --------------------------------------------------------
         #self.take_control_button.setSizePolicy(QtGui.QSizePolicy.Expanding,
@@ -231,6 +228,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.timeout_timer = QtCore.QTimer(self)
         self.timeout_timer.timeout.connect(self.timeoutApproaching)
+
 
     def propertyChanged(self, propertyName, oldValue, newValue):
         """

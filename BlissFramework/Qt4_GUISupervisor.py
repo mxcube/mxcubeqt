@@ -96,7 +96,6 @@ class GUISupervisor(QtGui.QWidget):
         self.splashScreen.show()
         self.timestamp = 0
 
-                
     def loadGUI(self, GUIConfigFile):
         self.configuration = Qt4_Configuration.Configuration()
         self.GUIConfigFile = GUIConfigFile
@@ -157,14 +156,10 @@ class GUISupervisor(QtGui.QWidget):
 
                         return mne_list
 
-                    if True:
-                        raw_config = eval(f.read())
-
-                        mnemonics = getMnemonics(raw_config)
-
-                        self.hardwareRepository.require(mnemonics)
-                    #finally:
-                        f.close()
+                    raw_config = eval(f.read())
+                    mnemonics = getMnemonics(raw_config)
+                    self.hardwareRepository.require(mnemonics)
+                    f.close()
 
                     try:
                         config = Qt4_Configuration.Configuration(raw_config)
@@ -433,14 +428,10 @@ class GUISupervisor(QtGui.QWidget):
 
         try:
             main_widget = None
-            
-            #try:
-            if True:
-                main_widget=self.loadGUI(GUIConfigFile)
-            #finally:
-                if main_widget:
-                  self.splashScreen.finish(main_widget)
-                del self.splashScreen
+            main_widget=self.loadGUI(GUIConfigFile)
+            if main_widget:
+                self.splashScreen.finish(main_widget)
+            del self.splashScreen
         except:
             logging.getLogger().exception("exception while loading GUI file")
             QtGui.QApplication.exit()

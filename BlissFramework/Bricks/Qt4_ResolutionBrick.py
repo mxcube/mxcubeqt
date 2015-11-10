@@ -64,8 +64,6 @@ class Qt4_ResolutionBrick(BlissWidget):
         self.addProperty('detectorDistance', 'string', '')
         self.addProperty('energy', 'string', '')
         self.addProperty('doorInterlock', 'string', '') 
-
-        self.addProperty('icons', 'string', '')
         self.addProperty('defaultMode', 'combo',('Ang','mm'),'Ang')
         self.addProperty('mmFormatString','formatString','###.##')
         self.addProperty('angFormatString','formatString','##.###')        
@@ -127,7 +125,7 @@ class Qt4_ResolutionBrick(BlissWidget):
                                        Qt4_widget_colors.LINE_EDIT_ACTIVE,
                                        QtGui.QPalette.Base)
         self.new_value_validator = QtGui.QDoubleValidator(self.new_value_ledit)
-        
+
     def propertyChanged(self, property_value, old_value, new_value):
         """
         Descript. : 
@@ -344,7 +342,7 @@ class Qt4_ResolutionBrick(BlissWidget):
         if resolution_ready:
             self.get_resolution_limits(False,True)
             curr_resolution = self.resolution_hwobj.getPosition()
-            self.resolution_changed(curr_resolution)
+            self.resolution_value_changed(curr_resolution)
             self.resolution_state_changed(self.resolution_hwobj.getState())
         else:
             self.resolution_state_changed(None)

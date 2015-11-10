@@ -44,12 +44,12 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.use_fixed_size = False
         self.graphics_items_initialized = None
         self.graphics_scene_size = None
         self.graphics_scene_fixed_size = None
         self.graphics_view = None
         self.graphics_camera_frame = None
+        self.fixed_size = None 
         self.use_fixed_size = None 
         self.display_beam = None
 
@@ -67,18 +67,18 @@ class Qt4_CameraBrick(BlissWidget):
 
         self.popup_menu = QtGui.QMenu(self)
         create_menu = self.popup_menu.addMenu("Create")
-        create_menu.addAction("Centring point with 3 clicks",
-                              self.create_point_click_clicked)
-        create_menu.addAction("Centring point on current position",
-                              self.create_point_current_clicked)
-        create_menu.addAction("Helical line",
-                              self.create_line_clicked)
-        create_menu.addAction("Grid with drag and drop",
-                              self.create_grid_drag_clicked)
-        create_menu.addAction("Grid with 2 click",
-                              self.create_grid_drag_clicked)
-        create_menu.addAction("Automatic grid",
-                              self.create_grid_auto_clicked)
+        temp_action = create_menu.addAction("Centring point with 3 clicks",
+            self.create_point_click_clicked)
+        temp_action.setShortcut("Ctrl+1")
+        temp_action = create_menu.addAction("Centring point on current position",
+            self.create_point_current_clicked)
+        temp_action.setShortcut("Ctrl+2")
+        temp_action = create_menu.addAction("Helical line",
+            self.create_line_clicked)
+        temp_action.setShortcut("Ctrl+3")
+        temp_action = create_menu.addAction("Grid with drag and drop",
+            self.create_grid_drag_clicked)
+        temp_action.setShortcut("Ctrl+4")
 
         measure_menu = self.popup_menu.addMenu("Measure")
         self.measure_distance_action = measure_menu.addAction(\
@@ -92,17 +92,33 @@ class Qt4_CameraBrick(BlissWidget):
         self.measure_area_action.setCheckable(True)         
 
         self.popup_menu.addSeparator()
+
         self.move_beam_mark_action = self.popup_menu.addAction(\
              "Move beam mark", self.move_beam_mark_toggled)
         self.display_histogram_action = self.popup_menu.addAction(\
              "Display histogram", self.display_histogram_toggled)
         self.define_histogram_action = self.popup_menu.addAction(\
              "Define histogram", self.define_histogram_clicked)
+        self.popup_menu.addSeparator()
 
-        #TODO implement
+        temp_action = self.popup_menu.addAction(\
+             "Select all centring points",
+             self.select_all_points_clicked)
+        temp_action.setShortcut("Ctrl+7")
+        temp_action = self.popup_menu.addAction(\
+             "Deselect all items",
+             self.deselect_all_items_clicked)
+        temp_action.setShortcut("Ctrl+8")
+        temp_action = self.popup_menu.addAction(\
+             "Clear all items",
+             self.clear_all_items_clicked)
+        temp_action.setShortcut("Ctrl+9")
+
         self.display_histogram_action.setEnabled(False)
         self.define_histogram_action.setEnabled(False)
-        self.popup_menu.addSeparator()
+
+        self.image_scale_menu = self.popup_menu.addMenu("Image scale")
+        self.image_scale_menu.setEnabled(False) 
         
         self.popup_menu.popup(QtGui.QCursor.pos())
 
@@ -137,7 +153,7 @@ class Qt4_CameraBrick(BlissWidget):
         if property_name == "mnemonic":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(self.graphics_manager_hwobj, 
-                                QtCore.SIGNAL('graphicsMouseMoved'),  
+                                QtCore.SIGNAL('mouseMoved'),  
                                 self.mouse_moved)
                 self.disconnect(self.graphics_manager_hwobj,
                                 QtCore.SIGNAL('measureDistanceStateChanged'),
@@ -151,14 +167,17 @@ class Qt4_CameraBrick(BlissWidget):
                 self.disconnect(self.graphics_manager_hwobj,
                                 QtCore.SIGNAL('moveBeamMarkStateChanged'),
                                 self.move_beam_mark_state_changed)
+                self.disconnect(self.graphics_manager_hwobj,
+                                QtCore.SIGNAL('imageScaleChanged'),        
+                                self.image_scaled)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value)
             if self.graphics_manager_hwobj is not None:
                 self.connect(self.graphics_manager_hwobj, 
-                             QtCore.SIGNAL('graphicsMouseMoved'), 
+                             QtCore.SIGNAL('mouseMoved'), 
                              self.mouse_moved)
                 self.connect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('measureDistanceStateChanged'),
-                                self.measure_distance_state_changed)
+                             QtCore.SIGNAL('measureDistanceStateChanged'),
+                             self.measure_distance_state_changed)
                 self.connect(self.graphics_manager_hwobj,
                              QtCore.SIGNAL('measureAngleStateChanged'),
                              self.measure_angle_state_changed)
@@ -168,11 +187,15 @@ class Qt4_CameraBrick(BlissWidget):
                 self.connect(self.graphics_manager_hwobj,
                              QtCore.SIGNAL('moveBeamMarkStateChanged'),
                              self.move_beam_mark_state_changed)
+                self.connect(self.graphics_manager_hwobj,
+                             QtCore.SIGNAL('imageScaleChanged'),
+                             self.image_scaled)
                 self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
                 self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 
                 self.main_layout.addWidget(self.graphics_view) 
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
+                self.init_image_zoom_list()
         elif property_name == 'fixedSize':
             try:
                 fixed_size = map(int, new_value.split())
@@ -196,6 +219,31 @@ class Qt4_CameraBrick(BlissWidget):
                  self.fixed_size, True)
             #self.setFixedSize(self.fixed_size[0], self.fixed_size[1])
 
+    def image_scaled(self, scale_value):
+        for index, action in enumerate(self.image_scale_menu.actions()):
+            action.setChecked(scale_value == self.image_scale_list[index])
+
+    def init_image_zoom_list(self):
+        self.image_scale_list = self.graphics_manager_hwobj.get_image_scale_list()
+        if len(self.image_scale_list) > 0:
+            self.image_scale_menu.setEnabled(True)
+            self.image_scale_menu.triggered.connect(self.image_scale_triggered)
+            for scale in self.image_scale_list:
+                #probably there is a way to use a single method for all actions
+                # by passing index. lambda function at first try did not work  
+                self.image_scale_menu.addAction("%d %%" % (scale * 100), self.not_used_function)
+            for action in self.image_scale_menu.actions():
+                action.setCheckable(True)
+            self.image_scaled(self.graphics_manager_hwobj.get_image_scale())
+
+    def not_used_function(self, *arg):
+        pass
+
+    def image_scale_triggered(self, selected_action):
+        for index, action in enumerate(self.image_scale_menu.actions()):
+            if selected_action == action:
+                self.graphics_manager_hwobj.set_image_scale(self.image_scale_list[index], action.isChecked())
+                
     def contextMenuEvent(self, event):
         self.popup_menu.popup(QtGui.QCursor.pos())
 
@@ -235,12 +283,6 @@ class Qt4_CameraBrick(BlissWidget):
     def create_grid_drag_clicked(self):
         self.graphics_manager_hwobj.create_grid_drag()
 
-    def create_grid_click_clicked(self):
-        self.graphics_manager_hwobj.create_grid_click()
- 
-    def create_grid_auto_clicked(self):
-        self.graphics_manager_hwobj.create_grid_auto()
-
     def move_beam_mark_toggled(self):
         self.graphics_manager_hwobj.start_move_beam_mark()
 
@@ -266,3 +308,12 @@ class Qt4_CameraBrick(BlissWidget):
         self.move_beam_mark_action.setChecked(False)
         self.move_beam_mark_action.setChecked(False)
         self.move_beam_mark_action.setChecked(state)
+
+    def select_all_points_clicked(self):
+        self.graphics_manager_hwobj.select_all_points()
+
+    def deselect_all_items_clicked(self):
+        self.graphics_manager_hwobj.de_select_all()
+
+    def clear_all_items_clicked(self):
+        self.graphics_manager_hwobj.clear_all()

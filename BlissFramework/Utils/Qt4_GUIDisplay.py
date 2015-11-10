@@ -52,6 +52,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.menu_data = None
         self.expert_pwd = None
         self.execution_mode = None
+        self.menu_items = []
 
         # Graphic elements ----------------------------------------------------
         #self.menubar = QtGui.QMenuBar(self) 
@@ -65,9 +66,10 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.view_toolbar_action = self.view_menu.addAction("Toolbar", 
              self.view_toolbar_clicked)
         self.view_toolbar_action.setCheckable(True)
-        self.view_graphics_manager_action = self.view_menu.addAction(\
-             "Graphics manager", self.view_graphics_manager_clicked)
-        self.view_graphics_manager_action.setCheckable(True)
+ 
+        #self.view_graphics_manager_action = self.view_menu.addAction(\
+        #     "Graphics manager", self.view_graphics_manager_clicked)
+        #self.view_graphics_manager_action.setCheckable(True)
 
         self.expert_mode_action.setCheckable(True) 
         self.help_menu = self.addMenu("Help") 
@@ -80,12 +82,19 @@ class CustomMenuBar(QtGui.QMenuBar):
 
 
         # Qt signal/slot connections ------------------------------------------
-        """QtCore.QObject.connect(self.expert_mode_checkbox, 
-                               QtCore.SIGNAL('clicked()'), 
-                               self.expert_mode_clicked)"""
 
         # Other ---------------------------------------------------------------
         self.expert_mode_checkboxStdColor=None
+        self.menu_items = [self.file_menu,
+                           self.view_menu,
+                           self.help_menu]
+
+    def insert_menu(self, new_menu, position):
+        self.clear()
+        for index in range(len(self.menu_items)):
+            if index == position:
+               self.addMenu(new_menu) 
+            self.addMenu(self.menu_items[index])
 
     def get_menu_bar(self):
         """
@@ -327,7 +336,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         #frame.setFrameStyle(QtGui.QFrame.Box)
         if not executionMode:
             frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
-        frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        #frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
         frame_layout = QtGui.QVBoxLayout() 
         frame_layout.setSpacing(0) 
@@ -348,7 +357,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         #frame.setFrameStyle(QtGui.QFrame.Box)
         if not executionMode:
             frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
-        frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        #frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
         frame_layout = QtGui.QHBoxLayout()
         frame_layout.setSpacing(0)
@@ -408,7 +417,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             #self.tab_widgets = []
             self.countChanged = {}
             self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-            QtCore.QObject.connect(self, QtCore.SIGNAL('currentChanged(int)'), self._pageChanged)
+            self.currentChanged.connect(self._pageChanged)
 
         def _pageChanged(self, index):
             """
@@ -459,12 +468,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             """
             Descript. :
             """
-            #TODO add scroll area 
             scroll_area = page_widget
             self.addTab(scroll_area, label) 
-            #self.tab_widgets.append(scroll_area)
-
-            #self.set_close_button()
 
             slotName = "showPage_%s" % label
             def tab_slot(self, page_index = self.indexOf(scroll_area)):
@@ -473,8 +478,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
-
-            # add 'hide page' slot
             slotName = "hidePage_%s" % label
             def tab_slot(self, hide=True, page = {"widget" : scroll_area, \
                          "label": self.tabText(self.indexOf(scroll_area)), 
@@ -482,7 +485,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                          "icon": icon, "hidden" : False}):
                 if hide:
                   if not page["hidden"]:
-                    self.removePage(page["widget"])
+                    self.removeTab(self.indexOf(page["widget"]))
+                    self.repaint()
                     page["hidden"] = True
                 else:
                   if page["hidden"]:
@@ -495,10 +499,6 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     page["hidden"] = False
                   else:
                     self.showPage(page["widget"])
-                #page_info =""
-                #for i in range(self.count()):
-                #  page_info+="PAGE %d: %s, %s "% (i, self.tabLabel(self.page(i)), self.page(i))
-                #logging.info(page_info)
             try:
               self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
             except: 
@@ -516,7 +516,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             # add 'enable tab' slot
             slotName = "enableTab_%s" % label
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
-                self.setTabEnabled(self.page(page_index),enable)
+                self.setTabEnabled(page_index, enable)
             try:
                 self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
             except:
@@ -672,6 +672,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.setLayout(_main_vlayout)
 
         self.menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
+
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowMaximizeButtonHint)
  
 
     def view_toolbar_toggled(self, state):
@@ -785,17 +787,18 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 newItem.close_tab_button.setIcon(QtGui.QIcon(Qt4_Icons.load('delete_small')))
                 newItem.setCornerWidget(newItem.close_tab_button)
                 newItem.close_tab_button.hide()
-                def close_current_page(tab=newItem):
-                  slotName = "hidePage_%s" % str(tab.tabText(tab.currentIndex()))
-                  slotName = slotName.replace(" ", "_")
-                  getattr(tab, slotName)()
+                def close_current_page():
+                  tab=newItem
+                  slot_name = "hidePage_%s" % str(tab.tabText(tab.currentIndex()))
+                  slot_name = slot_name.replace(" ", "_")
+                  getattr(tab, slot_name)()
                   #QtGui.QApplication.emit(QtCore.SIGNAL('tab_closed'), tab, slotName)
                 def current_page_changed(index):
                   item_cfg.notebookPageChanged(newItem.tabText(index))
  
                 newItem._close_current_page_cb = close_current_page
-                QtCore.QObject.connect(newItem, QtCore.SIGNAL('currentChanged(int)'), current_page_changed)
-                QtCore.QObject.connect(newItem.close_tab_button, QtCore.SIGNAL("clicked()"), close_current_page)
+                newItem.currentChanged.connect(current_page_changed)
+                newItem.close_tab_button.clicked.connect(close_current_page)
             elif item_type == "vsplitter" or type == "hsplitter":
                 pass
                 

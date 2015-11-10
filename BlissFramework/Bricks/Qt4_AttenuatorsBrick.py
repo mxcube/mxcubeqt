@@ -46,7 +46,6 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
         # Properties ---------------------------------------------------------- 
         self.addProperty('mnemonic', 'string', '')
-        self.addProperty('icons', 'string', '')
         self.addProperty('formatString', 'formatString', '###.##')
         self.addProperty('filtersMode', 'combo', ('Expert', 'Enabled', 
                          'Disabled'), 'Expert')
@@ -95,7 +94,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
                                        QtGui.QPalette.Base)
         self.new_value_validator = QtGui.QDoubleValidator(0, 100, 2, self.new_value_ledit)
         #self.instanceSynchronize("newTransmission")
-        
+
     def propertyChanged(self, property_value, old_value, new_value):
         """
         Descript. :

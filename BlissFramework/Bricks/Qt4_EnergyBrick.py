@@ -98,9 +98,6 @@ class Qt4_EnergyBrick(BlissWidget):
         _main_vlayout.addWidget(self.group_box)
 
         # SizePolicies --------------------------------------------------------
-        #self.setMaximumWidth(250)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
-                           QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.new_value_ledit.returnPressed.connect(self.current_value_changed)
@@ -120,8 +117,6 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_validator = QtGui.QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
         #self.new_value_ledit.setValidator(self.new_value_validator)
-     
-
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
