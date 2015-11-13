@@ -798,6 +798,7 @@ class CharacterisationGroupQueueEntry(BaseQueueEntry):
         BaseQueueEntry.pre_execute(self)
         char = self.get_data_model()
         reference_image_collection = char.reference_image_collection
+        characterisation_parameters = char.characterisation_parameters
 
         # Trick to make sure that the reference collection has a sample.
         reference_image_collection._parent = char.get_parent()
@@ -812,14 +813,20 @@ class CharacterisationGroupQueueEntry(BaseQueueEntry):
         dc_qe.set_enabled(True)
         self.enqueue(dc_qe)
 
-        char_qe = CharacterisationQueueEntry(self.get_view(), char,
+        logging.getLogger("HWR").info(" characterization entry. Using edna: %s" % characterisation_parameters.use_edna)
+        if characterisation_parameters.use_edna:
+            char_qe = CharacterisationQueueEntry(self.get_view(), char,
                                              view_set_queue_entry=False)
-        char_qe.set_enabled(True)
-        self.enqueue(char_qe)
-        self.char_qe = char_qe
+            char_qe.set_enabled(True)
+            self.enqueue(char_qe)
+            self.char_qe = char_qe
 
     def post_execute(self):
-        self.status = self.char_qe.status
+        char = self.get_data_model()
+        if char.characterisation_parameters.use_edna:
+            self.status = self.char_qe.status
+        else:
+            self.status = QUEUE_ENTRY_STATUS.SUCCESS
         BaseQueueEntry.post_execute(self)
 
 
@@ -1179,6 +1186,8 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
     loc = data_model.location
     holder_length = data_model.holder_length
 
+    log.info("Mounting sample %s" % str(loc))
+
     if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
        and (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
         element = '%d:%02d' % loc
@@ -1187,24 +1196,27 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
         beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
                                                               sample_location=loc,
                                                               wait=True)
-
     dm = beamline_setup_hwobj.diffractometer_hwobj
 
     if dm is not None:
         try:
             dm.connect("centringAccepted", centring_done_cb)
+            dm.connect("centringFailed", centring_done_cb)
             centring_method = view.listView().parent().\
                               centring_method
                   
             if centring_method == CENTRING_METHOD.MANUAL:
+                log.info("starting manual centring")
                 log.warning("Manual centring used, waiting for" +\
                             " user to center sample")
                 dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
             elif centring_method == CENTRING_METHOD.LOOP:
+                log.info("starting semi-auto centring")
                 dm.startCentringMethod(dm.C3D_MODE)
                 log.warning("Centring in progress. Please save" +\
                             " the suggested centring or re-center")
             elif centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
+                log.info("starting full-auto centring")
                 log.info("Centring sample, please wait.")
                 dm.startCentringMethod(dm.C3D_MODE)
 

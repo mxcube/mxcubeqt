@@ -512,6 +512,9 @@ class Characterisation(TaskNode):
         return [self.reference_image_collection.acquisitions[0].\
                 acquisition_parameters.centred_position]
 
+    def get_useedna(self):
+        return self.characterization_parameters.use_edna
+
     def set_centred_positions(self, cp):
         self.reference_image_collection.acquisitions[0].\
             acquisition_parameters.centred_position = cp
@@ -530,6 +533,7 @@ class CharacterisationParameters(object):
         self.experiment_type = 0
 
         # Optimisation parameters
+        self.use_edna = int()
         self.use_aimed_resolution = bool()
         self.aimed_resolution = float()
         self.use_aimed_multiplicity = bool()
@@ -570,6 +574,7 @@ class CharacterisationParameters(object):
 
     def as_dict(self):
         return {"experiment_type": self.experiment_type,
+                "use_edna": self.use_edna,
                 "use_aimed_resolution": self.use_aimed_resolution,
                 "use_aimed_multiplicity": self.use_aimed_multiplicity,
                 "aimed_multiplicity": self.aimed_multiplicity,

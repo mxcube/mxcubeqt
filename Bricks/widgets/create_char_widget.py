@@ -2,6 +2,7 @@ import os
 import qtui
 import qt
 import copy
+import logging
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 import queue_item
@@ -53,6 +54,13 @@ class CreateCharWidget(CreateTaskBase):
         widget.reparent(self, qt.QPoint(0,0))
         self._char_widget = widget
 
+        ui_file = 'ui_files/use_edna_widget_layout.ui'
+        widget = qtui.QWidgetFactory.\
+                 create(os.path.join(current_dir, ui_file))
+
+        widget.reparent(self, qt.QPoint(0,0))
+        self._use_edna_widget = widget
+
         self._data_path_gbox = \
             qt.QVGroupBox('Data location', self, 'data_path_gbox')
         
@@ -63,6 +71,7 @@ class CreateCharWidget(CreateTaskBase):
 
         v_layout.addWidget(self._acq_widget)
         v_layout.addWidget(self._data_path_gbox)
+        v_layout.addWidget(self._use_edna_widget)
         v_layout.addWidget(self._char_widget)
         v_layout.addWidget(self._vertical_dimension_widget)
         v_layout.addStretch(100)
@@ -75,6 +84,7 @@ class CreateCharWidget(CreateTaskBase):
         account_rad_dmg_cbx = self._char_widget.\
                               child('account_rad_dmg_cbx')
         start_comp_cbox = self._char_widget.child('start_comp_cbox')
+        useedna_cbox = self._use_edna_widget.child('useedna_cbox')
         #induced_burn_cbx = self._char_widget.child('induced_burn_cbx')
         max_vdim_ledit = self._vertical_dimension_widget.\
                          child('max_vdim_ledit')
@@ -105,6 +115,11 @@ class CreateCharWidget(CreateTaskBase):
         self._char_params_mib.bind_value_update('strategy_complexity',
                                                 start_comp_cbox,
                                                 int, None)
+
+        self._char_params_mib.bind_value_update('use_edna',
+                                                useedna_cbox,
+                                                int, None)
+
 
         self._char_params_mib.\
             bind_value_update('max_crystal_vdim',
@@ -150,8 +165,24 @@ class CreateCharWidget(CreateTaskBase):
                      qt.PYSIGNAL("path_template_changed"),
                      self.handle_path_conflict)
 
+        self.connect(self._use_edna_widget.child('useedna_cbox'),
+                        qt.SIGNAL("activated(int)"),
+                        self.useedna_selected)
+
         #self.connect(induced_burn_cbx, qt.SIGNAL("toggled(bool)"),
         #             self.use_induced_burn)
+
+    def useedna_selected(self, index):
+        logging.debug("Use EDNA changed. ")
+        use_edna = self.get_useedna()
+        self.emit(qt.PYSIGNAL('use_edna_changed'), (use_edna,))
+
+    def get_useedna(self):
+        logging.debug("getting use edna option")
+        use_edna = str(self._use_edna_widget.\
+                         child('useedna_cbox').currentText())
+        logging.debug("   - returns " + use_edna)
+        return use_edna
 
     def use_induced_burn(self, state):
         self._acquisition_parameters.induce_burn = state
@@ -211,7 +242,7 @@ class CreateCharWidget(CreateTaskBase):
         self._path_template.reference_image_prefix = 'ref'
         # The num images drop down default value is 1
         # we would like it to be 2
-        #self._acquisition_parameters.num_images = 4
+        self._acquisition_parameters.num_images = 2
         self._char.characterisation_software =\
             queue_model_enumerables.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
