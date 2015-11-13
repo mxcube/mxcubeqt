@@ -14,7 +14,6 @@ from widgets.widget_utils import DataModelInputBinder
 from widgets.vertical_crystal_dimension_widget_layout\
     import VerticalCrystalDimensionWidgetLayout
 
-
 class CharParametersWidget(qt.QWidget):
     def __init__(self, parent = None, name = "parameter_widget"):
         qt.QWidget.__init__(self, parent, name)
@@ -342,10 +341,10 @@ class CharParametersWidget(qt.QWidget):
                                           acquisitions[0].acquisition_parameters,
                                           self._char.reference_image_collection.\
                                           acquisitions[0].path_template)
-        
         self.path_widget.update_data_model(self._char.reference_image_collection.\
                                            acquisitions[0].path_template)
         
+        self.acq_widget.use_osc_start(True)
         if self._data_collection.acquisitions[0].acquisition_parameters.\
                 centred_position.snapshot_image:
             image = self._data_collection.acquisitions[0].\
