@@ -5,7 +5,7 @@
 
   <synchrotron_name>SOLEIL</synchrotron_name>
   <endstation_name>px2</endstation_name>
-  <beamline_name>proxima2a</beamline_name>
+  <beamline_name>PROXIMA2A</beamline_name>
     
   <proposals>
       <proposal>
