@@ -73,17 +73,14 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
              Qt4_Icons.load_icon("measure_distance"),
              "Distance", 
              self.measure_distance_clicked)
-        self.measure_distance_action.setCheckable(True)
         self.measure_angle_action = _measure_menu.addAction(
              Qt4_Icons.load_icon("measure_angle"),
              "Angle", 
              self.measure_angle_clicked)
-        self.measure_angle_action.setCheckable(True)
         self.measure_area_action = _measure_menu.addAction(
              Qt4_Icons.load_icon("measure_area"),
              "Area", 
              self.measure_area_clicked) 
-        self.measure_area_action.setCheckable(True)
 
         _create_menu = self.tools_menu.addMenu("Create")
         aa_action = _create_menu.addAction(Qt4_Icons.load_icon("VCRPlay2"),
@@ -95,8 +92,8 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         temp_action = _create_menu.addAction(Qt4_Icons.load_icon("Line.png"),
              "Helical line",self.create_line_clicked)
         temp_action.setShortcut("Ctrl+3")
-        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("GridDrag"),
-             "Grid with drag and drop", self.create_grid_drag_clicked)
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("Grid"),
+             "Grid", self.create_grid_clicked)
         temp_action.setShortcut("Ctrl+4")
         temp_action = self.tools_menu.addAction("Select all centring points",
              self.select_all_points_clicked)
@@ -129,65 +126,20 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         Descript. :
         """
         if property_name == "mnemonic":
-            if self.graphics_manager_hwobj:
-                self.disconnect(self.graphics_manager_hwobj, 
-                                QtCore.SIGNAL('measureDistanceStateChanged'),
-                                self.measure_distance_state_changed)
-                self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('measureAngleStateChanged'),
-                                self.measure_angle_state_changed)
-                self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('measureAreaStateChanged'),
-                                self.measure_area_state_changed)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value)
-            if self.graphics_manager_hwobj:
-                self.connect(self.graphics_manager_hwobj, 
-                                QtCore.SIGNAL('measureDistanceStateChanged'),
-                                self.measure_distance_state_changed)
-                self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('measureAngleStateChanged'),
-                             self.measure_angle_state_changed)
-                self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('measureAreaStateChanged'),
-                             self.measure_area_state_changed)
-           
         elif property_name == "targetMenu":
             self.target_menu = new_value
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def measure_distance_clicked(self):
-        if self.measure_distance_action.isChecked():
-            self.graphics_manager_hwobj.start_measure_distance(wait_click = True)
-        else:
-            self.graphics_manager_hwobj.stop_measure_distance() 
+        self.graphics_manager_hwobj.start_measure_distance(wait_click = True)
 
     def measure_angle_clicked(self):
-        if self.measure_angle_action.isChecked():
-            self.graphics_manager_hwobj.start_measure_angle(wait_click = True)
-        else:
-            self.graphics_manager_hwobj.stop_measure_angle() 
+        self.graphics_manager_hwobj.start_measure_angle(wait_click = True)
 
     def measure_area_clicked(self):
-        if self.measure_area_action.isChecked():
-            self.graphics_manager_hwobj.start_measure_area(wait_click = True)
-        else:
-            self.graphics_manager_hwobj.stop_measure_area()
-
-    def measure_distance_state_changed(self, state):
-        self.measure_distance_action.setChecked(state)
-        self.measure_angle_action.setChecked(False)
-        self.measure_area_action.setChecked(False)
-
-    def measure_angle_state_changed(self, state):
-        self.measure_distance_action.setChecked(False)
-        self.measure_angle_action.setChecked(state)
-        self.measure_area_action.setChecked(False)
-
-    def measure_area_state_changed(self, state):
-        self.measure_distance_action.setChecked(False)
-        self.measure_angle_action.setChecked(False)
-        self.measure_area_action.setChecked(state)
+        self.graphics_manager_hwobj.start_measure_area(wait_click = True)
 
     def create_point_click_clicked(self): 
         self.graphics_manager_hwobj.start_centring(tree_click=True)
@@ -198,8 +150,8 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
 
-    def create_grid_drag_clicked(self):
-        self.graphics_manager_hwobj.create_grid_drag()
+    def create_grid_clicked(self):
+        self.graphics_manager_hwobj.create_grid()
 
     def move_beam_mark_clicked(self):
         self.graphics_manager_hwobj.start_move_beam_mark()

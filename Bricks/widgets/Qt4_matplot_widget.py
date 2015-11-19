@@ -22,25 +22,30 @@ from PyQt4 import QtCore
 
 import numpy as np
 
+import matplotlib.pyplot as plt
 from matplotlib.backends import qt4_compat
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg \
+import NavigationToolbar2QTAgg as NavigationToolbar
 
 
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from BlissFramework.Utils import Qt4_widget_colors
 
 
-class TwoAxisPlotWidget(BlissWidget):
+class TwoAxisPlotWidget(QtGui.QWidget):
     """
     Descript. :
     """
 
-    def __init__(self, realtime_plot = False):
+    def __init__(self, parent, realtime_plot = False):
         """
         Descript. :
         """
-        BlissWidget.__init__(self)
+        QtGui.QWidget.__init__(self, parent)
 
+        self._realtime_plot = realtime_plot
         self._two_axis_figure_canvas = MplCanvas(self)
         self._two_axis_figure_canvas.set_real_time(realtime_plot)
 
@@ -48,16 +53,9 @@ class TwoAxisPlotWidget(BlissWidget):
         _main_vlayout.addWidget(self._two_axis_figure_canvas)  
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
 
         self.setSizePolicy(QtGui.QSizePolicy.Expanding,
                            QtGui.QSizePolicy.Expanding)
-
-    def set_real_time_plot(self, realtime_plot):
-        """
-        Descript. :
-        """
-        self._realtime_plot = realtime_plot
 
     def clear(self):
         """
@@ -65,28 +63,39 @@ class TwoAxisPlotWidget(BlissWidget):
         """
         self._two_axis_figure_canvas.clear()
 
-    def plot_scan_curve(self, result):
+    def plot_energy_scan_curve(self, energy_scan_result):
+        """
+        Descript. : result is a list of lists containing energy and counts
+                    Results are converted to two list describing
+                    x and y axes
+        """
         self._two_axis_figure_canvas.clear()
-        self._two_axis_figure_canvas.add_curve(result, 'energy')
+        #check the order of axis
+        x_result = [item[1] for item in energy_scan_result]
+        y_result = [item[0] for item in energy_scan_result] 
+        self._two_axis_figure_canvas.add_curve(x_result, y_result, 'energy')
 
-    def start_new_scan(self, scan_parameters):
+    def start_new_scan(self):
         """
         Descript. :
         """
         self._two_axis_figure_canvas.clear()
-        self._two_axis_figure_canvas.set_axes_labels(scan_parameters.get('xlabel', ''),
-                                                     scan_parameters.get('ylabel', ''))
+        self._two_axis_figure_canvas.set_axes_labels("energy", "counts")
+        self._two_axis_figure_canvas.set_title("Scan started")
 
-    def plot_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
+    def plot_energy_scan_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
                      chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
-        self._two_axis_figure_canvas.add_curve(chooch_graph_y1, chooch_graph_x, 'spline')
-        self._two_axis_figure_canvas.add_curve(chooch_graph_y2, chooch_graph_x, 'fp') 
+        self._two_axis_figure_canvas.add_curve(\
+             chooch_graph_y1, chooch_graph_x, 'spline', 'blue')
+        self._two_axis_figure_canvas.add_curve(\
+             chooch_graph_y2, chooch_graph_x, 'fp', 'red') 
+        self._two_axis_figure_canvas.set_title(title)
      
     def plot_finished(self):
         """
         Descript. :
         """
-        print "plot_finished"   
+        self._two_axis_figure_canvas.set_title("Scan finished")
 
     def add_new_plot_value(self, x, y):
         """
@@ -104,37 +113,45 @@ class MplCanvas(FigureCanvas):
         """
         Descript. :
         """
+        self.mouse_position = [0, 0]
 
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        self.axes.hold(False)
-        FigureCanvas.__init__(self, fig)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
+        self.curves = []
         self._axis_x_array = np.empty(0)
         self._axis_y_array = np.empty(0)
 
     def set_real_time(self, real_time):
         self.real_time = real_time
+        #clear all axes after plot is called
+        self.axes.hold(not real_time)
 
     def clear(self):
+        self.curves = []
         self.axes.cla()
+        self.axes.grid(True)
 
-    def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None):
+    def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None, color='blue'):
         if x_axis_array is None:
-            self.axes.plot(y_axis_array, label=curve_name)
+            self.curves.append(self.axes.plot(y_axis_array, 
+                 label = curve_name, linewidth = 2, color = color))
         else:
-            self.axes.plot(x_axis_array, y_axis_array, label=curve_name)
+            self.curves.append(self.axes.plot(x_axis_array, y_axis_array, 
+                 label = curve_name, linewidth = 2, color = color))
+        self.draw()
 
     def append_new_point(self, x, y):
         self._axis_x_array = np.append(self._axis_x_array, x)
         self._axis_y_array = np.append(self._axis_y_array, y)
-        self.axes.plot(self._axis_x_array, self._axis_y_array)
-        self.draw()
+        self.axes.plot(self._axis_x_array, self._axis_y_array, linewidth=2)
+        self.set_title("Scan in progres. Please wait...")
 
     def set_axes_labels(self, x_label, y_label):
         self.axes.set_xlabel(x_label)
@@ -142,4 +159,118 @@ class MplCanvas(FigureCanvas):
         self.axes.set_ylabel(y_label)
 
     def set_title(self, title):
-        self.title(title)
+        self.axes.set_title(title, fontsize = 14)
+        self.axes.grid(True)
+        self.draw()
+
+    def get_mouse_coord(self):
+        return self.mouse_position
+
+
+class PolarScaterWidget(QtGui.QWidget):
+    """
+    Descript. :
+    """
+
+    def __init__(self, parent = None):
+        """
+        Descript. :
+        """
+        QtGui.QWidget.__init__(self, parent)
+
+        self._polar_scater = PolarScater(self)
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self._polar_scater)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                           QtGui.QSizePolicy.Expanding)
+
+    def draw_multiwedge_scater(self, sw_list):
+        self._polar_scater.draw_scater(sw_list)
+
+class PolarScater(FigureCanvas):
+    """
+    Descript. : Class to draw plots on canvas
+    """
+
+    def __init__(self, parent = None, width = 5, height=4, dpi = 60):
+        """
+        Descript. :
+        """
+
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_axes([0.1, 0.1, 0.8, 0.8], polar=True)
+        #self.axes.hold(False)
+        FigureCanvas.__init__(self, self.fig)
+        self.setParent(parent)
+        FigureCanvas.setSizePolicy(self,
+                                   QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
+
+    def draw_scater(self, sw_list):
+        """
+        Descript. : draws data collection item on the scatter
+                    subwede is represented as list:
+                    collection_id, sw_id, first_image, num_images, 
+                    osc_start, osc_full_range
+        """
+        self.axes.clear()
+        for sw in sw_list:
+            self.axes.bar(np.radians(sw[4]),
+                      1,
+                      width = np.radians(sw[5]),
+                      bottom = sw[0],
+                      color = Qt4_widget_colors.TASK_GROUP[sw[0]])
+            self.fig.canvas.draw_idle()
+
+class TwoDimenisonalPlotWidget(QtGui.QWidget):
+    """
+    Descript. :
+    """
+    mouseClickedSignal = QtCore.pyqtSignal(int, int)
+
+    def __init__(self, parent=None):
+        """
+        Descript. :
+        """
+        QtGui.QWidget.__init__(self, parent)
+
+        self.mpl_canvas = MplCanvas(self)
+        self.ntb = NavigationToolbar(self.mpl_canvas, self)
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.mpl_canvas)
+        _main_vlayout.addWidget(self.ntb)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                           QtGui.QSizePolicy.Expanding)
+
+        self.mpl_canvas.axes.grid(True)
+        self.divider = make_axes_locatable(self.mpl_canvas.axes)
+        self.cax = self.divider.append_axes("right", size=0.3, pad=0.05)
+        self.cax.tick_params(axis='x', labelsize=8)
+        self.cax.tick_params(axis='y', labelsize=8)
+
+        self.mpl_canvas.fig.canvas.mpl_connect(\
+             "button_press_event", self.mouse_clicked)
+
+    def mouse_clicked(self, mouse_event):
+        self.mouseClickedSignal.emit(mouse_event.xdata,
+                                     mouse_event.ydata)
+
+    def plot_result(self, result, last_result=None):
+        im = self.mpl_canvas.axes.imshow(result, interpolation = 'none', aspect='auto')
+        plt.colorbar(im, cax = self.cax)
+        im.set_cmap('hot')
+        self.mpl_canvas.draw()
+        self.mpl_canvas.fig.canvas.draw_idle()
+
+    def get_current_coord(self):
+        return self.mpl_canvas.get_mouse_coord()

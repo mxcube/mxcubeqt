@@ -73,7 +73,6 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
     def populate_widget(self, item):
-        print item
         advanced = item.get_model()
         data_collection = advanced.reference_image_collection
 

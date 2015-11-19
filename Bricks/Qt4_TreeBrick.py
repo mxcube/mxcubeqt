@@ -94,6 +94,7 @@ class Qt4_TreeBrick(BlissWidget):
 
         # Populating the tabs with data
         self.defineSignal("populate_dc_parameter_widget", ())
+        self.defineSignal("populate_dc_group_widget", ())
         self.defineSignal("populate_char_parameter_widget",())
         self.defineSignal("populate_sample_details",())
         self.defineSignal("populate_energy_scan_widget", ())
@@ -455,9 +456,8 @@ class Qt4_TreeBrick(BlissWidget):
             print "sync with crims"
 
     def open_tree_options_dialog(self):
-        if self.tree_options_dialog.sample_listview is None:
-            self.tree_options_dialog.set_filter_lists(\
-                 self.dc_tree_widget.sample_tree_widget)
+        self.tree_options_dialog.set_filter_lists(\
+             self.dc_tree_widget.sample_tree_widget)
         self.tree_options_dialog.show()
 
     def get_sc_content(self, sample_changer):
@@ -468,31 +468,20 @@ class Qt4_TreeBrick(BlissWidget):
         """
         sc_basket_content = []
         sc_sample_content = []
-        if True:
-        #try:
-            for basket in sample_changer.getBasketList():
-                basket_index = basket.getIndex()
-                basket_code = basket.getID() or ""
-                basket_name = basket.getName()
-                is_present = basket.isPresent()
-                sc_basket_content.append((basket_index+1, basket, basket_name))
+        for basket in sample_changer.getBasketList():
+            basket_index = basket.getIndex()
+            basket_code = basket.getID() or ""
+            basket_name = basket.getName()
+            is_present = basket.isPresent()
+            sc_basket_content.append((basket_index+1, basket, basket_name))
              
-            for sample in sample_changer.getSampleList():
-                matrix = sample.getID() or ""
-                basket_index = sample.getContainer().getIndex()
-                sample_index = sample.getIndex()
-                basket_code = sample.getContainer().getID() or ""
-                sample_name = sample.getName()
-                sc_sample_content.append((matrix, basket_index + 1, sample_index + 1, sample_name))
-        """ 
-        except Exception:
-            logging.getLogger("user_level_log").\
-                info("Could not connect to sample changer,"  + \
-                     " unable to list contents. Make sure that" + \
-                     " the sample changer is turned on. Using free pin mode")
-            sc_basket_content = None
-            sc_sample_content = None
-        """
+        for sample in sample_changer.getSampleList():
+            matrix = sample.getID() or ""
+            basket_index = sample.getContainer().getIndex()
+            sample_index = sample.getIndex()
+            basket_code = sample.getContainer().getID() or ""
+            sample_name = sample.getName()
+            sc_sample_content.append((matrix, basket_index + 1, sample_index + 1, sample_name))
         return sc_basket_content, sc_sample_content
 
 
@@ -562,7 +551,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.emit(QtCore.SIGNAL("hide_advanced_tab"), True)
 
-    def show_dcg_tab(self):
+    def show_dcg_tab(self, item):
         """
         Descript. :
         """
@@ -600,6 +589,12 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("hide_workflow_tab"), True)
         self.emit(QtCore.SIGNAL("hide_advanced_tab"), True)
         self.populate_dc_parameters_tab(item)
+
+    def populate_dc_group_tab(self, item = None):
+        """
+        Descript. :
+        """
+        self.emit(QtCore.SIGNAL("populate_dc_group_widget"), item)
 
     def show_char_parameters_tab(self, item):
         """
@@ -774,6 +769,8 @@ class Qt4_TreeBrick(BlissWidget):
                 self.populate_workflow_tab(item)
             elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
                 self.populate_advanced_widget(item)
+            elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                self.populate_dc_group_tab(item)
 
         self.emit(QtCore.SIGNAL("selection_changed"), items)
 

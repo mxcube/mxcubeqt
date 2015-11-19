@@ -265,7 +265,6 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
             for child_task_node in task_list:
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
-
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)

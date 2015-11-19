@@ -25,7 +25,9 @@ from PyQt4 import QtCore
 
 from copy import copy
 from BlissFramework.Utils import Qt4_widget_colors
-from PyMca.QtBlissGraph import QtBlissGraph
+#from PyMca.QtBlissGraph import QtBlissGraph
+from widgets.Qt4_matplot_widget import TwoDimenisonalPlotWidget
+
 
 class HeatMapWidget(QtGui.QWidget):
     def __init__(self, parent = None):
@@ -63,9 +65,9 @@ class HeatMapWidget(QtGui.QWidget):
 
         # Graphic elements ----------------------------------------------------
         self._heat_map_gbox = QtGui.QGroupBox('Heat map', self)
-        self._heat_map_plot = QtBlissGraph(self._heat_map_gbox)
+        #self._heat_map_plot = QtBlissGraph(self._heat_map_gbox)
+        self._heat_map_plot = TwoDimenisonalPlotWidget(self)
         self._heat_map_popup_menu = QtGui.QMenu(self._heat_map_gbox)
-        self._position_label = QtGui.QLabel("X: #, Y: #", self._heat_map_gbox)
         self._image_info_label = QtGui.QLabel("Image: #, value #", self._heat_map_gbox)
 
         self._heat_map_tools_widget = QtGui.QWidget(self._heat_map_gbox)
@@ -94,7 +96,6 @@ class HeatMapWidget(QtGui.QWidget):
 
         _heat_map_gbox_vlayout = QtGui.QVBoxLayout(self._heat_map_gbox)
         _heat_map_gbox_vlayout.addWidget(self._heat_map_plot)
-        _heat_map_gbox_vlayout.addWidget(self._position_label)
         _heat_map_gbox_vlayout.addWidget(self._image_info_label)
         _heat_map_gbox_vlayout.addWidget(self._heat_map_tools_widget)
         _heat_map_gbox_vlayout.setSpacing(2)
@@ -112,17 +113,12 @@ class HeatMapWidget(QtGui.QWidget):
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        self._position_label.setAlignment(QtCore.Qt.AlignRight)
-        self._position_label.setSizePolicy(QtGui.QSizePolicy.Expanding, 
-                                           QtGui.QSizePolicy.Fixed)
         self._image_info_label.setAlignment(QtCore.Qt.AlignRight)
         self._image_info_label.setSizePolicy(QtGui.QSizePolicy.Expanding, 
                                              QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
-        QtCore.QObject.connect(self._heat_map_plot,
-                               QtCore.SIGNAL('QtBlissGraphSignal'),
-                               self.handle_plot_signal)
+        self._heat_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
         self._score_type_cbox.activated.connect(self.score_type_changed)
         self._threshold_slider.valueChanged.connect(\
              self.filter_min_slider_changed)
@@ -130,18 +126,18 @@ class HeatMapWidget(QtGui.QWidget):
              self.create_points_clicked)
 
         # Other ----------------------------------------------------------------
-        self._heat_map_plot.canvas().setMouseTracking(False)
-        Qt4_widget_colors.set_widget_color(self._heat_map_plot, QtCore.Qt.white)
-        self._heat_map_plot.mouseDoubleClickEvent = self.plot_double_clicked
-        self._heat_map_plot.setAxisAutoScale(False)
-        self._heat_map_plot.enableZoom(True)
-        self._heat_map_plot.showGrid()
+        #self._heat_map_plot.canvas().setMouseTracking(False)
+        #Qt4_widget_colors.set_widget_color(self._heat_map_plot, QtCore.Qt.white)
+        #self._heat_map_plot.mouseDoubleClickEvent = self.plot_double_clicked
+        #self._heat_map_plot.setAxisAutoScale(False)
+        #self._heat_map_plot.enableZoom(True)
+        #self._heat_map_plot.showGrid()
         tooltip_text = "Double click to move to the position. " + \
                        "Right click to open menu."
         self._heat_map_plot.setToolTip(tooltip_text) 
 
-        self._heat_map_popup_menu.addAction(\
-             "Reset zoom", self._heat_map_plot.zoomReset)
+        #self._heat_map_popup_menu.addAction(\
+        #     "Reset zoom", self._heat_map_plot.zoomReset)
         self._heat_map_popup_menu.addSeparator()
         self._heat_map_popup_menu.addAction(\
              "Move to position", self.move_to_position_clicked)
@@ -194,17 +190,17 @@ class HeatMapWidget(QtGui.QWidget):
     def set_associated_data_collection(self, data_collection):
         self.__associated_data_collection = data_collection
         self.__axis_x_range = [0, data_collection.acquisitions[0].acquisition_parameters.num_images]
-        self._heat_map_plot.setX1AxisLimits(0, self.__axis_x_range[1])
+        #self._heat_map_plot.setX1AxisLimits(0, self.__axis_x_range[1])
 
     def set_associated_grid(self, grid):
         if grid is None:
             self.__is_map_plot = False
-            self._heat_map_plot.x1Label("Image num")
-            self._heat_map_plot.y1Label("Score")
+            #self._heat_map_plot.x1Label("Image num")
+            #self._heat_map_plot.y1Label("Score")
         else:
             self.__is_map_plot = True
             self.__associated_grid = grid
-            self._heat_map_plot.enableZoom(False)
+            #self._heat_map_plot.enableZoom(False)
         
             axis_range = self.__associated_grid.get_col_row_num()
             self.__axis_x_range = [0, axis_range[0]]
@@ -224,21 +220,20 @@ class HeatMapWidget(QtGui.QWidget):
 
             self._heat_map_plot.setFixedWidth(width)
             self._heat_map_plot.setFixedHeight(height)
-            self._heat_map_plot.setX1AxisLimits(0, axis_range[0])
-            self._heat_map_plot.setY1AxisLimits(0, axis_range[1])
+            #self._heat_map_plot.setX1AxisLimits(0, axis_range[0])
+            #self._heat_map_plot.setY1AxisLimits(0, axis_range[1])
 
     def main_gbox_toggled(self, toggle):
-        self._position_label.setHidden(not toggle)
         self._heat_map_plot.setHidden(not toggle)
         self._heat_map_tools_widget.setHidden(not toggle)
             
     def open_heat_map_popup_menu(self, context_event):
-        point = qt.QPoint(context_event.globalX(), 
+        point = QtCore.QPoint(context_event.globalX(), 
                           context_event.globalY())
         self._heat_map_popup_menu.popup(point)
 
     def open_best_pos_popup_menu(self, context_event):
-        point = qt.QPoint(context_event.globalX(),
+        point = QtCore.QPoint(context_event.globalX(), 
                           context_event.globalY())
         self._best_pos_popup_menu.popup(point)  
 
@@ -284,39 +279,28 @@ class HeatMapWidget(QtGui.QWidget):
             if None in (self.__axis_x_range, self.__axis_y_range):
                 return
             
-            self._heat_map_plot.imagePlot(self.__result_display, ymirror=False)
-            self._heat_map_plot.plotImage.show()
-        self._heat_map_plot.setX1AxisLimits(0, self.__axis_x_range[1])
-        self._heat_map_plot.setY1AxisLimits(0, self.__axis_y_range[1])
-        self._heat_map_plot.replot() 
+            #self._heat_map_plot.imagePlot(self.__result_display, ymirror=False)
+            #self._heat_map_plot.plotImage.show()
+            self._heat_map_plot.plot_result(self.__result_display)
+        #self._heat_map_plot.setX1AxisLimits(0, self.__axis_x_range[1])
+        #self._heat_map_plot.setY1AxisLimits(0, self.__axis_y_range[1])
+        #self._heat_map_plot.replot() 
 
     def filter_min_slider_changed(self, value):
-        #self.__filter_min_value = self.__max_value * value / 100.0
         self.refresh()
 
-    #def filter_max_slider_changed(self, value):
-    #    self.__filter_max_value = value / 100.0
-    #    self._filter_max_ledit.setText(str(value))
-    #    self.refresh() 
-
-    def handle_plot_signal(self, signalDict):
-        if signalDict['event'] == 'MouseAt':
-            self.__selected_x = signalDict['x']
-            self.__selected_y = signalDict['y']
-            self._position_label.setText("X: %0.2f, Y: %0.2f" % \
-                 (self.__selected_x, self.__selected_y)) 
-            #if self.__axis_y_range:  
-            #    self.__selected_y = self.__axis_y_range[1] - self.__selected_y
-            image, line, self.selected_image_serial, image_path = \
-                 self.get_image_parameters_from_coord()
-            try:
-                col, row = self.get_col_row_from_image_line(line, image)
-                msg = "Image: %d, value: %.3f" %(self.selected_image_serial,
-                       self.__result_display[row][col])
-            except:
-                msg = "Image: %d" % self.selected_image_serial
-
-            self._image_info_label.setText(msg)
+    def mouse_clicked(self, pos_x, pos_y):
+        self.__selected_x = pos_x
+        self.__selected_y = pos_y
+        image, line, self.selected_image_serial, image_path = \
+              self.get_image_parameters_from_coord()
+        try:
+           col, row = self.get_col_row_from_image_line(line, image)
+           msg = "Image: %d, value: %.3f" %(self.selected_image_serial,
+                 self.__result_display[row][col])
+        except:
+           msg = "Image: %d" % self.selected_image_serial
+        self._image_info_label.setText(msg)
 
     def plot_double_clicked(self, event):
         self.move_to_selected_position()
@@ -342,11 +326,10 @@ class HeatMapWidget(QtGui.QWidget):
         self.__associated_data_collection = None
         self._threshold_slider.setValue(0)
 
-        if self._heat_map_plot.plotImage is not None:
-            self._heat_map_plot.plotImage.hide()
-        self._heat_map_plot.clearcurves()
-        self._heat_map_plot.setTitle("")
-        self._position_label.setText("")
+        #if self._heat_map_plot.plotImage is not None:
+        #    self._heat_map_plot.plotImage.hide()
+        #self._heat_map_plot.clearcurves()
+        #self._heat_map_plot.setTitle("")
         self._best_pos_table.setRowCount(0)
 
     def create_centring_point_clicked(self):

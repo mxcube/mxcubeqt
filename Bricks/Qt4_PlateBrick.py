@@ -186,9 +186,7 @@ class Qt4_PlateBrick(BlissWidget):
         root_item = QtGui.QTreeWidgetItem(self.plate_widget.xtal_treewidget,
                                           info_str_list)
         root_item.setExpanded(True)
-        print "refresh"
         for xtal in self.plate_content.Plate.xtal_list:
-            print xtal
             xtal_address = "%s:%d" % (xtal.Row, xtal.Column + 1)
             cell_treewidget_item = None
             #cell_treewidget_item = self.plate_widget.xtal_treewidget.\

@@ -77,6 +77,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
+             self.element_edge_selected)
         self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
              connect(self._run_number_ledit_change)
         self._data_path_widget.pathTemplateChangedSignal.connect(
@@ -97,7 +99,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         """
         Descript. :
         """
-        self._periodic_table_widget.periodic_table.setElements(energy_scan_hwobj.getElements())
+        self._periodic_table_widget.periodic_table.setElements(\
+             energy_scan_hwobj.getElements())
 
     def single_item_selection(self, tree_item):
         """
@@ -172,3 +175,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 info("No element selected, please select an element.")
 
         return data_collections
+
+    def element_edge_selected(self, element, edge):
+        if len(self._current_selected_items) == 1:
+            item = self._current_selected_items[0]
+            if isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
+                item.get_model().element_symbol = str(element)
+                item.get_model().edge = str(edge)

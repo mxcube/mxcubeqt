@@ -434,7 +434,6 @@ class CharParametersWidget(QtGui.QWidget):
       
         item = self.char_type_widget.charact_type_tbox.\
                widget(self._char_params.experiment_type)
-        print item 
         if item:
             self.char_type_widget.charact_type_tbox.setCurrentWidget(item)
         self.char_type_widget.toggle_time_dose()

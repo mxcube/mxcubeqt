@@ -32,6 +32,8 @@ class PeriodicTableWidget(QtGui.QWidget):
     """
     Descript. :
     """ 
+    elementEdgeSelectedSignal = QtCore.pyqtSignal(str, str)
+
     def __init__(self, parent = None, name = None, fl = 0):
 
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
@@ -51,11 +53,12 @@ class PeriodicTableWidget(QtGui.QWidget):
         self.edge_combo = QtGui.QComboBox(self.edge_widget)
 
         # Layout --------------------------------------------------------------
-        _edge_hlayout = QtGui.QHBoxLayout(self)
+        _edge_hlayout = QtGui.QHBoxLayout(self.edge_widget)
         _edge_hlayout.addStretch(0)
         _edge_hlayout.addWidget(edge_label)
         _edge_hlayout.addWidget(self.edge_combo)  
-        self.edge_widget.setLayout(_edge_hlayout)
+        _edge_hlayout.setSpacing(0)
+        _edge_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.periodic_table, QtCore.Qt.AlignHCenter)
@@ -65,10 +68,6 @@ class PeriodicTableWidget(QtGui.QWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        #self.periodic_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
-        #                                  QtGui.QSizePolicy.Fixed)
-        #self.periodic_table.setFixedSize(470, 230)
-        #self.setFixedHeight(232)
 
         # Qt signal/slot connections ------------------------------------------
         self.periodic_table.edgeSelectedSignal.connect(self.edge_selected)
@@ -85,9 +84,10 @@ class PeriodicTableWidget(QtGui.QWidget):
         self.selected_element = str(element)
         self.selected_edge = str(edge)
         self.edge_widget.setEnabled(edge != "K")
-        #if edge == "L":
-        #    self.edge_combo.setCurrentIndex(0)
-        #    self.edge_combo_activated(0)
+        if edge != "K":
+            self.edge_combo.setCurrentIndex(EDGE_LIST.index(edge))
+        self.elementEdgeSelectedSignal.emit(self.selected_element, 
+                                            self.selected_edge)
         
     def set_current_element_edge(self, element, edge):
         self.periodic_table.tableElementChanged(element, edge)
@@ -97,7 +97,8 @@ class PeriodicTableWidget(QtGui.QWidget):
 
     def edge_combo_activated(self, item_index):
         self.selected_edge = str(self.edge_combo.currentText())
-        self.periodic_table.tableElementChanged(self.selected_element, self.selected_edge)
+        self.periodic_table.tableElementChanged(self.selected_element,
+                                                self.selected_edge)
   
 class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
     edgeSelectedSignal = QtCore.pyqtSignal(str, str)
@@ -139,7 +140,6 @@ class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
             name = self.elements_dict[symbol][4]
             txt = "%s - %s (%s,%s)" % (symbol, energy, index, name)
             self.eltLabel.setText(txt)
-            #self.emit(QtCore.SIGNAL('edgeSelected'), symbol, energy)
             self.edgeSelectedSignal.emit(symbol ,energy)
             self.emit(QtCore.SIGNAL("widgetSynchronize"), symbol, energy)
 

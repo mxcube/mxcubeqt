@@ -342,6 +342,5 @@ class CreateCharWidget(CreateTaskBase):
         return tasks
 
     def characterisation_gbox_toggled(self, state):
-        print state
         if self._char:
             self._char.run_characterisation = state

@@ -39,7 +39,7 @@ class TreeOptionsDialog(QtGui.QDialog):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.sample_listview = None
+        self.sample_treewidget = None
 
         # Properties ---------------------------------------------------------- 
 
@@ -65,9 +65,9 @@ class TreeOptionsDialog(QtGui.QDialog):
         self.tree_options_widget.close_button.clicked.connect(\
              self.close_button_clicked)
         self.tree_options_widget.basket_treewidget.itemClicked.connect(\
-             self.basket_filter_listview_clicked)
+             self.basket_filter_treewidget_clicked)
         self.tree_options_widget.protein_treewidget.itemClicked.connect(\
-             self.protein_filter_listview_clicked)
+             self.protein_filter_treewidget_clicked)
         self.tree_options_widget.space_group_combo.activated.connect(\
              self.space_group_changed)
         self.tree_options_widget.holder_length_combo.activated.connect(\
@@ -75,60 +75,60 @@ class TreeOptionsDialog(QtGui.QDialog):
 
     def space_group_changed(self, index):
         space_group = self.space_group_combo.currentText()
-        it = qt.QListViewItemIterator(self.sample_listview)
-        item = it.current()
+        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_treewidget)
+        item = item_iterator.value()
 
         while item:
-            if isinstance(item, queue_item.SampleQueueItem):
+            if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 item_space_group = item.get_model().crystals[0].space_group
                 if space_group == "All":
-                    item.setVisible(True)
+                    item.setHidden(True)
                 else:
-                    item.setVisible(str(item_space_group) == space_group)
-            it += 1
-            item = it.current()
+                    item.setHidden(str(item_space_group) == space_group)
+            item_iterator += 1
+            item = item_iterator.value()
 
     def holder_length_changed(self, index):
         holder_length = self.holder_length_combo.currentText()
-        it = qt.QListViewItemIterator(self.sample_listview)
-        item = it.current()
+        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_treewidget)
+        item = item_iterator.value()
 
         while item:
-            if isinstance(item, queue_item.SampleQueueItem):
+            if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 item_holder_length = item.get_model().crystals[0].holder_length
                 if space_group == "All":
-                    item.setVisible(True)
+                    item.setHidden(True)
                 else:
-                    item.setVisible(str(item_holder_length) == holder_length)
-            it += 1
-            item = it.current() 
+                    item.setHidden(str(item_holder_length) == holder_length)
+            item_iterator += 1
+            item = item_iterator.value() 
 
-    def basket_filter_listview_clicked(self, listview_item):
-        it = qt.QListViewItemIterator(self.sample_listview)
-        item = it.current()
-
-        while item:
-            if isinstance(item, queue_item.BasketQueueItem):
-                if listview_item.text() == item.get_model().get_display_name():
-                    item.setVisible(listview_item.isOn())
-            it += 1
-            item = it.current()
-
-    def protein_filter_listview_clicked(self, listview_item):
-        it = qt.QListViewItemIterator(self.sample_listview)
-        item = it.current()
+    def basket_filter_treewidget_clicked(self, treewidget_item):
+        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_treewidget)
+        item = item_iterator.value()
 
         while item:
-            if isinstance(item, queue_item.SampleQueueItem):
+            if isinstance(item, Qt4_queue_item.BasketQueueItem):
+                if treewidget_item.text(0) == item.get_model().get_display_name():
+                    item.setHidden(2 - treewidget_item.checkState(0))
+            item_iterator += 1
+            item = item_iterator.value()
+
+    def protein_filter_treewidget_clicked(self, treewidget_item):
+        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_treewidget)
+        item = item_iterator.value()
+
+        while item:
+            if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 protein_name = item.get_model().crystals[0].protein_acronym
-                if listview_item.text() == protein_name:
-                    item.setVisible(listview_item.isOn())
-            it += 1
-            item = it.current()
+                if treewidget_item.text(0) == protein_name:
+                    item.setHidden(2 - 2 - treewidget_item.checkState(0))
+            item_iterator += 1
+            item = item_iterator.value()
 
-    def set_filter_lists(self, sample_listview):
-        self.sample_listview = sample_listview
-        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_listview)
+    def set_filter_lists(self, sample_treewidget):
+        self.sample_treewidget = sample_treewidget
+        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_treewidget)
         self.basket_list = []
         self.sample_list = []
         self.protein_list = []      
@@ -159,15 +159,20 @@ class TreeOptionsDialog(QtGui.QDialog):
         self.tree_options_widget.basket_treewidget.clear()
         for basket in self.basket_list:
             #last_item = self.basket_filter_tree.lastItem()
-            item = QtGui.QTreeWidgetItem(self.tree_options_widget.basket_treewidget, 
-                                         str(basket.get_model().get_display_name()))
-            item.setCheckState(0, QtCore.Qt.Checked)
+            info_str_list = QtCore.QStringList()
+            info_str_list.append(str(basket.get_model().get_display_name()))
+            treewidget_item = QtGui.QTreeWidgetItem(self.tree_options_widget.\
+               basket_treewidget, info_str_list)
+            if basket.isHidden():  
+                treewidget_item.setCheckState(0, QtCore.Qt.Unchecked)
+            else:
+                treewidget_item.setCheckState(0, QtCore.Qt.Checked)
 
         """
-        self.protein_filter_listview.clear()
+        self.protein_filter_treewidget.clear()
         for protein in self.protein_list:
-            last_item = self.protein_filter_listview.lastItem()
-            item = qt.QCheckListItem(self.protein_filter_listview, last_item, 
+            last_item = self.protein_filter_treewidget.lastItem()
+            item = qt.QCheckListItem(self.protein_filter_treewidget, last_item, 
                 protein, qt.QCheckListItem.CheckBoxController)
             item.setState(qt.QCheckListItem.On)
 
@@ -185,26 +190,28 @@ class TreeOptionsDialog(QtGui.QDialog):
         """
 
     def reset_button_clicked(self):
-        it = qt.QListViewItemIterator(self.sample_listview)
-        item = it.current()
+        item_iterator = QtGui.QTreeWidgetItemIterator(self.sample_treewidget)
+        item = item_iterator.value()
         while item:
-            item.setVisible(True)
-            it += 1
-            item = it.current()
+            item.setHidden(True)
+            item_iterator += 1
+            item = item_iterator.value()
 
-        it = qt.QListViewItemIterator(self.basket_filter_listview)
-        item = it.current()
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+            self.tree_options_widget.basket_treewidget)
+        item = item_iterator.value()
         while item:
-            item.setState(qt.QCheckListItem.On)
-            it += 1
-            item = it.current()
+            item.setCheckState(0, QtCore.Qt.Checked)
+            item_iterator += 1
+            item = item_iterator.value()
 
-        it = qt.QListViewItemIterator(self.protein_filter_listview)
-        item = it.current()
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+           self.tree_options_widget.protein_treewidget)
+        item = item_iterator.value()
         while item:
-            item.setState(qt.QCheckListItem.On)
-            it += 1
-            item = it.current()
+            item.setCheckState(0, QtCore.Qt.Checked)
+            item_iterator += 1
+            item = item_iterator.value()
 
         self.space_group_combo.setCurrentItem(0)  
         self.holder_length.setCurrentItem(0)

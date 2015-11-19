@@ -90,33 +90,35 @@ class DataCollectTree(QtGui.QWidget):
         self.confirm_dialog = ConfirmDialog(self, 'Confirm Dialog')
         self.confirm_dialog.setModal(True)
 
-        self.pin_pixmap = Qt4_Icons.load("sample_axis.png")
-        self.task_pixmap = Qt4_Icons.load("task.png")
-        self.play_pixmap = Qt4_Icons.load("VCRPlay.png")
-        self.stop_pixmap = Qt4_Icons.load("Stop.png")
-        self.up_pixmap = Qt4_Icons.load("Up2.png")
-        self.down_pixmap = Qt4_Icons.load("Down2.png")
-        self.delete_pixmap = Qt4_Icons.load("bin_small.png")
-        self.ispyb_pixmap = Qt4_Icons.load("SampleChanger2.png")
-        self.caution_pixmap = Qt4_Icons.load("Caution2.png")
+        self.pin_icon = Qt4_Icons.load_icon("sample_axis.png")
+        self.task_icon = Qt4_Icons.load_icon("task.png")
+        self.play_icon = Qt4_Icons.load_icon("VCRPlay.png")
+        self.stop_icon = Qt4_Icons.load_icon("Stop.png")
+        self.ispyb_icon = Qt4_Icons.load_icon("SampleChanger2.png")
+        self.caution_icon = Qt4_Icons.load_icon("Caution2.png")
         
         self.button_widget = QtGui.QWidget(self)                
         self.up_button = QtGui.QPushButton(self.button_widget)
-        self.up_button.setIcon(QtGui.QIcon(self.up_pixmap))
+        self.up_button.setIcon(Qt4_Icons.load_icon("Up2.png"))
         self.up_button.setFixedHeight(25)
         self.down_button = QtGui.QPushButton(self.button_widget)
-        self.down_button.setIcon(QtGui.QIcon(self.down_pixmap))
+        self.down_button.setIcon(Qt4_Icons.load_icon("Down2.png"))
         self.down_button.setFixedHeight(25)
 
+        self.copy_button = QtGui.QPushButton(self.button_widget)
+        self.copy_button.setIcon(Qt4_Icons.load_icon("copy.png"))
+        self.copy_button.setDisabled(True)
+        self.copy_button.setToolTip("Copy highlighted queue entries")
+
         self.delete_button = QtGui.QPushButton(self.button_widget)
-        self.delete_button.setIcon(QtGui.QIcon(self.delete_pixmap))
+        self.delete_button.setIcon(Qt4_Icons.load_icon("bin_small.png"))
         self.delete_button.setDisabled(True)
         self.delete_button.setToolTip("Delete highlighted queue entries")
 
         self.collect_button = QtGui.QPushButton(self.button_widget)
         self.collect_button.setText("Collect Queue")
         self.collect_button.setFixedWidth(125)
-        self.collect_button.setIcon(QtGui.QIcon(self.play_pixmap))
+        self.collect_button.setIcon(self.play_icon)
         Qt4_widget_colors.set_widget_color(self.collect_button, 
             Qt4_widget_colors.LIGHT_GREEN)
 
@@ -133,8 +135,9 @@ class DataCollectTree(QtGui.QWidget):
         button_widget_grid_layout.addWidget(self.up_button, 0, 0)
         button_widget_grid_layout.addWidget(self.down_button, 0, 1)
         button_widget_grid_layout.addWidget(self.collect_button, 1, 0, 1, 2)
-        button_widget_grid_layout.addWidget(self.delete_button, 0, 3)
-        button_widget_grid_layout.addWidget(self.continue_button, 1, 3)
+        button_widget_grid_layout.addWidget(self.copy_button, 0, 3)
+        button_widget_grid_layout.addWidget(self.delete_button, 0, 4)
+        button_widget_grid_layout.addWidget(self.continue_button, 1, 3, 1, 2)
         button_widget_grid_layout.setColumnStretch(2, 1)
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
@@ -152,6 +155,7 @@ class DataCollectTree(QtGui.QWidget):
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
         self.down_button.clicked.connect(self.down_click)
+        self.copy_button.clicked.connect(self.copy_click)
         self.delete_button.clicked.connect(self.delete_click)
         self.collect_button.clicked.connect(self.collect_stop_toggle)
         self.sample_tree_widget.itemSelectionChanged.\
@@ -166,8 +170,9 @@ class DataCollectTree(QtGui.QWidget):
 
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(2)
-        self.sample_tree_widget.setColumnWidth(0, 250)
-        self.sample_tree_widget.header().setDefaultSectionSize(250)
+        #self.sample_tree_widget.setColumnWidth(0, 150)
+        self.sample_tree_widget.setColumnWidth(1, 130)
+        self.sample_tree_widget.header().setDefaultSectionSize(220)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
@@ -288,6 +293,8 @@ class DataCollectTree(QtGui.QWidget):
                 self.tree_brick.show_workflow_tab(item)
             elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
                 self.tree_brick.show_advanced_tab(item)
+            elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                self.tree_brick.show_dcg_tab(item)
         #elif len(items) == 0:
         #    self.tree_brick.show_sample_tab()
 
@@ -383,15 +390,13 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         items = self.get_selected_items()
-        if len(items) == 1:
-            item = items[0]
-            
-        if len(items) > 1:
-            for item in items:
-                if isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem) or \
-                       isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                    self.delete_button.setDisabled(False)
-                    break
+        self.copy_button.setDisabled(True)
+
+        for item in items:
+            if type(item) in (Qt4_queue_item.DataCollectionGroupQueueItem,
+                              Qt4_queue_item.DataCollectionQueueItem):
+                self.copy_button.setDisabled(False)
+                break
 
         self.selection_changed_cb(items)        
         #checked_items = self.get_checked_items()
@@ -457,6 +462,10 @@ class DataCollectTree(QtGui.QWidget):
 
         self.queue_model_hwobj.view_created(view_item, task)
         self.collect_button.setDisabled(False)
+
+        if isinstance(view_item, Qt4_queue_item.TaskQueueItem):
+            self.sample_tree_widget.clearSelection()
+            view_item.setSelected(True)
 
     def get_selected_items(self):
         """
@@ -692,7 +701,7 @@ class DataCollectTree(QtGui.QWidget):
                           self.collect_button, 
                           Qt4_widget_colors.LIGHT_RED,
                           QtGui.QPalette.Button)
-        self.collect_button.setIcon(QtGui.QIcon(self.stop_pixmap))
+        self.collect_button.setIcon(self.stop_icon)
         self.parent().enable_hutch_menu(False)
         self.run_cb()
 
@@ -725,7 +734,7 @@ class DataCollectTree(QtGui.QWidget):
         QtGui.QApplication.restoreOverrideCursor() 
         self.collecting = False
         self.collect_button.setText("Collect Queue")
-        self.collect_button.setIcon(QtGui.QIcon(self.play_pixmap))
+        self.collect_button.setIcon(self.play_icon)
         Qt4_widget_colors.set_widget_color(
                           self.collect_button,
                           Qt4_widget_colors.LIGHT_GREEN,
@@ -750,6 +759,18 @@ class DataCollectTree(QtGui.QWidget):
             it += 1
             item = it.value()
         return checked_items
+
+    def copy_click(self, selected_items = None):
+        """
+        Descript. :
+        """
+        if not isinstance(selected_items, list):
+            selected_items = self.get_selected_items()
+
+        for item in selected_items:
+            if not isinstance(item, queue_model_objects.TaskGroup):
+                new_node = self.queue_model_hwobj.copy_node(item.get_model())
+                self.queue_model_hwobj.add_child(item.get_model().get_parent(), new_node)
  
     def delete_click(self, selected_items = None):
         """
@@ -952,7 +973,7 @@ class DataCollectTree(QtGui.QWidget):
                 item.set_mounted_style(False)
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
-                    item.setIcon(0, QtGui.QIcon(self.ispyb_pixmap))
+                    item.setIcon(0, self.ispyb_icon)
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
             elif isinstance(item, Qt4_queue_item.BasketQueueItem):
@@ -990,7 +1011,7 @@ class DataCollectTree(QtGui.QWidget):
 
                      if path_conflict:
                          conflict = True
-                         item.setIcon(0, QtGui.QIcon(self.caution_pixmap))
+                         item.setIcon(0, self.caution_icon)
                      else:
                          item.setIcon(0, QtGui.QIcon())
                          

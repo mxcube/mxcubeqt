@@ -27,7 +27,7 @@ import queue_model_objects_v1 as queue_model_objects
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget
-from widgets.Qt4_scan_plot_widget import ScanPlotWidget
+from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -60,10 +60,8 @@ class EnergyScanParametersWidget(QtGui.QWidget):
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.position_widget.setFixedSize(450, 340)        
 
-        self.scan_plot_widget = ScanPlotWidget(self)
-        self.scan_plot_widget.setRealTimePlot(True)
-        self.result_plot_widget = ScanPlotWidget(self)
-        self.result_plot_widget.setRealTimePlot(False)
+        self.scan_plot_widget = TwoAxisPlotWidget(self, True)
+        self.result_plot_widget = TwoAxisPlotWidget(self, False)
  
         # Layout -------------------------------------------------------------
         _parameters_widget_layout = QtGui.QVBoxLayout()
@@ -99,6 +97,10 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.setLayout(_main_vlayout)
       
         # SizePolicies --------------------------------------------------------
+        self.scan_plot_widget.setSizePolicy(QtGui.QSizePolicy.Fixed,
+                                            QtGui.QSizePolicy.Expanding)
+        self.result_plot_widget.setSizePolicy(QtGui.QSizePolicy.Fixed,
+                                              QtGui.QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         #qt.QObject.connect(self.periodic_table_widget, qt.PYSIGNAL('edgeSelected'), 
@@ -134,13 +136,19 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.periodic_table_widget.setEnabled(not executed)
         self.scan_plot_widget.setEnabled(not executed)
         self.result_plot_widget.setEnabled(not executed)
+ 
+        width = self.data_path_widget.width() + \
+                self.position_widget.width()
+        self.scan_plot_widget.setFixedWidth(width)
+        self.result_plot_widget.setFixedWidth(width)
 
         if executed:
             result = self.energy_scan_model.get_scan_result()
-            self.scan_plot_widget.plot_scan_curve(result.data)
-            self.result_plot_widget.plot_results(result.pk, result.fppPeak,
-              result.fpPeak, result.ip, result.fppInfl, result.fpInfl,
-              result.rm, result.chooch_graph_x, result.chooch_graph_y1,
+            self.scan_plot_widget.plot_energy_scan_curve(result.data)
+            self.result_plot_widget.plot_energy_scan_results(\
+              result.pk, result.fppPeak, result.fpPeak, result.ip, 
+              result.fppInfl, result.fpInfl, result.rm, 
+              result.chooch_graph_x, result.chooch_graph_y1, 
               result.chooch_graph_y2, result.title)
         else:
             self.scan_plot_widget.clear()
@@ -166,21 +174,21 @@ class EnergyScanParametersWidget(QtGui.QWidget):
     def set_enegy_scan_hwobj(self, energy_scan_hwobj):
         self.energy_scan_hwobj = energy_scan_hwobj
         if self.energy_scan_hwobj:
-            self.energy_scan_hwobj.connect("scanStart", self.scan_started)
-            self.energy_scan_hwobj.connect("scanNewPoint", self.scan_new_point) 
+            self.energy_scan_hwobj.connect("energyScanStarted", self.energy_scan_started)
+            self.energy_scan_hwobj.connect("scanNewPoint", self.energy_scan_new_point) 
             self.energy_scan_hwobj.connect("choochFinished", self.chooch_finished)
 
-    def scan_started(self, scan_parameters):
-        self.scan_plot_widget.start_new_scan(scan_parameters)
+    def energy_scan_started(self):
+        self.scan_plot_widget.start_new_scan()
         self.data_path_widget.setEnabled(False)
         self.periodic_table_widget.setEnabled(False)
 
-    def scan_new_point(self, x, y):
+    def energy_scan_new_point(self, x, y):
         self.scan_plot_widget.add_new_plot_value(x, y)
 
     def chooch_finished(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
               chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
-        self.result_plot_widget.plot_results(pk, fppPeak, fpPeak, 
+        self.result_plot_widget.plot_energy_scan_results(pk, fppPeak, fpPeak, 
               ip, fppInfl, fpInfl, rm, chooch_graph_x, chooch_graph_y1, 
               chooch_graph_y2, title)
-        self.scan_plot_widget.scan_finished()
+        self.scan_plot_widget.plot_finished()
