@@ -79,27 +79,26 @@ class Qt4_ChatBrick(BlissWidget):
         self.send_button.setEnabled(False)
 
         # Layout --------------------------------------------------------------
-
-        # SizePolicies --------------------------------------------------------
-        _controls_widget_hlayout = QtGui.QHBoxLayout(self)
+        _controls_widget_hlayout = QtGui.QHBoxLayout(_controls_widget)
         _controls_widget_hlayout.addWidget(_say_label)
         _controls_widget_hlayout.addWidget(self.message_ledit)
         _controls_widget_hlayout.addWidget(self.send_button)
         _controls_widget_hlayout.setSpacing(2)
         _controls_widget_hlayout.setContentsMargins(0, 0, 0, 0)
-        _controls_widget.setLayout(_controls_widget_hlayout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.conversation_textedit)
         _main_vlayout.addWidget(_controls_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
-        self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
         self.send_button.clicked.connect(self.send_current_message)
         self.message_ledit.returnPressed.connect(self.send_current_message)
         self.message_ledit.textChanged.connect(self.message_changed)
+
+        self.setFixedHeight(120)
+        self.setFixedWidth(790)
 
     def run(self):
         """

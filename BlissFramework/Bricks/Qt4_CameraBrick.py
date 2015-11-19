@@ -48,7 +48,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_scene_size = None
         self.graphics_scene_fixed_size = None
         self.graphics_view = None
-        self.graphics_camera_frame = None
+        #self.graphics_camera_frame = None
         self.fixed_size = None 
         self.use_fixed_size = None 
         self.display_beam = None
@@ -76,25 +76,22 @@ class Qt4_CameraBrick(BlissWidget):
         temp_action = create_menu.addAction("Helical line",
             self.create_line_clicked)
         temp_action.setShortcut("Ctrl+3")
-        temp_action = create_menu.addAction("Grid with drag and drop",
-            self.create_grid_drag_clicked)
+        temp_action = create_menu.addAction("Grid",
+            self.create_grid)
         temp_action.setShortcut("Ctrl+4")
 
         measure_menu = self.popup_menu.addMenu("Measure")
         self.measure_distance_action = measure_menu.addAction(\
              "Distance", self.measure_distance_clicked)
-        self.measure_distance_action.setCheckable(True)
         self.measure_angle_action = measure_menu.addAction(\
              "Angle", self.measure_angle_clicked)
-        self.measure_angle_action.setCheckable(True)
         self.measure_area_action = measure_menu.addAction(\
              "Area", self.measure_area_clicked)
-        self.measure_area_action.setCheckable(True)         
 
         self.popup_menu.addSeparator()
 
         self.move_beam_mark_action = self.popup_menu.addAction(\
-             "Move beam mark", self.move_beam_mark_toggled)
+             "Move beam mark", self.move_beam_mark)
         self.display_histogram_action = self.popup_menu.addAction(\
              "Display histogram", self.display_histogram_toggled)
         self.define_histogram_action = self.popup_menu.addAction(\
@@ -119,8 +116,14 @@ class Qt4_CameraBrick(BlissWidget):
 
         self.image_scale_menu = self.popup_menu.addMenu("Image scale")
         self.image_scale_menu.setEnabled(False) 
+        #self.zoom_window_menu = self.popup_menu.addAction(\
+        #     "Zoom window",
+        #     self.zoom_window_clicked)
         
         self.popup_menu.popup(QtGui.QCursor.pos())
+      
+        self.zoom_dialog = ZoomDialog(self) 
+        self.zoom_dialog.setModal(True) 
 
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
@@ -156,18 +159,6 @@ class Qt4_CameraBrick(BlissWidget):
                                 QtCore.SIGNAL('mouseMoved'),  
                                 self.mouse_moved)
                 self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('measureDistanceStateChanged'),
-                                self.measure_distance_state_changed)
-                self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('measureAngleStateChanged'),
-                                self.measure_angle_state_changed)
-                self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('measureAreaStateChanged'),
-                                self.measure_area_state_changed)
-                self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('moveBeamMarkStateChanged'),
-                                self.move_beam_mark_state_changed)
-                self.disconnect(self.graphics_manager_hwobj,
                                 QtCore.SIGNAL('imageScaleChanged'),        
                                 self.image_scaled)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value)
@@ -176,22 +167,10 @@ class Qt4_CameraBrick(BlissWidget):
                              QtCore.SIGNAL('mouseMoved'), 
                              self.mouse_moved)
                 self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('measureDistanceStateChanged'),
-                             self.measure_distance_state_changed)
-                self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('measureAngleStateChanged'),
-                             self.measure_angle_state_changed)
-                self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('measureAreaStateChanged'),
-                             self.measure_area_state_changed)
-                self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('moveBeamMarkStateChanged'),
-                             self.move_beam_mark_state_changed)
-                self.connect(self.graphics_manager_hwobj,
                              QtCore.SIGNAL('imageScaleChanged'),
                              self.image_scaled)
                 self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
-                self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 
+                #self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 
                 self.main_layout.addWidget(self.graphics_view) 
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
@@ -248,22 +227,13 @@ class Qt4_CameraBrick(BlissWidget):
         self.popup_menu.popup(QtGui.QCursor.pos())
 
     def measure_distance_clicked(self):
-        if self.measure_distance_action.isChecked():
-            self.graphics_manager_hwobj.start_measure_distance(wait_click=True)
-        else:
-            self.graphics_manager_hwobj.stop_measure_distance()
+        self.graphics_manager_hwobj.start_measure_distance(wait_click=True)
 
     def measure_angle_clicked(self):
-        if self.measure_angle_action.isChecked():
-            self.graphics_manager_hwobj.start_measure_angle(wait_click=True)
-        else:
-            self.graphics_manager_hwobj.stop_measure_angle()
+        self.graphics_manager_hwobj.start_measure_angle(wait_click=True)
 
     def measure_area_clicked(self):
-        if self.measure_area_action.isChecked():
-            self.graphics_manager_hwobj.start_measure_area(wait_click=True)
-        else:
-            self.graphics_manager_hwobj.stop_measure_area()
+        self.graphics_manager_hwobj.start_measure_area(wait_click=True)
 
     def display_histogram_toggled(self):
         return
@@ -280,34 +250,14 @@ class Qt4_CameraBrick(BlissWidget):
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
 
-    def create_grid_drag_clicked(self):
-        self.graphics_manager_hwobj.create_grid_drag()
+    def create_grid(self):
+        self.graphics_manager_hwobj.create_grid()
 
-    def move_beam_mark_toggled(self):
+    def move_beam_mark(self):
         self.graphics_manager_hwobj.start_move_beam_mark()
 
     def mouse_moved(self, x, y):
         self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" %(x, y))
-
-    def measure_distance_state_changed(self, state):
-        self.measure_distance_action.setChecked(state)
-        self.measure_angle_action.setChecked(False)
-        self.measure_area_action.setChecked(False)
-
-    def measure_angle_state_changed(self, state):
-        self.measure_distance_action.setChecked(False)
-        self.measure_angle_action.setChecked(state)
-        self.measure_area_action.setChecked(False)
-
-    def measure_area_state_changed(self, state):
-        self.measure_distance_action.setChecked(False)
-        self.measure_angle_action.setChecked(False)
-        self.measure_area_action.setChecked(state)
-
-    def move_beam_mark_state_changed(self, state):
-        self.move_beam_mark_action.setChecked(False)
-        self.move_beam_mark_action.setChecked(False)
-        self.move_beam_mark_action.setChecked(state)
 
     def select_all_points_clicked(self):
         self.graphics_manager_hwobj.select_all_points()
@@ -317,3 +267,39 @@ class Qt4_CameraBrick(BlissWidget):
 
     def clear_all_items_clicked(self):
         self.graphics_manager_hwobj.clear_all()
+
+    def zoom_window_clicked(self):
+        self.zoom_dialog.set_camera_frame(self.graphics_manager_hwobj.\
+             get_camera_frame())
+        self.zoom_dialog.set_coord(100, 100)
+        self.zoom_dialog.show()
+
+class ZoomDialog(QtGui.QDialog):
+    """
+    Descript. : 
+    """
+
+    def __init__(self, parent = None, name = None, flags = 0):
+        QtGui.QDialog.__init__(self, parent,
+              QtCore.Qt.WindowFlags(flags | QtCore.Qt.WindowStaysOnTopHint))
+
+        self.graphics_view = QtGui.QGraphicsView()
+        self.graphics_scene = QtGui.QGraphicsScene()
+        self.graphics_view.setScene(self.graphics_scene)
+        self.graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        __main_vlayout = QtGui.QVBoxLayout(self)
+        __main_vlayout.addWidget(self.graphics_view)
+        __main_vlayout.setSpacing(0)
+        __main_vlayout.setContentsMargins(0, 0, 0, 0) 
+
+        self.setMinimumWidth(300)
+        self.setMinimumHeight(300)
+
+    def set_camera_frame(self, camera_frame):
+        self.graphics_camera_frame = camera_frame
+        self.graphics_scene.addItem(camera_frame)
+
+    def set_coord(self, position_x, position_y):
+        return
