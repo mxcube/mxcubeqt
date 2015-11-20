@@ -406,6 +406,14 @@ class CreateTaskBase(QtGui.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
             self.setDisabled(False)
 
+        elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
+            self._path_template = copy.deepcopy(self._path_template)
+            self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
+                self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            self.setDisabled(False)          
+
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 

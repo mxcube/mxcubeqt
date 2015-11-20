@@ -198,6 +198,8 @@ class CreateAdvancedWidget(CreateTaskBase):
             self._init_models()
             self._acq_widget.update_data_model(self._acquisition_parameters,
                                                 self._path_template)            
+        elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
+            self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.AdvancedQueueItem):
             advanced = tree_item.get_model()
             if tree_item.get_model().is_executed():

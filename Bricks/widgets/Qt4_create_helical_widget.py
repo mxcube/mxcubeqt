@@ -200,7 +200,8 @@ class CreateHelicalWidget(CreateTaskBase):
             self._processing_parameters = sample_model.processing_parameters
             #self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
-
+        elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
+            self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 
