@@ -78,9 +78,9 @@ class ConfirmDialog(QtGui.QDialog):
              self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
+        self.setMinimumWidth(600)
 
         # Other --------------------------------------------------------------- 
-        #self.conf_dialog_layout.setChecked(True)
         self.setWindowTitle('Confirm collection')
 
     def set_plate_mode(self, plate_mode):

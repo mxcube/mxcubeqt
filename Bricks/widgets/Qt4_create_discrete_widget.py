@@ -84,7 +84,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.setContentsMargins(0,0,0,0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.addStretch(0)
+        _main_vlayout.addStretch(10)
 
         # SizePolicies --------------------------------------------------------
         
@@ -182,11 +182,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         Descript. :
         """
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
-
-        for shape in selected_shapes:
-            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
-                result = True
         return result
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -225,7 +220,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         else:
             tasks.extend(self.create_dc(sample, cpos=cpos))
             self._path_template.run_number += 1
-
         return tasks
     
     def create_dc(self, sample, run_number = None, start_image = None,
@@ -238,7 +232,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         # Acquisition for start position
         acq = self._create_acq(sample)
-       
+
         if run_number:        
             acq.path_template.run_number = run_number
 

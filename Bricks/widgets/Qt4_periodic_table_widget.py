@@ -57,14 +57,14 @@ class PeriodicTableWidget(QtGui.QWidget):
         _edge_hlayout.addStretch(0)
         _edge_hlayout.addWidget(edge_label)
         _edge_hlayout.addWidget(self.edge_combo)  
-        _edge_hlayout.setSpacing(0)
+        _edge_hlayout.setSpacing(2)
         _edge_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.periodic_table, QtCore.Qt.AlignHCenter)
         _main_vlayout.addWidget(self.edge_widget)
         _main_vlayout.addStretch(0)
-        _main_vlayout.setSpacing(0)
+        _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------

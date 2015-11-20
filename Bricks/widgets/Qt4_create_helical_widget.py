@@ -109,6 +109,8 @@ class CreateHelicalWidget(CreateTaskBase):
              self._enable_processing_toggled)
 
         # Other ---------------------------------------------------------------
+        for col in range(self._lines_widget.lines_treewidget.columnCount()):
+            self._lines_widget.lines_treewidget.resizeColumnToContents(col)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -121,7 +123,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters()
+                get_default_acquisition_parameters("default_helical_values")
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
@@ -244,7 +246,7 @@ class CreateHelicalWidget(CreateTaskBase):
     def _create_task(self,  sample, shape):
         data_collections = []
 
-        if isinstance(shape, graphics_manager.GraphicsItemLine):
+        for shape in self.get_selected_lines():
             snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
 
             # Acquisition for start position
@@ -277,7 +279,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
             dc.set_name(start_acq.path_template.get_prefix())
             dc.set_number(start_acq.path_template.run_number)
-            dc.experiment_type = EXPERIMENT_TYPE.HELICAL
+            dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
 
             data_collections.append(dc)
             self._path_template.run_number += 1
@@ -299,3 +301,10 @@ class CreateHelicalWidget(CreateTaskBase):
                 break
         if line_to_delete:
             self._graphics_manager_hwobj.delete_shape(line_to_delete)
+
+    def get_selected_lines(self):
+        selected_lines = []
+        for line, treewidget_item in self._lines_map.iteritems():
+            if treewidget_item.isSelected():
+                selected_lines.append(line)
+        return selected_lines

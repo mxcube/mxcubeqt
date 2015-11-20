@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>909</width>
-    <height>203</height>
+    <height>206</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -317,6 +317,18 @@
               </property>
               <item>
                <widget class="QLabel" name="overlap_label">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Oscillation overlap:</string>
                 </property>
@@ -327,6 +339,18 @@
               </item>
               <item>
                <widget class="QLabel" name="num_passes_label">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Number of passes:</string>
                 </property>
@@ -337,6 +361,18 @@
               </item>
               <item>
                <widget class="QLabel" name="energy_label">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>27</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>27</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Energy (KeV):</string>
                 </property>
@@ -351,7 +387,7 @@
                  <enum>Qt::Vertical</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
+                 <enum>QSizePolicy::Expanding</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -373,13 +409,13 @@
                 <property name="minimumSize">
                  <size>
                   <width>75</width>
-                  <height>0</height>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>50</width>
-                  <height>32767</height>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -389,13 +425,13 @@
                 <property name="minimumSize">
                  <size>
                   <width>75</width>
-                  <height>0</height>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>50</width>
-                  <height>32767</height>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -405,13 +441,13 @@
                 <property name="minimumSize">
                  <size>
                   <width>75</width>
-                  <height>0</height>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>75</width>
-                  <height>32767</height>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>

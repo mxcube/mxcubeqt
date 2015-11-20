@@ -25,7 +25,6 @@ from PyQt4 import QtCore
 
 from copy import copy
 from BlissFramework.Utils import Qt4_widget_colors
-#from PyMca.QtBlissGraph import QtBlissGraph
 from widgets.Qt4_matplot_widget import TwoDimenisonalPlotWidget
 
 
@@ -35,7 +34,7 @@ class HeatMapWidget(QtGui.QWidget):
         self.setObjectName('heat_map_widget')
 
         # Properties ---------------------------------------------------------- 
-        self.__half_widget_size = 900
+        #self.__half_widget_size = 900
 
         # Signals -------------------------------------------------------------
 
@@ -53,15 +52,14 @@ class HeatMapWidget(QtGui.QWidget):
         self.__selected_x = 0
         self.__selected_y = 0
         self.__selected_image_serial = 0
-        self.__axis_x_range = None
-        self.__axis_y_range = None
+        #self.__axis_x_range = None
+        #self.__axis_y_range = None
         self.__is_map_plot = None
         self.__score_type_index = 0
         self.__max_value = 0
         self.__filter_min_value = 0
         self.__best_pos_list = None
-        self.__heat_map_max_width = 800
-        self.__heat_map_max_height = 500
+        self.__heat_map_max_size = []
 
         # Graphic elements ----------------------------------------------------
         self._heat_map_gbox = QtGui.QGroupBox('Heat map', self)
@@ -182,6 +180,9 @@ class HeatMapWidget(QtGui.QWidget):
         self._best_pos_table.setHorizontalHeaderItem(8,
              QtGui.QTableWidgetItem("Motor positions"))
 
+        screenShape = QtGui.QDesktopWidget().screenGeometry()
+        self.__heat_map_max_size = (screenShape.width() / 2,
+                                    screenShape.height() / 2)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
         self._beamline_setup_hwobj = beamline_setup_hwobj
@@ -189,8 +190,9 @@ class HeatMapWidget(QtGui.QWidget):
 
     def set_associated_data_collection(self, data_collection):
         self.__associated_data_collection = data_collection
-        self.__axis_x_range = [0, data_collection.acquisitions[0].acquisition_parameters.num_images]
-        #self._heat_map_plot.setX1AxisLimits(0, self.__axis_x_range[1])
+        
+        #self._heat_map_plot.set_x_axis_limits((- 0.5, data_collection.\
+        #      acquisitions[0].acquisition_parameters.num_images - 0.5))
 
     def set_associated_grid(self, grid):
         if grid is None:
@@ -200,28 +202,26 @@ class HeatMapWidget(QtGui.QWidget):
         else:
             self.__is_map_plot = True
             self.__associated_grid = grid
-            #self._heat_map_plot.enableZoom(False)
-        
             axis_range = self.__associated_grid.get_col_row_num()
-            self.__axis_x_range = [0, axis_range[0]]
-            self.__axis_y_range = [0, axis_range[1]]
             grid_size = self.__associated_grid.get_size_pix()
 
             width = grid_size[0] * 10
             height = grid_size[1] * 10
             ratio = float(width) / height
-             
-            if width > self.__heat_map_max_width:
-                width = self.__heat_map_max_width
+
+            if width > self.__heat_map_max_size[0]:
+                width = self.__heat_map_max_size[0]
                 height = width / ratio
-            if height > self.__heat_map_max_height:
-                height = self.__heat_map_max_height
+            if height > self.__heat_map_max_size[1]:
+                height = self.__heat_map_max_size[1]
                 width = height * ratio
 
             self._heat_map_plot.setFixedWidth(width)
             self._heat_map_plot.setFixedHeight(height)
-            #self._heat_map_plot.setX1AxisLimits(0, axis_range[0])
-            #self._heat_map_plot.setY1AxisLimits(0, axis_range[1])
+
+            axis_range = self.__associated_grid.get_col_row_num()
+            self._heat_map_plot.set_x_axis_limits((- 0.5, axis_range[0] - 0.5))
+            self._heat_map_plot.set_y_axis_limits((- 0.5, axis_range[1] - 0.5))
 
     def main_gbox_toggled(self, toggle):
         self._heat_map_plot.setHidden(not toggle)
@@ -266,19 +266,16 @@ class HeatMapWidget(QtGui.QWidget):
         if len(self.__result_display.shape) == 1:
             #Displaying results as a line
             x_data = numpy.arange(self.__result_display.shape[0])
-            self.__axis_x_range = [0, self.__result_display.shape[0] - 1]
-            self.__axis_y_range = [self.__result_display.min(), 
-                                   self.__result_display.max()]
-            self._heat_map_plot.clearcurves()
-            self._heat_map_plot.setx1timescale(False)
-            self._heat_map_plot.setY1AxisLimits(self.__result_display.min(),
-                                                self.__result_display.max())
+            #self.__axis_x_range = [0, self.__result_display.shape[0] - 1]
+            #self.__axis_y_range = [self.__result_display.min(), 
+            #                       self.__result_display.max()]
+            #self._heat_map_plot.clearcurves()
+            #self._heat_map_plot.setx1timescale(False)
+            #self._heat_map_plot.setY1AxisLimits(self.__result_display.min(),
+            #                                    self.__result_display.max())
             self._heat_map_plot.newcurve("Dozor result", x_data, self.__result_display)
         else:
             #2D plot
-            if None in (self.__axis_x_range, self.__axis_y_range):
-                return
-            
             #self._heat_map_plot.imagePlot(self.__result_display, ymirror=False)
             #self._heat_map_plot.plotImage.show()
             self._heat_map_plot.plot_result(self.__result_display)
@@ -320,8 +317,8 @@ class HeatMapWidget(QtGui.QWidget):
 
     def clean_result(self):
         self.__results = None
-        self.__axis_x_range = None
-        self.__axis_y_range = None
+        #self.__axis_x_range = None
+        #self.__axis_y_range = None
         self.__associated_grid = None
         self.__associated_data_collection = None
         self._threshold_slider.setValue(0)

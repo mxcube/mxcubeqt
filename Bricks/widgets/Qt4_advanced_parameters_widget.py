@@ -63,20 +63,20 @@ class AdvancedParametersWidget(QtGui.QWidget):
         _dc_parameters_widget_layout.addWidget(self._data_path_widget)
         _dc_parameters_widget_layout.addWidget(self._acq_widget)
         _dc_parameters_widget_layout.setSpacing(2)
-        _dc_parameters_widget_layout.addStretch(0)
+        _dc_parameters_widget_layout.addStretch(10)
         _dc_parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
         _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
         _snapshots_vlayout.addWidget(self.position_widget)
         _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
         _snapshots_vlayout.setSpacing(2)
-        _snapshots_vlayout.addStretch(0)
+        _snapshots_vlayout.addStretch(10)
 
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
         _main_hlayout.addWidget(_snapshot_widget)
         _main_hlayout.setSpacing(2)
-        _main_hlayout.setContentsMargins(0, 0, 0, 0)
+        _main_hlayout.setContentsMargins(2, 2, 2, 2)
         _main_hlayout.addStretch(0)
 
         # Qt signal/slot connections ------------------------------------------

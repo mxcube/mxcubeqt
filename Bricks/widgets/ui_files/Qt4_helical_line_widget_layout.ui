@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>497</width>
-    <height>181</height>
+    <height>187</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -87,6 +87,9 @@
             </property>
             <property name="editTriggers">
              <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::MultiSelection</enum>
             </property>
             <property name="rootIsDecorated">
              <bool>false</bool>

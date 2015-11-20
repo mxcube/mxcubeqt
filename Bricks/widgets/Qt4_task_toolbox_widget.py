@@ -226,7 +226,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                             "would like to add to.")
             else:
                 for item in items:
-                    shapes = self.graphics_manager_hwobj.get_selected_shapes()
+                    shapes = self.graphics_manager_hwobj.get_selected_points()
                     task_model = item.get_model()
 
                     # Create a new group if sample is selected

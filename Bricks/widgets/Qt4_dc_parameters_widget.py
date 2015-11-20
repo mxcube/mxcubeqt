@@ -81,7 +81,7 @@ class DCParametersWidget(QtGui.QWidget):
         _snapshots_vlayout.addWidget(self.position_widget)
         _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
         _snapshots_vlayout.setSpacing(2)
-        _snapshots_vlayout.addStretch(0)
+        _snapshots_vlayout.addStretch(10)
 
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)

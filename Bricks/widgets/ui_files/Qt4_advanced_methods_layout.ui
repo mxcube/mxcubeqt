@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>457</width>
-    <height>314</height>
+    <width>482</width>
+    <height>323</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,14 +42,8 @@
        <property name="spacing">
         <number>6</number>
        </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
+       <property name="margin">
+        <number>2</number>
        </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -387,12 +381,12 @@
             </column>
             <column>
              <property name="text">
-              <string>Beam width ()</string>
+              <string>Beam width (μ)</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Beam height ()</string>
+              <string>Beam height (μ)</string>
              </property>
             </column>
             <column>

@@ -253,11 +253,6 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
                            QtGui.QSizePolicy.Expanding)
 
         self.mpl_canvas.axes.grid(True)
-        self.divider = make_axes_locatable(self.mpl_canvas.axes)
-        self.cax = self.divider.append_axes("right", size=0.3, pad=0.05)
-        self.cax.tick_params(axis='x', labelsize=8)
-        self.cax.tick_params(axis='y', labelsize=8)
-
         self.mpl_canvas.fig.canvas.mpl_connect(\
              "button_press_event", self.mouse_clicked)
 
@@ -267,10 +262,24 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
 
     def plot_result(self, result, last_result=None):
         im = self.mpl_canvas.axes.imshow(result, interpolation = 'none', aspect='auto')
-        plt.colorbar(im, cax = self.cax)
         im.set_cmap('hot')
+        if result.max() > 0:
+            self.add_divider()
+            plt.colorbar(im, cax = self.cax)
         self.mpl_canvas.draw()
         self.mpl_canvas.fig.canvas.draw_idle()
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()
+
+    def set_x_axis_limits(self, limits):
+        self.mpl_canvas.axes.set_xlim(limits)
+
+    def set_y_axis_limits(self, limits):
+        self.mpl_canvas.axes.set_ylim(limits)
+
+    def add_divider(self):
+        self.divider = make_axes_locatable(self.mpl_canvas.axes)
+        self.cax = self.divider.append_axes("right", size=0.3, pad=0.05)
+        self.cax.tick_params(axis='x', labelsize=8)
+        self.cax.tick_params(axis='y', labelsize=8)

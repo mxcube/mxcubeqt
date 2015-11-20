@@ -110,6 +110,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acq_widget.use_kappa_phi(False)
         self._acq_widget.acq_widget_layout.num_images_label.setEnabled(False)
         self._acq_widget.acq_widget_layout.num_images_ledit.setEnabled(False)
+        for col in range(self._advanced_methods_widget.grid_treewidget.columnCount()):
+            self._advanced_methods_widget.grid_treewidget.resizeColumnToContents(col)
 
     def init_models(self):
         """
@@ -135,8 +137,11 @@ class CreateAdvancedWidget(CreateTaskBase):
 
             if not self._advanced_methods:
                 self._advanced_methods = self._beamline_setup_hwobj.get_advanced_methods()            
-                for method in self._advanced_methods:
-                    self._advanced_methods_widget.method_combo.addItem(method)
+                if self._advanced_methods:
+                   for method in self._advanced_methods:
+                       self._advanced_methods_widget.method_combo.addItem(method)
+                else:
+                   self.setEnabled(False)    
             try:
                 transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
                 transmission = round(float(transmission), 1)
@@ -223,9 +228,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         data_collections = []
-        shape = self.get_selected_grid()
-
-        if shape is not None:
+        for shape in self.get_selected_grids():
             snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
             grid_properties = shape.get_properties()
 
@@ -272,7 +275,6 @@ class CreateAdvancedWidget(CreateTaskBase):
                 info_str_list)
             grid_treewidget_item.setSelected(True)
             self._grid_map[shape] = grid_treewidget_item
-
             self.grid_treewidget_item_selection_changed()
             
     def shape_deleted(self, shape, shape_type):
@@ -310,10 +312,12 @@ class CreateAdvancedWidget(CreateTaskBase):
             else:
                 grid_object.setSelected(False)
 
-    def get_selected_grid(self):
-        for grid_object, grid_treewidget_item in self._grid_map.iteritems():
+    def get_selected_grids(self):
+        selected_grids = [] 
+        for grid, grid_treewidget_item in self._grid_map.iteritems():
             if grid_treewidget_item.isSelected():
-                return grid_object
+                selected_grids.append(grid)
+        return selected_grids
 
     def draw_grid_button_clicked(self):
         self._graphics_manager_hwobj.create_grid(self.get_spacing())
@@ -337,4 +341,3 @@ class CreateAdvancedWidget(CreateTaskBase):
         except:
            pass
         return spacing
-

@@ -109,7 +109,6 @@ class DCGroupWidget(QtGui.QWidget):
         dcg_child_list = []
         sw_list = []
          
-
         if dcg_queue_item.interleave_sw_list:
             sw_list = dcg_queue_item.interleave_sw_list
             for child in dcg_queue_item.interleave_items: 
@@ -139,5 +138,4 @@ class DCGroupWidget(QtGui.QWidget):
                 self.subwedge_table.setItem(row, col, QtGui.QTableWidgetItem(param_list[col]))
                 self.subwedge_table.item(row, col).setBackground(\
                      QtGui.QColor(Qt4_widget_colors.TASK_GROUP[sw[0]]))
-
         self.polar_scater_widget.draw_multiwedge_scater(sw_list)

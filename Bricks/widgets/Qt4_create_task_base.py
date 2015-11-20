@@ -460,19 +460,39 @@ class CreateTaskBase(QtGui.QWidget):
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
-    def centred_position_selection(self, positions):
-         self._selected_positions = positions
+    def centred_position_selection(self, position):
+        """
+        Descript. : Called by the owning widget (task_toolbox_widget) when
+                    one or several centred positions are selected. 
+                    Updates kappa/phi position from the centring point
+                    Enables kappa/phi edit if not collection item and no
+                    centring point is selected. In all other cases kappa/phi
+                    edit is disabled.
+                    Also updates centring point if a data collection item is
+                    selected and new centring point clicked 
+        Args.     : centring points
+        Return    "
+        """
+        if self._acq_widget:
+            self._acq_widget.use_kappa(False)
+            self._acq_widget.use_kappa_phi(False)
 
-         if len(self._current_selected_items) == 1 and len(positions) == 1:
-             item = self._current_selected_items[0]
-             pos = positions[0]
+            if len(self._current_selected_items) == 1:
+                item = self._current_selected_items[0]
+                if position:
+                    cpos = position.get_centred_position()
+                    if cpos.kappa is not None:
+                        self._acq_widget.update_kappa(cpos.kappa)
+                        self._acq_widget.update_kappa_phi(cpos.kappa_phi)
+                    if isinstance(item, Qt4_queue_item.TaskQueueItem):
+                        snapshot = self._graphics_manager_hwobj.get_snapshot(position)
+                        cpos.snapshot_image = snapshot
+                        self._acquisition_parameters.centred_position = cpos
+                else:
+                    if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                        self._acq_widget.use_kappa(True)
+                        self._acq_widget.use_kappa_phi(True)
 
-             if isinstance(pos, Qt4_GraphicsManager.Point):
-                 if self._acq_widget and isinstance(item, Qt4_queue_item.TaskQueueItem):
-                     cpos = pos.get_centred_positions()[0]
-                     snapshot = self._graphics_manager_hwobj.get_snapshot([pos.qub_point])
-                     cpos.snapshot_image = snapshot        
-                     self._acquisition_parameters.centred_position = cpos
 
     # Should be called by the object that calls create_task,
     # and add_task.
@@ -518,7 +538,22 @@ class CreateTaskBase(QtGui.QWidget):
                 # Check if the tasks requires centring, assumes that all
                 # the "sub tasks" has the same centring requirements.
                 if temp_tasks[0].requires_centring():
-                    sc = queue_model_objects.SampleCentring('sample-centring')
+                    kappa = None
+                    kappa_phi = None
+                    task_label = 'sample-centring'
+                    if isinstance(temp_tasks[0], queue_model_objects.DataCollection):
+                        kappa = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa
+                        kappa_phi = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa_phi
+                        if kappa and kappa_phi:
+                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                    elif isinstance(temp_tasks[0], queue_model_objects.Characterisation):
+                        kappa = temp_tasks[0].reference_image_collection.\
+                               acquisitions[0].acquisition_parameters.kappa
+                        kappa_phi = temp_tasks[0].reference_image_collection.\
+                               acquisitions[0].acquisition_parameters.kappa_phi
+                        if kappa and kappa_phi:
+                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                    sc = queue_model_objects.SampleCentring(task_label, kappa, kappa_phi)
                     tasks.append(sc)
 
         for task in temp_tasks:
@@ -610,3 +645,14 @@ class CreateTaskBase(QtGui.QWidget):
                    not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 model.set_name(self._path_template.get_prefix())
                 item.setText(0, model.get_name())
+
+    def refresh_current_item(self):
+        if len(self._current_selected_items) > 0:
+            item = self._current_selected_items[0]
+            model = item.get_model()
+            if self.isEnabled():
+                if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
+                     not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                    name = self._path_template.get_prefix()
+                    model.set_name(name)
+                    item.setText(0, model.get_display_name())

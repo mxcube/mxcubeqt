@@ -71,8 +71,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self.main_layout.addWidget(self._periodic_table_widget)
         self.main_layout.addWidget(self._data_path_gbox)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.setSpacing(0)
-        self.main_layout.addStretch(0)
+        self.main_layout.setSpacing(6)
+        self.main_layout.addStretch(10)
 
         # SizePolicies --------------------------------------------------------
 

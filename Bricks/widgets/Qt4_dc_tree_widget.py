@@ -125,7 +125,6 @@ class DataCollectTree(QtGui.QWidget):
         self.continue_button = QtGui.QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
         self.continue_button.setEnabled(True)
-        self.continue_button.setFixedWidth(75)
         self.continue_button.setToolTip("Pause after current data collection")
 
         self.sample_tree_widget = QtGui.QTreeWidget(self)
@@ -172,7 +171,7 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.setColumnCount(2)
         #self.sample_tree_widget.setColumnWidth(0, 150)
         self.sample_tree_widget.setColumnWidth(1, 130)
-        self.sample_tree_widget.header().setDefaultSectionSize(220)
+        self.sample_tree_widget.header().setDefaultSectionSize(250)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
@@ -393,8 +392,7 @@ class DataCollectTree(QtGui.QWidget):
         self.copy_button.setDisabled(True)
 
         for item in items:
-            if type(item) in (Qt4_queue_item.DataCollectionGroupQueueItem,
-                              Qt4_queue_item.DataCollectionQueueItem):
+            if isinstance(item, Qt4_queue_item.TaskQueueItem):
                 self.copy_button.setDisabled(False)
                 break
 
@@ -462,10 +460,11 @@ class DataCollectTree(QtGui.QWidget):
 
         self.queue_model_hwobj.view_created(view_item, task)
         self.collect_button.setDisabled(False)
-
-        if isinstance(view_item, Qt4_queue_item.TaskQueueItem):
-            self.sample_tree_widget.clearSelection()
-            view_item.setSelected(True)
+   
+        #if isinstance(view_item, Qt4_queue_item.TaskQueueItem):
+        #    self.sample_tree_widget.clearSelection()
+        #    view_item.setSelected(True)
+        #    self.sample_tree_widget_selection()
 
     def get_selected_items(self):
         """
@@ -971,6 +970,7 @@ class DataCollectTree(QtGui.QWidget):
                 #self.sample_tree_widget_selection()
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 item.set_mounted_style(False)
+
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
                     item.setIcon(0, self.ispyb_icon)
