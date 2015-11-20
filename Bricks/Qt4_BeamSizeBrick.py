@@ -74,7 +74,7 @@ class Qt4_BeamSizeBrick(BlissWidget):
 
         # Properties ----------------------------------------------------------
         self.addProperty('mnemonic', 'string', '')
-        self.addProperty('formatString', 'formatString', '#.##')
+        self.addProperty('formatString', 'formatString', '#.#')
 
         # Signals ------------------------------------------------------------
 

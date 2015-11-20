@@ -67,8 +67,10 @@ class Qt4_HutchMenuBrick(BlissWidget):
         # Properties ----------------------------------------------------------
         self.addProperty('collection', 'string', '')
         self.addProperty('graphicsManager', 'string', '')
-        self.addProperty('useAutoCentringButton', 'boolean', True)
-        self.addProperty('useBeamMarkMoveButtons', 'boolean', True)
+        self.addProperty('enableAutoFocus', 'boolean', True)
+        self.addProperty('enableRefreshCamera', 'boolean', True)
+        self.addProperty('enableVisualAlign', 'boolean', True)
+        self.addProperty('enableAutoCenter', 'boolean', True)
 
         # Signals -------------------------------------------------------------
         
@@ -84,6 +86,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.reject_button.hide()
         self.create_line_button = MonoStateButton(self, "Line", "Line")
         self.draw_grid_button = MonoStateButton(self, "Grid", "Grid")
+        self.auto_focus_button = MonoStateButton(self, "Focus", "Eyeball")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
@@ -91,45 +94,20 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.clear_all_button = MonoStateButton(self, "Clear", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
 
-        self.beam_position_widget = QtGui.QWidget(self)
-        _move_mark_label = QtGui.QLabel("Beam mark", self.beam_position_widget)
-        _move_left_button = MonoStateButton(self.beam_position_widget,
-             None, "left_small.png", (23, 23))
-        _move_left_button.setAutoRepeat(True)
-        _move_right_button = MonoStateButton(self.beam_position_widget,
-             None, "right_small.png", (23, 23))
-        _move_right_button.setAutoRepeat(True)
-        _move_up_button = MonoStateButton(self.beam_position_widget,
-             None, "up_small.png", (23, 23))
-        _move_up_button.setAutoRepeat(True)
-        _move_down_button = MonoStateButton(self.beam_position_widget,
-             None, "down_small.png", (23, 23))
-        _move_down_button.setAutoRepeat(True)
-
         # Layout -------------------------------------------------------------- 
-        _beam_position_widget_gridlayout = QtGui.QGridLayout(self.beam_position_widget)
-        _beam_position_widget_gridlayout.addWidget(_move_mark_label, 0, 0, 1, 3, QtCore.Qt.AlignHCenter)
-        _beam_position_widget_gridlayout.addWidget(_move_left_button, 2, 0)
-        _beam_position_widget_gridlayout.addWidget(_move_up_button, 1, 1)
-        _beam_position_widget_gridlayout.addWidget(_move_right_button, 2, 2)
-        _beam_position_widget_gridlayout.addWidget(_move_down_button, 3, 1) 
-        _beam_position_widget_gridlayout.setHorizontalSpacing(0)
-        _beam_position_widget_gridlayout.setVerticalSpacing(0)
-        _beam_position_widget_gridlayout.setContentsMargins(0, 0, 0, 0)
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.centre_button)
         _main_vlayout.addWidget(self.accept_button)
         _main_vlayout.addWidget(self.reject_button)
         _main_vlayout.addWidget(self.create_line_button)
         _main_vlayout.addWidget(self.draw_grid_button)
+        _main_vlayout.addWidget(self.auto_focus_button)
         _main_vlayout.addWidget(self.snapshot_button)
         _main_vlayout.addWidget(self.refresh_camera_button)
         _main_vlayout.addWidget(self.visual_align_button)
         _main_vlayout.addWidget(self.select_all_button)
         _main_vlayout.addWidget(self.clear_all_button)
         _main_vlayout.addWidget(self.auto_center_button)
-        _main_vlayout.addWidget(self.beam_position_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -140,16 +118,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.reject_button.clicked.connect(self.reject_clicked)
         self.create_line_button.clicked.connect(self.create_line_clicked)
         self.draw_grid_button.clicked.connect(self.draw_grid_clicked)
+        self.auto_focus_button.clicked.connect(self.auto_focus_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
         self.refresh_camera_button.clicked.connect(self.refresh_camera_clicked)
         self.visual_align_button.clicked.connect(self.visual_align_clicked)
         self.select_all_button.clicked.connect(self.select_all_clicked)
         self.clear_all_button.clicked.connect(self.clear_all_clicked)
         self.auto_center_button.clicked.connect(self.auto_center_clicked)
-        _move_left_button.clicked.connect(self.move_left_clicked)
-        _move_right_button.clicked.connect(self.move_right_clicked)
-        _move_up_button.clicked.connect(self.move_up_clicked)
-        _move_down_button.clicked.connect(self.move_down_clicked)
 
         # Other ---------------------------------------------------------------
         self.centre_button.setToolTip("3 click centring (Ctrl+1)")
@@ -184,9 +159,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('minidiffReady'), self.diffractometer_ready_changed)
         elif property_name == "collection":
             self.collect_hwobj = self.getHardwareObject(new_value)
-        elif property_name == "useBeamMarkMoveButtons":
-            self.beam_position_widget.setVisible(new_value) 
-        elif property_name == "useAutoCentringButton":
+        elif property_name == "enableAutoFocus":
+            self.auto_focus_button.setVisible(new_value) 
+        elif property_name == "enableRefreshCamera":
+            self.refresh_camera_button.setVisible(new_value)
+        elif property_name == "enableVisualAlign":
+            self.visual_align_button.setVisible(new_value)
+        elif property_name == "enableAutoCenter":
             self.auto_center_button.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -371,20 +350,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
     def diffractometer_ready_changed(self, is_ready):
         self.setEnabled(is_ready)
 
+    def auto_focus_clicked(self):
+        self.graphics_manager_hwobj.auto_focus()
+
     def auto_center_clicked(self):
-        self.graphics_manager_hwobj.start_auto_centring(self)
-
-    def move_left_clicked(self):
-        self.graphics_manager_hwobj.move_beam_mark("left")
-
-    def move_right_clicked(self):
-        self.graphics_manager_hwobj.move_beam_mark("right")
-
-    def move_up_clicked(self):
-        self.graphics_manager_hwobj.move_beam_mark("up")
-
-    def move_down_clicked(self):
-        self.graphics_manager_hwobj.move_beam_mark("down")    
+        self.graphics_manager_hwobj.start_auto_centring()
 
 class MonoStateButton(QtGui.QToolButton):
 

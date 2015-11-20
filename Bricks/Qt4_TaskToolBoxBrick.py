@@ -45,7 +45,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.graphics_manager_hwobj = None
+        #self.graphics_manager_hwobj = None
         self.diffractometer_hwobj = None
         self.beamline_setup_hwobj = None
         self.queue_model_hwobj = None
@@ -157,18 +157,19 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         """
         if property_name == 'beamline_setup':
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
-
             if self.beamline_setup_hwobj:
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                     self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+                graphics_manager_hwobj = self.beamline_setup_hwobj.shape_history_hwobj
+                if graphics_manager_hwobj:
+                    graphics_manager_hwobj.connect('pointSelected', self.point_selected)
+                    graphics_manager_hwobj.connect('pointDeleted', self.point_deleted) 
             else:
                 logging.getLogger('user_level_log').error('Could not load beamline setup '+\
                                                           'check configuration !.')
         elif property_name == 'queue_model':
-
             self.queue_model_hwobj = self.getHardwareObject(new_value)
-
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
@@ -182,16 +183,31 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         """
         self.task_tool_box_widget.selection_changed(items)
 
-    def shape_selected(self, selected_positions):
+    def point_selected(self, selected_position):
         """
-        Descript. : Callback for the DrawingEvent object called when 
-                    a shape is selected.  
+        Descript. : slot when point selected
         Args.     :
         Return    :
         """
         self.task_tool_box_widget.helical_page.\
-            centred_position_selection(selected_positions)
+            centred_position_selection(selected_position)
         self.task_tool_box_widget.discrete_page.\
-            centred_position_selection(selected_positions)
-        self.task_tool_box_widget.\
-            char_page.centred_position_selection(selected_positions)
+            centred_position_selection(selected_position)
+        self.task_tool_box_widget.char_page.\
+            centred_position_selection(selected_position)
+        self.task_tool_box_widget.energy_scan_page.\
+            centred_position_selection(selected_position)
+        self.task_tool_box_widget.xrf_spectrum_page.\
+            centred_position_selection(selected_position)
+
+        self.task_tool_box_widget.discrete_page.refresh_current_item()
+        self.task_tool_box_widget.helical_page.refresh_current_item()
+        self.task_tool_box_widget.char_page.refresh_current_item()
+        self.task_tool_box_widget.energy_scan_page.refresh_current_item()
+        self.task_tool_box_widget.xrf_spectrum_page.refresh_current_item()
+
+    def point_deleted(self, shape):
+        """
+        Callback for the DrawingEvent object called when a shape is deleted.
+        """
+        self.task_tool_box_widget.helical_page.shape_deleted(shape) 

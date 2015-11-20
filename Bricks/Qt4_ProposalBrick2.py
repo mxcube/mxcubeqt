@@ -173,8 +173,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.proposal_password_ledit.returnPressed.connect(self.login)
