@@ -25,7 +25,6 @@ class EDNAParameters(BlissWidget):
         #when starting a workflow we emit this signal and expect
         #to get the beamline params through the slot
         self.defineSlot('updateBeamlineParameters', ())
-        self.defineSlot("populate_workflow_widget",({}))  
         self.defineSignal('beamlineParametersNeeded', ())
         self.defineSignal('workflowAvailable', ())
 
@@ -78,8 +77,6 @@ class EDNAParameters(BlissWidget):
         #                self.abort_workflow)
         QObject.connect(self.start_button, SIGNAL('clicked()'),
                         self.start_workflow)
-        QObject.connect(self.workflow_list, SIGNAL('activated ( const QString &)'),
-                        self.workflow_selected)
         # name -> model path mapping
         self.workflows = dict()
 
@@ -257,7 +254,6 @@ class EDNAParameters(BlissWidget):
             self.workflows[name] = w
         if previous_workflow_index is not None:
             self.workflow_list.setCurrentItem(previous_workflow_index)
-        self.workflow_selected(self.workflow_list.currentText())
 
     def start_workflow(self):
         #get the beamline params
@@ -320,24 +316,6 @@ class EDNAParameters(BlissWidget):
             self.beamline_params[k] = value
 
 
-    def workflow_selected(self, name):
-        if type(name) != types.StringType:
-            name = str(name)
-        self.workflow_list.setCurrentText(name)
-        #get the path of the html describing the WF
-        workflow_doc = self.workflows[name]['doc']
-        if self.params_widget is not None:
-            self.layout().removeChild(self.params_widget)
-        self.params_widget = QTextBrowser(self)
-        if os.path.exists(workflow_doc):
-            self.params_widget.setSource(workflow_doc)
-        else:
-            self.params_widget.setText('<center><b>no documentation available</b></center>')
-        # add the browser to the layout
-        self.layout().addMultiCellWidget(self.params_widget, 0, 0, 0, 1)
-        self.params_widget.show()
-
-
     def login_changed(self, *login_infos):
         logging.debug('user logged in, logins_info: %r', login_infos)
         if len(login_infos) == 1 and login_infos[0] == None:
@@ -346,6 +324,3 @@ class EDNAParameters(BlissWidget):
             self.session_id = int(login_infos[0])
 
 
-    def populate_workflow_widget(self, item, running = False):        
-        if item and not running:
-            self.workflow_selected(item.get_model().get_type())

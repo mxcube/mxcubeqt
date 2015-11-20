@@ -1,0 +1,34 @@
+<object class="PX1MultiCollect">
+
+   <collectname>i10-c-cx1/ex/collect</collectname>
+   <pilatusname>i10-c-cx1/dt/pilatus</pilatusname>
+   <fluomotor>i10-c-cx1/dt/dtc_sdd.1-pos</fluomotor>
+   <oscaxis>Phi</oscaxis>
+
+   <imgtojpeg>/data/local/mxcube_v2/mxcube/bin/adxv_makejpeg</imgtojpeg>
+
+   <!-- OPTIONS are firstandlast or allframes -->
+   <jpegoption>firstandlast</jpegoption>
+   <ruche_sync_dir>/nfs/archive_spool</ruche_sync_dir>
+
+   <object href="/session" role="session" />
+   <object href="/dbconnection" role="dbserver" />
+   <object href="/obx" role="safety_shutter" />
+   <object href="/fastshut" role="fast_shutter" />
+   <object href="/mxlocal" role="beamline_configuration" />
+   <object href="/minidiff" role="diffractometer" />
+   <object href="/cryotong" role="sample_changer" />
+   <object href="/soleil-energyscan" role="energy" />
+   <object href="/PS_attenuator" role="transmission" />
+   <object href="/detectordistance" role="detector_distance" />
+   <object href="/mach" role="machine_current" />
+   <object href="/resolution" role="resolution" />
+   <object href="/kappa" role="kappa" />
+   <object href="/phi" role="phi" />
+   <object href="/omega" role="omega" />
+   <object href="/flux" role="flux" />
+
+   <directory_prefix>PX1</directory_prefix>
+   <close_safty_shutter>0</close_safty_shutter>
+
+</object>

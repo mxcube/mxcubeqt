@@ -20,6 +20,7 @@ class AcquisitionWidget(qt.QWidget):
         #
         self._beamline_setup = None
         self.previous_energy = 0
+        self.layout_type = layout
 
         if acq_params is None:
             self._acquisition_parameters = queue_model_objects.\
@@ -105,6 +106,10 @@ class AcquisitionWidget(qt.QWidget):
             insertStrList(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
+        self.acq_widget_layout.child('kappa_ledit').setEnabled(False)
+        self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(False)
+        self.acq_widget_layout.child('detector_mode_label').setEnabled(False)
+        self.acq_widget_layout.child('detector_mode_combo').setEnabled(False)
 
     def osc_start_cbox_click(self, state):
         self.update_osc_start(self._beamline_setup._get_omega_axis_position())
@@ -123,14 +128,30 @@ class AcquisitionWidget(qt.QWidget):
             osc_start_ledit.setText("%.2f" % osc_start_value)
             self._acquisition_parameters.osc_start = osc_start_value
 
+    def update_kappa(self, new_value):
+        self.acq_widget_layout.child('kappa_ledit').\
+             setText("%.2f" % float(new_value))
+
+    def update_kappa_phi(self, new_value):
+        self.acq_widget_layout.child('kappa_phi_ledit').\
+             setText("%.2f" % float(new_value))
+
     def use_osc_start(self, state):
         self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
         self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
+
+    def use_kappa(self, state):
+        if self.layout_type == "vertical":
+            self.acq_widget_layout.child('kappa_ledit').setEnabled(state)
+
+    def use_kappa_phi(self, state):
+        if self.layout_type == "vertical":
+            self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
-        limits_dict = self._beamline_setup.get_acqisition_limt_values()
+        limits_dict = self._beamline_setup.get_acquisition_limit_values()
 
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
@@ -148,6 +169,16 @@ class AcquisitionWidget(qt.QWidget):
         osc_range_ledit = self.acq_widget_layout.child('osc_range_ledit')
         self._acquisition_mib.bind_value_update('osc_range', osc_range_ledit,
                                                 float, osc_range_validator)
+
+        kappa_validator = qt.QDoubleValidator(0, 360, 2, self)
+        kappa_ledit = self.acq_widget_layout.child('kappa_ledit')
+        self._acquisition_mib.bind_value_update('kappa', kappa_ledit,
+                                                float, kappa_validator)
+
+        kappa_phi_validator = qt.QDoubleValidator(0, 360, 2, self)
+        kappa_phi_ledit = self.acq_widget_layout.child('kappa_phi_ledit')
+        self._acquisition_mib.bind_value_update('kappa_phi', kappa_phi_ledit,
+                                                float, kappa_phi_validator)
 
         if 'exposure_time' in limits_dict:
             limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
@@ -406,3 +437,7 @@ class AcquisitionWidget(qt.QWidget):
         #else:
         #    self.acq_widget_layout.child('aperture_ledit').hide()
         #    self.acq_widget_layout.child('aperture_cbox').hide()
+
+    def check_parameter_conflict(self):
+        return len(self._acquisition_mib.validate_all()) > 0
+

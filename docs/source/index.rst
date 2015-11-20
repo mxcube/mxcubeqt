@@ -39,9 +39,8 @@ See the :doc:`design_overview` for more details
 
 Tutorials and Examples
 ----------------------
-* :doc:`packages/example_files`
 * :doc:`installation_instructions`
-
+* :doc:`packages/example_files`
 
 API
 ---
@@ -50,6 +49,10 @@ API
    :glob:
 
    packages/*
+
+Other information
+----------------------
+* :doc:`mxcube_meetings`
 
 Indices and tables
 ------------------

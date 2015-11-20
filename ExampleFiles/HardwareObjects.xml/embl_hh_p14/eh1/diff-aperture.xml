@@ -1,0 +1,23 @@
+<device class="BeamAperture">
+   <exporter_address>p14md301.embl-hamburg.de:9001</exporter_address>
+   <channel type="exporter" name="CurrentApertureDiameterIndex">CurrentApertureDiameterIndex</channel>
+   <!-- <beamFocusHO>/eh1/beamFocusing</beamFocusHO> -->
+   <defaultPosition>150</defaultPosition>	
+   <positions> 	    
+      <position>
+	  <posName>20</posName>
+          <modesAllowed>['Unfocused', 'Horizontal', 'Vertical']</modesAllowed>
+ 	  <size>[0.020, 0.020]</size>
+      </position>
+      <position>
+	 <posName>Out</posName>
+	 <modesAllowed>['Unfocused']</modesAllowed>
+        <size>[0.40000, 0.4000]</size>
+      </position>
+      <position>
+	 <posName>150</posName>
+         <modesAllowed>['Unfocused', 'Horizontal', 'Vertical', 'Double']</modesAllowed>
+	 <size>[0.150, 0.150]</size>
+      </position>
+   </positions>
+</device>

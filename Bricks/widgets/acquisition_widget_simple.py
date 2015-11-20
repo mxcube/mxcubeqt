@@ -42,6 +42,8 @@ class AcquisitionWidgetSimple(qt.QWidget):
         #
         # Logic
         #
+        self.acq_widget_layout.child('kappa_ledit').setEnabled(False)
+        self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(False)
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(False)
 
         # Default to 2-images
@@ -67,6 +69,20 @@ class AcquisitionWidgetSimple(qt.QWidget):
             
             osc_start_ledit.setText("%.2f" % osc_start_value)
             self._acquisition_parameters.osc_start = osc_start_value
+
+    def update_kappa(self, new_value):
+        self.acq_widget_layout.child('kappa_ledit').\
+             setText("%.2f" % float(new_value))
+
+    def update_kappa_phi(self, new_value):
+        self.acq_widget_layout.child('kappa_phi_ledit').\
+             setText("%.2f" % float(new_value))
+
+    def use_kappa(self, state):
+        self.acq_widget_layout.child('kappa_ledit').setDisabled(state)
+
+    def use_kappa_phi(self, state):
+        self.acq_widget_layout.child('kappa_phi_ledit').setDisabled(state)
     
     def update_num_images(self, index = None, num_images = None):
         if index is not None:
@@ -111,7 +127,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
 
-        limits_dict = self._beamline_setup.get_acqisition_limt_values()
+        limits_dict = self._beamline_setup.get_acquisition_limit_values()
 
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
@@ -119,7 +135,7 @@ class AcquisitionWidgetSimple(qt.QWidget):
             osc_start_validator = qt.QDoubleValidator(lower, upper, 4, self)
             osc_range_validator = qt.QDoubleValidator(lower, upper, 4, self)
         else:
-            osc_start_validator = qt.QDoubleValidator(10000, 10000, 4, self)
+            osc_start_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
             osc_range_validator = qt.QDoubleValidator(-10000, 10000, 4, self)
 
         osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
@@ -203,3 +219,6 @@ class AcquisitionWidgetSimple(qt.QWidget):
     def use_osc_start(self, state):
         self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
         self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
+
+    def check_parameter_conflict(self):
+        return len(self._acquisition_mib.validate_all()) > 0

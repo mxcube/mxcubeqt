@@ -8,6 +8,7 @@ from widgets.create_helical_widget import CreateHelicalWidget
 from widgets.create_discrete_widget import CreateDiscreteWidget
 from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
+from widgets.create_xrf_scan_widget import CreateXRFScanWidget
 from widgets.create_workflow_widget import CreateWorkflowWidget
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 
@@ -42,12 +43,14 @@ class TaskToolBoxWidget(qt.QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.helical_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
+        self.xrf_scan_page = CreateXRFScanWidget(self.tool_box, "xrf_scan")
         self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
+        self.tool_box.addItem(self.xrf_scan_page, "XRF Scan")
         self.tool_box.addItem(self.workflow_page, "Advanced")
 
         self.add_pixmap = Icons.load("add_row.png")
@@ -89,12 +92,13 @@ class TaskToolBoxWidget(qt.QWidget):
         self.shape_history = beamline_setup_hwobj.shape_history_hwobj
         self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
         self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
-        self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
 
         # Remove energy scan page from non tunable wavelentgh beamlines
         if not beamline_setup_hwobj.tunable_wavelength():
             self.tool_box.removeItem(self.energy_scan_page)
             self.energy_scan_page.hide()
+        else:
+            self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
@@ -127,6 +131,8 @@ class TaskToolBoxWidget(qt.QWidget):
                 new_pt = self.tool_box.item(page_index)._path_template
                 previous_pt = self.tool_box.item(self.previous_page_index)._path_template
                 new_pt.directory = previous_pt.directory
+                #issu #91 - carry over file prefix. Remove this comment later
+                new_pt.base_prefix = previous_pt.base_prefix
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
 
@@ -135,27 +141,30 @@ class TaskToolBoxWidget(qt.QWidget):
 
     def selection_changed(self, items):
         """
-        Called by the parent widget when selection in the tree changes.
+        Descript. : Called by the parent widget when selection in the tree changes.
+                    It also enables/disables add to queue button.
+                    If one tree item is selected then tool_box current page is set 
+                    to the page associated to the item. For example if a energy scan 
+                    item is selected then create_energy_scan tool box page is selected.
+                    Add to queue is disable if sample centring is selected
         """
         if len(items) == 1:
-            
-            if isinstance(items[0], queue_item.DataCollectionGroupQueueItem):
+            if isinstance(items[0], queue_item.SampleCentringQueueItem):
                 self.create_task_button.setEnabled(False)
             else:
-                self.create_task_button.setEnabled(True)
-
+                self.create_task_button.setEnabled(True)   
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
-
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
                     self.tool_box.setCurrentItem(self.helical_page)
                 else:
                     self.tool_box.setCurrentItem(self.discrete_page)
-
             elif isinstance(items[0], queue_item.CharacterisationQueueItem):
                 self.tool_box.setCurrentItem(self.char_page)
             elif isinstance(items[0], queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentItem(self.energy_scan_page)
+            elif isinstance(items[0], queue_item.XRFScanQueueItem):
+                self.tool_box.setCurrentItem(self.xrf_scan_page)
             elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentItem(self.workflow_page)
 
@@ -177,30 +186,46 @@ class TaskToolBoxWidget(qt.QWidget):
 
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
-                        group_task_node = queue_model_objects.TaskGroup()
-                        current_item = self.tool_box.currentItem()
-
-                        if current_item is self.workflow_page:
-                            group_name = current_item._workflow_cbox.currentText()
+                        task_model = self.create_task_group(task_model)
+                        if len(shapes):
+                            for shape in shapes:
+                                self.create_task(task_model, shape)
                         else:
-                            group_name = current_item._task_node_name
-
-                        group_task_node.set_name(group_name)
-                        num = task_model.get_next_number_for_name(group_name)
-                        group_task_node.set_number(num)
-
-                        self.tree_brick.queue_model_hwobj.\
-                          add_child(task_model, group_task_node)
-
-                        task_model = group_task_node
-                    
-                    if len(shapes):
-                        for shape in shapes:
-                            self.create_task(task_model, shape)
+                            self.create_task(task_model)
+                    elif isinstance(task_model, queue_model_objects.Basket):
+                        for sample_node in task_model.get_sample_list():
+                            child_task_model = self.create_task_group(sample_node)
+                            if len(shapes):
+                                for shape in shapes:
+                                    self.create_task(child_task_model, shape)
+                            else:
+                                self.create_task(child_task_model) 
                     else:
-                        self.create_task(task_model)
+                        if len(shapes):
+                            for shape in shapes:
+                                self.create_task(task_model, shape)
+                        else:
+                            self.create_task(task_model)
+
 
             self.tool_box.currentItem().update_selection()
+
+    def create_task_group(self, task_model):
+        group_task_node = queue_model_objects.TaskGroup()
+        current_item = self.tool_box.currentItem()
+
+        if current_item is self.workflow_page:
+            group_name = current_item._workflow_cbox.currentText()
+        else:
+            group_name = current_item._task_node_name
+        group_task_node.set_name(group_name)
+        num = task_model.get_next_number_for_name(group_name)
+        group_task_node.set_number(num)
+                         
+        self.tree_brick.queue_model_hwobj.\
+        add_child(task_model, group_task_node)
+
+        return group_task_node
 
     def create_task(self, task_node, shape = None):
         # Selected item is a task group
@@ -209,8 +234,10 @@ class TaskToolBoxWidget(qt.QWidget):
             task_list = self.tool_box.currentItem().create_task(sample, shape)
 
             for child_task_node in task_list:
+                if isinstance(child_task_node, queue_model_objects.DataCollection):
+                    for acq in child_task_node.acquisitions:
+                        acq.acquisition_parameters.overlap = 0
                 self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
-
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
