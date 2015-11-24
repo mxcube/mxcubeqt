@@ -55,6 +55,7 @@ class AcquisitionWidget(QtGui.QWidget):
 
         # Internal variables --------------------------------------------------
         self.previous_energy = 0
+        self.enable_parameter_update = True 
 
         # Properties ---------------------------------------------------------- 
 
@@ -103,6 +104,8 @@ class AcquisitionWidget(QtGui.QWidget):
              self.first_image_ledit_change)
         self.acq_widget_layout.num_images_ledit.textChanged.connect(\
              self.num_images_ledit_change)
+        self.acq_widget_layout.detector_roi_mode_combo.activated.connect(\
+             self.detector_roi_mode_changed)
 
         overlap_ledit = self.acq_widget_layout.findChild(\
             QtGui.QLineEdit, "overlap_ledit")
@@ -128,40 +131,45 @@ class AcquisitionWidget(QtGui.QWidget):
         self.first_img_validator = QtGui.QIntValidator(0, 99999, self)
         self.num_img_validator = QtGui.QIntValidator(1, 99999, self) 
         self.disable_inverse_beam(True)
+        self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
+        self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
+
+    def set_enable_parameter_update(self, state):
+        self.enable_parameter_update = state
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        osc_start_value = 0
-        try:
-           osc_start_value = round(float(new_value), 2)
-        except TypeError:
-           pass
-        self.acq_widget_layout.osc_start_ledit.setText("%.2f" % osc_start_value)
-        self._acquisition_parameters.osc_start = osc_start_value
+        if self.enable_parameter_update:
+            osc_start_value = 0
+            try:
+               osc_start_value = round(float(new_value), 2)
+            except TypeError:
+               pass
+            self.update_num_image_limits()
+            self.acq_widget_layout.osc_start_ledit.setText("%.2f" % osc_start_value)
+            #self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
-        self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
-        #self._acquisition_parameters.kappa = float(new_value)
+        if self.enable_parameter_update:
+            self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
+            #self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
-        self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
-        #self._acquisition_parameters.kappa_phi = float(new_value)
+        if self.enable_parameter_update:
+            self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
+            #self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
         self.acq_widget_layout.osc_start_label.setEnabled(state)
         self.acq_widget_layout.osc_start_ledit.setEnabled(state)
 
     def use_kappa(self, state):
-        #if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-        #    state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
 
     def use_kappa_phi(self, state):
-        #if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-        #    state = False
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
             
@@ -449,13 +457,15 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        self.acq_widget_layout.transmission_ledit.setText("%.2f" % float(transmission))
+        if self.enable_parameter_update:
+            self.acq_widget_layout.transmission_ledit.setText("%.2f" % float(transmission))
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
+        if self.enable_parameter_update:
+            self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
         if limits:
@@ -504,7 +514,7 @@ class AcquisitionWidget(QtGui.QWidget):
 
         if osc_range == 0:
             return
-        if self._beamline_setup.diffractometer_hwobj.in_plate_mode():
+        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
             num_image_limit = int((self.osc_start_validator.top() - osc_start) / osc_range)
         else:
             num_image_limit = 99999
@@ -514,31 +524,29 @@ class AcquisitionWidget(QtGui.QWidget):
               "Number of frames limit : %d" % num_image_limit)
         self._acquisition_mib.validate_all()
 
-    def init_detector_modes(self):
+    def init_detector_roi_modes(self):
         if self._beamline_setup_hwobj is not None:
-            modes_list = self._beamline_setup_hwobj._get_roi_modes()
-            if (len(modes_list) > 0 and
-                self.acq_widget_layout.detector_mode_combo.count() == 0):
-                self.acq_widget_layout.detector_mode_combo.\
-                     insertStrList(modes_list)
-                self.acq_widget_layout.detector_mode_combo.\
-                     setEnabled(True)
-                self._acquisition_mib.bind_value_update('detector_mode',
-                               self.acq_widget_layout.detector_mode_combo,
-                               int,
-                               None)
-            else:
-                self.acq_widget_layout.detector_mode_combo.\
-                     setEnabled(False)
+            roi_modes = self._beamline_setup_hwobj._get_roi_modes()
+            if (len(roi_modes) > 0 and
+                self.acq_widget_layout.detector_roi_mode_combo.count() == 0):
+                for roi_mode in roi_modes:
+                    self.acq_widget_layout.detector_roi_mode_combo.\
+                         addItem(roi_mode)
+                self.acq_widget_layout.detector_roi_mode_label.setEnabled(True)
+                self.acq_widget_layout.detector_roi_mode_combo.setEnabled(True)
+                #self._acquisition_mib.bind_value_update('detector_roi_mode',
+                #               self.acq_widget_layout.detector_roi_mode_combo,
+                ##               str,
+                #               None)
 
-    def update_detector_mode(self, detector_mode):
-        if self.acq_widget_layout.detector_mode_combo.count() > 0:
-            self.acq_widget_layoutdetector_mode_combo.\
-                 setCurrentItem(detector_mode)
+    def update_detector_roi_mode(self, roi_mode_index):
+        if self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
+            self.acq_widget_layout.detector_roi_mode_combo.\
+                 setCurrentIndex(roi_mode_index)
 
-    def detector_mode_changed(self, detector_mode):
+    def detector_roi_mode_changed(self, roi_mode_index):
         if self._beamline_setup_hwobj is not None:
-            self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(detector_mode)
+            self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(roi_mode_index)
 
     def update_data_model(self, acquisition_parameters, path_template):
         """

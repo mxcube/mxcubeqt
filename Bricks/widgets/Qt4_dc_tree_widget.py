@@ -76,6 +76,7 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_item_list = []
         self.collect_tree_task = None
         self.user_stopped = False
+        self.last_added_item = None
         
         self.selection_changed_cb = None
         self.collect_stop_cb = None
@@ -120,7 +121,8 @@ class DataCollectTree(QtGui.QWidget):
         self.collect_button.setFixedWidth(125)
         self.collect_button.setIcon(self.play_icon)
         Qt4_widget_colors.set_widget_color(self.collect_button, 
-            Qt4_widget_colors.LIGHT_GREEN)
+                                           Qt4_widget_colors.LIGHT_GREEN,
+                                           QtGui.QPalette.Button)
 
         self.continue_button = QtGui.QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
@@ -244,7 +246,9 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         self.check_for_path_collisions()
-
+        #items = self.get_selected_items()
+        #for item in items:
+             
     def item_changed(self, item, column):
         """
         Descript. : As there is no signal when item is checked/unchecked
@@ -397,8 +401,9 @@ class DataCollectTree(QtGui.QWidget):
                 break
 
         self.selection_changed_cb(items)        
-        #checked_items = self.get_checked_items()
-        #self.collect_button.setDisabled(len(checked_items) == 0)
+
+        checked_items = self.get_checked_items()
+        self.collect_button.setDisabled(len(checked_items) == 0)
         #self.set_first_element()
 
     def add_empty_task_node(self):
@@ -460,11 +465,8 @@ class DataCollectTree(QtGui.QWidget):
 
         self.queue_model_hwobj.view_created(view_item, task)
         self.collect_button.setDisabled(False)
-   
-        #if isinstance(view_item, Qt4_queue_item.TaskQueueItem):
-        #    self.sample_tree_widget.clearSelection()
-        #    view_item.setSelected(True)
-        #    self.sample_tree_widget_selection()
+
+        self.last_added_item = view_item   
 
     def get_selected_items(self):
         """
@@ -808,6 +810,7 @@ class DataCollectTree(QtGui.QWidget):
             self.delete_click(selected_items = children)
 
         self.check_for_path_collisions()
+        self.set_first_element()
 
     def set_first_element(self):
         """
@@ -1020,3 +1023,8 @@ class DataCollectTree(QtGui.QWidget):
             item = it.value()
 
         return conflict
+
+    def select_last_added_item(self):
+        if self.last_added_item:
+            self.sample_tree_widget.clearSelection()
+            self.last_added_item.setSelected(True) 

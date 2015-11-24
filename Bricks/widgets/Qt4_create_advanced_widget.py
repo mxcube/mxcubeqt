@@ -62,22 +62,14 @@ class CreateAdvancedWidget(CreateTaskBase):
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
 
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_gbox.setObjectName('data_path_gbox')
-        self._data_path_widget = DataPathWidget(self._data_path_gbox,
-             'create_dc_path_widget', data_model = self._path_template,
-             layout = 'vertical')
+        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget', 
+             data_model = self._path_template, layout = 'vertical')
 
         # Layout --------------------------------------------------------------
-        _data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
-        _data_path_gbox_vlayout.addWidget(self._data_path_widget)
-        _data_path_gbox_vlayout.setSpacing(0)
-        _data_path_gbox_vlayout.setContentsMargins(0,0,0,0)
-
         _main_vlayout = QtGui.QVBoxLayout(self) 
         _main_vlayout.addWidget(self._advanced_methods_widget)
         _main_vlayout.addWidget(self._acq_widget)
-        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)

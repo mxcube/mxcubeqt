@@ -261,13 +261,13 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
                                      mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
-        im = self.mpl_canvas.axes.imshow(result, interpolation = 'none', aspect='auto')
+        im = self.mpl_canvas.axes.imshow(result, interpolation = 'none')
         im.set_cmap('hot')
         if result.max() > 0:
             self.add_divider()
             plt.colorbar(im, cax = self.cax)
-        self.mpl_canvas.draw()
-        self.mpl_canvas.fig.canvas.draw_idle()
+            #self.mpl_canvas.draw()
+            self.mpl_canvas.fig.canvas.draw_idle()
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()

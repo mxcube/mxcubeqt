@@ -127,7 +127,10 @@ class ConfirmDialog(QtGui.QDialog):
         self.conf_dialog_layout.file_treewidget.clear()
 
         for item in checked_items:
+            collect_method = ""
+            acq_parameters = None
             info_str_list = QtCore.QStringList()
+      
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.sample_items.append(item)
                 current_sample_item = item
@@ -154,11 +157,24 @@ class ConfirmDialog(QtGui.QDialog):
                 QtGui.QTreeWidgetItem(collection_group_treewidget_item,
                                       info_str_list) 
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                info_str_list.append("Data collection")
+                collect_method = "Data collection"
+                acq_parameters = item.get_model().acquisitions[0].\
+                     acquisition_parameters
+            elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
+                collect_method = "Characterisation"
+                print item.get_model()
+                acq_parameters = item.get_model().reference_image_collection.\
+                    acquisitions[0].acquisition_parameters
+            elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
+                collect_method = "Mesh scan"
+                acq_parameters = item.get_model().reference_image_collection.\
+                     acquisitions[0].acquisition_parameters
+
+            if acq_parameters:
+                info_str_list.append(collect_method)
                 info_str_list.append("")
                 info_str_list.append("%d image(s) with %.2f exposure time" % (\
-                     item.get_model().acquisitions[0].acquisition_parameters.num_images,
-                     item.get_model().acquisitions[0].acquisition_parameters.exp_time))
+                     acq_parameters.num_images, acq_parameters.exp_time))
                 collection_treewidget_item = QtGui.QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
                 for col in range(3):

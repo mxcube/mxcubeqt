@@ -80,7 +80,7 @@ class CreateTaskBase(QtGui.QWidget):
             if self._acq_widget:
                 self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
-                self._acq_widget.init_detector_modes()
+                self._acq_widget.init_detector_roi_modes()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
@@ -125,7 +125,7 @@ class CreateTaskBase(QtGui.QWidget):
             bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
             bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
-            bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_mode)
+            bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_roi_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
@@ -255,11 +255,11 @@ class CreateTaskBase(QtGui.QWidget):
         if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_resolution(res)
 
-    def set_detector_mode(self, detector_mode):
+    def set_detector_roi_mode(self, detector_roi_mode):
         acq_widget = self.get_acquisition_widget()
 
         if acq_widget:
-            acq_widget.update_detector_mode(detector_mode)
+            acq_widget.update_detector_roi_mode(detector_roi_mode)
 
     def set_kappa(self, kappa):
         acq_widget = self.get_acquisition_widget()
@@ -363,7 +363,7 @@ class CreateTaskBase(QtGui.QWidget):
 
     def single_item_selection(self, tree_item):
         sample_item = self.get_sample_item(tree_item)
-        
+       
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)
@@ -417,6 +417,10 @@ class CreateTaskBase(QtGui.QWidget):
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
+        if self._acq_widget:
+            self._acq_widget.set_enable_parameter_update(\
+                 not isinstance(tree_item, Qt4_queue_item.TaskQueueItem)) 
+
     def _update_etr(self):
         omega = self._beamline_setup_hwobj._get_omega_axis_position()
         kappa = self._beamline_setup_hwobj._get_kappa_axis_position()
@@ -434,7 +438,7 @@ class CreateTaskBase(QtGui.QWidget):
 
     def multiple_item_selection(self, tree_items):
         tree_item = tree_items[0]
-        
+
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = tree_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)

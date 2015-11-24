@@ -83,9 +83,9 @@ class PeriodicTableWidget(QtGui.QWidget):
     def edge_selected(self, element, edge):
         self.selected_element = str(element)
         self.selected_edge = str(edge)
-        self.edge_widget.setEnabled(edge != "K")
-        if edge != "K":
-            self.edge_combo.setCurrentIndex(EDGE_LIST.index(edge))
+        self.edge_widget.setEnabled(self.selected_edge != "K")
+        if self.selected_edge in EDGE_LIST:
+            self.edge_combo.setCurrentIndex(EDGE_LIST.index(self.selected_edge))
         self.elementEdgeSelectedSignal.emit(self.selected_element, 
                                             self.selected_edge)
         

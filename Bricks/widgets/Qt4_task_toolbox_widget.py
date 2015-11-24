@@ -251,6 +251,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                                 self.create_task(task_model, shape)
                         else:
                              self.create_task(task_model)
+                self.tree_brick.select_last_added_item()
 
             self.tool_box.currentWidget().update_selection()
 

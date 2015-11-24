@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
+    <width>335</width>
     <height>159</height>
    </rect>
   </property>
@@ -103,6 +103,9 @@
               <width>75</width>
               <height>32767</height>
              </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

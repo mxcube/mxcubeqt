@@ -43,10 +43,8 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_widget = DataPathWidget(self._data_path_gbox, 
-                                               data_model = self._path_template,
-                                               layout = 'vertical')
+        self._data_path_widget = DataPathWidget(self, 
+             data_model = self._path_template, layout = 'vertical')
 
 	_parameters_gbox = QtGui.QGroupBox('Parameters', self)
 	_count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
@@ -54,11 +52,6 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.count_time_ledit.setMaximumWidth(75)
 
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
-        self._data_path_gbox_vlayout.addWidget(self._data_path_widget)
-        self._data_path_gbox_vlayout.setSpacing(0)
-        self._data_path_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-
         _parameters_gbox_hlayout = QtGui.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
         _parameters_gbox_hlayout.addWidget(self.count_time_ledit)
@@ -67,7 +60,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-	_main_vlayout.addWidget(self._data_path_gbox)
+	_main_vlayout.addWidget(self._data_path_widget)
 	_main_vlayout.addWidget(_parameters_gbox)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)

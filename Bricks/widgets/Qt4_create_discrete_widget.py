@@ -61,26 +61,16 @@ class CreateDiscreteWidget(CreateTaskBase):
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
 
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_gbox.setObjectName('data_path_gbox')        
-        self._data_path_widget = \
-            DataPathWidget(self._data_path_gbox,
-                           'create_dc_path_widget',
-                           data_model=self._path_template,
-                           layout='vertical')
+        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
+            data_model=self._path_template, layout='vertical')
 
         self._processing_widget = ProcessingWidget(self,
              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
-        self._data_path_gbox_layout.addWidget(self._data_path_widget)
-        self._data_path_gbox_layout.setSpacing(0)
-        self._data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
-        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.setContentsMargins(0,0,0,0)
         _main_vlayout.setSpacing(2)

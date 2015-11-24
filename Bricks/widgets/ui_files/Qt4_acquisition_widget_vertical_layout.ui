@@ -85,7 +85,7 @@
               <property name="maximumSize">
                <size>
                 <width>1677215</width>
-                <height>16777215</height>
+                <height>27</height>
                </size>
               </property>
               <property name="text">
@@ -98,6 +98,12 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
@@ -117,6 +123,12 @@
                 <height>27</height>
                </size>
               </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>27</height>
+               </size>
+              </property>
               <property name="text">
                <string>Kappa:</string>
               </property>
@@ -126,7 +138,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="detector_mode_label">
+             <widget class="QLabel" name="detector_roi_mode_label">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -142,7 +157,7 @@
               <property name="maximumSize">
                <size>
                 <width>160</width>
-                <height>16777215</height>
+                <height>27</height>
                </size>
               </property>
               <property name="text">
@@ -161,6 +176,12 @@
                 <height>27</height>
                </size>
               </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>27</height>
+               </size>
+              </property>
               <property name="text">
                <string>Energy (keV):</string>
               </property>
@@ -174,6 +195,12 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
@@ -196,6 +223,12 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
@@ -260,13 +293,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -288,7 +321,7 @@
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -298,29 +331,32 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>80</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="detector_mode_combo">
+             <widget class="QComboBox" name="detector_roi_mode_combo">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
               <property name="toolTip">
@@ -333,13 +369,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -349,13 +385,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -365,13 +401,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>909</width>
-    <height>206</height>
+    <width>841</width>
+    <height>207</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,14 +112,14 @@
                <widget class="QLineEdit" name="osc_start_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -128,14 +128,14 @@
                <widget class="QLineEdit" name="first_image_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -144,14 +144,14 @@
                <widget class="QLineEdit" name="transmission_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -160,14 +160,14 @@
                <widget class="QLineEdit" name="exp_time_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -223,6 +223,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="detector_roi_mode_label">
+                <property name="text">
+                 <string>Detector mode</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
@@ -234,14 +241,14 @@
                <widget class="QLineEdit" name="osc_range_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -250,14 +257,14 @@
                <widget class="QLineEdit" name="num_images_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>70</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -266,14 +273,30 @@
                <widget class="QLineEdit" name="resolution_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
-                  <height>0</height>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
-                  <height>32767</height>
+                  <width>80</width>
+                  <height>27</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="detector_roi_mode_combo">
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>27</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>27</height>
                  </size>
                 </property>
                </widget>
@@ -281,22 +304,6 @@
              </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <spacer name="col_two_spacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>16</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -408,13 +415,13 @@
                <widget class="QLineEdit" name="overlap_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
+                  <width>80</width>
                   <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
+                  <width>80</width>
                   <height>27</height>
                  </size>
                 </property>
@@ -424,13 +431,13 @@
                <widget class="QLineEdit" name="num_passes_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
+                  <width>80</width>
                   <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
+                  <width>80</width>
                   <height>27</height>
                  </size>
                 </property>
@@ -440,13 +447,13 @@
                <widget class="QLineEdit" name="energy_ledit">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
+                  <width>80</width>
                   <height>27</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>75</width>
+                  <width>80</width>
                   <height>27</height>
                  </size>
                 </property>
