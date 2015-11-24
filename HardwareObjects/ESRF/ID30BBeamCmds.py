@@ -14,6 +14,11 @@ class ControllerCommand(CommandObject):
     def isConnected(self):
         return True
 
+    def getArguments(self):
+        if self.name() == 'Anneal':
+            self._arguments.append(("Time [s]", "float"))
+        return self._arguments
+
     @task
     def __call__(self, *args, **kwargs):
         self.emit('commandBeginWaitReply', (str(self.name()), ))
@@ -48,6 +53,9 @@ class ID30BBeamCmds(HardwareObject):
         controller.detcover.set_in()
         self.centrebeam = ControllerCommand("Centre beam", controller.diffractometer.centrebeam)
         self.quick_realign = ControllerCommand("Quick realign", controller.quick_realign)
+        self.anneal = ControllerCommand("Anneal", controller.anneal_procedure)
 
     def getCommands(self):
-        return [self.centrebeam, self.quick_realign] 
+        return [self.centrebeam, self.quick_realign, self.anneal]
+
+        
