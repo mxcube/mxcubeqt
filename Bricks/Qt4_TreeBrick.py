@@ -809,3 +809,6 @@ class Qt4_TreeBrick(BlissWidget):
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
         
         self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
+
+    def select_last_added_item(self):
+        self.dc_tree_widget.select_last_added_item()

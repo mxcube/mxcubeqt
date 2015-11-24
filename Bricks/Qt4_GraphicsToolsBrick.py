@@ -86,7 +86,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         aa_action = _create_menu.addAction(Qt4_Icons.load_icon("VCRPlay2"),
              "Centring point with 3 clicks", self.create_point_click_clicked)
         aa_action.setShortcut("Ctrl+1")
-        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("ThumpUp"),
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("ThumbUp"),
              "Centring point on current position", self.create_point_current_clicked)
         temp_action.setShortcut("Ctrl+2")
         temp_action = _create_menu.addAction(Qt4_Icons.load_icon("Line.png"),

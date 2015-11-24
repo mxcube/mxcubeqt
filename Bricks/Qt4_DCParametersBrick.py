@@ -22,6 +22,7 @@ import html_template
 from PyQt4 import QtGui
 
 from widgets.Qt4_dc_parameters_widget import DCParametersWidget
+from widgets.Qt4_image_tracking_widget import ImageTrackingWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -49,6 +50,7 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.addProperty("session", "string", "/session")
         self.addProperty("queue-model", "string", "/Qt4_queue-model")
         self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
+        self.addProperty("useImageTracking", "boolean", True)
 
         # Signals ------------------------------------------------------------
 
@@ -59,10 +61,12 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
         self.toggle_page_button = QtGui.QPushButton('View Results', self)
         self.toggle_page_button.setFixedWidth(100)
-        self.results_view = QtGui.QTextBrowser(self)
+        self.results_static_view = QtGui.QTextBrowser(self)
+        self.results_dynamic_view = ImageTrackingWidget(self) 
         self.stacked_widget = QtGui.QStackedWidget(self)
         self.stacked_widget.addWidget(self.parameters_widget)
-        self.stacked_widget.addWidget(self.results_view) 
+        self.stacked_widget.addWidget(self.results_static_view) 
+        self.stacked_widget.addWidget(self.results_dynamic_view)
        
         # Layout -------------------------------------------------------------- 
         _main_vlayout = QtGui.QVBoxLayout(self)
@@ -77,7 +81,7 @@ class Qt4_DCParametersBrick(BlissWidget):
 
         # Other --------------------------------------------------------------- 
         self.parameters_widget.collection_type = None
-        self.toggle_page_button.setDisabled(True)
+        #self.toggle_page_button.setDisabled(True)
         self.stacked_widget.setCurrentWidget(self.parameters_widget) 
 
     def populate_dc_parameter_widget(self, item):
@@ -93,8 +97,12 @@ class Qt4_DCParametersBrick(BlissWidget):
         
         if data_collection.is_collected():
             self.parameters_widget.set_enabled(False)
-            self.populate_results(data_collection)
-            self.stacked_widget.setCurrentWidget(self.results_view)
+            if self.use_image_tracking:
+                self.results_dynamic_view.set_data_collection(data_collection)
+                self.stacked_widget.setCurrentWidget(self.results_dynamic_view)
+            else:
+                self.populate_results(data_collection)
+                self.stacked_widget.setCurrentWidget(self.results_static_view)
             self.toggle_page_button.setText("View parameters")
         else:
             self.parameters_widget.set_enabled(True)
@@ -102,33 +110,38 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.toggle_page_button.setText("View Results")
 
         self.parameters_widget.populate_widget(item)
-        self.toggle_page_button.setEnabled(data_collection.is_collected())
+        #self.toggle_page_button.setEnabled(data_collection.is_collected())
 
     def populate_results(self, data_collection):
         """
         Descript. :
         """
         if data_collection.html_report[-4:] == 'html':
-            if self.results_view.mimeSourceFactory().\
+            if self.results_static_view.mimeSourceFactory().\
                    data(data_collection.html_report) == None:
-                self.results_view.setText(\
+                self.results_static_view.setText(\
                      html_template.html_report(data_collection))
             else:
-                self.results_view.setSource(data_collection.html_report)
+                self.results_static_view.setSource(data_collection.html_report)
         else:
-            self.results_view.setText(\
+            self.results_static_view.setText(\
                  html_template.html_report(data_collection))
         
     def toggle_page(self):
         """
         Descript. :
         """
-        if self.stack.visibleWidget() is self.parameters_widget:
-            self.results_view.reload()
-            self.stack.raiseWidget(self.results_view)
+        if self.stacked_widget.currentWidget() is self.parameters_widget:
+            self.results_static_view.reload()
+            if self.use_image_tracking:
+                self.results_dynamic_view.refresh()
+                self.stacked_widget.setCurrentWidget(self.results_dynamic_view)
+            else:
+                self.results_static_view.reload()
+                self.stacked_widget.setCurrentWidget(self.results_static_view)
             self.toggle_page_button.setText("View parameters")
         else:
-            self.stack.raiseWidget(self.parameters_widget)
+            self.stacked_widget.setCurrentWidget(self.parameters_widget)
             self.toggle_page_button.setText("View Results")
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -140,6 +153,11 @@ class Qt4_DCParametersBrick(BlissWidget):
         elif property_name == 'beamline_setup':            
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
             self.parameters_widget.set_beamline_setup(self.beamline_setup_hwobj)
+            if hasattr(self.beamline_setup_hwobj, "image_tracking_hwobj"):
+                self.results_dynamic_view.set_image_tracking_hwobj(\
+                     self.beamline_setup_hwobj.image_tracking_hwobj)
         elif property_name == 'queue-model':            
             self.parameters_widget.queue_model_hwobj = \
                  self.getHardwareObject(new_value)
+        elif property_name == 'useImageTracking':
+            self.use_image_tracking = new_value

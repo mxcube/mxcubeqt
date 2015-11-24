@@ -70,6 +70,8 @@ class Qt4_CharParametersBrick(BlissWidget):
         _main_vlayout.addWidget(self.toggle_page_button)
 
         # SizePolicies -------------------------------------------------------
+        self.results_view.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                        QtGui.QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         self.toggle_page_button.clicked.connect(self.toggle_page)
@@ -95,6 +97,7 @@ class Qt4_CharParametersBrick(BlissWidget):
             self.toggle_page_button.setText("View parameters")
             self.parameters_widget.set_enabled(False)
 
+            print char.html_report
             if char.html_report:
                 self.results_view.load(QtCore.QUrl(char.html_report))
             else:

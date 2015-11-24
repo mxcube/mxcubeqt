@@ -71,7 +71,7 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         _main_gbox_vlayout.addWidget(self.state_label)
         _main_gbox_vlayout.addWidget(self.unlock_door_button)
         _main_gbox_vlayout.setSpacing(2)
-        _main_gbox_vlayout.setContentsMargins(0, 4, 4, 0)
+        _main_gbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_groupbox)

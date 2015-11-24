@@ -131,7 +131,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         #self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.user_group_label = QtGui.QLabel("  Group: ", self.user_group_widget)
         self.user_group_ledit = QtGui.QLineEdit(self.user_group_widget)
-        self.user_group_ledit.setFixedWidth(40)
+        #self.user_group_ledit.setFixedWidth(40)
         self.user_group_save_button = QtGui.QToolButton(self.user_group_widget)
         self.user_group_save_button.setText("Set")
         self.saved_group = True 
@@ -167,7 +167,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         _main_vlayout = QtGui.QHBoxLayout(self)
         _main_vlayout.addWidget(self.login_as_proposal_widget)
         _main_vlayout.addWidget(self.login_as_user_widget)
-        _main_vlayout.addSpacing(10)
+        #_main_vlayout.addSpacing(10)
         _main_vlayout.addWidget(self.user_group_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
