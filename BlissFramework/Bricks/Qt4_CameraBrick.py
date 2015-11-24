@@ -67,31 +67,43 @@ class Qt4_CameraBrick(BlissWidget):
 
         self.popup_menu = QtGui.QMenu(self)
         create_menu = self.popup_menu.addMenu("Create")
-        temp_action = create_menu.addAction("Centring point with 3 clicks",
+        temp_action = create_menu.addAction(
+            Qt4_Icons.load_icon("VCRPlay2"),
+            "Centring point with 3 clicks",
             self.create_point_click_clicked)
         temp_action.setShortcut("Ctrl+1")
-        temp_action = create_menu.addAction("Centring point on current position",
+        temp_action = create_menu.addAction(
+            Qt4_Icons.load_icon("ThumbUp"),
+            "Centring point on current position",
             self.create_point_current_clicked)
         temp_action.setShortcut("Ctrl+2")
-        temp_action = create_menu.addAction("Helical line",
+        temp_action = create_menu.addAction(
+            Qt4_Icons.load_icon("Line.png"),
+            "Helical line",
             self.create_line_clicked)
         temp_action.setShortcut("Ctrl+3")
-        temp_action = create_menu.addAction("Grid",
+        temp_action = create_menu.addAction(
+            Qt4_Icons.load_icon("Grid"),
+            "Grid",
             self.create_grid)
         temp_action.setShortcut("Ctrl+4")
 
         measure_menu = self.popup_menu.addMenu("Measure")
         self.measure_distance_action = measure_menu.addAction(\
+             Qt4_Icons.load_icon("measure_distance"),
              "Distance", self.measure_distance_clicked)
         self.measure_angle_action = measure_menu.addAction(\
+             Qt4_Icons.load_icon("measure_angle"),
              "Angle", self.measure_angle_clicked)
         self.measure_area_action = measure_menu.addAction(\
+             Qt4_Icons.load_icon("measure_area"),
              "Area", self.measure_area_clicked)
 
         self.popup_menu.addSeparator()
 
         self.move_beam_mark_action = self.popup_menu.addAction(\
              "Move beam mark", self.move_beam_mark)
+        self.move_beam_mark_action.setEnabled(False)
         self.display_histogram_action = self.popup_menu.addAction(\
              "Display histogram", self.display_histogram_toggled)
         self.define_histogram_action = self.popup_menu.addAction(\
@@ -161,6 +173,9 @@ class Qt4_CameraBrick(BlissWidget):
                 self.disconnect(self.graphics_manager_hwobj,
                                 QtCore.SIGNAL('imageScaleChanged'),        
                                 self.image_scaled)
+                self.disconnect(self.graphics_manager_hwobj,
+                                QtCore.SIGNAL('infoMsg'),
+                                self.set_info_msg)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value)
             if self.graphics_manager_hwobj is not None:
                 self.connect(self.graphics_manager_hwobj, 
@@ -169,6 +184,9 @@ class Qt4_CameraBrick(BlissWidget):
                 self.connect(self.graphics_manager_hwobj,
                              QtCore.SIGNAL('imageScaleChanged'),
                              self.image_scaled)
+                self.connect(self.graphics_manager_hwobj,
+                             QtCore.SIGNAL('infoMsg'),
+                             self.set_info_msg)
                 self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
                 #self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 
                 self.main_layout.addWidget(self.graphics_view) 
@@ -191,12 +209,17 @@ class Qt4_CameraBrick(BlissWidget):
                 self.graphics_manager_hwobj.set_scale_visible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+   
+    def set_expert_mode(self, is_expert_mode):
+        self.move_beam_mark_action.setEnabled(is_expert_mode)
+
+    def set_info_msg(self, msg):
+        self.info_label.setText(msg)
 
     def set_fixed_size(self):
         if self.fixed_size and self.graphics_manager_hwobj:
             self.graphics_manager_hwobj.set_graphics_scene_size(\
                  self.fixed_size, True)
-            #self.setFixedSize(self.fixed_size[0], self.fixed_size[1])
 
     def image_scaled(self, scale_value):
         for index, action in enumerate(self.image_scale_menu.actions()):

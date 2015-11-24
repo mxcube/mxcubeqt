@@ -53,6 +53,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.expert_pwd = None
         self.execution_mode = None
         self.menu_items = []
+        self.original_style = None
 
         # Graphic elements ----------------------------------------------------
         #self.menubar = QtGui.QMenuBar(self) 
@@ -115,6 +116,10 @@ class CustomMenuBar(QtGui.QMenuBar):
         """
         Descript. :
         """
+        if not self.original_style:
+            #This should be based on instance connection
+            # restore colour if master/client/etc
+            self.original_style =  self.styleSheet() 
         if self.expert_mode_action.isChecked():
             res = QtGui.QInputDialog.getText(self, 
                                              "Switch to expert mode",
@@ -124,7 +129,7 @@ class CustomMenuBar(QtGui.QMenuBar):
                 if str(res[0]) == self.expert_pwd:
                     #Qt4_widget_colors.set_widget_color(self.expert_mode_action,
                     #                                   Qt4_widget_colors.LIGHT_YELLOW)
-                    self.set_expert_mode(True)
+                    self.set_exp_mode(True)
                     self.expert_mode_action.setChecked(True)
                 else:
                     self.expert_mode_action.setChecked(False)
@@ -134,22 +139,21 @@ class CustomMenuBar(QtGui.QMenuBar):
                                                QtGui.QMessageBox.Ok)
             else:
                  self.expert_mode_action.setChecked(False)
-        #else:
-        #    Qt4_widget_colors.set_widget_color(self.expert_mode_action,
-        #                                       Qt4_widget_colors.LINE_EDIT_ORIGINAL)
-            self.set_expert_mode(False)
+        else:
+             #    Qt4_widget_colors.set_widget_color(self.expert_mode_action,
+             #    Qt4_widget_colors.LINE_EDIT_ORIGINAL)
+             self.set_exp_mode(False)
 
-    def set_expert_mode(self,state):
+    def set_exp_mode(self, state):
         """
         Descript. :
         """
         if not self.execution_mode:
             return
-        
+               
         if state:
             # switch to expert mode
             QtCore.QObject.emit(self.parent, QtCore.SIGNAL("enableExpertMode"), True)
-
             # go through all bricks and execute the method
             for w in QtGui.QApplication.allWidgets():
                 if isinstance(w, BlissWidget):
@@ -157,6 +161,7 @@ class CustomMenuBar(QtGui.QMenuBar):
                         w.set_expert_mode(True)
                     except:
                         logging.getLogger().exception("Could not set %s to expert mode", w.objectName())
+            self.set_color("orange")
         else:
             # switch to user mode
             QtCore.QObject.emit(self.parent, QtCore.SIGNAL("enableExpertMode"), False)
@@ -170,6 +175,8 @@ class CustomMenuBar(QtGui.QMenuBar):
                         w.set_expert_mode(False)
                     except:
                         logging.getLogger().exception("Could not set %s to user mode", w.objectName())
+            if self.original_style:
+                self.setStyleSheet(self.original_style)
 
     def whats_this_clicked(self):
         """
@@ -338,10 +345,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
         #frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-        frame_layout = QtGui.QVBoxLayout() 
+        frame_layout = QtGui.QVBoxLayout(frame) 
         frame_layout.setSpacing(0) 
         frame_layout.setContentsMargins(0,0,0,0)
-        frame.setLayout(frame_layout)
  
         return frame
 
@@ -359,10 +365,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
         #frame.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-        frame_layout = QtGui.QHBoxLayout()
+        frame_layout = QtGui.QHBoxLayout(frame)
         frame_layout.setSpacing(0)
         frame_layout.setContentsMargins(0, 0, 0, 0)
-        frame.setLayout(frame_layout) 
 
         return frame
        
@@ -376,10 +381,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         groupbox.setObjectName(args[1])      
         groupbox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
  
-        group_box_layout = QtGui.QHBoxLayout()
+        group_box_layout = QtGui.QHBoxLayout(groupbox)
         group_box_layout.setSpacing(0)
         group_box_layout.setContentsMargins(0, 0, 0, 0)
-        groupbox.setLayout(group_box_layout) 
 
         return groupbox
 
@@ -393,10 +397,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         groupbox.setObjectName(args[1])
         groupbox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-        group_box_layout = QtGui.QVBoxLayout()
+        group_box_layout = QtGui.QVBoxLayout(groupbox)
         group_box_layout.setSpacing(0)
         group_box_layout.setContentsMargins(0, 0, 0, 0)
-        groupbox.setLayout(group_box_layout)
 
         return groupbox        
 
@@ -727,7 +730,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if len(args) > 0:
             if args[0]:
                 return
-        self.menubar.set_expert_mode(False)
+        self.menubar.set_exp_mode(False)
 
     def add_item(self, item_cfg, parent):
         """
@@ -758,7 +761,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
                 if item_type.endswith("groupbox"):
                     newItem.setTitle(item_cfg["properties"]["label"])
-                    
+            
                 newItem.layout().setSpacing(item_cfg["properties"]["spacing"])
                 newItem.layout().setMargin(item_cfg["properties"]["margin"])
                 frame_style = QtGui.QFrame.NoFrame

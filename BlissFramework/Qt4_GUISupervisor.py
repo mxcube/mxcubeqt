@@ -320,7 +320,7 @@ class GUISupervisor(QtGui.QWidget):
                     window.show()
 
         if BlissWidget._menuBar:
-            BlissWidget._menuBar.set_expert_mode(False)
+            BlissWidget._menuBar.set_exp_mode(False)
         
         return main_window
                 

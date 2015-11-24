@@ -94,7 +94,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         _main_gbox_vlayout.addWidget(self.state_label)
         _main_gbox_vlayout.addWidget(self.buttons_widget)
         _main_gbox_vlayout.setSpacing(2)
-        _main_gbox_vlayout.setContentsMargins(0, 4, 4, 0)
+        _main_gbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
@@ -272,6 +272,7 @@ class Qt4_DuoStateBrick(BlissWidget):
                 #self.set_in_button.setMinimumWidth(w)
             help_text=newValue+" the "+self['username'].lower()
             self.set_in_button.setToolTip(help_text)
+            self.set_in_button.setText(self['setin'])
 
         elif propertyName=='setout':
             icons=self['icons']
@@ -284,6 +285,7 @@ class Qt4_DuoStateBrick(BlissWidget):
                 #self.set_out_button.setMinimumWidth(w)
             help_text=newValue+" the "+self['username'].lower()
             self.set_out_button.setToolTip(help_text)
+            self.set_out_button.setText(self['setout'])
 
         elif propertyName=='username':
             if newValue=='':
@@ -306,6 +308,19 @@ class Qt4_DuoStateBrick(BlissWidget):
 ### same behavior to the brick
 ###
 class WrapperHO(QtCore.QObject):
+    deviceMap = {"Device": "Procedure",
+                 "TangoShutter" : "Shutter",
+                 "ShutterEpics" : "Shutter",
+                 "MD2v4_FastShutter": "Shutter",
+                 "TempShutter": "Shutter",
+                 "EMBLSafetyShutter": "Shutter",
+                 "MDFastShutter" : "Shutter", 
+                 "WagoPneu" : "WagoPneu",
+                 "Shutter" : "WagoPneu",
+                 "SpecMotorWSpecPositions" : "WagoPneu", 
+                 "Procedure" : "WagoPneu", 
+                 "DoorInterlock" : "WagoPneu"}
+
     wagoStateDict={'in':'in', 'out':'out', 'unknown':'unknown'}
 
     shutterStateDict = {'fault': 'error', 'opened': 'in', 
@@ -341,32 +356,7 @@ class WrapperHO(QtCore.QObject):
             dev_class = sClass[i+1:j-1]
         self.devClass = dev_class.split('.')[-1]
 
-        if self.devClass=="Device":
-            self.devClass="Procedure"
-
-        if self.devClass=="TangoShutter":
-            self.devClass="Shutter"
-
-        #2011-08-30-bessy-mh: let the wrapper also feel responsible for my new ShutterEpics hardware object
-        #                     identical to the original Shutter hardware object
-        if self.devClass == "ShutterEpics":
-            self.devClass = "Shutter"
-        #2011-08-30-bessy-mh: end
-
-        #2013-10-31-bessy-mh: ... and for the MD2 shutter hardware object too!
-        if self.devClass == "MD2v4_FastShutter":
-            self.devClass = "Shutter"
-
-        if self.devClass == "TempShutter":
-            self.devClass = "Shutter"
-
-        if self.devClass == "TINEIcsShutter":
-            self.devClass = "Shutter"
-
-        #2013-10-31-bessy-mh: end
-            
-        if not self.devClass in ("WagoPneu", "Shutter", "SpecMotorWSpecPositions", "Procedure", "DoorInterlock"):
-          self.devClass = "WagoPneu"
+        self.devClass = WrapperHO.deviceMap.get(self.devClass, "Shutter")
 
         initFunc = getattr(self, "init%s" % self.devClass)
         initFunc()

@@ -57,24 +57,29 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.defineSlot('setEnabled',())
 
         # Graphic elements ----------------------------------------------------
-        self.label = QtGui.QLabel("motor:", self)
-        self.positions_combo = QtGui.QComboBox(self)
+        _group_box = QtGui.QGroupBox(self)
+        self.label = QtGui.QLabel("motor:", _group_box)
+        self.positions_combo = QtGui.QComboBox(_group_box)
 
         # Layout -------------------------------------------------------------- 
+        _group_box_hlayout = QtGui.QHBoxLayout(_group_box)
+        _group_box_hlayout.addWidget(self.label)
+        _group_box_hlayout.addWidget(self.positions_combo) 
+        _group_box_hlayout.setSpacing(2)
+        _group_box_hlayout.setContentsMargins(2, 2, 2, 2)
+
         main_layout = QtGui.QHBoxLayout(self)
-        main_layout.addWidget(self.label)
-        main_layout.addWidget(self.positions_combo) 
+        main_layout.addWidget(_group_box)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(main_layout)
 
         # Size Policy ---------------------------------------------------------
         #box1.setSizePolicy(QtGui.QSizePolicy.Fixed, 
         #                   QtGui.QSizePolicy.Fixed)
         self.label.setSizePolicy(QtGui.QSizePolicy.Fixed,
                                  QtGui.QSizePolicy.Fixed)
-        self.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                           QtGui.QSizePolicy.Fixed)
+        #self.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        #                   QtGui.QSizePolicy.Fixed)
         # Qt signal/slot connections ------------------------------------------
         self.positions_combo.activated.connect(self.lstPositionsClicked)
 

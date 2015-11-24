@@ -97,8 +97,8 @@ class Qt4_ChatBrick(BlissWidget):
         self.message_ledit.returnPressed.connect(self.send_current_message)
         self.message_ledit.textChanged.connect(self.message_changed)
 
-        self.setFixedHeight(120)
-        self.setFixedWidth(790)
+        #self.setFixedHeight(120)
+        #self.setFixedWidth(790)
 
     def run(self):
         """

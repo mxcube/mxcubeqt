@@ -122,35 +122,31 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.step_cbox.setDuplicatesEnabled(False)
 
         # Layout --------------------------------------------------------------
-        self.control_box_layout = QtGui.QHBoxLayout()
+        self.control_box_layout = QtGui.QHBoxLayout(self.control_box)
         self.control_box_layout.addWidget(self.move_left_button)
         self.control_box_layout.addWidget(self.move_right_button)
         self.control_box_layout.addWidget(self.position_spinbox)
-        self.control_box_layout.setSpacing(0)
+        self.control_box_layout.setSpacing(2)
         self.control_box_layout.setContentsMargins(0, 0, 0, 0)
-        self.control_box.setLayout(self.control_box_layout)  
 
-        self.extra_button_box_layout = QtGui.QHBoxLayout()
+        self.extra_button_box_layout = QtGui.QHBoxLayout(self.extra_button_box)
         self.extra_button_box_layout.addWidget(self.stop_button)
         self.extra_button_box_layout.addWidget(self.step_button)
         self.extra_button_box_layout.addWidget(self.step_cbox)
-        self.extra_button_box_layout.setSpacing(0)
+        self.extra_button_box_layout.setSpacing(2)
         self.extra_button_box_layout.setContentsMargins(0, 0, 0, 0)
-        self.extra_button_box.setLayout(self.extra_button_box_layout)
 
-        self.main_gbox_layout = QtGui.QHBoxLayout()
+        self.main_gbox_layout = QtGui.QHBoxLayout(self.main_gbox)
         self.main_gbox_layout.addWidget(self.motor_label)
         self.main_gbox_layout.addWidget(self.control_box)
         self.main_gbox_layout.addWidget(self.extra_button_box)
-        self.main_gbox_layout.setSpacing(0)
-        self.main_gbox_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_gbox.setLayout(self.main_gbox_layout)
+        self.main_gbox_layout.setSpacing(2)
+        self.main_gbox_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.main_layout = QtGui.QHBoxLayout()
+        self.main_layout = QtGui.QHBoxLayout(self)
         self.main_layout.addWidget(self.main_gbox)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout) 
 
         # SizePolicy (horizontal, vertical) -----------------------------------
         self.move_left_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
