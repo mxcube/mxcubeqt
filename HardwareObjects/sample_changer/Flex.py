@@ -270,9 +270,15 @@ class Flex(SampleChanger):
 
 		
     def updateInfoCallBack(self, sampleList):  
-        print "AK Flex updateInfoCallBack", sampleList
+        #print "AK Flex updateInfoCallBack", sampleList
         self.setWithPresentSamples(sampleList)
-        self._triggerInfoChangedEvent()
+	isScanning=(self.getLastTaskInfo()[0]=="Scanning Pucks In Dewar")
+	print "isScanning ", isScanning
+	if isScanning:
+	        self._triggerScanChangedEvent()
+	else:
+	        self._triggerInfoChangedEvent()
+
 		
 #-------------------------------------------------------------------------------
     def getSampleByCoords(self, location):       
