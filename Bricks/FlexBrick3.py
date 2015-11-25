@@ -727,11 +727,11 @@ class FlexBrick3(BlissWidget):
         self.scContentsAk.setInsideSpacing(2)
         self.scContentsAk.setAlignment(Qt.AlignHCenter)
         
-        self.scContents1 = QVGroupBox("", self.scContentsAk)
+        self.scContents1 = QVGroupBox("Contents1", self.scContentsAk)
         self.scContents1.setInsideMargin(4)
         self.scContents1.setInsideSpacing(2)
         self.scContents1.setAlignment(Qt.AlignHCenter)
-        self.scContents2 = QVGroupBox("", self.scContentsAk)
+        self.scContents2 = QVGroupBox("Contents2", self.scContentsAk)
         self.scContents2.setInsideMargin(4)
         self.scContents2.setInsideSpacing(2)
         self.scContents2.setAlignment(Qt.AlignHCenter)
@@ -809,6 +809,7 @@ class FlexBrick3(BlissWidget):
                 #self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT, self.akTestState)
                 self.connect(self.sampleChanger, SampleChanger.STATE_CHANGED_EVENT, self.sampleChangerStateChanged)
                 self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, self.infoChanged)
+                self.connect(self.sampleChanger, SampleChanger.SCAN_CHANGED_EVENT, self.infoChanged)
                 self.connect(self.sampleChanger, SampleChanger.SELECTION_CHANGED_EVENT, self.selectionChanged)
                 #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
                 #self.connect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
@@ -844,33 +845,6 @@ class FlexBrick3(BlissWidget):
 
     def status_msg_changed(self, msg, color):
         self.emit(PYSIGNAL("status_msg_changed"), (msg, color))
-
-    def AKresetContents(self):
-	#import pdb; pdb.set_trace()
-	for o in self.scContents1.children():
-		self.scContents1.removeChild(o)
-
-	for o in self.scContents2.children():
-		self.scContents2.removeChild(o)
-
-        nbPuck=len(self.sampleChanger.getComponents())
-        x= (nbPuck+1) / 2
-        l=list()
-        for p in self.sampleChanger.getComponents():
-			if (len(l)) < x:
-				b=BasketView(self.scContents1,p.getID(),p.__maxSamples__)
-			else :
-				b=BasketView(self.scContents2,p.getID(),p.__maxSamples__)
-			l.append(b)
-        self.baskets=tuple(l)
-			
-        for i in range(nbPuck):
-          QObject.connect(self.baskets[i],PYSIGNAL("loadThisSample"),self.loadThisSample)
-          self.baskets[i].setChecked(False)
-          self.baskets[i].setEnabled(True)
-        
-
-
 
     def selectionChanged(self):
         sample = self.sampleChanger.getSelectedSample()
@@ -1000,7 +974,7 @@ class FlexBrick3(BlissWidget):
         
     def sampleChangerStateChanged(self, state, previous_state=None):
         logging.getLogger().debug('FlexBrick3: state changed (%s)' % state)
-        #print "FlexBrick sampleChangerStateChanged", state
+        print "FlexBrick3 sampleChangerStateChanged", state
         #return
         self.status.setStatusMsg(state)
         self.status.setState(state)
@@ -1090,12 +1064,59 @@ class FlexBrick3(BlissWidget):
         self.infochanged()
         
         
+
+    def clearLayout(self,l):
+	#import pdb;pdb.set_trace()
+	for b in  l.children():
+		if isinstance(b,BasketView):
+			b.parent =None
+			b.deleteLater()
+	l.parent =None
+	l.deleteLater()
+
+
+
+    def reloadContents(self):
+	self.clearLayout(self.scContents1)
+	self.clearLayout(self.scContents2)
+	
+        self.scContents1 = QVGroupBox("Contents1", self.scContentsAk)
+        self.scContents1.setInsideMargin(4)
+        self.scContents1.setInsideSpacing(2)
+        self.scContents1.setAlignment(Qt.AlignHCenter)
+        self.scContents2 = QVGroupBox("ContentsAK", self.scContentsAk)
+        self.scContents2.setInsideMargin(4)
+        self.scContents2.setInsideSpacing(2)
+        self.scContents2.setAlignment(Qt.AlignHCenter)
+ #	for b in  self.scContents2.children():
+#		b.deleteLater()
+	
+        nbPuck=len(self.sampleChanger.getComponents())
+	print nbPuck
+        x= (nbPuck+1) / 2
+        l=list()
+        for p in self.sampleChanger.getComponents():
+			if (len(l)) < x:
+				b=BasketView(self.scContents1,p.getID(),p.__maxSamples__)
+			else :
+				b=BasketView(self.scContents2,p.getID(),p.__maxSamples__)
+			l.append(b)
+        self.baskets=tuple(l)
+			
+        for i in range(nbPuck):
+          QObject.connect(self.baskets[i],PYSIGNAL("loadThisSample"),self.loadThisSample)
+          self.baskets[i].setChecked(False)
+          self.baskets[i].setEnabled(True)
+	self.scContents1.show()
+	self.scContents2.show()
+	#self.scContents1.repaint()
+	#self.scContents2.repaint()
+	print "reloadContents Done"
+
         
     def infoChanged(self):
-	#print "AK f3 infochanged"
-	#self.AKresetContents()
+	self.reloadContents()
         baskets = self.sampleChanger.getComponents()
-	print "AK f3 infochanged", baskets
         
         presences = []
         for basket in baskets:
@@ -1122,6 +1143,12 @@ class FlexBrick3(BlissWidget):
             basket.setMatrices(presence)
         
         #self.emit(PYSIGNAL("scanBasketUpdate"),(cleared_matrix_codes,))
+	self.show()
+	self.update()
+	#QApplication.processEvents()
+	
+	print "infoChanged Done"
+	#import pdb;pdb.set_trace()
 
     def selectBasketsSamples(self):
         retval=self.basketsSamplesSelectionDialog.exec_loop()
