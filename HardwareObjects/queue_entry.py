@@ -422,13 +422,15 @@ class SampleQueueEntry(BaseQueueEntry):
         BaseQueueEntry.execute(self)
         log = logging.getLogger('queue_exec')
         sc_used = not self._data_model.free_pin_mode
-
         # Only execute samples with collections and when sample changer is used
         if len(self.get_data_model().get_children()) != 0 and sc_used:
             if self.diffractometer_hwobj.in_plate_mode():
                 mount_device = self.plate_manipulator_hwobj
+            elif self.beamline_setup.in_flex_mode() :
+                mount_device = self.beamline_setup.flex_hwobj
             else:
                 mount_device = self.sample_changer_hwobj
+                
             if mount_device is not None:
                 log.info("Loading sample " + self._data_model.loc_str)
 

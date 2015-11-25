@@ -411,7 +411,6 @@ class DataCollectTree(qt.QWidget):
     def add_to_view(self, parent, task):
         view_item = None
         parent_tree_item = self.get_item_by_model(parent)
-
         if parent_tree_item is self.sample_list_view:
             last_item = self.last_top_level_item()
         else:
@@ -420,10 +419,11 @@ class DataCollectTree(qt.QWidget):
         cls = queue_item.MODEL_VIEW_MAPPINGS[task.__class__]
 
         if parent_tree_item.lastItem():
-            view_item = cls(parent_tree_item, last_item,
-                            task.get_display_name())
+            view_item = cls(parent_tree_item, last_item, task.get_name())
         else:
-            view_item = cls(parent_tree_item, task.get_display_name())
+            view_item = cls(parent_tree_item, task.get_name())
+            #view_item = cls(parent_tree_item, task.get_display_name())
+
 
         if isinstance (task, queue_model_objects.Basket):
             view_item.setOpen(False) #task.get_is_present())
@@ -989,8 +989,7 @@ class DataCollectTree(qt.QWidget):
 			basketNode.name=self.flex_hwobj.getComponentById(curBasketId).__STYPE__
 		except:
 			pass
-		self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
-												 get_model_root(), basketNode)
+		self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(), basketNode)
             self.queue_model_hwobj.add_child(basketNode, sample)
         self.set_sample_pin_icon()
         self.initFlexMsg()
@@ -1100,11 +1099,23 @@ class DataCollectTree(qt.QWidget):
         self.setFlexError(msg)
 
         
+    def refresh_Scan_ListView(self):
+        """
+        Callback on flex.SCAN_CHANGED_EVENT
+        """
+        #print "AK Refreshing Scan listView"
+	print "refresh_Scan_ListView "
+	sc_basket_content, sc_sample_content = self.tree_brick.get_sc_content()
+	sc_basket_list, sc_sample_list = self.samples_from_sc_content(
+	                                            sc_basket_content, sc_sample_content)
+	self.populate_flex_view(sc_sample_list)
+	self.refresh_Flex_ListView()
+
     def refresh_Flex_ListView(self):
         """
         Callback on flex.INFO_CHANGED_EVENT
         """
-        #print "AK Refreshing listView"
+        print "AK Refreshing listView"
         it = qt.QListViewItemIterator(self.sample_list_view)
         item = it.current()
         while item:
