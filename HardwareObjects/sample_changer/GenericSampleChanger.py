@@ -83,6 +83,7 @@ class SampleChanger(Container,Equipment):
     SELECTION_CHANGED_EVENT="selectionChanged"    
     TASK_FINISHED_EVENT="taskFinished"
     EXCEPTION_EVENT="exception"
+    SCAN_CHANGED_EVENT="scanChanged"
     
                 
     def __init__(self,type,scannable, *args, **kwargs):
@@ -548,7 +549,10 @@ class SampleChanger(Container,Equipment):
     
     def _triggerSelectionChangedEvent(self):
         self.emit(self.SELECTION_CHANGED_EVENT, ())
-    
+#AK    
+    def _triggerScanChangedEvent(self):
+        self.emit(self.SCAN_CHANGED_EVENT, ())    
+#FAK
     def _triggerInfoChangedEvent(self):
         self.emit(self.INFO_CHANGED_EVENT, ())    
 
