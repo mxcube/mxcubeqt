@@ -238,6 +238,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                              self.refresh_Flex_State)
                 self.connect(self.flex_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.refresh_Flex_Info)
+                self.connect(self.flex_hwobj, SampleChanger.SCAN_CHANGED_EVENT, 
+                             self.refresh_Scan_Info)
                 self.connect(self.flex_hwobj, SampleChanger.EXCEPTION_EVENT, 
                              self.dc_tree_widget.flex_Exception)
 
@@ -289,6 +291,11 @@ class TreeBrick(BaseComponents.BlissWidget):
 		 
     def refresh_Flex_Info(self):
 		self.dc_tree_widget.refresh_Flex_ListView()
+		self.sample_load_state_changed("")
+		self.set_sample_pin_icon()
+
+    def refresh_Scan_Info(self):
+		self.dc_tree_widget.refresh_Scan_ListView()
 		self.sample_load_state_changed("")
 		self.set_sample_pin_icon()
 		 
