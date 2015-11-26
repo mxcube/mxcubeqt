@@ -64,7 +64,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.wavelength_ledit.setReadOnly(True)
 
         self.new_value_widget = QtGui.QWidget(self)
-        set_to_label = QtGui.QLabel("Set to: ", self)
+        self.set_to_label = QtGui.QLabel("Set to: ", self)
         self.new_value_ledit = QtGui.QLineEdit(self.new_value_widget)
         #self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QtGui.QComboBox(self.new_value_widget)
@@ -87,7 +87,7 @@ class Qt4_EnergyBrick(BlissWidget):
         _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1) 
         _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
         _group_box_gridlayout.addWidget(self.wavelength_ledit, 1, 1)
-        _group_box_gridlayout.addWidget(set_to_label, 2, 0) 
+        _group_box_gridlayout.addWidget(self.set_to_label, 2, 0) 
         _group_box_gridlayout.addWidget(self.new_value_widget, 2, 1)
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1) 
@@ -108,12 +108,6 @@ class Qt4_EnergyBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         self.group_box.setCheckable(True)
         self.group_box.setChecked(True)
-        Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
-                                           Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                           QtGui.QPalette.Base)
-        Qt4_widget_colors.set_widget_color(self.units_combobox,
-                                           Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
         self.new_value_validator = QtGui.QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
         #self.new_value_ledit.setValidator(self.new_value_validator)
@@ -164,8 +158,18 @@ class Qt4_EnergyBrick(BlissWidget):
         tunable_energy = self.energy_hwobj.can_move_energy()
         if tunable_energy is None:
             tunable_energy = False 
+        self.set_to_label.setEnabled(tunable_energy)
         self.new_value_ledit.setEnabled(tunable_energy)
         self.units_combobox.setEnabled(tunable_energy)
+        if tunable_energy:
+             Qt4_widget_colors.set_widget_color(\
+                self.new_value_ledit,
+                Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                QtGui.QPalette.Base)
+             Qt4_widget_colors.set_widget_color(\
+                self.units_combobox,
+                Qt4_widget_colors.LIGHT_GREEN,
+                QtGui.QPalette.Button) 
 
     def disconnected(self):
         """

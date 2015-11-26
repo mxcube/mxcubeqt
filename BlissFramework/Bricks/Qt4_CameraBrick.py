@@ -113,15 +113,15 @@ class Qt4_CameraBrick(BlissWidget):
         temp_action = self.popup_menu.addAction(\
              "Select all centring points",
              self.select_all_points_clicked)
-        temp_action.setShortcut("Ctrl+7")
+        temp_action.setShortcut("Ctrl+A")
         temp_action = self.popup_menu.addAction(\
              "Deselect all items",
              self.deselect_all_items_clicked)
-        temp_action.setShortcut("Ctrl+8")
+        temp_action.setShortcut("Ctrl+D")
         temp_action = self.popup_menu.addAction(\
              "Clear all items",
              self.clear_all_items_clicked)
-        temp_action.setShortcut("Ctrl+9")
+        temp_action.setShortcut("Ctrl+X")
 
         self.display_histogram_action.setEnabled(False)
         self.define_histogram_action.setEnabled(False)
@@ -220,6 +220,7 @@ class Qt4_CameraBrick(BlissWidget):
         if self.fixed_size and self.graphics_manager_hwobj:
             self.graphics_manager_hwobj.set_graphics_scene_size(\
                  self.fixed_size, True)
+            self.graphics_view.setFixedSize(self.fixed_size[0], self.fixed_size[1]) 
 
     def image_scaled(self, scale_value):
         for index, action in enumerate(self.image_scale_menu.actions()):
