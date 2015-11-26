@@ -169,7 +169,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         info_str_list = QtCore.QStringList()
         info_str_list.append(str(shape.index))
         if shape_type == "Point":
-            info_str_list.append(str(shape.get_position())) 
+            info_str_list.append(str(shape.get_start_position())) 
             self.manager_widget.point_treewidget.clearSelection()
             point_treewidget_item = QtGui.QTreeWidgetItem(\
                  self.manager_widget.point_treewidget, info_str_list)

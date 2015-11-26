@@ -67,8 +67,8 @@ class AdvancedResultsWidget(QtGui.QWidget):
 
     def set_beamline_setup(self, bl_setup):
         self._beamline_setup_hwobj = bl_setup
-        self._parallel_processing_hwobj = self._beamline_setup_hwobj.parallel_processing_hwobj
-        if self._parallel_processing_hwobj is not None:
+        if hasattr(self._beamline_setup_hwobj, 'parallel_processing_hwobj'):
+            self._parallel_processing_hwobj = self._beamline_setup_hwobj.parallel_processing_hwobj
             self._parallel_processing_hwobj.connect('paralleProcessingResults', self.set_processing_results)
         self.heat_map_widget.set_beamline_setup(bl_setup)
 

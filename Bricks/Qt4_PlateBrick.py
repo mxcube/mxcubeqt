@@ -148,8 +148,8 @@ class Qt4_PlateBrick(BlissWidget):
 
     def clear_view(self):
         self.plate_widget.xtal_treewidget.clear()
-        self.plate_widget.xtal_image_label_pixmap.fill(qt.Qt.white) 
-        self.xtal_image_label.setPixmap(self.xtal_image_label_pixmap)
+        #self.plate_widget.xtal_image_label_pixmap.fill(qt.Qt.white) 
+        #self.xtal_image_label.setPixmap(self.xtal_image_label_pixmap)
 
     def move_to_xtal_clicked(self):
         xtal_item = self.xtal_map.get(\
