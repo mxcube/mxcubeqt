@@ -97,13 +97,13 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         temp_action.setShortcut("Ctrl+4")
         temp_action = self.tools_menu.addAction("Select all centring points",
              self.select_all_points_clicked)
-        temp_action.setShortcut("Ctrl+7")
+        temp_action.setShortcut("Ctrl+A")
         temp_action = self.tools_menu.addAction("Deselect all items",
              self.deselect_all_items_clicked)
-        temp_action.setShortcut("Ctrl+8")
+        temp_action.setShortcut("Ctrl+D")
         temp_action = self.tools_menu.addAction("Clear all items",
              self.clear_all_items_clicked)
-        temp_action.setShortcut("Ctrl+9")
+        temp_action.setShortcut("Ctrl+X")
 
         self.move_beam_mark_action = self.tools_menu.addAction(
              "Move beam mark",

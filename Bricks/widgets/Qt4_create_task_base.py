@@ -489,9 +489,9 @@ class CreateTaskBase(QtGui.QWidget):
             self._acq_widget.use_kappa(False)
             self._acq_widget.use_kappa_phi(False)
 
-            if len(self._current_selected_items) == 1:
-                item = self._current_selected_items[0]
-                if position:
+            if position:
+                if len(self._current_selected_items) == 1:
+                    item = self._current_selected_items[0]
                     cpos = position.get_centred_position()
                     if cpos.kappa is not None:
                         self._acq_widget.update_kappa(cpos.kappa)
@@ -500,11 +500,9 @@ class CreateTaskBase(QtGui.QWidget):
                         snapshot = self._graphics_manager_hwobj.get_snapshot(position)
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
-                else:
-                    if isinstance(item, Qt4_queue_item.SampleQueueItem):
-                        self._acq_widget.use_kappa(True)
-                        self._acq_widget.use_kappa_phi(True)
-
+            else:
+                self._acq_widget.use_kappa(True)
+                self._acq_widget.use_kappa_phi(True)
 
     # Should be called by the object that calls create_task,
     # and add_task.

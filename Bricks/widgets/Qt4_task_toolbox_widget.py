@@ -122,11 +122,12 @@ class TaskToolBoxWidget(QtGui.QWidget):
             self.tool_box.widget(i).set_beamline_setup(beamline_setup_hwobj)
 
         self.graphics_manager_hwobj = beamline_setup_hwobj.shape_history_hwobj
-        self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
+        self.energy_scan_page.set_energy_scan_hwobj(\
+             beamline_setup_hwobj.energyscan_hwobj)
 
         # Remove energy scan page from non tunable wavelentgh beamlines
         if not beamline_setup_hwobj.tunable_wavelength():
-            self.tool_box.removeItem(self.energy_scan_page)
+            self.tool_box.removeItem(self.tool_box.indexOf(self.energy_scan_page))
             self.energy_scan_page.hide()
 
     def update_data_path_model(self):

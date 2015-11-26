@@ -46,8 +46,6 @@ class LogBarWidget(QtGui.QWidget):
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_hlayout) 
 
-        self.set_fixed_height(100)
-
     def toggle_background_color(self):
         gevent.spawn(self._toggle_background_color)
 

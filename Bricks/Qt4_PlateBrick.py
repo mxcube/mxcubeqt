@@ -128,7 +128,8 @@ class Qt4_PlateBrick(BlissWidget):
         Descript. : when user double clicks on plate table then sample in
                     corresponding cell is loaded
         """
-        item = [table_item.row(), table_item.column()]
+        item = "%s%d:2" % (chr(65 + table_item.row()),
+                           table_item.column() + 1)  
         self.plate_manipulator_hwobj.load(item)
 
     def search_button_clicked(self):

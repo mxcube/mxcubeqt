@@ -215,18 +215,29 @@ class PolarScater(FigureCanvas):
     def draw_scater(self, sw_list):
         """
         Descript. : draws data collection item on the scatter
-                    subwede is represented as list:
+                    subwedge is represented as list:
                     collection_id, sw_id, first_image, num_images, 
                     osc_start, osc_full_range
         """
         self.axes.clear()
-        for sw in sw_list:
-            self.axes.bar(np.radians(sw[4]),
-                      1,
-                      width = np.radians(sw[5]),
-                      bottom = sw[0],
-                      color = Qt4_widget_colors.TASK_GROUP[sw[0]])
-            self.fig.canvas.draw_idle()
+        col_count = 0
+        for sw_index, sw in enumerate(sw_list):
+            bars = self.axes.bar(np.radians(sw[4]), 1, 
+                width = np.radians(sw[5]), bottom = sw[0],
+                color = Qt4_widget_colors.TASK_GROUP[sw[0]])
+            x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
+                    bars[0].get_bbox().xmin) / 2.0 
+            y_mid = bars[0].get_bbox().ymin + (bars[0].get_bbox().ymax - \
+                    bars[0].get_bbox().ymin) / 2.0
+            self.axes.text(x_mid, y_mid, "%d (%d:%d)" % \
+                           (sw_index + 1, sw[0] + 1, sw[1] + 1),
+                           horizontalalignment='center',
+                           verticalalignment='center',
+                           weight='bold')
+            if sw[0] > col_count:
+                col_count = sw[0] 
+        self.axes.set_yticks(np.arange(1, col_count + 2))
+        self.fig.canvas.draw_idle()
 
 class TwoDimenisonalPlotWidget(QtGui.QWidget):
     """
@@ -256,6 +267,8 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.mpl_canvas.fig.canvas.mpl_connect(\
              "button_press_event", self.mouse_clicked)
 
+        self.setFixedSize(1000, 700)
+
     def mouse_clicked(self, mouse_event):
         self.mouseClickedSignal.emit(mouse_event.xdata,
                                      mouse_event.ydata)
@@ -268,6 +281,11 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
             plt.colorbar(im, cax = self.cax)
             #self.mpl_canvas.draw()
             self.mpl_canvas.fig.canvas.draw_idle()
+
+            mgr = plt.get_current_fig_manager()
+            #mgr.full_screen_toggle()
+            print mgr
+            mgr.window.move(10, 10)
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()

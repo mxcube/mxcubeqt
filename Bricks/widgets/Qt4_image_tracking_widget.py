@@ -89,7 +89,6 @@ class ImageTrackingWidget(QtGui.QWidget):
         self.view_current_image()
  
     def view_current_image(self):
-        print self.image_tracking_hwobj
         if self.image_tracking_hwobj is not None:
             self.image_tracking_hwobj.load_image(self.image_path % \
                  self.image_tracking_widget_layout.image_num_spinbox.value())    
@@ -110,7 +109,8 @@ class ImageTrackingWidget(QtGui.QWidget):
         if self.data_collection is not None:
             acq = self.data_collection.acquisitions[0]
             paths = acq.get_preview_image_paths()
-            if acq.acquisition_parameters.shutterless:
+            if acq.acquisition_parameters.shutterless and \
+               len(paths) > 1:
                 temp = [paths[0], paths[-1]]
                 paths = temp
 
@@ -125,7 +125,8 @@ class ImageTrackingWidget(QtGui.QWidget):
                  acq.acquisition_parameters.first_image + \
                      acq.acquisition_parameters.num_images - 1)
 
-            #
-            #self._first_image_label.setPixmap(qt.QPixmap(paths[0]))
-            #3if len(paths) > 1:
-            #    self._last_image_label.setPixmap(qt.QPixmap(paths[1]))
+            self.image_tracking_widget_layout.first_image_label.\
+                 setPixmap(QtGui.QPixmap(paths[0]))
+            if len(paths) > 1:
+                self.image_tracking_widget_layout.last_image_label.\
+                     setPixmap(QtGui.QPixmap(paths[1]))

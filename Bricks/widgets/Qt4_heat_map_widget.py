@@ -181,7 +181,7 @@ class HeatMapWidget(QtGui.QWidget):
              QtGui.QTableWidgetItem("Motor positions"))
 
         screenShape = QtGui.QDesktopWidget().screenGeometry()
-        self.__heat_map_max_size = (screenShape.width() / 2,
+        self.__heat_map_max_size = (screenShape.width() / 2 - 200,
                                     screenShape.height() / 2)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
@@ -205,8 +205,8 @@ class HeatMapWidget(QtGui.QWidget):
             axis_range = self.__associated_grid.get_col_row_num()
             grid_size = self.__associated_grid.get_size_pix()
 
-            width = grid_size[0] * 10
-            height = grid_size[1] * 10
+            width = grid_size[0] * 5
+            height = grid_size[1] * 5
             ratio = float(width) / height
 
             if width > self.__heat_map_max_size[0]:
@@ -216,12 +216,12 @@ class HeatMapWidget(QtGui.QWidget):
                 height = self.__heat_map_max_size[1]
                 width = height * ratio
 
-            self._heat_map_plot.setFixedWidth(width)
-            self._heat_map_plot.setFixedHeight(height)
+            #self._heat_map_plot.setFixedWidth(width)
+            #self._heat_map_plot.setFixedHeight(height)
 
-            axis_range = self.__associated_grid.get_col_row_num()
-            self._heat_map_plot.set_x_axis_limits((- 0.5, axis_range[0] - 0.5))
-            self._heat_map_plot.set_y_axis_limits((- 0.5, axis_range[1] - 0.5))
+            #axis_range = self.__associated_grid.get_col_row_num()
+            #self._heat_map_plot.set_x_axis_limits((- 0.5, axis_range[0] - 0.5))
+            #self._heat_map_plot.set_y_axis_limits((- 0.5, axis_range[1] - 0.5))
 
     def main_gbox_toggled(self, toggle):
         self._heat_map_plot.setHidden(not toggle)
@@ -371,8 +371,14 @@ class HeatMapWidget(QtGui.QWidget):
             coord_x = self.__selected_x
         if not coord_y:
             coord_y = self.__selected_y
+         
 
         if self.__is_map_plot:
+            num_cols, num_rows = self.__associated_grid.get_col_row_num()
+            if coord_x > num_cols:
+                coord_x = num_cols
+            if coord_y > num_rows:
+                coord_y = num_rows
             image, line, image_num = self.__associated_grid.\
                   get_image_from_col_row(coord_x, coord_y)
         else:

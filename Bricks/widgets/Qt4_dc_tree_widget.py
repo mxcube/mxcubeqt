@@ -977,7 +977,8 @@ class DataCollectTree(QtGui.QWidget):
 
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
-                    item.setIcon(0, self.ispyb_icon)
+                    if not self.is_mounted_sample_item(item):
+                        item.setIcon(0, self.ispyb_icon)
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
             elif isinstance(item, Qt4_queue_item.BasketQueueItem):

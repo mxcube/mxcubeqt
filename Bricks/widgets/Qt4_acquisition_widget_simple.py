@@ -45,6 +45,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
+        self.enable_parameter_update = True
 
         # Properties ---------------------------------------------------------- 
 
@@ -71,7 +72,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         main_layout.addWidget(self.acq_widget_layout)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(main_layout)
 
         # SizePolicies --------------------------------------------------------
 
@@ -94,30 +94,38 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
+    def set_enable_parameter_update(self, state):
+        self.enable_parameter_update = state
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        osc_start_value = 0
-        try:
-           osc_start_value = round(float(new_value), 2)
-        except TypeError:
-           pass
-        self.acq_widget_layout.osc_start_ledit.setText("%.2f" % osc_start_value)
-        self._acquisition_parameters.osc_start = osc_start_value
+        if self.enable_parameter_update:
+            osc_start_value = 0
+            try:
+               osc_start_value = round(float(new_value), 2)
+            except TypeError:
+               pass
+            self.acq_widget_layout.osc_start_ledit.setText(\
+                 "%.2f" % osc_start_value)
+            #self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
         """
         Descript. :
         """
-        self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
+        if self.enable_parameter_update:
+            self.acq_widget_layout.kappa_ledit.setText(\
+                 "%.2f" % float(new_value))
 
     def update_kappa_phi(self, new_value):
         """
         Descript. :
         """
-        self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
+        if self.enable_parameter_update:
+            self.acq_widget_layout.kappa_phi_ledit.setText(\
+                 "%.2f" % float(new_value))
 
     def use_kappa(self, state):
         """
@@ -211,13 +219,13 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
                                                 float, 
                                                 osc_range_validator)
 
-        kappa_validator = QtGui.QDoubleValidator(0, 180, 2, self)
+        kappa_validator = QtGui.QDoubleValidator(-30, 180, 2, self)
         self._acquisition_mib.bind_value_update('kappa', 
                                                 self.acq_widget_layout.kappa_ledit,
                                                 float, 
                                                 kappa_validator)
 
-        kappa_phi_validator = QtGui.QDoubleValidator(0, 180, 2, self)
+        kappa_phi_validator = QtGui.QDoubleValidator(-30, 180, 2, self)
         self._acquisition_mib.bind_value_update('kappa_phi', 
                                                 self.acq_widget_layout.kappa_phi_ledit,
                                                 float, 
@@ -255,22 +263,27 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        self._acquisition_parameters.energy = energy
-        self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
+        #self._acquisition_parameters.energy = energy
+        if self.enable_parameter_update:
+            self.acq_widget_layout.energy_ledit.setText(\
+                 "%.4f" % float(energy))
 
     def update_transmission(self, transmission):
         """
         Descript. :
         """
-        self.acq_widget_layout.transmission_ledit.setText("%.2f" % float(transmission))
-        self._acquisition_parameters.transmission = float(transmission)
+        if self.enable_parameter_update:
+            self.acq_widget_layout.transmission_ledit.setText(\
+                 "%.2f" % float(transmission))
+        #self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
-        self._acquisition_parameters.resolution = float(resolution)
+        if self.enable_parameter_update:
+            self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
+        #self._acquisition_parameters.resolution = float(resolution)
 
     def update_energy_limits(self, limits):
         """
@@ -335,11 +348,17 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
                 #               None)
 
     def update_detector_roi_mode(self, roi_mode_index):
+        """
+        Descript. :
+        """
         if self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
             self.acq_widget_layout.detector_roi_mode_combo.\
                  setCurrentIndex(roi_mode_index)
 
     def detector_roi_mode_changed(self, roi_mode_index):
+        """
+        Descript. :
+        """
         if self._beamline_setup_hwobj is not None:
             self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(roi_mode_index)
  

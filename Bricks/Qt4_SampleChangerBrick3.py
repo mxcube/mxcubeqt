@@ -1084,7 +1084,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             if sample.isLoaded():
                 presences[basket_index][vial_index] = [VialView.VIAL_AXIS, matrix]
 
-        for basket_index in range(len(presences)):
+        for basket_index in range(self.basket_count):
             presence = presences[basket_index]
             self.baskets[basket_index].setMatrices(presence)
 
