@@ -174,7 +174,8 @@ class Flex(SampleChanger):
         for i in range(self.__maxBasketIdx__ - 2):
             basket = SC3Basket(self,i+4)
             self._addComponent(basket)
-	    
+	
+        
     def init(self):
 
         self.exporterClient=""
@@ -201,7 +202,9 @@ class Flex(SampleChanger):
 			self.initExporter()
 		except:
 			pass
-	self.initWithPresentSamples()  
+	self.initWithPresentSamples()
+	self.controller = self.getObjectByRole("controller")
+	    
 #######AK
     	self.currentSampleLocation=None
 #######
@@ -261,7 +264,7 @@ class Flex(SampleChanger):
 		try:
 			self.onGoingTasks.remove(lastTaskInfo[7])
 		except: pass
-
+		print "lastTaskInfoCallBack",lastTaskInfo[7]
 		# if there is an error trigger the EcxeptionEvent
 		if len(lastTaskInfo)>6 and lastTaskInfo[6]<>'1': #On a une erreur
 			print "AK triggerExceptionEvent", lastTaskInfo[5]
@@ -381,31 +384,43 @@ class Flex(SampleChanger):
 		self._AKexecuteServerTask(self._doInitRobot)
 
     def load_sample(self, holder_length, sample_location, wait):
+	print str(self)+" Flex load_sample:sample_location"+str(sample_location), wait
+	if not self.controller.prepare_flex(load=True):
+		raise RuntimeError ("Flex load_sample : Cannot prepare the detector")
+	time.sleep(3)
 	sl=(str(sample_location[0]), str(sample_location[1]))
 	try:
 		taskId=self._AKexecuteServerTask(self._doLoad,holder_length, sl)
+		print str(self)+" Flex load_sample:sample_location"+str(sample_location), wait, taskId
 		if wait:
 			self.waitEndOfTask(taskId)
 	except Exception as e:
 		msg= "Flex load_sample "+ str(e.args)
 		raise e
+	time.sleep(15)
+	#self.controller.prepare_flex(load=False)
         return
-	sample=self.getComponentByAddress(Pin.getSampleAddress(int(basketId), int(sampleId)))
-	sample.loaded=True
+	
+	#sample=self.getComponentByAddress(Pin.getSampleAddress(int(basketId), int(sampleId)))
+	#sample.loaded=True
 
     def unload_sample(self, holder_length, sample_location, wait):
-	print str(self)+" Flex unload_sample:sample_location"+str(sample_location)
+	print str(self)+" Flex unload_sample:sample_location"+str(sample_location), wait
+	if not self.controller.prepare_flex(load=True):
+		raise RuntimeError ("Flex load_sample : Cannot prepare the detector")
+	time.sleep(3)
 	sl=(str(sample_location[0]), str(sample_location[1]))
 	try:
 		taskId=self._AKexecuteServerTask(self._doUnload,holder_length, sl)
+		print str(self)+" Flex unload_sample:sample_location"+str(sample_location), wait, taskId
 		if wait:
 			self.waitEndOfTask(taskId)
 	except Exception as e:
 		msg= "Flex unload_sample "+ str(e.args)
 		raise e
         return
-	sample=self.getComponentByAddress(Pin.getSampleAddress(int(basketId), int(sampleId)))
-	sample.loaded=False
+	#sample=self.getComponentByAddress(Pin.getSampleAddress(int(basketId), int(sampleId)))
+	#sample.loaded=False
 
 
 #########################           TASKS           #########################
