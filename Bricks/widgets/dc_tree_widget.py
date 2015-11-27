@@ -230,7 +230,7 @@ class DataCollectTree(qt.QWidget):
 		if not self.beamline_setup_hwobj.in_flex_mode():
 			return True
 		else:
-			return  (item.get_model().get_state() in ("on_gonio", "in_puck", "")) and self.flexStatus=="Ready"
+			return  item.get_model().get_state() in ("on_gonio", "in_puck", "") and self.flexStatus in ("Ready", "Robot Not Powered")
 #FAK		
     def item_double_click(self):
         self.show_details()
@@ -340,7 +340,7 @@ class DataCollectTree(qt.QWidget):
                 elif hasattr(self.sample_changer_hwobj, '__TYPE__')\
                    and (self.sample_changer_hwobj.__TYPE__ == 'FLEX'):
                     self.sample_changer_hwobj.\
-                      unload_sample(22, sample_location = location, wait = False)
+                      unload_sample(22, sample_location = location, wait = True)
                   #self.tree_brick.filter_cbox_changed("flex")
                 else:
                     if 'SC3' in self.beamline_setup_hwobj.sample_changer_hwobj.__class__.__name__:

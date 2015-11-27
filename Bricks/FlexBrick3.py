@@ -714,6 +714,7 @@ class FlexBrick3(BlissWidget):
         QObject.connect(self.currentBasket,PYSIGNAL("initFlex"),self.initFlex)
         
         self.currentSample=CurrentSampleView(self.contentsBox)
+	self.currentSample.hide()
         #VerticalSpacer(self.contentsBox)
         self.scContents = QVGroupBox("Contents", self.contentsBox)
         self.scContents.setInsideMargin(4)
@@ -775,7 +776,8 @@ class FlexBrick3(BlissWidget):
         
         self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
         self.contentsBox.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Minimum)
-
+	self.resetBasketsSamplesInfo()
+	
     def propertyChanged(self, propertyName, oldValue, newValue):
         if propertyName == 'icons':
             icons_list=newValue.split()
