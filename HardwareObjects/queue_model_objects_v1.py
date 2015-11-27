@@ -356,7 +356,7 @@ class BasketNode(TaskNode):
         self.name = 'Puck:'
 	self.loc_str = name
     def get_name(self):
-        return '%s - %s' % (self.name, self.loc_str)
+        return '%s - %s' % (self.loc_str,self.name)
 
 #FAK
 
