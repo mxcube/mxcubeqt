@@ -104,6 +104,7 @@ class Microdiff(MiniDiff.MiniDiff):
         return self.readPhase.getValue()
 
     def moveSyncMotors(self, motors_dict, wait=False, timeout=None):
+
         argin = ""
         #print "start moving motors =============", time.time()
         for motor in motors_dict.keys():
@@ -156,17 +157,23 @@ class Microdiff(MiniDiff.MiniDiff):
         return self.head_type.getValue() == "MiniKappa" and self.kappa.getValue()
 
     def getPositions(self):
+
         pos = { "phi": float(self.phiMotor.getPosition()),
                 "focus": float(self.focusMotor.getPosition()),
                 "phiy": float(self.phiyMotor.getPosition()),
                 "phiz": float(self.phizMotor.getPosition()),
                 "sampx": float(self.sampleXMotor.getPosition()),
-                "sampy": float(self.sampleYMotor.getPosition()), "zoom": float(self.zoomMotor.getPosition())}
-        if self.in_kappa_mode() == True:
-            pos.update({"kappa": float(self.kappaMotor.getPosition()), "kappa_phi": float(self.kappaPhiMotor.getPosition())})
+                "sampy": float(self.sampleYMotor.getPosition()), 
+		"zoom": float(self.zoomMotor.getPosition()),
+		"kappa":  float(self.kappaMotor.getPosition()) if self.in_kappa_mode() else None,
+                "kappa_phi": float(self.kappaPhiMotor.getPosition()) if self.in_kappa_mode() else None
+		}
+        #if self.in_kappa_mode() == True:
+        #    pos.update({"kappa": float(self.kappaMotor.getPosition()), "kappa_phi": float(self.kappaPhiMotor.getPosition())})
         return pos
 
     def moveMotors(self, roles_positions_dict):
+
         if not self.in_kappa_mode():
             try:
                 roles_positions_dict.pop["kappa"]
