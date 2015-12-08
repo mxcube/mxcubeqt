@@ -14,8 +14,13 @@ partners:
 * [ALBA] (https://www.cells.es/en)
 * [DESY] (https://www.desy.de)
 
-Actual information about the MXCuBE project can be found in 
-[project webpage] (http://mxcube.github.io/mxcube/)
+Actual information about the MXCuBE project can be found in the
+[project webpage] (http://mxcube.github.io/mxcube/).
 
-Information for developers can be found in [docs directory] 
-(https://github.com/mxcube/mxcube/tree/master/docs) in the git repository.
+## Information for developers
+
+* [How to install and run Qt version] (https://github.com/mxcube/mxcube/blob/master/docs/source/installation_instructions_qt4.rst)
+* [How to install and run Web version] (https://github.com/mxcube/mxcube/blob/master/docs/source/installation_instructions_web.rst)
+
+More detailed information is available in the [docs directory] 
+(https://github.com/mxcube/mxcube/tree/master/docs).
