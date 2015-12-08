@@ -12,8 +12,8 @@ MXCuBE has been tested with:
 Git repository
 --------------
 
-The MxCuBE is hosten in several git projects that all together can be found `here <https://github.com/mxcube/mxcube>`_
-The repository is organized in three submodules:
+The MXCuBE is hosten in several git projects that all together can be found `here <https://github.com/mxcube/mxcube>`_
+The repository for Qt version is organized in three submodules:
 
 * `HardwareRepository <https://github.com/mxcube/HardwareRepository.git>`_
 * `HardwareObjects <https://github.com/mxcube/HardwareObjects.git>`_

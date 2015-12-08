@@ -34,13 +34,15 @@ MXCuBE has two graphical user interfaces:
 * :doc:`qt_framework_overview` 
 * :doc:`web_framework_overview` 
 
-Tutorials and Examples
+Tutorials, examples and user manual
 ----------------------
 * :doc:`installation_instructions_qt4`
 * :doc:`installation_instructions_web`
 * :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
 * :doc:`packages/example_files`
+* :doc:`user_manual`
+
 API
 ---
 .. toctree::

@@ -1,10 +1,20 @@
 Qt framework based GUI
 ===============
 
+`BlissFramework <https://github.com/mxcube/BlissFramework.git>`_ handles overall gui,
+build based on single bricks that are available in 
+`BlissFramework/Bricks <https://github.com/mxcube/BlissFramework/tree/master/Bricks>`_ and 
+`mxcube/Bricks <https://github.com/mxcube/mxcube/tree/master/Bricks>`_ directories.
+and basic layout items (horizonal box, vertical box, groupbox etc.). 
+BlissFramework is supporting Qt3 and Qt4 platforms, and it is possible to run MXCuBE
+each of them (:doc:`installation_instructions_qt4`). However it is not possible to run
+both versions of Qt simultaneously. To clearly separate these two platforms qt4 version
+bricks, widgets and other files have prefix Qt4_.
+
 Best Practices
 --------------
-PEP-8 (http://www.python.org/dev/peps/pep-0008/) is used in general. However,
-Qt diverges from PEP-8 and uses camel case notation. This can be seen in the diagrams
+To format code PEP-8 (http://www.python.org/dev/peps/pep-0008/) is used in general. 
+However, Qt diverges from PEP-8 and uses camel case notation. This can be seen in the diagrams
 that contain Qt derived objects. New code should as much as possible confirm to PEP-8.
 
 Qt Signals
@@ -21,17 +31,17 @@ Widget Logic
 ------------
 Its recommended to separate widget logic from widget layout. One way of achieving that
 is to implement the layout in one widget and then use that layout from a widget which
-implements the logic. This pattern can be observed in a almost all new framework-2
-bricks. The brick implements the logic and it has a widget which implements the layout.
+implements the logic.
 
 Naming Conventions
 -----------------
-Attributes which reference Framework-2 hardware objects should end with hwobj, for in-
+Attributes which reference hardware objects should end with hwobj, for in-
 stance characterization hwobj or data collection hwobj. Names that are used frequently
 and/or which together with other names create long attribute names are abbreviated.
 The general rule is to use the first letter in each word. For instance, data collection
 group and data collection would be abbreviated dcg and dc.
 
-How to create a new brick
--------------------------
+Other
+----
+:doc:`how_to_create_qt_brick`
 
