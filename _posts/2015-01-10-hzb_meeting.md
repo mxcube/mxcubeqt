@@ -1,5 +1,5 @@
 ---
-title: "Meeting"
+title: "Previous meeting"
 bg: turquoise
 color: white
 fa-icon: users 

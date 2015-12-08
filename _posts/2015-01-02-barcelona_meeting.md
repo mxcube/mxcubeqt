@@ -1,5 +1,5 @@
 ---
-title: "Meeting"
+title: "Last meeting"
 bg: blue
 color: white
 fa-icon: users 
