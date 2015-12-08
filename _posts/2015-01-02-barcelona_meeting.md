@@ -15,6 +15,8 @@ Re-enforcing the collaboration spirit in Barcelona, MXCuBE has wind in the sails
 - Qt 4 version is ready for beta-testing
 - MXCuBE 3 development has started, first version to be ready for June 2016
 
+Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digitalpc.co.uk/fvx/iop/esrf/1512) (page 14).
+
 ## Full list of the presentations
 
 ### Status
