@@ -23,10 +23,3 @@ result in a web application
 * EDNA becomes part of MXCuBE
 * A MXCuBE 2 paper is in preparation
 
-### Next meeting will happen in ALBA in Barcelona in November
-
-## See you soon !
-
-
- 
-
