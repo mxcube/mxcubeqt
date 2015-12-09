@@ -210,12 +210,16 @@ class TreeBrick(BaseComponents.BlissWidget):
             self._lims_hwobj = bl_setup.lims_client_hwobj
 
             if self.sample_changer_hwobj is not None:
-                self.connect(self.sample_changer_hwobj,
-                             SampleChanger.STATE_CHANGED_EVENT,
-                             self.sample_load_state_changed)
-                self.connect(self.sample_changer_hwobj,
-                             SampleChanger.INFO_CHANGED_EVENT,
-                             self.set_sample_pin_icon)
+		if isinstance(self.sample_changer_hwobj,Flex):
+			bl_setup.flex_hwobj=self.sample_changer_hwobj
+			bl_setup.set_flex_mode(True)
+		else:
+		        self.connect(self.sample_changer_hwobj,
+		                     SampleChanger.STATE_CHANGED_EVENT,
+		                     self.sample_load_state_changed)
+		        self.connect(self.sample_changer_hwobj,
+		                     SampleChanger.INFO_CHANGED_EVENT,
+		                     self.set_sample_pin_icon)
 
             if self.plate_manipulator_hwobj is not None:
                 self.connect(self.plate_manipulator_hwobj,
@@ -242,7 +246,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                              self.refresh_Scan_Info)
                 self.connect(self.flex_hwobj, SampleChanger.EXCEPTION_EVENT, 
                              self.dc_tree_widget.flex_Exception)
-
+ 
 #FAK
             has_shutter_less = bl_setup.detector_has_shutterless()
             if has_shutter_less:
@@ -487,7 +491,10 @@ class TreeBrick(BaseComponents.BlissWidget):
                                 warning("No sample in ISPyB for location %s" % str(sc_sample.location))
                             sample_list.append(sc_sample)
 
-            self.dc_tree_widget.populate_list_view(basket_list, sample_list)
+	    if isinstance(self.sample_changer_hwobj, Flex):
+		self.dc_tree_widget.populate_flex_view(sample_list)
+	    else:
+		self.dc_tree_widget.populate_list_view(basket_list, sample_list)
 
     def get_sc_content(self):
         """
