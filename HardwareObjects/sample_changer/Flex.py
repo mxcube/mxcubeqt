@@ -189,13 +189,13 @@ class Flex(SampleChanger):
         self.tangoDevice = self.getProperty("tangoDevice") # set using flex-mockup.xml
         self.exporterDevice = self.getProperty("exporterDevice") # set using flex-mockup.xml
         self.comMode = self.getProperty("comMode") # set using flex-mockup.xml
-	print "AK comMode", self.comMode
+	#print "AK comMode", self.comMode
         self.__maxBasketIdx__ = self.getProperty("maxPucks") # set using flex-mockup.xml
         if self.comMode is None: self.comMode="exporter"
         if self.tangoDevice is None: self.tangoDevice="tango://CRG14-MADCAD.esrf.fr:18001/embl/flex/1#dbase=no"
         if self.exporterDevice is None: self.exporterDevice="wbm14staubli.esrf.fr:9001"
-	print "Flex self.__maxBasketIdx__ ", self.__maxBasketIdx__ 
-	print "Flex exporterDevice", self.exporterDevice
+	#print "Flex self.__maxBasketIdx__ ", self.__maxBasketIdx__ 
+	#print "Flex exporterDevice", self.exporterDevice
 	if self.comMode=="tango": self.initTango()
 	else: 
 		try:
