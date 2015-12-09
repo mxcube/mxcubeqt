@@ -20,11 +20,12 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
+from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-__category__ = 'Qt4_Motor'
+__category__ = 'Motor'
 
 
 class Qt4_MotorPredefPosBrick(BlissWidget):
@@ -35,8 +36,6 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                     Qt4_widget_colors.LIGHT_YELLOW,
                     Qt4_widget_colors.LIGHT_YELLOW,
                     Qt4_widget_colors.LINE_EDIT_CHANGED)
-
-    #DISABLED_COLOR = None
 
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
@@ -50,6 +49,8 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         # Properties ----------------------------------------------------------
         self.addProperty('label','string','')
         self.addProperty('mnemonic', 'string', '')
+        self.addProperty('icons', 'string', '')
+        self.addProperty('showMoveButtons', 'boolean', True)
 
         # Signals -------------------------------------------------------------
 
@@ -60,11 +61,15 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         _group_box = QtGui.QGroupBox(self)
         self.label = QtGui.QLabel("motor:", _group_box)
         self.positions_combo = QtGui.QComboBox(_group_box)
+        self.previous_position_button = QtGui.QPushButton(_group_box)
+        self.next_position_button = QtGui.QPushButton(_group_box)
 
         # Layout -------------------------------------------------------------- 
         _group_box_hlayout = QtGui.QHBoxLayout(_group_box)
         _group_box_hlayout.addWidget(self.label)
         _group_box_hlayout.addWidget(self.positions_combo) 
+        _group_box_hlayout.addWidget(self.previous_position_button)
+        _group_box_hlayout.addWidget(self.next_position_button)
         _group_box_hlayout.setSpacing(2)
         _group_box_hlayout.setContentsMargins(2, 2, 2, 2)
 
@@ -81,31 +86,34 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         #self.setSizePolicy(QtGui.QSizePolicy.Minimum,
         #                   QtGui.QSizePolicy.Fixed)
         # Qt signal/slot connections ------------------------------------------
-        self.positions_combo.activated.connect(self.lstPositionsClicked)
+        self.positions_combo.activated.connect(self.position_selected)
+        self.previous_position_button.clicked.connect(self.select_previous_position)
+        self.next_position_button.clicked.connect(self.select_next_position)
 
         # Other ---------------------------------------------------------------
         self.positions_combo.setToolTip("Moves the motor to a predefined position")
-        
-
-    def setToolTip(self,name=None,state=None):
-        states=("NOTREADY","UNUSABLE","READY","MOVESTARTED","MOVING","ONLIMIT")
+        self.previous_position_button.setIcon(QtGui.QIcon().fromTheme("go-previous"))
+        self.next_position_button.setIcon(QtGui.QIcon().fromTheme("go-next"))
+       
+    def setToolTip(self, name=None, state=None):
+        states = ("NOTREADY", "UNUSABLE", "READY", "MOVESTARTED", "MOVING", "ONLIMIT")
         if name is None:
-            name=self['mnemonic']
+            name = self['mnemonic']
 
         if self.motor_hwobj is None:
-            tip="Status: unknown motor "+name
+            tip = "Status: unknown motor " + name
         else:
             if state is None:
-                state=self.motor_hwobj.getState()
+                state = self.motor_hwobj.getState()
             try:
-                state_str=states[state]
+                state_str = states[state]
             except IndexError:
-                state_str="UNKNOWN"
-            tip="State:"+state_str
+                state_str = "UNKNOWN"
+            tip = "State:" + state_str
 
         self.label.setToolTip(tip)
 
-    def motorStateChanged(self, state):
+    def motor_state_changed(self, state):
         s = state == self.motor_hwobj.READY 
         self.positions_combo.setEnabled(s)
         Qt4_widget_colors.set_widget_color(self.positions_combo, 
@@ -113,43 +121,57 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                                            QtGui.QPalette.Button)
         self.setToolTip(state=state)
 
-    def propertyChanged(self,propertyName,oldValue,newValue):
-        if propertyName=='label':
-            if newValue=="" and self.motor_hwobj is not None:
-                self.label.setText("<i>"+self.motor_hwobj.username+":</i>")
-                tip=self.motor_hwobj.username
+    def propertyChanged(self, property_name, old_value, new_value):
+        if property_name == 'label':
+            if new_value == "" and self.motor_hwobj is not None:
+                self.label.setText("<i>" + self.motor_hwobj.username + ":</i>")
+                tip = self.motor_hwobj.username
             else:
-                self.label.setText(newValue)
-                tip=newValue
-        elif propertyName=='mnemonic':
+                self.label.setText(new_value)
+                tip = new_value
+        elif property_name == 'mnemonic':
             if self.motor_hwobj is not None:
-                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motorStateChanged)
-                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fillPositions)
-                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefinedPositionChanged)
-            self.motor_hwobj = self.getHardwareObject(newValue)
+                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motor_state_changed)
+                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fill_positions)
+                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefined_position_changed)
+            self.motor_hwobj = self.getHardwareObject(new_value)
             if self.motor_hwobj is not None:
-                self.connect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fillPositions)
-                self.connect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motorStateChanged)
-                self.connect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefinedPositionChanged)
+                self.connect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fill_positions)
+                self.connect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motor_state_changed)
+                self.connect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefined_position_changed)
 
-                self.fillPositions()
+                self.fill_positions()
 
                 if self.motor_hwobj.isReady():
-                    self.predefinedPositionChanged(self.motor_hwobj.getCurrentPositionName(), 0)
+                    self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)
 
-                if self['label']=="":
+                if self['label'] == "":
                     lbl=self.motor_hwobj.username
-                    self.label.setText("<i>"+lbl+":</i>")
+                    self.label.setText("<i>" + lbl + ":</i>")
                 Qt4_widget_colors.set_widget_color(self.positions_combo,
                                                    Qt4_MotorPredefPosBrick.STATE_COLORS[0],
                                                    QtGui.QPalette.Button)
-                self.motorStateChanged(self.motor_hwobj.getState())
-        elif propertyName=='listIndex':
-            self.fillPositions()
+                self.motor_state_changed(self.motor_hwobj.getState())
+        elif property_name == 'showMoveButtons':
+            if new_value:
+                self.previous_position_button.show()
+                self.next_position_button.show()
+            else:
+                self.previous_position_button.hide()
+                self.next_position_button.hide()
+        elif property_name == 'icons':
+            icons_list = new_value.split()
+            try:
+               self.previous_position_button.setIcon(\
+                    Qt4_Icons.load_icon(icons_list[0]))
+               self.next_position_button.setIcon(\
+                    Qt4_Icons.load_icon(icons_list[1]))
+            except:
+               pass
         else:
-            BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
+            BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
-    def fillPositions(self, positions = None): 
+    def fill_positions(self, positions = None): 
         self.positions_combo.clear()
         if self.motor_hwobj is not None:
             if positions is None:
@@ -167,16 +189,18 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
         if self.motor_hwobj is not None:
             if self.motor_hwobj.isReady():
-                self.predefinedPositionChanged(self.motor_hwobj.getCurrentPositionName(), 0)
+                self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)
 
-    def lstPositionsClicked(self, index):
+    def position_selected(self, index):
         if index > 0:
             if self.motor_hwobj.isReady():
                 self.motor_hwobj.moveToPosition(self.positions[index-1])
             else:
                 self.positions_combo.setCurrentIndex(0)
+        self.next_position_button.setEnabled(index < len(self.positions))
+        self.previous_position_button.setEnabled(index > 0)
 
-    def predefinedPositionChanged(self, positionName, offset):
+    def predefined_position_changed(self, positionName, offset):
         self.positions_combo.setCurrentIndex(0)
 
         if self.positions:
@@ -184,3 +208,9 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                if self.positions[i] == positionName:
                    self.positions_combo.setCurrentIndex(i+1)
                    break
+
+    def select_previous_position(self):
+        self.position_selected(self.positions_combo.currentIndex() - 1) 
+
+    def select_next_position(self):
+        self.position_selected(self.positions_combo.currentIndex() + 1)

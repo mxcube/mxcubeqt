@@ -205,8 +205,8 @@ class Qt4_InstanceListBrick(BlissWidget):
         _main_gbox_vlayout.addWidget(self.take_control_button)
         _main_gbox_vlayout.addWidget(self.ask_control_button)
         _main_gbox_vlayout.addWidget(_my_name_widget)
-        _main_gbox_vlayout.setSpacing(0)
-        _main_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_gbox_vlayout.setSpacing(2)
+        _main_gbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)

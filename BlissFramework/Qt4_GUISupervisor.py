@@ -60,30 +60,28 @@ class BlissSplashScreen(QtGui.QSplashScreen):
 
     def drawContents(self, painter):
         x0 = 10
-        x1 = 218
-        y0 = 109
-        y1 = 109 + painter.fontMetrics().height()
+        x1 = 390
+        y0 = 340
+        y1 = 340 + painter.fontMetrics().height()
         pxsize = 14
         painter.font().setPixelSize(pxsize)
-    
-        painter.setPen(QtGui.QPen(QtCore.Qt.white))
-
-        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), QtCore.QPoint(x1, y1)), 
-                                      QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, 'Loading')
+        painter.setPen(QtGui.QPen(QtCore.Qt.black))
+        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), 
+                         QtCore.QPoint(x1, y1)), 
+                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, 
+                         "Loading MXCuBE")
         painter.font().setPixelSize(pxsize*2.5)
-        y0 = y1
-        y1 += 3 + painter.fontMetrics().height()
-        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), QtCore.QPoint(x1, y1)), 
-                                      QtCore.Qt.AlignCenter, self.guiName)
         painter.font().setPixelSize(pxsize)
         y0 = y1
         y1 += 3 + painter.fontMetrics().height()
-        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), QtCore.QPoint(x1, y1)), 
-                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, 'Please wait...')
+        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), 
+                         QtCore.QPoint(x1, y1)), 
+                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, 
+                         "Please wait...")
 
 
 class GUISupervisor(QtGui.QWidget):
-    def __init__(self, designMode = False, showMaximized=False, noBorder=False):
+    def __init__(self, designMode=False, showMaximized=False, noBorder=False):
         QtGui.QWidget.__init__(self)
 
         self.launchInDesignMode = designMode
@@ -96,16 +94,16 @@ class GUISupervisor(QtGui.QWidget):
         self.splashScreen.show()
         self.timestamp = 0
 
-    def loadGUI(self, GUIConfigFile):
+    def load_gui(self, gui_config_file):
         self.configuration = Qt4_Configuration.Configuration()
-        self.GUIConfigFile = GUIConfigFile
+        self.gui_config_file = gui_config_file
 
-        if self.GUIConfigFile:
+        if self.gui_config_file:
             if hasattr(self, "splashScreen"):
-                self.splashScreen.setGUIName(os.path.splitext(os.path.basename(GUIConfigFile))[0])
+                self.splashScreen.setGUIName(os.path.splitext(os.path.basename(gui_config_file))[0])
         
-            if os.path.exists(GUIConfigFile):
-                filestat = os.stat(GUIConfigFile)
+            if os.path.exists(gui_config_file):
+                filestat = os.stat(gui_config_file)
                 self.timestamp = filestat[stat.ST_MTIME]
 
                 if filestat[stat.ST_SIZE] == 0:
@@ -116,10 +114,10 @@ class GUISupervisor(QtGui.QWidget):
                 # open existing file
                 #
                 try:
-                    f = open(GUIConfigFile)
+                    f = open(gui_config_file)
                 except:
-                    logging.getLogger().exception("Cannot open file %s", GUIConfigFile)
-                    QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % GUIConfigFile, QtGui.QMessageBox.Ok)
+                    logging.getLogger().exception("Cannot open file %s", gui_config_file)
+                    QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % gui_config_file, QtGui.QMessageBox.Ok)
                 else:
                     #
                     # find mnemonics to speed up loading
@@ -164,8 +162,8 @@ class GUISupervisor(QtGui.QWidget):
                     try:
                         config = Qt4_Configuration.Configuration(raw_config)
                     except:
-                        logging.getLogger().exception("Cannot read configuration from file %s", GUIConfigFile)
-                        QtGui.QMessageBox.warning(self, "Error", "Could not read configuration\nfrom file %s" % GUIConfigFile, QtGui.QMessageBox.Ok)    
+                        logging.getLogger().exception("Cannot read configuration from file %s", gui_config_file)
+                        QtGui.QMessageBox.warning(self, "Error", "Could not read configuration\nfrom file %s" % gui_config_file, QtGui.QMessageBox.Ok)    
                     else:
                         self.configuration = config
 
@@ -177,9 +175,9 @@ class GUISupervisor(QtGui.QWidget):
 
                         QtGui.QApplication.setActiveWindow(self.framework)
                          
-                        self.framework.filename = GUIConfigFile
+                        self.framework.filename = gui_config_file
                         self.framework.configuration = config
-                        self.framework.setWindowTitle("GUI Builder - %s" % GUIConfigFile)
+                        self.framework.setWindowTitle("GUI Builder - %s" % gui_config_file)
                         self.framework.gui_editor_window.set_configuration(config)
                         self.framework.gui_editor_window.draw_window_preview()  
                         self.framework.show()
@@ -203,21 +201,19 @@ class GUISupervisor(QtGui.QWidget):
 
         #tGui.QApplication.setMainWidget(self.framework)
         QtGui.QApplication.setActiveWindow(self.framework)
-
         self.framework.show()
-            
-        self.framework.new_clicked(self.GUIConfigFile)
+        self.framework.new_clicked(self.gui_config_file)
         
         return self.framework
              
 
     def reloadGUI(self):
-        if (QtGui.QMessageBox.question(self,
-                                   "Reload GUI",
-                                   "Are you sure you want to reload the GUI ?\nThis will stop the current application and restart it.",
-                                   QtGui.QMessageBox.Yes,
-                                   QtGui.QMessageBox.No,
-                                   QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Yes):
+        msg = "Are you sure you want to reload the GUI ?\n" +\
+              "This will stop the current application and restart it." 
+        if (QtGui.QMessageBox.question(self, "Reload GUI", msg, 
+             QtGui.QMessageBox.Yes, QtGui.QMessageBox.No, 
+             QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Yes):
+
             self.finalize()
 
             win0 = self.windows[0]
@@ -401,15 +397,15 @@ class GUISupervisor(QtGui.QWidget):
                         
             # save GUI file only if it is not more recent
             # (to prevent overwritting file if it has been modified in the meantime)
-            if self.GUIConfigFile and os.path.exists(self.GUIConfigFile):
-                ts = os.stat(self.GUIConfigFile)[stat.ST_MTIME]
+            if self.gui_config_file and os.path.exists(self.gui_config_file):
+                ts = os.stat(self.gui_config_file)[stat.ST_MTIME]
                 if ts <= self.timestamp:
                     if configurationSuffix == '':
                         logging.getLogger().debug("saving configuration file to keep windows pos. and sizes")
-                    self.configuration.save(self.GUIConfigFile)
+                    self.configuration.save(self.gui_config_file)
 
 
-    def finishInit(self, GUIConfigFile):
+    def finishInit(self, gui_config_file):
         while True:
             try:
                 self.hardwareRepository.connect()
@@ -418,8 +414,8 @@ class GUISupervisor(QtGui.QWidget):
                 
                 message = """Timeout while connecting to Hardware Repository server ;
                 make sure the Hardware Repository Server is running on host %s.""" % str(self.hardwareRepository.serverAddress).split(':')[0]
-                a = qt.QMessageBox.warning(None, 'Cannot connect to Hardware Repository', message, qt.QMessageBox.Retry, qt.QMessageBox.Cancel, qt.QMessageBox.NoButton)
-                if a == qt.QMessageBox.Cancel:
+                a = QtGui.QMessageBox.warning(None, 'Cannot connect to Hardware Repository', message, QtGui.QMessageBox.Retry, QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton)
+                if a == QtGui.QMessageBox.Cancel:
                     logging.getLogger().warning('Gave up trying to connect to Hardware Repository server.')
                     break
             else:
@@ -428,7 +424,7 @@ class GUISupervisor(QtGui.QWidget):
 
         try:
             main_widget = None
-            main_widget=self.loadGUI(GUIConfigFile)
+            main_widget=self.load_gui(gui_config_file)
             if main_widget:
                 self.splashScreen.finish(main_widget)
             del self.splashScreen
