@@ -509,6 +509,11 @@ class StatusView(QWidget):
         flags=self.lblError.alignment()|Qt.WordBreak
         self.lblError.setAlignment(flags)
 
+        self.lblLastError = QLabel("",self.box2)
+        self.lblLastError.setAlignment(Qt.AlignLeft)
+        flags=self.lblLastError.alignment()|Qt.WordBreak
+        self.lblLastError.setAlignment(flags)
+
         self.scCanLoad=QRadioButton("Sample changer can load/unload",self.box2)
         QObject.connect(self.scCanLoad,SIGNAL("clicked()"),self.sampleChangerMoveToLoadingPos)
         self.minidiffCanMove=QRadioButton("Minidiff motors can move",self.box2)
@@ -523,6 +528,14 @@ class StatusView(QWidget):
 
     def setIcons(self,reset_icon):
         self.buttonReset.setPixmap(Icons.load(reset_icon))
+
+    def setFlexErrorMsg(self, status):
+        #print "SAMPLE CHANGER MSG IS",status
+        QToolTip.add(self.lblLastError,status)
+        status = status.strip()
+        self.lblLastError.setText(status)
+        color = self.lblError.paletteBackgroundColor()
+        #self.emit(PYSIGNAL("status_msg_changed"), (status, color))
 
     def setErrorMsg(self, status):
         #print "SAMPLE CHANGER MSG IS",status
@@ -813,6 +826,7 @@ class FlexBrick3(BlissWidget):
                 self.connect(self.sampleChanger, SampleChanger.INFO_CHANGED_EVENT, self.infoChanged)
                 self.connect(self.sampleChanger, SampleChanger.SCAN_CHANGED_EVENT, self.infoChanged)
                 self.connect(self.sampleChanger, SampleChanger.SELECTION_CHANGED_EVENT, self.selectionChanged)
+                self.connect(self.sampleChanger, SampleChanger.EXCEPTION_EVENT, self.flexExceptionMsg)
                 #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
                 #self.connect(self.sampleChanger, PYSIGNAL("minidiffCanMove"), self.minidiffCanMove)
                 #self.connect(self.sampleChanger, PYSIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
@@ -991,6 +1005,9 @@ class FlexBrick3(BlissWidget):
     def sampleChangerCanLoad(self,can_load):
         self.status.setSampleChangerLoadStatus(can_load)
 
+    def flexExceptionMsg(self,msg):
+        self.status.setFlexErrorMsg(msg)
+
     def sampleChangerInUse(self,in_use):
         self.status.setSampleChangerUseStatus(in_use)
 
@@ -1086,7 +1103,7 @@ class FlexBrick3(BlissWidget):
         self.scContents1.setInsideMargin(4)
         self.scContents1.setInsideSpacing(2)
         self.scContents1.setAlignment(Qt.AlignHCenter)
-        self.scContents2 = QVGroupBox("ContentsAK", self.scContentsAk)
+        self.scContents2 = QVGroupBox("Contents2", self.scContentsAk)
         self.scContents2.setInsideMargin(4)
         self.scContents2.setInsideSpacing(2)
         self.scContents2.setAlignment(Qt.AlignHCenter)
