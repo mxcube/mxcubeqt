@@ -180,6 +180,7 @@ class DataCollectTree(qt.QWidget):
         self.setFixedWidth(415)
 
         self.collect_button.setDisabled(True)
+	self.showFlex(False)
 
     def eventFilter(self, _object, event):
         if event.type() == qt.QEvent.MouseButtonDblClick:

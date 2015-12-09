@@ -108,11 +108,6 @@
                                                     <string>Plate</string>
                                                 </property>
                                             </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Flex</string>
-                                                </property>
-                                             </item>
                                             <property name="name">
                                                 <cstring>filter_cbox</cstring>
                                             </property>
