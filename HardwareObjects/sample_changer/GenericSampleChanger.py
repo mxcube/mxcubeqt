@@ -551,7 +551,10 @@ class SampleChanger(Container,Equipment):
         self.emit(self.SELECTION_CHANGED_EVENT, ())
 #AK    
     def _triggerScanChangedEvent(self):
-        self.emit(self.SCAN_CHANGED_EVENT, ())    
+        self.emit(self.SCAN_CHANGED_EVENT, ())  
+  
+    def _triggerExceptionEvent(self,msg):
+        self.emit(self.EXCEPTION_EVENT, (msg,))    
 #FAK
     def _triggerInfoChangedEvent(self):
         self.emit(self.INFO_CHANGED_EVENT, ())    
