@@ -42,7 +42,8 @@ and/or which together with other names create long attribute names are abbreviat
 The general rule is to use the first letter in each word. For instance, data collection
 group and data collection would be abbreviated dcg and dc.
 
-Tutorial
-********
-:doc:`how_to_create_qt_brick`
+Tutorials
+*********
+* :doc:`installation_instructions_qt4`
+* :doc:`how_to_create_qt_brick`
 

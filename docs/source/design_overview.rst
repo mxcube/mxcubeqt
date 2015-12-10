@@ -16,7 +16,6 @@ Further main hardware objects are described.
 
 Queue and QueueModel
 ********************
-
 The :doc:`QueueModel <packages/HardwareObjects/QueueModel>` is a key component in MxCuBE. It handles the data model for the :doc:`Queue <packages/HardwareObjects/Queue>`. Each task in the queue, is a subclass of :doc:`QueueEntry <packages/HardwareObjects/queue_entry>`, and is associated with a model data node (:doc:`TaskNode <packages/HardwareObjects/queue_model_objects>`). 
 The QueueModel and is designed to be part of a MVC like pattern, where the QueueModel acts as the **Controller**. The QueueModel has a reference to one or more :doc:`RootNode <packages/HardwareObjects/queue_model_objects>` objects which contain the model.
 The TreeBrick and the Queue hardware objects behaves as **views** for the QueueModel. The TreeBrick is displaying the tasks for the user while the Queue represents the exectuable 'entity'. 
@@ -36,7 +35,8 @@ Session
 
 ShapeHistory and Qt4_GraphicsManager
 ************************************
-In Qt3 version graphics are handled by :doc:`ShapeHistory <packages/HardwareObjects/ShapeHistory>`  hardware object and in Qt4 version :doc:`Qt4_GraphicsManager <packages/HardwareObjects/Qt4_GraphicsManager>` is used.
+In Qt3 version graphics are handled by :doc:`ShapeHistory <packages/HardwareObjects/ShapeHistory>`  hardware object and in Qt4 version :doc:`Qt4_GraphicsManager <packages/HardwareObjects/Qt4_GraphicsManager>` with :doc:`graphics library <packages/HardwareObjects/Qt4_GraphicsLib>` is used.
 
 Other modules
 *************
+For communication with ISPyB :doc:`ISPyBClient2 <packages/HardwareObjects/ISPyBClient2>` hardware object is used.
