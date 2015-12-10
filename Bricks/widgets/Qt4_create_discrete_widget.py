@@ -23,9 +23,9 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
+from Qt4_GraphicsLib import GraphicsItemPoint
 
 from BlissFramework.Utils import Qt4_widget_colors
 from Qt4_data_path_widget import DataPathWidget
@@ -183,7 +183,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         """
         tasks = []
 
-        if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+        if isinstance(shape, GraphicsItemPoint):
             snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot

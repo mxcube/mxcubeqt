@@ -109,7 +109,7 @@ class DCGroupWidget(QtGui.QWidget):
         dcg_child_list = []
         sw_list = []
          
-        if hasattr(dcg_queue_item, "interleave_sw_list"):
+        if dcg_queue_item.interleave_sw_list:
             sw_list = dcg_queue_item.interleave_sw_list
             for child in dcg_queue_item.interleave_items: 
                 dcg_child_list.append(child['data_model'])

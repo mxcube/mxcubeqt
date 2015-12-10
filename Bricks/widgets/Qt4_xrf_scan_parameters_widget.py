@@ -44,7 +44,7 @@ class XRFScanParametersWidget(QtGui.QWidget):
         self.xrf_scan_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.xrf_scan_model = queue_model_objects.XRFScan()
+        self.xrf_scan_model = queue_model_objects.XRFSpectrum()
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------

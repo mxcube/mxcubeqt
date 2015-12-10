@@ -90,6 +90,12 @@ class QueueItem(QtGui.QTreeWidgetItem):
                     if self.child(index)._checkable:
                         self._checkable = True
                         break
+
+            self.parent().setCheckState(column, check_state)
+        elif isinstance(self, SampleQueueItem):
+            if self.parent():
+                self.parent().setCheckState(column, check_state)  
+
         if not self._checkable:
             check_state = QtCore.Qt.Unchecked  
         QtGui.QTreeWidgetItem.setCheckState(self, column, check_state)
@@ -97,6 +103,11 @@ class QueueItem(QtGui.QTreeWidgetItem):
             self._queue_entry.set_enabled(check_state > 0)
         if self._data_model:
             self._data_model.set_enabled(check_state > 0)
+
+    def set_hidden(self, hidden):
+        self.setHidden(hidden)
+        for index in range(self.childCount()):
+            self.child(index).setHidden(hidden)
 
     def update_check_state(self):
         """
@@ -106,8 +117,6 @@ class QueueItem(QtGui.QTreeWidgetItem):
         if type(self) in (SampleQueueItem, DataCollectionGroupQueueItem):
             for index in range(self.childCount()):
                 self.child(index).setCheckState(0, self.checkState(0))  
-        if isinstance(self.parent(), SampleQueueItem):
-            self.parent().setCheckState(0, self.checkState(0))
 
     def move_item(self, after):
         """
@@ -272,7 +281,7 @@ class EnergyScanQueueItem(TaskQueueItem):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
 
-class XRFScanQueueItem(TaskQueueItem):
+class XRFSpectrumQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
@@ -295,7 +304,7 @@ MODEL_VIEW_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueItem,
      queue_model_objects.Characterisation: CharacterisationQueueItem,
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
-     queue_model_objects.XRFScan: XRFScanQueueItem,
+     queue_model_objects.XRFSpectrum: XRFSpectrumQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
      queue_model_objects.Basket: BasketQueueItem, 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>388</width>
+    <width>356</width>
     <height>128</height>
    </rect>
   </property>
@@ -34,6 +34,15 @@
    </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="font">
@@ -85,7 +94,7 @@
          <property name="maximumSize">
           <size>
            <width>150</width>
-           <height>16777215</height>
+           <height>27</height>
           </size>
          </property>
          <item>
@@ -140,7 +149,7 @@
          <property name="maximumSize">
           <size>
            <width>120</width>
-           <height>16777215</height>
+           <height>27</height>
           </size>
          </property>
          <property name="text">
@@ -187,8 +196,8 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>32767</width>
-           <height>32767</height>
+           <width>130</width>
+           <height>27</height>
           </size>
          </property>
          <property name="toolTip">
@@ -224,12 +233,29 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QPushButton" name="synch_ispyb_button">
+         <property name="text">
+          <string>ISPyB</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../../BlissFramework/Icons/Refresh2.png</normaloff>../../../BlissFramework/Icons/Refresh2.png</iconset>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QLabel" name="synch_label">
+        <widget class="QLabel" name="filter_label">
          <property name="minimumSize">
           <size>
            <width>60</width>
@@ -243,59 +269,113 @@
           </size>
          </property>
          <property name="text">
-          <string>Sync:</string>
+          <string>Filter:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="synch_combo">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
+        <widget class="QLineEdit" name="filter_ledit">
+         <property name="enabled">
+          <bool>false</bool>
          </property>
          <property name="maximumSize">
           <size>
-           <width>32767</width>
-           <height>32767</height>
+           <width>130</width>
+           <height>27</height>
           </size>
          </property>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ISPyB</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>CRIMS</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_3">
+        <spacer name="horizontalSpacer_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
+           <width>10</width>
            <height>20</height>
           </size>
          </property>
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="tree_options_button">
-         <property name="text">
-          <string>Tree options</string>
+        <widget class="QComboBox" name="filter_combo">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>27</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>No filter</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Sample name</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Protein name</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Basket index</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Executed</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Not executed</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>OSC</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Helical</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Charaterisation</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Energy Scan</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>XRF Spectrum</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Advanced</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

@@ -22,13 +22,19 @@ from PyQt4 import QtCore
 
 import numpy as np
 
-import matplotlib.pyplot as plt
 from matplotlib.backends import qt4_compat
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg \
-import NavigationToolbar2QTAgg as NavigationToolbar
+
+try:
+   from matplotlib.backends.backend_qt4agg \
+   import NavigationToolbar2QTAgg as NavigationToolbar
+except:
+   from matplotlib.backends.backend_qt4agg \
+   import NavigationToolbar2QT as NavigationToolbar
+
+import matplotlib.pyplot as plt
 
 
 from BlissFramework.Utils import Qt4_widget_colors
@@ -284,7 +290,6 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
 
             mgr = plt.get_current_fig_manager()
             #mgr.full_screen_toggle()
-            print mgr
             mgr.window.move(10, 10)
 
     def get_current_coord(self):

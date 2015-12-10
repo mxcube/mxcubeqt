@@ -57,11 +57,11 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QtGui.QGroupBox("Door interlock", self)
-        self.main_groupbox.setAlignment(QtGui.QLabel.AlignCenter)
+        self.main_groupbox.setAlignment(QtCore.Qt.AlignCenter)
         self.state_label = QtGui.QLabel('<b>unknown</b>', self.main_groupbox)
         Qt4_widget_colors.set_widget_color(self.state_label,
                                            self.STATES['unknown']) 
-        self.state_label.setAlignment(QtGui.QLabel.AlignCenter)
+        self.state_label.setAlignment(QtCore.Qt.AlignCenter)
         self.unlock_door_button = QtGui.QPushButton(\
              Qt4_Icons.load_icon("EnterHutch"),
              "Unlock", self.main_groupbox)

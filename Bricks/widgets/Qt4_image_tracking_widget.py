@@ -50,10 +50,11 @@ class ImageTrackingWidget(QtGui.QWidget):
                  "ui_files/Qt4_image_tracking_widget_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        __main_vlayout = QtGui.QVBoxLayout(self)
-        __main_vlayout.addWidget(self.image_tracking_widget_layout)
-        __main_vlayout.setSpacing(0)
-        __main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.image_tracking_widget_layout)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.addStretch(10) 
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 

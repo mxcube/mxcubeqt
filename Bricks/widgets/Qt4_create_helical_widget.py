@@ -26,8 +26,8 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 import Qt4_queue_item
-import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
+from Qt4_GraphicsLib import GraphicsItemLine
 
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 from queue_model_enumerables_v1 import COLLECTION_ORIGIN
@@ -168,7 +168,7 @@ class CreateHelicalWidget(CreateTaskBase):
         selected_line = None
 
         for shape in self._graphics_manager_hwobj.get_shapes():
-            if isinstance(shape, graphics_manager.GraphicsItemLine):
+            if isinstance(shape, GraphicsItemLine):
                 (line_start_cpos, line_end_cpos) = shape.get_centred_positions() 
                 if line_start_cpos == start_cpos and line_end_cpos == end_cpos:
                     self._graphics_manager_hwobj.de_select_all()
@@ -272,6 +272,7 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_name(start_acq.path_template.get_prefix())
             dc.set_number(start_acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
+            dc.set_requires_centring(False)
 
             data_collections.append(dc)
             self._path_template.run_number += 1

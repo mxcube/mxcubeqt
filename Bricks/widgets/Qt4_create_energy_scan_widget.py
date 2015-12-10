@@ -24,7 +24,7 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
+from Qt4_GraphicsLib import GraphicsItemPoint
 import queue_model_objects_v1 as queue_model_objects
 
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
@@ -144,7 +144,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
-                if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+                if isinstance(shape, GraphicsItemPoint):
                     snapshot = self._graphics_manager_hwobj.\
                            get_snapshot(shape)
 

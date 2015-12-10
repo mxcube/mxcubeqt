@@ -25,9 +25,9 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
+from Qt4_GraphicsLib import GraphicsItemPoint
 
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from Qt4_create_task_base import CreateTaskBase
@@ -284,7 +284,7 @@ class CreateCharWidget(CreateTaskBase):
         selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
 
         for shape in selected_shapes:
-            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+            if isinstance(shape, GraphicsItemPoint):
                 result = True
         return result
         
@@ -296,7 +296,7 @@ class CreateCharWidget(CreateTaskBase):
         """
         tasks = []
 
-        if not shape or not isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+        if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
         else:
