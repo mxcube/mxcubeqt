@@ -1,9 +1,11 @@
-MxCuBE-2.0 Documentation
-========================
+########################
+MxCuBE Documentation
+########################
+
 MXCuBE stands for Macromolecular Xtallography CUstomized Beamline Environment.
 The project started in 2005 at `ESRF <http://www.esrf.eu>`_, since then it has
 been adopted by other institutes in Europe. In 2010, a collaboration
-agreement has been signed for the development of mxCuBE with the following
+agreement has been signed for the development of MXCuBE with the following
 partners:
 
 * `ESRF <http://www.esrf.eu>`_
@@ -34,25 +36,30 @@ MXCuBE has two graphical user interfaces:
 * :doc:`qt_framework_overview` 
 * :doc:`web_framework_overview` 
 
+***********************************
 Tutorials, examples and user manual
-----------------------
+***********************************
 * :doc:`installation_instructions_qt4`
 * :doc:`installation_instructions_web`
 * :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
+* :doc:`feature_overview`
 * :doc:`packages/example_files`
 * :doc:`user_manual`
 
+***
 API
----
+***
+
 .. toctree::
    :maxdepth: 1
    :glob:
 
    packages/*
 
+*****************
 Other information
-----------------------
+*****************
 
 * If you cite MXCuBE, please use reference:
 .. note:: 
@@ -61,8 +68,9 @@ Other information
 * `Full article <http://www.ncbi.nlm.nih.gov/pubmed/20724792>`_
 * :doc:`mxcube_meetings`
 
+******************
 Indices and tables
-------------------
+******************
 * :ref:`modindex`
 * :ref:`search`
 

@@ -22,8 +22,7 @@ elif sys.argv[-1].upper() == "-QT4":
     from BlissFramework import Qt4_startGUI
     BlissFramework.set_gui_version("qt4")
     Qt4_startGUI.run(MXCUBE_GUI_FILE)
-elif sys.argv[-1].upper() == "-WEB":
-    sys.argv.pop(-1)
-    print "Web gui support not available"
 else:
-    print "Incorrect gui version. Available: -qt3, -qt4, or -web"
+    msg = "Command line argument indicating gui platform not passed or is incorrect. " +\
+          "Add -qt3 or -qt4 as a last argument to run MXCuBE in Qt3 or Qt4"
+    print msg
