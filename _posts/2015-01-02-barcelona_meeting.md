@@ -23,10 +23,10 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [Status of MXCuBE @ ESRF](doc/ESRFHighlights.odp)
 - [Status of MXCuBE @ MAX IV](doc/201511_MXCuBE-MAXlab_JN.pdf)
 - [Status of MXCuBE @ HZB](doc/20151130_mxcube-HZB.pdf)
-- SOLEIL
+- [Status of MXCuBE @ SOLEIL](doc/mxCuBE_SOLEIL_Status_2015_11.pdf)
 - [Status of MXCuBE @ ALBA](doc/MXCuBEMeeting_ALBA-XALOC_Status.pdf)
 - DESY
-- Global Phasing
+- [Global Phasing](doc/gb_mxcube_alba_2015.pdf)
 
 ### New developments & progress around MXCuBE
 - [Unleashing full power of Eiger detector](https://drive.google.com/open?id=0B6zThwr9Jrr2eS1jZXQ5QlVLU1U)
