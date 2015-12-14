@@ -17,13 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from PyQt4 import QtGui, QtCore
 
 import numpy as np
-
-from matplotlib.backends import qt4_compat
 from matplotlib.figure import Figure
+
+#from matplotlib.backends import qt4_compat
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -157,7 +156,7 @@ class MplCanvas(FigureCanvas):
         self._axis_x_array = np.append(self._axis_x_array, x)
         self._axis_y_array = np.append(self._axis_y_array, y)
         self.axes.plot(self._axis_x_array, self._axis_y_array, linewidth=2)
-        self.set_title("Scan in progres. Please wait...")
+        self.set_title("Scan in progress. Please wait...")
 
     def set_axes_labels(self, x_label, y_label):
         self.axes.set_xlabel(x_label)
@@ -280,7 +279,8 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
                                      mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
-        im = self.mpl_canvas.axes.imshow(result, interpolation = 'none')
+        im = self.mpl_canvas.axes.imshow(result, interpolation='none', 
+            extent=[0, result.shape[0], 0, result.shape[1]])
         im.set_cmap('hot')
         if result.max() > 0:
             self.add_divider()

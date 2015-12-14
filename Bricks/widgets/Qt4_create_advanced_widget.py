@@ -223,7 +223,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         data_collections = []
         for shape in self.get_selected_grids():
-            snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
+            shape.set_snapshot(self._graphics_manager_hwobj.\
+                  get_snapshot(shape))
             grid_properties = shape.get_properties()
 
             acq = self._create_acq(sample)

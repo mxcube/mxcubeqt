@@ -129,6 +129,17 @@ class TaskToolBoxWidget(QtGui.QWidget):
         if not beamline_setup_hwobj.tunable_wavelength():
             self.tool_box.removeItem(self.tool_box.indexOf(self.energy_scan_page))
             self.energy_scan_page.hide()
+            logging.getLogger("user_level_log").info("Energy scan task not available")
+        
+        has_xrf_spectrum = False
+        if hasattr(beamline_setup_hwobj, 'xrf_spectrum_hwobj'):
+            if beamline_setup_hwobj.xrf_spectrum_hwobj:
+                has_xrf_spectrum = True
+
+        if not has_xrf_spectrum:
+            self.tool_box.removeItem(self.tool_box.indexOf(self.xrf_spectrum_page))
+            self.xrf_spectrum_page.hide()
+            logging.getLogger("user_level_log").info("XRF spectrum task not available")
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
@@ -259,6 +270,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
     def create_task_group(self, task_model):
         group_task_node = queue_model_objects.TaskGroup()
         current_item = self.tool_box.currentWidget()
+
         group_name = current_item._task_node_name
         group_task_node.set_name(group_name)
         num = task_model.get_next_number_for_name(group_name)

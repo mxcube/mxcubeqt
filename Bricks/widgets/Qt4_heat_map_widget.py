@@ -115,15 +115,15 @@ class HeatMapWidget(QtGui.QWidget):
         self._image_info_label.setSizePolicy(QtGui.QSizePolicy.Expanding, 
                                              QtGui.QSizePolicy.Fixed)
 
-        # Qt signal/slot connections ------------------------------------------
-        self._heat_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
+        # Qt signals and slots ------------------------------------------------
         self._score_type_cbox.activated.connect(self.score_type_changed)
         self._threshold_slider.valueChanged.connect(\
              self.filter_min_slider_changed)
         self._create_points_button.clicked.connect(\
              self.create_points_clicked)
+        self._heat_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
 
-        # Other ----------------------------------------------------------------
+        # Other ---------------------------------------------------------------
         #self._heat_map_plot.canvas().setMouseTracking(False)
         #Qt4_widget_colors.set_widget_color(self._heat_map_plot, QtCore.Qt.white)
         #self._heat_map_plot.mouseDoubleClickEvent = self.plot_double_clicked
@@ -216,8 +216,8 @@ class HeatMapWidget(QtGui.QWidget):
                 height = self.__heat_map_max_size[1]
                 width = height * ratio
 
-            #self._heat_map_plot.setFixedWidth(width)
-            #self._heat_map_plot.setFixedHeight(height)
+            self._heat_map_plot.setFixedWidth(width)
+            self._heat_map_plot.setFixedHeight(height)
 
             #axis_range = self.__associated_grid.get_col_row_num()
             #self._heat_map_plot.set_x_axis_limits((- 0.5, axis_range[0] - 0.5))
@@ -311,6 +311,7 @@ class HeatMapWidget(QtGui.QWidget):
         """
         self._heat_map_gbox.setEnabled(True)
         self.__results = results
+
         self.refresh()
         if last_results:
             self.set_best_pos()
