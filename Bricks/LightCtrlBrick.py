@@ -44,7 +44,7 @@ class LightCtrlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
         #self.lightOffButton.setDown(True)
         if self.actuatorLight is not None:
             if self.actuatorLight.getActuatorState(True) != "out":
-                if self.motor is not None:
+                if self.motor is not None and self['out_delta']!="0":
                     try:
                         self.lightSavedPosition=self.motor.getPosition()
                     except:
