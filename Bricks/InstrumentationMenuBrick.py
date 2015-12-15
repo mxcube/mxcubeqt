@@ -26,11 +26,13 @@ class InstrumentationMenuBrick(BlissWidget):
         self.scintillatorHO=None
         self.apertureHO=None
         self.fshutHO=None
+        self.detcoverHO = None
 
         self.addProperty('cryostream','string','')
         self.addProperty('fluodetector','string','')
         self.addProperty('hutchtrigger','string','')
         self.addProperty('light','string','')
+        self.addProperty('DetectorCover','string','')
         self.addProperty('FastShutter','string','')
         self.addProperty('scintillator','string','')
         self.addProperty('scintillatorWarning', 'string', '')
@@ -42,6 +44,12 @@ class InstrumentationMenuBrick(BlissWidget):
         self.addProperty('hutchtriggerDefaultMode', 'combo', ('automatic', 'manual'), 'automatic')
 
         self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
+
+    def detcoverClicked(self):
+        if self.instrumentationMenu.isItemChecked(self.detcoverId):
+            self.detcoverHO.actuatorOut()
+        else:
+            self.detcoverHO.actuatorIn()
 
     def lightClicked(self):
         if self.instrumentationMenu.isItemChecked(self.lightId):
@@ -74,6 +82,10 @@ class InstrumentationMenuBrick(BlissWidget):
             if len(msg) > 0:
               ret=QMessageBox.warning(self, 'Scintillator in', msg, QMessageBox.Ok, QMessageBox.Cancel)==QMessageBox.Ok
             if ret:
+                try:
+                    self.detcoverHO.actuatorIn()
+                except:
+                    pass
                 self.scintillatorHO.actuatorIn(timeout=20)
                 """
                 try:
@@ -93,6 +105,15 @@ class InstrumentationMenuBrick(BlissWidget):
             self.instrumentationMenu.setItemChecked(self.hutchtriggerId,False)
         else:
             self.instrumentationMenu.setItemChecked(self.hutchtriggerId,True)
+
+    def detcoverChanged(self,state):
+        if self.instrumentationMenu is None:
+            return
+        if state=="in":
+            state=True
+        else:
+            state=False
+        self.instrumentationMenu.setItemChecked(self.detcoverId,state)
 
     def lightChanged(self,state):
         if self.instrumentationMenu is None:
@@ -169,6 +190,12 @@ class InstrumentationMenuBrick(BlissWidget):
                     f.setPointSize(self.font().pointSize())
                     menu.setFont(f)
 
+            self.detcoverId=self.instrumentationMenu.insertItem("Detector Cover",self.detcoverClicked)
+            if self.detcoverHO is not None:
+                self.detcoverChanged(self.detcoverHO.getActuatorState())
+            else:
+                self.instrumentationMenu.setItemEnabled(self.detcoverId,False)
+
             self.lightId=self.instrumentationMenu.insertItem("Sample light",self.lightClicked)
             if self.lightHO is not None:
                 self.lightChanged(self.lightHO.getActuatorState())
@@ -235,6 +262,14 @@ class InstrumentationMenuBrick(BlissWidget):
                 self.lightHO=self.getHardwareObject(newValue)
                 if self.lightHO is not None:
                     self.connect(self.lightHO,'actuatorStateChanged',self.lightChanged)
+
+        elif propertyName=='DetectorCover':
+            if newValue:
+                if self.detcoverHO is not None:
+                    self.disconnect(self.detcoverHO,'actuatorStateChanged',self.detcoverChanged)
+                self.detcoverHO=self.getHardwareObject(newValue)
+                if self.detcoverHO is not None:
+                    self.connect(self.detcoverHO,'actuatorStateChanged',self.detcoverChanged)
 
         elif propertyName=='cryostream':
             if newValue:
