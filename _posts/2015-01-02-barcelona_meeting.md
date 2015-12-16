@@ -25,7 +25,7 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [Status of MXCuBE @ HZB](doc/20151130_mxcube-HZB.pdf)
 - [Status of MXCuBE @ SOLEIL](doc/mxCuBE_SOLEIL_Status_2015_11.pdf)
 - [Status of MXCuBE @ ALBA](doc/MXCuBEMeeting_ALBA-XALOC_Status.pdf)
-- DESY
+- [Status of MXCuBE @ DESY](doc/20151130_S1_MXCuBE_Status_DESY.pdf)
 - [Global Phasing](doc/gb_mxcube_alba_2015.pdf)
 
 ### New developments & progress around MXCuBE
@@ -34,6 +34,7 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [Organization of MXCuBE 3 development](doc/mxcube3web.pdf)
 - [MXCuBE 3 front-end development toolchain](http://slides.com/matiasg/mxcube3_fedev_toolchain) 
 - [Progress towards driving beamlines as a third party](doc/MXCuBE-2015-pkeller.odp)
+- [MXCuBE and EDNA at ALBA](doc/20151201_S3_ALBA_MXCuBE_and_EDNA.pdf)
 
 ### Next meeting will take place in Hamburg
 
