@@ -58,7 +58,7 @@ class ProposalBrick2(BlissWidget):
         self.defineSignal('loggedIn', ())
         self.defineSignal('user_group_saved', ())
         self.defineSlot('setButtonEnabled',())
-        self.defineSlot('impersonateProposal',())
+        #self.defineSlot('impersonateProposal',())
 
         # Initialize GUI elements
         self.contentsBox=QHGroupBox("User",self)
@@ -194,11 +194,13 @@ class ProposalBrick2(BlissWidget):
         self.loginButton.setEnabled(state)
         self.logoutButton.setEnabled(state)
 
+    """
     def impersonateProposal(self,proposal_code,proposal_number):
         if BlissWidget.isInstanceUserIdInhouse():
             self._do_login(proposal_code, proposal_number, None, self.dbConnection.beamline_name, impersonate=True)
         else:
             logging.getLogger().debug('ProposalBrick2: cannot impersonate unless logged as the inhouse user!')
+    """
 
     # Opens the logout dialog (modal); if the answer is OK then logout the user
     def openLogoutDialog(self):
@@ -539,113 +541,15 @@ class ProposalBrick2(BlissWidget):
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
     def _do_login(self, proposal_code,proposal_number,proposal_password,beamline_name, impersonate=False):
-        if not impersonate:
-            login_name=self.dbConnection.translate(proposal_code,'ldap')+str(proposal_number)
-            logging.getLogger().debug('ProposalBrick: querying LDAP...')
-            ok, msg=self.ldapConnection.login(login_name,proposal_password)
-            if not ok:
-                msg="%s." % msg.capitalize()
-                self.refuseLogin(None,msg)
-                return
-
-            logging.getLogger().debug("ProposalBrick: password for %s-%s validated" % (proposal_code,proposal_number))
-
-        # Get proposal and sessions
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
-        prop=self.dbConnection.getProposal(proposal_code,proposal_number)
-
-        # Check if everything went ok
-        prop_ok=True
-        try:
-            prop_ok=(prop['status']['code']=='ok')
-        except KeyError:
-            prop_ok=False
-        if not prop_ok:
-            self.ispybDown()
-            return
-
-        logging.getLogger().debug('ProposalBrick: got sessions from ISPyB...')
-
-        proposal=prop['Proposal']
-        person=prop['Person']
-        laboratory=prop['Laboratory']
-        try:
-            sessions=prop['Session']
-        except KeyError:
-            sessions=None
-
-        # Check if there are sessions in the proposal
-        todays_session=None
-        if sessions is None or len(sessions)==0:
-            pass
-        else:
-            # Check for today's session
-            for session in sessions:
-                beamline=session['beamlineName']
-                start_date="%s 00:00:00" % session['startDate'].split()[0]
-                end_date="%s 23:59:59" % session['endDate'].split()[0]
-                try:
-                    start_struct=time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
-                except ValueError:
-                    pass
-                else:
-                    try:
-                        end_struct=time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
-                    except ValueError:
-                        pass
-                    else:
-                        start_time=time.mktime(start_struct)
-                        end_time=time.mktime(end_struct)
-                        current_time=time.time()
-
-                        # Check beamline name
-                        if beamline==beamline_name:
-                            # Check date
-                            if current_time>=start_time and current_time<=end_time:
-                                todays_session=session
-                                break
-
-        if todays_session is None:
-            is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
-            if not is_inhouse:
-                if BlissWidget.isInstanceRoleClient():
-                    self.refuseLogin(None,"You don't have a session scheduled for today!")
-                    return
-
-                if not self.askForNewSession():
-                    self.refuseLogin(None,None)
-                    return
-
-            current_time=time.localtime()
-            start_time=time.strftime("%Y-%m-%d 00:00:00", current_time)
-            end_time=time.mktime(current_time)+60*60*24
-            tomorrow=time.localtime(end_time)
-            end_time=time.strftime("%Y-%m-%d 07:59:59", tomorrow)
-
-            # Create a session
-            new_session_dict={}
-            new_session_dict['proposalId']=prop['Proposal']['proposalId']
-            new_session_dict['startDate']=start_time
-            new_session_dict['endDate']=end_time
-            new_session_dict['beamlineName']=beamline_name
-            new_session_dict['scheduled']=0
-            new_session_dict['nbShifts']=3
-            new_session_dict['comments']="Session created by the BCM"
-            session_id=self.dbConnection.createSession(new_session_dict)
-            new_session_dict['sessionId']=session_id
-
-            todays_session=new_session_dict
-            localcontact=None
-        else:
-            session_id=todays_session['sessionId']
-            logging.getLogger().debug('ProposalBrick: getting local contact for %s' % session_id)
-            localcontact=self.dbConnection.getSessionLocalContact(session_id)
-
-        self.acceptLogin(prop['Proposal'],\
-            prop['Person'],\
-            prop['Laboratory'],\
-            todays_session,\
-            localcontact)
+        login_info = self.dbConnection.login(proposal_code+proposal_number, proposal_password, self.ldapConnection)
+        try: 
+            self.acceptLogin(login_info['Proposal'],\
+                login_info['person'],\
+                login_info['laboratory'],\
+                login_info['session']['session'],\
+                login_info['local_contact'])
+        except Exception, e:
+            self.refuseLogin("Could not log in: %s" % str(e))
 
 
 ### Auxiliary method to merge a person's name
