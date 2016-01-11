@@ -74,7 +74,7 @@ class Qt4_DuoStateBrick(BlissWidget):
       
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox("none", self)
-        self.main_gbox.setAlignment(QtGui.QLabel.AlignCenter)
+        self.main_gbox.setAlignment(QtCore.Qt.AlignCenter)
         self.state_label = QtGui.QLabel('<b>unknown</b>', self.main_gbox)
 
         self.buttons_widget = QtGui.QWidget(self.main_gbox)
@@ -108,7 +108,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.set_out_button.toggled.connect(self.set_out)
 
         # Other ---------------------------------------------------------------
-        self.state_label.setAlignment(QtGui.QLabel.AlignCenter)
+        self.state_label.setAlignment(QtCore.Qt.AlignCenter)
         self.state_label.setToolTip("Shows the current control state")
         self.set_in_button.setToolTip("Changes the control state")
         self.set_out_button.setToolTip("Changes the control state")           

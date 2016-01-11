@@ -573,8 +573,11 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         if BlissWidget._instanceMode==BlissWidget.INSTANCE_MODE_MASTER:
-            QtGui.QApplication.activeWindow().emit(QtCore.SIGNAL('applicationTabChanged'),
-                  tab_name, tab_index)
+            #TODO fixt this, by removing if
+            if QtGui.QApplication.activeWindow():
+                QtGui.QApplication.activeWindow().emit(\
+                   QtCore.SIGNAL('applicationTabChanged'),
+                   tab_name, tab_index)
 
     @staticmethod
     def widgetGroupBoxToggled(brick_name,widget_name,master_sync,state):

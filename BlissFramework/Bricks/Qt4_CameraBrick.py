@@ -44,13 +44,11 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.graphics_items_initialized = None
         self.graphics_scene_size = None
         self.graphics_scene_fixed_size = None
         self.graphics_view = None
         #self.graphics_camera_frame = None
         self.fixed_size = None 
-        self.use_fixed_size = None 
         self.display_beam = None
 
         # Properties ----------------------------------------------------------       
@@ -59,11 +57,13 @@ class Qt4_CameraBrick(BlissWidget):
         self.addProperty('displayBeam', 'boolean', True)
         self.addProperty('displayScale', 'boolean', True)
         self.addProperty('displayOmegaAxis', 'boolean', True)
+        self.addProperty('cameraControls', 'boolean', False)
 
         # Graphic elements-----------------------------------------------------
         self.info_widget = QtGui.QWidget(self)
         self.coord_label = QtGui.QLabel(":", self)
         self.info_label = QtGui.QLabel(self)
+        self.camera_control_dialog = CameraControlDialog(self)
 
         self.popup_menu = QtGui.QMenu(self)
         create_menu = self.popup_menu.addMenu("Create")
@@ -101,15 +101,6 @@ class Qt4_CameraBrick(BlissWidget):
 
         self.popup_menu.addSeparator()
 
-        self.move_beam_mark_action = self.popup_menu.addAction(\
-             "Move beam mark", self.move_beam_mark)
-        self.move_beam_mark_action.setEnabled(False)
-        self.display_histogram_action = self.popup_menu.addAction(\
-             "Display histogram", self.display_histogram_toggled)
-        self.define_histogram_action = self.popup_menu.addAction(\
-             "Define histogram", self.define_histogram_clicked)
-        self.popup_menu.addSeparator()
-
         temp_action = self.popup_menu.addAction(\
              "Select all centring points",
              self.select_all_points_clicked)
@@ -122,6 +113,17 @@ class Qt4_CameraBrick(BlissWidget):
              "Clear all items",
              self.clear_all_items_clicked)
         temp_action.setShortcut("Ctrl+X")
+        
+        self.popup_menu.addSeparator()
+
+        self.move_beam_mark_action = self.popup_menu.addAction(\
+             "Move beam mark", self.move_beam_mark)
+        self.move_beam_mark_action.setEnabled(False)
+        self.display_histogram_action = self.popup_menu.addAction(\
+             "Display histogram", self.display_histogram_toggled)
+        self.define_histogram_action = self.popup_menu.addAction(\
+             "Define histogram", self.define_histogram_clicked)
+        self.popup_menu.addSeparator()
 
         self.display_histogram_action.setEnabled(False)
         self.define_histogram_action.setEnabled(False)
@@ -131,7 +133,11 @@ class Qt4_CameraBrick(BlissWidget):
         #self.zoom_window_menu = self.popup_menu.addAction(\
         #     "Zoom window",
         #     self.zoom_window_clicked)
-        
+        self.camera_control_action = self.popup_menu.addAction(\
+             "Camera control",
+             self.open_camera_control_dialog)
+        self.camera_control_action.setEnabled(False)
+
         self.popup_menu.popup(QtGui.QCursor.pos())
       
         self.zoom_dialog = ZoomDialog(self) 
@@ -193,6 +199,8 @@ class Qt4_CameraBrick(BlissWidget):
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
                 self.init_image_zoom_list()
+                self.camera_control_dialog.set_camera_hwobj(\
+                     self.graphics_manager_hwobj.camera_hwobj)
         elif property_name == 'fixedSize':
             try:
                 fixed_size = map(int, new_value.split())
@@ -207,6 +215,8 @@ class Qt4_CameraBrick(BlissWidget):
             self.display_scale = new_value
             if self.graphics_manager_hwobj is not None:
                 self.graphics_manager_hwobj.set_scale_visible(new_value)
+        elif property_name == 'cameraControls':
+             self.image_scale_menu.setEnabled(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
    
@@ -221,6 +231,7 @@ class Qt4_CameraBrick(BlissWidget):
             self.graphics_manager_hwobj.set_graphics_scene_size(\
                  self.fixed_size, True)
             self.graphics_view.setFixedSize(self.fixed_size[0], self.fixed_size[1]) 
+            self.info_widget.setFixedWidth(self.fixed_size[0])
 
     def image_scaled(self, scale_value):
         for index, action in enumerate(self.image_scale_menu.actions()):
@@ -298,6 +309,9 @@ class Qt4_CameraBrick(BlissWidget):
         self.zoom_dialog.set_coord(100, 100)
         self.zoom_dialog.show()
 
+    def open_camera_control_dialog(self):
+        self.camera_control_dialog.show()
+
 class ZoomDialog(QtGui.QDialog):
     """
     Descript. : 
@@ -327,3 +341,134 @@ class ZoomDialog(QtGui.QDialog):
 
     def set_coord(self, position_x, position_y):
         return
+
+class CameraControlDialog(QtGui.QDialog):
+
+    def __init__(self, parent = None, name = None, flags = 0):
+        QtGui.QDialog.__init__(self, parent,
+              QtCore.Qt.WindowFlags(flags | QtCore.Qt.WindowStaysOnTopHint))
+
+        # Internal variables --------------------------------------------------
+        self.camera_hwobj = None
+
+        # Graphic elements ----------------------------------------------------
+        self.contrast_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        self.contrast_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.brightness_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        self.brightness_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.gain_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        self.gain_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.gamma_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        self.gamma_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.exposure_time_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        self.exposure_time_doublespinbox = QtGui.QDoubleSpinBox(self) 
+        __close_button = QtGui.QPushButton('Close', self)
+
+        # Layout --------------------------------------------------------------
+        __main_gridlayout = QtGui.QGridLayout(self)
+        __main_gridlayout.addWidget(QtGui.QLabel('Contrast:', self), 0, 0)
+        __main_gridlayout.addWidget(self.contrast_slider, 0, 1)
+        __main_gridlayout.addWidget(self.contrast_doublespinbox, 0, 2)
+        __main_gridlayout.addWidget(QtGui.QLabel('Brightness:', self), 1, 0)
+        __main_gridlayout.addWidget(self.brightness_slider, 1, 1)
+        __main_gridlayout.addWidget(self.brightness_doublespinbox, 1, 2)
+        __main_gridlayout.addWidget(QtGui.QLabel('Gain:', self), 2, 0)
+        __main_gridlayout.addWidget(self.gain_slider, 2, 1)
+        __main_gridlayout.addWidget(self.gain_doublespinbox, 2, 2)
+        __main_gridlayout.addWidget(QtGui.QLabel('Gamma:', self), 3, 0) 
+        __main_gridlayout.addWidget(self.gamma_slider, 3, 1)
+        __main_gridlayout.addWidget(self.gamma_doublespinbox, 3, 2)
+        __main_gridlayout.addWidget(QtGui.QLabel('Exposure time (s):', self), 4, 0)
+        __main_gridlayout.addWidget(self.exposure_time_slider, 4, 1)
+        __main_gridlayout.addWidget(self.exposure_time_doublespinbox, 4, 2)      
+        __main_gridlayout.addWidget(__close_button, 6, 2)
+        __main_gridlayout.setSpacing(2)
+        __main_gridlayout.setContentsMargins(5, 5, 5, 5)
+        __main_gridlayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+
+        # Qt signal/slot connections ------------------------------------------
+        self.contrast_slider.valueChanged.connect(self.set_contrast)
+        self.contrast_doublespinbox.valueChanged.connect(self.set_contrast)
+        self.brightness_slider.valueChanged.connect(self.set_brightness)
+        self.brightness_doublespinbox.valueChanged.connect(self.set_brightness)
+        self.gain_slider.valueChanged.connect(self.set_gain)
+        self.gain_doublespinbox.valueChanged.connect(self.set_gain)
+        self.gamma_slider.valueChanged.connect(self.set_gamma)
+        self.gamma_doublespinbox.valueChanged.connect(self.set_gamma)
+        self.exposure_time_slider.valueChanged.connect(self.set_exposure_time)
+        self.exposure_time_doublespinbox.valueChanged.connect(self.set_exposure_time)
+
+        __close_button.clicked.connect(self.close)
+
+        # SizePolicies --------------------------------------------------------
+        self.contrast_slider.setFixedWidth(200)
+        self.brightness_slider.setFixedWidth(200)
+        self.gain_slider.setFixedWidth(200)
+        self.gamma_slider.setFixedWidth(200)
+        self.exposure_time_slider.setFixedWidth(200)
+        __close_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
+                                     QtGui.QSizePolicy.Fixed)
+
+        # Other --------------------------------------------------------------- 
+        self.setModal(True)
+        self.setWindowTitle("Camera controls")
+
+    def set_camera_hwobj(self, camera_hwobj):
+        self.camera_hwobj = camera_hwobj
+        contrast_value = self.camera_hwobj.get_contrast()
+        brightness_value = self.camera_hwobj.get_brightness()
+        gain_value = self.camera_hwobj.get_gain()
+        gamma_value = self.camera_hwobj.get_gamma()
+        exposure_time_value = self.camera_hwobj.get_exposure_time()
+
+        self.contrast_slider.setDisabled(contrast_value is None)
+        self.contrast_doublespinbox.setDisabled(contrast_value is None)
+        self.brightness_slider.setDisabled(brightness_value is None)
+        self.brightness_doublespinbox.setDisabled(brightness_value is None)
+        self.gain_slider.setDisabled(gain_value is None)
+        self.gain_doublespinbox.setDisabled(gain_value is None)
+        self.gamma_slider.setDisabled(gamma_value is None)
+        self.gamma_doublespinbox.setDisabled(gamma_value is None)
+        self.exposure_time_slider.setDisabled(exposure_time_value is None)
+        self.exposure_time_doublespinbox.setDisabled(exposure_time_value is None)
+      
+        if contrast_value:
+            self.contrast_slider.setValue(contrast_value)
+            self.contrast_doublespinbox.setValue(contrast_value)
+        if brightness_value:
+            self.brightness_slider.setValue(brightness_value)
+            self.brightness_doublespinbox.setValue(brightness_value)
+        if gain_value:
+            self.gain_slider.setValue(gain_value)
+            self.gain_doublespinbox.setValue(gain_value)
+        if gamma_value:
+            self.gamma_slider.setValue(gamma_value)
+            self.gamma_doublespinbox.setValue(gamma_value)
+        if exposure_time_value:
+            self.exposure_time_slider.setValue(exposure_time_value)
+            self.exposure_time_doublespinbox.setValue(exposure_time_value)
+
+    def set_contrast(self, value):
+        self.contrast_slider.setValue(value)
+        self.contrast_doublespinbox.setValue(value)
+        self.camera_hwobj.set_contrast(value)
+
+    def set_brightness(self, value):
+        self.brightness_slider.setValue(value)
+        self.brightness_doublespinbox.setValue(value)
+        self.camera_hwobj.set_brightness(value)
+
+    def set_gain(self, value):
+        self.gain_slider.setValue(value)
+        self.gain_doublespinbox.setValue(value)
+        self.camera_hwobj.set_gain(value)
+
+    def set_gamma(self, value):
+        self.gamma_slider.setValue(value)
+        self.gamma_doublespinbox.setValue(value)
+        self.camera_hwobj.set_gamma(value)
+
+    def set_exposure_time(self, value):
+        self.exposure_time_slider.setValue(value)
+        self.exposure_time_doublespinbox.setValue(value)
+        self.camera_hwobj.set_exposure_time(value) 
