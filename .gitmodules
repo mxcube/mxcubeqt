@@ -6,4 +6,4 @@
 	url = git://github.com/mxcube/BlissFramework
 [submodule "HardwareObjects"]
 	path = HardwareObjects
-	url = git://github.com/mxcube/HardwareObjects.git
+	url = git://github.com/mxcube/HardwareObjects

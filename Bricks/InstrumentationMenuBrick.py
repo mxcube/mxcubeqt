@@ -25,19 +25,21 @@ class InstrumentationMenuBrick(BlissWidget):
         self.lightHO=None
         self.scintillatorHO=None
         self.apertureHO=None
+        self.fshutHO=None
 
         self.addProperty('cryostream','string','')
         self.addProperty('fluodetector','string','')
         self.addProperty('hutchtrigger','string','')
         self.addProperty('light','string','')
+        self.addProperty('FastShutter','string','')
         self.addProperty('scintillator','string','')
+        self.addProperty('scintillatorWarning', 'string', '')
         self.addProperty('Kappa on/off','string', '')
         self.addProperty('aperture','string','')
+        self.addProperty('apertureWarning', 'string', '')
         self.addProperty('menuTitle','string','Instrumentation')
         self.addProperty('menuPosition','integer',1)
         self.addProperty('hutchtriggerDefaultMode', 'combo', ('automatic', 'manual'), 'automatic')
-        self.addProperty('scintillatorWarning', 'string', '')
-        self.addProperty('apertureWarning', 'string', '')
 
         self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
 
@@ -61,14 +63,24 @@ class InstrumentationMenuBrick(BlissWidget):
 
     def scintillatorClicked(self):
         if self.instrumentationMenu.isItemChecked(self.scintillatorId):
-            self.scintillatorHO.actuatorOut()
+            try:
+                self.fshutHO.actuatorOut()
+            except:
+                pass
+            self.scintillatorHO.actuatorOut(timeout=20)
         else:
             msg = self["scintillatorWarning"]
             ret=True
             if len(msg) > 0:
               ret=QMessageBox.warning(self, 'Scintillator in', msg, QMessageBox.Ok, QMessageBox.Cancel)==QMessageBox.Ok
             if ret:
-              self.scintillatorHO.actuatorIn()
+                self.scintillatorHO.actuatorIn(timeout=20)
+                """
+                try:
+                    self.fshutHO.actuatorIn()
+                except:
+                    pass
+                """
 
     def apertureClicked(self):
         if self.instrumentationMenu.isItemChecked(self.apertureId):
@@ -217,52 +229,62 @@ class InstrumentationMenuBrick(BlissWidget):
     # Callback fot the brick's properties
     def propertyChanged(self,propertyName,oldValue,newValue):
         if propertyName=='light':
-            if self.lightHO is not None:
-                self.disconnect(self.lightHO,'actuatorStateChanged',self.lightChanged)
-            self.lightHO=self.getHardwareObject(newValue)
-            if self.lightHO is not None:
-                self.connect(self.lightHO,'actuatorStateChanged',self.lightChanged)
+            if newValue:
+                if self.lightHO is not None:
+                    self.disconnect(self.lightHO,'actuatorStateChanged',self.lightChanged)
+                self.lightHO=self.getHardwareObject(newValue)
+                if self.lightHO is not None:
+                    self.connect(self.lightHO,'actuatorStateChanged',self.lightChanged)
 
         elif propertyName=='cryostream':
-            if self.cryostreamHO is not None:
-                self.disconnect(self.cryostreamHO,'actuatorStateChanged',self.cryostreamChanged)
-            self.cryostreamHO=self.getHardwareObject(newValue)
-            if self.cryostreamHO is not None:
-                self.connect(self.cryostreamHO,'actuatorStateChanged',self.cryostreamChanged)
+            if newValue:
+                if self.cryostreamHO is not None:
+                    self.disconnect(self.cryostreamHO,'actuatorStateChanged',self.cryostreamChanged)
+                self.cryostreamHO=self.getHardwareObject(newValue)
+                if self.cryostreamHO is not None:
+                    self.connect(self.cryostreamHO,'actuatorStateChanged',self.cryostreamChanged)
 
         elif propertyName=='fluodetector':
-            if self.fluodetectorHO is not None:
-                self.disconnect(self.fluodetectorHO,'actuatorStateChanged',self.fluodetectorChanged)
-            self.fluodetectorHO=self.getHardwareObject(newValue)
-            if self.fluodetectorHO is not None:
-                self.connect(self.fluodetectorHO,'actuatorStateChanged',self.fluodetectorChanged)
+            if newValue:
+                if self.fluodetectorHO is not None:
+                    self.disconnect(self.fluodetectorHO,'actuatorStateChanged',self.fluodetectorChanged)
+                self.fluodetectorHO=self.getHardwareObject(newValue)
+                if self.fluodetectorHO is not None:
+                    self.connect(self.fluodetectorHO,'actuatorStateChanged',self.fluodetectorChanged)
 
         elif propertyName=='scintillator':
-            if self.scintillatorHO is not None:
-                self.disconnect(self.scintillatorHO,'actuatorStateChanged',self.scintillatorChanged)
-            self.scintillatorHO=self.getHardwareObject(newValue)
-            if self.scintillatorHO is not None:
-                self.connect(self.scintillatorHO,'actuatorStateChanged',self.scintillatorChanged)
+            if newValue:
+                if self.scintillatorHO is not None:
+                    self.disconnect(self.scintillatorHO,'actuatorStateChanged',self.scintillatorChanged)
+                self.scintillatorHO=self.getHardwareObject(newValue)
+                if self.scintillatorHO is not None:
+                    self.connect(self.scintillatorHO,'actuatorStateChanged',self.scintillatorChanged)
+
+        elif propertyName=='FastShutter':
+            if newValue:
+                self.fshutHO=self.getHardwareObject(newValue)
 
         elif propertyName=='aperture':
-            if self.apertureHO is not None:
-                self.disconnect(self.apertureHO,'actuatorStateChanged',self.apertureChanged)
-            self.apertureHO=self.getHardwareObject(newValue)
-            if self.apertureHO is not None:
-                self.connect(self.apertureHO,'actuatorStateChanged',self.apertureChanged)
+            if newValue:
+                if self.apertureHO is not None:
+                    self.disconnect(self.apertureHO,'actuatorStateChanged',self.apertureChanged)
+                self.apertureHO=self.getHardwareObject(newValue)
+                if self.apertureHO is not None:
+                    self.connect(self.apertureHO,'actuatorStateChanged',self.apertureChanged)
 
         elif propertyName=='hutchtrigger':
-            if self.hutchtriggerHO is not None:
-                self.disconnect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
-                self.disconnect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
-                self.disconnect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
-                self.disconnect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
-            self.hutchtriggerHO=self.getHardwareObject(newValue)
-            if self.hutchtriggerHO is not None:
-                self.connect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
-                self.connect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
-                self.connect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
-                self.connect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
+            if newValue:
+                if self.hutchtriggerHO is not None:
+                    self.disconnect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
+                    self.disconnect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
+                    self.disconnect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
+                    self.disconnect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
+                self.hutchtriggerHO=self.getHardwareObject(newValue)
+                if self.hutchtriggerHO is not None:
+                    self.connect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
+                    self.connect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
+                    self.connect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
+                    self.connect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
 
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
