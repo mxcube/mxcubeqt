@@ -4,3 +4,6 @@
 [submodule "BlissFramework"]
 	path = BlissFramework
 	url = git://github.com/mxcube/BlissFramework
+[submodule "HardwareObjects"]
+	path = HardwareObjects
+	url = git://github.com/mxcube/HardwareObjects.git
