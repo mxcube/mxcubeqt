@@ -26,7 +26,7 @@ from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_Graphics'
+__category__ = 'Graphics'
 
 
 class Qt4_CameraBrick(BlissWidget):
@@ -57,6 +57,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.addProperty('displayBeam', 'boolean', True)
         self.addProperty('displayScale', 'boolean', True)
         self.addProperty('displayOmegaAxis', 'boolean', True)
+        self.addProperty('beamDefiner', 'boolean', False)
         self.addProperty('cameraControls', 'boolean', False)
 
         # Graphic elements-----------------------------------------------------
@@ -119,14 +120,25 @@ class Qt4_CameraBrick(BlissWidget):
         self.move_beam_mark_action = self.popup_menu.addAction(\
              "Move beam mark", self.move_beam_mark)
         self.move_beam_mark_action.setEnabled(False)
-        self.display_histogram_action = self.popup_menu.addAction(\
-             "Display histogram", self.display_histogram_toggled)
-        self.define_histogram_action = self.popup_menu.addAction(\
-             "Define histogram", self.define_histogram_clicked)
-        self.popup_menu.addSeparator()
+        self.define_beam_action = self.popup_menu.addAction(\
+             "Define beam size", self.define_beam_size)
+        self.define_beam_action.setEnabled(False)
 
-        self.display_histogram_action.setEnabled(False)
-        self.define_histogram_action.setEnabled(False)
+        self.popup_menu.addSeparator()
+        self.display_grid_action = self.popup_menu.addAction(\
+             "Display grid", self.display_grid_toggled)
+        self.display_grid_action.setCheckable(True)
+        self.display_radiation_damage_action = self.popup_menu.addAction(\
+             "Display radiation damage", self.display_radiation_damage_toggled)
+        self.display_radiation_damage_action.setCheckable(True)
+
+        #self.display_histogram_action = self.popup_menu.addAction(\
+        #     "Display histogram", self.display_histogram_toggled)
+        #self.define_histogram_action = self.popup_menu.addAction(\
+        #     "Define histogram", self.define_histogram_clicked)
+
+        #self.display_histogram_action.setEnabled(False)
+        #self.define_histogram_action.setEnabled(False)
 
         self.image_scale_menu = self.popup_menu.addMenu("Image scale")
         self.image_scale_menu.setEnabled(False) 
@@ -140,9 +152,6 @@ class Qt4_CameraBrick(BlissWidget):
 
         self.popup_menu.popup(QtGui.QCursor.pos())
       
-        self.zoom_dialog = ZoomDialog(self) 
-        self.zoom_dialog.setModal(True) 
-
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.coord_label)
@@ -215,6 +224,8 @@ class Qt4_CameraBrick(BlissWidget):
             self.display_scale = new_value
             if self.graphics_manager_hwobj is not None:
                 self.graphics_manager_hwobj.set_scale_visible(new_value)
+        elif property_name == 'beamDefiner':
+             self.define_beam_action.setEnabled(new_value) 
         elif property_name == 'cameraControls':
              self.image_scale_menu.setEnabled(new_value) 
         else:
@@ -312,35 +323,16 @@ class Qt4_CameraBrick(BlissWidget):
     def open_camera_control_dialog(self):
         self.camera_control_dialog.show()
 
-class ZoomDialog(QtGui.QDialog):
-    """
-    Descript. : 
-    """
+    def display_grid_toggled(self):
+        self.graphics_manager_hwobj.display_grid(\
+             self.display_grid_action.isChecked())
 
-    def __init__(self, parent = None, name = None, flags = 0):
-        QtGui.QDialog.__init__(self, parent,
-              QtCore.Qt.WindowFlags(flags | QtCore.Qt.WindowStaysOnTopHint))
+    def define_beam_size(self):
+        self.graphics_manager_hwobj.start_define_beam()
 
-        self.graphics_view = QtGui.QGraphicsView()
-        self.graphics_scene = QtGui.QGraphicsScene()
-        self.graphics_view.setScene(self.graphics_scene)
-        self.graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-
-        __main_vlayout = QtGui.QVBoxLayout(self)
-        __main_vlayout.addWidget(self.graphics_view)
-        __main_vlayout.setSpacing(0)
-        __main_vlayout.setContentsMargins(0, 0, 0, 0) 
-
-        self.setMinimumWidth(300)
-        self.setMinimumHeight(300)
-
-    def set_camera_frame(self, camera_frame):
-        self.graphics_camera_frame = camera_frame
-        self.graphics_scene.addItem(camera_frame)
-
-    def set_coord(self, position_x, position_y):
-        return
+    def display_radiation_damage_toggled(self):
+        self.graphics_manager_hwobj.display_radiation_damage(\
+             self.display_radiation_damage_action.isChecked())
 
 class CameraControlDialog(QtGui.QDialog):
 
