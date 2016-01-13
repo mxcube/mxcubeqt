@@ -166,12 +166,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         result = CreateTaskBase.approve_creation(self)
 
-        method_name = str(self._advanced_methods_widget.method_combo.\
-                currentText()).title().replace(' ', '')
-        if len(self._advanced_methods_widget.grid_treewidget.selectedItems()) == 0:
-            logging.getLogger("user_level_log").error("No grid selected")
-            result = False 
-
+        if len(self._advanced_methods_widget.grid_treewidget.\
+            selectedItems()) == 0:
+            msg = "No grid selected. Automatic grid will be used."
+            logging.getLogger("user_level_log").info(msg)
         return result
             
     def update_processing_parameters(self, crystal):
@@ -222,18 +220,27 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         data_collections = []
-        for shape in self.get_selected_grids():
+        selected_grids = self.get_selected_grids() 
+
+        if len(selected_grids) == 0:
+            selected_grids.append(self._graphics_manager_hwobj.\
+                create_automatic_grid()) 
+
+        for shape in selected_grids:
             shape.set_snapshot(self._graphics_manager_hwobj.\
                   get_snapshot(shape))
             grid_properties = shape.get_properties()
 
             acq = self._create_acq(sample)
-            acq.acquisition_parameters.centred_position = shape.get_centred_position()
-            acq.acquisition_parameters.mesh_range = [grid_properties["dx_mm"],
-                                                     grid_properties["dy_mm"]]
-            acq.acquisition_parameters.num_lines = grid_properties["num_lines"]
-            acq.acquisition_parameters.num_images = grid_properties["num_lines"] * \
-                                                    grid_properties["num_images_per_line"]
+            acq.acquisition_parameters.centred_position = \
+                shape.get_centred_position()
+            acq.acquisition_parameters.mesh_range = \
+                (grid_properties["dx_mm"], grid_properties["dy_mm"])
+            acq.acquisition_parameters.num_lines = \
+                grid_properties["num_lines"]
+            acq.acquisition_parameters.num_images = \
+                grid_properties["num_lines"] * \
+                grid_properties["num_images_per_line"]
 
             processing_parameters = deepcopy(self._processing_parameters)
 
@@ -245,7 +252,8 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_number(acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
 
-            exp_type = str(self._advanced_methods_widget.method_combo.currentText())
+            exp_type = str(self._advanced_methods_widget.method_combo.\
+                currentText()).title().replace(" ", "")
             advanced = queue_model_objects.Advanced(exp_type, dc, 
                   shape, sample.crystals[0])
 
