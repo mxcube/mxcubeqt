@@ -1,5 +1,4 @@
-#############################
-MXCuBE Qt version user manual
+Qt version user manual
 #############################
 
 Please be aware that the GUI layout described in this manual could differ 

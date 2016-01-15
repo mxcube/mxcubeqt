@@ -248,7 +248,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
     """
     Descript. :
     """
-    mouseClickedSignal = QtCore.pyqtSignal(int, int)
+    mouseClickedSignal = QtCore.pyqtSignal(float, float)
 
     def __init__(self, parent=None):
         """
@@ -279,8 +279,10 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
                                      mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
-        im = self.mpl_canvas.axes.imshow(result, interpolation='none', 
-            extent=[0, result.shape[0], 0, result.shape[1]])
+        print "on widget: ", result, result.shape
+        im = self.mpl_canvas.axes.imshow(result, 
+                    interpolation='none',  aspect='auto',
+                    extent=[0, result.shape[1], 0, result.shape[0]])
         im.set_cmap('hot')
         if result.max() > 0:
             self.add_divider()

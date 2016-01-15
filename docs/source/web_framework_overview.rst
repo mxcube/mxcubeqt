@@ -1,2 +1,2 @@
-Web technology based GUI
-===============
+Web based GUI
+=============

@@ -163,7 +163,7 @@ class HeatMapWidget(QtGui.QWidget):
         self._best_pos_table.setEditTriggers(\
              QtGui.QAbstractItemView.NoEditTriggers)
         self._best_pos_table.setColumnCount(9)
-        self._best_pos_table.horizontalHeader().setStretchLastSection(True)
+        #self._best_pos_table.horizontalHeader().setStretchLastSection(True)
      
         self._best_pos_table.setHorizontalHeaderItem(0, \
             QtGui.QTableWidgetItem("No."))
@@ -311,7 +311,6 @@ class HeatMapWidget(QtGui.QWidget):
         """
         self._heat_map_gbox.setEnabled(True)
         self.__results = results
-
         self.refresh()
         if last_results:
             self.set_best_pos()
@@ -380,6 +379,7 @@ class HeatMapWidget(QtGui.QWidget):
                 coord_x = num_cols
             if coord_y > num_rows:
                 coord_y = num_rows
+
             image, line, image_num = self.__associated_grid.\
                   get_image_from_col_row(coord_x, coord_y)
         else:
@@ -484,15 +484,19 @@ class HeatMapWidget(QtGui.QWidget):
 
     def move_to_best_position_clicked(self):
         if self._best_pos_table.currentRow() > -1:
-            self._beamline_setup_hwobj.diffractometer_hwobj.move_to_motors_positions(\
-                self.__results["best_positions"][self._best_pos_table.currentRow()].get("cpos").as_dict())
+            self._beamline_setup_hwobj.diffractometer_hwobj.\
+                move_to_motors_positions(self.__results["best_positions"]\
+                [self._best_pos_table.currentRow()].get("cpos").as_dict())
 
     def create_best_centring_point_clicked(self):
         if self._best_pos_table.currentRow() > -1:
-            self._beamline_setup_hwobj.diffractometer_hwobj.create_centring_point(\
-                self.__results["best_positions"][self._best_pos_table.currentRow()].get("cpos").as_dict())   
+            self._beamline_setup_hwobj.diffractometer_hwobj.\
+                create_centring_point(self.__results["best_positions"]\
+                [self._best_pos_table.currentRow()].get("cpos").as_dict())   
 
     def display_best_image_clicked(self):
         if self._best_pos_table.currentRow() > -1:
-            image_path = self.__results["best_positions"][self._best_pos_table.currentRow()].get("filename")
-            self._beamline_setup_hwobj.image_tracking_hwobj.load_image(image_path)
+            image_path = self.__results["best_positions"]\
+               [self._best_pos_table.currentRow()].get("filename")
+            self._beamline_setup_hwobj.image_tracking_hwobj.\
+               load_image(image_path)
