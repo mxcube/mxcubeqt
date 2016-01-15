@@ -358,7 +358,9 @@ class SampleChanger(Container,Equipment):
             #raise Exception("A sample is loaded")
             #if self.getLoadedSample() == sample:
             #    raise Exception("The sample " + sample.getAddress() + " is already loaded")
-        return self._executeTask(SampleChangerState.Loading,wait,self._doLoad,sample)     
+        ret = self._executeTask(SampleChangerState.Loading,wait,self._doLoad,sample)     
+        logging.info("DONE with loading ")
+        return ret
 
     def unload(self, sample_slot=None, wait=True):
         """
@@ -436,7 +438,7 @@ class SampleChanger(Container,Equipment):
 
     def _executeTask(self,task,wait,method,*args):        
         self.assertCanExecuteTask()
-        logging.debug("Start "+ SampleChangerState.tostring(task))
+        logging.info("Start SC task "+ SampleChangerState.tostring(task))
         self.task=task
         self.task_error=None 
         self._setState(task)

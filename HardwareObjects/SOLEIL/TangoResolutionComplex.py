@@ -9,8 +9,8 @@ from PyTango import DeviceProxy
 from HardwareRepository import BaseHardwareObjects
 from HardwareRepository import HardwareRepository
 #from SpecClient import SpecCommand
-# Changed for PILATUS 6M
-DETECTOR_DIAMETER = 315 #424.
+# Changed for EIGER
+DETECTOR_DIAMETER = 233.25 #424. 3110 x 0.075mm put into xml in future
 # specState = {
 #     'NOTINITIALIZED':   0,
 #     'UNUSABLE':         1,
@@ -245,7 +245,7 @@ class TangoResolutionComplex(BaseHardwareObjects.Equipment):
             self.__dist2resA2 = None
 
 
-    def move(self, res, mindist=114, maxdist=1000):
+    def move(self, res, mindist=99.9, maxdist=1000):
         self.currentWavelength = self.blenergyHO.getCurrentWavelength()
         distance = self.res2dist(res)
         if distance >= mindist and distance <= maxdist:

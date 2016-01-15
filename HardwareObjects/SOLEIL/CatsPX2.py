@@ -260,7 +260,11 @@ class CatsPX2(SampleChanger):
             else:
                 self._executeServerTask(self._cmdChainedLoad, argin)
         else:
+            logging.debug("CATS executing server task command load.")
             self._executeServerTask(self._cmdLoad, argin)
+            logging.debug("CATS executing server task command load done.")
+
+        self._waitDeviceReady()
             
     def _doUnload(self,sample_slot=None):
         """

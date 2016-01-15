@@ -330,7 +330,7 @@ class CatsMaintSoleil(Equipment):
         if 'trfgtd' in value.lower():
             value = '%s\nTransfer permission was not granted by the gonio.\n1. Please Abort the trajectory\n2. set gonio to Transfer phase from the pull down menu on the right\n3. Start the load/unload trajectory again.' % value
         if 'dback' in value.lower():
-            value = '%s\nThe detector is too close (less then 180 mm from the sample)\nPlease move it to at least 181 mm.' % value
+            value = '%s\nThe detector is too close (less then 195 mm from the sample)\nPlease move it to at least 195 mm.' % value
         if 'remote mode requested' in value.lower():
             value = '%s\nRemote operation not enabled.\nPlease turn the robot key to the remote position.\nThe key is located next to the experiment hutch door.' % value
         self.emit('messageChanged', (value, ))

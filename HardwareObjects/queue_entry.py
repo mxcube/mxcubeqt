@@ -663,8 +663,9 @@ class DataCollectionQueueEntry(BaseQueueEntry):
                                          store_centred_position(end_cpos)
 
                     helical_oscil_pos = {'1': start_cpos.as_dict(), '2': end_cpos.as_dict()}
+                    helical_oscil_mot = {'1': start_cpos, '2': end_cpos}
                     #self.collect_hwobj.getChannelObject('helical_pos').setValue(helical_oscil_pos)
-                    self.collect_hwobj.set_helical(True, helical_oscil_pos)
+                    self.collect_hwobj.set_helical(True, helical_oscil_pos, helical_oscil_mot)
                     
                     msg = "Helical data collection, moving to start position"
                     log.info(msg)

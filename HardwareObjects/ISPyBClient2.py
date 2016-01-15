@@ -1213,9 +1213,10 @@ class ISPyBClient2(HardwareObject):
             pos_id = self._collection.service.\
                      storeOrUpdateMotorPosition(mpos_dict)
             msg = 'Centred position stored in lims: %s' % pos_id
-            logging.getLogger("ispyb_client").debug(msg)
+            logging.info("###########################  pos_id %s"  % pos_id)
+            logging.getLogger("ispyb_client").info(msg)
         except Exception, ex:
-            msg = 'Could not store centred position in lims: %s' % ex.message
+            msg = 'Could not store centred position in lims: %s' % ex
             logging.getLogger("ispyb_client").exception(msg)
 
         return pos_id

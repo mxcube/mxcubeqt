@@ -20,7 +20,7 @@
         </defaultenergy>
     </mad>
     
-    <directoryprefix>/927bis/ccd/2014</directoryprefix>-->
+    <directoryprefix>/nfs/ruchebis/2015_Run5</directoryprefix>-->
     <theoritical_edge_threshold>0.02</theoritical_edge_threshold>
     <scan>
         <roiwidth>0.3</roiwidth>

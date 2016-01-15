@@ -38,7 +38,7 @@ class CentringMotor:
   
 def prepare(centring_motors_dict):
   global SAVED_INITIAL_POSITIONS
-
+  logging.info(" sample_centring Start .............prepare" )
   if CURRENT_CENTRING and not CURRENT_CENTRING.ready():
     raise RuntimeError("Cannot start new centring while centring in progress")
   
@@ -62,7 +62,8 @@ def start(centring_motors_dict,
           chi_angle = 0,
           n_points = 3):
   global CURRENT_CENTRING
-
+  logging.info(" sample_centring Start ............." )
+    
   phi, phiy, phiz, sampx, sampy = prepare(centring_motors_dict)
 
   CURRENT_CENTRING = gevent.spawn(center, 
@@ -81,12 +82,14 @@ def ready(*motors):
   return not any([m.motorIsMoving() for m in motors])
 
 def move_motors(motor_positions_dict):
+  logging.info("mover motors to the positions >>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+  logging.info('position %s' % motor_positions_dict)
   def wait_ready(timeout=None):
     with gevent.Timeout(timeout):
       while not ready(*motor_positions_dict.keys()):
         time.sleep(0.1)
 
-  wait_ready(timeout=3)
+  wait_ready(timeout=20)
 
   if not ready(*motor_positions_dict.keys()):
     raise RuntimeError("Motors not ready")
@@ -110,12 +113,14 @@ def center(phi, phiy, phiz,
            n_points):
   global USER_CLICKED_EVENT
   X, Y, phi_positions = [], [], []
-
+  logging.info(" sample_centring Start ............. center " )
+  logging.info(" finally. we are at the center routine" )
   phi_angle = 180.0/(n_points-1)
 
   try:
     i = 0
     while i < n_points:
+      logging.info(" waiting for click %d" %i)
       x, y = USER_CLICKED_EVENT.get()
       USER_CLICKED_EVENT = gevent.event.AsyncResult()
       X.append(x / float(pixelsPerMm_Hor))
@@ -125,6 +130,8 @@ def center(phi, phiy, phiz,
       READY_FOR_NEXT_POINT.set()
       i += 1
   except:
+    import traceback    
+    logging.info(" out of centring because exception happened %s" % traceback.format_exc())
     move_motors(SAVED_INITIAL_POSITIONS)
     raise
 
@@ -163,8 +170,11 @@ def center(phi, phiy, phiz,
   return centred_pos
 
 def end(centred_pos=None):
+  logging.getLogger("HWR").info(">>>>>>>>>>>>>> sampleCentring.end >>>>>>>>>>>>>>> center_pos : %s" % centred_pos)
+  
   if centred_pos is None:
       centred_pos = CURRENT_CENTRING.get()
+      logging.getLogger("HWR").info(">>>>>>>>>>>>>> sampleCentring.end center_pos after get:>>>>>>>>>>>>>>>>> %s" % centred_pos)
   try:
     move_motors(centred_pos)
   except:
@@ -180,7 +190,9 @@ def start_auto(camera,  centring_motors_dict,
                new_point_cb=None):    
     global CURRENT_CENTRING
 
+    logging.getLogger("HWR").info("preparing motors for automatic centring")
     phi, phiy, phiz, sampx, sampy = prepare(centring_motors_dict)
+    logging.getLogger("HWR").info("    motors ready for automatic centring")
 
     CURRENT_CENTRING = gevent.spawn(auto_center, 
                                     camera, 
@@ -191,6 +203,7 @@ def start_auto(camera,  centring_motors_dict,
                                     chi_angle,
                                     n_points,
                                     msg_cb, new_point_cb)
+    logging.getLogger("HWR").info("    auto_center routine spawned")
     return CURRENT_CENTRING
 
 def find_loop(camera, pixelsPerMm_Hor, msg_cb, new_point_cb):
@@ -219,14 +232,17 @@ def auto_center(camera,
  
     #check if loop is there at the beginning
     i = 0
+    logging.getLogger("HWR").info("    in auto_center . looking if there is a loop")
     while -1 in find_loop(camera, pixelsPerMm_Hor, msg_cb, new_point_cb):
         phi.syncMoveRelative(90)
+        logging.getLogger("HWR").info("    one step" )
         i+=1
         if i>4:
             if callable(msg_cb):
                 msg_cb("No loop detected, aborting")
             return
     
+    logging.getLogger("HWR").info("    found a loop in the image" )
     for k in range(2):
       if callable(msg_cb):
             msg_cb("Doing automatic centring")

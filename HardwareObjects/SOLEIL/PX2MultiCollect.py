@@ -7,53 +7,48 @@ import numpy
 import re
 import math
 import subprocess
+from eiger import detector, goniometer
+import eiger
 
-class LimaAdscDetector:
+class EigerDetector:
     def __init__(self):
         self.ready = False
-        self.adscdev           = None
-        self.limaadscdev       = None
         self.xformstatusfile   = None
         self.first_frame = True
         self.jpeg_allframes = False
+        self.detector = detector(host='172.19.10.26', port=80)
+        
+    def initDetector(self, xformstatusfile):
+        self.xformstatusfile   = xformstatusfile
+        
+     
+    def set_photon_energy(self, photon_energy):
+        # photon_energy in eV
+        return self.detector.set_photon_energy(photon_energy)
+        
+    def set_detector_distance(self, detector_distance):
+        # detector distance in meters
+        return self.detector.set_detector_distance(detector_distance)
+       
+    def set_beam_center_x(self, beam_center_x):
+        return self.detector.set_beam_center_x(beam_center_x)
 
-    def initDetector(self, adscname, limaadscname, xformstatusfile):
-        logging.info("<SOLEIL MultiCollect> Initializing LIMA detector")
-        try: 
-           self.adscdev           = DeviceProxy(adscname) 
-           self.limaadscdev       = DeviceProxy(limaadscname) 
-           self.xformstatusfile   = xformstatusfile
-        except:
-           import traceback
-           logging.error("<SOLEIL MultiCollect> Cannot initialize LIMA detector")
-           logging.error( traceback.format_exc() )
-        else:
-           self.ready = True
+    def set_beam_center_y(self, beam_center_y):
+        return self.detector.set_beam_center_y(beam_center_y)
 
     @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment="", lima_overhead=0.):
+    def prepare_acquisition(self, start, osc_range, exptime, npass, number_of_images, comment=""):
         if not self.ready:
             return
             
         self.new_acquisition = True
-        logging.info('Preparing LIMA Detector')
-        #if self.limaadscdev.state().name != 'STANDBY':
-            #self.limaadscdev.Stop()
-            #time.sleep(0.1)
-
-        #if self.adscdev.state().name != 'STANDBY':
-            #time.sleep(0.1)
+        logging.info('Preparing EIGER Detector')
+        self.detector.set_omega(start)
+        self.detector.set_omega_range_average(osc_range)
+        self.detector.set_count_time(exptime)
+        self.detector.set_frame_time(exptime)
+        self.detector.set_nimages(number_of_images)
         
-        self.wait(self.adscdev)
-        self.wait(self.limaadscdev)
-        
-        self.limaadscdev.exposuretime = (exptime + lima_overhead) * 1e3
-        #bj.getState() DISABLE
-        if (self.limaadscdev.get_timeout_millis() - self.limaadscdev.exposuretime) < 2000:
-            self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposuretime) + 2000)
-        
-        self.wait(self.limaadscdev)
-        self.limaadscdev.write_attribute('nbFrames', number_of_images)
 
     @task
     def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
@@ -66,60 +61,43 @@ class LimaAdscDetector:
         self.fileName   = os.path.basename(filename)
         self.imageNumber = frame_number
 
-        logging.info("<PX2 LimaAdscDetector> Setting detector filenames")
+        logging.info("<PX2 EigerDetector> Setting detector filenames")
         logging.info("     - frame_number: %s", frame_number)
         logging.info("     - start: %s", start)
         logging.info("     - jpeg path: %s", jpeg_full_path)
         logging.info("     - thumb path: %s", jpeg_thumbnail_full_path)
 
-        logging.info('LIMA Detector - set filenames - imagePath is %s / filename is %s' % (self.imagePath, self.fileName))
+        logging.info('EIGER Detector - set filenames - imagePath is %s / filename is %s' % (self.imagePath, self.fileName))
         logging.info('   - thumbnail full path %s' % jpeg_thumbnail_full_path )
         logging.info('   - snapshot full path %s' % jpeg_full_path )
 
-        self.wait(self.adscdev)
-        self.adscdev.write_attribute('imagePath', self.imagePath)
-        self.adscdev.write_attribute('fileName',  os.path.basename(self.fileName))
+        self.detector.set_name_pattern(os.path.basename(self.fileName))
        
     @task
     def prepare_oscillation(self, start, osc_range, exptime, npass):
-        logging.info("<SOLEIL MultiCollect> prepare_acquisition")
-        if self.ready:
-           head = self.prepareHeader()
-           self.adscdev.SetHeaderParameters( head )
-           #self.limaadscdev.exposureTime = (exptime + 0.6) * 1e3
-           #if self.limaadscdev.exposureTime > 2500:
-               #logging.info("<SOLEIL MultiCollect> prepare_acquisition setting timeout to %s " % (self.limaadscdev.exposureTime + 1500))
-               #self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposureTime + 1500))
-           self.wait(self.adscdev)
-
+        logging.info("<PX2 MulitCollect> prepare_oscillation")
         return (start, start+osc_range)
         
     @task
     def do_oscillation(self, start, end, exptime, npass):
+        logging.info("<PX2 MulitCollect> do oscillation")
         self.first_frame = True
         self.new_acquisition = False
-
         pass
 
     @task
     def start_acquisition(self, exptime, npass, first_frame):
-        logging.info("<SOLEIL MultiCollect> start_acquisition")
+        logging.info("<PX2 MulitCollect> start_acquisition")
         # Comes from   self.lenergy_obj.getState() DISABLEimaadscSnap() in original Martin's thread program
         if not self.ready:
             return
-        logging.info("<SOLEIL MultiCollect> start_acquisition limaadscdev timeout %s" % self.limaadscdev.get_timeout_millis())
-        self.limaadscdev.Snap()
-        time.sleep(0.05)
-        #while self.limaadscdev.log[-1].find('yat::DEVICE_SNAP_MSG') == -1:
-            #time.sleep(0.05)
-            #self.limaadscdev.Snap()
         return
       
     @task
     def write_image(self, last_frame, image_filename, jpeg_full_path, jpeg_thumbnail_full_path):
         start = time.time()
 
-        logging.info("<LimaAdscDetector> write last image, converting jpegs")
+        logging.info("<EigerDetector> write last image, converting jpegs")
         logging.info("jpeg_full_path %s" % jpeg_full_path)
         logging.info("jpeg_thumbnail_full_path %s" % jpeg_thumbnail_full_path)
     
@@ -128,7 +106,7 @@ class LimaAdscDetector:
     
         img_full_path = os.path.join(self.imagePath, image_filename)
     
-        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        logging.info("<PX2 MulitCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
         logging.info(" allframes %s / first_frame %s / last_frame %s " % (self.jpeg_allframes, self.first_frame, last_frame))
 
         if (self.jpeg_allframes or self.first_frame or last_frame):
@@ -142,14 +120,15 @@ class LimaAdscDetector:
             self.first_frame = False
             img_full_path = os.path.join(self.imagePath, image_filename)
             
-            logging.info("<LimaAdscDetector> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+            logging.info("<EigerDetector> write last image, converting jpegs, time spent %s " % str(time.time() - start))
         else:
-            logging.info("<LimaAdscDetector> write last image, skipping %s" % image_filename)
-        logging.info("<LimaAdscDetector> write_image time spent %s " % str(time.time() - start))
+            logging.info("<EigerDetector> write last image, skipping %s" % image_filename)
+        logging.info("<EigerDetector> write_image time spent %s " % str(time.time() - start))
         
-    def reportLatestImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
+            
+    def reportLatestImage(self, integer=1, imagePath='/nfs/ruchebis/2015_Run5', fileName='test.img'):
 
-        logging.info("<SOLEIL MultiCollect> reporting latest image, xformstatusfile %s " % self.xformstatusfile)
+        logging.info("<PX2 MulitCollect> reporting latest image, xformstatusfile %s " % self.xformstatusfile)
         line = str(integer) + ' ' + os.path.join(imagePath, fileName)
         try:
             f = open( self.xformstatusfile, 'w')
@@ -196,49 +175,19 @@ class LimaAdscDetector:
         
     @task
     def stop_acquisition(self):
-        # Comes from   self.limaadscStop() in original Martin's thread program
-        if not self.ready:
-           return
-
-        k = 0
-        while self.limaadscdev.log[-1].find('Acquisition is Stopped.') == -1 and self.limaadscdev.state().name == 'RUNNING' and k < 3:
-            try:
-                k += 1
-                self.limaadscdev.Stop()
-                if k > 1:
-                    logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it.' % k)
-                time.sleep(0.1)
-            except:
-                import traceback
-                logging.info('Problem executing Stop command on limaadsc. Attempt %d to stop it. Exception %s' % (k, traceback.format_exc()))
-        return
+        return self.detector.cancel()
 
     @task
     def reset_detector(self):   
         return
 
     def wait(self, device):
-        green_light = False
-        k = 0
-        while green_light is False:
-            try:
-                if device.state().name not in ['STANDBY']:
-                    logging.info("Device %s wait" % device)
-                else:
-                    green_light = True
-                    return
-            except:
-                k += 1
-                import traceback
-                traceback.print_exc()
-                logging.info('Problem occured in wait %s, attempt %s ' % (device, k))
-                logging.info(traceback.print_exc())
-            time.sleep(.1)
+        return
         
     def waitReady(self, device):
-        while device.state().name in [ 'MOVING', 'RUNNING'] :
-            time.sleep(.1)
-
+        logging.info("<PX2 EigerDetector MulitCollect> waitReady")
+        return
+        
     def prepareHeader(self):
         '''Should return a nice header. Implemented in PX2MultiCollect.py'''
         return ""
@@ -246,9 +195,10 @@ class LimaAdscDetector:
 class PX2MultiCollect(SOLEILMultiCollect):
     def __init__(self, name):
 
-        SOLEILMultiCollect.__init__(self, name, LimaAdscDetector(), TunableEnergy())
+        SOLEILMultiCollect.__init__(self, name, EigerDetector(), TunableEnergy())
         #SOLEILMultiCollect.__init__(self, name, DummyDetector(), TunableEnergy())
         self.motors = ['sampx', 'sampy', 'phiz', 'phiy']
+        self.goniometer = goniometer()
         
     def init(self):
 
@@ -285,13 +235,20 @@ class PX2MultiCollect(SOLEILMultiCollect):
         self.take_sample_snapshots = int(self.getProperty("take_sample_snapshots"))
         self.move_detector_flag = int(self.getProperty("move_detector_flag"))
         self.move_resolution_flag = int(self.getProperty("move_resolution_flag"))
-        self.lima_overhead = float(self.getProperty("lima_overhead"))
         self.synchronize_flag = int(self.getProperty("synchronize"))
-        logging.info("<PX2 MultiCollect> lima_overhead %s" % self.lima_overhead)
         self._detector.prepareHeader = self.prepareHeader
         logging.getLogger("user_level_log").info("initializing PX2MultiCollect")
         SOLEILMultiCollect.init(self)
-       
+    
+    def write_destination_namepattern(self, image_path, name_pattern):
+        try:
+            f = open(self.goimgfile, 'w')
+            f.write('%s %s' % (os.path.join(image_path, 'process'), name_pattern))
+            f.close()
+        except IOError:
+            import traceback
+            logging.info('Problem writing goimg.db %s' % (traceback.format_exc()))
+            
     def prepareHeader(self, X=None, Y=None, D=None):
         '''Will set up header given the actual values of beamline energy, mono and detector distance'''
         if X is None or Y is None:
@@ -427,7 +384,37 @@ class PX2MultiCollect(SOLEILMultiCollect):
         [1] The condition number is large, 1.32e+03. This might indicate that there are
         strong multicollinearity or other numerical problems.
         '''
-        theta = numpy.matrix([  1.50045368e+03,   1.60241789e-04,  3.87663239e+00,   9.77188997e+00])
+        '''
+        ==============================================================================
+        Dependent Variable: ORGX
+        Method: Least Squares
+        Date:  Tue, 08 Dec 2015
+        Time:  05:16:58
+        # obs:                  30
+        # variables:         3
+        ==============================================================================
+        variable     coefficient     std. Error      t-statistic     prob.
+        ==============================================================================
+        const           1547.767066      0.413731      3740.999156      0.000000
+        wavelength           0.365109      0.281833      1.295479      0.206122
+        distance          -0.112769      0.000801     -140.798053      0.000000
+        ==============================================================================
+        Models stats                         Residual stats
+        ==============================================================================
+        R-squared             0.998706         Durbin-Watson stat   2.314365
+        Adjusted R-squared    0.998610         Omnibus stat         0.744639
+        F-statistic           10415.702869         Prob(Omnibus stat)   0.689134
+        Prob (F-statistic)    0.000000          JB stat              0.116611
+        Log likelihood       -21.536651         Prob(JB)             0.943362
+        AIC criterion         1.635777         Skew                -0.085131
+        BIC criterion         1.775897         Kurtosis             3.253573
+        ==============================================================================
+
+        '''
+        #theta = numpy.matrix([  1.50045368e+03,   1.60241789e-04,  3.87663239e+00,   9.77188997e+00])
+        #theta = numpy.matrix([  1.54776707e+03,   3.65108709e-01,  -1.12769165e-01, 9.77188997e+00]) 
+        theta = numpy.matrix([ 1.65113065e+03,   5.63662370e+00,   3.49706731e-03, 9.77188997e+00])
+        
         orgy = X * theta.T
         return float(orgy)
     
@@ -464,77 +451,112 @@ class PX2MultiCollect(SOLEILMultiCollect):
         [1] The condition number is large, 1.27e+03. This might indicate that there are
         strong multicollinearity or other numerical problems.
         '''
+        '''
+        ==============================================================================
+        Dependent Variable: ORGY
+        Method: Least Squares
+        Date:  Tue, 08 Dec 2015
+        Time:  05:15:24
+        # obs:                  30
+        # variables:         3
+        ==============================================================================
+        variable     coefficient     std. Error      t-statistic     prob.
+        ==============================================================================
+        const           1651.130655      0.201311      8201.871706      0.000000
+        wavelength           5.636624      0.137133      41.103299      0.000000
+        distance           0.003497      0.000390      8.973457      0.000000
+        ==============================================================================
+        Models stats                         Residual stats
+        ==============================================================================
+        R-squared             0.984271         Durbin-Watson stat   1.711823
+        Adjusted R-squared    0.983106         Omnibus stat         0.256553
+        F-statistic           844.786189         Prob(Omnibus stat)   0.879610
+        Prob (F-statistic)    0.000000          JB stat              0.374312
+        Log likelihood        0.074228          Prob(JB)             0.829314
+        AIC criterion         0.195051         Skew                -0.190431
+        BIC criterion         0.335171         Kurtosis             2.607070
+        ==============================================================================
+        '''
         # values from 2014-07-01
-        theta = numpy.matrix([  1.72620674e+03,  -8.43965198e-02,  -6.16352910e-01,   9.74625808e+00])
+        #theta = numpy.matrix([  1.72620674e+03,  -8.43965198e-02,  -6.16352910e-01,   9.74625808e+00])
+        # values from 2015-12-08
+        #theta = numpy.matrix([  1.65113065e+03,   5.63662370e+00,   3.49706731e-03,   9.74625808e+00])
+        theta = numpy.matrix([  1.54776707e+03,   3.65108709e-01,  -1.12769165e-01,   9.74625808e+00])
         orgx = X * theta.T
         return float(orgx)
     
     def beamCenter2(self):
         logging.info('beamCenter calculation')
-        q = 0.102592
+        q = 0.075 #0.102592
         
         wavelength = self.mono1dev.read_attribute('lambda').value
         distance   = self.det_mt_ts_dev.read_attribute('position').value
-        tx         = self.det_mt_tx_dev.read_attribute('position').value
-        tz         = self.det_mt_tz_dev.read_attribute('position').value
+        tx         = self.det_mt_tx_dev.read_attribute('position').value - 30.0
+        tz         = self.det_mt_tz_dev.read_attribute('position').value + 14.3
         logging.info('wavelength %s' % wavelength)
         logging.info('mt_ts %s' % distance)
         logging.info('mt_tx %s' % tx)
         logging.info('mt_tz %s' % tz)
+        print('wavelength %s' % wavelength)
+        print('mt_ts %s' % distance)
+        print('mt_tx %s' % tx)
+        print('mt_tz %s' % tz)
         #wavelength  = self.mono1.read_attribute('lambda').value
         #distance    = self.detector_mt_ts.read_attribute('position').value
         #tx          = self.detector_mt_tx.position
         #tz          = self.detector_mt_tz.position
         
-        X = numpy.matrix([1., distance, wavelength, tx, tz])
+        X = numpy.matrix([1., wavelength, distance, 0, 0 ]) #tx, tz])
         
-        beam_center_x = self.get_beam_center_x(X[:, [0, 1, 2, 4]])
-        beam_center_y = self.get_beam_center_y(X[:, [0, 1, 2, 3]])
+        beam_center_y = self.get_beam_center_x(X[:, [0, 1, 2, 4]])
+        beam_center_x = self.get_beam_center_y(X[:, [0, 1, 2, 3]])
         
+        beam_center_x += tx / 0.075
+        beam_center_y += tz / 0.075
         #dirty fix for drift between Run3 and Run4 2014
-        beam_center_x -= 3.08
-        beam_center_y -= 1.45
+        #beam_center_x -= 3.08
+        #beam_center_y -= 1.45
 
         #dirty fix for shift (re-focusing) beginning Run1 2015
-        beam_center_x += 0.15
-        beam_center_y -= 2.34
+        #beam_center_x += 0.15
+        #beam_center_y -= 2.34
         
         #shift beginning Run2 2015
-        beam_center_x -= 0.21
-        beam_center_y -= 0.86
+        #beam_center_x -= 0.21
+        #beam_center_y -= 0.86
         
         #shift beginning Run3 2015
-        beam_center_x += 1.85
-        beam_center_y -= 0
+        #beam_center_x += 1.85
+        #beam_center_y -= 0
 
         #shift 2015-07-24 (something wierd happened with mirrors over the week of 2015-06-22 and then again 2015-07-10 -- probably during colimator commissioning)
         # optimal 1508.45   1527.97
         # input   1507.5    1527.4
         # this corresponds to yshift in beamcenter as represented in analysis.py in /927bis/ccd/gitRepos/CollectionStatistics
-        beam_center_x += 0.85 # plus adjusts for shifts up
-        beam_center_y -= 1 # minus adjusts for shifts up
+        #beam_center_x += 0.85 # plus adjusts for shifts up
+        #beam_center_y -= 1 # minus adjusts for shifts up
         #shift 2015-07-25
-        beam_center_x -= 0.28  # yshifts - -> go up
-        beam_center_y += 2     # xshifts + -> go down
+        #beam_center_x -= 0.28  # yshifts - -> go up
+        #beam_center_y += 2     # xshifts + -> go down
         
         # shift beginning Run4 2015 (2015-09-04)
-        beam_center_x -= 1.61 # go up
-        beam_center_y -= 0.20 # go up
+        #beam_center_x -= 1.61 # go up
+        #beam_center_y -= 0.20 # go up
         
         # shift 2015-09-15
-        beam_center_x -= 0.2
-        beam_center_y -= 0.5
+        #beam_center_x -= 0.2
+        #beam_center_y -= 0.5
         
         # shift 2015-10-01
-        beam_center_x += 0.25 #yshifts
-        beam_center_y += 0.41 #xshifts
+        #beam_center_x += 0.25 #yshifts
+        #beam_center_y += 0.41 #xshifts
         
-        beam_center_y *= q
-        beam_center_x *= q
+        #beam_center_y *= q
+        #beam_center_x *= q
         
         # The following two lines fixes the loss of offsets from 2014-09-12 (apparently an init on translation stage device servers)
-        beam_center_y += -17.2 #3.5
-        beam_center_x += 3.5 #17.2
+        #beam_center_y += -17.2 #3.5
+        #beam_center_x += 3.5 #17.2
         
         print 'beamCenter2', beam_center_y, beam_center_x
         return beam_center_x, beam_center_y
@@ -542,6 +564,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
     def set_collect_position(self, position):
         logging.info("<PX2 MultiCollect> set collect position %s" % position)
         logging.info("<PX2 MultiCollect> set collect position type %s" % type(position))
+        self.centered_position = position
         self.standard_collect = True
         #pos = dict(position)
         #collect_position = {} 
@@ -558,13 +581,15 @@ class PX2MultiCollect(SOLEILMultiCollect):
                     return False
         return True
         
-    def set_helical(self, onmode, positions=None):
+    def set_helical(self, onmode, positions=None, posmot=None):
         logging.info("<PX2 MultiCollect> set helical")
         self.helical = onmode
         if onmode:
             logging.info("<PX2 MultiCollect> set helical pos1 %s pos2 %s" % (positions['1'], positions['2']))
             self.helicalStart = positions['1']
             self.helicalFinal = positions['2']
+            self.hs_start = posmot['1']
+            self.hs_final = posmot['2']
         
     def set_translational(self, onmode, positions=None, step=None):
         logging.info("<PX2 MultiCollect> set translational")
@@ -840,6 +865,26 @@ class PX2MultiCollect(SOLEILMultiCollect):
         logging.info('Wedges to collect %s' % wedges)
         return wedges
     
+    def prepare_wedges_to_collect(self, start, nframes, osc_range, reference_interval, inverse_beam, overlap):
+        # code to prepare the list of frames to collect: [(start, wedge_size), ...]
+        if overlap == 0 and inverse_beam == False:
+            reference_interval = nframes
+        logging.info('prepare_wedges_to_collect %s %s %s %s %s %s' % (start, nframes, osc_range, reference_interval, inverse_beam, overlap))
+        wedges_to_collect = []
+        wedge_sizes_list = [reference_interval]*(nframes/reference_interval)
+        remaining_frames = nframes % reference_interval
+        if remaining_frames:
+            wedge_sizes_list.append(remaining_frames)
+
+        for wedge_size in wedge_sizes_list:
+            orig_start = start
+            
+            wedges_to_collect.append((start, wedge_size))
+            if inverse_beam != 0:
+                wedges_to_collect.append((start+180, wedge_size))
+            start += (osc_range - overlap) * wedge_size
+        return wedges_to_collect
+        
     def get_sync_destination(self, directory, reference = '/home/experiences/proxima2a/com-proxima2a'):
         logging.info('get_sync_destination')
         self.sync_destination = os.path.join(reference, directory[1:])
@@ -900,11 +945,41 @@ class PX2MultiCollect(SOLEILMultiCollect):
     #    logging.info("<SOLEIL collect>  I WILL take snapshots")
     #    return True
         
+    def translate_position(self, position):
+        motorShortNames = ['PhiX', 'PhiY', 'PhiZ', 'SamX', 'SamY']
+        mxcubeShortNames = ['phix', 'phiy', 'phiz', 'sampx', 'sampy']
+        translation = dict(zip(mxcubeShortNames, motorShortNames))
+        translated_position = {}
+        for key in position.keys():
+            if key in mxcubeShortNames:
+                translated_position[translation[key]] = position[key]
+                
+        return translated_position
+        
     @task
     def do_collect(self, owner, data_collect_parameters, in_multicollect=False):
         # reset collection id on each data collect
         logging.info("<SOLEIL do_collect>  data_collect_parameters %s" % data_collect_parameters)
         logging.info("<SOLEIL do_collect>  in_multicollect %s" % in_multicollect)
+        
+        if self.helical:
+            logging.info('helicalFinal %s' % self.helicalFinal)
+            logging.info('hs_final %s' % self.hs_final)
+            translated_final = self.translate_position(self.helicalFinal)
+            logging.info('translated Final %s' % translated_final)
+            #self.goniometer.moveToPosition(translated_final)
+            self.bl_control.diffractometer.moveToCentredPosition(self.hs_final)
+            self.bl_control.diffractometer.wait()
+            self.goniometer.set_helical_stop()
+            logging.info('helicalStart %s' % self.helicalStart)
+            logging.info('hs_start %s' % self.hs_start)
+            translated_start = self.translate_position(self.helicalStart)
+            logging.info('translated Start %s' % translated_start)
+            #self.goniometer.moveToPosition(translated_start)
+            self.bl_control.diffractometer.moveToCentredPosition(self.hs_start)
+            self.bl_control.diffractometer.wait()
+            self.goniometer.set_helical_start()
+            
         self.collection_id = None
         self.snapshots_taken = False
 
@@ -1084,15 +1159,15 @@ class PX2MultiCollect(SOLEILMultiCollect):
         inverse = inverse_beam
         ScanOverlap = oscillation_parameters["overlap"]
         template = image_file_template
-        myWedges = self.prepareWedges(firstImage, 
-                                      nbFrames, 
-                                      ScanStartAngle, 
-                                      ScanRange, 
-                                      wedgeSize, 
-                                      inverse, 
-                                      ScanOverlap, 
-                                      template)
-        positions = myWedges['positions']
+        #myWedges = self.prepareWedges(firstImage, 
+                                      #nbFrames, 
+                                      #ScanStartAngle, 
+                                      #ScanRange, 
+                                      #wedgeSize, 
+                                      #inverse, 
+                                      #ScanOverlap, 
+                                      #template)
+        #positions = myWedges['positions']
         wedges_to_collect = self.prepare_wedges_to_collect(oscillation_parameters["start"],
                                                            oscillation_parameters["number_of_images"],
                                                            oscillation_parameters["range"],
@@ -1137,7 +1212,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
           self.set_wavelength(data_collect_parameters["wavelength"])
         elif 'energy' in data_collect_parameters:
           self.set_energy(data_collect_parameters["energy"])
-        
+          self._detector.set_photon_energy(data_collect_parameters["energy"] * 1000.)
         if 'resolution' in data_collect_parameters:
           if self.move_resolution_flag == 1:
             resolution = data_collect_parameters["resolution"]["upper"]
@@ -1152,7 +1227,8 @@ class PX2MultiCollect(SOLEILMultiCollect):
             self.send_detector(oscillation_parameters["detdistance"])
           else:
             logging.getLogger("HWR").info("Not moving the detector, if this is not intended, change the move_detector configuration parameter in ~/mxcube_v2/HardwareObjects.xml/PX2/mxcollect.xml")
-         
+
+
         frame = start_image_number
         osc_range = oscillation_parameters["range"]
         exptime = oscillation_parameters["exposure_time"]
@@ -1164,8 +1240,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                      exptime,
                                      npass,
                                      nframes,
-                                     data_collect_parameters["comment"],
-                                     lima_overhead = self.lima_overhead)
+                                     data_collect_parameters["comment"])
         #self.close_fast_shutter()
 
         with cleanup(self.data_collection_cleanup):
@@ -1224,7 +1299,7 @@ class PX2MultiCollect(SOLEILMultiCollect):
                                        data_collect_parameters.get("sample_reference", {}).get("cell", ""))
             
             k = 0
-            reference_position = positions[0]
+            #reference_position = positions[0]
             #if self.standard_collect is True:
                 #if self.are_positions_equal(self.collect_position, self.bl_control.diffractometer.getPositions()):
                     #logging.info("PX2MultiCollect moving into collect position %s " % self.collect_position)
@@ -1241,15 +1316,41 @@ class PX2MultiCollect(SOLEILMultiCollect):
             self.verify_resolution()
             self.bl_control.diffractometer.verifyGonioInCollect()
             
+                    
+            self._detector.set_detector_distance(self.get_detector_distance()/1000.)
+            beam_center_x, beam_center_y = self.beamCenter2()
+            self._detector.set_beam_center_x(beam_center_x)
+            self._detector.set_beam_center_y(beam_center_y)
+            
             logging.info('moving motors before collect %s' % motors_to_move_before_collect)
             self.move_motors(motors_to_move_before_collect)
             self.bl_control.diffractometer.wait()
             
+            multi_wedge = False
+            if len(wedges_to_collect) > 1:
+                multi_wedge = True
+            m = 0
+            
             for start, wedge_size in wedges_to_collect:
+                m += 1
+                scan_range = osc_range * wedge_size
+                scan_exposure_time = exptime * wedge_size
+                scan_start_angle = start
+                angle_per_frame = osc_range
+                name_pattern = image_file_template[:-8]  #.replace('_%04d.h5', '')
+                if multi_wedge:
+                    name_pattern +=  '_%s' % m
+                image_nr_start = frame
+                
+                logging.info('sweep parameters %s %s %s %s %s %s %s' % (scan_range, scan_exposure_time, scan_start_angle, angle_per_frame, name_pattern, image_nr_start, self.helical))
+                sweep = eiger.sweep(scan_range, scan_exposure_time, scan_start_angle, angle_per_frame, name_pattern, image_nr_start, self.helical)
+                
+                self.write_destination_namepattern(file_location, name_pattern)
+                
                 itt = time.time()
                 k += 1
-                end = start + osc_range
-                collect_position = positions[k-1]
+                end = start + osc_range * wedge_size
+                #collect_position = positions[k-1]
                 filename = image_file_template % frame
                 try:
                   jpeg_full_path = jpeg_file_template % frame
@@ -1259,54 +1360,81 @@ class PX2MultiCollect(SOLEILMultiCollect):
                   jpeg_thumbnail_full_path = None
                 file_path  = os.path.join(file_location, filename)
                 
-                logging.info("Frame %d, %7.3f to %7.3f degrees", frame, start, end)
+                logging.info("Frames %d, %7.3f to %7.3f degrees", frame, start, end)
 
                 self.set_detector_filenames(frame, start, file_path, jpeg_full_path, jpeg_thumbnail_full_path)
                 
-                osc_start, osc_end = self.prepare_oscillation(start, osc_range, exptime, npass)
+                osc_start, osc_end = self.prepare_oscillation(start, scan_range, scan_exposure_time, npass)
                 
                 with error_cleanup(self.reset_detector):
-                    self.move_motors(collect_position, epsilon=0.0002)
-                    self.start_acquisition(exptime, npass, start_image_number)
-                    if osc_end - osc_start < 1E-4:
-                       self.open_fast_shutter()
-                       time.sleep(exptime)
-                       self.close_fast_shutter()
-                    else:
-                       self.do_oscillation(osc_start, osc_end, exptime, npass)
-                    self.stop_acquisition()
+                    #self.move_motors(collect_position, epsilon=0.0002)
+                    
+                    sweep.collect()
+                    
+                    while sweep.detector.fileWriterStatus('state')['value'] == 'ready':
+                        time.sleep(0.1)
+                       
+                    logging.info('fileWriterStatus %s' % sweep.detector.fileWriterStatus('state')['value'])
+                    
+                    collecting = True
+                    while collecting == True:
+                        try:
+                            #sweep.detector.status_update()
+                            monitor = sweep.detector.monitorStatus('monitor_image_number')['value']
+                            if monitor == None:
+                                time.sleep(exptime)
+                                continue
+                            logging.info('inside do_collect monitor %s' % monitor)
+                            frame = monitor[1] + 1
+                            if frame < wedge_size - 1:
+                                self.emit("collectImageTaken", frame)
+                                time.sleep(exptime)
+                            else:
+                                collecting = False
+                                sweep.clean()
+                        except:
+                            import traceback
+                            logging.info(traceback.print_exc())
+                    #self.start_acquisition(exptime, npass, start_image_number)
+                    #if osc_end - osc_start < 1E-4:
+                       #self.open_fast_shutter()
+                       #time.sleep(exptime)
+                       #self.close_fast_shutter()
+                    #else:
+                       #self.do_oscillation(osc_start, osc_end, exptime, npass)
+                    #self.stop_acquisition()
                     last_frame = start_image_number + nframes - 1
                     if frame == last_frame:
                         is_last_frame = True
                     else:
                         is_last_frame = False
                     
-                    swi = time.time()
-                    self.write_image(is_last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
-                    logging.info("<do_collect> write_image call time spent %s " % str(time.time() - swi))
+                    #swi = time.time()
+                    #self.write_image(is_last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
+                    #logging.info("<do_collect> write_image call time spent %s " % str(time.time() - swi))
                     
                     # Store image in lims
-                    if self.bl_control.lims:
-                      if self.store_image_in_lims(frame, frame == start_image_number, frame == last_frame):
-                        lims_image={'dataCollectionId': self.collection_id,
-                                    'fileName': filename,
-                                    'fileLocation': file_location,
-                                    'imageNumber': frame,
-                                    'measuredIntensity': self.get_measured_intensity(),
-                                    'synchrotronCurrent': self.get_machine_current(),
-                                    'machineMessage': self.get_machine_message(),
-                                    'temperature': self.get_cryo_temperature()}
+                    #if self.bl_control.lims:
+                      #if self.store_image_in_lims(frame, frame == start_image_number, frame == last_frame):
+                        #lims_image={'dataCollectionId': self.collection_id,
+                                    #'fileName': filename,
+                                    #'fileLocation': file_location,
+                                    #'imageNumber': frame,
+                                    #'measuredIntensity': self.get_measured_intensity(),
+                                    #'synchrotronCurrent': self.get_machine_current(),
+                                    #'machineMessage': self.get_machine_message(),
+                                    #'temperature': self.get_cryo_temperature()}
 
-                        if archive_directory:
-                          lims_image['jpegFileFullPath'] = jpeg_full_path
-                          lims_image['jpegThumbnailFileFullPath'] = jpeg_thumbnail_full_path
+                        #if archive_directory:
+                          #lims_image['jpegFileFullPath'] = jpeg_full_path
+                          #lims_image['jpegThumbnailFileFullPath'] = jpeg_thumbnail_full_path
 
-                        try:
-                          self.bl_control.lims.store_image(lims_image)
-                        except:
-                          logging.getLogger("HWR").exception("Could not store image in LIMS")
+                        #try:
+                          #self.bl_control.lims.store_image(lims_image)
+                        #except:
+                          #logging.getLogger("HWR").exception("Could not store image in LIMS")
                                               
-                    self.emit("collectImageTaken", frame)
+                    #self.emit("collectImageTaken", frame)
                         
                     if self.bl_control.lims and self.bl_config.input_files_server:
                       if data_collect_parameters.get("processing", False)=="True":
@@ -1323,11 +1451,11 @@ class PX2MultiCollect(SOLEILMultiCollect):
                 
                 #self.synchronize_thread(file_location, filename)
                 #tsi = time.time()
-                if self.synchronize_flag is 1:
-                    self.synchronize_image(file_location, filename, wait=False)
-                #logging.info("<do_collect> total synchronize_image time spent %s " % str(time.time() - tsi))
-                frame += 1
-                logging.info("<do_collect> total collect_image %s time spent %s " % (filename, str(time.time() - itt)))
+                #if self.synchronize_flag is 1:
+                    #self.synchronize_image(file_location, filename, wait=False)
+                ##logging.info("<do_collect> total synchronize_image time spent %s " % str(time.time() - tsi))
+                #frame += 1
+                #logging.info("<do_collect> total collect_image %s time spent %s " % (filename, str(time.time() - itt)))
             #self.sync_collect(file_location, filename, image_file_template, wait=False)
             self.finalize_acquisition()
     @task
@@ -1359,6 +1487,10 @@ def test():
     print "Synchrotron name is ", coll.bl_config.synchrotron_name
     res_corner = coll.get_resolution_at_corner()
     print "Resolution corner is ", res_corner
+    print 'beam_center'
+    x, y = coll.beamCenter2()
+    print 'beam_center_x', x
+    print 'beam_center_y', y
 
 if __name__ == '__main__':
    test()

@@ -14,5 +14,5 @@
     <BLEnergy>/BLEnergy</BLEnergy>
     <resmotor>/resolution</resmotor>
     <detdistmotor>/detectordistance</detdistmotor>
-    <directoryprefix>/927bis/ccd/2014/Run5</directoryprefix>
+    <directoryprefix>/nfs/ruchebis/2015_Run5</directoryprefix>
 </procedure>

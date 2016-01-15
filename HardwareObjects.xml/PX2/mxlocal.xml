@@ -39,27 +39,27 @@
     </SPEC_PARS>
     <BCM_PARS>
         <detector>
-            <manufacturer>ADSC</manufacturer>   <!--<manufacturer>Dectris</manufacturer> -->
-            <type>Quantum</type>                <!--       <type>PILATUS</type> -->
-            <model>315R</model>                 <!--       <model>6M</model> -->
+            <manufacturer>DECTRIS</manufacturer>   <!--<manufacturer>Dectris</manufacturer> -->
+            <type>EIGER</type>                <!--       <type>PILATUS</type> -->
+            <model>9M</model>                 <!--       <model>6M</model> -->
         </detector>
-        <detector_radius>157.5</detector_radius> <!--might need to be changed to 157.5? -->
-        <FileSuffix>img</FileSuffix>
-        <minimum_exposure_time>0.05</minimum_exposure_time>
-        <minimum_phi_speed>0.1</minimum_phi_speed>
+        <detector_radius>116.62</detector_radius> <!--might need to be changed to 157.5? -->
+        <FileSuffix>h5</FileSuffix>
+        <minimum_exposure_time>0.0042</minimum_exposure_time>
+        <minimum_phi_speed>0.05</minimum_phi_speed>
         <minimum_phi_oscillation>0.01</minimum_phi_oscillation>
-        <maximum_phi_speed>5</maximum_phi_speed>
+        <maximum_phi_speed>130</maximum_phi_speed>
         <maximum_radiation_exposure>4000</maximum_radiation_exposure>
     </BCM_PARS>
     <VALIDATE_PARS>
-        <exposure_time>0.05,100</exposure_time>
+        <exposure_time>0.0042,100</exposure_time>
         <start_angle>-360,360</start_angle>
         <range>0.0,10</range>
         <number_of_passes>1,10</number_of_passes>
         <start_image_number>0,10000</start_image_number>
         <run_number>0,10000</run_number>
         <overlap>-90,0.99</overlap>
-        <number_of_images>1,10000</number_of_images>
+        <number_of_images>1,100000</number_of_images>
     </VALIDATE_PARS>
     <EXTRAVALIDATE_PARS>
         <rotation_speed>0.1,100</rotation_speed>

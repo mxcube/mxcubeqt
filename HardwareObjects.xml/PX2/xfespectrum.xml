@@ -2,7 +2,7 @@
     <ketek>i11-ma-cx1/dt/dtc-mca_xmap.1</ketek>
     <counter>i11-ma-c00/ca/cpt.2</counter>
     <md2>i11-ma-cx1/ex/md2</md2>
-    <directoryprefix>/927bis/ccd/2013</directoryprefix> 
+    <directoryprefix>/nfs/ruchebis/2015_Run5</directoryprefix> 
 
 <!--   <specversion>SPEC_HOST:SPEC_VERSION</specversion> -->
 <!--   <command type="spec" name="doSpectrum">eprodc_xfespectrum</command> -->

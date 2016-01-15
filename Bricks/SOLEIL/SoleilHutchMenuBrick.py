@@ -126,7 +126,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         self.buttonReject.setMinimumSize(QSize(75,50))
         self.buttonReject.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.buttonReject.setEnabled(False)
-        self.buttonReject.hide()
+        #self.buttonReject.hide()
         QObject.connect(self.buttonReject,SIGNAL('clicked()'),self.rejectClicked)
 
         #HorizontalSpacer4(self.sampleCentreBox)
@@ -209,7 +209,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         self.buttonReject.setMinimumSize(QSize(50,40))
         self.buttonReject.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.buttonReject.setEnabled(False)
-        self.buttonReject.hide()
+        #self.buttonReject.hide()
         QObject.connect(self.buttonReject,SIGNAL('clicked()'),self.rejectClicked)
 
         self.extraCommands=CommandMenuBrick.CommandMenuBrick(self.sampleCentreBox)
@@ -476,8 +476,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         self.insideDataCollection=False
 
     def centringMoving(self):
-        self.isMoving=True
-        logging.info("disabling accept because centring is moving ")  
+        self.isMoving=True          
         self.buttonAccept.setEnabled(False)
         self.buttonReject.setEnabled(False)
 
@@ -581,10 +580,9 @@ class SoleilHutchMenuBrick(BlissWidget):
                 self.standardColor=self.buttonAccept.paletteBackgroundColor()
             self.buttonAccept.setPaletteBackgroundColor(widget_colors.LIGHT_GREEN)
             self.buttonReject.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-
+        
         if self.collectObj is not None:
             self.collectObj.setCentringStatus(centring_status)
-
         self.isMoving=False
         self.sampleCentreBox.setEnabled(True)
         self.emit(PYSIGNAL("enableMinidiff"), (True,))
@@ -771,7 +769,6 @@ class SoleilHutchMenuBrick(BlissWidget):
     # Update both zoom and slits when started
     def run(self):
         beam_info = self.beamInfo.get_beam_info()
-        logging.getLogger().info("HucthMenuBrick connect to BeamInfo_hwo >>>>>>>>>>>> %s" % beam_info)
         if self.minidiff is not None:
             zoom=self.minidiff.zoomMotor
             if zoom is not None:
@@ -797,9 +794,7 @@ class SoleilHutchMenuBrick(BlissWidget):
             self.__helpLine.setAutoDisconnectEvent(True)
             self.__helpLine.setExclusive(False)
             self.__helpLine.setColor(Qt.yellow)
-            
-            logging.getLogger().info("HutchMenuBrick help line OK")
-            
+                      
             self.__rectangularBeam, _ = QubAddDrawing(self.__drawing, QubContainerDrawingMgr, QubCanvasSlitbox)
             self.__rectangularBeam.set_xMid_yMid(self.beam_position[0], self.beam_position[1])
             self.__rectangularBeam.show()
@@ -837,7 +832,6 @@ class SoleilHutchMenuBrick(BlissWidget):
                 #self.slitsPositionChanged()
                 logging.getLogger().info("HutchMenuBrick runs. It will now update the beam drawing")
                 self.__rectangularBeam.set_xMid_yMid(self.beam_position[0], self.beam_position[1])
-                logging.getLogger().info("HutchMenuBrick setting rectangular beam xMid, yMid to %s, %s" % (self.beam_position[0], self.beam_position[1]))
                 self.updateBeam(force=True)
         except:
             import traceback

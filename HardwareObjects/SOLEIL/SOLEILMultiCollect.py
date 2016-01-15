@@ -64,154 +64,6 @@ class TunableEnergy:
         logging.info("<SOLEIL MultiCollect TUNABLE ENERGY> VERIFY - get wavelenth")
         return self.bl_control.energy.getCurrentWavelength()
 
-class DummyDetector:
-    @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - prepare acquisition")
-
-    @task
-    def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - set filenames")
-       
-    @task
-    def prepare_oscillation(self, start, osc_range, exptime, npass):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - prepare oscillation")
-        return (start, start+osc_range)
-        
-    @task
-    def do_oscillation(self, start, end, exptime, npass):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - do oscillation")
-
-    @task
-    def start_acquisition(self, exptime, npass, first_frame):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - start acquisition")
-      
-    @task
-    def write_image(self, last_frame):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - write image")
-
-    @task
-    def stop_acquisition(self):
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - stop acquisition")
-      
-    @task
-    def reset_detector(self):   
-        logging.info("<SOLEIL MultiCollect> DETECTOR DUMMY - reset acquisition")
-
-class LimaPilatusDetector:
-    def __init__(self):
-        self.shutterless = True
-        self.new_acquisition = True
-        self.oscillation_task = None
-        self.shutterless_exptime = None
-        self.shutterless_range = None
-
-        self.ready = False
-        self.adscdev           = None
-        self.limaadscdev       = None
-        self.xformstatusfile   = None
-
-    def initDetector(self, adscname, limaadscname, xformstatusfile):
-        try: 
-           self.adscdev           = PyTango.DeviceProxy(adscname) 
-           self.limaadscdev       = PyTango.DeviceProxy(limaadscname) 
-           self.xformstatusfile   = xformstatusfile
-        except:
-           import traceback
-           logging.error("<SOLEIL Mulenergy_obj.getState() DISABLEtiCollect> Cannot initialize LIMA detector")
-           logging.error( traceback.format_exc() )
-            
-        else:
-           self.ready = True
-    @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
-        self.new_acquisition = True
-        if  osc_range < 0.0001:
-            self.shutterless = False
-        take_dark = 0
-        if self.shutterless:
-            self.shutterless_range = osc_range*number_of_images
-            self.shutterless_exptime = (exptime + 0.003)*number_of_images
-
-        logging.getLogger("PILATUS").info("prepare acquisition. empty")      
-        #self.execute_command("prepare_acquisition", take_dark, start, osc_range, exptime, npass, comment)
-        #self.getCommandObject("build_collect_seq").executeCommand("write_dp_inputs(COLLECT_SEQ,MXBCM_PARS)",wait=True)
-        
-    @task
-    def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
-      if self.shutterless and not self.new_acquisition:
-          return
-
-      logging.getLogger("PILATUS").info("set detector filenames. empty")      
-      #self.getCommandObject("prepare_acquisition").executeCommand('setMxCollectPars("current_phi", %f)' % start)
-      #self.getCommandObject("prepare_acquisition").executeCommand('setMxCurrentFilename("%s")' % filename)
-      #self.getCommandObject("prepare_acquisition").executeCommand("ccdfile(COLLECT_SEQ, %d)" % frame_number, wait=True)
-
-    @task
-    def prepare_oscillation(self, start, osc_range, exptime, npass):
-        if self.shutterless:
-            if self.new_acquisition:
-                logging.getLogger("PILATUS").info("prepare oscillation new. empty")      
-                #self.execute_command("prepare_oscillation", start, start+self.shutterless_range, self.shutterless_exptime, npass)
-        else:
-            if osc_range < 1E-4:
-                # still image
-                pass
-            else:
-                logging.getLogger("PILATUS").info("prepare oscillation 2. empty")      
-                #self.execute_command("prepare_oscillation", start, start+osc_range, exptime, npass)
-        return (start, start+osc_range)
-
-    @task
-    def start_acquisition(self, exptime, npass, first_frame):
-      if not first_frame and self.shutterless:
-        time.sleep(exptime) 
-      else:
-        logging.getLogger("PILATUS").info("start acquisition. empty")      
-        #self.execute_command("start_acquisition")
-
-    @task
-    def do_oscillation(self, start, end, exptime, npass):
-      if self.shutterless:
-          if self.new_acquisition:
-              # only do this once per collectenergy_obj.getState() DISABLE
-              npass = 1
-              exptime = self.shutterless_exptime
-              end = start + self.shutterless_range
-          
-              # make oscillation an asynchronous task => do not wait here
-              self.oscillation_task = self.execute_command("do_oscillation", start, end, exptime, npass, wait=False)
-              logging.getLogger("PILATUS").info("do oscillation. empty")      
-          else:
-              try:
-                 self.oscillation_task.get(block=False)
-              except gevent.Timeout:
-                 pass #no result yet, it is normal
-              except:
-                 # an exception occured in task! Pilatus server died?
-                 raise
-      else:
-          #self.execute_command("do_oscillation", start, end, exptime, npass)
-          logging.getLogger("PILATUS").info("do oscillation. empty")      
-    
-    @task
-    def write_image(self, last_frame):
-      if last_frame:
-        if self.shutterless:
-            self.oscillation_task.get()
-            logging.getLogger("PILATUS").info("write image. empty")      
-            #self.execute_command("specific_collect_frame_hook")
-
-    def stop_acquisition(self):
-        self.new_acquisition = False
-      
-    @task
-    def reset_detector(self):
-      if self.shutterless:
-          self.oscillation_task.kill()
-      logging.getLogger("PILATUS").info("resetting detector. empty")      
-      #self.execute_command("reset_detector")
-
 
 class LimaAdscDetector:
     def __init__(self):
@@ -219,18 +71,19 @@ class LimaAdscDetector:
         self.adscdev           = None
         self.limaadscdev       = None
         self.xformstatusfile   = None
+        self.first_frame = True
+        self.jpeg_allframes = False
 
     def initDetector(self, adscname, limaadscname, xformstatusfile):
-        logging.info("<SOLEIL MultiCollect> Initializing LIMA detector")
+        logging.info("<PX2 MulitCollect> Initializing LIMA detector")
         try: 
-           self.adscdev           = PyTango.DeviceProxy(adscname) 
-           self.limaadscdev       = PyTango.DeviceProxy(limaadscname) 
+           self.adscdev           = DeviceProxy(adscname) 
+           self.limaadscdev       = DeviceProxy(limaadscname) 
            self.xformstatusfile   = xformstatusfile
         except:
            import traceback
-           logging.error("<SOLEIL MultiCollect> Cannot initialize LIMA detector")
+           logging.error("<PX2 MulitCollect> Cannot initialize LIMA detector")
            logging.error( traceback.format_exc() )
-            
         else:
            self.ready = True
 
@@ -239,6 +92,7 @@ class LimaAdscDetector:
         if not self.ready:
             return
             
+        self.new_acquisition = True
         logging.info('Preparing LIMA Detector')
         #if self.limaadscdev.state().name != 'STANDBY':
             #self.limaadscdev.Stop()
@@ -251,6 +105,7 @@ class LimaAdscDetector:
         self.wait(self.limaadscdev)
         
         self.limaadscdev.exposuretime = (exptime + lima_overhead) * 1e3
+        #bj.getState() DISABLE
         if (self.limaadscdev.get_timeout_millis() - self.limaadscdev.exposuretime) < 2000:
             self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposuretime) + 2000)
         
@@ -263,45 +118,49 @@ class LimaAdscDetector:
           return
 
         self.imagePath   = os.path.dirname(filename)
-        self.fileName    = os.path.basename(filename)
+        if not self.imagePath.endswith('/'):
+            self.imagePath += '/'
+        self.fileName   = os.path.basename(filename)
         self.imageNumber = frame_number
+
+        logging.info("<PX2 LimaAdscDetector> Setting detector filenames")
+        logging.info("     - frame_number: %s", frame_number)
+        logging.info("     - start: %s", start)
+        logging.info("     - jpeg path: %s", jpeg_full_path)
+        logging.info("     - thumb path: %s", jpeg_thumbnail_full_path)
 
         logging.info('LIMA Detector - set filenames - imagePath is %s / filename is %s' % (self.imagePath, self.fileName))
         logging.info('   - thumbnail full path %s' % jpeg_thumbnail_full_path )
         logging.info('   - snapshot full path %s' % jpeg_full_path )
 
-        if not self.imagePath.endswith('/'):
-            self.imagePath += '/'
-        
         self.wait(self.adscdev)
         self.adscdev.write_attribute('imagePath', self.imagePath)
         self.adscdev.write_attribute('fileName',  os.path.basename(self.fileName))
        
     @task
     def prepare_oscillation(self, start, osc_range, exptime, npass):
-        logging.info("<SOLEIL MultiCollect> prepare_acquisition")
+        logging.info("<PX2 MulitCollect> prepare_oscillation")
         if self.ready:
            head = self.prepareHeader()
            self.adscdev.SetHeaderParameters( head )
-           #self.limaadscdev.exposureTime = (exptime + 0.6) * 1e3
-           #if self.limaadscdev.exposureTime > 2500:
-               #logging.info("<SOLEIL MultiCollect> prepare_acquisition setting timeout to %s " % (self.limaadscdev.exposureTime + 1500))
-               #self.limaadscdev.set_timeout_millis(int(self.limaadscdev.exposureTime + 1500))
            self.wait(self.adscdev)
 
         return (start, start+osc_range)
         
     @task
     def do_oscillation(self, start, end, exptime, npass):
+        self.first_frame = True
+        self.new_acquisition = False
+
         pass
 
     @task
     def start_acquisition(self, exptime, npass, first_frame):
-        logging.info("<SOLEIL MultiCollect> start_acquisition")
-        # Comes from   self.limaadscSnap() in original Martin's thread program
+        logging.info("<PX2 MulitCollect> start_acquisition")
+        # Comes from   self.lenergy_obj.getState() DISABLEimaadscSnap() in original Martin's thread program
         if not self.ready:
             return
-        logging.info("<SOLEIL MultiCollect> start_acquisition limaadscdev timeout %s" % self.limaadscdev.get_timeout_millis())
+        logging.info("<PX2 MulitCollect> start_acquisition limaadscdev timeout %s" % self.limaadscdev.get_timeout_millis())
         self.limaadscdev.Snap()
         time.sleep(0.05)
         #while self.limaadscdev.log[-1].find('yat::DEVICE_SNAP_MSG') == -1:
@@ -310,16 +169,68 @@ class LimaAdscDetector:
         return
       
     @task
-    def write_image(self, last_frame, jpeg_full_path='/tmp/jfp.jpeg', jpeg_thumbnail_full_path='/tmp/jtfp.jpeg'):
+    def write_image(self, last_frame, image_filename, jpeg_full_path, jpeg_thumbnail_full_path):
         start = time.time()
-        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs")
+
+        logging.info("<LimaAdscDetector> write last image, converting jpegs")
         logging.info("jpeg_full_path %s" % jpeg_full_path)
         logging.info("jpeg_thumbnail_full_path %s" % jpeg_thumbnail_full_path)
-        self.lastImage(integer=last_frame, imagePath=self.imagePath, fileName=self.fileName)
-        img_full_path = os.path.join(self.imagePath, self.fileName)
+    
+        self.wait_image_on_disk(image_filename, timeout=15)
+        self.reportLatestImage(integer=last_frame, imagePath=self.imagePath, fileName=image_filename)
+    
+        img_full_path = os.path.join(self.imagePath, image_filename)
+    
+        logging.info("<PX2 MulitCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        logging.info(" allframes %s / first_frame %s / last_frame %s " % (self.jpeg_allframes, self.first_frame, last_frame))
+
+        if (self.jpeg_allframes or self.first_frame or last_frame):
+
+            if os.path.exists( image_filename ):
+                subprocess.Popen([ self.imgtojpeg, image_filename, jpeg_full_path, '0.4' ])
+                subprocess.Popen([ self.imgtojpeg, image_filename, jpeg_thumbnail_full_path, '0.1' ])
+            else:
+                logging.info("Oopps.  Trying to generate thumbs but image %s is not on disk")
+    
+            self.first_frame = False
+            img_full_path = os.path.join(self.imagePath, image_filename)
+            
+            logging.info("<LimaAdscDetector> write last image, converting jpegs, time spent %s " % str(time.time() - start))
+        else:
+            logging.info("<LimaAdscDetector> write last image, skipping %s" % image_filename)
+        logging.info("<LimaAdscDetector> write_image time spent %s " % str(time.time() - start))
         
-        logging.info("<SOLEIL MultiCollect> write last image, converting jpegs, time spent %s " % str(time.time() - start))
-        
+    def reportLatestImage(self, integer=1, imagePath='/927bis/ccd/test/', fileName='test.img'):
+
+        logging.info("<PX2 MulitCollect> reporting latest image, xformstatusfile %s " % self.xformstatusfile)
+        line = str(integer) + ' ' + os.path.join(imagePath, fileName)
+        try:
+            f = open( self.xformstatusfile, 'w')
+            f.write('%s\n' % line)
+            f.close()
+        except IOError:
+            logging.info('Problem writing the last image %s' % (traceback.format_exc()))
+
+        try:
+            f = open(self.goimgfile, 'w')
+            f.write('%s' % os.path.join(imagePath, 'process'))
+            f.close()
+        except IOError:
+            import traceback
+            logging.info('Problem writing goimg.db %s' % (traceback.format_exc()))
+
+    def wait_image_on_disk(self, filename,timeout=10.0):
+        start_wait = time.time()
+        logging.info("Waiting for image %s to appear on disk." % filename)
+        while not os.path.exists(filename):
+            dirname = os.path.dirname(filename)
+            if time.time() - start_wait > timeout:
+                logging.info("Giving up waiting for image. Timeout")
+                break
+            #logging.info("Content of %s directory is: %s" % (dirname, str(os.listdir(dirname))))
+            time.sleep(0.5)
+        logging.info("Waiting for image %s ended in  %3.2f secs" % (filename, time.time()-start_wait))
+
     def analyze_thread(self, filename):
         logging.info.info('Starting Analyze Thread')
         logging.info.info('filename %s ' % filename)
@@ -384,139 +295,8 @@ class LimaAdscDetector:
     def prepareHeader(self):
         '''Should return a nice header. Implemented in PX2MultiCollect.py'''
         return ""
-
-class CcdDetector:
-    @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
-        self.getChannelObject("take_dark").setValue(take_dark)
-        self.execute_command("prepare_acquisition", take_dark, start, osc_range, exptime, npass, comment)
-        #self.getCommandObject("build_collect_seq").executeCommand("write_dp_inputs(COLLECT_SEQ,MXBCM_PARS)", wait=True)
-
-    @task
-    def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
-        self.getCommandObject("prepare_acquisition").executeCommand('setMxCollectPars("current_phi", %f)' % start)
-        self.getCommandObject("prepare_acquisition").executeCommand('setMxCurrentFilename("%s")' % filename)
-        self.getCommandObject("prepare_acquisition").executeCommand("ccdfile(COLLECT_SEQ, %d)" % frame_number, wait=True)
-       
-    @task
-    def prepare_oscillation(self, start, osc_range, exptime, npass):
-        if osc_range < 1E-4:
-            # still image
-            return (start, start+osc_range)
-        else:
-            self.execute_command("prepare_oscillation", start, start+osc_range, exptime, npass)
-            return (start, start+osc_range)
         
-    @task
-    def do_oscillation(self, start, end, exptime, npass):
-        self.execute_command("do_oscillation", start, end, exptime, npass)
-
-    @task
-    def start_acquisition(self, exptime, npass, first_frame):
-        self.execute_command("start_acquisition")  
-      
-    @task
-    def write_image(self, last_frame):
-        if last_frame:
-            self.execute_command("flush_detector")
-        else:
-            self.execute_command("write_image")
-
-    @task
-    def stop_acquisition(self):
-        self.execute_command("detector_readout")
-      
-    @task
-    def reset_detector(self):   
-        self.execute_command("reset_detector")
-
-
-class PixelDetector:
-    def __init__(self):
-        self.shutterless = True
-        self.new_acquisition = True
-        self.oscillation_task = None
-        self.shutterless_exptime = None
-        self.shutterless_range = None
-
-    @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
-        self.new_acquisition = True
-        if  osc_range < 0.0001:
-            self.shutterless = False
-        take_dark = 0
-        if self.shutterless:
-            self.shutterless_range = osc_range*number_of_images
-            self.shutterless_exptime = (exptime + 0.003)*number_of_images
-        self.execute_command("prepare_acquisition", take_dark, start, osc_range, exptime, npass, comment)
         
-    @task
-    def set_detector_filenames(self, frame_number, start, filename, jpeg_full_path, jpeg_thumbnail_full_path):
-      if self.shutterless and not self.new_acquisition:
-          return
-
-      self.getCommandObject("prepare_acquisition").executeCommand('setMxCollectPars("current_phi", %f)' % start)
-      self.getCommandObject("prepare_acquisition").executeCommand('setMxCurrentFilename("%s")' % filename)
-      self.getCommandObject("prepare_acquisition").executeCommand("ccdfile(COLLECT_SEQ, %d)" % frame_number, wait=True)
-
-    @task
-    def prepare_oscillation(self, start, osc_range, exptime, npass):
-        if self.shutterless:
-            if self.new_acquisition:
-                self.execute_command("prepare_oscillation", start, start+self.shutterless_range, self.shutterless_exptime, npass)
-        else:
-            if osc_range < 1E-4:
-                # still image
-                pass
-            else:
-                self.execute_command("prepare_oscillation", start, start+osc_range, exptime, npass)
-        return (start, start+osc_range)
-
-    @task
-    def start_acquisition(self, exptime, npass, first_frame):
-      if not first_frame and self.shutterless:
-        time.sleep(exptime) 
-      else:
-        self.execute_command("start_acquisition")
-
-    @task
-    def do_oscillation(self, start, end, exptime, npass):
-      if self.shutterless:
-          if self.new_acquisition:
-              # only do this once per collect
-              npass = 1
-              exptime = self.shutterless_exptime
-              end = start + self.shutterless_range
-          
-              # make oscillation an asynchronous task => do not wait here
-              self.oscillation_task = self.execute_command("do_oscillation", start, end, exptime, npass, wait=False)
-          else:
-              try:
-                 self.oscillation_task.get(block=False)
-              except gevent.Timeout:
-                 pass #no result yet, it is normal
-              except:
-                 # an exception occured in task! Pilatus server died?
-                 raise
-      else:
-          self.execute_command("do_oscillation", start, end, exptime, npass)
-    
-    @task
-    def write_image(self, last_frame):
-      if last_frame:
-        if self.shutterless:
-            self.oscillation_task.get()
-            self.execute_command("specific_collect_frame_hook")
-
-    def stop_acquisition(self):
-        self.new_acquisition = False
-      
-    @task
-    def reset_detector(self):
-      if self.shutterless:
-          self.oscillation_task.kill()
-      self.execute_command("reset_detector")
-
 SOLEILBeamlineConfig = namedtuple('SOLEILBeamlineConfig', BeamlineConfig._fields+('detector_radius', 'synchrotron_name',))
 
 class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
@@ -595,7 +375,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
                                       #auto_processing_server = self.getProperty("auto_processing_server"),
                                       input_files_server = self.getProperty("input_files_server"))
   
-        self._detector.initDetector( self.adscname, self.limaadscname, self.xformstatusfile )
+        self._detector.initDetector( self.xformstatusfile )
         self._tunable_bl.bl_control = self.bl_control
 
         self.emit("collectConnected", (True,))
@@ -769,7 +549,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         return AbstractMultiCollect.prepare_wedges_to_collect(self, start, nframes, osc_range, reference_interval, inverse_beam, overlap)
 
     @task
-    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment="", lima_overhead=0):
+    def prepare_acquisition(self, take_dark, start, osc_range, exptime, npass, number_of_images, comment=""):
         # Program scan and other values in md2 for all the oscillations
         # TOFILL self.monoOff()
 
@@ -781,7 +561,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         #self.bl_control.diffractometer.goniometerReady( osc_range, npass, exptime)
         self.bl_control.diffractometer.sendGonioToCollect(osc_range, npass, exptime)
         
-        return self._detector.prepare_acquisition(take_dark, start, osc_range, exptime, npass, number_of_images, comment, lima_overhead)
+        return self._detector.prepare_acquisition(start, osc_range, exptime, npass, number_of_images, comment)
 
     def finalize_acquisition(self):
         # TOFILL self.monoOn()
@@ -832,6 +612,7 @@ class SOLEILMultiCollect(AbstractMultiCollect, HardwareObject):
         return self._detector.write_image(last_frame, jpeg_full_path=jpeg_full_path, jpeg_thumbnail_full_path=jpeg_thumbnail_full_path)
 
     def stop_acquisition(self):
+        self.bl_control.diffractometer.stop_acquisition()
         return self._detector.stop_acquisition()
         
     def reset_detector(self):

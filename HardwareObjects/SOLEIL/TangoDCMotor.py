@@ -103,7 +103,6 @@ class TangoDCMotor(Device):
     def motorStateChanged(self, state):
         self.stateValue = str(state)
         self.setIsReady(True)
-        logging.info("motor state changed. it is %s " % self.stateValue)
         self.emit('stateChanged', (TangoDCMotor.stateDict[self.stateValue], ))
         
     def getState(self):
@@ -174,11 +173,23 @@ class TangoDCMotor(Device):
             qApp.processEvents(100)
         
     def convertValue(self, value):
-        logging.info("TangoDCMotor: converting value to %s " % str(self.dataType))
         retvalue = value
         if self.dataType in [ "short", "int", "long"]:
             retvalue = int(value)
         return retvalue
+
+    def get_mystate(self):
+        dev = DeviceProxy(self.tangoname)
+
+        if self.motor_name == "Omega":
+            omega_state=dev.MotorStates[0]
+            if omega_state == "Omega=Ready": 
+                   mystate = "READY"
+            else:
+                   mystate = "MOVING"
+        else:      
+            mystate = str( dev.State() )
+        return mystate     
 
     def syncMoveRelative(self, position):
         old_pos = self.positionValue
@@ -186,17 +197,18 @@ class TangoDCMotor(Device):
         logging.info("TangoDCMotor: syncMoveRelative going to %s " % str( self.convertValue(self.positionValue)))
         self.positionChan.setValue( self.convertValue(self.positionValue) )
 
-        dev = DeviceProxy(self.tangoname)
         time.sleep(0.2) # allow MD2 to change the state
 
-        mystate = str( dev.State() )
+        mystate = self.get_mystate()
         logging.info("TangoDCMotor: %s syncMoveRelative state is %s / %s " % ( self.tangoname, str( self.stateValue ), mystate))
 
         while mystate == "RUNNING" or mystate == "MOVING":
-            logging.info("TangoDCMotor: syncMoveRelative is moving %s" % str( mystate ))
             time.sleep(0.1)
-            mystate = str( dev.State() )
+            mystate = self.get_mystate()
+            logging.info("TangoDCMotor: %s syncMoveRelative state is %s / %s " % ( self.tangoname, str( self.stateValue ), mystate))
             qApp.processEvents(100)
+
+        logging.info("TangoDCMotor: %s syncMoveRelative done. now at position %s" % (self.tangoname, self.positionChan.getValue()))
         
     def getMotorMnemonic(self):
         return self.name()
@@ -211,16 +223,11 @@ class TangoDCMotor(Device):
         absolutePosition = float(absolutePosition)
         if type(absolutePosition) != float and type(absolutePosition) != int:
             logging.getLogger("TangoClient").error("Cannot move %s: position '%s' is not a number. It is a %s", self.tangoname, absolutePosition, type(absolutePosition))
-        logging.info("TangoDCMotor: move. motor will go to %s " % str(absolutePosition))   
-        logging.getLogger("HWR").info("TangoDCMotor.move to absolute position: %.3f" % absolutePosition)
-        logging.getLogger("TangoClient").info("TangoDCMotor move. Trying to go to %s: that is a '%s'", absolutePosition, type(absolutePosition))
+
         if abs(self.getPosition() - absolutePosition) > epsilon:
-            logging.info("TangoDCMotor: difference larger then epsilon (%s), executing the move " % str(epsilon))
             self.positionChan.setValue( self.convertValue(absolutePosition) )
         else:
             logging.info("TangoDCMotor: not moving really as epsilon is large %s " % str(epsilon))
-            logging.info("TangoDCMotor: self.getPosition() %s " % str(self.getPosition()))
-            logging.info("TangoDCMotor: absolutePosition %s " % str(absolutePosition))
             
     def stop(self):
         logging.getLogger("HWR").info("TangoDCMotor.stop")

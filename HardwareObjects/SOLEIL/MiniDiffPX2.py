@@ -33,6 +33,7 @@ class myimage:
         self.imgcopy = f.read()
         f.close()
         os.unlink(name)
+
     def __str__(self):
         return self.imgcopy
 
@@ -242,7 +243,7 @@ class MiniDiffPX2(Equipment):
 
 
     def apertureChanged(self, *args):
-        # will trigger minidiffReady signal for update of beam size in video
+        # will trigger minidiffReadyling accept because centring is moving signal for update of beam size in video
         self.equipmentReady()
          
 
@@ -334,7 +335,6 @@ class MiniDiffPX2(Equipment):
            logging.info("sampleYMotorMoved time.time() - self.centredTime %s", str(time.time() - self.centredTime) )
            self.invalidateCentring()
 
-
     def sampleChangerSampleIsLoaded(self, state):
         if time.time() - self.centredTime > 2.0:
            self.invalidateCentring()
@@ -394,6 +394,9 @@ class MiniDiffPX2(Equipment):
             else:
                 self.md2.backlightison=False
               
+    def stop_acquistion(self):
+        return self.md2.abort()
+
     def verifyGonioInCollect(self):
         while self.md2.currentphase != self.collect_phaseposition:
             time.sleep(0.1)
@@ -505,7 +508,9 @@ class MiniDiffPX2(Equipment):
 
 
     def startCentringMethod(self,method,sample_info=None):
-        logging.getLogger("HWR").exception("MiniDiffPX2: starting the centring method")
+        logging.getLogger("HWR").info(">>>>>>>>>>>>>>>>>>>>>>> MiniDiffPX2: starting the centring method")
+        logging.getLogger("HWR").info(">>>>>>>>>>>>>>>>>>>>>> methode %s" % method)
+        logging.getLogger("HWR").info(">>>>>>>>>>>>>>>>>>>>>> sample_info %s" % sample_info)
         if self.currentCentringMethod is not None:
             logging.getLogger("HWR").error("MiniDiff: already in centring method %s" % self.currentCentringMethod)
             return
@@ -557,7 +562,7 @@ class MiniDiffPX2(Equipment):
 
 
     def start3ClickCentring(self, sample_info=None):
-        logging.getLogger("HWR").exception("MiniDiffPX2: starting the 3 click centring")
+        logging.getLogger("HWR").info("#################### start3clickCentring #########################   MiniDiffPX2: starting the 3 click centring")
         self.currentCentringProcedure = sample_centring.start({"phi":self.centringPhi,
                                                                "phiy":self.centringPhiy,
                                                                "sampx": self.centringSamplex,
@@ -570,6 +575,8 @@ class MiniDiffPX2(Equipment):
 
   
     def motor_positions_to_screen(self, centred_positions_dict):
+        logging.getLogger("HWR").info("####################  motor postion to screem #######   %s " % self.sampleXMotor.getPosition())
+
         self.pixelsPerMmY, self.pixelsPerMmZ = self.get_pixels_per_mm() #getCalibrationData(self.zoomMotor.getPosition())
         phi_angle = math.radians(self.centringPhi.direction*self.phiMotor.getPosition()) 
         sampx = self.centringSamplex.direction * (centred_positions_dict["sampx"]-self.sampleXMotor.getPosition())
@@ -589,14 +596,19 @@ class MiniDiffPX2(Equipment):
         return x, y
  
     def manualCentringDone(self, manual_centring_procedure):
+        logging.getLogger("HWR").info("################ manualCentringDone  #############################   MiniDiffPX2: starting the 3 click centring finished")
+
         try:
           motor_pos = manual_centring_procedure.get()
+          logging.getLogger("HWR").info("################ motor_pos %s" % motor_pos)
           if isinstance(motor_pos, gevent.GreenletExit):
+            logging.getLogger("HWR").info("################ raise motor_pos %s")
             raise motor_pos
         except:
           logging.exception("Could not complete manual centring")
           self.emitCentringFailed()
         else:
+          logging.getLogger("HWR").info("################ manualCentringDone  #############################   emit CentringMoving signal")
           self.emitProgressMessage("Moving sample to centred position...")
           self.emitCentringMoving()
           try:
@@ -638,6 +650,8 @@ class MiniDiffPX2(Equipment):
             self.acceptCentring()
               
     def startAutoCentring(self, sample_info=None, loop_only=False):
+         
+        logging.info("Automatic centring selected")
         self.currentCentringProcedure = sample_centring.start_auto(self.camera, 
                                                                    {"phi":self.centringPhi,
                                                                     "phiy":self.centringPhiy,
@@ -650,8 +664,7 @@ class MiniDiffPX2(Equipment):
                                                                    new_point_cb=lambda point: self.emit("newAutomaticCentringPoint", point))
        
         self.currentCentringProcedure.link(self.autoCentringDone)
-
-	self.emitProgressMessage("Starting automatic centring procedure...")
+        logging.info("Automatic centring working...")
        
     @task 
     def moveToCentredPosition(self, centred_position):
@@ -683,6 +696,7 @@ class MiniDiffPX2(Equipment):
         self.emit('centringAccepted', (False,self.getCentringStatus()))
 
     def emitCentringMoving(self):
+        logging.info("MiniDiffPX2: emitting centring ...................................")
         self.emit('centringMoving', ())
 
     def emitCentringFailed(self):
@@ -694,6 +708,8 @@ class MiniDiffPX2(Equipment):
         self.emit('centringFailed', (method,self.getCentringStatus()))
 
     def emitCentringSuccessful(self):
+        logging.getLogger("HWR").debug("MiniDiffPX2: emitCentringSuccessful")
+        
         if self.currentCentringProcedure is not None:
             curr_time=time.strftime("%Y-%m-%d %H:%M:%S")
             self.centringStatus["endTime"]=curr_time
