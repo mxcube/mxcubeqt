@@ -1,6 +1,5 @@
-###########################################
-How to install and run Qt version of MXCuBE
-###########################################
+How to install and run Qt version
+#################################
 
 MXCuBE is organized as a subset of several git submodules that are necessary to run MXCuBE. 
 In this page a sequence how to get software code, install dependencies and execute software is described.

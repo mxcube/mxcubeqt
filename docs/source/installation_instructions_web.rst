@@ -1,6 +1,5 @@
-############################################
-How to install and run web version of MXCuBE
-############################################
+How to install and run web version
+##################################
 
 This page will describe the steps required to successfully install and launch the web version of MXCuBE, aka MXCuBE3.
 Before installing packages it might be useful to have a look at configuring 

@@ -63,7 +63,6 @@ class Qt4_TreeBrick(BlissWidget):
         #self.current_cpos = None
         self.__collection_stopped = False 
         self.current_view = None
-        self.item_iterator = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("holderLengthMotor", "string", "")
@@ -149,8 +148,8 @@ class Qt4_TreeBrick(BlissWidget):
         main_layout.setContentsMargins(0, 0, 0, 0) 
 
         # SizePolicies --------------------------------------------------------
-        self.sample_changer_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                                 QtGui.QSizePolicy.Fixed)
+        self.sample_changer_widget.setSizePolicy(\
+             QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.sample_changer_widget.details_button.clicked.connect(\
@@ -389,6 +388,7 @@ class Qt4_TreeBrick(BlissWidget):
             lims_client = self.lims_hwobj
             samples = lims_client.get_samples(self.session_hwobj.proposal_id,
                                               self.session_hwobj.session_id)
+            basket_list = []
             sample_list = []
           
             if samples:
@@ -828,27 +828,40 @@ class Qt4_TreeBrick(BlissWidget):
            11: Advanced
 
         """
-        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
-             self.dc_tree_widget.sample_tree_widget) 
         self.sample_changer_widget.filter_ledit.setEnabled(\
              filter_index in (1, 2, 3))
+        self.clear_filter()
         if filter_index == 0:
             self.clear_filter() 
-        elif filter_index == 4:
-            pass
-        elif filter_index == 5:
-            pass
-        elif filter_index == 6:
-            pass
-        elif filter_index == 7:
-            pass
-        elif filter_index == 8:
-            pass
+        else:
+            item_iterator = QtGui.QTreeWidgetItemIterator(\
+                  self.dc_tree_widget.sample_tree_widget)
+            item = item_iterator.value()
+            while item:
+                  hide = False
+                  item_model = item.get_model() 
+                  if filter_index == 4:
+                      hide = not item_model.is_executed()
+                  elif filter_index == 5:
+                      hide = item_model.is_executed()
+                  elif filter_index == 6:
+                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                          hide = item_model.is_helical()
+                  elif filter_index == 7:
+                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                          hide = not item_model.is_helical()
+                  elif filter_index == 8:
+                      hide = not isinstance(item, Qt4_queue_item.CharacterisationQueueItem)
+                  item.set_hidden(hide)
+                  item_iterator += 1
+                  item = item_iterator.value()
+
+        self.hide_empty_baskets()     
 
     def filter_text_changed(self, new_text):
-        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
              self.dc_tree_widget.sample_tree_widget) 
-        item = self.item_iterator.value()
+        item = item_iterator.value()
         while item:
               hide = False
               new_text = str(new_text)
@@ -858,35 +871,36 @@ class Qt4_TreeBrick(BlissWidget):
               elif self.sample_changer_widget.filter_combo.currentIndex() == 2:
                   if isinstance(item, Qt4_queue_item.SampleQueueItem):
                       hide = not new_text in item.get_model().crystals[0].protein_acronym
-              
-            
               item.set_hidden(hide) 
-              self.item_iterator += 1
-              item = self.item_iterator.value()
+              item_iterator += 1
+              item = item_iterator.value()
 
         self.hide_empty_baskets()
         
     def clear_filter(self):
-        item = self.item_iterator.value()
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+             self.dc_tree_widget.sample_tree_widget)
+        item = item_iterator.value()
         while item:
               item.setHidden(False)
-              self.item_iterator += 1
-              item = self.item_iterator.value() 
+              item_iterator += 1
+              item = item_iterator.value() 
 
     def hide_empty_baskets(self):
-        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
              self.dc_tree_widget.sample_tree_widget) 
-        item = self.item_iterator.value()
+        item = item_iterator.value()
         while item:
               hide = True
               
-              if isinstance(item, Qt4_queue_item.BasketQueueItem): 
+              if type(item) in(Qt4_queue_item.BasketQueueItem,
+                               Qt4_queue_item.DataCollectionGroupQueueItem): 
                   for index in range(item.childCount()):
                       if not item.child(index).isHidden():
                           hide = False
                           break
                   item.setHidden(hide) 
                  
-              self.item_iterator += 1
-              item = self.item_iterator.value()
+              item_iterator += 1
+              item = item_iterator.value()
  

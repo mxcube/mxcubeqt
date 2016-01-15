@@ -14,7 +14,7 @@ partners:
 * [ALBA] (https://www.cells.es/en)
 * [DESY] (https://www.desy.de)
 
-Actual information about the MXCuBE project can be found in the
+Latest information about the MXCuBE project can be found in the
 [project webpage] (http://mxcube.github.io/mxcube/).
 
 ## Information for developers
@@ -23,8 +23,10 @@ Actual information about the MXCuBE project can be found in the
 * [How to install and run Web version] (https://github.com/mxcube/mxcube/blob/master/docs/source/installation_instructions_web.rst)
 
 More detailed information is available in the [docs directory] 
-(https://github.com/mxcube/mxcube/tree/master/docs).
+(https://github.com/mxcube/mxcube/tree/master/docs). Use [sphinx] (http://sphinx-doc.org/) to build the documentation.
 
-## User manual
+## Information for users
 
-Actual user manual can be found [here] (https://github.com/mxcube/mxcube/blob/master/docs/manual/MXCuBE2_1_manual_march2015-v2.pdf).
+* [User manual] (https://github.com/mxcube/mxcube/blob/master/docs/manual/MXCuBE2_1_manual_march2015-v2.pdf).
+* [Example screenshots] (https://github.com/mxcube/mxcube/blob/master/docs/source/screen_examples.rst)
+* [Feature overview] (https://github.com/mxcube/mxcube/blob/master/docs/source/feature_overview.rst)

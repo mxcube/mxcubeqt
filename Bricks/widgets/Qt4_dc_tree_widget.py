@@ -99,19 +99,19 @@ class DataCollectTree(QtGui.QWidget):
         
         self.button_widget = QtGui.QWidget(self)                
         self.up_button = QtGui.QPushButton(self.button_widget)
-        self.up_button.setIcon(QtGui.QIcon().fromTheme("go-up"))
+        self.up_button.setIcon(Qt4_Icons.load_icon("Up2.png"))
         self.up_button.setFixedHeight(25)
         self.down_button = QtGui.QPushButton(self.button_widget)
-        self.down_button.setIcon(QtGui.QIcon().fromTheme("go-down"))
+        self.down_button.setIcon(Qt4_Icons.load_icon("Down2.png"))
         self.down_button.setFixedHeight(25)
 
         self.copy_button = QtGui.QPushButton(self.button_widget)
-        self.copy_button.setIcon(QtGui.QIcon().fromTheme("edit-copy"))
+        self.copy_button.setIcon(Qt4_Icons.load_icon("copy.png"))
         self.copy_button.setDisabled(True)
         self.copy_button.setToolTip("Copy highlighted queue entries")
 
         self.delete_button = QtGui.QPushButton(self.button_widget)
-        self.delete_button.setIcon(QtGui.QIcon().fromTheme("edit-clear"))
+        self.delete_button.setIcon(Qt4_Icons.load_icon("bin_small.png"))
         self.delete_button.setDisabled(True)
         self.delete_button.setToolTip("Delete highlighted queue entries")
 

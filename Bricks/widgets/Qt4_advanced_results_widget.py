@@ -77,7 +77,7 @@ class AdvancedResultsWidget(QtGui.QWidget):
         advanced = item.get_model()
         data_collection = advanced.reference_image_collection
 
-        executed = data_collection.is_executed()
+        executed = advanced.is_executed()
         associated_grid = advanced.get_associated_grid()
 
         self.heat_map_widget.clean_result()

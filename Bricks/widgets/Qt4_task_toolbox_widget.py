@@ -244,7 +244,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
                         task_model = self.create_task_group(task_model)
-                        if len(shapes):
+                        if self.tool_box.currentWidget() in (self.discrete_page, 
+                           self.char_page, self.energy_scan_page, 
+                           self.xrf_spectrum_page) and len(shapes):
+                            #This could be done in more nicer way...
                             for shape in shapes:
                                 self.create_task(task_model, shape)
                         else:
@@ -252,13 +255,17 @@ class TaskToolBoxWidget(QtGui.QWidget):
                     elif isinstance(task_model, queue_model_objects.Basket):
                         for sample_node in task_model.get_sample_list():
                             child_task_model = self.create_task_group(sample_node)
-                            if len(shapes):
+                            if self.tool_box.currentWidget() in (self.discrete_page,
+                               self.char_page, self.energy_scan_page, 
+                               self.xrf_spectrum_page) and len(shapes):
                                 for shape in shapes:
                                     self.create_task(child_task_model, shape)
                             else:
                                 self.create_task(child_task_model)
                     else:
-                        if len(shapes):
+                        if self.tool_box.currentWidget() in (self.discrete_page,
+                           self.char_page, self.energy_scan_page, 
+                           self.xrf_spectrum_page) and len(shapes):
                             for shape in shapes:
                                 self.create_task(task_model, shape)
                         else:
