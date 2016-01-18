@@ -28,7 +28,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_Motor'
+__category__ = 'Motor'
 
 
 class Qt4_MotorSpinBoxBrick(BlissWidget):
@@ -113,7 +113,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.stop_button.setToolTip("Stops the motor")
         self.stop_button.setFixedWidth(25)
         self.step_button = QtGui.QPushButton(self.extra_button_box)
-        self.step_button_icon = Qt4_Icons.load_icon('steps_small')
+        self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
         self.step_cbox = QtGui.QComboBox(self.extra_button_box)
@@ -307,7 +307,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.demand_move = 1
+        #self.demand_move = 1
         self.update_gui()
         state = self.motor_hwobj.getState()
         if state == self.motor_hwobj.READY:
@@ -322,7 +322,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.demand_move = -1
+        #self.demand_move = -1
         self.update_gui()
         state = self.motor_hwobj.getState()
         if state == self.motor_hwobj.READY:
@@ -344,6 +344,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 s = self.motor_hwobj.GUIstep
             except:
                 s = 1.0
+
+        print s
         if self.motor_hwobj is not None:
             if self.motor_hwobj.isReady():
                 self.motor_hwobj.moveRelative(s)
@@ -445,7 +447,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 self.step_editor = StepEditorDialog(self)
                 icons_list = self['icons'].split()
                 try:
-                    self.step_editor.setQt4_Icons(icons_list[4], icons_list[5])
+                    self.step_editor.setIcon(Qt4_icons.load_icon(icons_list[4]))
                 except IndexError:
                     pass
 
@@ -782,11 +784,6 @@ class StepEditorDialog(QtGui. QDialog):
         self.setWindowTitle("Motor step editor")
 
     def set_motor(self, motor, brick, name, default_step):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         self.motor_hwobj = motor
         self.brick = brick
 
