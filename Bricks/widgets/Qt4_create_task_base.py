@@ -388,6 +388,19 @@ class CreateTaskBase(QtGui.QWidget):
                     self._path_template.process_directory = proc_directory
                     self._path_template.base_prefix = self.get_default_prefix()
 
+            #If no information from lims then add basket/sample info
+            """
+            # This works if each sample is clicked, but do not work
+            # when a task is assigned to the whole puck.
+            # Then all samples get the same dir
+            
+            if sample_data_model.lims_id == -1 and \
+               not None in (sample_data_model.location):
+                (data_directory, proc_directory) = self.get_default_directory(tree_item)
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
+            """
+              
             # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
@@ -409,9 +422,14 @@ class CreateTaskBase(QtGui.QWidget):
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+
+            #Update energy transmission and resolution
+            if self._acq_widget:
+                self._update_etr()
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                   self._path_template)
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
-                self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
             self.setDisabled(False)          
 
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):

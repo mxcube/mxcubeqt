@@ -31,7 +31,7 @@ __category__ = 'General'
 class Qt4_DetectorStatusBrick(BlissWidget):
  
     STATES = {'unknown': Qt4_widget_colors.LIGHT_GRAY,
-              'OK': Qt4_widget_colors.SKY_BLUE,
+              'OK': Qt4_widget_colors.LIGHT_BLUE,
               'BAD': Qt4_widget_colors.LIGHT_RED}
     DETECTOR_STATES = {'busy': Qt4_widget_colors.LIGHT_GREEN,
                        'error': Qt4_widget_colors.LIGHT_RED,
@@ -39,7 +39,7 @@ class Qt4_DetectorStatusBrick(BlissWidget):
                        'calibrating': Qt4_widget_colors.LIGHT_YELLOW,
                        'slave': Qt4_widget_colors.LIGHT_RED,
                        'exposing': Qt4_widget_colors.LIGHT_GREEN,
-                       'ready': Qt4_widget_colors.SKY_BLUE,
+                       'ready': Qt4_widget_colors.LIGHT_BLUE,
                        'uninitialized': Qt4_widget_colors.LIGHT_GRAY} 
  
     def __init__(self, *args):

@@ -78,7 +78,7 @@ class CreateCharWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._vertical_dimension_widget)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.addStretch(0)
+        _main_vlayout.addStretch(10)
 
         # SizePolicies --------------------------------------------------------
 

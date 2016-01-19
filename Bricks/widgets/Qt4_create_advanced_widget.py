@@ -229,13 +229,14 @@ class CreateAdvancedWidget(CreateTaskBase):
         for shape in selected_grids:
             shape.set_snapshot(self._graphics_manager_hwobj.\
                   get_snapshot(shape))
+
             grid_properties = shape.get_properties()
 
             acq = self._create_acq(sample)
             acq.acquisition_parameters.centred_position = \
                 shape.get_centred_position()
             acq.acquisition_parameters.mesh_range = \
-                (grid_properties["dx_mm"], grid_properties["dy_mm"])
+                [grid_properties["dx_mm"], grid_properties["dy_mm"]]
             acq.acquisition_parameters.num_lines = \
                 grid_properties["num_lines"]
             acq.acquisition_parameters.num_images = \

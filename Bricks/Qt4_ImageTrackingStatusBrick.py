@@ -78,7 +78,7 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
              self.image_tracking_cbox_changed)
 
         # Other ---------------------------------------------------------------
-        self.state_label.setAlignment(QtGui.QLabel.AlignCenter)
+        self.state_label.setAlignment(QtCore.Qt.AlignCenter)
         self.state_changed("unknown")
         
     def propertyChanged(self, property, oldValue, newValue):

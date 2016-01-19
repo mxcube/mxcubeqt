@@ -116,6 +116,8 @@ class ConfirmDialog(QtGui.QDialog):
 
         self.conf_dialog_layout.summary_treewidget.clear()
         self.conf_dialog_layout.file_treewidget.clear()
+        self.conf_dialog_layout.interleave_cbx.setChecked(False)
+        self.conf_dialog_layout.interleave_images_num_ledit.setText("")
 
         for item in checked_items:
             item_type_name = ""
@@ -130,7 +132,7 @@ class ConfirmDialog(QtGui.QDialog):
                 if item.mounted_style:
                     info_str_list.append("Already mounted")
                 else:
-                    info_str_list.append("Will mount") 
+                    info_str_list.append("Sample mounting") 
                 sample_treewidget_item = QtGui.QTreeWidgetItem(\
                    self.conf_dialog_layout.summary_treewidget,
                    info_str_list)

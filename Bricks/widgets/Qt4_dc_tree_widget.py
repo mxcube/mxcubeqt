@@ -331,6 +331,7 @@ class DataCollectTree(QtGui.QWidget):
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
+                    print "mounttt 1"
                     if self.sample_mount_method == 1:
                         queue_entry.mount_sample(
                             self.beamline_setup_hwobj.sample_changer_one_hwobj, 
@@ -343,6 +344,7 @@ class DataCollectTree(QtGui.QWidget):
                             self.beamline_setup_hwobj,
                             items[0], items[0].get_model(), self.centring_done,
                             self.sample_centring_result)
+                    print "mounttt 2"
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
@@ -369,6 +371,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
+        self.enable_collect(False)
         gevent.spawn(self.unmount_sample_task)
 
     def unmount_sample_task(self):
@@ -385,6 +388,7 @@ class DataCollectTree(QtGui.QWidget):
 
             location = items[0].get_model().location
 
+            print "unmount 1"
             sample_changer = None
             if self.sample_mount_method == 1:
                 sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
@@ -392,13 +396,15 @@ class DataCollectTree(QtGui.QWidget):
                 sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwobj
             if sample_changer:
                 if hasattr(sample_changer, '__TYPE__')\
-                   and (sample_changer.__TYPE__ == 'CATS'):
+                   and sample_changer.__TYPE__ in ('CATS', 'Marvin'):
                     sample_changer.unload(wait=True)
                 else:
                     sample_changer.unload(22, sample_location = location, wait = False)
 
+            print "unmount 2"
             items[0].setOn(False)
             items[0].set_mounted_style(False)
+        self.enable_collect(True)
 
     def sample_tree_widget_selection(self):
         """
@@ -545,7 +551,6 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
-        self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER_ONE:
             self.sample_tree_widget.clear()
             self.queue_model_hwobj.select_model('sc_one')
@@ -557,16 +562,18 @@ class DataCollectTree(QtGui.QWidget):
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
             try:
-                sample_changer = None
-                if self.sample_mount_method == 1:
-                    sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
-                elif self.sample_mount_method == 2:
-                    sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwob 
-                if sample_changer:                
-                    loaded_sample = sample_changer.getLoadedSample()
+                loaded_sample = self.beamline_setup_hwobj.\
+                    sample_changer_one_hwobj.getLoadedSample()
+                loaded_sample_loc = loaded_sample.getCoords() 
+            except:
+                pass
+
+            try:
+                loaded_sample = self.beamline_setup_hwobj.\
+                    sample_changer_two_hwobj.getLoadedSample()
                 loaded_sample_loc = loaded_sample.getCoords()
             except:
-                loaded_sample_loc = None
+                pass
 
             it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()

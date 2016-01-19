@@ -553,20 +553,20 @@ class StatusView(QtGui.QWidget):
         _box1_hlayout = QtGui.QHBoxLayout(self.box1)
         _box1_hlayout.addWidget(self.status_label)
         _box1_hlayout.addWidget(self.reset_button)
-        _box1_hlayout.setSpacing(0)
-        _box1_hlayout.setContentsMargins(0,0,0,0)
+        _box1_hlayout.setSpacing(2)
+        _box1_hlayout.setContentsMargins(2, 2, 2, 2)
 
         _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
         _contents_widget_vlayout.addWidget(self.box1)
         _contents_widget_vlayout.addWidget(self.sc_can_load_radiobutton)
         _contents_widget_vlayout.addWidget(self.minidiff_can_move_radiobutton)
-        _contents_widget_vlayout.setSpacing(0)
-        _contents_widget_vlayout.setContentsMargins(0,0,0,0) 
+        _contents_widget_vlayout.setSpacing(2)
+        _contents_widget_vlayout.setContentsMargins(2, 2, 2, 2) 
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.contents_widget)
-        _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
 
