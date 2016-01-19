@@ -407,11 +407,20 @@ class CameraControlDialog(QtGui.QDialog):
 
     def set_camera_hwobj(self, camera_hwobj):
         self.camera_hwobj = camera_hwobj
-        contrast_value = self.camera_hwobj.get_contrast()
-        brightness_value = self.camera_hwobj.get_brightness()
-        gain_value = self.camera_hwobj.get_gain()
-        gamma_value = self.camera_hwobj.get_gamma()
-        exposure_time_value = self.camera_hwobj.get_exposure_time()
+        contrast_value = None
+        brightness_value = None
+        gain_value = None
+        gamma_value = None
+        exposure_time_value = None
+
+        try:
+           contrast_value = self.camera_hwobj.get_contrast()
+           brightness_value = self.camera_hwobj.get_brightness()
+           gain_value = self.camera_hwobj.get_gain()
+           gamma_value = self.camera_hwobj.get_gamma()
+           exposure_time_value = self.camera_hwobj.get_exposure_time()
+        except AttributeError:
+           pass
 
         self.contrast_slider.setDisabled(contrast_value is None)
         self.contrast_doublespinbox.setDisabled(contrast_value is None)
