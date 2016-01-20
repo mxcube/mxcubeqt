@@ -220,8 +220,8 @@ class HeatMapWidget(QtGui.QWidget):
             self._heat_map_plot.setFixedHeight(height)
 
             #axis_range = self.__associated_grid.get_col_row_num()
-            #self._heat_map_plot.set_x_axis_limits((- 0.5, axis_range[0] - 0.5))
-            #self._heat_map_plot.set_y_axis_limits((- 0.5, axis_range[1] - 0.5))
+            self._heat_map_plot.set_x_axis_limits((0, axis_range[0] - 1))
+            self._heat_map_plot.set_y_axis_limits((0, axis_range[1] - 1))
 
     def main_gbox_toggled(self, toggle):
         self._heat_map_plot.setHidden(not toggle)

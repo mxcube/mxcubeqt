@@ -331,7 +331,6 @@ class DataCollectTree(QtGui.QWidget):
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
-                    print "mounttt 1"
                     if self.sample_mount_method == 1:
                         queue_entry.mount_sample(
                             self.beamline_setup_hwobj.sample_changer_one_hwobj, 
@@ -344,7 +343,6 @@ class DataCollectTree(QtGui.QWidget):
                             self.beamline_setup_hwobj,
                             items[0], items[0].get_model(), self.centring_done,
                             self.sample_centring_result)
-                    print "mounttt 2"
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
@@ -388,7 +386,6 @@ class DataCollectTree(QtGui.QWidget):
 
             location = items[0].get_model().location
 
-            print "unmount 1"
             sample_changer = None
             if self.sample_mount_method == 1:
                 sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
@@ -401,7 +398,6 @@ class DataCollectTree(QtGui.QWidget):
                 else:
                     sample_changer.unload(22, sample_location = location, wait = False)
 
-            print "unmount 2"
             items[0].setOn(False)
             items[0].set_mounted_style(False)
         self.enable_collect(True)
