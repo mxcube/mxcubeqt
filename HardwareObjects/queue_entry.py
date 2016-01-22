@@ -1187,46 +1187,57 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
     loc = data_model.location
     holder_length = data_model.holder_length
 
-    log.info("Mounting sample %s" % str(loc))
+    logging.info(">>>>>>>>>>>>  .>>>>>>>>>> Mounting sample %s" % str(loc))
 
-    if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
-       and (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
-        element = '%d:%02d' % loc
+    if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__'):
+        if  (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
+            element = '%d:%02d' % loc
+            logging.info("??????????    ??????? ELEMENT IN CATS IS %s" % element)
         beamline_setup_hwobj.sample_changer_hwobj.load(sample=element, wait=True)
     else:
         beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
                                                               sample_location=loc,
                                                               wait=True)
-    dm = beamline_setup_hwobj.diffractometer_hwobj
+    
+    if  not beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
+        view.setOn(False)
+        view.setText(1, "Sample not loaded")
+    else:
+        view.setText(1, "Sample loaded")
+        logging.info(">>>>>>>>>>>>  .>>>>>>>>>> loading is OK @@@@@@@@@@@@@@@@@@@@@@2   ")
+        dm = beamline_setup_hwobj.diffractometer_hwobj
 
-    if dm is not None:
-        try:
-            dm.connect("centringAccepted", centring_done_cb)
-            dm.connect("centringFailed", centring_done_cb)
-            centring_method = view.listView().parent().\
+        if dm is not None:
+            try:
+                dm.connect("centringAccepted", centring_done_cb)
+                #dm.connect("centringFailed", centring_done_cb)
+                centring_method = view.listView().parent().\
                               centring_method
                   
-            if centring_method == CENTRING_METHOD.MANUAL:
-                log.info("starting manual centring")
-                log.warning("Manual centring used, waiting for" +\
+                if centring_method == CENTRING_METHOD.MANUAL:
+                    log.info("starting manual centring")
+                    log.warning("Manual centring used, waiting for" +\
                             " user to center sample")
-                dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
-            elif centring_method == CENTRING_METHOD.LOOP:
-                log.info("starting semi-auto centring")
-                dm.startCentringMethod(dm.C3D_MODE)
-                log.warning("Centring in progress. Please save" +\
+                    dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
+                elif centring_method == CENTRING_METHOD.LOOP:
+                    log.info("starting semi-auto centring")
+                    dm.startCentringMethod(dm.C3D_MODE)
+                    log.warning("Centring in progress. Please save" +\
                             " the suggested centring or re-center")
-            elif centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
-                log.info("starting full-auto centring")
-                log.info("Centring sample, please wait.")
-                dm.startCentringMethod(dm.C3D_MODE)
+                elif centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
+                    log.info("starting full-auto centring")
+                    log.info("Centring sample, please wait.")
+                    dm.startCentringMethod(dm.C3D_MODE)
 
-            view.setText(1, "Centring !")
-            async_result.get()
-            view.setText(1, "Centring done !")
-            log.info("Centring saved")
-        finally:
-            dm.disconnect("centringAccepted", centring_done_cb)
+                view.setText(1, "Centring !")
+                centring_result = async_result.get()
+                if centring_result ['valid']:
+                    view.setText(1, "Centring done !")
+                    log.info("Centring saved")
+            except:
+                pass
+            finally:
+                dm.disconnect("centringAccepted", centring_done_cb)
 
 
 MODEL_QUEUE_ENTRY_MAPPINGS = \
