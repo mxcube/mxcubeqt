@@ -485,7 +485,7 @@ class SoleilLoginBrick(BlissWidget):
             except AttributeError:
                 locallogin_person="local user"
             pers_dict={'familyName':locallogin_person}
-            lab_dict={'name':'ESRF'}
+            lab_dict={'name':'SOLEIL'}
             cont_dict={'familyName':'local contact'}
 
             logging.getLogger().debug("ProposalBrick: local login password validated")
