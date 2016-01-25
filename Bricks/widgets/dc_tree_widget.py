@@ -169,7 +169,7 @@ class DataCollectTree(qt.QWidget):
 
     def show_context_menu(self, item, point, col):
         menu = qt.QPopupMenu(self.sample_list_view, "popup_menu")
-
+        
         if item:
             if isinstance(item, queue_item.DataCollectionGroupQueueItem):
                 menu.insertItem(qt.QString("Rename"), self.rename_list_view_item)
@@ -178,11 +178,16 @@ class DataCollectTree(qt.QWidget):
                 menu.popup(point);
             elif isinstance(item, queue_item.SampleQueueItem):
                 if not item.get_model().free_pin_mode:
+                    itemMounted = None
                     if self.is_mounted_sample_item(item): 
-                        menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
+                        itemMounted = menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
                     else:
-                        menu.insertItem(qt.QString("Mount"), self.mount_sample)
-                       
+                        itemMounted = menu.insertItem(qt.QString("Mount"), self.mount_sample)
+                if self.sample_changer_hwobj is not None:
+                    if self.sample_changer_hwobj.getChannelObject("_chnPowered").getValue():
+                        menu.setItemEnabled(itemMounted, True)
+                    else :
+                        menu.setItemEnabled(itemMounted, False)
                 menu.insertSeparator(3)
                 menu.insertItem(qt.QString("Details"), self.show_details) 
                 menu.popup(point);
