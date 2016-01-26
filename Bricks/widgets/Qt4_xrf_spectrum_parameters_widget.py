@@ -87,6 +87,7 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         _top_widget_layout.addWidget(_parameters_widget)
         _top_widget_layout.addWidget(_snapshot_widget)
         _top_widget_layout.setSpacing(2)
+        _top_widget_layout.addStretch(0)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
         
         _main_vlayout = QtGui.QVBoxLayout(self)

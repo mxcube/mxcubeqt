@@ -388,7 +388,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def overlay_cbox_toggled(self, state):
         for grid_object, treewidget_item in self._grid_map.iteritems():
             if treewidget_item.isSelected():
-                grid_object.set_display_score(state)
+                grid_object.set_display_overlay(state)
            
     def overlay_alpha_changed(self, alpha_value):
         for grid_object, treewidget_item in self._grid_map.iteritems():

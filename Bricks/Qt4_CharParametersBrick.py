@@ -67,7 +67,7 @@ class Qt4_CharParametersBrick(BlissWidget):
         # Layout --------------------------------------------------------------
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.stacked_widget)
-        _main_vlayout.addStretch(0)
+        #_main_vlayout.addStretch(0)
         _main_vlayout.addWidget(self.toggle_page_button)
 
         # SizePolicies -------------------------------------------------------

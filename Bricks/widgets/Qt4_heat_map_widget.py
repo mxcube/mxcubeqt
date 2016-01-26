@@ -122,6 +122,7 @@ class HeatMapWidget(QtGui.QWidget):
         self._create_points_button.clicked.connect(\
              self.create_points_clicked)
         self._heat_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
+        self._heat_map_plot.mouseDoubleClickedSignal.connect(self.move_to_position_clicked)
 
         # Other ---------------------------------------------------------------
         #self._heat_map_plot.canvas().setMouseTracking(False)
@@ -220,8 +221,8 @@ class HeatMapWidget(QtGui.QWidget):
             self._heat_map_plot.setFixedHeight(height)
 
             #axis_range = self.__associated_grid.get_col_row_num()
-            self._heat_map_plot.set_x_axis_limits((0, axis_range[0] - 1))
-            self._heat_map_plot.set_y_axis_limits((0, axis_range[1] - 1))
+            self._heat_map_plot.set_x_axis_limits((0, axis_range[0]))
+            self._heat_map_plot.set_y_axis_limits((0, axis_range[1]))
 
     def main_gbox_toggled(self, toggle):
         self._heat_map_plot.setHidden(not toggle)
@@ -258,30 +259,15 @@ class HeatMapWidget(QtGui.QWidget):
         elif self.__score_type_index == 4:
             self.__result_display = copy(self.__results["image_num"])
 
-        #self.__max_value = self.__result_display.max()
         self.__filter_min_value = self.__result_display.max() * \
              self._threshold_slider.value() / 100.0
         self.__result_display[self.__result_display < self.__filter_min_value] = 0
       
         if len(self.__result_display.shape) == 1:
-            #Displaying results as a line
             x_data = numpy.arange(self.__result_display.shape[0])
-            #self.__axis_x_range = [0, self.__result_display.shape[0] - 1]
-            #self.__axis_y_range = [self.__result_display.min(), 
-            #                       self.__result_display.max()]
-            #self._heat_map_plot.clearcurves()
-            #self._heat_map_plot.setx1timescale(False)
-            #self._heat_map_plot.setY1AxisLimits(self.__result_display.min(),
-            #                                    self.__result_display.max())
             self._heat_map_plot.newcurve("Dozor result", x_data, self.__result_display)
         else:
-            #2D plot
-            #self._heat_map_plot.imagePlot(self.__result_display, ymirror=False)
-            #self._heat_map_plot.plotImage.show()
             self._heat_map_plot.plot_result(self.__result_display)
-        #self._heat_map_plot.setX1AxisLimits(0, self.__axis_x_range[1])
-        #self._heat_map_plot.setY1AxisLimits(0, self.__axis_y_range[1])
-        #self._heat_map_plot.replot() 
 
     def filter_min_slider_changed(self, value):
         self.refresh()
@@ -353,7 +339,7 @@ class HeatMapWidget(QtGui.QWidget):
             for col in range(self.__result_display.shape[0]):
                 if self.__result_display[col] > 0:
                     self.create_centring_point(col + 0.5)
-        self._beamline_setup_hwobj.shape_history_hwobj.select_all_cpos()
+        self._beamline_setup_hwobj.shape_history_hwobj.select_all_points()
   
     def display_image_clicked(self):
         """
@@ -426,8 +412,10 @@ class HeatMapWidget(QtGui.QWidget):
                       get_centred_positions()
             motor_pos_dict = self._beamline_setup_hwobj.diffractometer_hwobj.\
                       get_point_from_line(point_one, point_two, coord_x, num_images)
-        self._beamline_setup_hwobj.diffractometer_hwobj.\
-             create_centring_point(motor_pos_dict, omega)
+
+        motor_pos_dict['phi'] = omega
+        self._beamline_setup_hwobj.shape_history_hwobj.\
+             create_centring_point(True, {"motors": motor_pos_dict})
 
     def move_to_selected_position(self):
         """

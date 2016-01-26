@@ -63,7 +63,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.addProperty('collection', 'string', '')
         self.addProperty('graphicsManager', 'string', '')
         self.addProperty('enableAutoFocus', 'boolean', True)
-        self.addProperty('enableRefreshCamera', 'boolean', True)
+        self.addProperty('enableRefreshCamera', 'boolean', False)
         self.addProperty('enableVisualAlign', 'boolean', True)
         self.addProperty('enableAutoCenter', 'boolean', True)
 

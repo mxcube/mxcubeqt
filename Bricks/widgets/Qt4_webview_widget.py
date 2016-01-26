@@ -20,6 +20,8 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
+from BlissFramework import Qt4_Icons
+
 try:
     #PyQt > 4.8. has WebKit 
     from PyQt4.QtWebKit import QWebView
@@ -47,9 +49,9 @@ class WebViewWidget(QtGui.QWidget):
         self.back_button = QtGui.QPushButton(self.navigation_bar)
         self.forward_button = QtGui.QPushButton(self.navigation_bar)
 
-        self.home_button.setIcon(QtGui.QIcon().fromTheme("go-home"))
-        self.back_button.setIcon(QtGui.QIcon().fromTheme("go-previous"))
-        self.forward_button.setIcon(QtGui.QIcon().fromTheme("go-next"))
+        self.home_button.setIcon(Qt4_Icons.load_icon("Home2"))
+        self.back_button.setIcon(Qt4_Icons.load_icon("Left2"))
+        self.forward_button.setIcon(Qt4_Icons.load_icon("Right2"))
          
         if QWEBVIEW_AVAILABLE:
             self.web_page_viewer = QWebView(self)
@@ -60,7 +62,7 @@ class WebViewWidget(QtGui.QWidget):
         _navigation_bar_hlayout.addWidget(self.forward_button)
         _navigation_bar_hlayout.addWidget(self.url_ledit)  
         _navigation_bar_hlayout.setSpacing(2)
-        _navigation_bar_hlayout.setContentsMargins(0, 0, 0, 0)
+        _navigation_bar_hlayout.setContentsMargins(2, 2, 2, 2)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.navigation_bar) 
