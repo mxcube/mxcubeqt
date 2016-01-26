@@ -141,7 +141,7 @@ class Qt4_DuoStateBrick(BlissWidget):
     def updateLabel(self,label):
         self.main_gbox.setTitle(label)
 
-    def stateChanged(self,state,state_label=None):
+    def stateChanged(self,state,state_label=""):
         state = str(state)
         try:
             color=self.STATES[state][0]
@@ -153,7 +153,7 @@ class Qt4_DuoStateBrick(BlissWidget):
 
         Qt4_widget_colors.set_widget_color(self.state_label, color)
         #self.state_label.setPaletteBackgroundColor(QColor(color))
-        if state_label is not None:
+        if len(state_label) > 0:
             self.state_label.setText('<b>%s</b>' % state_label)
         else:
             self.state_label.setText('<b>%s</b>' % state)
@@ -318,8 +318,7 @@ class WrapperHO(QtCore.QObject):
                  "WagoPneu" : "WagoPneu",
                  "Shutter" : "WagoPneu",
                  "SpecMotorWSpecPositions" : "WagoPneu", 
-                 "Procedure" : "WagoPneu", 
-                 "DoorInterlock" : "WagoPneu"}
+                 "Procedure" : "WagoPneu"}
 
     wagoStateDict={'in':'in', 'out':'out', 'unknown':'unknown'}
 
@@ -338,7 +337,7 @@ class WrapperHO(QtCore.QObject):
 
     STATES = ('unknown','disabled','error','out','moving','in','automatic')
 
-    duoStateChangedSignal = QtCore.pyqtSignal(str)
+    duoStateChangedSignal = QtCore.pyqtSignal(str, str)
 
     def __init__(self, hardware_obj):
         QtCore.QObject.__init__(self)
@@ -412,12 +411,14 @@ class WrapperHO(QtCore.QObject):
         self.dev.openShutter()
     def setOutShutter(self):
         self.dev.closeShutter()
-    def stateChangedShutter(self,state):
+    def stateChangedShutter(self, state, state_label=None):
         try:
             state=WrapperHO.shutterStateDict[state]
         except KeyError:
             state='error'
-        self.duoStateChangedSignal.emit(state)
+        if not state_label:
+            state_label=""
+        self.duoStateChangedSignal.emit(state, state_label)
     def getStateShutter(self):
         state=self.dev.getShutterState()
         try:

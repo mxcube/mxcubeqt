@@ -35,9 +35,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
     """
     Descript. :
     """
-    STATE_COLORS = (Qt4_widget_colors.LIGHT_RED, 
-                    Qt4_widget_colors.DARK_GRAY,
-                    Qt4_widget_colors.LIGHT_GREEN,
+    STATE_COLORS = (Qt4_widget_colors.LIGHT_RED,     # error
+                    Qt4_widget_colors.DARK_GRAY,     # unknown
+                    Qt4_widget_colors.LIGHT_GREEN,   # ready
                     Qt4_widget_colors.LIGHT_YELLOW,  
                     Qt4_widget_colors.LIGHT_YELLOW,
                     Qt4_widget_colors.LIGHT_YELLOW)
@@ -90,11 +90,11 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         #Main controls
         self.control_box = QtGui.QWidget(self.main_gbox)
         self.move_left_button = QtGui.QPushButton(self.control_box)
-        self.move_left_button.setIcon(Qt4_Icons.load_icon('far_left'))
+        self.move_left_button.setIcon(Qt4_Icons.load_icon('Left2'))
         self.move_left_button.setToolTip("Moves the motor down (while pressed)")
         self.move_left_button.setFixedWidth(25)
         self.move_right_button = QtGui.QPushButton(self.control_box)
-        self.move_right_button.setIcon(Qt4_Icons.load_icon('far_right'))
+        self.move_right_button.setIcon(Qt4_Icons.load_icon('Right2'))
         self.move_right_button.setToolTip("Moves the motor up (while pressed)")  
         self.move_right_button.setFixedWidth(25)
         
@@ -165,6 +165,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.position_spinbox.installEventFilter(spinbox_event)
         spinbox_event.returnPressedSignal.connect(self.change_position) 
         spinbox_event.contextMenuSignal.connect(self.open_history_menu) 
+        self.position_spinbox.lineEdit().textEdited.connect(self.position_value_edited)
 
         self.step_cbox.activated.connect(self.go_to_step)
         self.step_cbox.activated.connect(self.step_changed)
@@ -344,8 +345,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 s = self.motor_hwobj.GUIstep
             except:
                 s = 1.0
-
-        print s
         if self.motor_hwobj is not None:
             if self.motor_hwobj.isReady():
                 self.motor_hwobj.moveRelative(s)
@@ -408,7 +407,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         menu = QtGui.QMenu(self)
-        menu.addAction("<nobr><b>%s history</b></nobr>" % self.motor_hwobj.userName())
+        menu.addAction("Previous positions")
         #menu.insertSeparator()
         for i in range(len(self.pos_history)):
             menu.addAction(self.pos_history[i], i)
@@ -451,7 +450,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 except IndexError:
                     pass
 
-            self.step_editor.set_motor(self.motor_hwobj, self, self['label'], self['defaultStep'])
+            self.step_editor.set_motor(self.motor_hwobj, 
+                                       self, 
+                                       self['label'], 
+                                       self['defaultStep'])
             s = self.font().pointSize()
             f = self.step_editor.font()
             f.setPointSize(s)
@@ -474,7 +476,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         color = Qt4_MotorSpinBoxBrick.STATE_COLORS[state]
-        Qt4_widget_colors.set_widget_color(self.position_spinbox.lineEdit(), color)
+        Qt4_widget_colors.set_widget_color(self.position_spinbox.lineEdit(), 
+                                           color,
+                                           QtGui.QPalette.Base) 
 
     def state_changed(self, state):
         """
@@ -536,6 +540,11 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         if self.motor_hwobj is not None:
             self.motor_hwobj.move(self.position_spinbox.value())
+
+    def position_value_edited(self, value):
+        Qt4_widget_colors.set_widget_color(self.position_spinbox.lineEdit(),
+                                           QtGui.QColor(255,165,0),
+                                           QtGui.QPalette.Base)
 
     def setToolTip(self, name = None, state = None, limits = None):
         """

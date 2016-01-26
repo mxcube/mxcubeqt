@@ -110,13 +110,14 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
             if self.diffractometer_hwobj is not None:
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaMotorMoved"), self.kappa_motor_moved) 
                 self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaPhiMotorMoved"), self.kappaphi_motor_moved)
-                self.disconnect(self.diffractometer_hwobj, Qtcore.SIGNAL('minidiffStateChanged'),self.diffractometer_state_changed)
+                self.disconnect(self.diffractometer_hwobj, Qtcore.SIGNAL('minidiffStatusChanged'),self.diffractometer_state_changed)
             self.diffractometer_hwobj = self.getHardwareObject(newValue)
             if self.diffractometer_hwobj is not None:
                 self.connect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaMotorMoved"), self.kappa_motor_moved)            
                 self.connect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaPhiMotorMoved"), self.kappaphi_motor_moved)
-                self.connect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffStateChanged'),self.diffractometer_state_changed)
+                self.connect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffStatusChanged'),self.diffractometer_state_changed)
                 self.setDisabled(self.diffractometer_hwobj.in_plate_mode())
+                self.diffractometer_state_changed("Ready")
             else:
                 self.setEnabled(False)
         elif propertyName=='showStop':
@@ -142,12 +143,6 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
            self.diffractometer_hwobj.move_kappa_and_phi(kappa_value, phi_value)
         except:
            pass
-        Qt4_widget_colors.set_widget_color(self.kappa_value_ledit,
-                                           Qt4_widget_colors.WHITE,
-                                           QtGui.QPalette.Base)
-        Qt4_widget_colors.set_widget_color(self.kappaphi_value_ledit,
-                                           Qt4_widget_colors.WHITE,
-                                           QtGui.QPalette.Base)
         self.kappa_value_ledit.clearFocus()
         self.kappaphi_value_ledit.clearFocus()
 
@@ -176,9 +171,26 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         self.kappaphi_value_ledit.blockSignals(False)
 
     def diffractometer_state_changed(self, state):
-        self.apply_button.setEnabled(state == self.diffractometer_hwobj.phiMotor.READY)
-        self.kappa_value_ledit.setEnabled(state == self.diffractometer_hwobj.phiMotor.READY)
-        self.kappaphi_value_ledit.setEnabled(state == self.diffractometer_hwobj.phiMotor.READY)
+        if state == "Ready":
+            self.apply_button.setEnabled(True)
+            self.kappa_value_ledit.setEnabled(True)
+            self.kappaphi_value_ledit.setEnabled(True)
+            Qt4_widget_colors.set_widget_color(self.kappa_value_ledit,
+                                               Qt4_widget_colors.LIGHT_GREEN,
+                                               QtGui.QPalette.Base)
+            Qt4_widget_colors.set_widget_color(self.kappaphi_value_ledit,
+                                               Qt4_widget_colors.LIGHT_GREEN,
+                                               QtGui.QPalette.Base)
+        else:
+            self.apply_button.setEnabled(False)
+            self.kappa_value_ledit.setEnabled(False)
+            self.kappaphi_value_ledit.setEnabled(False) 
+            Qt4_widget_colors.set_widget_color(self.kappa_value_ledit,
+                                               Qt4_widget_colors.LIGHT_YELLOW,
+                                               QtGui.QPalette.Base)
+            Qt4_widget_colors.set_widget_color(self.kappaphi_value_ledit,
+                                               Qt4_widget_colors.LIGHT_YELLOW,
+                                               QtGui.QPalette.Base)
 
     def setLabel(self,label):
         if not self['showLabel']:

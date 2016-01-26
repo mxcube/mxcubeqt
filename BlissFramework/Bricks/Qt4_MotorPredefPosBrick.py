@@ -92,9 +92,9 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
         # Other ---------------------------------------------------------------
         self.positions_combo.setToolTip("Moves the motor to a predefined position")
-        self.previous_position_button.setIcon(QtGui.QIcon().fromTheme("go-previous"))
+        self.previous_position_button.setIcon(Qt4_Icons.load_icon('Minus2'))
         self.previous_position_button.setFixedWidth(27) 
-        self.next_position_button.setIcon(QtGui.QIcon().fromTheme("go-next"))
+        self.next_position_button.setIcon(Qt4_Icons.load_icon('Plus2'))
         self.next_position_button.setFixedWidth(27)
        
     def setToolTip(self, name=None, state=None):
