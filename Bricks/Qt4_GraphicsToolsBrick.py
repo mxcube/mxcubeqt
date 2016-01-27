@@ -56,6 +56,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
+        self.move_beam_mark_action = None
 
         # Layout --------------------------------------------------------------
 
@@ -108,6 +109,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         self.move_beam_mark_action = self.tools_menu.addAction(
              "Move beam mark",
              self.move_beam_mark_clicked)
+        self.move_beam_mark_action.setEnabled(False)
 
         if self.target_menu == "menuBar":
             BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
@@ -131,6 +133,10 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
             self.target_menu = new_value
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def set_expert_mode(self, is_expert_mode):
+        if self.move_beam_mark_action:
+            self.move_beam_mark_action.setEnabled(is_expert_mode)
 
     def measure_distance_clicked(self):
         self.graphics_manager_hwobj.start_measure_distance(wait_click = True)
