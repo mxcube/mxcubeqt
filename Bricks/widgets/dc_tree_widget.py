@@ -268,12 +268,12 @@ class DataCollectTree(qt.QWidget):
                   info('Its not possible to mount samples in free pin mode')
 
     def centring_done(self, success, centring_info):
-        if success:
-            self.sample_centring_result.set(centring_info)
-        else:
+        if not success:
+
             msg = "Loop centring failed or was cancelled, " +\
                   "please continue manually."
             logging.getLogger("user_level_log").warning(msg)
+        self.sample_centring_result.set(centring_info)
 
     def unmount_sample(self):
         gevent.spawn(self.unmount_sample_task)
@@ -530,7 +530,6 @@ class DataCollectTree(qt.QWidget):
 
     def is_mounted_sample_item(self, item):
         result = False
-
         if isinstance(item, queue_item.SampleQueueItem):
             if item.get_model().free_pin_mode == True:
                 result = True
