@@ -55,8 +55,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.beamline_config_hwobj = None
         self.session_hwobj = None
         self.lims_hwobj = None
-        self.sample_changer_one_hwobj = None
-        self.sample_changer_two_hwobj = None
+        self.sample_changer_hwobj = None
+        self.plate_manipulator_hwobj = None
         self.queue_hwobj = None
 
         # Internal variables --------------------------------------------------
@@ -225,20 +225,30 @@ class Qt4_TreeBrick(BlissWidget):
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
-            self.sample_changer_one_hwobj = bl_setup.sample_changer_one_hwobj
-            self.sample_changer_two_hwobj = bl_setup.sample_changer_two_hwobj
+            try:
+               self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
+            except AttributeError:
+               logging.getLogger("user_level_log").\
+                    debug("Qt4_TreeBrick: sample changer hwobj not defined.")
+               self.sample_changer_hwobj = None
+            try:
+               self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
+               logging.getLogger("user_level_log").\
+                    debug("Qt4_TreeBrick: plate manipulator hwobj not defined.")
+            except:
+               self.plate_manipulator_hwobj = None 
             self.session_hwobj = bl_setup.session_hwobj
             self.lims_hwobj = bl_setup.lims_client_hwobj
 
-            if self.sample_changer_one_hwobj is not None:
-                self.connect(self.sample_changer_one_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+            if self.sample_changer_hwobj is not None:
+                self.connect(self.sample_changer_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sample_changer_one_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
+                self.connect(self.sample_changer_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
-            if self.sample_changer_two_hwobj is not None:
-                self.connect(self.sample_changer_two_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+            if self.plate_manipulator_hwobj is not None:
+                self.connect(self.plate_manipulator_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.sample_changer_two_hwobj, SampleChanger.INFO_CHANGED_EVENT,
+                self.connect(self.plate_manipulator_hwobj, SampleChanger.INFO_CHANGED_EVENT,
                              self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
@@ -283,9 +293,9 @@ class Qt4_TreeBrick(BlissWidget):
             self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
           
-            if self.sample_changer_one_hwobj: 
+            if self.sample_changer_hwobj: 
                 sc_basket_content, sc_sample_content = self.get_sc_content(\
-                    self.sample_changer_one_hwobj)
+                    self.sample_changer_hwobj)
                 if sc_basket_content and sc_sample_content:
                     sc_basket_list, sc_sample_list = self.dc_tree_widget.\
                          samples_from_sc_content(sc_basket_content, sc_sample_content)
@@ -293,9 +303,9 @@ class Qt4_TreeBrick(BlissWidget):
                     self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
                          self.dc_tree_widget.sample_mount_method)
    
-            if self.sample_changer_two_hwobj:        
+            if self.plate_manipulator_hwobj:        
                 sc_basket_content, sc_sample_content = self.get_sc_content(\
-                    self.sample_changer_two_hwobj)
+                    self.plate_manipulator_hwobj)
                 if sc_basket_content and sc_sample_content:
                     sc_basket_list, sc_sample_list = self.dc_tree_widget.\
                          samples_from_sc_content(sc_basket_content, sc_sample_content)
@@ -391,13 +401,13 @@ class Qt4_TreeBrick(BlissWidget):
             basket_list = []
             sample_list = []
           
-            if samples:
-                sample_changer = None
-                if self.dc_tree_widget.sample_mount_method == 1:
-                    sample_changer = self.sample_changer_one_hwobj
-                else:
-                    sample_changer = self.sample_changer_two_hwobj     
- 
+            sample_changer = None
+            if self.dc_tree_widget.sample_mount_method == 1:
+                sample_changer = self.sample_changer_hwobj
+            else:
+                sample_changer = self.plate_manipulator_hwobj
+
+            if samples and sample_changer:
                 (barcode_samples, location_samples) = \
                     self.dc_tree_widget.samples_from_lims(samples)
                 sc_basket_content, sc_sample_content = self.get_sc_content(\

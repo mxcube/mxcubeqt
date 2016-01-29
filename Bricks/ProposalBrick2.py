@@ -30,7 +30,7 @@ class ProposalBrick2(BlissWidget):
         self.dbConnection=None
         self.localLogin=None
         self.session_hwobj = None
-
+       
         # Initialize session info
         self.proposal=None
         self.session=None
@@ -38,6 +38,7 @@ class ProposalBrick2(BlissWidget):
         self.laboratory=None
         #self.sessionId=None
         self.inhouseProposal=None
+	self.loginType = "proposal"
 
         self.instanceServer=None
 
@@ -66,16 +67,24 @@ class ProposalBrick2(BlissWidget):
         self.contentsBox.setInsideSpacing(5)
 
         self.loginBox=QHBox(self.contentsBox, 'login_box')
-        code_label=QLabel("  Code: ",self.loginBox)
+
+        self.code_label=QLabel("  Code: ",self.loginBox)
         self.propType=QComboBox(self.loginBox)
         self.propType.setEditable(True)
         self.propType.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.propType.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-        dash_label=QLabel(" - ",self.loginBox)
+        self.dash_label=QLabel(" - ",self.loginBox)
         self.propNumber=QLineEdit(self.loginBox)
         self.propNumber.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.propNumber.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.propNumber.setFixedWidth(50)
+	
+        self.userName=QLineEdit(self.loginBox)
+        self.userName.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
+        self.userName.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+        self.userName.setFixedWidth(75)
+	self.userName.hide()
+
         password_label=QLabel("   Password: ",self.loginBox)
         self.propPassword=QLineEdit(self.loginBox)
         self.propPassword.setEchoMode(QLineEdit.Password)
@@ -463,12 +472,19 @@ class ProposalBrick2(BlissWidget):
         self.user_group_ledit.setText('')
         self.setEnabled(False)
 
-        prop_type=str(self.propType.currentText())
-        prop_number=str(self.propNumber.text())
-        prop_password=str(self.propPassword.text())
+        propType=str(self.propType.currentText())
+        propNumber=str(self.propNumber.text()) or ""
+	userName = str(self.userName.text()) or ""
+        password=str(self.propPassword.text())
         self.propPassword.setText("")
 
-        if prop_type=="" and prop_number=="":
+	if self.loginType == "proposal":
+	    loginID = "%s%s" % (propType,propNumber)
+	else:
+	    loginID= userName
+	
+        # try local login if userID is empty
+        if propNumber =="" and userName == "":
             if self.localLogin is None:
                 return self.refuseLogin(False,"Local login not configured.")
             try:
@@ -476,7 +492,7 @@ class ProposalBrick2(BlissWidget):
             except AttributeError:
                 return self.refuseLogin(False,"Local login not configured.")
 
-            if prop_password!=locallogin_password:
+            if password!=locallogin_password:
                 return self.refuseLogin(None,"Invalid local login password.")
 
             now=time.strftime("%Y-%m-%d %H:%M:S")
@@ -491,15 +507,28 @@ class ProposalBrick2(BlissWidget):
             cont_dict={'familyName':'local contact'}
 
             logging.getLogger().debug("ProposalBrick: local login password validated")
-            
             return self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
-        if self.ldapConnection == None:
-            return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
         if self.dbConnection == None:
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
-
-        self._do_login(prop_type,prop_number,prop_password, self.dbConnection.beamline_name)
+         
+	loginRes=self.dbConnection.login(loginID,password)
+	try:
+            login_ok=(loginRes['status']['code']=='ok')
+        except KeyError:
+            login_ok=False
+        if not login_ok:
+	    if loginRes['status']['code'] == 'ispybDown':
+		self.ispybDown()
+		return
+            else:
+                self.refuseLogin(False, loginRes['status']['msg'])
+	else:
+	    # login succeed but without a scheduled session, a newSession is created instead. Ask the user to accep the new session
+            if loginRes['session']['new_session_flag']:
+                if not  self.askForNewSession():
+                    return self.refuseLogin(None,None)
+            self.acceptLogin(loginRes['Proposal'],loginRes['person'],loginRes['laboratory'],loginRes['session']['session'],loginRes['local_contact'])
 
     def passControl(self,has_control_id):
         pass
@@ -517,6 +546,8 @@ class ProposalBrick2(BlissWidget):
             self.localLogin=self.getHardwareObject(newValue)
         elif propertyName=='dbConnection':
             self.dbConnection = self.getHardwareObject(newValue)
+	    logging.getLogger().info("dbconnection is %s", str(newValue))
+	    self.updateLoginID()
         elif propertyName=='instanceServer':
             if self.instanceServer is not None:
                 self.disconnect(self.instanceServer,PYSIGNAL('passControl'), self.passControl)
@@ -540,16 +571,22 @@ class ProposalBrick2(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
-    def _do_login(self, proposal_code,proposal_number,proposal_password,beamline_name, impersonate=False):
-        login_info = self.dbConnection.login(proposal_code+proposal_number, proposal_password, self.ldapConnection)
-        try: 
-            self.acceptLogin(login_info['Proposal'],\
-                login_info['person'],\
-                login_info['laboratory'],\
-                login_info['session']['session'],\
-                login_info['local_contact'])
-        except Exception, e:
-            self.refuseLogin("Could not log in: %s" % str(e))
+    def updateLoginID(self):
+	if self.loginType == self.dbConnection.loginType:
+	    return
+        self.loginType = self.dbConnection.loginType
+        if self.loginType == "proposal":
+	    self.code_label.setText("  Code: ")
+            self.userName.hide()
+	    self.propType.show()
+	    self.dash_label.show()
+	    self.propNumber.show()
+	else:
+            self.code_label.setText("  User ID: ")
+	    self.userName.show()
+            self.propType.hide()
+            self.dash_label.hide()
+            self.propNumber.hide()
 
 
 ### Auxiliary method to merge a person's name

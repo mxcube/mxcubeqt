@@ -448,7 +448,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.setEnabled(self.session_hwobj is not None)
 
         # find if we are using ldap, dbconnection, etc. or not
-        if None in (self.ldap_connection_hwobj, self.lims_hwobj):
+        if not self.lims_hwobj:
             self.login_as_proposal_widget.hide()
             self.login_button.hide()
             #self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])

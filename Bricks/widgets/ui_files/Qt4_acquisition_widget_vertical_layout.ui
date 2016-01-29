@@ -94,7 +94,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="first_iamge_label">
+             <widget class="QLabel" name="num_images_label">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -107,8 +107,11 @@
                 <height>27</height>
                </size>
               </property>
+              <property name="acceptDrops">
+               <bool>true</bool>
+              </property>
               <property name="text">
-               <string>First image:</string>
+               <string>Number of images:</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>
@@ -296,13 +299,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="first_image_ledit">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QLineEdit" name="num_images_ledit">
               <property name="minimumSize">
                <size>
                 <width>80</width>
@@ -447,7 +444,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="num_images_label">
+             <widget class="QLabel" name="first_iamge_label">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -460,11 +457,8 @@
                 <height>27</height>
                </size>
               </property>
-              <property name="acceptDrops">
-               <bool>true</bool>
-              </property>
               <property name="text">
-               <string>Number of images:</string>
+               <string>First image:</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>
@@ -608,7 +602,13 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="num_images_ledit">
+             <widget class="QLineEdit" name="first_image_ledit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>80</width>

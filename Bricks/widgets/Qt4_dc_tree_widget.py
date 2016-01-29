@@ -340,13 +340,11 @@ class DataCollectTree(QtGui.QWidget):
                 try:
                     if self.sample_mount_method == 1:
                         queue_entry.mount_sample(
-                            self.beamline_setup_hwobj.sample_changer_one_hwobj, 
                             self.beamline_setup_hwobj,
                             items[0], items[0].get_model(), self.centring_done,
                             self.sample_centring_result)
                     elif self.sample_mount_method == 2:
                         queue_entry.mount_sample(
-                            self.beamline_setup_hwobj.sample_changer_two_hwobj,   
                             self.beamline_setup_hwobj,
                             items[0], items[0].get_model(), self.centring_done,
                             self.sample_centring_result)
@@ -395,9 +393,16 @@ class DataCollectTree(QtGui.QWidget):
 
             sample_changer = None
             if self.sample_mount_method == 1:
-                sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
+                try:
+                   sample_changer = self.beamline_setup_hwobj.sample_changer_hwobj
+                except AttributeError:
+                   sample_changer = None
             elif self.sample_mount_method == 2:
-                sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwobj
+                try:
+                   sample_changer = self.beamline_setup_hwobj.plate_manipulator_hwobj
+                except AttributeError:
+                   sample_changer = None
+
             if sample_changer:
                 if hasattr(sample_changer, '__TYPE__')\
                    and sample_changer.__TYPE__ in ('CATS', 'Marvin'):
@@ -480,9 +485,8 @@ class DataCollectTree(QtGui.QWidget):
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
 
         if isinstance(task, queue_model_objects.Basket):
-            
             view_item.setExpanded(task.get_is_present() == True)
-            view_item.setDisabled(not task.get_is_present())
+            #view_item.setDisabled(not task.get_is_present())
         else:
             view_item.setExpanded(True) 
 
@@ -701,9 +705,16 @@ class DataCollectTree(QtGui.QWidget):
         if isinstance(item, Qt4_queue_item.SampleQueueItem):
             sample_changer = None
             if self.sample_mount_method == 1:
-                sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
+                try:
+                   sample_changer = self.beamline_setup_hwobj.sample_changer_hwobj
+                except AttributeError:
+                   sample_changer = None
             elif self.sample_mount_method == 2:
-                sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwobj
+                try:
+                   sample_changer = self.beamline_setup_hwobj.plate_manipulator_hwobj
+                except AttributeError:
+                   sample_changer = None
+                 
  
             if item.get_model().free_pin_mode == True:
                 result = True
@@ -986,6 +997,7 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_model_hwobj.clear_model(mode_str)
         self.sample_tree_widget.clear()
         self.queue_model_hwobj.select_model(mode_str)
+
         for basket in basket_list:
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
                                              get_model_root(), basket)

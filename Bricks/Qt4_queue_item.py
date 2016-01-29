@@ -204,7 +204,7 @@ class SampleQueueItem(QueueItem):
         dc_tree_widget = self.listView().parent()
 
         if  dc_tree_widget._loaded_sample_item:
-            dc_tree_widget._loaded_sample_item.setIcon(0, qt.QPixmap())
+            dc_tree_widget._loaded_sample_item.setIcon(0, QtGui.QPixmap())
             
         dc_tree_widget._loaded_sample_item = self
         self.setIcon(0, QtGui.QIcon(dc_tree_widget.pin_pixmap))
