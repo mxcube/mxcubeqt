@@ -20,7 +20,7 @@
         </defaultenergy>
     </mad>
     
-    <directoryprefix>/nfs/ruchebis/2015_Run5</directoryprefix>-->
+    <directoryprefix>/nfs/ruchebis/2016_Run1</directoryprefix>-->
     <theoritical_edge_threshold>0.02</theoritical_edge_threshold>
     <scan>
         <roiwidth>0.3</roiwidth>

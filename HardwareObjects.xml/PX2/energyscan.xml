@@ -16,7 +16,7 @@
     <bst>i11-ma-cx1/ex/md2-mvbs</bst> 
     <ketekinsert>i11-ma-cx1/ex/md2</ketekinsert> 
     <safetyshutter>i11-ma-c04/ex/obx.1</safetyshutter>
-    <directoryprefix>/nfs/ruchebis/2015_Run5</directoryprefix>
+    <directoryprefix>/nfs/ruchebis/2016_Run1</directoryprefix>
     <scan>
         <roiwidth>0.3</roiwidth>
         <before>0.030</before>
