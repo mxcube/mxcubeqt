@@ -521,11 +521,8 @@ class CreateTaskBase(qt.QWidget):
     # a task. When a task_node is selected.
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
-	#AK
-	sample_changer=self._beamline_setup_hwobj.sample_changer_hwobj
-	if self._beamline_setup_hwobj.in_flex_mode:
-		sample_changer=self._beamline_setup_hwobj.flex_hwobj
-	#FAK		
+        sample_changer=self._beamline_setup_hwobj.sample_changer_hwobj
+
         try: 
             sample_is_mounted = sample_changer.\
                                 getLoadedSample().getCoords() == sample.location
