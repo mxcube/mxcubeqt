@@ -276,7 +276,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
 
             exp_type = str(self._advanced_methods_widget.method_combo.\
-                currentText()).title().replace(" ", "")
+                currentText())
             advanced = queue_model_objects.Advanced(exp_type, dc, 
                   shape, sample.crystals[0])
 
@@ -378,6 +378,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         for grid_object, treewidget_item in self._grid_map.iteritems():
             if treewidget_item.isSelected():
                 grid_object.set_spacing(spacing)
+                #self._graphics_manager_hwobj.\
+                #     update_grid_motor_positions(grid_object)
 
     def move_to_grid(self):
         for grid_object, treewidget_item in self._grid_map.iteritems():

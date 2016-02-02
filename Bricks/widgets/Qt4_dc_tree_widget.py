@@ -256,8 +256,15 @@ class DataCollectTree(QtGui.QWidget):
                     Item check state is updated when checkbox is toggled
                     (to avoid update when text is changed)                    
         """
-        if item.checkState(0) != item.get_previous_check_state():
-            item.update_check_state()        
+        #if item.checkState(0) != item.get_previous_check_state():
+        #   item.update_check_state()        
+
+        # IK. This type check should not be here,because all tree items are 
+        # anyway QueueItems. but somehow on the init item got native
+        # QTreeWidgetItem type and method was not found. Interesting...
+
+        if type(item) == Qt4_queue_item.QueueItem:
+            item.update_check_state(item.checkState(0))
 
     def context_collect_item(self):
         """
@@ -473,7 +480,9 @@ class DataCollectTree(QtGui.QWidget):
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
 
         if isinstance(task, queue_model_objects.Basket):
+            
             view_item.setExpanded(task.get_is_present() == True)
+            view_item.setDisabled(not task.get_is_present())
         else:
             view_item.setExpanded(True) 
 

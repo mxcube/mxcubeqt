@@ -316,3 +316,6 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.cax = self.divider.append_axes("right", size=0.3, pad=0.05)
         self.cax.tick_params(axis='x', labelsize=8)
         self.cax.tick_params(axis='y', labelsize=8)
+
+    def clear(self): 
+        self.mpl_canvas.axes.cla()

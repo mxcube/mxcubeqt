@@ -159,6 +159,16 @@
           <string>Exposure time</string>
          </property>
         </column>
+        <column>
+         <property name="text">
+          <string>Total osc</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Total exposure time</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>

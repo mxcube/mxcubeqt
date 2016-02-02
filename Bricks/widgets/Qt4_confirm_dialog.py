@@ -68,7 +68,7 @@ class ConfirmDialog(QtGui.QDialog):
              self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
-        self.setMinimumWidth(720)
+        self.setMinimumWidth(800)
 
         # Other --------------------------------------------------------------- 
         self.setWindowTitle('Confirm collection')
@@ -84,6 +84,7 @@ class ConfirmDialog(QtGui.QDialog):
         self.conf_dialog_layout.take_snapshots_combo.clear()
         for item in snapshot_count:
             self.conf_dialog_layout.take_snapshots_combo.addItem(str(item))        
+        self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(1)
  
     def disable_dark_current_cbx(self):
         """
@@ -136,7 +137,7 @@ class ConfirmDialog(QtGui.QDialog):
                 sample_treewidget_item = QtGui.QTreeWidgetItem(\
                    self.conf_dialog_layout.summary_treewidget,
                    info_str_list)
-                for col in range(7):
+                for col in range(9):
                     sample_treewidget_item.setBackground(col, \
                       QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
                 sample_treewidget_item.setExpanded(True)
@@ -178,10 +179,14 @@ class ConfirmDialog(QtGui.QDialog):
                 info_str_list.append(str(acq_parameters.num_images))
                 info_str_list.append(str(acq_parameters.osc_range))
                 info_str_list.append(str(acq_parameters.exp_time))
+                info_str_list.append(str(acq_parameters.num_images * \
+                                         acq_parameters.osc_range))
+                info_str_list.append(str(acq_parameters.num_images * \
+                                         acq_parameters.exp_time))
 
                 collection_treewidget_item = QtGui.QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
-                for col in range(7):
+                for col in range(9):
                     collection_treewidget_item.setBackground(col, \
                       QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_COLLECTION))  
              

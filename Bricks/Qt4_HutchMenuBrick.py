@@ -86,7 +86,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
-        self.clear_all_button = MonoStateButton(self, "Clear", "Delete")
+        self.clear_all_button = MonoStateButton(self, "Clear all", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
 
         # Layout -------------------------------------------------------------- 
