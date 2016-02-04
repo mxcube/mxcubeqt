@@ -6,10 +6,10 @@ based on bricks (available in
 `BlissFramework/Bricks <https://github.com/mxcube/BlissFramework/tree/master/Bricks>`_ and 
 `mxcube/Bricks <https://github.com/mxcube/mxcube/tree/master/Bricks>`_)  
 and basic layout items (horizonal box, vertical box, groupbox etc.). 
-Originaly it was written in Qt3 and later adopted to Qt4 platform. 
-It is possible to run MXCuBE in each Qt version (:doc:`installation_instructions_qt4`), but 
+Originaly it was written in Qt3 and later adopted to the Qt4 platform. 
+It is possible to run MXCuBE on both Qt versions (:doc:`installation_instructions_qt4`), but 
 it is not possible to run both versions of Qt simultaneously. 
-To clearly separate these two platforms Qt4 version bricks, widgets and other 
+To clearly separate these two Qt version, Qt4 bricks, widgets and other 
 files have prefix Qt4_.
 
 Best Practices
@@ -45,5 +45,6 @@ group and data collection would be abbreviated dcg and dc.
 Tutorials
 *********
 * :doc:`installation_instructions_qt4`
+* :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
-
+* :doc:`how_to_define_gui`

@@ -1,10 +1,10 @@
 How to install and run Qt version
 #################################
 
-MXCuBE is organized as a subset of several git submodules that are necessary to run MXCuBE. 
+MXCuBE is organized as a subset of several git submodules. 
 In this page a sequence how to get software code, install dependencies and execute software is described.
 
-MXCuBE has been tested with:
+Tested with:
 
 * Linux: Ubuntu 10, 12, 14 (with gnome and kde) and Centos 7 (with gnome)
 * Macos.
@@ -155,5 +155,7 @@ To launch gui builder add **-d** before **-qt4** argument. For example:
 Other information
 *****************
 
+* :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
+* :doc:`how_to_defined_gui`
 
