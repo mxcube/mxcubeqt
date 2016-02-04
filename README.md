@@ -28,5 +28,5 @@ More detailed information is available in the [docs directory]
 ## Information for users
 
 * [User manual] (https://github.com/mxcube/mxcube/blob/master/docs/manual/MXCuBE2_1_manual_march2015-v2.pdf).
-* [Example screenshots] (https://github.com/mxcube/mxcube/blob/master/docs/source/screen_examples.rst)
 * [Feature overview] (https://github.com/mxcube/mxcube/blob/master/docs/source/feature_overview.rst)
+* [Overview of Graphical user interface] (https://github.com/mxcube/mxcube/blob/master/docs/source/gui_overview.rst)
