@@ -21,6 +21,7 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 
 ### Status
 - [Status of MXCuBE @ ESRF](doc/ESRFHighlights.odp)
+- [Status of MXCuBe @ EMBL-Hamburg](doc/2015_mxcube_alba_karpics_01_status.pdf)
 - [Status of MXCuBE @ MAX IV](doc/201511_MXCuBE-MAXlab_JN.pdf)
 - [Status of MXCuBE @ HZB](doc/20151130_mxcube-HZB.pdf)
 - [Status of MXCuBE @ SOLEIL](doc/mxCuBE_SOLEIL_Status_2015_11.pdf)
@@ -35,6 +36,8 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [MXCuBE 3 front-end development toolchain](http://slides.com/matiasg/mxcube3_fedev_toolchain) 
 - [Progress towards driving beamlines as a third party](doc/MXCuBE-2015-pkeller.odp)
 - [MXCuBE and EDNA at ALBA](doc/20151201_S3_ALBA_MXCuBE_and_EDNA.pdf)
+- [MXCuBE and Qt4](doc/2015_mxcube_alba_karpics_03_qt4.pdf)
+- [Advanced methods and abstraction](doc/2015_mxcube_alba_karpics_02_advanced.pdf)
 
 ### Next meeting will take place in Hamburg
 
