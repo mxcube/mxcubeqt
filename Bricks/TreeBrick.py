@@ -218,6 +218,9 @@ class TreeBrick(BaseComponents.BlissWidget):
 		        self.connect(self.sample_changer_hwobj,
 		                     SampleChanger.SCAN_CHANGED_EVENT,
 		                     self.refresh_Scan_Info)
+		        self.connect(self.sample_changer_hwobj,
+		                     SampleChanger.EXCEPTION_EVENT,
+		                     self.sc_exception)
 
             if self.plate_manipulator_hwobj is not None:
                 self.connect(self.plate_manipulator_hwobj,
@@ -257,6 +260,9 @@ class TreeBrick(BaseComponents.BlissWidget):
 		self.dc_tree_widget.refresh_Scan_ListView()
 		self.sample_load_state_changed("Running")
 		self.set_sample_pin_icon()
+
+    def sc_exception(self, msg):
+		logging.getLogger("user_level_log").info(msg)
 		 
 
 
@@ -475,9 +481,8 @@ class TreeBrick(BaseComponents.BlissWidget):
                 basket_index = str(coords[0])
                 vial_index = ":".join(map(str, coords[1:]))
                 basket_code = sample.getContainer().getID() or ""
-                sState=sample.getState() #AK           
-            
-                sc_sample_content.append((matrix, basket_index, vial_index, basket_code, 0, coords))
+                sState=sample.getState() #AK                       
+                sc_sample_content.append((matrix, basket_index, vial_index, basket_code, 0, coords,sState))
         else:
 	#except:
             logging.getLogger("user_level_log").\

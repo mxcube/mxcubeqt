@@ -8,24 +8,39 @@ from sample_changer_helper import *
 from qt import *
 import qt
 
+
+
 class VialView(QWidget):
-    (VIAL_UNKNOWN,VIAL_NONE,VIAL_NOBARCODE,VIAL_BARCODE,VIAL_AXIS,VIAL_ALREADY_LOADED,VIAL_NOBARCODE_LOADED)=(0,1,2,3,4,5,6)
+    (VIAL_UNKNOWN,VIAL_NONE,VIAL_NOBARCODE,VIAL_BARCODE,VIAL_AXIS,VIAL_ALREADY_LOADED,VIAL_NOBARCODE_LOADED,VIAL_BLACKLISTED)=(0,1,2,3,4,5,6,7)
+    vStateConvert = {'unmounting':VIAL_NOBARCODE, 'mounting':VIAL_BARCODE, 'on_gonio':VIAL_AXIS, 'unknown':VIAL_UNKNOWN}
+    vState = {VIAL_UNKNOWN:'Unknown', VIAL_NONE:'',VIAL_NOBARCODE:'',VIAL_BARCODE:'',VIAL_AXIS:'On Gonio',VIAL_ALREADY_LOADED:'',VIAL_NOBARCODE_LOADED:'',VIAL_BLACKLISTED:'Black Listed'}
     def __init__(self,vial_index,parent):
         QWidget.__init__(self,parent)
         self.vialIndex=vial_index
         self.setFixedSize(20,16)
-        self.pixmapUnknown=Icons.load("sample_unknown")
+        self.pixmapUnknown=Icons.load("sample_unknown.png")
+        self.pixmapBlackListed=Icons.load("red_led.png")
         self.pixmapNoBarcode=Icons.load("sample_nobarcode.png")
         self.pixmapBarcode=Icons.load("sample_barcode.png")
         self.pixmapAxis=Icons.load("sample_axis.png")
         self.pixmapAlreadyLoaded=Icons.load("sample_already_loaded.png")
         self.pixmapAlreadyLoadedNoBarcode=Icons.load("sample_already_loaded2.png")
-        self.pixmaps=[self.pixmapUnknown,None,self.pixmapNoBarcode,self.pixmapBarcode,self.pixmapAxis,self.pixmapAlreadyLoaded, self.pixmapAlreadyLoadedNoBarcode]
+        self.pixmaps=[self.pixmapUnknown,None,self.pixmapNoBarcode,self.pixmapBarcode,self.pixmapAxis,self.pixmapAlreadyLoaded, self.pixmapAlreadyLoadedNoBarcode,self.pixmapBlackListed]
         self.vialState=VialView.VIAL_UNKNOWN
         self.vialCode=""
         self.setEnabled(True)
         self.sBox=parent
         parent.setVial(self)
+        """
+        self.vState=[]
+        self.vState[VialView.VIAL_UNKNOWN]=''
+        self.vState[VIAL_NONE]=''
+        self.vState[VIAL_NOBARCODE]=''
+        self.vState[VIAL_AXIS]=''
+        self.vState[VIAL_ALREADY_LOADED]=''
+        self.vState[VIAL_NOBARCODE_LOADED]=''
+        self.vState[VIAL_BLACKLISTED]='BlackListed'
+        """
 
 
     def setVial(self,vial_state):
@@ -36,7 +51,7 @@ class VialView(QWidget):
             self.vialCode=""
         #self.setEnabled(self.vialState!=VialView.VIAL_NONE)
         self.setEnabled(True)
-        QToolTip.add(self,self.vialCode)
+        QToolTip.add(self,"%s" % VialView.vState[self.vialState])
         self.update()
         
     def paintEvent(self,event):
@@ -112,16 +127,17 @@ class SampleBox(QVBox):
         print "rightClickMenu"
         self.emit(PYSIGNAL("selectThisSample"),(self.vial,))
         menu = qt.QPopupMenu(self, "popup_menu")
-        if self.vial.vialState==VialView.VIAL_AXIS:
-			menu.insertItem(qt.QString("UnLoad"), self.unloadSample)
-        else:
-			menu.insertItem(qt.QString("Load"), self.loadSample)
-        menu.insertSeparator(1)
+        if self.vial.vialState not in (VialView.VIAL_UNKNOWN, VialView.VIAL_BLACKLISTED) :
+			if self.vial.vialState==VialView.VIAL_AXIS:
+				menu.insertItem(qt.QString("UnLoad"), self.unloadSample)
+			else:
+				menu.insertItem(qt.QString("Load"), self.loadSample)
+			menu.insertSeparator(1)
         
-        point       = self.rect().bottomRight()
-        global_point = self.mapToGlobal(point)
-        #print 
-        menu.popup(QPoint(global_point.x()-15, global_point.y()-10))
+			point       = self.rect().bottomRight()
+			global_point = self.mapToGlobal(point)
+			#print 
+			menu.popup(QPoint(global_point.x()-15, global_point.y()-10))
  
     def loadSample(self):
         print "loadSample"
@@ -401,10 +417,11 @@ class CurrentBasketView(CurrentView):
 		self.contentsBox.layout().addLayout(self.flex_bt_layout)
 
     def setState(self,state):
-		if state=="Unusable":
+		if state=="Parked":
 			self.flex_park_button.setEnabled(False)
 			self.flex_init_button.setEnabled(True)
-		else:	
+		else:
+			print "flex state", state
 			enabled=SC_STATE_GENERAL.get(state, False)
 			for wid in self.commandsWidget:
 				wid.setEnabled(enabled)
@@ -580,18 +597,6 @@ class CurrentSampleView(CurrentView):
 class StatusView(CurrentView):
     def __init__(self,parent):
         CurrentView.__init__(self,"Flex Sample Changer",parent)
-        #QWidget.__init__(self, parent)
-        #self.title="Flex AK"       
-        
-        #self.contentsBox=QVGroupBox(self.title,self)
-        #self.contentsBox.setInsideMargin(4)
-        #self.contentsBox.setInsideSpacing(2)
-        #self.contentsBox.setAlignment(Qt.AlignHCenter)
-
-        #QVBoxLayout(self)
-        #self.layout().addWidget(self.contentsBox)
-        
-
         self.box1=QHBox(self.contentsBox)
 
         self.lblState = QLabel("",self.box1)
@@ -1215,15 +1220,23 @@ class FlexBrick3(BlissWidget):
 	self.scContents2.show()
 
 
+    def getBasketIdx(self,basket_id):
+        nbPuck=len(self.sampleChanger.getComponents())
+        for i in range(nbPuck):
+			if self.baskets[i].basket_index==basket_id:
+				return self.baskets[i]
+        return None
+
+        
     def selectThisSample(self,basket_index, vial_index):
         print "FB3: selectThisSample", self, basket_index,vial_index
         if self.currentLocation is not None and self.currentLocation[0] != basket_index:
 			print self.currentLocation
-			self.baskets[self.currentLocation[0]-1].clearCurrentVial()
+			b=self.getBasketIdx(self.currentLocation[0])
+			if b is not None:
+				b.clearCurrentVial()
         self.currentLocation=(basket_index, vial_index)
         
-
-
         
     def infoChanged(self):
 	self.reloadContents()
@@ -1253,6 +1266,9 @@ class FlexBrick3(BlissWidget):
             elif sample.getState()=="mounting":
 				print sample.getState()
 				presences[basket_index][vial_index]=[VialView.VIAL_ALREADY_LOADED,matrix]
+            elif sample.getState()=="unknown":
+				print basket_index, vial_index, sample.getState()
+				presences[basket_index][vial_index]=[VialView.VIAL_UNKNOWN,matrix]
         
         for i, basket in enumerate(self.baskets):
             presence=presences[i]

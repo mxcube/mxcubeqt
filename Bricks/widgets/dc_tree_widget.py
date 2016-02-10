@@ -68,6 +68,7 @@ class DataCollectTree(qt.QWidget):
         self.delete_pixmap = Icons.load("bin_small.png")
         self.ispyb_pixmap = Icons.load("SampleChanger2.png")
         self.caution_pixmap = Icons.load("Caution2.png")
+        self.unknown_pixmap = Icons.load("sample_unknown.png")
                         
         self.up_button = qt.QPushButton(self, "up_button")
         self.up_button.setPixmap(self.up_pixmap)
@@ -214,7 +215,7 @@ class DataCollectTree(qt.QWidget):
 		#print self.sample_changer_hwobj
 		if hasattr(self.sample_changer_hwobj, '__TYPE__')\
                    and (self.sample_changer_hwobj.__TYPE__ == 'FLEX'):
-			return  item.get_model().get_state() in ("on_gonio", "in_puck", "") and self.sample_changer_hwobj.status in ("Ready")
+			return  item.get_model().get_state() in ("on_gonio", "in_puck", "") #and self.sample_changer_hwobj.status in ("Ready")
 		else:
 			return True			
 		
@@ -475,7 +476,7 @@ class DataCollectTree(qt.QWidget):
         self.confirm_dialog.set_plate_mode(False)       
 #AK
         logging.getLogger("user_level_log").\
-                            warning("Set mode to: "+filterOptions[option])    
+                            info("Set mode to: "+filterOptions[option])    
  
  
  
@@ -881,6 +882,10 @@ class DataCollectTree(qt.QWidget):
                     item.setPixmap(0, self.ispyb_pixmap)
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
+                if item.get_model().get_state() not in ("on_gonio", "in_puck", ""):
+					item.setText(1, item.get_model().get_state())
+					item.setPixmap(0, self.unknown_pixmap)
+                #print item.get_model().lims_location, item.get_model().get_state()
             elif isinstance(item, queue_item.BasketQueueItem):
                 do_it = True
                 child_item = item.firstChild()
