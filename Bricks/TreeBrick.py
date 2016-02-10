@@ -195,7 +195,10 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.beamline_config_hwobj = bl_setup
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
             self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
-            self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
+            try:
+                self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
+            except AttributeError:
+                self.plate_manipulator_hwobj = None
             self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
             self.dc_tree_widget.plate_manipulator_hwobj  = self.plate_manipulator_hwobj
             self.session_hwobj = bl_setup.session_hwobj
