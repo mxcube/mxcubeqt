@@ -103,8 +103,6 @@ class EDNAParameters(BlissWidget):
                              self.prompt_parameters)
                 self.connect(self.workflow, PYSIGNAL('stateChanged'),
                              self.workflow_state_changed)
-                self.connect(self.workflow, PYSIGNAL('currentActorChanged'),
-                             self.current_actor_changed)
                 #populate the available workflows list
                 self.refresh_workflows()
         if prop == 'edna object':
@@ -156,82 +154,6 @@ class EDNAParameters(BlissWidget):
         except:
             # We don't care if it doesn't work..
             pass
-
-    
-    def refresh_workflow_state(self, new_state, actor):
-        #abort button should never be disabled
-        new_state = str(new_state) #convert from DevState to string
-        if self.params_widget is not None: self.params_widget.setEnabled(new_state == "OPEN")
-        self.ok_button.setEnabled(new_state == "OPEN")
-
-        # only available when engine is idle
-        self.start_button.setEnabled(new_state == "ON")
-        self.workflow_list.setEnabled(new_state == "ON")
-
-        if new_state == "RUNNING":
-            message = 'Workflow engine running (actor: %s)' % self.workflow.current_actor.getValue()
-        elif new_state == "STANDBY":
-            message = 'Workflow engine paused'
-        elif new_state == "ON":
-            self.refresh_workflows()
-            message = 'Workflow engine idle'
-        elif new_state == "OPEN":
-            try:
-                actor_name = self.workflow.current_actor.getValue()
-            except:
-                actor_name = 'Unknown actor'
-            message = 'Actor %s waiting for parameters' % actor_name
-        elif new_state == "None":
-            message = 'Workflow engine is offline'
-        else:
-            message = 'Workflow engine is in a state it should not be in (%r)' % (new_state, )
-            #self.start_button.setEnabled(new_state == "ON")
-            #self.workflow_list.setEnabled(new_state == "ON")
-        #self.info_label.setText(message)
-        logging.info(message)
-
-    def current_actor_changed(self, actor):
-        if type(actor) == types.ListType or type(actor) == types.TupleType:
-            actor = actor[0]
-        
-        try:
-            state = self.workflow.state.getValue()
-            self.refresh_workflow_state(state, actor)
-        except:
-            pass
-            #self.info_label.setText('Lost connection with workflow engine')
-        
-    def workflow_state_changed(self, new_state):
-        logging.debug('%s: new workflow state is %r', self.name(), new_state)
-        if type(new_state) == types.ListType or type(new_state) == types.TupleType:
-            new_state = str(new_state[0])
-        try:
-            actor = self.workflow.current_actor.getValue()
-            self.refresh_workflow_state(new_state, actor)
-        except:
-            pass
-            #self.info_label.setText('Lost connection with workflow engine')
-        if new_state == "ON" and self.previous_workflow_state == "RUNNING":
-            # workflow finished, open the output file and use an EDNACaracterize method to
-            # continue the work
-            if self.workflow_output_file is not None and os.path.exists(self.workflow_output_file):
-                logging.debug('Workflow finished, sending the results to %r', self.edna)
-                logging.debug('Workflow file is %s', self.workflow_output_file)
-                try:
-                    data = XSDataResultMXCuBE.parseFile(self.workflow_output_file)
-                    self.edna.readEDNAResults(data.getCharacterisationResult(), self.workflow_output_file,
-                                              self.beamline_params['directory'], self.beamline_params['prefix'],
-                                              int(self.beamline_params['run_number']),
-                                              process_dir=self.process_dir, do_inducedraddam=False)
-                    logging.debug('Results sent')
-                except:
-                    logging.debug('Malformed or empty results file')
-            else:
-                logging.debug('Workflow finished, no result file')
-            # then remove the current widget with the parameters
-            if self.params_widget is not None:
-                self.layout().removeChild(self.params_widget)
-        self.previous_workflow_state = new_state
 
     def abort_workflow(self):
         if self.workflow is not None:

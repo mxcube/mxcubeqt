@@ -187,7 +187,7 @@ class DataCollectTree(qt.QWidget):
                         menu.insertItem(qt.QString("Move"), self.mount_sample)
                     else:
                         if self.is_mounted_sample_item(item): 
-                            menu.insertItem(qt.QString("Un-Mount"), self.unmount_sample)
+                            menu.insertItem(qt.QString("Unmount"), self.unmount_sample)
                         else:
                             menu.insertItem(qt.QString("Mount"), self.mount_sample)
                        
@@ -231,8 +231,8 @@ class DataCollectTree(qt.QWidget):
                 self.tree_brick.show_edna_tab(item)
             elif isinstance(item, queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
-            elif isinstance(item, queue_item.XRFScanQueueItem):
-                self.tree_brick.show_xrf_scan_tab(item) 
+            elif isinstance(item, queue_item.XRFSpectrumQueueItem):
+                self.tree_brick.show_xrf_spectrum_tab(item) 
             elif isinstance(item, queue_item.GenericWorkflowQueueItem):
                 self.tree_brick.show_workflow_tab(item)
         #elif len(items) == 0:
@@ -299,6 +299,7 @@ class DataCollectTree(qt.QWidget):
 
             #Estimate if minidiff is in plate mode
             #This could be done also in a different way
+	    
             if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 self.plate_manipulator_hwobj._doUnload()
             else:
@@ -504,7 +505,7 @@ class DataCollectTree(qt.QWidget):
 
         self.sample_list_view_selection()
         
-    def set_centring_method(self, method_number):       
+    def set_centring_method(self, method_number):
         self.centring_method = method_number
 
         try:
@@ -589,11 +590,6 @@ class DataCollectTree(qt.QWidget):
         if isinstance(item, queue_item.SampleQueueItem):
             if item.get_model().free_pin_mode == True:
                 result = True
-            #elif not self.sample_changer_hwobj.hasLoadedSample():
-            #    result = False
-            #elif item.get_model().location == self.sample_changer_hwobj.getLoadedSample().getCoords():
-            #    result = True
-
             elif self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 if self.plate_manipulator_hwobj is not None:
                     if not self.plate_manipulator_hwobj.hasLoadedSample():
@@ -840,7 +836,8 @@ class DataCollectTree(qt.QWidget):
             basket.clear_sample_list()
             for sample in sample_list:
                 #TODO check index 
-                if int(sample.location[0]) == basket.get_location():
+                
+                if sample.location[:-1] == basket.get_location():
                      basket.add_sample(sample)
                      self.queue_model_hwobj.add_child(basket, sample)
                      sample.set_enabled(False)
@@ -903,3 +900,4 @@ class DataCollectTree(qt.QWidget):
 
         return conflict
         
+

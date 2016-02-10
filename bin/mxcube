@@ -8,14 +8,8 @@ sys.path.insert(0, MXCUBE_ROOT)
 os.environ["CUSTOM_BRICKS_PATH"]=os.path.join(MXCUBE_ROOT, "Bricks")
 os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareObjects")
 
-if sys.argv[-1].upper() == "-QT3":
-    MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube.gui")
-    sys.argv.pop(-1)
-    import BlissFramework 
-    from BlissFramework import startGUI
-    BlissFramework.set_gui_version("qt3")
-    startGUI.run(MXCUBE_GUI_FILE)
-elif sys.argv[-1].upper() == "-QT4":
+
+if sys.argv[-1].upper() == "-QT4":
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "Qt4_example_mxcube.gui")
     sys.argv.pop(-1)
     import BlissFramework
@@ -23,6 +17,9 @@ elif sys.argv[-1].upper() == "-QT4":
     BlissFramework.set_gui_version("qt4")
     Qt4_startGUI.run(MXCUBE_GUI_FILE)
 else:
-    msg = "Command line argument indicating gui platform not passed or is incorrect. " +\
-          "Add -qt3 or -qt4 as a last argument to run MXCuBE in Qt3 or Qt4"
-    print msg
+    MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "mxcube.gui")
+    import BlissFramework 
+    from BlissFramework import startGUI
+    BlissFramework.set_gui_version("qt3")
+    startGUI.run(MXCUBE_GUI_FILE)
+

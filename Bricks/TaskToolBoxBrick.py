@@ -78,7 +78,7 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
                                               moveToCentredPosition                            
             self.shape_history.get_drawing_event_handler().\
                 move_to_screen_position_cb = self.diffractometer_hwobj.\
-                                              move_to_coord
+                                              moveToBeam
         except AttributeError:
             logging.error('Could not get diffractometer_hwobj, check your configuration')
             traceback.print_exc()
@@ -184,14 +184,14 @@ class TaskToolBoxBrick(BaseComponents.BlissWidget):
             centred_position_selection(selected_positions)
         self.task_tool_box_widget.energy_scan_page.\
             centred_position_selection(selected_positions)
-        self.task_tool_box_widget.xrf_scan_page.\
+        self.task_tool_box_widget.xrf_spectrum_page.\
             centred_position_selection(selected_positions)
 
         self.task_tool_box_widget.discrete_page.refresh_current_item()
         self.task_tool_box_widget.helical_page.refresh_current_item()
         self.task_tool_box_widget.char_page.refresh_current_item()
         self.task_tool_box_widget.energy_scan_page.refresh_current_item()
-        self.task_tool_box_widget.xrf_scan_page.refresh_current_item()
+        self.task_tool_box_widget.xrf_spectrum_page.refresh_current_item()
 
     def shape_deleted(self, shape):
         """

@@ -385,7 +385,6 @@ class ResolutionBrick(BlissWidget):
           resolution_str=self['angFormatString'] % float(resolution)
         except:
           return
-        print '*'*10, resolution
         self.currentResolutionValue=self['angFormatString'] % resolution
         self.currentResolution.setText("%s %s" % (resolution_str,chr(197)))
 
