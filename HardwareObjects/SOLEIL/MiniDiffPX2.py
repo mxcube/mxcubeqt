@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*: utf-8 -*-
 import gevent
 from gevent.event import AsyncResult
 from Qub.Tools import QubImageSave
@@ -148,7 +148,7 @@ class MiniDiffPX2(Equipment):
         # some defaults
         self.anticipation  = 1
         self.collect_phaseposition = 'DataCollection'
-        
+        self.centring_phaseposition = 'Centring'
         sc_prop=self.getProperty("samplechanger")
         if sc_prop is not None:
             try:
@@ -374,6 +374,21 @@ class MiniDiffPX2(Equipment):
         self.beamShape = "rectangular"
         return d
        
+    
+    
+    def sendGonioToCentringPhase(self):
+        md2State = self.getState()
+        logging.info("SOLEILCollect - setting gonio MD2 ready (state: %s)" % md2State)
+        if self.md2_ready:
+            #if self.md2.currentphase != self.centring_phaseposition:
+            #logging.getLogger("user_level_log").info("No set gonio to centring phase juste to put backlignt.")
+            self.md2.backlightison=True
+
+    
+    
+    
+    
+    
     def sendGonioToCollect(self, oscrange, npass, exptime):
         logging.info("MiniDiffPX2 / send gonio to collect oscrange=%s npass=%s exptime=%s" % (oscrange,npass, exptime) )
         if self.md2_ready:
@@ -517,7 +532,10 @@ class MiniDiffPX2(Equipment):
         
         curr_time=time.strftime("%Y-%m-%d %H:%M:%S")
         self.centringStatus={"valid":False, "startTime":curr_time}
-
+        
+        self.sendGonioToCentringPhase()
+        time.sleep(1)
+        
         self.emitCentringStarted(method)
 
         try:

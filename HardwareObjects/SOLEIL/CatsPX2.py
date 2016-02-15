@@ -7,7 +7,7 @@ Derived from Alexandre Gobbo's implementation for the EMBL SC3 sample changer.
 """
 from GenericSampleChanger import *
 import time
-
+import logging
 __author__ = "Michael Hellmig"
 __credits__ = ["The MxCuBE collaboration"]
 
@@ -260,11 +260,11 @@ class CatsPX2(SampleChanger):
             else:
                 self._executeServerTask(self._cmdChainedLoad, argin)
         else:
-            logging.debug("CATS executing server task command load.")
+            #logging.debug("CATS executing server task command load.")
             self._executeServerTask(self._cmdLoad, argin)
             logging.debug("CATS executing server task command load done.")
 
-        self._waitDeviceReady()
+        #self._waitDeviceReady()
             
     def _doUnload(self,sample_slot=None):
         """
@@ -313,7 +313,7 @@ class CatsPX2(SampleChanger):
         """
         self._waitDeviceReady(3.0)
         task_id = method(*args)
-        print "CatsPX2._executeServerTask", task_id
+        logging.info("CatsPX2._executeServerTask %s"  % str(task_id))
         ret=None
         if task_id is None: #Reset
             while self._isDeviceBusy():
@@ -321,9 +321,9 @@ class CatsPX2(SampleChanger):
         else:
             # introduced wait because it takes some time before the attribute PathRunning is set
             # after launching a transfer
-            time.sleep(2.0)
+            time.sleep(4.0) # may be other way better than this exist have to see  but it works!!!
             while str(self._chnPathRunning.getValue()).lower() == 'true': 
-                gevent.sleep(0.1)            
+                gevent.sleep(0.1)
             ret = True
         return ret
 

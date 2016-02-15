@@ -44,7 +44,8 @@ class EigerDetector:
         self.new_acquisition = True
         logging.info('Preparing EIGER Detector')
         self.detector.set_omega(start)
-        self.detector.set_omega_range_average(osc_range)
+        self.detector.set_omega_increment(osc_range)
+        #self.detector.set_omega_range_average(osc_range)
         self.detector.set_count_time(exptime)
         self.detector.set_frame_time(exptime)
         self.detector.set_nimages(number_of_images)

@@ -453,12 +453,12 @@ class SampleQueueEntry(BaseQueueEntry):
                 log.info(msg)
 
     def centring_done(self, success, centring_info):
-        if success:
-            self.sample_centring_result.set(centring_info)
-        else:
+        if not success:
+            
             msg = "Loop centring failed or was cancelled, " +\
                   "please continue manually."
             logging.getLogger("user_level_log").warning(msg)
+        self.sample_centring_result.set(centring_info)
 
     def pre_execute(self):
         BaseQueueEntry.pre_execute(self)
@@ -1186,19 +1186,18 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
 
     loc = data_model.location
     holder_length = data_model.holder_length
-
-    logging.info(">>>>>>>>>>>>  .>>>>>>>>>> Mounting sample %s" % str(loc))
-
+  
     if hasattr(beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__'):
         if  (beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
             element = '%d:%02d' % loc
-            logging.info("??????????    ??????? ELEMENT IN CATS IS %s" % element)
+            
         beamline_setup_hwobj.sample_changer_hwobj.load(sample=element, wait=True)
     else:
-        beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
+        if beamline_setup_hwobj.sample_changer_hwobj.load_sample(holder_length,
                                                               sample_location=loc,
-                                                              wait=True)
-    
+                                                              wait=True) == False :
+            raise QueueSkippEntryException("Sample chenger could not load sample", "")
+     
     if  not beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
         view.setOn(False)
         view.setText(1, "Sample not loaded")
@@ -1215,18 +1214,15 @@ def mount_sample(beamline_setup_hwobj, view, data_model,
                               centring_method
                   
                 if centring_method == CENTRING_METHOD.MANUAL:
-                    log.info("starting manual centring")
                     log.warning("Manual centring used, waiting for" +\
                             " user to center sample")
                     dm.startCentringMethod(dm.MANUAL3CLICK_MODE)
                 elif centring_method == CENTRING_METHOD.LOOP:
-                    log.info("starting semi-auto centring")
                     dm.startCentringMethod(dm.C3D_MODE)
                     log.warning("Centring in progress. Please save" +\
                             " the suggested centring or re-center")
                 elif centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
                     log.info("starting full-auto centring")
-                    log.info("Centring sample, please wait.")
                     dm.startCentringMethod(dm.C3D_MODE)
 
                 view.setText(1, "Centring !")

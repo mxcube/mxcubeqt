@@ -41,17 +41,11 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
                     self._collection = self._wsdl_collection_client()
                     self._tools_ws = self._wsdl_tools_client()
 
-                except: 
-                    import traceback
-                    print traceback.print_exc()
-                #except URLError:
-                    print "URLError"
+                except:
                     logging.getLogger("ispyb_client")\
                         .exception(_CONNECTION_ERROR_MSG)
                     return
         except:
-            import traceback
-            print traceback.print_exc()
             logging.getLogger("ispyb_client").exception(_CONNECTION_ERROR_MSG)
             return
  
@@ -79,8 +73,6 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
             pass
         except:
             pass
-            #import traceback
-            #traceback.print_exc()
 
         self.beamline_name = self.get_beamline_name()
 
@@ -110,7 +102,7 @@ class SOLEILISPyBClient(ISPyBClient2.ISPyBClient2):
         url_opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
         trans = HttpAuthenticated(username = self.ws_username, password = self.ws_password)
-        print '_wsdl_client %s' % service_name, trans
+        logging.info('_wsdl_client service_name %s - trans %s' % (service_name, trans))
         trans.urlopener = url_opener
         urlbase = service_name + "?wsdl"
         locbase = service_name
