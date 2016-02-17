@@ -1,4 +1,4 @@
-<object class="EMBLMultiCollect">
+<object class="EMBLCollect">
   <object href="/mini-diff" role="diffractometer"/>
   <object href="/safshut" role="safety_shutter"/>
   <object href="/beam-info" role="beam_info"/>
