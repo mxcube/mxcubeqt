@@ -33,6 +33,7 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 import BlissFramework
+BlissFramework.set_gui_version("qt4")
 from BlissFramework import Qt4_GUISupervisor
 from BlissFramework.Utils import Qt4_ErrorHandler
 from BlissFramework.Utils import Qt4_GUILogHandler
