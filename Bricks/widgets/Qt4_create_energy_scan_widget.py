@@ -24,7 +24,7 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
+from Qt4_GraphicsLib import GraphicsItemPoint
 import queue_model_objects_v1 as queue_model_objects
 
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
@@ -56,20 +56,13 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         # Graphic elements ----------------------------------------------------
         self._periodic_table_widget = PeriodicTableWidget(self)
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_widget = DataPathWidget(self._data_path_gbox,
-                                               data_model = self._path_template,
-                                               layout = 'vertical')
+        self._data_path_widget = DataPathWidget(self, 
+             data_model = self._path_template, layout = 'vertical')
 
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
-        self._data_path_gbox_vlayout.addWidget(self._data_path_widget)
-        self._data_path_gbox_vlayout.setSpacing(0)
-        self._data_path_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-
         self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self._periodic_table_widget)
-        self.main_layout.addWidget(self._data_path_gbox)
+        self.main_layout.addWidget(self._data_path_widget)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.main_layout.addStretch(10)
@@ -151,7 +144,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
-                if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+                if isinstance(shape, GraphicsItemPoint):
                     snapshot = self._graphics_manager_hwobj.\
                            get_snapshot(shape)
 

@@ -1,5 +1,0 @@
-<object class="PX2DataAnalysis">
-  <!-- Path to script that launches edna -->
-  <edna_command>/home/experiences/proxima2a/com-proxima2a/bin/edna_script.sh</edna_command>
-  <edna_default_file>/home/experiences/proxima2a/com-proxima2a/mxcube_v2/HardwareObjects.xml/PX2/edna_defaults.xml</edna_default_file>
-</object>

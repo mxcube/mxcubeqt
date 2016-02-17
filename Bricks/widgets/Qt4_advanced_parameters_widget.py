@@ -153,11 +153,21 @@ class AdvancedParametersWidget(QtGui.QWidget):
 
     def populate_widget(self, tree_view_item):
         self._tree_view_item = tree_view_item
-        self._data_collection = tree_view_item.get_model().reference_image_collection
+        advanced_model = tree_view_item.get_model()
+        self._data_collection = advanced_model.reference_image_collection
         executed = self._data_collection.is_executed()
 
         self._acq_widget.setEnabled(not executed)
         self._data_path_widget.setEnabled(not executed)
+
+
+        image = advanced_model.grid_object.get_snapshot()
+        try:
+           image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
+           self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
+        except:
+           pass 
+
         self._acquisition_mib = DataModelInputBinder(self._data_collection.\
              acquisitions[0].acquisition_parameters)
 

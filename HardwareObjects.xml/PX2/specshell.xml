@@ -1,8 +1,0 @@
-<procedure class = "SpecShell">
-  <specversion>SPEC_HOST:SPEC_VERSION</specversion>
-  <usercmds>
-    <cmd><method>wa</method><args></args></cmd>
-    <cmd><method>reconfig</method><args></args></cmd>
-    <cmd><method>print "echo"</method><args></args></cmd>
-  </usercmds>
-</procedure>

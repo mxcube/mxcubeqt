@@ -26,7 +26,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 class Qt4_DetectorStatusBrick(BlissWidget):
  
@@ -65,7 +65,7 @@ class Qt4_DetectorStatusBrick(BlissWidget):
         _main_groupbox = QtGui.QGroupBox("Detector status", self) 
         self.status_label = QtGui.QLabel("<b>unknown status</b>", _main_groupbox)
         self.temperature_label = QtGui.QLabel("Temperature:", _main_groupbox)
-        self.humidity_label = QtGui.QLabel("Humidity:    ", _main_groupbox)
+        self.humidity_label = QtGui.QLabel("Humidity:     ", _main_groupbox)
 
         # Layout -------------------------------------------------------------- 
         _main_groupbox_vlayout = QtGui.QVBoxLayout(_main_groupbox)
@@ -73,7 +73,7 @@ class Qt4_DetectorStatusBrick(BlissWidget):
         _main_groupbox_vlayout.addWidget(self.temperature_label)
         _main_groupbox_vlayout.addWidget(self.humidity_label)
         _main_groupbox_vlayout.setSpacing(2)
-        _main_groupbox_vlayout.setContentsMargins(0, 4, 4, 0)
+        _main_groupbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
         main_layout = QtGui.QVBoxLayout(self)
         main_layout.addWidget(_main_groupbox)
@@ -129,7 +129,7 @@ class Qt4_DetectorStatusBrick(BlissWidget):
                Qt4_DetectorStatusBrick.STATES['BAD'])
 
     def humidity_changed(self, value, status_ok):
-        self.humidity_label.setText("   Humidity        : %0.1f%s" %(value, chr(37)))
+        self.humidity_label.setText("   Humidity         : %0.1f%s" %(value, chr(37)))
         if status_ok:
             Qt4_widget_colors.set_widget_color(self.humidity_label,
                Qt4_DetectorStatusBrick.STATES['OK'])

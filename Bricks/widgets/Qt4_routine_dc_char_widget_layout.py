@@ -64,7 +64,7 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
         _main_gridlayout.addWidget(self.dose_ledit, 0, 2)
         _main_gridlayout.addWidget(self.time_ledit, 1, 2)
         _main_gridlayout.addWidget(self.radiation_damage_cbx, 2, 0, 1, 2)  
-        _main_gridlayout.setColumnStretch(4, 0)
+        _main_gridlayout.setColumnStretch(3, 0)
 
         # SizePolicies --------------------------------------------------------
 
@@ -72,7 +72,7 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
 
         # Other ---------------------------------------------------------------
         self.languageChange()
-        self.resize(QtCore.QSize(380,114).expandedTo(self.minimumSizeHint()))
+        #self.resize(QtCore.QSize(380,114).expandedTo(self.minimumSizeHint()))
         #self.setAttribute(QtCore.Qt.WA_WState_Polished)
 
     def languageChange(self):

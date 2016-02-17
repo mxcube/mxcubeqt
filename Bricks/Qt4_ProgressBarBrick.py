@@ -46,7 +46,10 @@ class Qt4_ProgressBarBrick(BlissWidget):
 	self.collect_hwobj = None	
 
         # Internal values -----------------------------------------------------
-	self.addProperty('mnemonic', 'string', '')
+        self.number_of_steps = 0
+
+        # Properties ----------------------------------------------------------
+        self.addProperty('mnemonicList', 'string', '')
 
         # Signals ------------------------------------------------------------
 
@@ -65,30 +68,34 @@ class Qt4_ProgressBarBrick(BlissWidget):
         main_layout.setSpacing(2)
         self.setEnabled(False)
 
-    def set_progress_total(self, value, exp_time):
-        self.progress_bar.setMaximum(value)
-        self.setEnabled(True)
-
     def stop_progress(self, *args):
+        self.progress_bar.reset()
         self.progress_type_label.setText("")
-        self.progress_bar.setValue(0)
         self.setEnabled(False)
 
-    def set_progress_step(self, step):
+    def step_progress(self, step):
         self.progress_bar.setValue(step)
-        if step == self.progress_bar.maximum():
+        self.setEnabled(True)
+        if step >= self.number_of_steps:
             self.stop_progress()
 
+    def init_progress(self, progress_type, number_of_steps):
+        self.setEnabled(True)
+        self.progress_bar.reset()
+        self.progress_type_label.setText(progress_type)
+        self.number_of_steps = number_of_steps
+        self.progress_bar.setMaximum(self.number_of_steps)
+
     def propertyChanged(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.collect_hwobj is not None:
-		self.disconnect(self.collect_hwobj, QtCore.SIGNAL('collectNumberOfFrames'), self.set_progress_total)
-		self.disconnect(self.collect_hwobj, QtCore.SIGNAL('collectImageTaken'), self.set_progress_step)
-		self.disconnect(self.collect_hwobj, QtCore.SIGNAL('collectEnded'), self.stop_progress) 
-            self.collect_hwobj = self.getHardwareObject(new_value)
-            if self.collect_hwobj is not None:
-		self.connect(self.collect_hwobj, QtCore.SIGNAL('collectNumberOfFrames'), self.set_progress_total)
-                self.connect(self.collect_hwobj, QtCore.SIGNAL('collectImageTaken'), self.set_progress_step)
-                self.connect(self.collect_hwobj, QtCore.SIGNAL('collectEnded'), self.stop_progress)
+        if property_name == "mnemonicList":
+            hwobj_role_list = new_value.split()
+            self.hwobj_list = []
+            for hwobj_role in hwobj_role_list:
+                hwobj = self.getHardwareObject(hwobj_role)
+                if hwobj is not None:
+                    self.hwobj_list.append(hwobj)
+                    self.connect(self.hwobj_list[-1], QtCore.SIGNAL('progressInit'), self.init_progress)
+                    self.connect(self.hwobj_list[-1], QtCore.SIGNAL('progressStep'), self.step_progress)
+                    self.connect(self.hwobj_list[-1], QtCore.SIGNAL('progressStop'), self.stop_progress)
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BlissWidget.propertyChanged(self,property_name, old_value, new_value)

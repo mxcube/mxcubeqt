@@ -27,7 +27,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 __category__ = 'Qt4_General'
 
-STATES = {'unknown': Qt4_widget_colors.DARK_GRAY,
+STATES = {'unknown': Qt4_widget_colors.GRAY,
           'ready': Qt4_widget_colors.LIGHT_BLUE,
           'error': Qt4_widget_colors.LIGHT_RED}
 
@@ -135,6 +135,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 if self.mach_info_hwobj.has_cryo() is False:
                     self.cryo_label.hide()
                     self.cryo_value_label.hide()
+                self.mach_info_hwobj.update_values() 
             else:
                 self.setEnabled(False)
         else:
@@ -230,13 +231,16 @@ class Qt4_MachineInfoBrick(BlissWidget):
                                                self.sizeof_fmt(free),
                                                '{0:.0%}'.format(perc))  
             if free / 2 ** 30 > self['diskThreshold']:
-                self.disc.setPaletteBackgroundColor(STATES['ready'])
+                Qt4_widget_colors.set_widget_color(self.disc_value_label,
+                                                   STATES['ready'])
             else:
-                self.disc.setPaletteBackgroundColor(STATES['error'])	
+                Qt4_widget_colors.set_widget_color(self.disc_value_label,
+                                                   STATES['error'])
         else:
             txt = 'Not available'
-            self.disc.setPaletteBackgroundColor(STATES['unknown'])
-        self.disc.setText(txt)
+            Qt4_widget_colors.set_widget_color(self.disc_value_label,
+                                                   STATES['unknown'])
+        self.disc_value_label.setText(txt)
 
     def temp_hum_changed(self, values, valuesInRange):
         """
@@ -251,14 +255,19 @@ class Qt4_MachineInfoBrick(BlissWidget):
 	      str(self['formatString'] % values[1])
         self.humidity_value_label.setText(txt)	           
         if valuesInRange[0] is None:
-            Qt4_widget_colors.set_widget_color(self.temperature_value_label, STATES['unknown'])
+            Qt4_widget_colors.set_widget_color(self.temperature_value_label, 
+                                               STATES['unknown'])
         elif valuesInRange[0]:
-            Qt4_widget_colors.set_widget_color(self.temperature_value_label, STATES['ready'])
+            Qt4_widget_colors.set_widget_color(self.temperature_value_label, 
+                                               STATES['ready'])
         else:
-            Qt4_widget_colors.set_widget_color(self.temperature_value_label, STATES['error'])
+            Qt4_widget_colors.set_widget_color(self.temperature_value_label, 
+                                               STATES['error'])
         if valuesInRange[1] is None:
-            Qt4_widget_colors.set_widget_color(self.humidity_value_label, STATES['unknown'])
+            Qt4_widget_colors.set_widget_color(self.humidity_value_label, 
+                                               STATES['unknown'])
         elif valuesInRange[1]:
-            Qt4_widget_colors.set_widget_color(self.humidity_value_label, STATES['ready'])
+            Qt4_widget_colors.set_widget_color(self.humidity_value_label, 
+                                               STATES['ready'])
         else:
             Qt4_widget_colors.set_widget_color(self.humidity_value_label, STATES['error'])

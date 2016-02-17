@@ -1,8 +1,0 @@
-<device class="MicrodiffMotor">
-  <username>apz</username>
-  <tangoname>i11-ma-cx1/ex/md2</tangoname>
-<!-- <motor_name>ApertureHorizontalPosition</motor_name> This is the attribute name in the MD2 tango device server.   -->
-  <motor_name>ApertureVertical</motor_name>
-  <channel type="tango" polling="1000" name="position">ApertureVerticalPosition</channel>
-  <channel type="tango" polling="1000" name="state">State</channel>
-</device>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>497</width>
-    <height>187</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,7 +89,7 @@
              <set>QAbstractItemView::NoEditTriggers</set>
             </property>
             <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
+             <enum>QAbstractItemView::ExtendedSelection</enum>
             </property>
             <property name="rootIsDecorated">
              <bool>false</bool>
@@ -109,6 +109,13 @@
               <string>End point</string>
              </property>
             </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="display_beam_cbox">
+            <property name="text">
+             <string>Display beam shapes</string>
+            </property>
            </widget>
           </item>
           <item>

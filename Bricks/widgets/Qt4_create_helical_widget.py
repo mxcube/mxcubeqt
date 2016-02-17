@@ -26,8 +26,8 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 import Qt4_queue_item
-import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
+from Qt4_GraphicsLib import GraphicsItemLine
 
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 from queue_model_enumerables_v1 import COLLECTION_ORIGIN
@@ -58,26 +58,17 @@ class CreateHelicalWidget(CreateTaskBase):
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
 
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_widget = \
-            DataPathWidget(self._data_path_gbox,
-                           'create_dc_path_widget',
-                           data_model=self._path_template,
-                           layout='vertical')
+        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
+             data_model=self._path_template, layout='vertical')
 
         self._processing_widget = ProcessingWidget(self,
              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
-        _data_path_gbox_layout.addWidget(self._data_path_widget)
-        _data_path_gbox_layout.setSpacing(0)
-        _data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
-        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
@@ -86,8 +77,8 @@ class CreateHelicalWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._lines_widget.lines_treewidget.itemSelectionChanged.connect(\
-             self.lines_treewidget_selection_changed)
+        #self._lines_widget.lines_treewidget.itemSelectionChanged.connect(\
+        #     self.lines_treewidget_selection_changed)
         self._lines_widget.create_line_button.clicked.connect(\
              self.create_line_button_clicked)
         self._lines_widget.remove_line_button.clicked.connect(\
@@ -172,22 +163,22 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_parameters.cell_gamma = crystal.cell_gamma
         self._processing_widget.update_data_model(self._processing_parameters)
 
-    def select_shape_with_cpos(self, start_cpos, end_cpos):
-        self._graphics_manager_hwobj.de_select_all()
+    def select_shape_with_cpos(self, start_cpos, end_cpos, num_images):
         selected_line = None
 
         for shape in self._graphics_manager_hwobj.get_shapes():
-            if isinstance(shape, graphics_manager.GraphicsItemLine):
+            if isinstance(shape, GraphicsItemLine):
                 (line_start_cpos, line_end_cpos) = shape.get_centred_positions() 
                 if line_start_cpos == start_cpos and line_end_cpos == end_cpos:
                     self._graphics_manager_hwobj.de_select_all()
-                    shape.setSelected(True)
+                    self._graphics_manager_hwobj.select_line(shape)
+                    shape.set_num_images(num_images)
                     selected_line = shape
 
         #de-select previous selected list items and
         #select the current shape (Line).
         for (list_item, shape) in self._lines_map.iteritems():
-            if selected_line is shape:
+            if selected_line == shape:
                 list_item.setSelected(True)
             else:
                 list_item.setSelected(False)
@@ -206,14 +197,10 @@ class CreateHelicalWidget(CreateTaskBase):
             data_collection = tree_item.get_model()
 
             if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
-                if tree_item.get_model().is_executed():
-                    self.setDisabled(True)
-                else:
-                    self.setDisabled(False)
+                self.setDisabled(tree_item.get_model().is_executed())
 
                 self._path_template = data_collection.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
-                
                 self._acquisition_parameters = data_collection.acquisitions[0].\
                                                acquisition_parameters
 
@@ -222,8 +209,9 @@ class CreateHelicalWidget(CreateTaskBase):
                                  centred_position
                     end_cpos = data_collection.acquisitions[1].acquisition_parameters.\
                                centred_position
-
-                    self.select_shape_with_cpos(start_cpos, end_cpos)
+                    num_images = data_collection.acquisitions[0].acquisition_parameters.\
+                                 num_images
+                    self.select_shape_with_cpos(start_cpos, end_cpos, num_images)
 
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
@@ -281,6 +269,7 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_name(start_acq.path_template.get_prefix())
             dc.set_number(start_acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
+            dc.set_requires_centring(False)
 
             data_collections.append(dc)
             self._path_template.run_number += 1
@@ -295,7 +284,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._graphics_manager_hwobj.create_line()
 
     def remove_line_button_clicked(self):
-        line_object_to_delete = None
+        line_to_delete = None
         for line, treewidget_item in self._lines_map.iteritems():
             if treewidget_item.isSelected():
                 line_to_delete = line

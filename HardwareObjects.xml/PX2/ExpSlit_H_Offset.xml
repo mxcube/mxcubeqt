@@ -1,7 +1,0 @@
-<device class = "TangoMotor">
-  <username>ExpSlit_H_Offset</username>
-  <tangoname>i11-ma-c04/ex/FENT_H.3-MT_Tx</tangoname>
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <channel type="tango" polling="1000" name="position">position</channel>
-  <interval>1000</interval>
-</device>

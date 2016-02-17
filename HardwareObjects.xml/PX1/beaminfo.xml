@@ -1,9 +1,0 @@
-<equipment class = "BeamInfoPX1">
-  <username>BeamInfo</username>
-  <!-- channel type="tango" tangoname="i10-c-cx1/ex/beamsize" polling="1000" name="beamsizex">sizeX</channel -->
-  <!-- channel type="tango" tangoname="i10-c-cx1/ex/beamsize" polling="1000" name="beamsizey">sizeZ</channel -->
-  <!-- channel type="tango" tangoname="i10-c-cx1/ex/beamposition" polling="1000" name="positionx">positionX</channel -->
-  <!-- channel type="tango" tangoname="i10-c-cx1/ex/beamposition" polling="1000" name="positiony">positionZ</channel -->
-  <object  role="zoom"  hwrid="/zoom"></object>
-</equipment>
-

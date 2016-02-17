@@ -18,7 +18,7 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
+from Qt4_GraphicsLib import GraphicsItemPoint
 import queue_model_objects_v1 as queue_model_objects
 
 from Qt4_create_task_base import CreateTaskBase
@@ -30,7 +30,8 @@ __category__ = 'Qt4_TaskToolbox_Tabs'
 
 class CreateXRFSpectrumWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
-        CreateTaskBase.__init__(self, parent, name, QtCore.Qt.WindowFlags(fl), 'XRFSpectrum')
+        CreateTaskBase.__init__(self, parent, name, 
+            QtCore.Qt.WindowFlags(fl), 'XRF spectrum')
  
         if name is not None:
             self.setObjectName(name)
@@ -43,10 +44,8 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_widget = DataPathWidget(self._data_path_gbox, 
-                                               data_model = self._path_template,
-                                               layout = 'vertical')
+        self._data_path_widget = DataPathWidget(self, 
+             data_model = self._path_template, layout = 'vertical')
 
 	_parameters_gbox = QtGui.QGroupBox('Parameters', self)
 	_count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
@@ -54,11 +53,6 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.count_time_ledit.setMaximumWidth(75)
 
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
-        self._data_path_gbox_vlayout.addWidget(self._data_path_widget)
-        self._data_path_gbox_vlayout.setSpacing(0)
-        self._data_path_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-
         _parameters_gbox_hlayout = QtGui.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
         _parameters_gbox_hlayout.addWidget(self.count_time_ledit)
@@ -67,7 +61,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-	_main_vlayout.addWidget(self._data_path_gbox)
+	_main_vlayout.addWidget(self._data_path_widget)
 	_main_vlayout.addWidget(_parameters_gbox)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -85,7 +79,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self.enery_scan = queue_model_objects.XRFScan()
+        self.enery_scan = queue_model_objects.XRFSpectrum()
         self._path_template.start_num = 1
         self._path_template.num_files = 1
         self._path_template.suffix = 'raw'
@@ -94,7 +88,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         escan_model = tree_item.get_model()
 
-        if isinstance(tree_item, Qt4_queue_item.XRFScanQueueItem):
+        if isinstance(tree_item, Qt4_queue_item.XRFSpectrumQueueItem):
             if tree_item.get_model().is_executed():
                 self.setDisabled(True)
             else:
@@ -105,7 +99,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
 
             self._data_path_widget.update_data_model(self._path_template)
         elif not(isinstance(tree_item, Qt4_queue_item.SampleQueueItem) or \
-                     isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem)):
+                 isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem)):
             self.setDisabled(True)
 
 
@@ -135,7 +129,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
-                if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+                if isinstance(shape, GraphicsItemPoint):
                     snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
@@ -143,12 +137,12 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
 
             path_template = self._create_path_template(sample, self._path_template)
            
-            xrf_scan = queue_model_objects.XRFScan(sample, path_template, cpos)
-            xrf_scan.set_name(path_template.get_prefix())
-            xrf_scan.set_number(path_template.run_number)
-            xrf_scan.count_time = self.count_time
+            xrf_spectrum = queue_model_objects.XRFSpectrum(sample, path_template, cpos)
+            xrf_spectrum.set_name(path_template.get_prefix())
+            xrf_spectrum.set_number(path_template.run_number)
+            xrf_spectrum.count_time = self.count_time
             
-            data_collections.append(xrf_scan)
+            data_collections.append(xrf_spectrum)
         else:
             logging.getLogger("user_level_log").\
                 info("No count time specified.") 

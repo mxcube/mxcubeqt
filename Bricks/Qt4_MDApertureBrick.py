@@ -52,7 +52,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_MDApertureBrick(BlissWidget):
@@ -80,72 +80,73 @@ class Qt4_MDApertureBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox("Aperture", self)
-        self.aperture_cbox = QtGui.QComboBox(self.main_gbox)
-        self.aperture_cbox.setMinimumWidth(100)
+        self.aperture_combo = QtGui.QComboBox(self.main_gbox)
+        self.aperture_combo.setMinimumWidth(100)
 
         # Layout --------------------------------------------------------------
         _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
-        _main_gbox_vlayout.addWidget(self.aperture_cbox)
+        _main_gbox_vlayout.addWidget(self.aperture_combo)
         _main_gbox_vlayout.addStretch()
-        _main_gbox_vlayout.setSpacing(0)
-        _main_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.main_gbox.setLayout(_main_gbox_vlayout)  
+        _main_gbox_vlayout.setSpacing(2)
+        _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
+        _main_vlayout.addSpacing(0)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------
-
-        self.aperture_cbox.activated.connect(self.change_aperture)
+        self.aperture_combo.activated.connect(self.change_aperture)
  
         # SizePolicies --------------------------------------------------------
 
         # Other --------------------------------------------------------------- 
-        Qt4_widget_colors.set_widget_color(self.aperture_cbox,
+        Qt4_widget_colors.set_widget_color(self.aperture_combo,
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Window)
+                                           QtGui.QPalette.Button)
 
-    def propertyChanged(self, property, oldValue, newValue):
+    def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         """
-        if property == "mnemonic":
+        if property_name == "mnemonic":
             if self.aperture_hwobj is not None:
-                self.disconnect(self.aperture_hwobj, QtCore.SIGNAL('apertureChanged'), 
-                     self.apertureChanged)
-            self.aperture_hwobj = self.getHardwareObject(newValue)
+                self.disconnect(self.aperture_hwobj, 
+                                QtCore.SIGNAL('apertureChanged'), 
+                                self.aperture_changed)
+            self.aperture_hwobj = self.getHardwareObject(new_value)
             if self.aperture_hwobj is not None:
                 self.init_aperture_list()
-                self.connect(self.aperture_hwobj, QtCore.SIGNAL('apertureChanged'), 
-                     self.apertureChanged)
+                self.connect(self.aperture_hwobj, 
+                             QtCore.SIGNAL('apertureChanged'), 
+                             self.aperture_changed)
                 self.aperture_hwobj.update_value()
         else:
-            BlissWidget.propertyChanged(self, property, oldValue, newValue)
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
     
     def change_aperture(self):
         """
         Descript. :
         """
-        self.aperture_hwobj.set_active_position(self.aperture_cbox.currentIndex())
+        self.aperture_hwobj.set_active_position(\
+             self.aperture_combo.currentIndex())
 
     def init_aperture_list(self):
         aperture_list = self.aperture_hwobj.get_aperture_list()
-        self.aperture_cbox.clear()
+        self.aperture_combo.clear()
         for aperture in aperture_list:
-            self.aperture_cbox.addItem(aperture)
+            self.aperture_combo.addItem(aperture)
 
-    def apertureChanged(self, pos_index, size):
+    def aperture_changed(self, pos_index, size):
         """
         Descript. :
         """
         if pos_index is None:
-            self.aperture_cbox.setEnabled(False)
+            self.aperture_combo.setEnabled(False)
         else:
-            self.aperture_cbox.setEnabled(True)
-            self.aperture_cbox.blockSignals(True)
-            self.aperture_cbox.setCurrentIndex(pos_index)
-            self.aperture_cbox.blockSignals(False)
+            self.aperture_combo.setEnabled(True)
+            self.aperture_combo.blockSignals(True)
+            self.aperture_combo.setCurrentIndex(pos_index)
+            self.aperture_combo.blockSignals(False)
 

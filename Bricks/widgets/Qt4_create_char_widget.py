@@ -25,9 +25,9 @@ from PyQt4 import QtGui
 from PyQt4 import uic
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
+from Qt4_GraphicsLib import GraphicsItemPoint
 
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from Qt4_create_task_base import CreateTaskBase
@@ -61,11 +61,8 @@ class CreateCharWidget(CreateTaskBase):
             AcquisitionWidgetSimple(self, acq_params = self._acquisition_parameters,
                                     path_template = self._path_template)
 
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_widget = DataPathWidget(
-                               self._data_path_gbox,
-                               data_model = self._path_template,
-                               layout = 'vertical')
+        self._data_path_widget = DataPathWidget(self, 
+             data_model = self._path_template, layout = 'vertical')
 
         self._vertical_dimension_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_vertical_crystal_dimension_widget_layout.ui'))
@@ -74,19 +71,14 @@ class CreateCharWidget(CreateTaskBase):
              'ui_files/Qt4_characterise_simple_widget_vertical_layout.ui')) 
 
         # Layout --------------------------------------------------------------
-        _data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
-        _data_path_gbox_layout.addWidget(self._data_path_widget)
-        _data_path_gbox_layout.setSpacing(0)
-        _data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
-
         _main_vlayout = QtGui.QVBoxLayout(self) 
         _main_vlayout.addWidget(self._acq_widget)
-        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.addStretch(0)
+        _main_vlayout.addStretch(10)
 
         # SizePolicies --------------------------------------------------------
 
@@ -292,7 +284,7 @@ class CreateCharWidget(CreateTaskBase):
         selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
 
         for shape in selected_shapes:
-            if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+            if isinstance(shape, GraphicsItemPoint):
                 result = True
         return result
         
@@ -304,7 +296,7 @@ class CreateCharWidget(CreateTaskBase):
         """
         tasks = []
 
-        if not shape or not isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+        if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot()
         else:

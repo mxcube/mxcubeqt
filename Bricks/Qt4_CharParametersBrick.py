@@ -23,6 +23,7 @@ from PyQt4.QtWebKit import QWebView
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
+from widgets.Qt4_webview_widget import WebViewWidget
 
 
 __category__ = 'Task'
@@ -59,17 +60,19 @@ class Qt4_CharParametersBrick(BlissWidget):
         self.toggle_page_button = QtGui.QPushButton('View Results', self)
         self.toggle_page_button.setFixedWidth(100)
 
-        self.results_view = QWebView(self)
+        self.results_view = WebViewWidget(self)
         self.stacked_widget.addWidget(self.parameters_widget)
         self.stacked_widget.addWidget(self.results_view)
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.stacked_widget)
-        _main_vlayout.addStretch(0)
+        #_main_vlayout.addStretch(0)
         _main_vlayout.addWidget(self.toggle_page_button)
 
         # SizePolicies -------------------------------------------------------
+        self.results_view.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                        QtGui.QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         self.toggle_page_button.clicked.connect(self.toggle_page)
@@ -96,9 +99,10 @@ class Qt4_CharParametersBrick(BlissWidget):
             self.parameters_widget.set_enabled(False)
 
             if char.html_report:
-                self.results_view.load(QtCore.QUrl(char.html_report))
+                self.results_view.set_url(char.html_report)
             else:
-                self.results_view.setHtml("<center><h1>Characterisation failed</h1></center>") 
+                self.results_view.set_static_page(\
+                    "<center><h1>Characterisation failed</h1></center>") 
         else:
             self.parameters_widget.set_enabled(True)
             self.stacked_widget.setCurrentWidget(self.parameters_widget)

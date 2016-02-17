@@ -148,20 +148,24 @@ class Qt4_TreeBrick(BlissWidget):
         main_layout.setContentsMargins(0, 0, 0, 0) 
 
         # SizePolicies --------------------------------------------------------
-        self.sample_changer_widget.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                                 QtGui.QSizePolicy.Fixed)
+        self.sample_changer_widget.setSizePolicy(\
+             QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
-        self.sample_changer_widget.details_button.clicked.\
-             connect(self.toggle_sample_changer_tab)
-        self.sample_changer_widget.filter_cbox.activated.\
-             connect(self.mount_mode_combo_changed)
-        self.sample_changer_widget.centring_cbox.activated.\
-             connect(self.dc_tree_widget.set_centring_method)
-        self.sample_changer_widget.synch_combo.currentIndexChanged.\
-             connect(self.refresh_sample_list)
-        self.sample_changer_widget.tree_options_button.clicked.connect(\
-             self.open_tree_options_dialog)
+        self.sample_changer_widget.details_button.clicked.connect(\
+             self.toggle_sample_changer_tab)
+        self.sample_changer_widget.filter_cbox.activated.connect(\
+             self.mount_mode_combo_changed)
+        self.sample_changer_widget.centring_cbox.activated.connect(\
+             self.dc_tree_widget.set_centring_method)
+        self.sample_changer_widget.synch_ispyb_button.clicked.connect(\
+             self.refresh_sample_list)
+        #self.sample_changer_widget.tree_options_button.clicked.connect(\
+        #     self.open_tree_options_dialog)
+        self.sample_changer_widget.filter_combo.activated.connect(\
+             self.filter_combo_changed)
+        self.sample_changer_widget.filter_ledit.textChanged.connect(\
+             self.filter_text_changed)
 
         # Other --------------------------------------------------------------- 
         self.enable_collect(False)
@@ -200,6 +204,9 @@ class Qt4_TreeBrick(BlissWidget):
             self.connect(self.queue_hwobj, 'show_workflow_tab',
                          self.show_workflow_tab_from_model)
 
+            self.connect(self.queue_hwobj, 'queue_entry_execute',
+                         self.dc_tree_widget.queue_entry_execution_started)
+
             self.connect(self.queue_hwobj, 'queue_paused', 
                          self.dc_tree_widget.queue_paused_handler)
 
@@ -224,15 +231,11 @@ class Qt4_TreeBrick(BlissWidget):
             self.lims_hwobj = bl_setup.lims_client_hwobj
 
             if self.sample_changer_one_hwobj is not None:
-                self.dc_tree_widget.active_sample_changer_hwobj = \
-                     bl_setup.sample_changer_one_hwobj
                 self.connect(self.sample_changer_one_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
                 self.connect(self.sample_changer_one_hwobj, SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
             if self.sample_changer_two_hwobj is not None:
-                self.dc_tree_widget.active_sample_changer_hwobj = \
-                     bl_setup.sample_changer_two_hwobj
                 self.connect(self.sample_changer_two_hwobj, SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
                 self.connect(self.sample_changer_two_hwobj, SampleChanger.INFO_CHANGED_EVENT,
@@ -289,8 +292,6 @@ class Qt4_TreeBrick(BlissWidget):
                     self.dc_tree_widget.sample_mount_method = 1
                     self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
                          self.dc_tree_widget.sample_mount_method)
-                    self.dc_tree_widget.active_sample_changer_hwobj = \
-                         self.sample_changer_one_hwobj
    
             if self.sample_changer_two_hwobj:        
                 sc_basket_content, sc_sample_content = self.get_sc_content(\
@@ -301,8 +302,6 @@ class Qt4_TreeBrick(BlissWidget):
                     self.dc_tree_widget.sample_mount_method = 2
                     self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
                          self.dc_tree_widget.sample_mount_method)    
-                    self.dc_tree_widget.active_sample_changer_hwobj = \
-                         self.sample_changer_two_hwobj
 
             #if self.dc_tree_widget.sample_mount_method > 0:
             #self.sample_changer_widget.synch_combo.setEnabled()
@@ -380,25 +379,29 @@ class Qt4_TreeBrick(BlissWidget):
 
         return barcode_samples, l_samples
 
-    def refresh_sample_list(self, current_index):
+    def refresh_sample_list(self):
         """
         Retrives sample information from ISPyB and populates the sample list
         accordingly.
         """
-        if current_index == 0:
-            self.dc_tree_widget.filter_sample_list(\
-                 self.dc_tree_widget.sample_mount_method) 
-        elif current_index == 1: 
+        if True:
             lims_client = self.lims_hwobj
             samples = lims_client.get_samples(self.session_hwobj.proposal_id,
                                               self.session_hwobj.session_id)
+            basket_list = []
             sample_list = []
           
             if samples:
+                sample_changer = None
+                if self.dc_tree_widget.sample_mount_method == 1:
+                    sample_changer = self.sample_changer_one_hwobj
+                else:
+                    sample_changer = self.sample_changer_two_hwobj     
+ 
                 (barcode_samples, location_samples) = \
                     self.dc_tree_widget.samples_from_lims(samples)
                 sc_basket_content, sc_sample_content = self.get_sc_content(\
-                  self.dc_tree_widget.active_sample_changer_hwobj)
+                  sample_changer)
                 sc_basket_list, sc_sample_list = self.dc_tree_widget.\
                   samples_from_sc_content(sc_basket_content, sc_sample_content)
 
@@ -452,8 +455,6 @@ class Qt4_TreeBrick(BlissWidget):
                                 sample_list.append(sc_sample)
             self.dc_tree_widget.populate_tree_widget(basket_list, sample_list, 
                  self.dc_tree_widget.sample_mount_method)
-        elif current_index == 2:
-            print "sync with crims"
 
     def open_tree_options_dialog(self):
         self.tree_options_dialog.set_filter_lists(\
@@ -721,8 +722,6 @@ class Qt4_TreeBrick(BlissWidget):
 
     def mount_mode_combo_changed(self, index):
         self.dc_tree_widget.filter_sample_list(index)
-        self.sample_changer_widget.synch_combo.setEnabled(index > 0)
-        self.sample_changer_widget.synch_label.setEnabled(index > 0)
         
     def toggle_sample_changer_tab(self): 
         """
@@ -763,7 +762,7 @@ class Qt4_TreeBrick(BlissWidget):
                 self.populate_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.populate_energy_scan_tab(item)
-            elif isinstance(item, Qt4_queue_item.XRFScanQueueItem):
+            elif isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem):
                 self.populate_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.populate_workflow_tab(item)
@@ -809,3 +808,99 @@ class Qt4_TreeBrick(BlissWidget):
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
         
         self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
+
+    def select_last_added_item(self):
+        self.dc_tree_widget.select_last_added_item()
+
+    def filter_combo_changed(self, filter_index):
+        """Filters sample treewidget based on the selected filter criteria:
+           0 : No filter
+           1 : Sample name
+           2 : Protein name
+           3 : Basket index
+           4 : Executed
+           5 : Not executed
+           6 : OSC
+           7 : Helical
+           8 : Characterisation
+           9 : Energy Scan
+           10: XRF spectrum            
+           11: Advanced
+
+        """
+        self.sample_changer_widget.filter_ledit.setEnabled(\
+             filter_index in (1, 2, 3))
+        self.clear_filter()
+        if filter_index == 0:
+            self.clear_filter() 
+        else:
+            item_iterator = QtGui.QTreeWidgetItemIterator(\
+                  self.dc_tree_widget.sample_tree_widget)
+            item = item_iterator.value()
+            while item:
+                  hide = False
+                  item_model = item.get_model() 
+                  if filter_index == 4:
+                      hide = not item_model.is_executed()
+                  elif filter_index == 5:
+                      hide = item_model.is_executed()
+                  elif filter_index == 6:
+                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                          hide = item_model.is_helical()
+                  elif filter_index == 7:
+                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                          hide = not item_model.is_helical()
+                  elif filter_index == 8:
+                      hide = not isinstance(item, Qt4_queue_item.CharacterisationQueueItem)
+                  item.set_hidden(hide)
+                  item_iterator += 1
+                  item = item_iterator.value()
+
+        self.hide_empty_baskets()     
+
+    def filter_text_changed(self, new_text):
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+             self.dc_tree_widget.sample_tree_widget) 
+        item = item_iterator.value()
+        while item:
+              hide = False
+              new_text = str(new_text)
+              if self.sample_changer_widget.filter_combo.currentIndex() == 1:
+                  if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                      hide = not new_text in item.text(0)
+              elif self.sample_changer_widget.filter_combo.currentIndex() == 2:
+                  if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                      hide = not new_text in item.get_model().crystals[0].protein_acronym
+              item.set_hidden(hide) 
+              item_iterator += 1
+              item = item_iterator.value()
+
+        self.hide_empty_baskets()
+        
+    def clear_filter(self):
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+             self.dc_tree_widget.sample_tree_widget)
+        item = item_iterator.value()
+        while item:
+              item.setHidden(False)
+              item_iterator += 1
+              item = item_iterator.value() 
+
+    def hide_empty_baskets(self):
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+             self.dc_tree_widget.sample_tree_widget) 
+        item = item_iterator.value()
+        while item:
+              hide = True
+              
+              if type(item) in(Qt4_queue_item.BasketQueueItem,
+                               Qt4_queue_item.DataCollectionGroupQueueItem): 
+                  for index in range(item.childCount()):
+                      if not item.child(index).isHidden():
+                          hide = False
+                          break
+                  item.setHidden(hide) 
+                 
+              item_iterator += 1
+              item = item_iterator.value()
+ 

@@ -122,12 +122,24 @@ class TaskToolBoxWidget(QtGui.QWidget):
             self.tool_box.widget(i).set_beamline_setup(beamline_setup_hwobj)
 
         self.graphics_manager_hwobj = beamline_setup_hwobj.shape_history_hwobj
-        self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
+        self.energy_scan_page.set_energy_scan_hwobj(\
+             beamline_setup_hwobj.energyscan_hwobj)
 
         # Remove energy scan page from non tunable wavelentgh beamlines
         if not beamline_setup_hwobj.tunable_wavelength():
-            self.tool_box.removeItem(self.energy_scan_page)
+            self.tool_box.removeItem(self.tool_box.indexOf(self.energy_scan_page))
             self.energy_scan_page.hide()
+            logging.getLogger("user_level_log").info("Energy scan task not available")
+        
+        has_xrf_spectrum = False
+        if hasattr(beamline_setup_hwobj, 'xrf_spectrum_hwobj'):
+            if beamline_setup_hwobj.xrf_spectrum_hwobj:
+                has_xrf_spectrum = True
+
+        if not has_xrf_spectrum:
+            self.tool_box.removeItem(self.tool_box.indexOf(self.xrf_spectrum_page))
+            self.xrf_spectrum_page.hide()
+            logging.getLogger("user_level_log").info("XRF spectrum task not available")
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
@@ -174,7 +186,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(tree_item, Qt4_queue_item.EnergyScanQueueItem):
                 if self.tool_box.currentWidget() == self.energy_scan_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, Qt4_queue_item.XRFScanQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.XRFSpectrumQueueItem):
                 if self.tool_box.currentWidget() == self.xrf_spectrum_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, Qt4_queue_item.GenericWorkflowQueueItem):
@@ -206,7 +218,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 self.tool_box.setCurrentWidget(self.char_page)
             elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentWidget(self.energy_scan_page)
-            elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
+            elif isinstance(items[0], Qt4_queue_item.XRFSpectrumQueueItem):
                 self.tool_box.setCurrentWidget(self.xrf_spectrum_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
@@ -232,7 +244,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
                         task_model = self.create_task_group(task_model)
-                        if len(shapes):
+                        if self.tool_box.currentWidget() in (self.discrete_page, 
+                           self.char_page, self.energy_scan_page, 
+                           self.xrf_spectrum_page) and len(shapes):
+                            #This could be done in more nicer way...
                             for shape in shapes:
                                 self.create_task(task_model, shape)
                         else:
@@ -240,23 +255,29 @@ class TaskToolBoxWidget(QtGui.QWidget):
                     elif isinstance(task_model, queue_model_objects.Basket):
                         for sample_node in task_model.get_sample_list():
                             child_task_model = self.create_task_group(sample_node)
-                            if len(shapes):
+                            if self.tool_box.currentWidget() in (self.discrete_page,
+                               self.char_page, self.energy_scan_page, 
+                               self.xrf_spectrum_page) and len(shapes):
                                 for shape in shapes:
                                     self.create_task(child_task_model, shape)
                             else:
                                 self.create_task(child_task_model)
                     else:
-                        if len(shapes):
+                        if self.tool_box.currentWidget() in (self.discrete_page,
+                           self.char_page, self.energy_scan_page, 
+                           self.xrf_spectrum_page) and len(shapes):
                             for shape in shapes:
                                 self.create_task(task_model, shape)
                         else:
                              self.create_task(task_model)
+                self.tree_brick.select_last_added_item()
 
             self.tool_box.currentWidget().update_selection()
 
     def create_task_group(self, task_model):
         group_task_node = queue_model_objects.TaskGroup()
         current_item = self.tool_box.currentWidget()
+
         group_name = current_item._task_node_name
         group_task_node.set_name(group_name)
         num = task_model.get_next_number_for_name(group_name)

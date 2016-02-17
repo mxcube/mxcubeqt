@@ -56,6 +56,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
+        self.move_beam_mark_action = None
 
         # Layout --------------------------------------------------------------
 
@@ -86,7 +87,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         aa_action = _create_menu.addAction(Qt4_Icons.load_icon("VCRPlay2"),
              "Centring point with 3 clicks", self.create_point_click_clicked)
         aa_action.setShortcut("Ctrl+1")
-        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("ThumpUp"),
+        temp_action = _create_menu.addAction(Qt4_Icons.load_icon("ThumbUp"),
              "Centring point on current position", self.create_point_current_clicked)
         temp_action.setShortcut("Ctrl+2")
         temp_action = _create_menu.addAction(Qt4_Icons.load_icon("Line.png"),
@@ -97,17 +98,18 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         temp_action.setShortcut("Ctrl+4")
         temp_action = self.tools_menu.addAction("Select all centring points",
              self.select_all_points_clicked)
-        temp_action.setShortcut("Ctrl+7")
+        temp_action.setShortcut("Ctrl+A")
         temp_action = self.tools_menu.addAction("Deselect all items",
              self.deselect_all_items_clicked)
-        temp_action.setShortcut("Ctrl+8")
+        temp_action.setShortcut("Ctrl+D")
         temp_action = self.tools_menu.addAction("Clear all items",
              self.clear_all_items_clicked)
-        temp_action.setShortcut("Ctrl+9")
+        temp_action.setShortcut("Ctrl+X")
 
         self.move_beam_mark_action = self.tools_menu.addAction(
              "Move beam mark",
              self.move_beam_mark_clicked)
+        self.move_beam_mark_action.setEnabled(False)
 
         if self.target_menu == "menuBar":
             BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
@@ -131,6 +133,10 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
             self.target_menu = new_value
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def set_expert_mode(self, is_expert_mode):
+        if self.move_beam_mark_action:
+            self.move_beam_mark_action.setEnabled(is_expert_mode)
 
     def measure_distance_clicked(self):
         self.graphics_manager_hwobj.start_measure_distance(wait_click = True)

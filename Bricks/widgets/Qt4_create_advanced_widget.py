@@ -62,22 +62,14 @@ class CreateAdvancedWidget(CreateTaskBase):
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
 
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_gbox.setObjectName('data_path_gbox')
-        self._data_path_widget = DataPathWidget(self._data_path_gbox,
-             'create_dc_path_widget', data_model = self._path_template,
-             layout = 'vertical')
+        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget', 
+             data_model = self._path_template, layout = 'vertical')
 
         # Layout --------------------------------------------------------------
-        _data_path_gbox_vlayout = QtGui.QVBoxLayout(self._data_path_gbox)
-        _data_path_gbox_vlayout.addWidget(self._data_path_widget)
-        _data_path_gbox_vlayout.setSpacing(0)
-        _data_path_gbox_vlayout.setContentsMargins(0,0,0,0)
-
         _main_vlayout = QtGui.QVBoxLayout(self) 
         _main_vlayout.addWidget(self._advanced_methods_widget)
         _main_vlayout.addWidget(self._acq_widget)
-        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -103,6 +95,26 @@ class CreateAdvancedWidget(CreateTaskBase):
              connect(self.draw_grid_button_clicked)
         self._advanced_methods_widget.remove_grid_button.clicked.\
              connect(self.remove_grid_button_clicked)
+        self._advanced_methods_widget.hor_spacing_ledit.textChanged.\
+             connect(self.spacing_changed)
+        self._advanced_methods_widget.ver_spacing_ledit.textChanged.\
+             connect(self.spacing_changed)
+
+        self._advanced_methods_widget.move_right_button.clicked.\
+             connect(lambda : self.move_grid("right"))
+        self._advanced_methods_widget.move_left_button.clicked.\
+             connect(lambda : self.move_grid("left"))
+        self._advanced_methods_widget.move_up_button.clicked.\
+             connect(lambda : self.move_grid("up"))
+        self._advanced_methods_widget.move_down_button.clicked.\
+             connect(lambda : self.move_grid("down"))        
+      
+        self._advanced_methods_widget.overlay_cbox.toggled.\
+             connect(self.overlay_cbox_toggled)
+        self._advanced_methods_widget.overlay_alpha_progressbar.valueChanged.\
+             connect(self.overlay_alpha_changed) 
+        self._advanced_methods_widget.move_to_grid_button.clicked.\
+             connect(self.move_to_grid)
 
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
@@ -110,8 +122,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acq_widget.use_kappa_phi(False)
         self._acq_widget.acq_widget_layout.num_images_label.setEnabled(False)
         self._acq_widget.acq_widget_layout.num_images_ledit.setEnabled(False)
-        for col in range(self._advanced_methods_widget.grid_treewidget.columnCount()):
-            self._advanced_methods_widget.grid_treewidget.resizeColumnToContents(col)
+        for col in range(self._advanced_methods_widget.\
+                         grid_treewidget.columnCount()):
+            self._advanced_methods_widget.grid_treewidget.\
+                 resizeColumnToContents(col)
 
     def init_models(self):
         """
@@ -174,12 +188,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         result = CreateTaskBase.approve_creation(self)
 
-        method_name = str(self._advanced_methods_widget.method_combo.\
-                currentText()).title().replace(' ', '')
-        if len(self._advanced_methods_widget.grid_treewidget.selectedItems()) == 0:
-            logging.getLogger("user_level_log").error("No grid selected")
-            result = False 
-
+        if len(self._advanced_methods_widget.grid_treewidget.\
+            selectedItems()) == 0:
+            msg = "No grid selected. Automatic grid will be used."
+            logging.getLogger("user_level_log").info(msg)
         return result
             
     def update_processing_parameters(self, crystal):
@@ -230,17 +242,28 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         data_collections = []
-        for shape in self.get_selected_grids():
-            snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
+        selected_grids = self.get_selected_grids() 
+
+        if len(selected_grids) == 0:
+            selected_grids.append(self._graphics_manager_hwobj.\
+                create_automatic_grid()) 
+
+        for shape in selected_grids:
+            shape.set_snapshot(self._graphics_manager_hwobj.\
+                  get_snapshot(shape))
+
             grid_properties = shape.get_properties()
 
             acq = self._create_acq(sample)
-            acq.acquisition_parameters.centred_position = shape.get_centred_position()
-            acq.acquisition_parameters.mesh_range = [grid_properties["dx_mm"],
-                                                     grid_properties["dy_mm"]]
-            acq.acquisition_parameters.num_lines = grid_properties["num_lines"]
-            acq.acquisition_parameters.num_images = grid_properties["num_lines"] * \
-                                                    grid_properties["num_images_per_line"]
+            acq.acquisition_parameters.centred_position = \
+                shape.get_centred_position()
+            acq.acquisition_parameters.mesh_range = \
+                [grid_properties["dx_mm"], grid_properties["dy_mm"]]
+            acq.acquisition_parameters.num_lines = \
+                grid_properties["num_lines"]
+            acq.acquisition_parameters.num_images = \
+                grid_properties["num_lines"] * \
+                grid_properties["num_images_per_line"]
 
             processing_parameters = deepcopy(self._processing_parameters)
 
@@ -252,7 +275,8 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_number(acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
 
-            exp_type = str(self._advanced_methods_widget.method_combo.currentText())
+            exp_type = str(self._advanced_methods_widget.method_combo.\
+                currentText())
             advanced = queue_model_objects.Advanced(exp_type, dc, 
                   shape, sample.crystals[0])
 
@@ -313,6 +337,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._advanced_methods_widget.remove_grid_button.setEnabled(True)
             else:
                 grid_object.setSelected(False)
+        self._advanced_methods_widget.move_to_grid_button.setEnabled(True)
 
     def get_selected_grids(self):
         selected_grids = [] 
@@ -331,15 +356,50 @@ class CreateAdvancedWidget(CreateTaskBase):
                 grid_to_delete = grid
                 break
         if grid_to_delete:
-            self._graphics_manager_hwobj.delete_shape(grid_to_delete)                
+            self._graphics_manager_hwobj.delete_shape(grid_to_delete)
+            self._advanced_methods_widget.move_to_grid_button.setEnabled(False)           
 
     def get_spacing(self):
         spacing = [0, 0]
         try:
            spacing[0] = float(self._advanced_methods_widget.\
                hor_spacing_ledit.text())
+        except:
+           pass
+        try:
            spacing[1] = float(self._advanced_methods_widget.\
                ver_spacing_ledit.text())
         except:
            pass
         return spacing
+
+    def spacing_changed(self, value):
+        spacing = self.get_spacing()
+        for grid_object, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                grid_object.set_spacing(spacing)
+                #self._graphics_manager_hwobj.\
+                #     update_grid_motor_positions(grid_object)
+
+    def move_to_grid(self):
+        for grid_object, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                self._beamline_setup_hwobj.diffractometer_hwobj.\
+                     move_to_centred_position(grid_object.get_centred_position())
+
+    def overlay_cbox_toggled(self, state):
+        for grid_object, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                grid_object.set_display_overlay(state)
+           
+    def overlay_alpha_changed(self, alpha_value):
+        for grid_object, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                grid_object.set_fill_alpha(alpha_value)
+
+    def move_grid(self, direction):
+        for grid_object, treewidget_item in self._grid_map.iteritems():
+            if treewidget_item.isSelected():
+                grid_object.move_by_pix(direction)
+                self._graphics_manager_hwobj.\
+                     update_grid_motor_positions(grid_object)

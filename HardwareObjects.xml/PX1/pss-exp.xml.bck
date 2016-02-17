@@ -1,6 +1,0 @@
-<device class = "TangoPssPX1">
-  <username>expPss</username>
-  <tangoname>I10-C-CE/PSS/DB_DATA</tangoname>
-  <hutch>experimental</hutch>
-  <interval>1000</interval>
-</device>

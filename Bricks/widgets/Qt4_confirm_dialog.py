@@ -18,19 +18,14 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import logging
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
 
-
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
 from BlissFramework.Utils import Qt4_widget_colors
-
-from widgets.Qt4_confirm_dialog_widget_vertical_layout \
-     import ConfirmDialogWidgetVerticalLayout
 
 
 class ConfirmDialog(QtGui.QDialog):
@@ -39,7 +34,7 @@ class ConfirmDialog(QtGui.QDialog):
     """
     continueClickedSignal = QtCore.pyqtSignal(list, list)
 
-    def __init__(self, parent = None, name = None, flags = 0):
+    def __init__(self, parent=None, name=None, flags=0):
         """
         Descript. :
         """
@@ -50,14 +45,9 @@ class ConfirmDialog(QtGui.QDialog):
         if name is not None:
             self.setObjectName(name) 
 
-        # Internal variab;es --------------------------------------------------
-        self.ready_event = False
+        # Internal variables --------------------------------------------------
         self.checked_items = []
         self.sample_items = []
-        self.files_to_be_written = []
-        self.item_run_number_list = []
-        self.queue_model_hwobj = None
-        self.action_item_map = {}
        
         # Graphic elements ---------------------------------------------------- 
         self.conf_dialog_layout = uic.loadUi(os.path.join(\
@@ -78,7 +68,7 @@ class ConfirmDialog(QtGui.QDialog):
              self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
-        self.setMinimumWidth(600)
+        self.setMinimumWidth(800)
 
         # Other --------------------------------------------------------------- 
         self.setWindowTitle('Confirm collection')
@@ -94,6 +84,7 @@ class ConfirmDialog(QtGui.QDialog):
         self.conf_dialog_layout.take_snapshots_combo.clear()
         for item in snapshot_count:
             self.conf_dialog_layout.take_snapshots_combo.addItem(str(item))        
+        self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(1)
  
     def disable_dark_current_cbx(self):
         """
@@ -114,8 +105,9 @@ class ConfirmDialog(QtGui.QDialog):
         Descript. :
         """
         self.sample_items = []
-        self.files_to_be_written = []
         self.checked_items = checked_items
+        info_str_list = QtCore.QStringList()
+        file_str_list = QtCore.QStringList()
         collection_items = []
         current_sample_item = None
         sample_treewidget_item = None
@@ -125,24 +117,30 @@ class ConfirmDialog(QtGui.QDialog):
 
         self.conf_dialog_layout.summary_treewidget.clear()
         self.conf_dialog_layout.file_treewidget.clear()
+        self.conf_dialog_layout.interleave_cbx.setChecked(False)
+        self.conf_dialog_layout.interleave_images_num_ledit.setText("")
 
         for item in checked_items:
-            info_str_list = QtCore.QStringList()
+            item_type_name = ""
+            info_str_list.clear()
+            acq_parameters = None
+            path_template = None
+            
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.sample_items.append(item)
                 current_sample_item = item
+                info_str_list.append(item.get_model().get_name())
                 if item.mounted_style:
                     info_str_list.append("Already mounted")
                 else:
-                    info_str_list.append("Sample mounting")
-            
-                info_str_list.append(item.get_model().get_name())
+                    info_str_list.append("Sample mounting") 
                 sample_treewidget_item = QtGui.QTreeWidgetItem(\
                    self.conf_dialog_layout.summary_treewidget,
                    info_str_list)
-                for col in range(3):
+                for col in range(9):
                     sample_treewidget_item.setBackground(col, \
                       QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
+                sample_treewidget_item.setExpanded(True)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem): 
                 info_str_list.append(item.get_model().get_name()) 
                 collection_group_treewidget_item = QtGui.QTreeWidgetItem(\
@@ -154,42 +152,65 @@ class ConfirmDialog(QtGui.QDialog):
                 QtGui.QTreeWidgetItem(collection_group_treewidget_item,
                                       info_str_list) 
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                info_str_list.append("Data collection")
+                item_type_name = "Data collection"
+                acq_parameters = item.get_model().acquisitions[0].\
+                     acquisition_parameters
+            elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
+                item_type_name = "Characterisation"
+                acq_parameters = item.get_model().reference_image_collection.\
+                    acquisitions[0].acquisition_parameters
+            elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
+                item_type_name = "Advanced"
+                acq_parameters = item.get_model().reference_image_collection.\
+                     acquisitions[0].acquisition_parameters
+
+            path_template = item.get_model().get_path_template()
+
+            if acq_parameters and path_template:
+                info_str_list.append(item_type_name)
                 info_str_list.append("")
-                info_str_list.append("%d image(s) with %.2f exposure time" % (\
-                     item.get_model().acquisitions[0].acquisition_parameters.num_images,
-                     item.get_model().acquisitions[0].acquisition_parameters.exp_time))
+                info_str_list.append(path_template.directory)
+                #This part is also in Qt4_data_path_widget. Mote to PathTemplate
+                file_name = path_template.get_image_file_name()
+                file_name = file_name.replace('%' + path_template.precision + \
+                      'd', int(path_template.precision) * '#' )
+                file_name = file_name.strip(' ')
+                info_str_list.append(file_name)
+                info_str_list.append(str(acq_parameters.num_images))
+                info_str_list.append(str(acq_parameters.osc_range))
+                info_str_list.append(str(acq_parameters.exp_time))
+                info_str_list.append(str(acq_parameters.num_images * \
+                                         acq_parameters.osc_range))
+                info_str_list.append(str(acq_parameters.num_images * \
+                                         acq_parameters.exp_time))
+
                 collection_treewidget_item = QtGui.QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
-                for col in range(3):
+                for col in range(9):
                     collection_treewidget_item.setBackground(col, \
                       QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_COLLECTION))  
              
-            sample_treewidget_item.setExpanded(True)
-            path_template = item.get_model().get_path_template()
-
-            if path_template:
                 collection_items.append(item)
                 file_paths = path_template.get_files_to_be_written()
                 num_images += len(file_paths)
 
                 for file_path in file_paths:
-                    if os.path.isfile(file_path):
+                    if os.path.exists(file_path):
                         (dir_name, file_name) = os.path.split(file_path)
-                        sample_name = current_sample_item.get_model().get_display_name()
+                        sample_name = current_sample_item.get_model().\
+                            get_display_name()
                         if sample_name is '':
                             sample_name = current_sample_item.get_model().loc_str
+                        file_str_list.clear()
+                        file_str_list.append(sample_name)
+                        file_str_list.append(dir_name)
+                        file_str_list.append(file_name)
 
-                        last_item = self.conf_dialog_layout.file_treewidget.topLevelItem(\
-                                    (self.conf_dialog_layout.file_treewidget.topLevelItemCount() - 1)) 
-
-                        info_str_list = QtCore.QStringList()
-                        info_str_list.append(sample_name)
-                        info_str_list.append(dir_name)
-                        info_str_list.append(file_name)
                         file_treewidgee_item = QtGui.QTreeWidgetItem(\
-                            self.conf_dialog_layout.file_treewidget,
-                            info_str_list)
+                             self.conf_dialog_layout.file_treewidget,
+                             file_str_list)
+                        file_treewidgee_item.setTextColor(1, QtCore.Qt.red)
+                        file_treewidgee_item.setTextColor(2, QtCore.Qt.red)
                         file_exists = True
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)
@@ -198,7 +219,10 @@ class ConfirmDialog(QtGui.QDialog):
         num_samples = len(self.sample_items)
         num_collections = len(collection_items)
 
-        self.conf_dialog_layout.summary_treewidget.resizeColumnToContents(0)
+        for col_index in range(self.conf_dialog_layout.summary_treewidget.columnCount()):
+            if col_index == 0 or col_index > 3:
+                self.conf_dialog_layout.summary_treewidget.\
+                     resizeColumnToContents(col_index)
         self.conf_dialog_layout.summary_label.setText(\
              "Collecting " + str(num_collections) + \
              " collection(s) on " + str(num_samples) + \
@@ -221,11 +245,11 @@ class ConfirmDialog(QtGui.QDialog):
                      acquisitions[0].acquisition_parameters 
             elif isinstance(item_model, queue_model_objects.TaskGroup):
                 try:
-                   item_model.interleave_num_images = \
+                    item_model.interleave_num_images = \
                       int(self.conf_dialog_layout.\
                       interleave_images_num_ledit.text())
                 except:
-                   pass
+                    pass
             
             if acq_parameters: 
                 acq_parameters.take_snapshots = int(self.conf_dialog_layout.\

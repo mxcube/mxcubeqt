@@ -1,8 +1,0 @@
-<device class="TangoDCMotor">
-  <username>Phi_Z</username>
-  <tangoname>i10-c-cx1/ex/microglide</tangoname>
-  <motor_name>z</motor_name>
-  <channel type="tango" polling="1000" name="position">z</channel>
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <interval>1000</interval>
-</device>

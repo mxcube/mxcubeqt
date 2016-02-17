@@ -1,8 +1,0 @@
-<device class="InOut">
-  <username>OBX</username>
-  <tangoname>i11-ma-c04/ex/obx.1</tangoname>
-  <tangoname2>i11-ma-ce/pss/db_data-parser</tangoname2>
-  <channel type="tango" tangoname="i11-ma-c04/ex/obx.1" polling="500" name="state">State</channel>
-  <command type="tango" tangoname="i11-ma-c04/ex/obx.1" name="set_in">Open</command>
-  <command type="tango" tangoname="i11-ma-c04/ex/obx.1" name="set_out">Close</command>
-</device>

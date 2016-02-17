@@ -76,7 +76,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         Qt4_widget_colors.set_widget_color(self.phase_combobox,
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Window)
+                                           QtGui.QPalette.Button)
  
     def propertyChanged(self, property, oldValue, newValue):
         """

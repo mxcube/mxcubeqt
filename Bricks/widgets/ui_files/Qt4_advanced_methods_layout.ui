@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>323</height>
+    <width>489</width>
+    <height>346</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -37,27 +37,33 @@
      <property name="spacing">
       <number>2</number>
      </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
      <item>
       <layout class="QVBoxLayout" name="main_vlayout">
        <property name="spacing">
         <number>6</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>2</number>
        </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
-          <number>6</number>
+          <number>2</number>
          </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
+         <property name="margin">
+          <number>2</number>
          </property>
          <item>
           <widget class="QLabel" name="method_type_label">
@@ -106,22 +112,115 @@
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="leftMargin">
-           <number>0</number>
+           <number>2</number>
           </property>
           <property name="topMargin">
            <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>2</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>2</number>
           </property>
-          <property name="horizontalSpacing">
-           <number>6</number>
+          <property name="spacing">
+           <number>2</number>
           </property>
+          <item row="2" column="0">
+           <widget class="QTreeWidget" name="grid_treewidget">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <column>
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Beam width (μ)</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Beam height (μ)</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Lines</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Images per line</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <layout class="QHBoxLayout" name="buttons_hlayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="draw_grid_button">
+              <property name="text">
+               <string>Draw</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../../../BlissFramework/Icons/Grid.png</normaloff>../../../BlissFramework/Icons/Grid.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="remove_grid_button">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
           <item row="0" column="0">
            <layout class="QVBoxLayout" name="grid_vlayout">
+            <property name="spacing">
+             <number>2</number>
+            </property>
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -136,14 +235,8 @@
               <property name="spacing">
                <number>6</number>
               </property>
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
+              <property name="margin">
+               <number>2</number>
               </property>
               <item>
                <layout class="QVBoxLayout" name="spacing_lable_vlayout">
@@ -355,54 +448,11 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0">
-           <widget class="QTreeWidget" name="grid_treewidget">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>150</height>
-             </size>
+          <item row="3" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="spacing">
+             <number>2</number>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>9</pointsize>
-              <weight>50</weight>
-              <italic>false</italic>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="rootIsDecorated">
-             <bool>false</bool>
-            </property>
-            <column>
-             <property name="text">
-              <string>Name</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Beam width (μ)</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Beam height (μ)</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Lines</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Images per line</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <layout class="QHBoxLayout" name="buttons_hlayout">
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -410,36 +460,71 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="draw_grid_button">
-              <property name="text">
-               <string>Draw</string>
+             <widget class="QCheckBox" name="overlay_cbox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../../BlissFramework/Icons/Grid.png</normaloff>../../../BlissFramework/Icons/Grid.png</iconset>
+              <property name="maximumSize">
+               <size>
+                <width>130</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Display overlay:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer_2">
+             <widget class="QScrollBar" name="overlay_alpha_progressbar">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="value">
+               <number>130</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
+             </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="remove_grid_button">
+             <widget class="QPushButton" name="move_to_grid_button">
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
-               <string>Remove</string>
+               <string>Move to grid</string>
               </property>
              </widget>
             </item>
@@ -457,5 +542,22 @@
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>overlay_cbox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>overlay_alpha_progressbar</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>360</x>
+     <y>143</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

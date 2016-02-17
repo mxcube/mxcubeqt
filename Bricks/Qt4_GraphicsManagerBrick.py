@@ -169,7 +169,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         info_str_list = QtCore.QStringList()
         info_str_list.append(str(shape.index))
         if shape_type == "Point":
-            info_str_list.append(str(shape.get_position())) 
+            info_str_list.append(str(shape.get_start_position())) 
             self.manager_widget.point_treewidget.clearSelection()
             point_treewidget_item = QtGui.QTreeWidgetItem(\
                  self.manager_widget.point_treewidget, info_str_list)
@@ -192,39 +192,44 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             self.__grid_map[shape] = grid_treewidget_item
 
     def shape_deleted(self, shape, shape_type):
-        item_index = self.manager_widget.shapes_treewidget.indexOfTopLevelItem(\
-              self.__shape_map[shape])
-        self.__shape_map.pop(shape)
-        self.manager_widget.shapes_treewidget.takeTopLevelItem(item_index) 
-        if shape_type == "Point":
-            item_index = self.manager_widget.point_treewidget.indexOfTopLevelItem(\
-              self.__point_map[shape])
-            self.__point_map.pop(shape)
-            self.manager_widget.point_treewidget.takeTopLevelItem(item_index)
-        elif shape_type == "Line":
-            item_index = self.manager_widget.line_treewidget.indexOfTopLevelItem(\
-              self.__line_map[shape])
-            self.__line_map.pop(shape)
-            self.manager_widget.line_treewidget.takeTopLevelItem(item_index)
-        elif shape_type == "Grid":
-            item_index = self.manager_widget.grid_treewidget.indexOfTopLevelItem(\
-              self.__grid_map[shape])
-            self.__grid_map.pop(shape)
-            self.manager_widget.grid_treewidget.takeTopLevelItem(item_index)
-
+        if self.__shape_map.get(shape): 
+            item_index = self.manager_widget.shapes_treewidget.\
+                 indexOfTopLevelItem(self.__shape_map[shape])
+            self.__shape_map.pop(shape)
+            self.manager_widget.shapes_treewidget.\
+                 takeTopLevelItem(item_index) 
+            if shape_type == "Point":
+                item_index = self.manager_widget.point_treewidget.\
+                    indexOfTopLevelItem(self.__point_map[shape])
+                self.__point_map.pop(shape)
+                self.manager_widget.point_treewidget.\
+                    takeTopLevelItem(item_index)
+            elif shape_type == "Line":
+                item_index = self.manager_widget.line_treewidget.\
+                    indexOfTopLevelItem(self.__line_map[shape])
+                self.__line_map.pop(shape)
+                self.manager_widget.line_treewidget.\
+                     takeTopLevelItem(item_index)
+            elif shape_type == "Grid":
+                item_index = self.manager_widget.grid_treewidget.\
+                    indexOfTopLevelItem(self.__grid_map[shape])
+                self.__grid_map.pop(shape)
+                self.manager_widget.grid_treewidget.\
+                    takeTopLevelItem(item_index)
         self.toggle_buttons_enabled()
 
     def shape_selected(self, shape, selected_state):
-        self.__shape_map[shape].setData(4, QtCore.Qt.DisplayRole, str(selected_state)) 
-        self.__shape_map[shape].setSelected(selected_state)
-        if self.__point_map.get(shape):
-            self.__point_map[shape].setSelected(selected_state)
-        if self.__line_map.get(shape):
-            self.__line_map[shape].setSelected(selected_state)
-        if self.__grid_map.get(shape):
-            self.__grid_map[shape].setSelected(selected_state)
-        self.manager_widget.change_color_button.setEnabled(\
-             len(self.graphics_manager_hwobj.get_selected_shapes()) > 0)
+        if shape in self.__shape_map:
+            self.__shape_map[shape].setData(4, QtCore.Qt.DisplayRole, str(selected_state)) 
+            self.__shape_map[shape].setSelected(selected_state)
+            if self.__point_map.get(shape):
+                self.__point_map[shape].setSelected(selected_state)
+            if self.__line_map.get(shape):
+                self.__line_map[shape].setSelected(selected_state)
+            if self.__grid_map.get(shape):
+                self.__grid_map[shape].setSelected(selected_state)
+            self.manager_widget.change_color_button.setEnabled(\
+                 len(self.graphics_manager_hwobj.get_selected_shapes()) > 0)
 
     def centring_in_progress_changed(self, centring_in_progress):
         if centring_in_progress:

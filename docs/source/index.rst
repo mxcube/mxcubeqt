@@ -1,61 +1,61 @@
-MxCuBE-2.0 Documentation
-========================
-MxCuBE stands for macromolecular xtallography customized beamline environment;
-the project started in 2005 at `ESRF <http://www.esrf.eu>`_, since then it has
+MxCuBE Documentation
+####################
+
+MXCuBE stands for Macromolecular Xtallography CUstomized Beamline Environment.
+The project started in 2005 at `ESRF <http://www.esrf.eu>`_, since then it has
 been adopted by other institutes in Europe. In 2010, a collaboration
-agreement has been signed for the development of mxCuBE with the following
+agreement has been signed for the development of MXCuBE with the following
 partners:
 
-* ESRF
+* `ESRF <http://www.esrf.eu>`_
 * `Soleil <http://www.synchrotron-soleil.fr/>`_
 * `Max lab <https://www.maxlab.lu.se/>`_
 * `HZB <http://www.helmholtz-berlin.de/>`_
 * `EMBL <http://www.embl.org/>`_
 * `Global Phasing Ltd. <http://www.globalphasing.com/>`_
+* `ALBA <https://www.cells.es/en>`_
+* `DESY <https://www.desy.de>`_
 
-MxCuBE consist of 2 main parts:
+Latest news about the MXCuBE project can be found in the `project website <http://mxcube.github.io/mxcube/>`_.
 
-* A graphical user interface
-* Data acquisition control layer
 
-.. rubric:: Graphical user interface
-
-MxCuBE GUI is built on top of the `Bliss Framework-2 <http://github.com/mxcube/BlissFramework>`_,
-a tool developed at ESRF for building graphical interfaces based on Python 2.x
-and the Qt 3 toolkit, especially designed for beamline experiment control applications.
+MXCuBE consist of separated data acquisition control layer and graphical user interface.
 
 .. rubric:: Data acquisition control
 
-Data acquisition control is made of Hardware Objects. Hardware Objects are Python
-classes associated with a configuration XML file. Hardware Objects are instanciated
-by the `Hardare Repository <http://github.com/mxcube/HardwareRepository>`_.
+Data acquisition control is based on Hardware Objects as Python classes associated with a configuration XML file. Hardware Objects are instanciated by the `Hardware Repository <http://github.com/mxcube/HardwareRepository>`_.
+Each Hardware Object should be based on an abstract class, defining a common API for MXCuBE. Then, implementation differs at each site depending on hardware and beamline specificities.
+See the :doc:`design_overview` and :doc:`feature_overview` for more details.
 
-Each Hardware Object should be based on an abstract class, defining a common API
-for MxCuBE. Then, implementation differs at each site depending on hardware and
-beamline specificities.
+.. rubric:: Graphical user interface
 
-See the :doc:`design_overview` for more details
+MXCuBE has two graphical user interfaces:
+
+* :doc:`qt_framework_overview` 
+* :doc:`web_framework_overview` 
+
+Information for users
+*********************
+
+* :doc:`gui_overview`
+* :doc:`feature_overview`
+* :doc:`user_manual`
+* If you cite MXCuBE, please use the reference:
+.. note:: 
+   Gabadinho, J. et al. (2010). MxCuBE: a synchrotron beamline control environment customized for macromolecular crystallography experiments. J. Synchrotron Rad. 17, 700-707
+
+* `Article <http://www.ncbi.nlm.nih.gov/pubmed/20724792>`_
 
 
-Tutorials and Examples
-----------------------
-* :doc:`installation_instructions`
+Information for developers
+**************************
+
+* :doc:`installation_instructions_qt4`
+* :doc:`installation_instructions_web`
+* :doc:`how_to_create_hwobj`
+* :doc:`how_to_create_qt_brick`
+* :doc:`how_to_define_qt_gui` 
+* :doc:`packages/HardwareObjects`
 * :doc:`packages/example_files`
-
-API
----
-.. toctree::
-   :maxdepth: 1
-   :glob:
-
-   packages/*
-
-Other information
-----------------------
 * :doc:`mxcube_meetings`
-
-Indices and tables
-------------------
-* :ref:`modindex`
-* :ref:`search`
-
+* :doc:`changelog`

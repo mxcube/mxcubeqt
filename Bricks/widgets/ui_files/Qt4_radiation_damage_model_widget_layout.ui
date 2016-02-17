@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
-    <height>111</height>
+    <width>170</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,19 +33,6 @@
        <number>2</number>
       </property>
       <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <layout class="QHBoxLayout">
         <property name="spacing">
          <number>2</number>
@@ -53,10 +40,16 @@
         <item>
          <layout class="QVBoxLayout">
           <property name="spacing">
-           <number>2</number>
+           <number>4</number>
           </property>
           <item>
            <widget class="QLabel" name="beta_over_gray_label">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>27</height>
+             </size>
+            </property>
             <property name="text">
              <string>βÅ&lt;sup&gt;2&lt;/sup&gt;/MGy:</string>
             </property>
@@ -67,6 +60,12 @@
           </item>
           <item>
            <widget class="QLabel" name="gamma_over_gray_label">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>27</height>
+             </size>
+            </property>
             <property name="text">
              <string>γ 1/MGy:</string>
             </property>
@@ -77,6 +76,12 @@
           </item>
           <item>
            <widget class="QLabel" name="sensetivity_label">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>27</height>
+             </size>
+            </property>
             <property name="text">
              <string>Sensetivity:</string>
             </property>
@@ -85,19 +90,32 @@
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
         <item>
          <layout class="QVBoxLayout">
           <property name="spacing">
-           <number>2</number>
+           <number>4</number>
           </property>
           <item>
            <widget class="QLineEdit" name="beta_over_gray_ledit">
             <property name="minimumSize">
              <size>
               <width>75</width>
-              <height>0</height>
+              <height>27</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -113,7 +131,7 @@
             <property name="minimumSize">
              <size>
               <width>75</width>
-              <height>0</height>
+              <height>27</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -129,7 +147,7 @@
             <property name="minimumSize">
              <size>
               <width>75</width>
-              <height>0</height>
+              <height>27</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -140,41 +158,26 @@
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
        </layout>
       </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </widget>
    </item>
-<item>
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-
-
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

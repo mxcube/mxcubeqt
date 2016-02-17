@@ -32,7 +32,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_HutchMenuBrick(BlissWidget):
@@ -53,22 +53,17 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.queue_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.beam_position = [0, 0]
-        self.beam_size = [0, 0]
-        self.beam_shape = "Rectangular"
-        self.pixels_per_mm = [0, 0]
         self.inside_data_collection =  None
         self.full_centring_done = None  
         self.directory = "/tmp"
-        self.prefix = "snapshot"
+        self.prefix = "snapshot" 
         self.file_index = 1
-        self.format_type = "png"
 
         # Properties ----------------------------------------------------------
         self.addProperty('collection', 'string', '')
         self.addProperty('graphicsManager', 'string', '')
         self.addProperty('enableAutoFocus', 'boolean', True)
-        self.addProperty('enableRefreshCamera', 'boolean', True)
+        self.addProperty('enableRefreshCamera', 'boolean', False)
         self.addProperty('enableVisualAlign', 'boolean', True)
         self.addProperty('enableAutoCenter', 'boolean', True)
 
@@ -91,7 +86,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
-        self.clear_all_button = MonoStateButton(self, "Clear", "Delete")
+        self.clear_all_button = MonoStateButton(self, "Clear all", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
 
         # Layout -------------------------------------------------------------- 
@@ -134,8 +129,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.create_line_button.setToolTip("Create helical line between \n" + \
              "two points (Ctrl+3)")
         self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+4)")
-        self.select_all_button.setToolTip("Select all centring points (Ctrl+7)")
-        self.clear_all_button.setToolTip("Clear all items (Ctrl+8)")
+        self.select_all_button.setToolTip("Select all centring points (Ctrl+A)")
+        self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
         #self.instanceSynchronize("")
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -191,30 +186,20 @@ class Qt4_HutchMenuBrick(BlissWidget):
         formats = ["*.%s" % unicode(format).lower() for format in \
                    QtGui.QImageWriter.supportedImageFormats()]
 
-        current_filename = os.path.join(self.directory, self.prefix)
-        current_filename = current_filename + '_%d%s%s' % (self.file_index, \
-                           os.path.extsep, self.format_type)
-
-        #dialog = QtGui.QFileDialog(self, "Open Directory", current_filename)
-        #dialog.exec()  
-
+        current_file_name = "%s/%s_%d.%s" % (self.directory, self.prefix,
+            self.file_index, "png")
         filename = QtCore.QString(QtGui.QFileDialog.getSaveFileName(\
             self, "Choose a filename to save under",
-            current_filename, "Image files (%s)" % " ".join(formats)))
+            current_file_name, "Image files (%s)" % " ".join(formats)))
 
         if not filename.isEmpty():
+            filename = str(filename)
             image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
-                img = self.graphics_manager_hwobj.get_snapshot([])
-                img.save(filename)
-                logging.getLogger().info("Saving snapshot : %s", filename)
-                #QubImageSave.save(filename, img, self.__drawing.canvas(), zoom, image_type)
+                self.graphics_manager_hwobj.save_snapshot(filename)
+                self.file_index += 1        
             except:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
-                logging.getLogger().error("HutchMenuBrick: error saving snapshot!")
-            else:
-                self.formatType = image_type.lower()
-                self.file_index += 1 
 
     def refresh_camera_clicked(self):
         """
@@ -358,7 +343,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
 class MonoStateButton(QtGui.QToolButton):
 
-    def __init__(self, parent, caption=None, icon=None, fixed_size=(70, 50)):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(70, 45)):
         QtGui.QToolButton.__init__(self, parent)
         self.setUsesTextLabel(True)
         if fixed_size: 
@@ -390,7 +375,7 @@ class DuoStateButton(QtGui.QToolButton):
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
         self.setUsesTextLabel(True)
         self.setText(caption)
-        self.setFixedSize(70, 50)
+        self.setFixedSize(70, 45)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 

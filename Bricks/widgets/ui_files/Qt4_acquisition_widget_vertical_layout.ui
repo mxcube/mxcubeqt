@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
-    <height>302</height>
+    <width>460</width>
+    <height>291</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -85,7 +85,7 @@
               <property name="maximumSize">
                <size>
                 <width>1677215</width>
-                <height>16777215</height>
+                <height>27</height>
                </size>
               </property>
               <property name="text">
@@ -101,8 +101,36 @@
                 <height>27</height>
                </size>
               </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>27</height>
+               </size>
+              </property>
               <property name="text">
                <string>First image:</string>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="exp_time_label">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Exposure time (s):</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>
@@ -117,36 +145,14 @@
                 <height>27</height>
                </size>
               </property>
-              <property name="text">
-               <string>Kappa:</string>
-              </property>
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="detector_mode_label">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
+              <property name="maximumSize">
                <size>
-                <width>0</width>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>16777215</height>
-               </size>
-              </property>
               <property name="text">
-               <string>Detector mode:</string>
+               <string>Kappa:</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>
@@ -158,6 +164,12 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
@@ -174,6 +186,12 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
@@ -196,6 +214,12 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
                 <height>27</height>
                </size>
               </property>
@@ -260,13 +284,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -288,7 +312,23 @@
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="exp_time_ledit">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -298,33 +338,14 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>80</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="detector_mode_combo">
-              <property name="minimumSize">
-               <size>
-                <width>80</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>70</width>
-                <height>32767</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Select necesaary detector mode</string>
               </property>
              </widget>
             </item>
@@ -333,13 +354,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -349,13 +370,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -365,13 +386,13 @@
               <property name="minimumSize">
                <size>
                 <width>80</width>
-                <height>0</height>
+                <height>27</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>70</width>
-                <height>32767</height>
+                <height>27</height>
                </size>
               </property>
              </widget>
@@ -387,7 +408,7 @@
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>60</height>
+                <height>56</height>
                </size>
               </property>
              </spacer>
@@ -451,6 +472,37 @@
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="detector_roi_mode_label">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>160</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Detector mode:</string>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="kappa_phi_label">
               <property name="minimumSize">
                <size>
@@ -466,28 +518,6 @@
               </property>
               <property name="text">
                <string>Phi:</string>
-              </property>
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="exp_time_label">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>27</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>27</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Exposure time (s):</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>
@@ -594,7 +624,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="kappa_phi_ledit">
+             <widget class="QComboBox" name="detector_roi_mode_combo">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>80</width>
@@ -607,10 +640,13 @@
                 <height>27</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Select necesaary detector mode</string>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="exp_time_ledit">
+             <widget class="QLineEdit" name="kappa_phi_ledit">
               <property name="minimumSize">
                <size>
                 <width>80</width>

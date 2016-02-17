@@ -1,6 +1,0 @@
-<device class = "TangoPssComplex">
-  <username>optPss</username>
-  <tangoname>i11-ma-co/pss/db_data-parser</tangoname>
-  <hutch>optical</hutch>
-  <interval>1000</interval>
-</device>

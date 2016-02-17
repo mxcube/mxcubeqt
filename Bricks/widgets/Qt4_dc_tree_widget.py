@@ -65,7 +65,6 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_hwobj = None
         self.queue_model_hwobj = None
         self.beamline_setup_hwobj = None
-        self.active_sample_changer_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.collecting = False
@@ -76,6 +75,7 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_item_list = []
         self.collect_tree_task = None
         self.user_stopped = False
+        self.last_added_item = None
         
         self.selection_changed_cb = None
         self.collect_stop_cb = None
@@ -120,7 +120,8 @@ class DataCollectTree(QtGui.QWidget):
         self.collect_button.setFixedWidth(125)
         self.collect_button.setIcon(self.play_icon)
         Qt4_widget_colors.set_widget_color(self.collect_button, 
-            Qt4_widget_colors.LIGHT_GREEN)
+                                           Qt4_widget_colors.LIGHT_GREEN,
+                                           QtGui.QPalette.Button)
 
         self.continue_button = QtGui.QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
@@ -244,7 +245,9 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         self.check_for_path_collisions()
-
+        #items = self.get_selected_items()
+        #for item in items:
+             
     def item_changed(self, item, column):
         """
         Descript. : As there is no signal when item is checked/unchecked
@@ -253,8 +256,15 @@ class DataCollectTree(QtGui.QWidget):
                     Item check state is updated when checkbox is toggled
                     (to avoid update when text is changed)                    
         """
-        if item.checkState(0) != item.get_previous_check_state():
-            item.update_check_state()        
+        #if item.checkState(0) != item.get_previous_check_state():
+        #   item.update_check_state()        
+
+        # IK. This type check should not be here,because all tree items are 
+        # anyway QueueItems. but somehow on the init item got native
+        # QTreeWidgetItem type and method was not found. Interesting...
+
+        if type(item) == Qt4_queue_item.QueueItem:
+            item.update_check_state(item.checkState(0))
 
     def context_collect_item(self):
         """
@@ -286,7 +296,7 @@ class DataCollectTree(QtGui.QWidget):
                 self.tree_brick.show_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
-	    elif isinstance(item, Qt4_queue_item.XRFScanQueueItem):
+	    elif isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem):
                 self.tree_brick.show_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tree_brick.show_workflow_tab(item)
@@ -328,10 +338,18 @@ class DataCollectTree(QtGui.QWidget):
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
-                    queue_entry.mount_sample(self.active_sample_changer_hwobj, 
-                                             self.beamline_setup_hwobj,
-                                             items[0], items[0].get_model(), self.centring_done,
-                                             self.sample_centring_result)
+                    if self.sample_mount_method == 1:
+                        queue_entry.mount_sample(
+                            self.beamline_setup_hwobj.sample_changer_one_hwobj, 
+                            self.beamline_setup_hwobj,
+                            items[0], items[0].get_model(), self.centring_done,
+                            self.sample_centring_result)
+                    elif self.sample_mount_method == 2:
+                        queue_entry.mount_sample(
+                            self.beamline_setup_hwobj.sample_changer_two_hwobj,   
+                            self.beamline_setup_hwobj,
+                            items[0], items[0].get_model(), self.centring_done,
+                            self.sample_centring_result)
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
@@ -358,6 +376,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
+        self.enable_collect(False)
         gevent.spawn(self.unmount_sample_task)
 
     def unmount_sample_task(self):
@@ -374,15 +393,21 @@ class DataCollectTree(QtGui.QWidget):
 
             location = items[0].get_model().location
 
-            if hasattr(self.active_sample_changer_hwobj, '__TYPE__')\
-               and (self.active_sample_changer_hwobj.__TYPE__ == 'CATS'):
-                self.active_sample_changer_hwobj.unload(wait=True)
-            else:
-                self.active_sample_changer_hwobj.\
-                    unload(22, sample_location = location, wait = False)
+            sample_changer = None
+            if self.sample_mount_method == 1:
+                sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
+            elif self.sample_mount_method == 2:
+                sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwobj
+            if sample_changer:
+                if hasattr(sample_changer, '__TYPE__')\
+                   and sample_changer.__TYPE__ in ('CATS', 'Marvin'):
+                    sample_changer.unload(wait=True)
+                else:
+                    sample_changer.unload(22, sample_location = location, wait = False)
 
             items[0].setOn(False)
             items[0].set_mounted_style(False)
+        self.enable_collect(True)
 
     def sample_tree_widget_selection(self):
         """
@@ -397,8 +422,9 @@ class DataCollectTree(QtGui.QWidget):
                 break
 
         self.selection_changed_cb(items)        
-        #checked_items = self.get_checked_items()
-        #self.collect_button.setDisabled(len(checked_items) == 0)
+
+        checked_items = self.get_checked_items()
+        self.collect_button.setDisabled(len(checked_items) == 0)
         #self.set_first_element()
 
     def add_empty_task_node(self):
@@ -454,17 +480,16 @@ class DataCollectTree(QtGui.QWidget):
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
 
         if isinstance(task, queue_model_objects.Basket):
+            
             view_item.setExpanded(task.get_is_present() == True)
+            view_item.setDisabled(not task.get_is_present())
         else:
             view_item.setExpanded(True) 
 
         self.queue_model_hwobj.view_created(view_item, task)
         self.collect_button.setDisabled(False)
-   
-        #if isinstance(view_item, Qt4_queue_item.TaskQueueItem):
-        #    self.sample_tree_widget.clearSelection()
-        #    view_item.setSelected(True)
-        #    self.sample_tree_widget_selection()
+
+        self.last_added_item = view_item   
 
     def get_selected_items(self):
         """
@@ -531,7 +556,6 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
-        self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER_ONE:
             self.sample_tree_widget.clear()
             self.queue_model_hwobj.select_model('sc_one')
@@ -543,11 +567,18 @@ class DataCollectTree(QtGui.QWidget):
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
             try:
-                loaded_sample = self.active_sample_changer_hwobj.\
-                                 getLoadedSample()
+                loaded_sample = self.beamline_setup_hwobj.\
+                    sample_changer_one_hwobj.getLoadedSample()
+                loaded_sample_loc = loaded_sample.getCoords() 
+            except:
+                pass
+
+            try:
+                loaded_sample = self.beamline_setup_hwobj.\
+                    sample_changer_two_hwobj.getLoadedSample()
                 loaded_sample_loc = loaded_sample.getCoords()
             except:
-                loaded_sample_loc = None
+                pass
 
             it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()
@@ -658,7 +689,6 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        self.parent().sample_changer_widget.synch_combo.setEnabled(state)
         self.parent().sample_changer_widget.centring_cbox.setEnabled(state)
         self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
 
@@ -669,13 +699,19 @@ class DataCollectTree(QtGui.QWidget):
         result = False
 
         if isinstance(item, Qt4_queue_item.SampleQueueItem):
-           if item.get_model().free_pin_mode == True:
-               result = True
-           elif self.active_sample_changer_hwobj is not None:
-               if not self.active_sample_changer_hwobj.hasLoadedSample():
-                   result = False
-               elif item.get_model().location == self.active_sample_changer_hwobj.getLoadedSample().getCoords():
-                   result = True
+            sample_changer = None
+            if self.sample_mount_method == 1:
+                sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
+            elif self.sample_mount_method == 2:
+                sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwobj
+ 
+            if item.get_model().free_pin_mode == True:
+                result = True
+            elif sample_changer is not None:
+                if not sample_changer.hasLoadedSample():
+                    result = False
+                elif item.get_model().location == sample_changer.getLoadedSample().getCoords():
+                    result = True
         return result
 
     def collect_items(self, items = [], checked_items = []):
@@ -725,6 +761,15 @@ class DataCollectTree(QtGui.QWidget):
         QtGui.QApplication.restoreOverrideCursor()
         self.user_stopped = True
         self.queue_execution_completed(None)
+
+    def queue_entry_execution_started(self, queue_entry):
+        view_item = queue_entry.get_view()
+        if isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
+            self.tree_brick.show_energy_scan_tab(view_item)  
+        elif isinstance(view_item, Qt4_queue_item.XRFSpectrumQueueItem):
+            self.tree_brick.show_xrf_spectrum_tab(view_item)
+        elif isinstance(view_item, Qt4_queue_item.AdvancedQueueItem):
+            self.tree_brick.show_advanced_tab(view_item)
                
     def queue_execution_completed(self, status):
         """
@@ -796,18 +841,15 @@ class DataCollectTree(QtGui.QWidget):
                         parent.setOn(False)
             else:
                 item.reset_style()
-                #child = item.firstChild() 
-                child = item.child(0)
 
-                while child: 
-                    children.append(child)
-                    #child = child.nextSibling()
-                    child = child.treeWidget().itemBelow(child)
+                for index in range(item.childCount()):
+                    children.append(item.child(index)) 
 
         if children:
             self.delete_click(selected_items = children)
 
         self.check_for_path_collisions()
+        self.set_first_element()
 
     def set_first_element(self):
         """
@@ -974,7 +1016,8 @@ class DataCollectTree(QtGui.QWidget):
 
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
-                    item.setIcon(0, self.ispyb_icon)
+                    if not self.is_mounted_sample_item(item):
+                        item.setIcon(0, self.ispyb_icon)
                     item.setText(0, item.get_model().loc_str + ' - ' \
                                  + item.get_model().get_display_name())
             elif isinstance(item, Qt4_queue_item.BasketQueueItem):
@@ -1020,3 +1063,8 @@ class DataCollectTree(QtGui.QWidget):
             item = it.value()
 
         return conflict
+
+    def select_last_added_item(self):
+        if self.last_added_item:
+            self.sample_tree_widget.clearSelection()
+            self.last_added_item.setSelected(True) 

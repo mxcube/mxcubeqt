@@ -35,7 +35,6 @@ class Qt4_AdvancedBrick(BlissWidget):
 
         # Hardware objects ----------------------------------------------------
         self.session_hwobj = None
-        self.beamline_setup = None
 
         # Internal values -----------------------------------------------------
 
@@ -97,9 +96,9 @@ class Qt4_AdvancedBrick(BlissWidget):
         if property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'beamline_setup':
-            self.beamline_setup = self.getHardwareObject(new_value)
-            self.parameters_widget.set_beamline_setup(self.beamline_setup)
-            self.results_widget.set_beamline_setup(self.beamline_setup)
+            bl_setup = self.getHardwareObject(new_value)
+            self.parameters_widget.set_beamline_setup(bl_setup)
+            self.results_widget.set_beamline_setup(bl_setup)
 
     def toggle_page(self):
         if self.stacked_widget.currentWidget() is self.parameters_widget:

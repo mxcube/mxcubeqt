@@ -23,9 +23,9 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
+from Qt4_GraphicsLib import GraphicsItemPoint
 
 from BlissFramework.Utils import Qt4_widget_colors
 from Qt4_data_path_widget import DataPathWidget
@@ -61,30 +61,20 @@ class CreateDiscreteWidget(CreateTaskBase):
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
 
-        self._data_path_gbox = QtGui.QGroupBox('Data location', self)
-        self._data_path_gbox.setObjectName('data_path_gbox')        
-        self._data_path_widget = \
-            DataPathWidget(self._data_path_gbox,
-                           'create_dc_path_widget',
-                           data_model=self._path_template,
-                           layout='vertical')
+        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
+            data_model=self._path_template, layout='vertical')
 
         self._processing_widget = ProcessingWidget(self,
              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
-        self._data_path_gbox_layout = QtGui.QVBoxLayout(self._data_path_gbox)
-        self._data_path_gbox_layout.addWidget(self._data_path_widget)
-        self._data_path_gbox_layout.setSpacing(0)
-        self._data_path_gbox_layout.setContentsMargins(0, 0, 0, 0)
-
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
-        _main_vlayout.addWidget(self._data_path_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
-        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.addStretch(10)
+        _main_vlayout.setContentsMargins(0,0,0,0)
 
         # SizePolicies --------------------------------------------------------
         
@@ -193,7 +183,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         """
         tasks = []
 
-        if isinstance(shape, Qt4_GraphicsManager.GraphicsItemPoint):
+        if isinstance(shape, GraphicsItemPoint):
             snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
