@@ -24,13 +24,15 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 from PyQt4 import uic
 
-
-from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
+from BlissFramework.Utils import Qt4_widget_colors
+from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
 __category__ = "Test"
 
+
+RESULT_ICONS = ("Delete2", "Check")
 
 class Qt4_BeamlineTestBrick(BlissWidget):
 
@@ -41,12 +43,10 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.beamline_test_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.icon_list = ["Delete2", "Check"]
         self.available_test = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("mnemonic", "string", "")
-        self.icon_list = ["Delete2", "Check"]
 
         # Signals ------------------------------------------------------------
 
@@ -107,21 +107,34 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             icons_list=newValue.split()
         elif propertyName == 'mnemonic':
             if self.beamline_test_hwobj is not None:
-                self.disconnect(self.beamline_test_hwobj, QtCore.SIGNAL('deviceCommunicationTested'), self.update_com_status)
-                self.disconnect(self.beamline_test_hwobj, QtCore.SIGNAL('focModeChanged'), self.update_focus_status)
-                self.disconnect(self.beamline_test_hwobj, QtCore.SIGNAL('ppuStatusChanged'), self.update_ppu_status)
-                self.disconnect(self.beamline_test_hwobj, QtCore.SIGNAL('testFinished'), self.test_finished)
+                self.disconnect(self.beamline_test_hwobj, 
+                                QtCore.SIGNAL('deviceCommunicationTested'), 
+                                self.update_com_status)
+                self.disconnect(self.beamline_test_hwobj, 
+                                QtCore.SIGNAL('focModeChanged'), 
+                                self.update_focus_status)
+                self.disconnect(self.beamline_test_hwobj, 
+                                QtCore.SIGNAL('ppuStatusChanged'), 
+                                self.update_ppu_status)
+                self.disconnect(self.beamline_test_hwobj, 
+                                QtCore.SIGNAL('testFinished'), 
+                                self.test_finished)
             self.beamline_test_hwobj = self.getHardwareObject(newValue)
-            print 1
             if self.beamline_test_hwobj is not None:
-                print 2 
                 self.init_com_table()                
-                print 3
                 self.init_test_queue()
-                self.connect(self.beamline_test_hwobj, QtCore.SIGNAL('deviceCommunicationTested'), self.update_com_status)
-                self.connect(self.beamline_test_hwobj, QtCore.SIGNAL('focModeChanged'), self.update_focus_status)
-                self.connect(self.beamline_test_hwobj, QtCore.SIGNAL('ppuStatusChanged'), self.update_ppu_status)
-                self.connect(self.beamline_test_hwobj, QtCore.SIGNAL('testFinished'), self.test_finished)
+                self.connect(self.beamline_test_hwobj, 
+                             QtCore.SIGNAL('deviceCommunicationTested'), 
+                             self.update_com_status)
+                self.connect(self.beamline_test_hwobj, 
+                             QtCore.SIGNAL('focModeChanged'), 
+                             self.update_focus_status)
+                self.connect(self.beamline_test_hwobj,
+                             QtCore.SIGNAL('ppuStatusChanged'),
+                             self.update_ppu_status)
+                self.connect(self.beamline_test_hwobj,
+                             QtCore.SIGNAL('testFinished'),
+                             self.test_finished)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -158,24 +171,24 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.test_focus_mode()
 
     def update_com_status(self, device_index, status):
-        self.beamline_test_widget.child("progress_bar").setProgress(device_index)
+        self.beamline_test_widget.progress_bar.setProgress(device_index)
         #self.com_device_table.setPixmap(device_index, 0, Icons.load(self.icon_list[int(status)]))
         if device_index == len(self.com_device_list) - 1:
-            self.beamline_test_widget.child("progress_bar").reset()            
+            self.beamline_test_widget.progress_bar.reset()            
 
     def update_focus_status(self):
         self.test_focus_mode()
 
     def update_ppu_status(self, is_error, status_text):
-        self.beamline_test_widget.child("ppu_test_button").setEnabled(True)
+        self.beamline_test_widget.ppu_test_button.setEnabled(True)
         if is_error:
-            self.beamline_test_widget.child("ppu_status_label").setText(\
+            self.beamline_test_widget.ppu_status_label.setText(\
                  "<font color='red'>PPU is not running properly</font>")
         else:
-            self.beamline_test_widget.child("ppu_status_label").setText(\
+            self.beamline_test_widget.ppu_status_label.setText(\
                  "<font color='black'>PPU is running properly</font>")
-        self.beamline_test_widget.child("ppu_status_textbrowser").setText(status_text)
-        self.beamline_test_widget.child("ppu_restart_button").setEnabled(is_error)  
+        self.beamline_test_widget.ppu_status_textbrowser.setText(status_text)
+        self.beamline_test_widget.ppu_restart_button.setEnabled(is_error)  
                   
     def init_com_table(self):
         self.com_device_list = self.beamline_test_hwobj.get_device_list()
@@ -186,12 +199,14 @@ class Qt4_BeamlineTestBrick(BlissWidget):
               for device in self.com_device_list:
                   row += 1
                   for info_index, info in enumerate(device):
-                      self.com_device_table.setText(row - 1, info_index, info)
-                      
-              for col in range(self.com_device_table.columnCount()):
-                   self.com_device_table.adjustColumn(col)
-              self.com_device_table.adjustSize()
-              self.beamline_test_widget.child("progress_bar").setTotalSteps(len(self.com_device_list))
+                      temp_table_item = QtGui.QTableWidgetItem(info)
+                      self.com_device_table.setItem(row - 1, info_index, temp_table_item)
+               
+              print "todo..."       
+              #for col in range(self.com_device_table.columnCount()):
+              #     self.com_device_table.adjustColumn(col)
+              #self.com_device_table.adjustSize()
+              self.beamline_test_widget.progress_bar.setMaximum(len(self.com_device_list))
 
     def init_test_queue(self):
         self.available_test = self.beamline_test_hwobj.get_available_tests()
@@ -203,46 +218,49 @@ class Qt4_BeamlineTestBrick(BlissWidget):
 
     def test_focus_mode(self):
         active_mode, beam_size = self.beamline_test_hwobj.get_focus_mode()
+        print 111
+        print active_mode, beam_size 
         if active_mode is None:
-            self.beamline_test_widget.child("focus_mode_label").setText(\
+            self.beamline_test_widget.focus_mode_label.setText(\
                  "<font color='red'>No focusing mode detected<font>")
         else:
-            self.beamline_test_widget.child("focus_mode_label").setText(\
+            self.beamline_test_widget.focus_mode_label.setText(\
                  "<font color='black'>%s mode detected<font>" % active_mode)
         focus_modes = self.beamline_test_hwobj.get_focus_mode_names()
-        focus_modes_table = self.beamline_test_widget.child("focus_modes_table")
-        focus_modes_combo = self.beamline_test_widget.child("focus_modes_combo")
+        focus_modes_table = self.beamline_test_widget.focus_modes_table
+        focus_modes_combo = self.beamline_test_widget.focus_modes_combo
         
-        #self.focus_modesCount = 0
-        if focus_modes is not None:
-            focus_modes_table.setNumCols(0)
-            focus_modes_table.setNumRows(0)
-            focus_modes_table.insertColumns(0, len(focus_modes))
+        if focus_modes:
+            focus_modes_table.setColumnCount(len(focus_modes))
             focus_modes_combo.clear()
-            for col, mode in enumerate(focus_modes):
-                focus_modes_table.horizontalHeader().setLabel(col, mode)
-                #self.focus_modesCount += 1
-                focus_modes_combo.insertItem(mode)
+            hor_labels = QtCore.QStringList(focus_modes)
+            focus_modes_table.setHorizontalHeaderLabels(hor_labels)
+            #for col, mode in enumerate(focus_modes):
+            #    #focus_modes_table.horizontalHeader().setLabel(col, mode)
+            #    #self.focus_modesCount += 1
+            #    focus_modes_combo.insertItem(mode)
         if active_mode:
             focus_modes_combo.setCurrentText(active_mode)
         focus_motors_list = self.beamline_test_hwobj.get_focus_motors()
-        if focus_motors_list is not None:
-            focus_modes_table.insertRows(0, len(focus_motors_list))
+        if focus_motors_list:
+            ver_labels = QtCore.QStringList()
+            focus_modes_table.setRowCount(len(focus_motors_list))
             for row, motor in enumerate(focus_motors_list):
-                focus_modes_table.verticalHeader().setLabel(row, motor['motorName'])
+                ver_labels.append(motor['motorName'])
                 for col, mode in enumerate(focus_modes):
-                    focus_modes_table.setText(row, col, '')
+                    item_text = "%.3f/%.3f" %(motor['focusingModes'][mode], motor['position'])
                     res = (mode in motor['focMode'])
-                    if len(self.icon_list) > 1:
-                        focus_modes_table.setPixmap(row, col, Icons.load(self.icon_list[int(res)]))
+                    if res:
+                        temp_table_item = QtGui.QTableWidgetItem(item_text) 
+                        temp_table_item.setBackground(Qt4_widget_colors.LIGHT_GREEN)
                     else:
-                        if res:
-                            focus_modes_table.setText(row, col, '+')
-                        else:
-                            focus_modes_table.setText(row, col, '')
-            for col in range(focus_modes_table.numCols()):
-                focus_modes_table.adjustColumn(col)
+                        temp_table_item = QtGui.QTableWidgetItem(item_text)
+                        temp_table_item.setBackground(Qt4_widget_colors.LIGHT_RED)
+                    focus_modes_table.setItem(row, col, temp_table_item) 
+            focus_modes_table.setVerticalHeaderLabels(ver_labels)
+            #for col in range(focus_modes_table.numCols()):
+            #    focus_modes_table.adjustColumn(col)
 
     def set_focus_mode_pressed(self, item_index):
         self.beamline_test_hwobj.set_focus_mode(\
-             self.beamline_test_widget.child("focus_modes_combo").currentText())
+             self.beamline_test_widget.focus_modes_combo.currentText())

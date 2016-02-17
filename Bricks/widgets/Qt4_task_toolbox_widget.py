@@ -186,7 +186,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(tree_item, Qt4_queue_item.EnergyScanQueueItem):
                 if self.tool_box.currentWidget() == self.energy_scan_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, Qt4_queue_item.XRFScanQueueItem):
+            elif isinstance(tree_item, Qt4_queue_item.XRFSpectrumQueueItem):
                 if self.tool_box.currentWidget() == self.xrf_spectrum_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, Qt4_queue_item.GenericWorkflowQueueItem):
@@ -218,7 +218,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 self.tool_box.setCurrentWidget(self.char_page)
             elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
                 self.tool_box.setCurrentWidget(self.energy_scan_page)
-            elif isinstance(items[0], Qt4_queue_item.EnergyScanQueueItem):
+            elif isinstance(items[0], Qt4_queue_item.XRFSpectrumQueueItem):
                 self.tool_box.setCurrentWidget(self.xrf_spectrum_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)

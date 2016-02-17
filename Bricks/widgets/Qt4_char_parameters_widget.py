@@ -64,7 +64,8 @@ class CharParametersWidget(QtGui.QWidget):
         self.add_dc_cb = None
         
         # Graphic elements ----------------------------------------------------
-        rone_widget = QtGui.QWidget(self)
+        main_widget = QtGui.QWidget(self)
+        rone_widget = QtGui.QWidget(main_widget)
         self.reference_img_widget = ReferenceImageWidget(rone_widget)
         self.acq_widget = self.reference_img_widget.acq_widget
         self.path_widget = self.reference_img_widget.path_widget
@@ -72,51 +73,54 @@ class CharParametersWidget(QtGui.QWidget):
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.position_widget.setMinimumSize(450, 340)
 
-        rtwo_widget = QtGui.QWidget(self)
+        rtwo_widget = QtGui.QWidget(main_widget)
         self.char_type_widget = CharTypeWidget(rtwo_widget)
         self.routine_dc_widget = self.char_type_widget.routine_dc_page
         self.sad_widget = self.char_type_widget.sad_page
         self.rad_dmg_char_widget = self.char_type_widget.rad_damage_page
         self.opt_parameters_widget = OptimisationParametersWidgetLayout(self)
         
-        rtree_widget = QtGui.QWidget(self)
+        rtree_widget = QtGui.QWidget(main_widget)
         self.rad_dmg_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_radiation_damage_model_widget_layout.ui'))
         self.vertical_dimension_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_vertical_crystal_dimension_widget_layout.ui'))
 
         # Layout --------------------------------------------------------------
-        rone_widget_layout = QtGui.QHBoxLayout(self)
+        rone_widget_layout = QtGui.QHBoxLayout(rone_widget)
         rone_widget_layout.addWidget(self.reference_img_widget)
         rone_widget_layout.addWidget(self.position_widget)
-        #rone_widget_layout.addStretch(0)
+        # rone_widget_layout.addStretch(0)
         rone_widget_layout.setSpacing(2)
         rone_widget_layout.setContentsMargins(0, 0, 0, 0)
-        rone_widget.setLayout(rone_widget_layout)
 
-        rtwo_widget_layout = QtGui.QHBoxLayout(self)
+        rtwo_widget_layout = QtGui.QHBoxLayout(rtwo_widget)
         rtwo_widget_layout.addWidget(self.char_type_widget)
         rtwo_widget_layout.addWidget(self.opt_parameters_widget)
         rtwo_widget_layout.addStretch(0)
         rtwo_widget_layout.setSpacing(2)
         rtwo_widget_layout.setContentsMargins(0, 0, 0, 0)
-        rtwo_widget.setLayout(rtwo_widget_layout)
 
-        rtree_widget_layout = QtGui.QHBoxLayout(self)
+        rtree_widget_layout = QtGui.QHBoxLayout(rtree_widget)
         rtree_widget_layout.addWidget(self.rad_dmg_widget)
         rtree_widget_layout.addWidget(self.vertical_dimension_widget)
-        rtree_widget_layout.addStretch(0)
+        rtree_widget_layout.addStretch(10)
         rtree_widget_layout.setSpacing(2)
         rtree_widget_layout.setContentsMargins(0, 0, 0, 0)
-        rtree_widget.setLayout(rtree_widget_layout)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(rone_widget)
-        _main_vlayout.addWidget(rtwo_widget)
-        _main_vlayout.addWidget(rtree_widget)
-        _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
+        _main_widget_vlayout = QtGui.QVBoxLayout(main_widget)
+        _main_widget_vlayout.addWidget(rone_widget)
+        _main_widget_vlayout.addWidget(rtwo_widget)
+        _main_widget_vlayout.addWidget(rtree_widget)
+        _main_widget_vlayout.addStretch(10)
+        _main_widget_vlayout.setSpacing(2)
+        _main_widget_vlayout.setContentsMargins(0, 0, 0, 0)
+
+        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout.addWidget(main_widget)
+        _main_hlayout.setSpacing(0)
+        _main_hlayout.addStretch(0) 
+        _main_hlayout.setContentsMargins(0, 0, 0, 0) 
 
         # SizePolicies -------------------------------------------------------
 

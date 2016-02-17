@@ -17,7 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
+from PyQt4 import QtCore
 
 import numpy as np
 from matplotlib.figure import Figure
@@ -249,6 +250,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
     Descript. :
     """
     mouseClickedSignal = QtCore.pyqtSignal(float, float)
+    mouseDoubleClickedSignal = QtCore.pyqtSignal(float, float)
 
     def __init__(self, parent=None):
         """
@@ -275,11 +277,17 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.setFixedSize(1000, 700)
 
     def mouse_clicked(self, mouse_event):
-        self.mouseClickedSignal.emit(mouse_event.xdata,
-                                     mouse_event.ydata)
+        dbl_click = False
+        if hasattr(mouse_event, "dblclick"):
+            dbl_click = mouse_event.dblclick
+        if dbl_click:
+            self.mouseDoubleClickedSignal.emit(mouse_event.xdata,
+                                               mouse_event.ydata)
+        else:
+            self.mouseClickedSignal.emit(mouse_event.xdata,
+                                         mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
-        print "on widget: ", result, result.shape
         im = self.mpl_canvas.axes.imshow(result, 
                     interpolation='none',  aspect='auto',
                     extent=[0, result.shape[1], 0, result.shape[0]])
@@ -308,3 +316,6 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.cax = self.divider.append_axes("right", size=0.3, pad=0.05)
         self.cax.tick_params(axis='x', labelsize=8)
         self.cax.tick_params(axis='y', labelsize=8)
+
+    def clear(self): 
+        self.mpl_canvas.axes.cla()

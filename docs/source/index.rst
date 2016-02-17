@@ -54,6 +54,7 @@ Information for developers
 * :doc:`installation_instructions_web`
 * :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
+* :doc:`how_to_define_qt_gui` 
 * :doc:`packages/HardwareObjects`
 * :doc:`packages/example_files`
 * :doc:`mxcube_meetings`

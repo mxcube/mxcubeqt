@@ -53,7 +53,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_BeamSizeBrick(BlissWidget):
@@ -105,15 +105,13 @@ class Qt4_BeamSizeBrick(BlissWidget):
         _main_gbox_gridlayout.addWidget(self.hor_size_ledit, 0, 1)
         _main_gbox_gridlayout.addWidget(ver_label, 1, 0)
         _main_gbox_gridlayout.addWidget(self.ver_size_ledit, 1, 1) 
-        _main_gbox_gridlayout.setSpacing(0)
-        _main_gbox_gridlayout.setContentsMargins(0, 0, 0, 0)
-        self.main_gbox.setLayout(_main_gbox_gridlayout)
+        _main_gbox_gridlayout.setSpacing(2)
+        _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
 

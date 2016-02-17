@@ -85,7 +85,7 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self.heat_map_widget.set_associated_grid(associated_grid)
      
         if executed: 
-            processing_results = advanced.get_processing_results()
+            processing_results = advanced.get_first_processing_results()
             if processing_results is not None: 
                 self.heat_map_widget.set_results(processing_results, True)    
 

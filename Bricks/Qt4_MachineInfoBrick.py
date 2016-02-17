@@ -27,7 +27,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 __category__ = 'Qt4_General'
 
-STATES = {'unknown': Qt4_widget_colors.DARK_GRAY,
+STATES = {'unknown': Qt4_widget_colors.GRAY,
           'ready': Qt4_widget_colors.LIGHT_BLUE,
           'error': Qt4_widget_colors.LIGHT_RED}
 

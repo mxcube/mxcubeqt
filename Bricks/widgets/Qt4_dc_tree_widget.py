@@ -256,8 +256,15 @@ class DataCollectTree(QtGui.QWidget):
                     Item check state is updated when checkbox is toggled
                     (to avoid update when text is changed)                    
         """
-        if item.checkState(0) != item.get_previous_check_state():
-            item.update_check_state()        
+        #if item.checkState(0) != item.get_previous_check_state():
+        #   item.update_check_state()        
+
+        # IK. This type check should not be here,because all tree items are 
+        # anyway QueueItems. but somehow on the init item got native
+        # QTreeWidgetItem type and method was not found. Interesting...
+
+        if type(item) == Qt4_queue_item.QueueItem:
+            item.update_check_state(item.checkState(0))
 
     def context_collect_item(self):
         """
@@ -369,6 +376,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
+        self.enable_collect(False)
         gevent.spawn(self.unmount_sample_task)
 
     def unmount_sample_task(self):
@@ -392,13 +400,14 @@ class DataCollectTree(QtGui.QWidget):
                 sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwobj
             if sample_changer:
                 if hasattr(sample_changer, '__TYPE__')\
-                   and (sample_changer.__TYPE__ == 'CATS'):
+                   and sample_changer.__TYPE__ in ('CATS', 'Marvin'):
                     sample_changer.unload(wait=True)
                 else:
                     sample_changer.unload(22, sample_location = location, wait = False)
 
             items[0].setOn(False)
             items[0].set_mounted_style(False)
+        self.enable_collect(True)
 
     def sample_tree_widget_selection(self):
         """
@@ -471,7 +480,9 @@ class DataCollectTree(QtGui.QWidget):
         view_item = cls(parent_tree_item, last_item, task.get_display_name())
 
         if isinstance(task, queue_model_objects.Basket):
+            
             view_item.setExpanded(task.get_is_present() == True)
+            view_item.setDisabled(not task.get_is_present())
         else:
             view_item.setExpanded(True) 
 
@@ -545,7 +556,6 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
-        self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER_ONE:
             self.sample_tree_widget.clear()
             self.queue_model_hwobj.select_model('sc_one')
@@ -557,16 +567,18 @@ class DataCollectTree(QtGui.QWidget):
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
             try:
-                sample_changer = None
-                if self.sample_mount_method == 1:
-                    sample_changer = self.beamline_setup_hwobj.sample_changer_one_hwobj
-                elif self.sample_mount_method == 2:
-                    sample_changer = self.beamline_setup_hwobj.sample_changer_two_hwob 
-                if sample_changer:                
-                    loaded_sample = sample_changer.getLoadedSample()
+                loaded_sample = self.beamline_setup_hwobj.\
+                    sample_changer_one_hwobj.getLoadedSample()
+                loaded_sample_loc = loaded_sample.getCoords() 
+            except:
+                pass
+
+            try:
+                loaded_sample = self.beamline_setup_hwobj.\
+                    sample_changer_two_hwobj.getLoadedSample()
                 loaded_sample_loc = loaded_sample.getCoords()
             except:
-                loaded_sample_loc = None
+                pass
 
             it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()

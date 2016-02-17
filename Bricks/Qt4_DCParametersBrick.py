@@ -60,7 +60,7 @@ class Qt4_DCParametersBrick(BlissWidget):
         # Graphic elements ---------------------------------------------------- 
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
         self.toggle_page_button = QtGui.QPushButton('View Results', self)
-        self.toggle_page_button.setFixedWidth(100)
+        self.toggle_page_button.setFixedWidth(120)
         self.results_static_view = QtGui.QTextBrowser(self)
         self.results_dynamic_view = ImageTrackingWidget(self) 
         self.stacked_widget = QtGui.QStackedWidget(self)

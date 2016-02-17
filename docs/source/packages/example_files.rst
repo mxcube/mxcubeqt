@@ -57,9 +57,9 @@ Generic and mockup configuration files
 .. hlist::
    :columns: 4
 
-   * :download:`beam-info-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/beam-info-mockup.xml>`
    * :download:`beam-info.xml <../../../ExampleFiles/HardwareObjects.xml/beam-info.xml>`
    * :download:`beamline-setup.xml <../../../ExampleFiles/HardwareObjects.xml/beamline-setup.xml>`
+   * :download:`beamline-test.xml <../../../ExampleFiles/HardwareObjects.xml/beamline-test.xml>`
    * :download:`camera.xml <../../../ExampleFiles/HardwareObjects.xml/camera.xml>`
    * :download:`cats.xml <../../../ExampleFiles/HardwareObjects.xml/cats.xml>`
    * :download:`catsmaint.xml <../../../ExampleFiles/HardwareObjects.xml/catsmaint.xml>`
@@ -67,9 +67,9 @@ Generic and mockup configuration files
    * :download:`collect-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/collect-mockup.xml>`
    * :download:`data-analysis.xml <../../../ExampleFiles/HardwareObjects.xml/data-analysis.xml>`
    * :download:`detector-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/detector-mockup.xml>`
-   * :download:`diff-kappa.xml <../../../ExampleFiles/HardwareObjects.xml/diff-kappa.xml>`
-   * :download:`diff-kappaphi.xml <../../../ExampleFiles/HardwareObjects.xml/diff-kappaphi.xml>`
-   * :download:`diff-omega.xml <../../../ExampleFiles/HardwareObjects.xml/diff-omega.xml>`
+   * :download:`diff-kappa-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/diff-kappa-mockup.xml>`
+   * :download:`diff-kappaphi-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/diff-kappaphi-mockup.xml>`
+   * :download:`diff-omega-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/diff-omega-mockup.xml>`
    * :download:`diff-phiz.xml <../../../ExampleFiles/HardwareObjects.xml/diff-phiz.xml>`
    * :download:`diffractometer-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/diffractometer-mockup.xml>`
    * :download:`edna_defaults.xml <../../../ExampleFiles/HardwareObjects.xml/edna_defaults.xml>`
@@ -90,7 +90,7 @@ Generic and mockup configuration files
    * :download:`shape-history.xml <../../../ExampleFiles/HardwareObjects.xml/shape-history.xml>`
    * :download:`transmission-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/transmission-mockup.xml>`
    * :download:`xml-rpc-server.xml <../../../ExampleFiles/HardwareObjects.xml/xml-rpc-server.xml>`
-   * :download:`xrfscan-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/xrfscan-mockup.xml>`
+   * :download:`xrf-spectrum-mockup.xml <../../../ExampleFiles/HardwareObjects.xml/xrf-spectrum-mockup.xml>`
 
 ESRF ID23_1
 -------------------------------------
@@ -113,12 +113,12 @@ EMBL Hamburg P13
    * :download:`embl_hh_p13/centring-math.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/centring-math.xml>`
    * :download:`embl_hh_p13/data-analysis.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/data-analysis.xml>`
    * :download:`embl_hh_p13/dbconnection.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/dbconnection.xml>`
-   * :download:`embl_hh_p13/detector-distance.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/detector-distance.xml>`
-   * :download:`embl_hh_p13/detector.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/detector.xml>`
+   * :download:`embl_hh_p13/detector-distance.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/detector-distance.xml>`
+   * :download:`embl_hh_p13/detector.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/detector.xml>`
    * :download:`embl_hh_p13/door-interlock.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/door-interlock.xml>`
    * :download:`embl_hh_p13/edna-defaults.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/edna-defaults.xml>`
-   * :download:`embl_hh_p13/energy.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/energy.xml>`
-   * :download:`embl_hh_p13/energy-motor.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/energy-motor.xml>`
+   * :download:`embl_hh_p13/energy.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/energy.xml>`
+   * :download:`embl_hh_p13/energy-motor.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/energy-motor.xml>`
    * :download:`embl_hh_p13/energyscan.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/energyscan.xml>`
    * :download:`embl_hh_p13/image-tracking.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/image-tracking.xml>`
    * :download:`embl_hh_p13/instanceconnection.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/instanceconnection.xml>`
@@ -129,7 +129,7 @@ EMBL Hamburg P13
    * :download:`embl_hh_p13/ppu-control.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/ppu-control.xml>`
    * :download:`embl_hh_p13/queue_model.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/queue-model.xml>`
    * :download:`embl_hh_p13/queue.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/queue.xml>`
-   * :download:`embl_hh_p13/resolution.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/resolution.xml>`
+   * :download:`embl_hh_p13/eh1/resolution.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/resolution.xml>`
    * :download:`embl_hh_p13/safshut.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/safshut.xml>`
    * :download:`embl_hh_p13/sc-generic.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/sc-generic.xml>`
    * :download:`embl_hh_p13/session.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/session.xml>`
@@ -154,7 +154,6 @@ EMBL Hamburg P13
    * :download:`embl_hh_p13/eh1/diff-sampx.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/diff-sampx.xml>`
    * :download:`embl_hh_p13/eh1/diff-sampy.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/diff-sampy.xml>`
    * :download:`embl_hh_p13/eh1/diff-zoom.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/diff-zoom.xml>`
-   * :download:`embl_hh_p13/eh1/energy.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/energy.xml>`
    * :download:`embl_hh_p13/eh1/resolution.xml <../../../ExampleFiles/HardwareObjects.xml/embl_hh_p13/eh1/resolution.xml>` 
    
 

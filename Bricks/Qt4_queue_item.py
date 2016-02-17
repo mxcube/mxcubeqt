@@ -109,14 +109,15 @@ class QueueItem(QtGui.QTreeWidgetItem):
         for index in range(self.childCount()):
             self.child(index).setHidden(hidden)
 
-    def update_check_state(self):
+    def update_check_state(self, new_state):
         """
         Descript. : in qt3 method was called stateChanged.
         """
-        self.setCheckState(0, self.checkState(0))
-        if type(self) in (SampleQueueItem, DataCollectionGroupQueueItem):
-            for index in range(self.childCount()):
-                self.child(index).setCheckState(0, self.checkState(0))  
+        if new_state != self._previous_check_state:
+            self.setCheckState(0, self.checkState(0))
+            if type(self) in (SampleQueueItem, DataCollectionGroupQueueItem):
+                for index in range(self.childCount()):
+                    self.child(index).setCheckState(0, self.checkState(0))  
 
     def move_item(self, after):
         """
