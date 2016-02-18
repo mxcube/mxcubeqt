@@ -99,7 +99,6 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         states = ("NOTREADY", "UNUSABLE", "READY", "MOVESTARTED", "MOVING", "ONLIMIT")
         if name is None:
             name = self['mnemonic']
-
         if self.motor_hwobj is None:
             tip = "Status: unknown motor " + name
         else:
@@ -114,7 +113,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.label.setToolTip(tip)
 
     def motor_state_changed(self, state):
-        s = state == self.motor_hwobj.READY 
+        s = state in (self.motor_hwobj.READY, self.motor_hwobj.ONLIMIT)
         self.positions_combo.setEnabled(s)
         Qt4_widget_colors.set_widget_color(self.positions_combo, 
                                            Qt4_MotorPredefPosBrick.STATE_COLORS[state],
@@ -125,10 +124,8 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         if property_name == 'label':
             if new_value == "" and self.motor_hwobj is not None:
                 self.label.setText("<i>" + self.motor_hwobj.username + ":</i>")
-                tip = self.motor_hwobj.username
             else:
                 self.label.setText(new_value)
-                tip = new_value
         elif property_name == 'mnemonic':
             if self.motor_hwobj is not None:
                 self.disconnect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motor_state_changed)
@@ -139,12 +136,9 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                 self.connect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fill_positions)
                 self.connect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motor_state_changed)
                 self.connect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefined_position_changed)
-
                 self.fill_positions()
-
                 if self.motor_hwobj.isReady():
                     self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)
-
                 if self['label'] == "":
                     lbl=self.motor_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
@@ -162,12 +156,12 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         elif property_name == 'icons':
             icons_list = new_value.split()
             try:
-               self.previous_position_button.setIcon(\
+                self.previous_position_button.setIcon(\
                     Qt4_Icons.load_icon(icons_list[0]))
-               self.next_position_button.setIcon(\
+                self.next_position_button.setIcon(\
                     Qt4_Icons.load_icon(icons_list[1]))
             except:
-               pass
+                pass
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
@@ -176,41 +170,37 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         if self.motor_hwobj is not None:
             if positions is None:
                 positions = self.motor_hwobj.getPredefinedPositionsList()
-
         if positions is None:
             positions=[]
-
         for p in positions:
             pos_list=p.split()
             pos_name=pos_list[1]
             self.positions_combo.addItem(str(pos_name))
-
         self.positions=positions
-
         if self.motor_hwobj is not None:
             if self.motor_hwobj.isReady():
                 self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)
 
     def position_selected(self, index):
-        if index > 0:
+        if index >= 0:
             if self.motor_hwobj.isReady():
-                self.motor_hwobj.moveToPosition(self.positions[index-1])
+                self.motor_hwobj.moveToPosition(self.positions[index])
             else:
                 self.positions_combo.setCurrentIndex(0)
         self.next_position_button.setEnabled(index < len(self.positions))
-        self.previous_position_button.setEnabled(index > 0)
+        self.previous_position_button.setEnabled(index >= 0)
 
     def predefined_position_changed(self, positionName, offset):
         self.positions_combo.setCurrentIndex(0)
-
         if self.positions:
-           for i in range(len(self.positions)):
-               if self.positions[i] == positionName:
-                   self.positions_combo.setCurrentIndex(i+1)
-                   break
+            for i in range(len(self.positions)):
+                if self.positions[i] == positionName:
+                    self.positions_combo.setCurrentIndex(i)
+                    break
 
     def select_previous_position(self):
         self.position_selected(self.positions_combo.currentIndex() - 1) 
 
     def select_next_position(self):
         self.position_selected(self.positions_combo.currentIndex() + 1)
+
