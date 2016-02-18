@@ -148,7 +148,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.camera_control_action = self.popup_menu.addAction(\
              "Camera control",
              self.open_camera_control_dialog)
-        self.camera_control_action.setEnabled(False)
+        self.camera_control_action.setEnabled(True)
 
         self.popup_menu.popup(QtGui.QCursor.pos())
       
@@ -346,14 +346,19 @@ class CameraControlDialog(QtGui.QDialog):
         # Graphic elements ----------------------------------------------------
         self.contrast_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.contrast_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.contrast_checkbox = QtGui.QCheckBox("auto", self)
         self.brightness_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.brightness_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.brightness_checkbox = QtGui.QCheckBox("auto", self)
         self.gain_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.gain_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.gain_checkbox = QtGui.QCheckBox("auto", self)
         self.gamma_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.gamma_doublespinbox = QtGui.QDoubleSpinBox(self)
+        self.gamma_checkbox = QtGui.QCheckBox("auto", self)
         self.exposure_time_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.exposure_time_doublespinbox = QtGui.QDoubleSpinBox(self) 
+        self.exposure_time_checkbox = QtGui.QCheckBox("auto", self)
         __close_button = QtGui.QPushButton('Close', self)
 
         # Layout --------------------------------------------------------------
@@ -361,18 +366,23 @@ class CameraControlDialog(QtGui.QDialog):
         __main_gridlayout.addWidget(QtGui.QLabel('Contrast:', self), 0, 0)
         __main_gridlayout.addWidget(self.contrast_slider, 0, 1)
         __main_gridlayout.addWidget(self.contrast_doublespinbox, 0, 2)
+        __main_gridlayout.addWidget(self.contrast_checkbox, 0, 3)
         __main_gridlayout.addWidget(QtGui.QLabel('Brightness:', self), 1, 0)
         __main_gridlayout.addWidget(self.brightness_slider, 1, 1)
         __main_gridlayout.addWidget(self.brightness_doublespinbox, 1, 2)
+        __main_gridlayout.addWidget(self.brightness_checkbox, 1, 3)
         __main_gridlayout.addWidget(QtGui.QLabel('Gain:', self), 2, 0)
         __main_gridlayout.addWidget(self.gain_slider, 2, 1)
         __main_gridlayout.addWidget(self.gain_doublespinbox, 2, 2)
+        __main_gridlayout.addWidget(self.gain_checkbox, 2, 3)
         __main_gridlayout.addWidget(QtGui.QLabel('Gamma:', self), 3, 0) 
         __main_gridlayout.addWidget(self.gamma_slider, 3, 1)
         __main_gridlayout.addWidget(self.gamma_doublespinbox, 3, 2)
-        __main_gridlayout.addWidget(QtGui.QLabel('Exposure time (s):', self), 4, 0)
+        __main_gridlayout.addWidget(self.gamma_checkbox, 3, 3)
+        __main_gridlayout.addWidget(QtGui.QLabel('Exposure time (ms):', self), 4, 0)
         __main_gridlayout.addWidget(self.exposure_time_slider, 4, 1)
         __main_gridlayout.addWidget(self.exposure_time_doublespinbox, 4, 2)      
+        __main_gridlayout.addWidget(self.exposure_time_checkbox, 4, 3)      
         __main_gridlayout.addWidget(__close_button, 6, 2)
         __main_gridlayout.setSpacing(2)
         __main_gridlayout.setContentsMargins(5, 5, 5, 5)
@@ -381,14 +391,19 @@ class CameraControlDialog(QtGui.QDialog):
         # Qt signal/slot connections ------------------------------------------
         self.contrast_slider.valueChanged.connect(self.set_contrast)
         self.contrast_doublespinbox.valueChanged.connect(self.set_contrast)
+        self.contrast_checkbox.stateChanged.connect(self.set_contrast_auto)
         self.brightness_slider.valueChanged.connect(self.set_brightness)
         self.brightness_doublespinbox.valueChanged.connect(self.set_brightness)
+        self.brightness_checkbox.stateChanged.connect(self.set_brightness_auto)
         self.gain_slider.valueChanged.connect(self.set_gain)
         self.gain_doublespinbox.valueChanged.connect(self.set_gain)
+        self.gain_checkbox.stateChanged.connect(self.set_gain_auto)
         self.gamma_slider.valueChanged.connect(self.set_gamma)
         self.gamma_doublespinbox.valueChanged.connect(self.set_gamma)
+        self.gamma_checkbox.stateChanged.connect(self.set_gamma_auto)
         self.exposure_time_slider.valueChanged.connect(self.set_exposure_time)
         self.exposure_time_doublespinbox.valueChanged.connect(self.set_exposure_time)
+        self.exposure_time_checkbox.stateChanged.connect(self.set_exposure_time_auto)
 
         __close_button.clicked.connect(self.close)
 
@@ -407,47 +422,129 @@ class CameraControlDialog(QtGui.QDialog):
 
     def set_camera_hwobj(self, camera_hwobj):
         self.camera_hwobj = camera_hwobj
-        contrast_value = None
-        brightness_value = None
-        gain_value = None
-        gamma_value = None
-        exposure_time_value = None
 
+        # get attribute value
         try:
-           contrast_value = self.camera_hwobj.get_contrast()
-           brightness_value = self.camera_hwobj.get_brightness()
-           gain_value = self.camera_hwobj.get_gain()
-           gamma_value = self.camera_hwobj.get_gamma()
-           exposure_time_value = self.camera_hwobj.get_exposure_time()
+            contrast_value = self.camera_hwobj.get_contrast()
         except AttributeError:
-           pass
+            contrast_value = None
+        try:
+            brightness_value = self.camera_hwobj.get_brightness()
+        except AttributeError:
+            brightness_value = None
+        try:
+            gain_value = self.camera_hwobj.get_gain()
+        except AttributeError:
+            gain_value = None
+        try:
+            gamma_value = self.camera_hwobj.get_gamma()
+        except AttributeError:
+            gamma_value = None
+        try:
+            exposure_time_value = self.camera_hwobj.get_exposure_time()
+        except AttributeError:
+            exposure_time_value = None
+
+        # get attribute auto state
+        try:
+            contrast_auto = self.camera_hwobj.get_contrast_auto()
+        except AttributeError:
+            contrast_auto = None
+        try:
+            brightness_auto = self.camera_hwobj.get_brightness_auto()
+        except AttributeError:
+            brightness_auto = None
+        try:
+            gain_auto = self.camera_hwobj.get_gain_auto()
+        except AttributeError:
+            gain_auto = None
+        try:
+            gamma_auto = self.camera_hwobj.get_gamma_auto()
+        except AttributeError:
+            gamma_auto = None
+        try:
+            exposure_time_auto = self.camera_hwobj.get_exposure_time_auto()
+        except AttributeError:
+            exposure_time_auto = None
+
+        # get attribute range
+        try:
+            contrast_min_max = self.camera_hwobj.get_contrast_min_max()
+        except AttributeError:
+            contrast_min_max = (0, 100)
+        try:
+            brightness_min_max = self.camera_hwobj.get_brightness_min_max()
+        except AttributeError:
+            brightness_min_max = (0, 100)
+        try:
+            gain_min_max = self.camera_hwobj.get_gain_min_max()
+        except AttributeError:
+            gain_min_max = (0, 100)
+        try:
+            gamma_min_max = self.camera_hwobj.get_gamma_min_max()
+        except AttributeError:
+            gamma_min_max = (0, 100)
+        try:
+            exposure_time_min_max = self.camera_hwobj.get_exposure_time_min_max()
+        except AttributeError:
+            exposure_time_min_max = (0, 100)
 
         self.contrast_slider.setDisabled(contrast_value is None)
         self.contrast_doublespinbox.setDisabled(contrast_value is None)
+        self.contrast_checkbox.setDisabled(contrast_auto is None or contrast_value is None)
         self.brightness_slider.setDisabled(brightness_value is None)
         self.brightness_doublespinbox.setDisabled(brightness_value is None)
+        self.brightness_checkbox.setDisabled(brightness_auto is None or brightness_value is None)
         self.gain_slider.setDisabled(gain_value is None)
         self.gain_doublespinbox.setDisabled(gain_value is None)
+        self.gain_checkbox.setDisabled(gain_auto is None or gain_value is None)
         self.gamma_slider.setDisabled(gamma_value is None)
         self.gamma_doublespinbox.setDisabled(gamma_value is None)
+        self.gamma_checkbox.setDisabled(gamma_auto is None or gamma_value is None)
         self.exposure_time_slider.setDisabled(exposure_time_value is None)
         self.exposure_time_doublespinbox.setDisabled(exposure_time_value is None)
-      
+        self.exposure_time_checkbox.setDisabled(exposure_time_auto is None or exposure_time_value is None)
+
         if contrast_value:
             self.contrast_slider.setValue(contrast_value)
+            self.contrast_slider.setRange(contrast_min_max[0], contrast_min_max[1])
             self.contrast_doublespinbox.setValue(contrast_value)
+            self.contrast_doublespinbox.setRange(contrast_min_max[0], contrast_min_max[1])
+            self.contrast_checkbox.blockSignals(True)
+            self.contrast_checkbox.setChecked(bool(contrast_auto))
+            self.contrast_checkbox.blockSignals(False)
         if brightness_value:
             self.brightness_slider.setValue(brightness_value)
+            self.brightness_slider.setRange(brightness_min_max[0], brightness_min_max[1])
             self.brightness_doublespinbox.setValue(brightness_value)
+            self.brightness_doublespinbox.setRange(brightness_min_max[0], brightness_min_max[1])
+            self.brightness_checkbox.blockSignals(True)
+            self.brightness_checkbox.setChecked(bool(brightness_auto))
+            self.brightness_checkbox.blockSignals(False)
         if gain_value:
             self.gain_slider.setValue(gain_value)
+            self.gain_slider.setRange(gain_min_max[0], gain_min_max[1])
             self.gain_doublespinbox.setValue(gain_value)
+            self.gain_doublespinbox.setRange(gain_min_max[0], gain_min_max[1])
+            self.gain_checkbox.blockSignals(True)
+            self.gain_checkbox.setChecked(bool(gain_auto))
+            self.gain_checkbox.blockSignals(False)
         if gamma_value:
             self.gamma_slider.setValue(gamma_value)
+            self.gamma_slider.setRange(gamma_min_max[0], gamma_min_max[1])
             self.gamma_doublespinbox.setValue(gamma_value)
+            self.gamma_doublespinbox.setRange(gamma_min_max[0], gamma_min_max[1])
+            self.gamma_checkbox.blockSignals(True)
+            self.gamma_checkbox.setChecked(bool(gamma_auto))
+            self.gamma_checkbox.blockSignals(False)
         if exposure_time_value:
             self.exposure_time_slider.setValue(exposure_time_value)
+            self.exposure_time_slider.setRange(exposure_time_min_max[0], exposure_time_min_max[1])
             self.exposure_time_doublespinbox.setValue(exposure_time_value)
+            self.exposure_time_doublespinbox.setRange(exposure_time_min_max[0], exposure_time_min_max[1])
+            self.exposure_time_checkbox.blockSignals(True)
+            self.exposure_time_checkbox.setChecked(bool(exposure_time_auto))
+            self.exposure_time_checkbox.blockSignals(False)
 
     def set_contrast(self, value):
         self.contrast_slider.setValue(value)
@@ -473,3 +570,38 @@ class CameraControlDialog(QtGui.QDialog):
         self.exposure_time_slider.setValue(value)
         self.exposure_time_doublespinbox.setValue(value)
         self.camera_hwobj.set_exposure_time(value) 
+
+    def set_contrast_auto(self, state):
+        state = bool(state)
+        self.camera_hwobj.set_contrast_auto(state)
+        value = self.camera_hwobj.get_contrast()
+        self.contrast_slider.setValue(value)
+        self.contrast_doublespinbox.setValue(value)
+
+    def set_brightness_auto(self, state):
+        state = bool(state)
+        self.camera_hwobj.set_brightness_auto(state)
+        value = self.camera_hwobj.get_brightness()
+        self.brightness_slider.setValue(value)
+        self.brightness_doublespinbox.setValue(value)
+
+    def set_gain_auto(self, state):
+        state = bool(state)
+        self.camera_hwobj.set_gain_auto(state)
+        value = self.camera_hwobj.get_gain()
+        self.gain_slider.setValue(value)
+        self.gain_doublespinbox.setValue(value)
+
+    def set_gamma_auto(self, state):
+        state = bool(state)
+        self.camera_hwobj.set_gamma_auto(state)
+        value = self.camera_hwobj.get_gamma()
+        self.gamma_slider.setValue(value)
+        self.gamma_doublespinbox.setValue(value)
+
+    def set_exposure_time_auto(self, state):
+        state = bool(state)
+        self.camera_hwobj.set_exposure_time_auto(state)
+        value = self.camera_hwobj.get_exposure_time()
+        self.exposure_time_slider.setValue(value)
+        self.exposure_time_doublespinbox.setValue(value)
