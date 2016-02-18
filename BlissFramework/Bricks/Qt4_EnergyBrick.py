@@ -24,7 +24,7 @@ from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
-__category__ = "Qt4_General"
+__category__ = "General"
 
 class Qt4_EnergyBrick(BlissWidget):
     """
@@ -166,10 +166,10 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_ACTIVE,
                 QtGui.QPalette.Base)
-             Qt4_widget_colors.set_widget_color(\
-                self.units_combobox,
-                Qt4_widget_colors.LIGHT_GREEN,
-                QtGui.QPalette.Button) 
+             #Qt4_widget_colors.set_widget_color(\
+             #   self.units_combobox,
+             #   Qt4_widget_colors.LIGHT_GREEN,
+             #   QtGui.QPalette.Button) 
 
     def disconnected(self):
         """

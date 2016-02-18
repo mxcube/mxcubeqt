@@ -92,8 +92,10 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
         # Other ---------------------------------------------------------------
         self.positions_combo.setToolTip("Moves the motor to a predefined position")
-        self.previous_position_button.setIcon(QtGui.QIcon().fromTheme("go-previous"))
-        self.next_position_button.setIcon(QtGui.QIcon().fromTheme("go-next"))
+        self.previous_position_button.setIcon(Qt4_Icons.load_icon('Minus2'))
+        self.previous_position_button.setFixedWidth(27) 
+        self.next_position_button.setIcon(Qt4_Icons.load_icon('Plus2'))
+        self.next_position_button.setFixedWidth(27)
        
     def setToolTip(self, name=None, state=None):
         states = ("NOTREADY", "UNUSABLE", "READY", "MOVESTARTED", "MOVING", "ONLIMIT")
@@ -187,16 +189,19 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                 self.motor_hwobj.moveToPosition(self.positions[index])
             else:
                 self.positions_combo.setCurrentIndex(0)
-        self.next_position_button.setEnabled(index < len(self.positions))
+        self.next_position_button.setEnabled(index < (len(self.positions) - 1))
         self.previous_position_button.setEnabled(index >= 0)
 
-    def predefined_position_changed(self, positionName, offset):
-        self.positions_combo.setCurrentIndex(0)
+    def predefined_position_changed(self, position_name, offset):
         if self.positions:
-            for i in range(len(self.positions)):
-                if self.positions[i] == positionName:
-                    self.positions_combo.setCurrentIndex(i)
+            index = 0
+            for index in range(len(self.positions)):
+                if self.positions[index] == position_name:
                     break
+
+            self.positions_combo.setCurrentIndex(index)
+            self.next_position_button.setEnabled(index < (len(self.positions) - 1))
+            self.previous_position_button.setEnabled(index > 0)
 
     def select_previous_position(self):
         self.position_selected(self.positions_combo.currentIndex() - 1) 

@@ -242,7 +242,7 @@ class Qt4_CameraBrick(BlissWidget):
             self.graphics_manager_hwobj.set_graphics_scene_size(\
                  self.fixed_size, True)
             self.graphics_view.setFixedSize(self.fixed_size[0], self.fixed_size[1]) 
-            self.info_widget.setFixedWidth(self.fixed_size[0])
+            #self.info_widget.setFixedWidth(self.fixed_size[0])
 
     def image_scaled(self, scale_value):
         for index, action in enumerate(self.image_scale_menu.actions()):
@@ -422,6 +422,7 @@ class CameraControlDialog(QtGui.QDialog):
 
     def set_camera_hwobj(self, camera_hwobj):
         self.camera_hwobj = camera_hwobj
+
         # get attribute value
         try:
             contrast_value = self.camera_hwobj.get_contrast()
