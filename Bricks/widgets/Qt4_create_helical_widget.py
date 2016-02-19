@@ -236,7 +236,7 @@ class CreateHelicalWidget(CreateTaskBase):
         data_collections = []
 
         for shape in self.get_selected_lines():
-            snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
+            snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
 
             # Acquisition for start position
             start_acq = self._create_acq(sample) 

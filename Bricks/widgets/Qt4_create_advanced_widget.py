@@ -250,7 +250,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         for shape in selected_grids:
             shape.set_snapshot(self._graphics_manager_hwobj.\
-                  get_snapshot(shape))
+                  get_scene_snapshot(shape))
 
             grid_properties = shape.get_properties()
 

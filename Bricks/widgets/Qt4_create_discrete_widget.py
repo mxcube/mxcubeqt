@@ -184,12 +184,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = self._graphics_manager_hwobj.get_snapshot(shape)
+            snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager_hwobj.get_snapshot() 
+            cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot() 
 
         if self._acq_widget.use_inverse_beam():
             total_num_images = self._acquisition_parameters.num_images
