@@ -204,7 +204,7 @@ class Qt4_TreeBrick(BlissWidget):
             self.connect(self.queue_hwobj, 'show_workflow_tab',
                          self.show_workflow_tab_from_model)
 
-            self.connect(self.queue_hwobj, 'queue_entry_execute',
+            self.connect(self.queue_hwobj, 'queue_execute_started',
                          self.dc_tree_widget.queue_entry_execution_started)
 
             self.connect(self.queue_hwobj, 'queue_paused', 

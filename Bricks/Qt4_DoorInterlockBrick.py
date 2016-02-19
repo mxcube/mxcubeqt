@@ -86,6 +86,7 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.state_label.setToolTip("Shows the current door state")
         self.unlock_door_button.setToolTip("Unlocks the doors")
+        self.setEnabled(False)
 
     def unlock_doors(self):
         self.door_interlock_hwobj.unlock_door_interlock()
@@ -116,6 +117,6 @@ class Qt4_DoorInterlockBrick(BlissWidget):
             if self.door_interlock_hwobj is not None:
                 self.connect(self.door_interlock_hwobj, QtCore.SIGNAL('doorInterlockStateChanged'), self.state_changed)
                 self.state_changed(self.door_interlock_hwobj.getState())
-            self.setDisabled(self.door_interlock_hwobj is None)
+                self.setEnabled(True)
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)

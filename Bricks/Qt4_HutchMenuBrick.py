@@ -49,7 +49,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         # Hardware objects ----------------------------------------------------
         self.beam_info_hwobj = None
         self.graphics_manager_hwobj = None
-        self.collect_hwobj = None
         self.queue_hwobj = None
 
         # Internal values -----------------------------------------------------
@@ -152,8 +151,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringFailed'), self.centring_failed)
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringSuccessful'), self.centring_successful)
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('minidiffReady'), self.diffractometer_ready_changed)
-        elif property_name == "collection":
-            self.collect_hwobj = self.getHardwareObject(new_value)
         elif property_name == "enableAutoFocus":
             self.auto_focus_button.setVisible(new_value) 
         elif property_name == "enableRefreshCamera":
@@ -303,8 +300,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(self.reject_button, 
                                                Qt4_widget_colors.LIGHT_RED)
 
-        if self.collect_hwobj is not None:
-            self.collect_hwobj.setCentringStatus(centring_status)
         self.setEnabled(True)
         self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
@@ -322,8 +317,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(self.reject_button, QtCore.Qt.red)
         else:
             self.reject_button.setEnabled(False)
-        if self.collect_hwobj is not None:
-            self.collect_hwobj.setCentringStatus(centring_status)
         #self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
     def create_line_clicked(self):

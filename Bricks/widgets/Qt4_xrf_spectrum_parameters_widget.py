@@ -161,8 +161,8 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
     def set_xrf_spectrum_hwobj(self, xrf_spectrum_hwobj):
         self.xrf_spectrum_hwobj = xrf_spectrum_hwobj
         if self.xrf_spectrum_hwobj:
-            self.xrf_spectrum_hwobj.connect("xrfScanFinished", self.spectrum_finished)
+            self.xrf_spectrum_hwobj.connect("xrfSpectrumFinished", self.spectrum_finished)
 
     def spectrum_finished(self, mca_data, mca_calib, mca_config):
-        self.mca_spectrum_widget.setData(mca_data, mca_calib, mca_config)
- 
+        self.mca_spectrum_widget.set_data(mca_data, mca_calib, mca_config)
+

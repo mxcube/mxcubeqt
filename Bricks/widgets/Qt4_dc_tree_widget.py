@@ -338,16 +338,9 @@ class DataCollectTree(QtGui.QWidget):
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
-                    if self.sample_mount_method == 1:
-                        queue_entry.mount_sample(
-                            self.beamline_setup_hwobj,
-                            items[0], items[0].get_model(), self.centring_done,
-                            self.sample_centring_result)
-                    elif self.sample_mount_method == 2:
-                        queue_entry.mount_sample(
-                            self.beamline_setup_hwobj,
-                            items[0], items[0].get_model(), self.centring_done,
-                            self.sample_centring_result)
+                   queue_entry.mount_sample(self.beamline_setup_hwobj,
+                        items[0], items[0].get_model(), self.centring_done,
+                        self.sample_centring_result)
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
@@ -560,6 +553,7 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)       
+        self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER_ONE:
             self.sample_tree_widget.clear()
             self.queue_model_hwobj.select_model('sc_one')
@@ -572,14 +566,14 @@ class DataCollectTree(QtGui.QWidget):
             loaded_sample_loc = None
             try:
                 loaded_sample = self.beamline_setup_hwobj.\
-                    sample_changer_one_hwobj.getLoadedSample()
+                    sample_changer_hwobj.getLoadedSample()
                 loaded_sample_loc = loaded_sample.getCoords() 
             except:
                 pass
 
             try:
                 loaded_sample = self.beamline_setup_hwobj.\
-                    sample_changer_two_hwobj.getLoadedSample()
+                    plate_manipulator_hwobj.getLoadedSample()
                 loaded_sample_loc = loaded_sample.getCoords()
             except:
                 pass

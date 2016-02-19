@@ -42,7 +42,7 @@ the fit configuration file well as
 [HardwareObjects]
 
 """
-
+import os
 import logging
 
 from PyQt4 import QtGui
@@ -59,7 +59,7 @@ class McaSpectrumWidget(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
-        self.defineSlot('setData',())
+        self.defineSlot('set_data',())
        
         self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
         self.mcafit_widget.dismissButton.hide()
@@ -69,10 +69,10 @@ class McaSpectrumWidget(BlissWidget):
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-    def setData(self, data, calib, config):
+    def set_data(self, data, calib, config):
         try:
             configured = False
-            if config.get("file", None):
+            if os.path.exists(config.get("file", "")):
                 self._configure(config)
                 configured = True
             data = Numeric.array(data)
@@ -100,8 +100,6 @@ class McaSpectrumWidget(BlissWidget):
             sourcename = config['legend']
 
             result = self._fit()
-           
-
             if configured:
                 report = McaAdvancedFit.QtMcaAdvancedFitReport.\
                      QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,
@@ -112,7 +110,8 @@ class McaSpectrumWidget(BlissWidget):
                 report.writeReport(text=text)
   
         except:
-            logging.getLogger().exception('McaSpectrumWidget: problem fitting %s %s %s' % (str(data),str(calib),str(config)))
+            logging.getLogger().exception("McaSpectrumWidget: problem fitting %s %s %s" % \
+                                          (str(data), str(calib), str(config)))
 
     def _fit(self):
         return self.mcafit_widget.fit()
