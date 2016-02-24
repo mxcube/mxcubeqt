@@ -47,7 +47,7 @@ class Qt4_LogBarBrick(BlissWidget):
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(self._status_bar_widget)
         _main_hlayout.setSpacing(0)
-        _main_hlayout.setContentsMargins(0, 0, 0, 0)
+        _main_hlayout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(_main_hlayout)
 
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 

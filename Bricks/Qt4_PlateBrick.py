@@ -217,7 +217,7 @@ class Qt4_PlateBrick(BlissWidget):
         Descript. :
         """
         loaded_sample = self.plate_manipulator_hwobj.getLoadedSample()
-        new_location = self.plate_manipulator_hwobj.get_current_location() 
+        new_location = self.plate_manipulator_hwobj.get_plate_location() 
         if self.current_location != new_location:
             #self.plate_widget.navigation_label_painter.setBrush(.QBrush(qt.QWidget.white, qt.Qt.SolidPattern))
 
@@ -285,9 +285,8 @@ class Qt4_PlateBrick(BlissWidget):
         self.plate_widget.sample_table.setFixedHeight(table_height)
         self.plate_widget.navigation_graphicsview.setFixedHeight(table_height)
         self.navigation_item.set_size(120, table_height)
-        #self.navigation_graphicsscene.setSceneRect(0, 0, 116, table_height - 4)
-        self.navigation_item.set_num_drops_per_cell(\
-             self.plate_manipulator_hwobj.get_num_drops_per_cell())
+        plate_info = self.plate_manipulator_hwobj.get_plate_info() 
+        self.navigation_item.set_num_drops_per_cell(plate_info['num_drops'])
         self.refresh_plate_location()
 
     def navigation_item_double_clicked(self, pos_x, pos_y):

@@ -698,7 +698,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         proposal = selected_proposal['Proposal']
         #person = selected_proposal['Person']
         #laboratory = selected_proposal['Laboratory']
-        sessions = selected_proposal['Sessions']
+        sessions = selected_proposal['Session']
         # Check if there are sessions in the proposal
         todays_session = None
         if sessions is None or len(sessions) == 0:
@@ -804,7 +804,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                   If no session found then returns first proposal
         """
         for prop_index, proposal in enumerate(proposal_list):
-            sessions = proposal['Sessions']
+            sessions = proposal['Session']
             if len(sessions) > 0:
                 # Check for today's session
                 for session in sessions:
