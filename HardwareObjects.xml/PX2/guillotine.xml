@@ -5,4 +5,13 @@
   <channel type="tango" polling="1000" name="State">State</channel>
   <command type="tango" name="_Insert">Insert</command>
   <command type="tango" name="_Extract">Extract</command>
+  <object href="/TangoExpPss" role="pss" />
+  <object href="/detectordistance" role="detectordistance"/>
+
+  <!-- connect to MD2Phase -->
+  <object href="/md2j_phase" role="md2j_phase"/>
+
+  <security_distance>180</security_distance>
+  <safe_distance>300</safe_distance>
+
 </device>
