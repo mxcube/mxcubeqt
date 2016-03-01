@@ -18,6 +18,6 @@
        <state>
           <name>DataCollection</name>
        </state>
-   </states>
-   <!--object href="/guillotine" role="guillotine" /-->
+    </states>
+   <object href="/guillotine" role="guillotine"/>
 </device>

@@ -110,7 +110,6 @@ class MD2_NamedState(Device):
 
         self.emit('hardwareStateChanged', ("STANDBY",))
         logging.getLogger().exception('changing state for %s to ws: %s.' % ( self.getUserName(), statename))
-        logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..............changing state for %s to ws: %s.' % ( self.getUserName(), statename))
         if self.commandtype is not None and self.commandtype == 'index':
             logging.getLogger().info('   this is index mode. %s' % str(self.stateList))
             try:
@@ -124,11 +123,9 @@ class MD2_NamedState(Device):
         else:
             statevalue = statename
             
-        logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..............changing statename for %s.' % statename)
-        logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..............changing statevalue for %s.' % statevalue)
-        #if str(statename == 'Transfert'):
-        #    logging.getLogger().exception('XXXXXXXXXXXXXXXXX    changing state for %s to ws: %s.' % ( self.getUserName(), statename))
-        #    self.guillotine.goToSecurityDistance()
+        if statevalue == 'Transfer':
+            logging.getLogger().exception('changing state for %s to ws: %s.' % ( self.getUserName(), statevalue))
+            self.guillotine.goToSecurityDistance()
 
         try:
             if self.changeCmd is not None:

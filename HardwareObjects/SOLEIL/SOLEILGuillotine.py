@@ -13,6 +13,8 @@ Example XML:
 from HardwareRepository import BaseHardwareObjects
 import logging
 import time
+import PyTango
+
 
 class SOLEILGuillotine(BaseHardwareObjects.Device):
     shutterState = {
@@ -100,19 +102,29 @@ class SOLEILGuillotine(BaseHardwareObjects.Device):
             
             self.pss = self.getObjectByRole("pss")
             self.detector = self.getObjectByRole("detectordistance")
-            self.md2_phase = self.getObjectByRole("md2j_phase")
             
-            #self.connect(self.pss, 'wagoStateChanged', self.updateGuillotine)
             self.connect(self.detector, 'positionChanged', self.shutterStateChanged)
             self.connect(self.detector, 'positionChanged', self.updateDetectorDistance)
-            self.connect(self.md2_phase, 'stateChanged', self.moveGuillotine)
 
             for command_name in ("_Insert","_Extract"):
                 setattr(self, command_name, self.getCommandObject(command_name))
                                
         except KeyError:
             logging.getLogger().warning('%s: cannot report State', self.name())
+            
+        try:
+            self.pss_door = self.getProperty("tangoname_pss")#PyTango.DeviceProxy('I11-MA-CE/PSS/DB_DATA')          
+        except :
+            logging.getLogger("HWR").error('Guillotine I11-MA-CE/PSS/DB_DATA: tangopssDevice is not defined ')
+           
+        if self.pss_door is not None :
+            self.memIntChan = self.getChannelObject("memInt")
+            self.connect(self.memIntChan,"update", self.updateGuillotine)
+        else :
+            logging.getLogger("HWR").error('Guillotine: tangopssDevice is not defined ')
 
+            
+            
     def shutterStateChanged(self, value):
         #
         # emit signal
@@ -123,6 +135,7 @@ class SOLEILGuillotine(BaseHardwareObjects.Device):
         self.emit('shutterStateChanged', (self.getShutterState(),))
 
     def getShutterState(self):
+        #A tester dans les conditions reelles de fonctionnement de la ligne
         #if self.pss.getWagoState() != "ready":
         #    return "disabled"
         if not self.checkDistance() :
@@ -133,21 +146,25 @@ class SOLEILGuillotine(BaseHardwareObjects.Device):
         self._currentDistance = value #self.detector.res2dist(value)
     
     def moveGuillotine(self, state):
-        logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GUILLOTINE..............changing state for %s.' % state)
         if state == 'Transfer' :
             self.goToSecurityDistance()
     
-    def updateGuillotine(self,timeout=10.0):
+    def updateGuillotine(self,value):
         #if open door close guillotine but test distance
         #if distance security ok else move detector to security distance
         #wait until distance is reached
-        if self.pss.getWagoState() != "ready":
+        #if self.pss.getWagoState() != "ready":
+        
+        if not value:
             if self.checkDistance() :
                 self.goToSecurityDistance()
-                self.setIn()   
+            else :
+                self.detector.move(self._d_home)
+                time.sleep(1.0)# wait distance minimum to insert guillotine
+                self._Insert()
+        
     def checkDistance(self):
-        logging.info('Current distance is %s' % self._currentDistance)
-
+        #logging.info('Current distance is %s' % self._currentDistance)
         if self._currentDistance < self._d_security :
             return False
         else :
