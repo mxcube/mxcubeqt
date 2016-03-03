@@ -30,10 +30,12 @@ class EigerDetector:
         # detector distance in meters
         return self.detector.set_detector_distance(detector_distance)
        
-    def set_beam_center_x(self, beam_center_x):
+    def set_beam_center_x(self, beam_center_x):        
         return self.detector.set_beam_center_x(beam_center_x)
 
     def set_beam_center_y(self, beam_center_y):
+        if self.detector.get_roi_mode() == '4M':
+            beam_center_y -= 550.
         return self.detector.set_beam_center_y(beam_center_y)
 
     @task
