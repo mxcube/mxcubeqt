@@ -12,6 +12,9 @@ Example XML:
 
 from HardwareRepository import BaseHardwareObjects
 import logging
+import time
+import PyTango
+
 
 class SOLEILGuillotine(BaseHardwareObjects.Device):
     shutterState = {
@@ -71,7 +74,7 @@ class SOLEILGuillotine(BaseHardwareObjects.Device):
         'CLOSE':     '#FF00FF',
         'OPEN':      '#00FF00',
         'OPENED':    '#00FF00', 
-        'INSERT':    '#C03000',
+        'INSERT':    '#EC3CDD',
         'EXTRACT':   '#512345',
         'MOVING':    '#663300',
         'STANDBY':   '#009900',
@@ -89,40 +92,110 @@ class SOLEILGuillotine(BaseHardwareObjects.Device):
         logging.info("Guillotine init ")
         
     def init(self):
-        self.shutterStateValue = 'UNKNOWN'
-
+        self._shutterStateValue = 'UNKNOWN'
+        self._currentDistance = 'None'
+        self._d_security = self.getProperty('security_distance')
+        self._d_home = self.getProperty('safe_distance')
         try:
             self.shutChannel = self.getChannelObject('State')
             self.shutChannel.connectSignal('update', self.shutterStateChanged)
-             
+            
+            self.pss = self.getObjectByRole("pss")
+            self.detector = self.getObjectByRole("detectordistance")
+            
+            self.connect(self.detector, 'positionChanged', self.shutterStateChanged)
+            self.connect(self.detector, 'positionChanged', self.updateDetectorDistance)
+
             for command_name in ("_Insert","_Extract"):
                 setattr(self, command_name, self.getCommandObject(command_name))
                                
         except KeyError:
             logging.getLogger().warning('%s: cannot report State', self.name())
+            
+        try:
+            self.pss_door = self.getProperty("tangoname_pss")#PyTango.DeviceProxy('I11-MA-CE/PSS/DB_DATA')          
+        except :
+            logging.getLogger("HWR").error('Guillotine I11-MA-CE/PSS/DB_DATA: tangopssDevice is not defined ')
+           
+        if self.pss_door is not None :
+            self.memIntChan = self.getChannelObject("memInt")
+            self.connect(self.memIntChan,"update", self.updateGuillotine)
+        else :
+            logging.getLogger("HWR").error('Guillotine: tangopssDevice is not defined ')
 
+            
+            
     def shutterStateChanged(self, value):
         #
         # emit signal
         #
-
+        if type(value) == float :
+            value = self.shutChannel.value
         self.shutterStateValue = str(value)
         self.emit('shutterStateChanged', (self.getShutterState(),))
 
     def getShutterState(self):
-
+        #A tester dans les conditions reelles de fonctionnement de la ligne
+        #if self.pss.getWagoState() != "ready":
+        #    return "disabled"
+        if not self.checkDistance() :
+            return "disabled"
         return SOLEILGuillotine.shutterState.get(self.shutterStateValue, "UNKNOWN").lower()
 
+    def updateDetectorDistance(self, value):
+        self._currentDistance = value #self.detector.res2dist(value)
+    
+    def moveGuillotine(self, state):
+        if state == 'Transfer' :
+            self.goToSecurityDistance()
+    
+    def updateGuillotine(self,value):
+        #if open door close guillotine but test distance
+        #if distance security ok else move detector to security distance
+        #wait until distance is reached
+        #if self.pss.getWagoState() != "ready":
+        
+        if not value:
+            if self.checkDistance() :
+                self.goToSecurityDistance()
+            else :
+                self.detector.move(self._d_home)
+                time.sleep(1.0)# wait distance minimum to insert guillotine
+                self._Insert()
+        
+    def checkDistance(self):
+        #logging.info('Current distance is %s' % self._currentDistance)
+        if self._currentDistance < self._d_security :
+            return False
+        else :
+            return True
+
+    def goToSecurityDistance(self):
+        self.detector.move(self._d_home)
+        if str(self.shutChannel.value) == 'EXTRACT':
+            self._Insert()                
+        while self.detector.motorIsMoving():
+            time.sleep(0.5)
 
     def isShutterOk(self):
         return not self.getShutterState() in ('OFF', 'UNKNOWN', 'MOVING', 'FAULT', 'INSERT', 'EXTRACT',
                                               'INIT', 'DISABLED', 'ERROR', 'ALARM', 'STANDBY')            
     def openShutter(self):
         logging.info("Guillotine extract")
-        self._Extract()
-            
+        if self.checkDistance():
+            self._Extract()
+            return
+        logging.getLogger("user_level_log").error( " Detector is too closed to the gonio Guillotine couldn't be moved")
+    
     def closeShutter(self):
         logging.info( "Guillotine insert")
+        if self.checkDistance():
+            self._Insert()
+            return
+        logging.getLogger("user_level_log").error( " Detector is too closed to the gonio Guillotine couldn't be moved")
 
+    def setIn(self):
         self._Insert()
 
+    def setOut(self):
+        self._Extract()

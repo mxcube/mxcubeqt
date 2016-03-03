@@ -19,4 +19,5 @@
           <name>DataCollection</name>
        </state>
     </states>
+   <object href="/guillotine" role="guillotine"/>
 </device>

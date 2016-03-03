@@ -36,6 +36,8 @@ class MD2_NamedState(Device):
         self.stateChan.connectSignal("update", self.stateChanged)
         if self.moveStateChan:
             self.moveStateChan.connectSignal("update", self.hardwareStateChanged)
+        
+        self.guillotine  = self.getObjectByRole("guillotine")
 
         Device._init(self)
 
@@ -47,12 +49,12 @@ class MD2_NamedState(Device):
             self.emit(signal, (self.getState(), ))
 
     def stateChanged(self, channelValue):
-        logging.info('hw MD2 NamedState %s. got new value %s' % (self.name(), channelValue))
+        #logging.info('hw MD2 NamedState %s. got new value %s' % (self.name(), channelValue))
         self.setIsReady(True)
         self.emit('stateChanged', (self.getState(), ))
         
     def hardwareStateChanged(self, channelValue):
-        logging.info('hw MD2 NamedState %s. Hardware state is now %s' % (self.name(), channelValue))
+        #logging.info('hw MD2 NamedState %s. Hardware state is now %s' % (self.name(), channelValue))
         self.hdw_state = channelValue
         self.emit('hardwareStateChanged', (self.hdw_state,))
 
@@ -108,7 +110,6 @@ class MD2_NamedState(Device):
 
         self.emit('hardwareStateChanged', ("STANDBY",))
         logging.getLogger().exception('changing state for %s to ws: %s.' % ( self.getUserName(), statename))
-
         if self.commandtype is not None and self.commandtype == 'index':
             logging.getLogger().info('   this is index mode. %s' % str(self.stateList))
             try:
@@ -121,16 +122,20 @@ class MD2_NamedState(Device):
                 return
         else:
             statevalue = statename
+            
+        if statevalue == 'Transfer':
+            logging.getLogger().exception('changing state for %s to ws: %s.' % ( self.getUserName(), statevalue))
+            self.guillotine.goToSecurityDistance()
 
         try:
-            logging.getLogger().exception('changing state for %s to ws: %s' % ( self.getUserName(), statevalue))
             if self.changeCmd is not None:
                 logging.getLogger().exception('  - using command mode')
                 self.changeCmd(statevalue)
             else:
                 logging.getLogger().exception('  - using attribute mode')
                 try:
-                    self.stateChan.setValue(statevalue) 
+                    self.stateChan.setValue(statevalue)
+       
                 except:
                     logging.getLogger().exception("cannot write attribute")
                     self.emit('stateChanged', (self.getState(), ))
