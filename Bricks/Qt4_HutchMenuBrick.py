@@ -193,7 +193,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             filename = str(filename)
             image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
-                self.graphics_manager_hwobj.save_snapshot(filename)
+                self.graphics_manager_hwobj.save_scene_snapshot(filename)
                 self.file_index += 1        
             except:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")

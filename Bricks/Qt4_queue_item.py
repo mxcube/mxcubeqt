@@ -79,8 +79,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
         """
         Descript. : sets check state for item and all children and parent
                     if they exist
-        """    
-        self._previous_check_state = self.checkState(0) 
+        """   
+        self._previous_check_state = self.checkState(0)
         if isinstance(self, DataCollectionGroupQueueItem):
             self._checkable = False
             if self.childCount() == 0:
@@ -90,11 +90,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
                     if self.child(index)._checkable:
                         self._checkable = True
                         break
-
             self.parent().setCheckState(column, check_state)
-        elif isinstance(self, SampleQueueItem):
-            if self.parent():
-                self.parent().setCheckState(column, check_state)  
 
         if not self._checkable:
             check_state = QtCore.Qt.Unchecked  
@@ -115,9 +111,11 @@ class QueueItem(QtGui.QTreeWidgetItem):
         """
         if new_state != self._previous_check_state:
             self.setCheckState(0, self.checkState(0))
-            if type(self) in (SampleQueueItem, DataCollectionGroupQueueItem):
-                for index in range(self.childCount()):
-                    self.child(index).setCheckState(0, self.checkState(0))  
+            if type(self) in (BasketQueueItem, 
+                              SampleQueueItem, 
+                              DataCollectionGroupQueueItem):
+               for index in range(self.childCount()):
+                   self.child(index).setCheckState(0, self.checkState(0))  
 
     def move_item(self, after):
         """

@@ -63,7 +63,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.ldap_connection_hwobj = None
         self.lims_hwobj = None
         self.local_login_hwobj = None
         self.session_hwobj = None
@@ -81,7 +80,6 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         # Properties ----------------------------------------------------------
         self.addProperty('loginAsUser', 'boolean', True)
-        self.addProperty('ldapServer', 'string', '')
         self.addProperty('instanceServer', 'string', '')
         self.addProperty('localLogin', 'string', '')
         self.addProperty('titlePrefix', 'string', '')
@@ -107,19 +105,21 @@ class Qt4_ProposalBrick2(BlissWidget):
         code_label = QtGui.QLabel("  Code: ", self.login_as_proposal_widget)
         self.proposal_type_combox = QtGui.QComboBox(self.login_as_proposal_widget)
         self.proposal_type_combox.setEditable(True)
-        self.proposal_type_combox.setFixedWidth(50)
+        self.proposal_type_combox.setFixedWidth(60)
         dash_label = QtGui.QLabel(" - ", self.login_as_proposal_widget)
         self.proposal_number_ledit = QtGui.QLineEdit(self.login_as_proposal_widget)
-        self.proposal_number_ledit.setFixedWidth(40)
+        self.proposal_number_ledit.setFixedWidth(60)
         password_label = QtGui.QLabel("   Password: ", self.login_as_proposal_widget)
         self.proposal_password_ledit = QtGui.QLineEdit(self.login_as_proposal_widget)
         self.proposal_password_ledit.setEchoMode(QtGui.QLineEdit.Password)
-        self.proposal_password_ledit.setFixedWidth(40)
+        #self.proposal_password_ledit.setFixedWidth(40)
         self.login_button = QtGui.QPushButton("Login", self.login_as_proposal_widget)
-        self.login_button.setFixedWidth(60)
-        self.logout_button = QtGui.QPushButton("Logout", self.login_as_proposal_widget)
+        self.login_button.setFixedWidth(70)
+        self.logout_button = QtGui.QPushButton("Logout", self)
         self.logout_button.hide()
+        self.logout_button.setFixedWidth(70)
         self.login_as_proposal_widget.hide()
+        
 
         self.login_as_user_widget = QtGui.QWidget(self)
         proposal_label = QtGui.QLabel("Proposal: ", self.login_as_user_widget)
@@ -154,7 +154,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         _login_as_proposal_widget_layout.addWidget(password_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_password_ledit)
         _login_as_proposal_widget_layout.addWidget(self.login_button)
-        _login_as_proposal_widget_layout.addWidget(self.logout_button)
         _login_as_proposal_widget_layout.setSpacing(2)
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -166,6 +165,7 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         _main_vlayout = QtGui.QHBoxLayout(self)
         _main_vlayout.addWidget(self.login_as_proposal_widget)
+        _main_vlayout.addWidget(self.logout_button)
         _main_vlayout.addWidget(self.login_as_user_widget)
         #_main_vlayout.addSpacing(10)
         _main_vlayout.addWidget(self.user_group_widget)
@@ -281,11 +281,9 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        if QtGui.QMessageBox.question(self, 
-                                      "Confirm logout", 
-                                      "Press OK to logout.",
-                                      QtGui.QMessageBox.Ok,
-                                      QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Ok:
+        if QtGui.QMessageBox.question(self, "Confirm logout", 
+            "Press OK to logout.", QtGui.QMessageBox.Ok,
+            QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Ok:
             self.log_out()
 
     # Logout the user; reset the brick; changes from logout mode to login mode
@@ -301,9 +299,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.person = None
         self.laboratory = None
         # Change mode from logout to login
-        self.login_as_proposal_widget.show()
-        self.login_button.show()
-        self.logout_button.hide()
+        if not self.login_as_user: 
+            self.login_as_proposal_widget.setEnabled(True)
+            self.login_button.show()
+            self.logout_button.hide()
         #self.title_label.hide()
         self.user_group_widget.hide()
        
@@ -339,9 +338,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.session_hwobj.proposal_number = proposal['number']
 
         # Change mode
-        self.login_as_proposal_widget.hide()
-        self.login_button.hide() 
-        self.logout_button.show()
+        if not self.login_as_user:
+            self.login_button.hide()
+            self.login_as_proposal_widget.setDisabled(True)
+            self.logout_button.show()
 
         # Store info in the brick
         self.proposal = proposal
@@ -447,7 +447,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         self.setEnabled(self.session_hwobj is not None)
 
-        # find if we are using ldap, dbconnection, etc. or not
+        # find if we are using dbconnection, etc. or not
         if not self.lims_hwobj:
             self.login_as_proposal_widget.hide()
             self.login_button.hide()
@@ -525,8 +525,9 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        msg_dialog = QtGui.QMessageBox("Register user", \
-            "Couldn't contact the ISPyB database server: you've been logged as the local user.\nYour experiments' information will not be stored in ISPyB!",\
+        msg_dialog = QtGui.QMessageBox("Register user", "Couldn't contact " + \
+            "the ISPyB database server: you've been logged as the local user.\n" + \
+            "Your experiments' information will not be stored in ISPyB!",\
             QtGui.QMessageBox.Warning, 
             QtGui.QMessageBox.Ok, 
             QtGui.QMessageBox.NoButton,
@@ -546,7 +547,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         except AttributeError:
             locallogin_person = "local user"
         pers_dict = {'familyName' : locallogin_person}
-        lab_dict = {'name':'EMBL-HH'}
+        lab_dict = {'name': 'lab'}
         cont_dict = {'familyName' : 'local contact'}
         #self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
         self.acceptLogin(prop_dict, ses_dict)
@@ -562,9 +563,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.user_group_ledit.setText('')
         self.setEnabled(False)
 
-        if self.login_as_user:
-            print "login as user... implement this"    
-        else:
+        if not self.login_as_user:
             prop_type = str(self.proposal_type_combox.currentText())
             prop_number = str(self.proposal_number_ledit.text())
             prop_password = str(self.proposal_password_ledit.text())
@@ -596,8 +595,6 @@ class Qt4_ProposalBrick2(BlissWidget):
                 #return self.acceptLogin(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
                 return self.acceptLogin(prop_dict, ses_dict)
 
-            if self.ldap_connection_hwobj == None:
-                return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
             if self.lims_hwobj == None:
                 return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
 
@@ -619,22 +616,19 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        if property_name == 'loginAsUser':
-            self.login_as_user = new_value
-            if self.login_as_user:
-               self.login_as_user_widget.show()
-               self.login_as_proposal_widget.hide()
-            else:
-               self.login_as_user_widget.hide()
-               self.login_as_proposal_widget.show() 
-        elif property_name == 'ldapServer':
-            self.ldap_connection_hwobj = self.getHardwareObject(new_value)
-        elif property_name == 'codes':
+        if property_name == 'codes':
             self.setCodes(new_value)
         elif property_name == 'localLogin':
             self.local_login_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'dbConnection':
             self.lims_hwobj = self.getHardwareObject(new_value)
+            self.login_as_user = self.lims_hwobj.get_login_type() == "user"
+            if self.login_as_user:
+               self.login_as_user_widget.show()
+               self.login_as_proposal_widget.hide()
+            else:
+               self.login_as_user_widget.hide()
+               self.login_as_proposal_widget.show()
         elif property_name == 'instanceServer':
             if self.instanceServer is not None:
                 self.disconnect(self.instanceServer, QtCore.SIGNAL('passControl'), self.passControl)
@@ -662,19 +656,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        if not impersonate:
-            login_name = self.lims_hwobj.translate(proposal_code, 'ldap') + \
-                             str(proposal_number)
-            logging.getLogger().debug('ProposalBrick: querying LDAP...')
-            ok, msg = self.ldap_connection_hwobj.login(login_name, proposal_password)
-            if not ok:
-                msg = "%s." % msg.capitalize()
-                self.refuseLogin(None, msg)
-                return
-
-            logging.getLogger().debug("ProposalBrick: password for %s-%s validated" % \
-                     (proposal_code,proposal_number))
-
         # Get proposal and sessions
         logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
         prop = self.lims_hwobj.getProposal(proposal_code, proposal_number)

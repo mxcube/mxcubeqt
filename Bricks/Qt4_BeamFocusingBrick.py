@@ -131,7 +131,6 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         else:
             self.init_focus_mode_combo()
             self.setEnabled(True)
-            print 1
             index = self.beam_focusing_combo.findText(self.active_focus_mode) 
             self.beam_focusing_combo.setCurrentIndex(index)
 

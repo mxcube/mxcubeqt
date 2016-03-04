@@ -115,7 +115,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         Descript. :
         """
         if self.minidiff_hwobj is not None:
-            self.minidiff_hwobj.start_set_phase(self.phase_combobox.currentText())
+            self.minidiff_hwobj.set_phase(self.phase_combobox.currentText())
 
     def phase_changed(self, phase):
         """

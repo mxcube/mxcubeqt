@@ -18,13 +18,11 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import logging
 
-from PyQt4 import QtCore
 from PyQt4 import QtGui
+from PyQt4 import QtCore
 from PyQt4 import uic
 
-from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_webview_widget import WebViewWidget
@@ -43,6 +41,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
 
         # Internal variables --------------------------------------------------
         self.available_test = None
+        self.com_device_list = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("mnemonic", "string", "")
@@ -112,10 +111,8 @@ class Qt4_BeamlineTestBrick(BlissWidget):
     def setExpertMode(self, expert):
         self.setEnabled(expert)
 
-    def propertyChanged(self, propertyName, oldValue, newValue):
-        if propertyName == 'icons':
-            icons_list=newValue.split()
-        elif propertyName == 'mnemonic':
+    def propertyChanged(self, property_name, old_value, new_value):
+        if property_name == 'mnemonic':
             if self.beamline_test_hwobj is not None:
                 self.disconnect(self.beamline_test_hwobj, 
                                 QtCore.SIGNAL('testProgress'), 
@@ -129,7 +126,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                 self.disconnect(self.beamline_test_hwobj, 
                                 QtCore.SIGNAL('testFinished'), 
                                 self.test_finished)
-            self.beamline_test_hwobj = self.getHardwareObject(newValue)
+            self.beamline_test_hwobj = self.getHardwareObject(new_value)
             if self.beamline_test_hwobj is not None:
                 self.init_com_table()                
                 self.init_test_queue()
@@ -147,7 +144,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                              self.test_finished)
                 #self.load_result_page()
         else:
-            BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def add_test_button_clicked(self):
         for selected_item in self.available_test_listwidget.selectedItems():
@@ -209,23 +206,23 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.com_device_list = self.beamline_test_hwobj.get_device_list()
 
         if self.com_device_list:
-              row = 0
-              self.com_device_table.setRowCount(len(self.com_device_list))
-              for device in self.com_device_list:
-                  row += 1
-                  for info_index, info in enumerate(device):
-                      temp_table_item = QtGui.QTableWidgetItem(info)
-                      self.com_device_table.setItem(row - 1, info_index, temp_table_item)
+            row = 0
+            self.com_device_table.setRowCount(len(self.com_device_list))
+            for device in self.com_device_list:
+                row += 1
+                for info_index, info in enumerate(device):
+                    temp_table_item = QtGui.QTableWidgetItem(info)
+                    self.com_device_table.setItem(row - 1, info_index, temp_table_item)
                
-              print "todo..."       
-              #for col in range(self.com_device_table.columnCount()):
-              #     self.com_device_table.adjustColumn(col)
-              #self.com_device_table.adjustSize()
-              self.beamline_test_widget.progress_bar.setMaximum(len(self.com_device_list))
+            print "todo..."       
+            #for col in range(self.com_device_table.columnCount()):
+            #     self.com_device_table.adjustColumn(col)
+            #self.com_device_table.adjustSize()
+            self.beamline_test_widget.progress_bar.setMaximum(len(self.com_device_list))
 
     def init_test_queue(self):
         self.available_test = self.beamline_test_hwobj.get_available_tests()
-        for key, value in self.available_test.iteritems():
+        for value in self.available_test.values():
             self.available_test_listwidget.addItem(value)
         current_test_queue = self.beamline_test_hwobj.get_startup_test_list()
         for item in current_test_queue:
@@ -253,8 +250,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             #    #self.focus_modesCount += 1
             #    focus_modes_combo.insertItem(mode)
         if active_mode:
-            print "TODO"
-            #focus_modes_combo.setCurrentText(active_mode)
+            focus_modes_combo.setCurrentText(focus_modes_combo.findText(active_mode))
         focus_motors_list = self.beamline_test_hwobj.get_focus_motors()
         if focus_motors_list:
             ver_labels = QtCore.QStringList()
@@ -262,7 +258,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             for row, motor in enumerate(focus_motors_list):
                 ver_labels.append(motor['motorName'])
                 for col, mode in enumerate(focus_modes):
-                    item_text = "%.3f/%.3f" %(motor['focusingModes'][mode], motor['position'])
+                    item_text = "%.3f/%.3f" % (motor['focusingModes'][mode], motor['position'])
                     res = (mode in motor['focMode'])
                     if res:
                         temp_table_item = QtGui.QTableWidgetItem(item_text) 
