@@ -177,5 +177,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        new_values_str = self['formatString'] % new_value
-        self.transmission_ledit.setText("%s%%" % new_values_str)
+        try:
+           new_values_str = self['formatString'] % new_value
+           self.transmission_ledit.setText("%s%%" % new_values_str)
+        except:
+           pass

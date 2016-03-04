@@ -17,10 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import new
 import logging
 import weakref
 import platform
+import webbrowser
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -31,7 +33,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
 
 
-__version__ = '2.1'
+__version__ = '2.2'
 
 
 class CustomMenuBar(QtGui.QMenuBar):
@@ -74,7 +76,13 @@ class CustomMenuBar(QtGui.QMenuBar):
 
         self.expert_mode_action.setCheckable(True) 
         self.help_menu = self.addMenu("Help") 
+        self.info_for_developers_action =  self.help_menu.addAction(\
+             "Information for developers", self.info_for_developers_clicked)
+        self.info_for_developers_action.setEnabled(False)
+        self.help_menu.addAction("User manual", self.user_manual_clicked)
+        self.help_menu.addSeparator()
         self.help_menu.addAction("Whats this", self.whats_this_clicked)
+        self.help_menu.addSeparator()
         self.help_menu.addAction("About", self.about_clicked) 
 
         # Layout --------------------------------------------------------------
@@ -89,6 +97,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.menu_items = [self.file_menu,
                            self.view_menu,
                            self.help_menu]
+        #self.setwindowIcon(Qt4_Icons.load_icon("desktop_icon"))
 
     def insert_menu(self, new_menu, position):
         self.clear()
@@ -150,6 +159,8 @@ class CustomMenuBar(QtGui.QMenuBar):
         """
         if not self.execution_mode:
             return
+
+        self.info_for_developers_action.setEnabled(state)
                
         if state:
             # switch to expert mode
@@ -186,12 +197,13 @@ class CustomMenuBar(QtGui.QMenuBar):
             BlissWidget.updateWhatsThis()
 
     def about_clicked(self):
-        QtGui.QMessageBox.about(self, "About MXCuBE",
-                 """<b>MXCuBE v %s </b> 
+        about_msg_box = QtGui.QMessageBox.about(self, 
+             "About MXCuBE",
+             """<b>MXCuBE v %s </b> 
                  <p>Macromolecular Xtallography Customized Beamline Environment<p>
                  Python %s - Qt %s - PyQt %s on %s"""%(__version__, 
-                 platform.python_version(),
-                 QtCore.QT_VERSION_STR, QtCore.PYQT_VERSION_STR, platform.system()))
+              platform.python_version(),
+              QtCore.QT_VERSION_STR, QtCore.PYQT_VERSION_STR, platform.system()))
 
     def quit_clicked(self):
         """
@@ -199,6 +211,26 @@ class CustomMenuBar(QtGui.QMenuBar):
         """
         if self.execution_mode:
             QtGui.QApplication.quit()
+
+    def info_for_developers_clicked(self):
+        path_list = os.path.dirname(__file__)
+        filename = os.path.join(*path_list[:-2])
+        filename = os.path.join(os.sep, filename, "docs/build/index.html")
+        if os.path.exists(filename):
+            webbrowser.open(filename)
+        else:
+            logging.getLogger().error("Could not find html file %s. " + \
+               "Use sphinx to build documentation (in doc dir execute " + \
+               "'sphinx-build source build')" % filename)
+
+    def user_manual_clicked(self):
+        path_list = os.path.dirname(__file__).split(os.sep)
+        filename = os.path.join(*path_list[:-2]) 
+        filename = os.path.join(os.sep, filename, "docs/build/user_manual.html")
+        if os.path.exists(filename):
+            webbrowser.open(filename)
+        else:
+            logging.getLogger().error("Could not find html file %s" % filename)
 
     def set_color(self, color):
         if color:  
@@ -677,7 +709,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowMaximizeButtonHint)
- 
+        self.setWindowIcon(Qt4_Icons.load_icon("desktop_icon")) 
 
     def view_toolbar_toggled(self, state):
         if state:

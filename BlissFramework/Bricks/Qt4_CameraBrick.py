@@ -117,9 +117,12 @@ class Qt4_CameraBrick(BlissWidget):
         
         self.popup_menu.addSeparator()
 
-        self.move_beam_mark_action = self.popup_menu.addAction(\
-             "Move beam mark", self.move_beam_mark)
-        self.move_beam_mark_action.setEnabled(False)
+        self.move_beam_mark_manual_action = self.popup_menu.addAction(\
+             "Set beam mark manually", self.move_beam_mark_manual)
+        self.move_beam_mark_manual_action.setEnabled(False)
+        self.move_beam_mark_auto_action = self.popup_menu.addAction(\
+             "Set beam mark automaticaly", self.move_beam_mark_auto)
+        self.move_beam_mark_auto_action.setEnabled(False)
         self.define_beam_action = self.popup_menu.addAction(\
              "Define beam size", self.define_beam_size)
         self.define_beam_action.setEnabled(False)
@@ -128,9 +131,6 @@ class Qt4_CameraBrick(BlissWidget):
         self.display_grid_action = self.popup_menu.addAction(\
              "Display grid", self.display_grid_toggled)
         self.display_grid_action.setCheckable(True)
-        self.display_radiation_damage_action = self.popup_menu.addAction(\
-             "Display radiation damage", self.display_radiation_damage_toggled)
-        self.display_radiation_damage_action.setCheckable(True)
 
         #self.display_histogram_action = self.popup_menu.addAction(\
         #     "Display histogram", self.display_histogram_toggled)
@@ -148,7 +148,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.camera_control_action = self.popup_menu.addAction(\
              "Camera control",
              self.open_camera_control_dialog)
-        self.camera_control_action.setEnabled(True)
+        self.camera_control_action.setEnabled(False)
 
         self.popup_menu.popup(QtGui.QCursor.pos())
       
@@ -232,7 +232,8 @@ class Qt4_CameraBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
    
     def set_expert_mode(self, is_expert_mode):
-        self.move_beam_mark_action.setEnabled(is_expert_mode)
+        self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
+        self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
 
     def set_info_msg(self, msg):
         self.info_label.setText(msg)
@@ -299,8 +300,11 @@ class Qt4_CameraBrick(BlissWidget):
     def create_grid(self):
         self.graphics_manager_hwobj.create_grid()
 
-    def move_beam_mark(self):
+    def move_beam_mark_manual(self):
         self.graphics_manager_hwobj.start_move_beam_mark()
+
+    def move_beam_mark_auto(self):
+        self.graphics_manager_hwobj.move_beam_mark_auto()
 
     def mouse_moved(self, x, y):
         self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" %(x, y))

@@ -467,7 +467,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.position_spinbox.setValue(float(new_position))
+        try:
+           self.position_spinbox.setValue(float(new_position))
+        except:
+           pass
 
     def set_position_spinbox_color(self, state):
         """
