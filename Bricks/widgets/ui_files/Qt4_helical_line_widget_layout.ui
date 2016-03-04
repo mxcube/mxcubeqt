@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>497</width>
-    <height>209</height>
+    <height>216</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CharacteriseWidgetVerticalSimple</string>
+   <string>Helical line widget</string>
   </property>
   <layout class="QHBoxLayout">
    <property name="spacing">
@@ -112,11 +112,41 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="display_beam_cbox">
-            <property name="text">
-             <string>Display beam shapes</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QCheckBox" name="overlay_cbox">
+              <property name="text">
+               <string>Display overlay</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="overlay_slider">
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="value">
+               <number>120</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout">
@@ -164,5 +194,22 @@
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>overlay_cbox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>overlay_slider</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>161</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

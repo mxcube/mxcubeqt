@@ -303,7 +303,7 @@ class CreateCharWidget(CreateTaskBase):
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
             snapshot = self._graphics_manager_hwobj.\
-                        get_snapshot(shape)
+                        get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot 
 

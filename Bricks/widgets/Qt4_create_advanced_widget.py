@@ -110,8 +110,8 @@ class CreateAdvancedWidget(CreateTaskBase):
              connect(lambda : self.move_grid("down"))        
       
         self._advanced_methods_widget.overlay_cbox.toggled.\
-             connect(self.overlay_cbox_toggled)
-        self._advanced_methods_widget.overlay_alpha_progressbar.valueChanged.\
+             connect(self.overlay_toggled)
+        self._advanced_methods_widget.overlay_slider.valueChanged.\
              connect(self.overlay_alpha_changed) 
         self._advanced_methods_widget.move_to_grid_button.clicked.\
              connect(self.move_to_grid)
@@ -387,7 +387,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._beamline_setup_hwobj.diffractometer_hwobj.\
                      move_to_centred_position(grid_object.get_centred_position())
 
-    def overlay_cbox_toggled(self, state):
+    def overlay_toggled(self, state):
         for grid_object, treewidget_item in self._grid_map.iteritems():
             if treewidget_item.isSelected():
                 grid_object.set_display_overlay(state)

@@ -515,7 +515,7 @@ class CreateTaskBase(QtGui.QWidget):
                         self._acq_widget.update_kappa(cpos.kappa)
                         self._acq_widget.update_kappa_phi(cpos.kappa_phi)
                     if isinstance(item, Qt4_queue_item.TaskQueueItem):
-                        snapshot = self._graphics_manager_hwobj.get_snapshot(position)
+                        snapshot = self._graphics_manager_hwobj.get_scene_snapshot(position)
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:

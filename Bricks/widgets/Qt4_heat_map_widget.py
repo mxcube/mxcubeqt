@@ -431,8 +431,7 @@ class HeatMapWidget(QtGui.QWidget):
                       get_centred_positions()
             motor_pos_dict = self._beamline_setup_hwobj.diffractometer_hwobj.\
                       get_point_from_line(point_one, point_two, coord_x, num_images)
-
-        motor_pos_dict['phi'] = omega
+            motor_pos_dict['phi'] = omega
         self._beamline_setup_hwobj.shape_history_hwobj.\
              create_centring_point(True, {"motors": motor_pos_dict})
 

@@ -482,18 +482,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QScrollBar" name="overlay_alpha_progressbar">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
+             <widget class="QSlider" name="overlay_slider">
               <property name="maximum">
                <number>255</number>
               </property>
               <property name="value">
-               <number>130</number>
+               <number>120</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -546,16 +540,16 @@
   <connection>
    <sender>overlay_cbox</sender>
    <signal>toggled(bool)</signal>
-   <receiver>overlay_alpha_progressbar</receiver>
+   <receiver>overlay_slider</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>138</x>
-     <y>139</y>
+     <x>42</x>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
-     <x>360</x>
-     <y>143</y>
+     <x>184</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>

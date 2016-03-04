@@ -77,12 +77,16 @@ class CreateHelicalWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        #self._lines_widget.lines_treewidget.itemSelectionChanged.connect(\
-        #     self.lines_treewidget_selection_changed)
+        self._lines_widget.lines_treewidget.itemSelectionChanged.connect(\
+             self.lines_treewidget_selection_changed)
         self._lines_widget.create_line_button.clicked.connect(\
              self.create_line_button_clicked)
         self._lines_widget.remove_line_button.clicked.connect(\
              self.remove_line_button_clicked)  
+        self._lines_widget.overlay_cbox.stateChanged.connect(\
+             self.overlay_toggled)
+        self._lines_widget.overlay_slider.valueChanged.\
+             connect(self.overlay_alpha_changed)
 
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
@@ -118,6 +122,15 @@ class CreateHelicalWidget(CreateTaskBase):
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
             self._path_template = queue_model_objects.PathTemplate()
+
+    def set_beamline_setup(self, bl_setup_hwobj):
+        CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
+       
+        # At startup, if scene loaded from file, then update listwidget
+        shapes = self._graphics_manager_hwobj.get_shapes()
+        for shape in shapes: 
+            if isinstance(shape, GraphicsItemLine):
+                self.shape_created(shape, "Line")
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
@@ -166,22 +179,25 @@ class CreateHelicalWidget(CreateTaskBase):
     def select_shape_with_cpos(self, start_cpos, end_cpos, num_images):
         selected_line = None
 
+        self._graphics_manager_hwobj.de_select_all()
         for shape in self._graphics_manager_hwobj.get_shapes():
             if isinstance(shape, GraphicsItemLine):
-                (line_start_cpos, line_end_cpos) = shape.get_centred_positions() 
-                if line_start_cpos == start_cpos and line_end_cpos == end_cpos:
-                    self._graphics_manager_hwobj.de_select_all()
-                    self._graphics_manager_hwobj.select_line(shape)
+                (start_cpos_index, end_cpos_index) = shape.get_points_index()
+                if start_cpos_index == start_cpos.index and \
+                   end_cpos_index == end_cpos.index:
+                    self._graphics_manager_hwobj.select_shape(shape)
                     shape.set_num_images(num_images)
                     selected_line = shape
 
         #de-select previous selected list items and
         #select the current shape (Line).
+        """
         for (list_item, shape) in self._lines_map.iteritems():
             if selected_line == shape:
                 list_item.setSelected(True)
             else:
                 list_item.setSelected(False)
+        """
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -243,6 +259,7 @@ class CreateHelicalWidget(CreateTaskBase):
            
             start_graphical_point, end_graphical_point = \
                 shape.get_graphical_points() 
+
             start_acq.acquisition_parameters.\
                 centred_position = copy.deepcopy(start_graphical_point.get_centred_position())
             start_acq.acquisition_parameters.centred_position.\
@@ -278,7 +295,8 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def lines_treewidget_selection_changed(self):
         for shape, list_item in self._lines_map.iteritems():
-            shape.setSelected(list_item.isSelected())
+            self._graphics_manager_hwobj.select_shape(shape, list_item.isSelected())
+            #shape.setSelected(list_item.isSelected())
 
     def create_line_button_clicked(self):
         self._graphics_manager_hwobj.create_line()
@@ -298,3 +316,11 @@ class CreateHelicalWidget(CreateTaskBase):
             if treewidget_item.isSelected():
                 selected_lines.append(line)
         return selected_lines
+
+    def overlay_toggled(self, state):
+        self._graphics_manager_hwobj.set_display_overlay(state)
+
+    def overlay_alpha_changed(self, alpha_value):
+        for line, treewidget_item in self._lines_map.iteritems():
+            if treewidget_item.isSelected():
+                line.set_fill_alpha(alpha_value)

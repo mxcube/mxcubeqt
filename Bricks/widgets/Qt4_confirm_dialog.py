@@ -68,7 +68,7 @@ class ConfirmDialog(QtGui.QDialog):
              self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
-        self.setMinimumWidth(800)
+        self.setMinimumWidth(860)
 
         # Other --------------------------------------------------------------- 
         self.setWindowTitle('Confirm collection')
