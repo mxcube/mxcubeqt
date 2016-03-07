@@ -8,14 +8,6 @@ from BlissFramework.Utils import widget_colors
 
 __category__ = 'mxCuBE'
 
-"""RESOLUTION_GUI_EVENT = QEvent.User
-class ResolutionGUIEvent(QCustomEvent):
-    def __init__(self, method, arguments):
-        QCustomEvent.__init__(self, RESOLUTION_GUI_EVENT)
-        self.method = method
-        self.arguments = arguments
-"""
-
 class ResolutionBrick(BlissWidget):
     STATE_COLORS = (widget_colors.LIGHT_RED, 
                     widget_colors.LIGHT_RED,
@@ -33,7 +25,7 @@ class ResolutionBrick(BlissWidget):
 
         self.resolutionMotor=None
         self.detectorMotor=None
-        self.energyScanObj=None
+        self.energyHObj=None
         self.colorGroupDict={}
         self.originalBackgroundColor=None
 
@@ -45,9 +37,7 @@ class ResolutionBrick(BlissWidget):
         self.currentResolutionValue=None
         self.currentDetDistanceValue=None
 
-        self.addProperty('resolutionMotor', 'string', '')
-        self.addProperty('detectorMotor', 'string', '')
-        self.addProperty('energyScan', 'string', '')
+        self.addProperty('resolution', 'string', '')
         self.addProperty('icons', 'string', '')
         self.addProperty('defaultMode', 'combo',('Ang','mm'),'Ang')
         self.addProperty('mmFormatString','formatString','###.##')
@@ -111,67 +101,31 @@ class ResolutionBrick(BlissWidget):
         self.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Fixed)
 
     def propertyChanged(self, property, oldValue, newValue):
-        if property == 'detectorMotor':
+        if property == 'resolution':
+            if self.resolutionMotor is not None:
+                self.disconnect(self.resolutionMotor,PYSIGNAL('deviceReady'),self.resolutionReady)
+                self.disconnect(self.resolutionMotor,PYSIGNAL('deviceNotReady'),self.resolutionNotReady)
+                self.disconnect(self.resolutionMotor,PYSIGNAL('stateChanged'),self.resolutionStateChanged)
+                self.disconnect(self.resolutionMotor,PYSIGNAL('positionChanged'),self.resolutionChanged)
             if self.detectorMotor is not None:
                 self.disconnect(self.detectorMotor,PYSIGNAL('deviceReady'),self.resolutionReady)
                 self.disconnect(self.detectorMotor,PYSIGNAL('deviceNotReady'),self.resolutionNotReady)
                 self.disconnect(self.detectorMotor,PYSIGNAL('stateChanged'),self.detectorStateChanged)
                 self.disconnect(self.detectorMotor,PYSIGNAL('positionChanged'),self.detectorChanged)
                 self.disconnect(self.detectorMotor,PYSIGNAL('limitsChanged'),self.detectorLimitsChanged)
-
-            self.units.clear()
-            self.mmHistory=[]
-            available_units=[]
-            if self.resolutionMotor is not None:
-                self.units.insertItem(chr(197))
-                available_units.append('Ang')
-            self.detectorMotor=self.getHardwareObject(newValue)
-            if self.detectorMotor is not None:
-                self.units.insertItem('mm')
-                available_units.append('mm')
-
-                try:
-                    self.connect(self.detectorMotor,PYSIGNAL('deviceReady'),self.resolutionReady)
-                    self.connect(self.detectorMotor,PYSIGNAL('deviceNotReady'),self.resolutionNotReady)
-                    self.connect(self.detectorMotor,PYSIGNAL('stateChanged'),self.detectorStateChanged)
-                    self.connect(self.detectorMotor,PYSIGNAL('positionChanged'),self.detectorChanged)
-                    self.connect(self.detectorMotor,PYSIGNAL('limitsChanged'),self.detectorLimitsChanged)
-                except:
-                    logging.getLogger().exception('ResolutionBrick: problem connecting to the detector distance motor')
-
-                if self.detectorMotor.isReady():
-                    self.detectorReady()
-                else:
-                    self.detectorNotReady()
-            else:
-                self.updateGUI()
-
-            try:
-                i=available_units.index(self['defaultMode'])
-            except ValueError:
-                #curr=str(self.units.currentText())
-                curr=self.units.currentText()
-                if curr!="":
-                    self.unitChanged(curr)
-            else:
-                def_mode=self['defaultMode']
-                if def_mode=='Ang':
-                    def_mode=chr(197)
-                self.units.setCurrentText(def_mode)
-                self.unitChanged(def_mode)
-
-        elif property == 'resolutionMotor':
-            if self.resolutionMotor is not None:
-                self.disconnect(self.resolutionMotor,PYSIGNAL('deviceReady'),self.resolutionReady)
-                self.disconnect(self.resolutionMotor,PYSIGNAL('deviceNotReady'),self.resolutionNotReady)
-                self.disconnect(self.resolutionMotor,PYSIGNAL('stateChanged'),self.resolutionStateChanged)
-                self.disconnect(self.resolutionMotor,PYSIGNAL('positionChanged'),self.resolutionChanged)
-
+            if self.energyHObj is not None:
+                self.disconnect(self.energyHObj,PYSIGNAL('moveEnergyFinished'),self.energyChanged)
             self.units.clear()
             self.angHistory=[]
+            self.mmHistory=[]
             available_units=[]
             self.resolutionMotor=self.getHardwareObject(newValue)
+            self.detectorMotor = None
+            self.energyHObj = None
             if self.resolutionMotor is not None:
+                self.detectorMotor=self.resolutionMotor.dtox
+                self.energyHObj = self.resolutionMotor.energy
+
                 self.units.insertItem(chr(197))
                 available_units.append('Ang')
 
@@ -186,7 +140,18 @@ class ResolutionBrick(BlissWidget):
                     self.connect(self.resolutionMotor,PYSIGNAL('positionChanged'),self.resolutionChanged)
                 except:
                     logging.getLogger().exception('ResolutionBrick: problem connecting to the resolution motor')
-
+                try:
+                    self.connect(self.detectorMotor,PYSIGNAL('deviceReady'),self.resolutionReady)
+                    self.connect(self.detectorMotor,PYSIGNAL('deviceNotReady'),self.resolutionNotReady)
+                    self.connect(self.detectorMotor,PYSIGNAL('stateChanged'),self.detectorStateChanged)
+                    self.connect(self.detectorMotor,PYSIGNAL('positionChanged'),self.detectorChanged)
+                    self.connect(self.detectorMotor,PYSIGNAL('limitsChanged'),self.detectorLimitsChanged)
+                except:
+                    logging.getLogger().exception('ResolutionBrick: problem connecting to the detector distance motor')
+                try:
+                    self.connect(self.energyHObj,PYSIGNAL('moveEnergyFinished'),self.energyChanged)
+                except:
+                    logging.getLogger().exception('ResolutionBrick: problem connecting to the energy motor')
                 if self.resolutionMotor.isReady():
                     self.resolutionReady()
                 else:
@@ -211,21 +176,8 @@ class ResolutionBrick(BlissWidget):
                     def_mode=chr(197)
                 self.units.setCurrentText(def_mode)
                 self.unitChanged(def_mode)
-
-        elif property == 'energyScan':
-            if self.energyScanObj is not None:
-                self.disconnect(self.energyScanObj,PYSIGNAL('moveEnergyFinished'),self.energyChanged)
-            self.energyScanObj=self.getHardwareObject(newValue)
-            if self.energyScanObj is not None:
-                self.connect(self.energyScanObj,PYSIGNAL('moveEnergyFinished'),self.energyChanged)
-
         elif property == 'icons':
             icons_list=newValue.split()
-
-            #try:
-            #    self.applyButton.setPixmap(Icons.load(icons_list[0]))
-            #except IndexError:
-            #    pass
 
             try:
                 self.stopButton.setPixmap(Icons.load(icons_list[1]))
@@ -408,12 +360,7 @@ class ResolutionBrick(BlissWidget):
                     resolution_ready=self.resolutionMotor.isReady()
                     
         if resolution_ready:
-            try:
-              self.resolutionMotor.getLimits(callback=self.resolutionLimitsChanged)
-            except TypeError:
-              self.resolutionMotor.getLimits()
-            #self.resolutionThread=ResolutionLimitsThread(self,self.resolutionMotor)
-            #self.resolutionThread.start()
+            self.resolutionLimitsChanged(self.resolutionMotor.getLimits())
         else:
             self.resolutionLimits=None
 
@@ -498,10 +445,8 @@ class ResolutionBrick(BlissWidget):
                     self.newValue.setText("")
                     self.newValue.blockSignals(False)
                     self.newValue.setEnabled(True)
-                    #self.applyButton.setEnabled(True)
                 else:
                     self.newValue.setEnabled(False)
-                    #self.applyButton.setEnabled(False)
                 if state==self.detectorMotor.MOVING or state==self.detectorMotor.MOVESTARTED:
                     self.stopButton.setEnabled(True)
                 else:
@@ -535,10 +480,8 @@ class ResolutionBrick(BlissWidget):
                 self.newValue.setText("")
                 self.newValue.blockSignals(False)
                 self.newValue.setEnabled(True)
-                #self.applyButton.setEnabled(True)
             else:
                 self.newValue.setEnabled(False)
-                #self.applyButton.setEnabled(False)
             if state==self.detectorMotor.MOVING or state==self.detectorMotor.MOVESTARTED:
                 self.stopButton.setEnabled(True)
             else:
@@ -610,6 +553,7 @@ class ResolutionBrick(BlissWidget):
         ang=float(self.angHistory[idx])
         self.setResolution(ang)
 
+"""
 ###
 ### Auxiliary class for positioning
 ###
@@ -617,24 +561,4 @@ class HorizontalSpacer(QWidget):
     def __init__(self,*args):
         QWidget.__init__(self,*args)
         self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
-
-"""
-class ResolutionLimitsThread(QThread):
-    def __init__(self,brick,res_motor):
-        QThread.__init__(self)
-        self.Brick=brick
-        self.resolutionMotor=res_motor
-
-    def run(self):
-        res_limits=self.resolutionMotor.getLimits()
-        if type(res_limits)!=types.TupleType:
-            logging.getLogger().warning("ResolutionBrick: unknown resolution limits (%s)" % str(res_limits))
-            res_limits=None
-        self.postResolutionLimitsEvent(res_limits)
-
-    def postResolutionLimitsEvent(self,res_limits):
-        method=ResolutionBrick.resolutionLimitsChanged
-        arguments=(self.Brick,res_limits)
-        custom_event=ResolutionGUIEvent(method,arguments)
-        self.postEvent(self.Brick,custom_event)
 """

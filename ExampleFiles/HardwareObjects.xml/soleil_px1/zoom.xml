@@ -1,0 +1,85 @@
+<!-- md2-zoomlevel has zoomlevel, backlightlevel and the frontlinelevel but not pixelsize and beamposition -->
+<!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
+<!-- device class="TangoMotorWPositionsPX2" -->
+<device class="TangoDCMotorWPositions">
+    <username>Zoom</username>
+       <tangoname>i10-c-cx1/ex/zoom.1-mt_tz</tangoname> 
+    <focus>PhiTableXAxisPosition</focus>
+    <channel type="tango" polling="1000" name="state">State</channel>
+    <channel type="tango" polling="1000" name="position">position</channel>
+    <datatype>int</datatype>
+    <delta>0.1</delta>
+    <interval>1000</interval>
+  <positions>
+    <position>
+      <username>Zoom 1</username>
+      <offset>0</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>28</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>647</pixelsPerMmY>
+        <pixelsPerMmZ>647</pixelsPerMmZ>
+<!--as of 2015-06-14        <beamPositionX>636</beamPositionX>-->
+<!--as of 2015-06-14        <beamPositionY>496</beamPositionY>-->
+        <beamPositionX>620</beamPositionX>
+        <beamPositionY>499</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 2</username>
+      <offset>3700</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>35</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>1240</pixelsPerMmY>
+        <pixelsPerMmZ>1240</pixelsPerMmZ>
+<!--as of 2015-06-14        <beamPositionX>594</beamPositionX>-->
+<!--as of 2015-06-14        <beamPositionY>483</beamPositionY>-->
+        <beamPositionX>570</beamPositionX>
+        <beamPositionY>482</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 3</username>
+      <offset>5900</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>50</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>1855</pixelsPerMmY>
+        <pixelsPerMmZ>1855</pixelsPerMmZ>
+<!--as of 2015-06-14        <beamPositionX>556</beamPositionX>-->
+<!--as of 2015-06-14        <beamPositionY>462</beamPositionY>-->
+        <beamPositionX>514</beamPositionX>
+        <beamPositionY>467</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 4</username>
+      <offset>7700</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>60</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>2550</pixelsPerMmY>
+        <pixelsPerMmZ>2550</pixelsPerMmZ>
+<!--as of 2015-06-14        <beamPositionX>506</beamPositionX>-->
+<!--as of 2015-06-14        <beamPositionY>444</beamPositionY>-->
+        <beamPositionX>449</beamPositionX>
+        <beamPositionY>444</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 5</username>
+      <offset>9000</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>60</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>3155</pixelsPerMmY>
+        <pixelsPerMmZ>3155</pixelsPerMmZ>
+<!--as of 2015-06-14        <beamPositionX>460</beamPositionX>-->
+<!--as of 2015-06-14        <beamPositionY>418</beamPositionY>-->
+        <beamPositionX>389</beamPositionX>
+        <beamPositionY>426</beamPositionY>
+      </calibrationData>
+    </position>
+    </positions>
+</device>

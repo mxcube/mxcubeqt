@@ -1,0 +1,5 @@
+<equipment class="ImageTracking">
+   <channel type="tine" name="chanEnableImageTracking" tinename="/P13/image-tracker/img-tracker">load-state</channel>
+   <channel type="tine" name="chanState" tinename="/P13/image-tracker/img-tracker">status</channel>
+</equipment>
+

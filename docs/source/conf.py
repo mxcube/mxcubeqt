@@ -173,17 +173,17 @@ htmlhelp_basename = 'MxCuBE20doc'
 # -- Options for LaTeX output --------------------------------------------------
 
 # The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
+latex_paper_size = 'a4'
 
 # The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
+latex_font_size = '10pt'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-#latex_documents = [
-#  ('index', 'MxCuBE20.tex', u'MxCuBE 2.0 Documentation',
-#   u'MxCuBE Collaboration', 'manual'),
-#]
+latex_documents = [
+  ('user_manual', 'MxCuBE2.tex', u'MxCuBE 2.0 Documentation',
+   u'MxCuBE Collaboration', 'manual'),
+]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -201,3 +201,11 @@ htmlhelp_basename = 'MxCuBE20doc'
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+numfig = True
+
+pdf_documents = [('index', u'mxcube_manual', u'MXCuBE manual', u''),]
+# index - master document
+# rst2pdf - name of the generated pdf
+# Sample rst2pdf doc - title of the pdf
+# Your Name - author name in the pdf

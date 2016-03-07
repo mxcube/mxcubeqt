@@ -67,7 +67,7 @@ class ConfirmDialog(qt.QDialog):
 
 
     def set_plate_mode(self, plate_mode):
-        self.dialog_layout_widget.snapshots_list = [1,0] if plate_mode else [4,2,1,0]
+        self.dialog_layout_widget.snapshots_list = [1,0] if plate_mode else [4,1,2,0]
         self.dialog_layout_widget.languageChange()
  
  
@@ -82,7 +82,6 @@ class ConfirmDialog(qt.QDialog):
         
 
     def set_items(self, checked_items):
-        self.dialog_layout_widget.take_snapshots_cbox.setCurrentItem(3)
         self.sample_items = []
         self.files_to_be_written = []
         self.checked_items = checked_items
@@ -140,15 +139,16 @@ class ConfirmDialog(qt.QDialog):
 
     def continue_button_click(self):
         for item in self.checked_items:
-            process_item = None
+            acq_params = None
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
-                process_item = item.get_model().acquisitions[0].acquisition_parameters
+                acq_params = item.get_model().acquisitions[0].acquisition_parameters
             elif isinstance(item.get_model(), queue_model_objects.Characterisation):
-                process_item = item.get_model().reference_image_collection.acquisitions[0].acquisition_parameters
-            if process_item :
-                process_item.take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
-                process_item.take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
-                process_item.skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
+                acq_params = item.get_model().reference_image_collection.acquisitions[0].acquisition_parameters
+            if acq_params is None:
+                continue
+            acq_params.take_snapshots = int(self.dialog_layout_widget.take_snapshots_cbox.currentText())
+            acq_params.take_dark_current = self.dialog_layout_widget.force_dark_cbx.isOn()
+            acq_params.skip_existing_images = self.dialog_layout_widget.skip_existing_images_cbx.isOn()
         
         self.emit(qt.PYSIGNAL("continue_clicked"), (self.sample_items, self.checked_items))
         self.accept()

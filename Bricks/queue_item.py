@@ -25,7 +25,9 @@ class QueueItem(qt.QCheckListItem):
         controller = kwargs.pop('controller', None)
         args = args + (controller, )
 
-        qt.QCheckListItem.__init__(self, *args, **kwargs)
+        #qt.QCheckListItem.__init__(self, *args, **kwargs)
+        #IK Python version
+        qt.QCheckListItem.__init__(self, *args)
 
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
@@ -189,6 +191,8 @@ class QueueItem(qt.QCheckListItem):
     def get_model(self):
         return self._data_model
 
+    def set_background_color(self, color_index):
+        self.setBackgroundColor(widget_colors.QUEUE_ENTRY_COLORS[color_index]) 
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
@@ -233,6 +237,12 @@ class SampleQueueItem(QueueItem):
     def reset_style(self):
         QueueItem.reset_style(self)
         self.set_mounted_style(self.mounted_style, clear_background = True)
+
+class BasketQueueItem(QueueItem):
+    def __init__(self, *args, **kwargs):
+        kwargs['controller'] = qt.QCheckListItem.CheckBoxController
+        kwargs['deletable'] = False
+        QueueItem.__init__(self, *args, **kwargs)
             
 
 class TaskQueueItem(QueueItem):
@@ -264,6 +274,11 @@ class CharacterisationQueueItem(TaskQueueItem):
 
 
 class EnergyScanQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
+
+class XRFSpectrumQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
@@ -336,8 +351,10 @@ MODEL_VIEW_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueItem,
      queue_model_objects.Characterisation: CharacterisationQueueItem,
      queue_model_objects.EnergyScan: EnergyScanQueueItem,
+     queue_model_objects.XRFSpectrum: XRFSpectrumQueueItem,
      queue_model_objects.SampleCentring: SampleCentringQueueItem,
      queue_model_objects.Sample: SampleQueueItem,
+     queue_model_objects.Basket: BasketQueueItem,
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

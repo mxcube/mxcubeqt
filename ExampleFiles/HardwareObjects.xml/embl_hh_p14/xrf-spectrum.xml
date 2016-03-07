@@ -1,0 +1,11 @@
+<equipment class="EMBLXRFSpectrum">
+  <device hwrid="/attenuators" role="transmission"/>
+  <device hwrid="/eh1/energy" role="energy"/>
+  <device hwrid="/beam-info" role="beam_info"/>
+  <device hwrid="/dbconnection" role="dbserver"/>
+
+  <command type="tine" name="cmdScanStart" tinename="/P14/fluorescence-scan/fls-scan">get-spectrum</command>
+  <command type="tine" name="cmdAdjustTransmission" tinename="/P14/fluorescence-scan/fls-scan">find-transmission</command>
+  <channel type="tine" name="chanScanStatus" tinename="/P14/fluorescence-scan/fls-scan" attach="event">status</channel>
+  <channel type="tine" name="chanScanConsts" tinename="/P14/fluorescence-scan/fls-scan">calibration-consts</channel>
+</equipment>

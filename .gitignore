@@ -8,3 +8,11 @@ HardwareObjects.xml/PX2_old
 *saved*
 lucid
 mahotas
+*.gui
+*.old
+build
+*.swp
+\#*#
+.*
+.ab*
+.ik*

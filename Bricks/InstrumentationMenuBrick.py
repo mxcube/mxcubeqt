@@ -25,62 +25,95 @@ class InstrumentationMenuBrick(BlissWidget):
         self.lightHO=None
         self.scintillatorHO=None
         self.apertureHO=None
+        self.fshutHO=None
+        self.detcoverHO = None
 
         self.addProperty('cryostream','string','')
         self.addProperty('fluodetector','string','')
         self.addProperty('hutchtrigger','string','')
         self.addProperty('light','string','')
+        self.addProperty('DetectorCover','string','')
+        self.addProperty('FastShutter','string','')
         self.addProperty('scintillator','string','')
+        self.addProperty('scintillatorWarning', 'string', '')
         self.addProperty('Kappa on/off','string', '')
         self.addProperty('aperture','string','')
+        self.addProperty('apertureWarning', 'string', '')
         self.addProperty('menuTitle','string','Instrumentation')
         self.addProperty('menuPosition','integer',1)
         self.addProperty('hutchtriggerDefaultMode', 'combo', ('automatic', 'manual'), 'automatic')
-        self.addProperty('scintillatorWarning', 'string', '')
-        self.addProperty('apertureWarning', 'string', '')
 
         self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
 
+    def detcoverClicked(self):
+        if self.instrumentationMenu.isItemChecked(self.detcoverId):
+            self.detcoverHO.actuatorOut()
+        else:
+            self.detcoverHO.actuatorIn()
+
     def lightClicked(self):
         if self.instrumentationMenu.isItemChecked(self.lightId):
-            self.lightHO.wagoOut()
+            self.lightHO.actuatorOut()
         else:
-            self.lightHO.wagoIn()
+            self.lightHO.actuatorIn()
 
     def cryostreamClicked(self):
         if self.instrumentationMenu.isItemChecked(self.cryostreamId):
-            self.cryostreamHO.wagoOut()
+            self.cryostreamHO.actuatorOut()
         else:
-            self.cryostreamHO.wagoIn()
+            self.cryostreamHO.actuatorIn()
 
     def fluodetectorClicked(self):
         if self.instrumentationMenu.isItemChecked(self.fluodetectorId):
-            self.fluodetectorHO.wagoOut()
+            self.fluodetectorHO.actuatorOut()
         else:
-            self.fluodetectorHO.wagoIn()
+            self.fluodetectorHO.actuatorIn()
 
     def scintillatorClicked(self):
         if self.instrumentationMenu.isItemChecked(self.scintillatorId):
-            self.scintillatorHO.wagoOut()
+            try:
+                self.fshutHO.actuatorOut()
+            except:
+                pass
+            self.scintillatorHO.actuatorOut(timeout=20)
         else:
             msg = self["scintillatorWarning"]
             ret=True
             if len(msg) > 0:
               ret=QMessageBox.warning(self, 'Scintillator in', msg, QMessageBox.Ok, QMessageBox.Cancel)==QMessageBox.Ok
             if ret:
-              self.scintillatorHO.wagoIn()
+                try:
+                    self.detcoverHO.actuatorIn()
+                except:
+                    pass
+                self.scintillatorHO.actuatorIn(timeout=20)
+                """
+                try:
+                    self.fshutHO.actuatorIn()
+                except:
+                    pass
+                """
 
     def apertureClicked(self):
         if self.instrumentationMenu.isItemChecked(self.apertureId):
-            self.apertureHO.wagoOut()
+            self.apertureHO.actuatorOut()
         else:
-            self.apertureHO.wagoIn()
+            self.apertureHO.actuatorIn()
 
     def hutchtriggerClicked(self):
         if self.instrumentationMenu.isItemChecked(self.hutchtriggerId):
             self.instrumentationMenu.setItemChecked(self.hutchtriggerId,False)
         else:
             self.instrumentationMenu.setItemChecked(self.hutchtriggerId,True)
+
+    def detcoverChanged(self,state):
+        if self.instrumentationMenu is None:
+            return
+        if state=="in":
+            state=True
+        else:
+            state=False
+        self.instrumentationMenu.setItemChecked(self.detcoverId,state)
 
     def lightChanged(self,state):
         if self.instrumentationMenu is None:
@@ -157,31 +190,37 @@ class InstrumentationMenuBrick(BlissWidget):
                     f.setPointSize(self.font().pointSize())
                     menu.setFont(f)
 
+            self.detcoverId=self.instrumentationMenu.insertItem("Detector Cover",self.detcoverClicked)
+            if self.detcoverHO is not None:
+                self.detcoverChanged(self.detcoverHO.getActuatorState())
+            else:
+                self.instrumentationMenu.setItemEnabled(self.detcoverId,False)
+
             self.lightId=self.instrumentationMenu.insertItem("Sample light",self.lightClicked)
             if self.lightHO is not None:
-                self.lightChanged(self.lightHO.getWagoState())
+                self.lightChanged(self.lightHO.getActuatorState())
             else:
                 self.instrumentationMenu.setItemEnabled(self.lightId,False)
 
             self.cryostreamId=self.instrumentationMenu.insertItem("Cryostream",self.cryostreamClicked)
             if self.cryostreamHO is not None:
-                self.cryostreamChanged(self.cryostreamHO.getWagoState())
+                self.cryostreamChanged(self.cryostreamHO.getActuatorState())
             else:
                 self.instrumentationMenu.setItemEnabled(self.cryostreamId,False)
 
             self.fluodetectorId=self.instrumentationMenu.insertItem("Fluorescence detector",self.fluodetectorClicked)
             if self.fluodetectorHO is not None:
-                self.fluodetectorChanged(self.fluodetectorHO.getWagoState())
+                self.fluodetectorChanged(self.fluodetectorHO.getActuatorState())
             else:
                 self.instrumentationMenu.setItemEnabled(self.fluodetectorId,False)
 
             if self.scintillatorHO is not None:
                 self.scintillatorId=self.instrumentationMenu.insertItem("Scintillator",self.scintillatorClicked)
-                self.scintillatorChanged(self.scintillatorHO.getWagoState())
+                self.scintillatorChanged(self.scintillatorHO.getActuatorState())
 
             if self.apertureHO is not None:
                 self.apertureId=self.instrumentationMenu.insertItem("Aperture",self.apertureClicked)
-                self.apertureChanged(self.apertureHO.getWagoState())
+                self.apertureChanged(self.apertureHO.getActuatorState())
 
             self.instrumentationMenu.insertItem("Kappa on/off", self.toggle_kappa)
 
@@ -217,52 +256,70 @@ class InstrumentationMenuBrick(BlissWidget):
     # Callback fot the brick's properties
     def propertyChanged(self,propertyName,oldValue,newValue):
         if propertyName=='light':
-            if self.lightHO is not None:
-                self.disconnect(self.lightHO,'wagoStateChanged',self.lightChanged)
-            self.lightHO=self.getHardwareObject(newValue)
-            if self.lightHO is not None:
-                self.connect(self.lightHO,'wagoStateChanged',self.lightChanged)
+            if newValue:
+                if self.lightHO is not None:
+                    self.disconnect(self.lightHO,'actuatorStateChanged',self.lightChanged)
+                self.lightHO=self.getHardwareObject(newValue)
+                if self.lightHO is not None:
+                    self.connect(self.lightHO,'actuatorStateChanged',self.lightChanged)
+
+        elif propertyName=='DetectorCover':
+            if newValue:
+                if self.detcoverHO is not None:
+                    self.disconnect(self.detcoverHO,'actuatorStateChanged',self.detcoverChanged)
+                self.detcoverHO=self.getHardwareObject(newValue)
+                if self.detcoverHO is not None:
+                    self.connect(self.detcoverHO,'actuatorStateChanged',self.detcoverChanged)
 
         elif propertyName=='cryostream':
-            if self.cryostreamHO is not None:
-                self.disconnect(self.cryostreamHO,'wagoStateChanged',self.cryostreamChanged)
-            self.cryostreamHO=self.getHardwareObject(newValue)
-            if self.cryostreamHO is not None:
-                self.connect(self.cryostreamHO,'wagoStateChanged',self.cryostreamChanged)
+            if newValue:
+                if self.cryostreamHO is not None:
+                    self.disconnect(self.cryostreamHO,'actuatorStateChanged',self.cryostreamChanged)
+                self.cryostreamHO=self.getHardwareObject(newValue)
+                if self.cryostreamHO is not None:
+                    self.connect(self.cryostreamHO,'actuatorStateChanged',self.cryostreamChanged)
 
         elif propertyName=='fluodetector':
-            if self.fluodetectorHO is not None:
-                self.disconnect(self.fluodetectorHO,'wagoStateChanged',self.fluodetectorChanged)
-            self.fluodetectorHO=self.getHardwareObject(newValue)
-            if self.fluodetectorHO is not None:
-                self.connect(self.fluodetectorHO,'wagoStateChanged',self.fluodetectorChanged)
+            if newValue:
+                if self.fluodetectorHO is not None:
+                    self.disconnect(self.fluodetectorHO,'actuatorStateChanged',self.fluodetectorChanged)
+                self.fluodetectorHO=self.getHardwareObject(newValue)
+                if self.fluodetectorHO is not None:
+                    self.connect(self.fluodetectorHO,'actuatorStateChanged',self.fluodetectorChanged)
 
         elif propertyName=='scintillator':
-            if self.scintillatorHO is not None:
-                self.disconnect(self.scintillatorHO,'wagoStateChanged',self.scintillatorChanged)
-            self.scintillatorHO=self.getHardwareObject(newValue)
-            if self.scintillatorHO is not None:
-                self.connect(self.scintillatorHO,'wagoStateChanged',self.scintillatorChanged)
+            if newValue:
+                if self.scintillatorHO is not None:
+                    self.disconnect(self.scintillatorHO,'actuatorStateChanged',self.scintillatorChanged)
+                self.scintillatorHO=self.getHardwareObject(newValue)
+                if self.scintillatorHO is not None:
+                    self.connect(self.scintillatorHO,'actuatorStateChanged',self.scintillatorChanged)
+
+        elif propertyName=='FastShutter':
+            if newValue:
+                self.fshutHO=self.getHardwareObject(newValue)
 
         elif propertyName=='aperture':
-            if self.apertureHO is not None:
-                self.disconnect(self.apertureHO,'wagoStateChanged',self.apertureChanged)
-            self.apertureHO=self.getHardwareObject(newValue)
-            if self.apertureHO is not None:
-                self.connect(self.apertureHO,'wagoStateChanged',self.apertureChanged)
+            if newValue:
+                if self.apertureHO is not None:
+                    self.disconnect(self.apertureHO,'actuatorStateChanged',self.apertureChanged)
+                self.apertureHO=self.getHardwareObject(newValue)
+                if self.apertureHO is not None:
+                    self.connect(self.apertureHO,'actuatorStateChanged',self.apertureChanged)
 
         elif propertyName=='hutchtrigger':
-            if self.hutchtriggerHO is not None:
-                self.disconnect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
-                self.disconnect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
-                self.disconnect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
-                self.disconnect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
-            self.hutchtriggerHO=self.getHardwareObject(newValue)
-            if self.hutchtriggerHO is not None:
-                self.connect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
-                self.connect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
-                self.connect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
-                self.connect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
+            if newValue:
+                if self.hutchtriggerHO is not None:
+                    self.disconnect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
+                    self.disconnect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
+                    self.disconnect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
+                    self.disconnect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
+                self.hutchtriggerHO=self.getHardwareObject(newValue)
+                if self.hutchtriggerHO is not None:
+                    self.connect(self.hutchtriggerHO,'hutchTrigger',self.hutchtriggerChanged)
+                    self.connect(self.hutchtriggerHO,'connected',self.hutchtriggerConnected)
+                    self.connect(self.hutchtriggerHO,'disconnected',self.hutchtriggerDisconnected)
+                    self.connect(self.hutchtriggerHO,'msgChanged',self.hutchtriggerMsgChanged)
 
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)

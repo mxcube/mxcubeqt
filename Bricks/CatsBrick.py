@@ -197,6 +197,7 @@ class CatsBrick(BaseComponents.BlissWidget):
             self.widget.btLoadSample.setEnabled(False) 
             self.widget.btUnloadSample.setEnabled(False)
             self.widget.btAbort.setEnabled(False)
+            self.widget.lvSC.setEnabled(False)
         else:
             charging = (self.device.getState() == SampleChanger.SampleChangerState.Charging)
             ready = (self.device.getState() == SampleChanger.SampleChangerState.Ready)
@@ -204,6 +205,7 @@ class CatsBrick(BaseComponents.BlissWidget):
             moving = (self.device.getState() in [SampleChanger.SampleChangerState.Moving, SampleChanger.SampleChangerState.Loading, SampleChanger.SampleChangerState.Unloading])
             self.widget.btLoadSample.setEnabled(ready and not charging and (selected_sample is not None) and selected_sample.isPresent() and (selected_sample != self._loadedSample))
             self.widget.btUnloadSample.setEnabled(ready and not charging and self.device.hasLoadedSample())
+            self.widget.lvSC.setEnabled(ready or standby or charging)
         self.widget.btAbort.setEnabled(self.device is not None and not self.device.isReady())
 
     def _abort(self):

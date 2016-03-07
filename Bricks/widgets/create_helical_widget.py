@@ -43,8 +43,8 @@ class CreateHelicalWidget(CreateTaskBase):
 
         self._list_box = qt.QListBox(self._lines_gbox, "helical_page")
         self._list_box.setSelectionMode(qt.QListBox.Extended)
-        self._list_box.setFixedWidth(175)
-        self._list_box.setFixedHeight(50)
+        self._list_box.setFixedWidth(200)
+        self._list_box.setFixedHeight(75)
         list_box_tool_tip = "Select the line(s) to perfrom helical scan on"
         qt.QToolTip.add(self._list_box, list_box_tool_tip)
 
@@ -134,7 +134,7 @@ class CreateHelicalWidget(CreateTaskBase):
             self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters()
+                get_default_acquisition_parameters("default_helical_values")
         else:
             self._acquisition_parameters = qmo.AcquisitionParameters()
             self._path_template = qmo.PathTemplate()
@@ -143,8 +143,8 @@ class CreateHelicalWidget(CreateTaskBase):
         selected_shapes = self._shape_history.selected_shapes.values()
 
         if len(selected_shapes) == 2:
-            p1 = selected_shapes[1]
-            p2 = selected_shapes[0]
+            p1 = selected_shapes[0]
+            p2 = selected_shapes[1]
             
             line = shape_history.\
                    Line(self._shape_history.get_drawing(),
@@ -153,7 +153,14 @@ class CreateHelicalWidget(CreateTaskBase):
 
             line.show()
             self._shape_history.add_shape(line)
-            list_box_item = qt.QListBoxText(self._list_box, 'Line')
+            points_index = line.get_points_index()
+            if points_index:
+                display_name = "Line (points: %d, %d)" % \
+                               (points_index[0], points_index[1])
+            else:
+                display_name = "Line (points: #, #)"
+            list_box_item = qt.QListBoxText(self._list_box, display_name)
+            #list_box_item = qt.QListBoxText(self._list_box, 'Line')
             self._list_item_map[list_box_item] = line
 
             # De select previous items
@@ -198,6 +205,7 @@ class CreateHelicalWidget(CreateTaskBase):
         else:
             self._prev_pos = None
             self._current_pos = None
+            self._list_box.clearSelection()
 
     def list_box_selection_changed(self):
         self.show_selected_lines()
@@ -272,7 +280,8 @@ class CreateHelicalWidget(CreateTaskBase):
             self._processing_parameters = sample_model.processing_parameters
             #self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
-
+        elif isinstance(tree_item, queue_item.BasketQueueItem):
+            self.setDisabled(False)
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 

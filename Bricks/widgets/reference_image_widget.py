@@ -30,7 +30,7 @@ class ReferenceImageWidget(QWidget):
         self.acq_widget.acq_widget_layout.child('shutterless_cbx').hide()
         self.acq_widget.acq_widget_layout.child('subwedge_size_label').hide()
         self.acq_widget.acq_widget_layout.child('subwedge_size_ledit').hide()
-        self.acq_widget.acq_widget_layout.setFixedHeight(130)
+        self.acq_widget.acq_widget_layout.setFixedHeight(160)
       
         self.tool_box.addItem(self.page_layout, "Acquisition parameters")
 

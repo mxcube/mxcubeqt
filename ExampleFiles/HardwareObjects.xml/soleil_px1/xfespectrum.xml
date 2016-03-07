@@ -1,0 +1,6 @@
+<equipment class="XfeSpectrumPX1">
+    <directoryprefix>/tmp</directoryprefix> 
+
+    <object href="/xfecollect" role="xfecollect" />
+
+</equipment>

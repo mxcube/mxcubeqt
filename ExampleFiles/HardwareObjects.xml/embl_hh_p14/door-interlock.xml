@@ -1,0 +1,15 @@
+<device class="TINEDoorInterlock">
+  <username>TINEDoorInterlock</username>
+  <command type="tine" name="cmdBreakInterlock" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">BreakInterlock14.2a</command>
+  <channel type="tine" name="chanCanUnlockCond" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface">BS14_1_offen</channel>
+  <channel type="tine" name="chanDoorInterlocked" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface">G14_2a_TI</channel>
+
+  <canUnlockCond>3</canUnlockCond>
+  <doorInterlockedCond>0</doorInterlockedCond>
+  <executeCommandsBeforeUnlock>True</executeCommandsBeforeUnlock>
+
+  <beforeUnlockCommandsPresent>True</beforeUnlockCommandsPresent>
+  <beforeUnlockCommands>[{"address":"/P14/MD3/MD3_0","property":"startSetPhase","type":"query","argument":"Transfer"}]</beforeUnlockCommands>
+
+  <useDoorInterlock>True</useDoorInterlock>
+</device>

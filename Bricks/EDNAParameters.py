@@ -25,7 +25,6 @@ class EDNAParameters(BlissWidget):
         #when starting a workflow we emit this signal and expect
         #to get the beamline params through the slot
         self.defineSlot('updateBeamlineParameters', ())
-        self.defineSlot("populate_workflow_widget",({}))  
         self.defineSignal('beamlineParametersNeeded', ())
         self.defineSignal('workflowAvailable', ())
 
@@ -78,8 +77,6 @@ class EDNAParameters(BlissWidget):
         #                self.abort_workflow)
         QObject.connect(self.start_button, SIGNAL('clicked()'),
                         self.start_workflow)
-        QObject.connect(self.workflow_list, SIGNAL('activated ( const QString &)'),
-                        self.workflow_selected)
         # name -> model path mapping
         self.workflows = dict()
 
@@ -106,8 +103,6 @@ class EDNAParameters(BlissWidget):
                              self.prompt_parameters)
                 self.connect(self.workflow, PYSIGNAL('stateChanged'),
                              self.workflow_state_changed)
-                self.connect(self.workflow, PYSIGNAL('currentActorChanged'),
-                             self.current_actor_changed)
                 #populate the available workflows list
                 self.refresh_workflows()
         if prop == 'edna object':
@@ -172,18 +167,14 @@ class EDNAParameters(BlissWidget):
         self.workflow_list.setEnabled(new_state == "ON")
 
         if new_state == "RUNNING":
-            message = 'Workflow engine running (actor: %s)' % self.workflow.current_actor.getValue()
+            message = 'Workflow engine running'
         elif new_state == "STANDBY":
             message = 'Workflow engine paused'
         elif new_state == "ON":
             self.refresh_workflows()
             message = 'Workflow engine idle'
         elif new_state == "OPEN":
-            try:
-                actor_name = self.workflow.current_actor.getValue()
-            except:
-                actor_name = 'Unknown actor'
-            message = 'Actor %s waiting for parameters' % actor_name
+            message = 'Waiting for parameters'
         elif new_state == "None":
             message = 'Workflow engine is offline'
         else:
@@ -193,27 +184,11 @@ class EDNAParameters(BlissWidget):
         #self.info_label.setText(message)
         logging.info(message)
 
-    def current_actor_changed(self, actor):
-        if type(actor) == types.ListType or type(actor) == types.TupleType:
-            actor = actor[0]
-        
-        try:
-            state = self.workflow.state.getValue()
-            self.refresh_workflow_state(state, actor)
-        except:
-            pass
-            #self.info_label.setText('Lost connection with workflow engine')
         
     def workflow_state_changed(self, new_state):
         logging.debug('%s: new workflow state is %r', self.name(), new_state)
         if type(new_state) == types.ListType or type(new_state) == types.TupleType:
             new_state = str(new_state[0])
-        try:
-            actor = self.workflow.current_actor.getValue()
-            self.refresh_workflow_state(new_state, actor)
-        except:
-            pass
-            #self.info_label.setText('Lost connection with workflow engine')
         if new_state == "ON" and self.previous_workflow_state == "RUNNING":
             # workflow finished, open the output file and use an EDNACaracterize method to
             # continue the work
@@ -257,7 +232,6 @@ class EDNAParameters(BlissWidget):
             self.workflows[name] = w
         if previous_workflow_index is not None:
             self.workflow_list.setCurrentItem(previous_workflow_index)
-        self.workflow_selected(self.workflow_list.currentText())
 
     def start_workflow(self):
         #get the beamline params
@@ -320,24 +294,6 @@ class EDNAParameters(BlissWidget):
             self.beamline_params[k] = value
 
 
-    def workflow_selected(self, name):
-        if type(name) != types.StringType:
-            name = str(name)
-        self.workflow_list.setCurrentText(name)
-        #get the path of the html describing the WF
-        workflow_doc = self.workflows[name]['doc']
-        if self.params_widget is not None:
-            self.layout().removeChild(self.params_widget)
-        self.params_widget = QTextBrowser(self)
-        if os.path.exists(workflow_doc):
-            self.params_widget.setSource(workflow_doc)
-        else:
-            self.params_widget.setText('<center><b>no documentation available</b></center>')
-        # add the browser to the layout
-        self.layout().addMultiCellWidget(self.params_widget, 0, 0, 0, 1)
-        self.params_widget.show()
-
-
     def login_changed(self, *login_infos):
         logging.debug('user logged in, logins_info: %r', login_infos)
         if len(login_infos) == 1 and login_infos[0] == None:
@@ -346,6 +302,3 @@ class EDNAParameters(BlissWidget):
             self.session_id = int(login_infos[0])
 
 
-    def populate_workflow_widget(self, item, running = False):        
-        if item and not running:
-            self.workflow_selected(item.get_model().get_type())
