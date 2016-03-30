@@ -205,6 +205,8 @@ class CreateTaskBase(QtGui.QWidget):
     def get_sample_item(self, item):
         if isinstance(item, Qt4_queue_item.SampleQueueItem):
             return item
+        elif isinstance(item, Qt4_queue_item.BasketQueueItem):
+            return item
         elif isinstance(item, Qt4_queue_item.TaskQueueItem):
             return item.get_sample_view_item()
         else:
@@ -317,12 +319,16 @@ class CreateTaskBase(QtGui.QWidget):
             sub_dir = group_name + '/' + sub_dir
 
         if tree_item:
-            item = self.get_sample_item(tree_item)            
-            sub_dir += item.get_model().get_name()
+            item = self.get_sample_item(tree_item)
+            if isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
+                sub_dir += str(tree_item.get_model().get_location())
+            else:
+                item = self.get_sample_item(tree_item)
+                sub_dir += item.get_model().get_name()
 
-            if isinstance(item, Qt4_queue_item.SampleQueueItem):
-                if item.get_model().lims_id == -1:
-                    sub_dir += ''
+                if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
+                    if item.get_model().lims_id == -1:
+                        sub_dir += ''
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
@@ -362,8 +368,9 @@ class CreateTaskBase(QtGui.QWidget):
         self.selection_changed(self._current_selected_items)
 
     def single_item_selection(self, tree_item):
+        self._graphics_manager_hwobj.de_select_all()
         sample_item = self.get_sample_item(tree_item)
-       
+      
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)
@@ -389,7 +396,6 @@ class CreateTaskBase(QtGui.QWidget):
                     self._path_template.base_prefix = self.get_default_prefix()
 
             #If no information from lims then add basket/sample info
-            """
             # This works if each sample is clicked, but do not work
             # when a task is assigned to the whole puck.
             # Then all samples get the same dir
@@ -399,7 +405,6 @@ class CreateTaskBase(QtGui.QWidget):
                 (data_directory, proc_directory) = self.get_default_directory(tree_item)
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
-            """
               
             # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
@@ -422,6 +427,9 @@ class CreateTaskBase(QtGui.QWidget):
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
+            (data_directory, proc_directory) = self.get_default_directory(tree_item)
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
 
             #Update energy transmission and resolution
             if self._acq_widget:

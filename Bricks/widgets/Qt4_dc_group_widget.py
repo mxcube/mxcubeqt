@@ -68,15 +68,8 @@ class DCGroupWidget(QtGui.QWidget):
         _subwedge_widget_vlayout.setSpacing(6)
         _subwedge_widget_vlayout.addStretch(0)
 
-        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
-        _snapshots_vlayout.addWidget(self.position_widget)
-        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
-        _snapshots_vlayout.setSpacing(6)
-        _snapshots_vlayout.addStretch(0)
-
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(_subwedge_widget)
-        _main_hlayout.addWidget(_snapshot_widget)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.setSpacing(2)
         _main_hlayout.addStretch(0)
@@ -93,7 +86,7 @@ class DCGroupWidget(QtGui.QWidget):
         self.subwedge_table.setEditTriggers(\
              QtGui.QAbstractItemView.NoEditTriggers)
         self.subwedge_table.setColumnCount(7)
-        self.subwedge_table.horizontalHeader().setStretchLastSection(True)
+        self.subwedge_table.horizontalHeader().setStretchLastSection(False)
 
         horizontal_headers = ["Osc start", "Osc range", "Images", 
                               "Exposure time", 
@@ -101,6 +94,8 @@ class DCGroupWidget(QtGui.QWidget):
         for index, header in enumerate(horizontal_headers):
             self.subwedge_table.setHorizontalHeaderItem(index, 
                  QtGui.QTableWidgetItem(header))
+        #self.subwedge_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
+        #                                  QtGui.QSizePolicy.Fixed)
 
     def populate_widget(self, item):
         dcg_queue_item = item.get_queue_entry()
@@ -118,12 +113,16 @@ class DCGroupWidget(QtGui.QWidget):
                 if isinstance(children.get_view(), Qt4_queue_item.DataCollectionQueueItem):
                     dcg_child_list.append(children.get_data_model())
                     acq_par = children.get_data_model().acquisitions[0].acquisition_parameters
-                    sw_list.append((len(sw_list), 0, acq_par.first_image, 
+                    sw_list.append([len(sw_list), 0, acq_par.first_image, 
                        acq_par.num_images, acq_par.osc_start, 
-                       acq_par.osc_range * acq_par.num_images)) 
+                       acq_par.osc_range * acq_par.num_images]) 
+
+        for sw in sw_list:
+            color = Qt4_widget_colors.get_random_hex(alpha=50)
+            sw.append(color)
 
         self.subwedge_table.setRowCount(0) 
-        for sw in sw_list: 
+        for sw in sw_list:
             acq_par = dcg_child_list[sw[0]].acquisitions[0].acquisition_parameters
             row = self.subwedge_table.rowCount()
             self.subwedge_table.setRowCount(row + 1)
@@ -134,8 +133,13 @@ class DCGroupWidget(QtGui.QWidget):
                           str(acq_par.energy),
                           str(acq_par.transmission),
                           str(acq_par.resolution)) 
+            #color = Qt4_widget_colors.get_random_color()
+            #sw.append(color)
             for col in range(7):
                 self.subwedge_table.setItem(row, col, QtGui.QTableWidgetItem(param_list[col]))
-                self.subwedge_table.item(row, col).setBackground(\
-                     QtGui.QColor(Qt4_widget_colors.TASK_GROUP[sw[0]]))
+                color = QtGui.QColor(sw[-1])
+                color.setAlpha(100)
+                self.subwedge_table.item(row, col).setBackground(color)
+                #     QtGui.QColor(Qt4_widget_colors.TASK_GROUP[sw[0]]))
+
         self.polar_scater_widget.draw_multiwedge_scater(sw_list)

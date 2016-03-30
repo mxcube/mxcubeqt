@@ -128,15 +128,6 @@ class DCParametersWidget(QtGui.QWidget):
         path_template = self._data_collection.acquisitions[0].path_template
         path_conflict = self.queue_model_hwobj.\
                         check_for_path_collisions(path_template)
-        if new_value != '':
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before collecting')
-
-                widget.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-            else:
-                widget.setPaletteBackgroundColor(widget_colors.WHITE)
 
     def __add_data_collection(self):
         return self.add_dc_cb(self._data_collection, self.collection_type)

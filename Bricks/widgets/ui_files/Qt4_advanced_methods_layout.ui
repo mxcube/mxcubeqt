@@ -152,12 +152,12 @@
             </column>
             <column>
              <property name="text">
-              <string>Beam width (μ)</string>
+              <string>Beam width (μm)</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Beam height (μ)</string>
+              <string>Beam height (μm)</string>
              </property>
             </column>
             <column>
@@ -203,6 +203,34 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="move_to_grid_button">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Move to grid</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="remove_grid_button">
@@ -255,14 +283,14 @@
                 <item>
                  <widget class="QLabel" name="hor_spacing_label">
                   <property name="text">
-                   <string>Horizontal spacing</string>
+                   <string>Horizontal spacing (μm)</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="ver_spacing_label_2">
                   <property name="text">
-                   <string>Vetical spacing</string>
+                   <string>Vetical spacing (μm)</string>
                   </property>
                  </widget>
                 </item>
@@ -347,6 +375,9 @@
                 </property>
                 <item>
                  <widget class="QPushButton" name="move_left_button">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>27</width>
@@ -364,6 +395,9 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="move_up_button">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>27</width>
@@ -397,6 +431,9 @@
                 </property>
                 <item>
                  <widget class="QPushButton" name="move_right_button">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>27</width>
@@ -414,6 +451,9 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="move_down_button">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>27</width>
@@ -461,6 +501,9 @@
             </property>
             <item>
              <widget class="QCheckBox" name="overlay_cbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -483,6 +526,9 @@
             </item>
             <item>
              <widget class="QSlider" name="overlay_slider">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="maximum">
                <number>255</number>
               </property>
@@ -495,30 +541,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="move_to_grid_button">
+             <widget class="QPushButton" name="overlay_color_button">
               <property name="enabled">
                <bool>false</bool>
               </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
               <property name="text">
-               <string>Move to grid</string>
+               <string>Overlay color</string>
               </property>
              </widget>
             </item>

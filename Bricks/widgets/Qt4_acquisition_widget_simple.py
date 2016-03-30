@@ -76,6 +76,8 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
+             self.use_osc_start)
         self.acq_widget_layout.num_images_cbox.activated.connect(\
              self.update_num_images)
         self.acq_widget_layout.detector_roi_mode_combo.activated.connect(\
@@ -86,9 +88,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
         self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
         self.exp_time_validator = QtGui.QDoubleValidator(0, 10000, 5, self)
-        #self.acq_widget_layout.osc_start_ledit.setEnabled(False)
-        #self.acq_widget_layout.kappa_ledit.setEnabled(False)
-        #self.acq_widget_layout.kappa_phi_ledit.setEnabled(False) 
         self.acq_widget_layout.num_images_cbox.setCurrentIndex(1)
 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
@@ -101,7 +100,8 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if self.enable_parameter_update and \
+           not self.acq_widget_layout.osc_start_cbox.isChecked():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
@@ -131,13 +131,15 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        self.acq_widget_layout.kappa_ledit.setDisabled(state)
+        self.acq_widget_layout.kappa_label.setEnabled(state)
+        self.acq_widget_layout.kappa_ledit.setEnabled(state)
 
     def use_kappa_phi(self, state):
         """
         Descript. :
         """
-        self.acq_widget_layout.kappa_phi_ledit.setDisabled(state)
+        self.acq_widget_layout.kappa_phi_label.setEnabled(state)
+        self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
     
     def update_num_images(self, index = None, num_images = None):
         """

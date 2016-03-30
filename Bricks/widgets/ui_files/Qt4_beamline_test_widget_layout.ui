@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>526</width>
-    <height>405</height>
+    <width>968</width>
+    <height>793</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,19 +36,19 @@
         </font>
        </property>
        <property name="currentIndex">
-        <number>4</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="queue_toolbox_page">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>436</width>
-          <height>269</height>
+          <width>948</width>
+          <height>635</height>
          </rect>
         </property>
         <attribute name="label">
-         <string>Test queue</string>
+         <string>All tests</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
@@ -67,104 +67,47 @@
              <property name="margin">
               <number>0</number>
              </property>
+            </layout>
+           </item>
+           <item>
+            <widget class="QListWidget" name="available_tests_listwidget"/>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
              <item>
-              <widget class="QGroupBox" name="current_test">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+              <widget class="QLabel" name="label">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
                </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
+               <property name="text">
+                <string>Double click starts the test</string>
                </property>
-               <property name="title">
-                <string>Current test queue</string>
-               </property>
-               <layout class="QVBoxLayout">
-                <item>
-                 <widget class="QListWidget" name="current_test_listbox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>200</width>
-                    <height>150</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="remove_button">
-                  <property name="text">
-                   <string>Remove selected</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="available_test">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
-               <property name="minimumSize">
+               <property name="sizeHint" stdset="0">
                 <size>
-                 <width>0</width>
-                 <height>0</height>
+                 <width>40</width>
+                 <height>20</height>
                 </size>
                </property>
-               <property name="title">
-                <string>Available tests</string>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="execute_all_button">
+               <property name="text">
+                <string>Execute all tests</string>
                </property>
-               <layout class="QVBoxLayout">
-                <item>
-                 <widget class="QListWidget" name="available_test_listbox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>200</width>
-                    <height>150</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="add_button">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Add to queue</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
               </widget>
              </item>
             </layout>
@@ -194,8 +137,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>290</width>
-          <height>88</height>
+          <width>948</width>
+          <height>635</height>
          </rect>
         </property>
         <attribute name="label">
@@ -268,8 +211,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>500</width>
-          <height>152</height>
+          <width>948</width>
+          <height>315</height>
          </rect>
         </property>
         <attribute name="label">
@@ -405,8 +348,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>422</width>
-          <height>157</height>
+          <width>948</width>
+          <height>635</height>
          </rect>
         </property>
         <attribute name="label">
@@ -546,61 +489,6 @@
           </layout>
          </item>
         </layout>
-       </widget>
-       <widget class="QWidget" name="profile_toolbox_page">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>506</width>
-          <height>220</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Beam profile test</string>
-        </attribute>
-        <widget class="QWidget" name="layout21">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>99</width>
-           <height>86</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout">
-          <item>
-           <widget class="QCheckBox" name="checkBox3">
-            <property name="text">
-             <string>Slits</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox4">
-            <property name="text">
-             <string>Aperture</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox5">
-            <property name="text">
-             <string>Focusing</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
        </widget>
       </widget>
      </item>

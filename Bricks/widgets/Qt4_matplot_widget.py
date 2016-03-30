@@ -229,8 +229,9 @@ class PolarScater(FigureCanvas):
         col_count = 0
         for sw_index, sw in enumerate(sw_list):
             bars = self.axes.bar(np.radians(sw[4]), 1, 
-                width = np.radians(sw[5]), bottom = sw[0],
-                color = Qt4_widget_colors.TASK_GROUP[sw[0]])
+                width=np.radians(sw[5]), bottom = sw[0],
+                color=sw[-1],
+                alpha=0.3)
             x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
                     bars[0].get_bbox().xmin) / 2.0 
             y_mid = bars[0].get_bbox().ymin + (bars[0].get_bbox().ymax - \
