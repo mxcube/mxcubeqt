@@ -51,7 +51,6 @@ class Qt4_CRLBrick(BlissWidget):
         # Properties ----------------------------------------------------------
         self.addProperty('lenseCount', 'integer', 6)
         self.addProperty('mnemonic', 'string', '')
-        self.addProperty('focusing', 'string', '')
         self.addProperty('formatString', 'formatString', '#.#')
 
         # Signals ------------------------------------------------------------
@@ -63,6 +62,7 @@ class Qt4_CRLBrick(BlissWidget):
         self.main_gbox = QtGui.QGroupBox('CRL', self) 
         top_widget = QtGui.QWidget(self.main_gbox)
         self.mode_combo = QtGui.QComboBox(top_widget)
+        self.set_according_to_energy_button = QtGui.QPushButton("Set")
         #self.status_label = QtGui.QLabel("status", top_widget)
         self.crl_value_table = QtGui.QTableWidget(self.main_gbox)
 
@@ -70,6 +70,7 @@ class Qt4_CRLBrick(BlissWidget):
         # Layout --------------------------------------------------------------
         _top_hlayout = QtGui.QHBoxLayout(top_widget)
         _top_hlayout.addWidget(self.mode_combo)
+        _top_hlayout.addWidget(self.set_according_to_energy_button) 
         #_top_hlayout.addWidget(self.status_label)
         _top_hlayout.setSpacing(2)
         _top_hlayout.setContentsMargins(2, 2, 2, 2)
@@ -88,14 +89,13 @@ class Qt4_CRLBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self.mode_combo.activated.connect(self.set_crl_mode)
         self.crl_value_table.itemDoubleClicked.connect(\
              self.crl_table_item_doubleclicked)
+        self.set_according_to_energy_button.clicked.connect(\
+             self.set_according_to_energy)
 
         # Other ---------------------------------------------------------------
-        self.main_gbox.setCheckable(True)
-        self.mode_combo.addItem("Out") 
-        self.mode_combo.addItem("Automatic")
-        self.mode_combo.addItem("Manual")
         self.mode_combo.setCurrentIndex(1)
         self.crl_value_table.setRowCount(1)
         self.crl_value_table.verticalHeader().hide()
@@ -110,17 +110,13 @@ class Qt4_CRLBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.crl_hwobj:
+                self.disconnect(self.crl_hwobj, 'crlModeChanged', self.crl_mode_changed)
                 self.disconnect(self.crl_hwobj, 'crlValueChanged', self.crl_value_changed)
             self.crl_hwobj = self.getHardwareObject(new_value)
             if self.crl_hwobj:
+                self.init_crl_modes()
+                self.connect(self.crl_hwobj, 'crlModeChanged', self.crl_mode_changed)
                 self.connect(self.crl_hwobj, 'crlValueChanged', self.crl_value_changed)
-        if property_name == 'focusing':
-            if self.focusing_hwobj:
-                self.disconnect(self.focusing_hwobj, 'definerPosChanged', self.focusing_mode_changed)
-            self.focusing_hwobj = self.getHardwareObject(new_value)
-            if self.focusing_hwobj:
-                self.connect(self.focusing_hwobj, 'definerPosChanged', self.focusing_mode_changed)
-                self.focusing_mode_changed(self.focusing_hwobj.get_focus_mode())
         elif property_name == 'lenseCount':
             self.crl_value_table.setColumnCount(new_value)
             for col_index in range(new_value):
@@ -134,6 +130,22 @@ class Qt4_CRLBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
+    def set_crl_mode(self):
+        self.crl_hwobj.set_mode(self.mode_combo.currentText())
+
+    def crl_mode_changed(self, mode):
+        self.mode_combo.setCurrentIndex(self.mode_combo.findText(mode))  
+        self.crl_value_table.setEnabled(mode == "Manual")
+        self.set_according_to_energy_button.setEnabled(mode == "Manual")
+
+    def init_crl_modes(self):
+        crl_modes = self.crl_hwobj.get_modes()
+        for mode in crl_modes:
+            self.mode_combo.addItem(mode)
+       
+        crl_mode = self.crl_hwobj.get_mode()
+        self.mode_combo.setCurrentIndex(self.mode_combo.findText(crl_mode))
+
     def crl_value_changed(self, value):
         for col_index in range(self.crl_value_table.columnCount()): 
             if value[col_index]:
@@ -145,11 +157,11 @@ class Qt4_CRLBrick(BlissWidget):
                     setBackground(Qt4_widget_colors.LIGHT_GRAY)
                self.crl_value[col_index] = 0
 
-    def focusing_mode_changed(self, value):
-        self.setEnabled(value == 'unfocused')
-
     def crl_table_item_doubleclicked(self, tablewidget_item):
         #if > 1
         self.crl_value[tablewidget_item.column()] = \
              1 - self.crl_value[tablewidget_item.column()]
         self.crl_hwobj.set_crl_value(self.crl_value)
+
+    def set_according_to_energy(self):
+        self.crl_hwobj.set_according_to_energy()

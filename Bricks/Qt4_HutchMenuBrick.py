@@ -126,8 +126,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
              "create a point\nbased on current position (Ctrl+2)")
         self.reject_button.setToolTip("Reject centring")
         self.create_line_button.setToolTip("Create helical line between \n" + \
-             "two points (Ctrl+3)")
-        self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+4)")
+             "two points (Ctrl+L)")
+        self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+G)")
         self.select_all_button.setToolTip("Select all centring points (Ctrl+A)")
         self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
         #self.instanceSynchronize("")

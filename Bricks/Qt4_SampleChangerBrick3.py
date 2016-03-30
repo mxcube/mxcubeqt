@@ -751,6 +751,8 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.status = StatusView(self.contents_widget)
         self.switch_to_sample_transfer_button = QtGui.QPushButton(\
              "Switch to Sample Transfer mode", self.contents_widget)
+        self.test_sample_changer_button = QtGui.QPushButton(\
+             "Test sample changer", self.contents_widget)
         self.current_basket_view = CurrentBasketView(self.contents_widget)
         self.current_sample_view = CurrentSampleView(self.contents_widget)
 
@@ -780,6 +782,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
         _contents_widget_vlayout.addWidget(self.status)
         _contents_widget_vlayout.addWidget(self.switch_to_sample_transfer_button)
+        _contents_widget_vlayout.addWidget(self.test_sample_changer_button)
         _contents_widget_vlayout.addWidget(self.current_basket_view)
         _contents_widget_vlayout.addWidget(self.current_sample_view)
         _contents_widget_vlayout.addWidget(self.sc_contents_gbox)
@@ -793,6 +796,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.main_vlayout.setSpacing(0)
         self.main_vlayout.setContentsMargins(0, 0, 0, 0)
         
+        self.test_sample_changer_button.clicked.connect(self.test_sample_changer)
         self.reset_baskets_samples_button.clicked.connect(self.resetBasketsSamplesInfo)
 
         """
@@ -1102,6 +1106,9 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                     input[1]=sample
                     input[2]=1
                     self.sample_changer_hwobj.setBasketSampleInformation(input)
+
+    def test_sample_changer(self):
+        self.sample_changer_hwobj.run_test() 
 
 class HorizontalSpacer(QtGui.QWidget):
     def __init__(self,*args):

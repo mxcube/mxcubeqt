@@ -25,7 +25,7 @@ from PyQt4 import QtCore
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 STATES = {'unknown': Qt4_widget_colors.GRAY,
           'ready': Qt4_widget_colors.LIGHT_BLUE,

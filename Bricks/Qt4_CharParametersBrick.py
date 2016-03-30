@@ -47,7 +47,7 @@ class Qt4_CharParametersBrick(BlissWidget):
         # Properties ----------------------------------------------------------
         self.addProperty("tunable-energy", "boolean", "True")
         self.addProperty("session", "string", "/session")
-        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
 

@@ -89,8 +89,10 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
                                 self.state_changed)
             self.image_tracking_hwobj = self.getHardwareObject(newValue)
             if self.image_tracking_hwobj is not None:
+                self.image_tracking_cbox.blockSignals(True)
                 self.image_tracking_cbox.setChecked(\
                      self.image_tracking_hwobj.is_tracking_enabled() == True)
+                self.image_tracking_cbox.blockSignals(False)
                 self.connect(self.image_tracking_hwobj, 
                              QtCore.SIGNAL('stateChanged'), 
                              self.state_changed)
@@ -103,6 +105,7 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
             BlissWidget.propertyChanged(self,property,oldValue,newValue)
 
     def image_tracking_cbox_changed(self, state):
+        print "set_tracking"
         self.image_tracking_hwobj.set_image_tracking_state(state)
 
     def state_changed(self, state, state_label = None):

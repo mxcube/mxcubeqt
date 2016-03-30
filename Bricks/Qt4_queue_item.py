@@ -122,7 +122,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
         Descript. :
         """
         self.parent().takeChild(self.parent().indexOfChild(self))
-        after.parent().insertChild(after.parent().indexOfChild(after), self)
+        after.parent().insertChild(after.parent().indexOfChild(after) + 1, self)
 
         container_qe = self.get_queue_entry().get_container()
         after_qe = after.get_queue_entry()
