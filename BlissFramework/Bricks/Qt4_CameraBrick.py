@@ -82,12 +82,12 @@ class Qt4_CameraBrick(BlissWidget):
             Qt4_Icons.load_icon("Line.png"),
             "Helical line",
             self.create_line_clicked)
-        temp_action.setShortcut("Ctrl+3")
+        temp_action.setShortcut("Ctrl+l")
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("Grid"),
             "Grid",
             self.create_grid)
-        temp_action.setShortcut("Ctrl+4")
+        temp_action.setShortcut("Ctrl+G")
 
         measure_menu = self.popup_menu.addMenu("Measure")
         self.measure_distance_action = measure_menu.addAction(\
@@ -132,19 +132,9 @@ class Qt4_CameraBrick(BlissWidget):
              "Display grid", self.display_grid_toggled)
         self.display_grid_action.setCheckable(True)
 
-        #self.display_histogram_action = self.popup_menu.addAction(\
-        #     "Display histogram", self.display_histogram_toggled)
-        #self.define_histogram_action = self.popup_menu.addAction(\
-        #     "Define histogram", self.define_histogram_clicked)
-
-        #self.display_histogram_action.setEnabled(False)
-        #self.define_histogram_action.setEnabled(False)
-
         self.image_scale_menu = self.popup_menu.addMenu("Image scale")
         self.image_scale_menu.setEnabled(False) 
-        #self.zoom_window_menu = self.popup_menu.addAction(\
-        #     "Zoom window",
-        #     self.zoom_window_clicked)
+
         self.camera_control_action = self.popup_menu.addAction(\
              "Camera control",
              self.open_camera_control_dialog)
@@ -227,11 +217,13 @@ class Qt4_CameraBrick(BlissWidget):
         elif property_name == 'beamDefiner':
              self.define_beam_action.setEnabled(new_value) 
         elif property_name == 'cameraControls':
-             self.image_scale_menu.setEnabled(new_value) 
+             self.camera_control_action.setEnabled(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
    
     def set_expert_mode(self, is_expert_mode):
+        #if self.define_beam_action and self['beamDefiner']:
+        #    self.define_beam_action.setEnabled(is_expert_mode)
         self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
         self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
 

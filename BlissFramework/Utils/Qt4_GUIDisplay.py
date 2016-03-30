@@ -79,7 +79,8 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.info_for_developers_action =  self.help_menu.addAction(\
              "Information for developers", self.info_for_developers_clicked)
         self.info_for_developers_action.setEnabled(False)
-        self.help_menu.addAction("User manual", self.user_manual_clicked)
+        self.user_manual_action = self.help_menu.addAction("User manual", 
+             self.user_manual_clicked)
         self.help_menu.addSeparator()
         self.help_menu.addAction("Whats this", self.whats_this_clicked)
         self.help_menu.addSeparator()
@@ -97,6 +98,15 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.menu_items = [self.file_menu,
                            self.view_menu,
                            self.help_menu]
+
+        path_list = os.path.dirname(__file__).split(os.sep)
+        self.user_manual_filename = os.path.join(*path_list[:-2])
+        self.user_manual_filename = os.path.join(os.sep, 
+            self.user_manual_filename, "docs/build/user_manual.html")
+        if not os.path.exists(self.user_manual_filename):
+            logging.getLogger().error("BlissFramework: Could not find user " + \
+                    "manual file %s" % self.user_manual_filename)
+            self.user_manual_action.setEnabled(False)
         #self.setwindowIcon(Qt4_Icons.load_icon("desktop_icon"))
 
     def insert_menu(self, new_menu, position):
@@ -224,13 +234,7 @@ class CustomMenuBar(QtGui.QMenuBar):
                "'sphinx-build source build')" % filename)
 
     def user_manual_clicked(self):
-        path_list = os.path.dirname(__file__).split(os.sep)
-        filename = os.path.join(*path_list[:-2]) 
-        filename = os.path.join(os.sep, filename, "docs/build/user_manual.html")
-        if os.path.exists(filename):
-            webbrowser.open(filename)
-        else:
-            logging.getLogger().error("Could not find html file %s" % filename)
+        webbrowser.open(self.user_manual_filename)
 
     def set_color(self, color):
         if color:  
