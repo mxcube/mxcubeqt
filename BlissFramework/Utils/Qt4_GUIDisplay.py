@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import new
+#import new
 import logging
 import weakref
 import platform
@@ -31,6 +31,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, LabelCfg, WindowCfg, ContainerCfg, TabCfg
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
+import collections
 
 
 __version__ = '2.2'
@@ -79,8 +80,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.info_for_developers_action =  self.help_menu.addAction(\
              "Information for developers", self.info_for_developers_clicked)
         self.info_for_developers_action.setEnabled(False)
-        self.user_manual_action = self.help_menu.addAction("User manual", 
-             self.user_manual_clicked)
+        self.help_menu.addAction("User manual", self.user_manual_clicked)
         self.help_menu.addSeparator()
         self.help_menu.addAction("Whats this", self.whats_this_clicked)
         self.help_menu.addSeparator()
@@ -98,15 +98,6 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.menu_items = [self.file_menu,
                            self.view_menu,
                            self.help_menu]
-
-        path_list = os.path.dirname(__file__).split(os.sep)
-        self.user_manual_filename = os.path.join(*path_list[:-2])
-        self.user_manual_filename = os.path.join(os.sep, 
-            self.user_manual_filename, "docs/build/user_manual.html")
-        if not os.path.exists(self.user_manual_filename):
-            logging.getLogger().error("BlissFramework: Could not find user " + \
-                    "manual file %s" % self.user_manual_filename)
-            self.user_manual_action.setEnabled(False)
         #self.setwindowIcon(Qt4_Icons.load_icon("desktop_icon"))
 
     def insert_menu(self, new_menu, position):
@@ -234,7 +225,13 @@ class CustomMenuBar(QtGui.QMenuBar):
                "'sphinx-build source build')" % filename)
 
     def user_manual_clicked(self):
-        webbrowser.open(self.user_manual_filename)
+        path_list = os.path.dirname(__file__).split(os.sep)
+        filename = os.path.join(*path_list[:-2]) 
+        filename = os.path.join(os.sep, filename, "docs/build/user_manual.html")
+        if os.path.exists(filename):
+            webbrowser.open(filename)
+        else:
+            logging.getLogger().error("Could not find html file %s" % filename)
 
     def set_color(self, color):
         if color:  
@@ -514,7 +511,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             def tab_slot(self, page_index = self.indexOf(scroll_area)):
                 self.setCurrentIndex(page_index)
             try:
-                self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
+                #self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
+                self.__dict__[slotName.replace(" ", "_")] = tab_slot
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
             slotName = "hidePage_%s" % label
@@ -539,7 +537,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                   else:
                     self.showPage(page["widget"])
             try:
-              self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
+              #self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
+              self.__dict__[slotName.replace(" ", "_")] = tab_slot
             except: 
               logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName())) 
         
@@ -548,7 +547,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.page(page_index).setEnabled(enable)
             try:
-                self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                self.__dict__[slotName.replace(" ", "_")] = tab_slot
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
@@ -557,7 +557,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.setTabEnabled(page_index, enable)
             try:
-                self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                self.__dict__[slotName.replace(" ", "_")] = tab_slot
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
@@ -598,7 +599,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                         self.countChanged[page_index]=False
                         self.setTabLabel(self.page(page_index),new_label)
             try:
-                self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                self.__dict__[slotName.replace(" ", "_")] = tab_slot
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.name()))
 
@@ -639,7 +641,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     self.countChanged[page_index]=True
                     self.setTabLabel(self.page(page_index),new_label)
             try:
-                self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                self.__dict__[slotName.replace(" ", "_")] = tab_slot
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
@@ -872,7 +875,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 if not isinstance(child, BrickCfg):
                     if child["properties"].hasProperty("fontSize"):
                         f = new_item.font()
-                        if child["properties"]["fontSize"] <= 0:
+                        if int(child["properties"]["fontSize"]) <= 0:
                             child["properties"].getProperty("fontSize").setValue(f.pointSize())
                         else:
                             f.setPointSize(int(child["properties"]["fontSize"]))
@@ -909,10 +912,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         Descript. :
         """
-        for (w, m) in self.additionalWindows.itervalues():
+        for (w, m) in self.additionalWindows.values():
             w.close()
         # reset colors
-        if callable(self.__putBackColors):
+        if isinstance(self.__putBackColors, collections.Callable):
             self.__putBackColors()
             self.__putBackColors = None
 
@@ -1025,7 +1028,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             else:          
                 new_index = current_index + 1
 
-            if (new_index <> current_index and \
+            if (new_index != current_index and \
                 new_index > -1 and \
                 new_index < parent_layout.count()):
                 parent_layout.removeWidget(item)
@@ -1035,7 +1038,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """
         Descript. : function to select widget in the gui
         """
-        if callable(self.__putBackColors):
+        if isinstance(self.__putBackColors, collections.Callable):
             self.__putBackColors()
             self.__putBackColors = None
         if (len(selected_item) and 
@@ -1051,7 +1054,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         Arguments : widget - widget which 
         Return    : None
         """
-        if callable(self.__putBackColors):
+        if isinstance(self.__putBackColors, collections.Callable):
             self.__putBackColors()
         widget_palette = widget.palette()
         orig_bkgd_color = widget_palette.color(QtGui.QPalette.Window)

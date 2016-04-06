@@ -110,7 +110,7 @@ class ProcedureSelectionBrick(BaseComponents.BlissWidget):
         l.append('')
         self.equipmentsList.append(None)
         
-        for e in filter(None, [self.getHardwareObject(x) for x in equipments]):
+        for e in [_f for _f in [self.getHardwareObject(x) for x in equipments] if _f]:
             if len(e['procedures']) > 0:
                 l.append(e.userName())
                 self.equipmentsList.append(e)

@@ -1,4 +1,5 @@
 from qt import *
+import collections
 
 _pleaseWaitDialog = None
 
@@ -16,7 +17,7 @@ def show(msg = "Please wait...", abortMsg = "abort", abortCallback = None):
     _pleaseWaitDialog.layout().addWidget(pleaseWaitLabel)
     _pleaseWaitDialog.layout().addWidget(cmdAbort, Qt.AlignHCenter)
 
-    if callable(abortCallback):
+    if isinstance(abortCallback, collections.Callable):
         QObject.connect(cmdAbort, SIGNAL('clicked()'), abortCallback)
         
     _pleaseWaitDialog.show()

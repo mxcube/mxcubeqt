@@ -27,7 +27,7 @@ external action and some drawing vector.
 | action : scale                              | boolean  | show scale action
 | action : change foreground color            | boolean  | show change foreground color action
 | action : measure                            | boolean  | show measure action
-| action : measure (place)		      | combo    | display measure action in the toolbar or in contextmenu
+| action : measure (place)                    | combo    | display measure action in the toolbar or in contextmenu
 | action : zoom window                        | boolean  | show zoom window action
 | action : zoom fit or fill                   | boolean  | show zoom fit or fill action
 | action : zoom list                          | boolean  | show zoom list action
@@ -359,10 +359,10 @@ class CameraBrick(BlissWidget):
             self.__hwoName   = newValue
 
             if self.camera is not None:
-		try:
+                try:
                     self.__tangoName = self.camera.tangoname
-		except:
-		    self.__tangoName = ""
+                except:
+                    self.__tangoName = ""
 
                 try:
                     camera_role=self.camera.getDeviceByRole('camera')
@@ -531,19 +531,19 @@ class CameraBrick(BlissWidget):
 
     def __cameraStart(self, onoff) :
         if onoff :
-            print "********************************************************Set the camera ON"
+            print("********************************************************Set the camera ON")
             if self.camera is not None:
                 self.camera.setLive(True)
             else:
-                print "camera is none"
+                print("camera is none")
         else:
-            print "****************************************************Set the camera off"
+            print("****************************************************Set the camera off")
             if self.camera is not None:
-                print "camera :"
-                print self.camera
+                print("camera :")
+                print(self.camera)
                 self.camera.setLive(False)
             else:
-                print "camera is none"
+                print("camera is none")
 
     def __hide_show_zoom(self,actif) :
         if actif :

@@ -247,4 +247,4 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        print "stoped clicked"
+        print("stoped clicked")

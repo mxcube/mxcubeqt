@@ -2,7 +2,7 @@ import logging
 import os
 import stat
 import sys
-import cPickle
+import pickle
 import time
 
 import qt
@@ -13,8 +13,10 @@ from BlissFramework import GUIBuilder
 from BlissFramework.Utils import GUIDisplay
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.BaseComponents import BlissWidget
+#import Icons
 import Icons
 import BlissFramework
+import collections
 
 
 LOAD_GUI_EVENT = qt.QEvent.MaxUser
@@ -109,7 +111,7 @@ class GUISupervisor(qt.QWidget):
                             if "brick" in item:
                                 #print item["name"]
                                 try:
-                                    props = cPickle.loads(item["properties"])
+                                    props = pickle.loads(item["properties"])
                                 except:
                                     logging.getLogger().exception("could not load properties for %s", item["name"])
                                 else:
@@ -240,7 +242,7 @@ class GUISupervisor(qt.QWidget):
             #
             # make connections
             #        
-            widgets_dict = dict([(callable(w.name) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
+            widgets_dict = dict([(isinstance(w.name, collections.Callable) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
 
             def make_connections(items_list):
                 for item in items_list:
@@ -318,7 +320,7 @@ class GUISupervisor(qt.QWidget):
                 GUIDisplay.restoreSizes(self.configuration,window,display,configurationSuffix = '_%d' % key,moveWindowFlag = False)
                 
     def changeFontSize(self, mode):
-        widgets_dict = dict([(callable(w.name) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
+        widgets_dict = dict([(isinstance(w.name, collections.Callable) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
         
         def setFontSize(item):
             if mode == 1:

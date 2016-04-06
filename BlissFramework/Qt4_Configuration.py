@@ -21,7 +21,7 @@ import logging
 import imp
 import types
 import pprint
-import cPickle
+import pickle
 from BlissFramework.Utils import PropertyBag
 from BlissFramework import Qt4_BaseLayoutItems
 from BlissFramework.Qt4_BaseComponents import NullBrick
@@ -289,14 +289,14 @@ class Configuration:
             all_items.update(self.bricks)
             all_items.update(self.items)
 
-            for item in all_items.itervalues():
+            for item in all_items.values():
                 if isinstance(item, dict):
                     connections = item["connections"]
                 else:
                     connections = item.connections
                 for c in connections:
                     if c[recv]==old_item_name:
-                        print "receiver item %s in %s has been changed to %s" % (old_item_name, item.name, new_item_name)
+                        print("receiver item %s in %s has been changed to %s" % (old_item_name, item.name, new_item_name))
                         c[recv]=new_item_name
 
             self.hasChanged=True
@@ -506,9 +506,12 @@ class Configuration:
                         self.items[child["name"]] = newItem
 
                 if newItem is not None:
-                    if type(child["properties"]) == types.StringType:
+                    # LNLS
+                    if type(child["properties"]) == bytes:
+                    #if type(child["properties"]) == str:
                         try:
-                            newItem.setProperties(cPickle.loads(child["properties"]))
+                            newItem.setProperties(pickle.loads(child["properties"]))
+                            #newItem.setProperties(pickle.loads(child["properties"].encode('utf8')))
                         except:
                             logging.getLogger().exception("Error: could not load properties for %s", child["name"])
                             newItem.properties = PropertyBag.PropertyBag()
@@ -561,7 +564,7 @@ class Configuration:
         """
         Descript. :
         """
-        if type(brick_cfg) == types.StringType:
+        if type(brick_cfg) == bytes:
             brick_cfg = self.findItem(brick_cfg)
 
         brick_name = brick_cfg["name"]

@@ -12,7 +12,7 @@ import logging
 import code
 import rlcompleter
 import traceback
-import cStringIO
+import io
 import json
 
 HISTORY = {}
@@ -29,7 +29,7 @@ def export(name, obj):
 class GreenletStdout:
   def write(self, output):
     # find right client id depending on greenlet
-    for client_id, greenlet in CODE_EXECUTION.iteritems():
+    for client_id, greenlet in CODE_EXECUTION.items():
       if greenlet == gevent.getcurrent():
         break
     else:
@@ -55,14 +55,14 @@ class InteractiveInterpreter(code.InteractiveInterpreter):
 
     self.at_prompt = True
     self.completer = rlcompleter.Completer(globals_dict)
-    self.error = cStringIO.StringIO()
+    self.error = io.StringIO()
 
   def write(self, data):
     self.error.write(data)
 
   def runcode(self, c):
     try:
-      exec c in self.locals
+      exec(c, self.locals)
     except KeyboardInterrupt:
       self.showtraceback()
     except SystemExit:
@@ -72,7 +72,7 @@ class InteractiveInterpreter(code.InteractiveInterpreter):
       self.showtraceback()
     else:
       if code.softspace(sys.stdout, 0):
-         print
+         print()
 
   def compile_and_run(self, python_code_to_execute, dontcompile=False):
     code_obj = None
@@ -84,8 +84,8 @@ class InteractiveInterpreter(code.InteractiveInterpreter):
       else:
         try:
           code_obj = code.compile_command(python_code_to_execute)
-        except SyntaxError, exc_instance:
-          raise RuntimeError, str(exc_instance)
+        except SyntaxError as exc_instance:
+          raise RuntimeError(str(exc_instance))
         else:
           if code_obj is None:
             # input is incomplete
@@ -95,8 +95,8 @@ class InteractiveInterpreter(code.InteractiveInterpreter):
 
             if self.error.tell() > 0:
               error_string = self.error.getvalue()
-              self.error = cStringIO.StringIO()
-              raise RuntimeError, error_string
+              self.error = io.StringIO()
+              raise RuntimeError(error_string)
     finally:
       self.at_prompt = True
 
@@ -141,7 +141,7 @@ def send_log():
 @bottle.get("/completion_request")
 def send_completion():
   text = bottle.request.GET["text"]
-  tmp = filter(None, re.split(r'[ ;]', text))
+  tmp = [_f for _f in re.split(r'[ ;]', text) if _f]
   if len(tmp) > 0:
     text = tmp[-1]
   else:
@@ -198,7 +198,7 @@ def do_execute(python_code_to_execute):
         INTERPRETER.compile_and_run(python_code_to_execute)
       except EOFError:
         return {"error":"EOF","input":python_code_to_execute}
-      except RuntimeError, e:
+      except RuntimeError as e:
         error_string = str(e)
         sys.stderr.write(error_string)
         return {"error":error_string+"\n"}

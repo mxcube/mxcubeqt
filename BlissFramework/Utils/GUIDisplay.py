@@ -7,6 +7,7 @@ from BlissFramework.Utils import widget_colors
 from BlissFramework.BaseLayoutItems import BrickCfg, SpacerCfg, LabelCfg, WindowCfg, ContainerCfg, TabCfg
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
+import collections
 
 
 class MenuBar(qt.QMenuBar):
@@ -555,7 +556,7 @@ class WindowDisplayWidget(qt.QScrollView):
 
                 frame_style=qt.QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"]!="default":
-                    print "frameshape... ", item_cfg["properties"]["frameshape"]
+                    print("frameshape... ", item_cfg["properties"]["frameshape"])
                     frame_style = getattr(qt.QFrame, item_cfg["properties"]["frameshape"].capitalize())
                 if item_cfg["properties"]["shadowstyle"]!="default":
                     frame_style = frame_style | getattr(qt.QFrame, item_cfg["properties"]["shadowstyle"].capitalize())
@@ -665,11 +666,11 @@ class WindowDisplayWidget(qt.QScrollView):
 
     def updatePreview(self, container_cfg, window_id, container_ids = [], selected_item=""):
         # remove additional windows
-        for (w, m) in self.additionalWindows.itervalues():
+        for (w, m) in self.additionalWindows.values():
             w.close()
         
         # reset colors
-        if callable(self.__putBackColors):
+        if isinstance(self.__putBackColors, collections.Callable):
             self.__putBackColors()
             self.__putBackColors = None
 
@@ -679,7 +680,7 @@ class WindowDisplayWidget(qt.QScrollView):
             # remove all bricks and destroy all other items
             previewItems = self.previewItems[self.currentWindow]
             
-            for container_id, itemsList in previewItems.iteritems():
+            for container_id, itemsList in previewItems.items():
                 for widget in itemsList:
                     if isinstance(widget, BlissWidget):
                         i = itemsList.index(widget)
@@ -728,7 +729,7 @@ class WindowDisplayWidget(qt.QScrollView):
                     previewItems[container_id][i] = None
 
         try:
-            for w in filter(None, previewItems[container_ids[0]][1:]):
+            for w in [_f for _f in previewItems[container_ids[0]][1:] if _f]:
                 w.close(True)
         except Exception:
             pass
@@ -766,7 +767,7 @@ class WindowDisplayWidget(qt.QScrollView):
         self.makeItem(container_cfg, parent, container_ids)
 
         if len(selected_item):
-            for item_list in previewItems.itervalues():
+            for item_list in previewItems.values():
                 for item in item_list:
                     if item.name() == selected_item:
                         self.selectWidget(item)
@@ -778,7 +779,7 @@ class WindowDisplayWidget(qt.QScrollView):
 
 
     def selectWidget(self, w):
-        if callable(self.__putBackColors):
+        if isinstance(self.__putBackColors, collections.Callable):
             self.__putBackColors()
 
         orig_bkgd_color = w.paletteBackgroundColor()

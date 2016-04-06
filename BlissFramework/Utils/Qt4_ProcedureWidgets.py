@@ -118,7 +118,7 @@ class ProcedurePanel(QtGui.QWidget):
         if id == self.lastCommandID:
             self.lastCommandID = None
 
-            if type(reply) == types.StringType and reply.startswith('error:'):
+            if type(reply) == bytes and reply.startswith('error:'):
                 error = reply.split(':')[1]
                 QMessageBox.warning(None, 'Invalid value', '%s' % str(error), QMessageBox.Ok)
                 self.currentWidget.validationFailed(error)

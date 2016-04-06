@@ -215,13 +215,13 @@ class CameraBeamBrick(BlissWidget):
             else:
                 # self.YBeam = None
                 # self.ZBeam = None
-                print "CameraBeamBrick.py--zoomChanged--zerouillage"
+                print("CameraBeamBrick.py--zoomChanged--zerouillage")
                 self.YBeam = 0
                 self.ZBeam = 0
         else:
             # self.YBeam = None
             # self.ZBeam = None
-            print "CameraBeamBrick.py--zoomChanged--zerouying"
+            print("CameraBeamBrick.py--zoomChanged--zerouying")
             self.YBeam = 0
             self.ZBeam = 0
 

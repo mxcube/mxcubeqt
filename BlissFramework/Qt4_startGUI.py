@@ -151,8 +151,8 @@ def run(GUIConfigFile = None):
     except KeyError:
         pass
 
-    bricksDirs = filter(None, bricksDirs)
-    hoDirs = filter(None, hoDirs)
+    bricksDirs = [_f for _f in bricksDirs if _f]
+    hoDirs = [_f for _f in hoDirs if _f]
     
     app = QtGui.QApplication([])
     lockfile = None
@@ -166,7 +166,7 @@ def run(GUIConfigFile = None):
 
           sys.exit(1)
       else:
-          os.chmod(lock_filename,0666)
+          os.chmod(lock_filename,0o666)
           try:
              fcntl.lockf(lockfile.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
           except:
@@ -198,7 +198,7 @@ def run(GUIConfigFile = None):
           log_ok=False
       else:
           try:
-            os.chmod(log_lock_filename,0666)
+            os.chmod(log_lock_filename,0o666)
           except:
             pass
           try:
@@ -223,7 +223,7 @@ def run(GUIConfigFile = None):
             pass
           else:
             try:
-              os.chmod(log_lock_filename2,0666)
+              os.chmod(log_lock_filename2,0o666)
             except:
               pass
             try:
@@ -245,14 +245,13 @@ def run(GUIConfigFile = None):
     #
     logLevel = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(logLevel)
-
-    logging.getLogger().info("Starting MXCuBE")
-    logging.getLogger().info("Qt4 GUI file: %s" % (GUIConfigFile or "unnamed"))
-    logging.getLogger().info("Hardware repository: %s" % hwrServer) 
+    logInfo = 'Qt4 GUI started (%s)' % (GUIConfigFile or "unnamed")
+    logInfo += ', HWRSERVER=%s' % hwrServer
     if len(hoDirs) > 0:
-        logging.getLogger("Additional Hardware objects: %s" % os.path.pathsep.join(hoDirs))
+        logInfo += ', HODIRS=%s' % os.path.pathsep.join(hoDirs)
     if len(bricksDirs) > 0:
-        logging.getLogger("Additional bricks: %s" % os.path.pathsep.join(bricksDirs))
+        logInfo += ', BRICKSDIRS=%s' % os.path.pathsep.join(bricksDirs)
+    logging.getLogger().info(logInfo)
 
     QtGui.QApplication.setDesktopSettingsAware(False) #use default settings
     QtCore.QObject.connect(app, QtCore.SIGNAL("lastWindowClosed()"), app.quit)

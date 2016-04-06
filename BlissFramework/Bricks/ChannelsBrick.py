@@ -11,7 +11,7 @@ class ChannelsBrick(BlissWidget):
         self.addProperty("xmlFile", "string", "")
         self.addProperty("uiFile", "string", "")
         self.addProperty("expert_channels", "string", "", hidden=True)
-        self.__brick_properties = self.propertyBag.properties.keys()
+        self.__brick_properties = list(self.propertyBag.properties.keys())
         self.hwo = None
         self.expert_channels = []
         self.property_expert_channels = {}
@@ -20,7 +20,7 @@ class ChannelsBrick(BlissWidget):
         if prop == "xmlFile":
             if not self.isRunning():
               # we are changing xmlFile in design mode
-              for propname in self.propertyBag.properties.keys():
+              for propname in list(self.propertyBag.properties.keys()):
                 if not propname in self.__brick_properties: 
                   self.delProperty(propname)
 
@@ -38,7 +38,7 @@ class ChannelsBrick(BlissWidget):
             if self.isRunning():
               # it is time to set expert channels
               expert_channels = eval(self["expert_channels"])
-              for channel_prop in expert_channels.keys():
+              for channel_prop in list(expert_channels.keys()):
                 expert = expert_channels[channel_prop]
                 try:
                   self.getProperty(channel_prop).setValue(expert)

@@ -143,7 +143,7 @@ class SubmitFeedback(QWidget):
 
             logging.getLogger().debug("Sending feedback from %s to %s" % (fromaddr,toaddrs))
             error_dict = smtp.sendmail(fromaddr, toaddrs.split(','), email_msg)
-        except smtplib.SMTPException, e:
+        except smtplib.SMTPException as e:
             logging.getLogger().error("Could not send mail: %s" % str(e))
             smtp.quit()
         else:

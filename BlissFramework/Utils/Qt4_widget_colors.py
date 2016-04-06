@@ -19,7 +19,6 @@
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-from random import randint
 
 #Basic core colors
 WHITE = QtCore.Qt.white
@@ -47,6 +46,9 @@ QUEUE_ENTRY_COLORS = [WHITE, LIGHT_GREEN, LIGHT_YELLOW, LIGHT_RED]
 TREE_ITEM_SAMPLE = QtGui.QColor(240, 240, 240)
 TREE_ITEM_COLLECTION = QtGui.QColor(255, 230, 210)
 
+TASK_GROUP = ["#B0DBFF", "#E57935", "#B1FF52"]
+
+
 def set_widget_color(widget, color, color_role =None):
     """
     Descript. :
@@ -57,12 +59,3 @@ def set_widget_color(widget, color, color_role =None):
     widget_palette.setColor(color_role, color)
     widget.setAutoFillBackground(True) 
     widget.setPalette(widget_palette)
-
-def get_random_color():
-    return QtGui.QColor(randint(0, 255), randint(0, 255), randint(0, 255))  
-
-def get_random_rgb(alpha=255):
-    return [randint(0, 255), randint(0, 255), randint(0, 255), alpha]
-
-def get_random_hex(alpha=255):
-    return "#{0:02x}{1:02x}{2:02x}".format(randint(0, 255), randint(0, 255), randint(0, 255))

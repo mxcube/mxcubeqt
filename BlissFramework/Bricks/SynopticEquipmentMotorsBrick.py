@@ -16,7 +16,7 @@ class VerticalSpacer(QWidget):
 
 class SynopticEquipmentMotorsBrick(SynopticBrick.SynopticBrick):
     def __init__(self, *args):
-        SynopticBrick.SynopticBrick.__init__.im_func(self, *args)
+        SynopticBrick.SynopticBrick.__init__.__func__(self, *args)
         
         self.motors = {}
         self.hardwareObject = None
@@ -45,15 +45,15 @@ class SynopticEquipmentMotorsBrick(SynopticBrick.SynopticBrick):
                             
             self.showMotors(self['displayMode'])
         elif propertyName == 'allowControl':
-            for motor in self.motors.itervalues():
+            for motor in self.motors.values():
                 motor['allowDoubleClick'] = newValue
         elif propertyName == 'formatString':
-            for motor in self.motors.itervalues():
+            for motor in self.motors.values():
                 motor['formatString'] = newValue
         elif propertyName == 'displayMode':
             self.showMotors(newValue)
         else:
-            SynopticBrick.SynopticBrick.propertyChanged.im_func(self, propertyName, oldValue, newValue)
+            SynopticBrick.SynopticBrick.propertyChanged.__func__(self, propertyName, oldValue, newValue)
 
 
     def showMotors(self, displayMode):

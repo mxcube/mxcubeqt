@@ -62,8 +62,8 @@ def addCustomBricksDirs(bricksDirs):
 
     global _bricksDirs
     
-    if type(bricksDirs) == types.ListType:
-        newBricksDirs = filter(os.path.isdir, map(os.path.abspath, bricksDirs))
+    if type(bricksDirs) == list:
+        newBricksDirs = list(filter(os.path.isdir, list(map(os.path.abspath, bricksDirs))))
 
         for newBrickDir in reversed(newBricksDirs):
             if not newBrickDir in sys.path:
@@ -79,11 +79,11 @@ def getCustomBricksDirs():
 
 
 def _frameworkTraceFunction(frame, event, arg):
-    print 'EVENT %s' % event
-    print '  { FRAME INFO }'
-    print '    - filename  %s' % frame.f_code.co_filename
-    print '    - line      %d' % frame.f_lineno
-    print '    - name      %s' % frame.f_code.co_name
+    print('EVENT %s' % event)
+    print('  { FRAME INFO }')
+    print('    - filename  %s' % frame.f_code.co_filename)
+    print('    - line      %d' % frame.f_lineno)
+    print('    - name      %s' % frame.f_code.co_name)
     
 
 loggingName = ''
@@ -111,7 +111,7 @@ def setLogFile(filename):
         
     #_hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 10 files max.
     _hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=1)
-    os.chmod(filename, 0666)
+    os.chmod(filename, 0o666)
     _hdlr.setFormatter(_formatter)
     _logger.addHandler(_hdlr)
 

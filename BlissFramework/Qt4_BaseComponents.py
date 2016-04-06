@@ -22,7 +22,7 @@ import pprint
 import types
 import os
 import sys
-import new
+#import new
 import time
 import operator
 import weakref
@@ -105,8 +105,8 @@ class WeakMethodBound:
         """
         Descript. :
         """
-        self.f = weakref.ref(f.im_func)
-        self.c = weakref.ref(f.im_self)
+        self.f = weakref.ref(f.__func__)
+        self.c = weakref.ref(f.__self__)
 
     def __call__(self , *args):
         """
@@ -138,7 +138,7 @@ def WeakMethod(f):
     Descript. :
     """
     try:
-        f.im_func
+        f.__func__
     except AttributeError :
         return WeakMethodFree(f)
     return WeakMethodBound(f)
@@ -627,10 +627,13 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         else:
             widget=getattr(self, widget_name)
         if isinstance(widget, QtGui.QComboBox):
-            widget.activated = new.instancemethod(ComboBoxActivated,widget,widget.__class__)
+            #widget.activated = new.instancemethod(ComboBoxActivated,widget,widget.__class__)
+            widget.activated = ComboBoxActivated
         elif isinstance(widget, QtGui.QSpinBox):
-            widget.setEditorText = new.instancemethod(SpinBoxSetEditorText,widget,widget.__class__)
-            widget.editorTextChanged = new.instancemethod(SpinBoxEditorTextChanged,widget,widget.__class__)
+            #widget.setEditorText = new.instancemethod(SpinBoxSetEditorText,widget,widget.__class__)
+            widget.setEditorText = SpinBoxSetEditorText
+            #widget.editorTextChanged = new.instancemethod(SpinBoxEditorTextChanged,widget,widget.__class__)
+            widget.editorTextChanged = SpinBoxEditorTextChanged
             self.connect(widget.lineEdit(), QtCore.SIGNAL('textChanged(const QString &)'), widget.editorTextChanged)
 
         self._widgetEvents.append((widget, widget_name, master_sync))
@@ -665,7 +668,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        events=BlissWidget._eventsCache.values()
+        events=list(BlissWidget._eventsCache.values())
         ordered_events=sorted(events,key=operator.itemgetter(0))
         for event_timestamp,event_method,event_args in ordered_events:
             try:
@@ -753,16 +756,16 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         uid=(sender, signal, hash(slot))
-	signalSlotFilter = SignalSlotFilter(signal, slot, should_cache)
+        signalSlotFilter = SignalSlotFilter(signal, slot, should_cache)
         self._signalSlotFilters[uid]=signalSlotFilter
 
-	QtCore.QObject.connect(sender, signal, signalSlotFilter)
+        QtCore.QObject.connect(sender, signal, signalSlotFilter)
 
     def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
         """
         Descript. :
         """
-	signal = str(signal)
+        signal = str(signal)
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
           signal=signal[1:]
@@ -772,12 +775,14 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if not isinstance(sender, QtCore.QObject):
           if isinstance(sender, HardwareObject):
             #logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
-            sender.connect(signal, slot) 
+            # LNLS
+            #sender.connect(signal, slot) 
+            sender.connect(sender, signal, slot)
             return
           else:
             _sender = emitter(sender)
         else:
-	    _sender = sender
+            _sender = sender
 
         if instanceFilter:
             self.connectSignalSlotFilter(_sender, pysignal and PYSIGNAL(signal) or SIGNAL(signal), slot, shouldCache)
@@ -792,7 +797,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-	signal = str(signal)
+        signal = str(signal)
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
           signal=signal[1:]
@@ -801,7 +806,9 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         if isinstance(sender, HardwareObject):
           #logging.warning("You should use %s.disconnect instead of using %s.connect", sender,self)
-          sender.disconnect(signal, slot)
+          # LNLS
+          #sender.disconnect(signal, slot)
+          sender.disconnect(sender, signal, slot)
           return
 
         # workaround for PyQt lapse
@@ -1162,9 +1169,9 @@ class ProcedureBrick(BlissWidget):
         """
         self.getProperty('mnemonic').setValue(mne)
 
- 	proc = HardwareRepository.HardwareRepository().getProcedure(mne)
+        proc = HardwareRepository.HardwareRepository().getProcedure(mne)
 
-	self.__setProcedure(proc)
+        self.__setProcedure(proc)
 
     def __setProcedure(self, proc):
         """
@@ -1237,7 +1244,7 @@ class ProcedureBrick(BlissWidget):
         Descript. :
         """
         if property_name == 'mnemonic':
-       	    self.setMnemonic(new_value) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
+                   self.setMnemonic(new_value) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
         elif property_name == 'equipment':
             self.setEquipment(self.getHardwareObject(new_value))
 

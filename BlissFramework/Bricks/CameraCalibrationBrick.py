@@ -242,7 +242,7 @@ class CameraCalibrationBrick(BlissWidget):
 
                 self.drawing.addDrawingMgr(self.drawingMgr)
             except:
-                print "No View"
+                print("No View")
 
         self.firstTime = False
 
@@ -329,7 +329,7 @@ class CameraCalibrationBrick(BlissWidget):
             self.hwZoom.setPositionKeyValue(currentPos, "resox", str(self.YCalib))
             self.hwZoom.setPositionKeyValue(currentPos, "resoy", str(self.ZCalib))
         else:
-            print "CameraCalibrationBrick--ARG--hwZoom is None"
+            print("CameraCalibrationBrick--ARG--hwZoom is None")
 
     def calibrationAction(self):
         if self.calibration == 0:

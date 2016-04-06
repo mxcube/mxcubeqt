@@ -115,10 +115,8 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.label.setToolTip(tip)
 
     def motor_state_changed(self, state):
-        is_enabled = state in (self.motor_hwobj.READY, self.motor_hwobj.ONLIMIT)
-        self.positions_combo.setEnabled(is_enabled)
-        #self.previous_position_button.setEnabled(is_enabled)
-        #self.next_position_button.setEnabled(is_enabled)
+        s = state in (self.motor_hwobj.READY, self.motor_hwobj.ONLIMIT)
+        self.positions_combo.setEnabled(s)
         Qt4_widget_colors.set_widget_color(self.positions_combo, 
                                            Qt4_MotorPredefPosBrick.STATE_COLORS[state],
                                            QtGui.QPalette.Button)
@@ -202,7 +200,6 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                     break
 
             self.positions_combo.setCurrentIndex(index)
-
             self.next_position_button.setEnabled(index < (len(self.positions) - 1))
             self.previous_position_button.setEnabled(index > 0)
 

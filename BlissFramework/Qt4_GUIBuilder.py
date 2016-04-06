@@ -42,6 +42,12 @@ try:
     from HardwareRepository import HardwareRepository
 except ImportError:
     logging.getLogger().warning("no Hardware Repository client module could be found")
+
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    QtCore.QString = str
+
 #else:
 #    from HardwareRepository import HardwareRepositoryBrowser   
  
@@ -188,8 +194,8 @@ class ToolboxWindow(QtGui.QWidget):
        
         self.bricks_dict = {}
         self.bricks_tab_dict = {}
-        map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + \
-             tuple(BlissFramework.getCustomBricksDirs()))
+        list(map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + \
+             tuple(BlissFramework.getCustomBricksDirs())))
 
     def brickTextLabel(self, brickName):
         """
@@ -237,7 +243,7 @@ class ToolboxWindow(QtGui.QWidget):
         for full_filename in full_filenames:
             filename = os.path.basename(full_filename)
             
-            if filter(lambda x: filename.endswith(x), [x[0] for x in imp.get_suffixes()]):
+            if [x for x in [x[0] for x in imp.get_suffixes()] if filename.endswith(x)]:
                 brickName = filename[:filename.rfind('.')]
                 if (not brickName == '__init__' and 
                     brickName.startswith('Qt4') and
@@ -279,7 +285,7 @@ class ToolboxWindow(QtGui.QWidget):
         if len(bricksCategories) == 0:
             return
 
-        categoryKeys = bricksCategories.keys()
+        categoryKeys = list(bricksCategories.keys())
         categoryKeys.sort()
 
         for category in categoryKeys:
@@ -341,7 +347,7 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
         """
         try:
             cb = self.__property_changed_cb[self.properties_table.propertyBag]
-        except KeyError, err:
+        except KeyError as err:
             return
         else:
             cb(*args)
@@ -367,7 +373,7 @@ class ToolButton(QtGui.QToolButton):
 
         self.setIcon(QtGui.QIcon(Qt4_Icons.load(icon)))
 
-        if type(text) != types.StringType:
+        if type(text) != bytes:
             tooltip = callback
             callback = text
         else:
@@ -754,7 +760,7 @@ class GUIEditorWindow(QtGui.QWidget):
             if item_type == "window":
                 new_item = self.configuration.addWindow()
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     QtGui.QMessageBox.warning(self, "Cannot add", new_item, QtGui.QMessageBox.Ok)
                 else:
                     new_item["properties"].getProperty("w").setValue(QtGui.QApplication.desktop().width())
@@ -766,7 +772,7 @@ class GUIEditorWindow(QtGui.QWidget):
                
                 new_item = self.configuration.addBrick(brick_type, parent)
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     QtGui.QMessageBox.warning(self, "Cannot add", new_item, QtGui.QMessageBox.Ok)
                 else:
                     brick_name = new_item["name"]
@@ -775,7 +781,7 @@ class GUIEditorWindow(QtGui.QWidget):
             elif item_type == "tab":
                 new_item = self.configuration.addItem(item_type, parent)
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     QtGui.QMessageBox.warning(self, "Cannot add", new_item, QtGui.QMessageBox.Ok)
                 else:
                     item_name = new_item["name"]
@@ -784,13 +790,13 @@ class GUIEditorWindow(QtGui.QWidget):
                 item_subtype = args[0]
                 new_item = self.configuration.addItem(item_subtype, parent)
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     QtGui.QMessageBox.warning(self, "Cannot add", new_item, QtGui.QMessageBox.Ok)
                 else:
                     item_name = new_item["name"]
                     new_list_item = self.appendItem(parentListItem, item_name, item_type, icon=item_subtype)
                         
-            if type(new_item) != types.StringType and new_item is not None:
+            if type(new_item) != bytes and new_item is not None:
                 self.connectItem(parent, new_item, new_list_item)
                 self.emit(QtCore.SIGNAL("addWidget"), new_item, parent)
         finally:

@@ -8,7 +8,7 @@ class Connectable:
         try:
             args = tuple(signalArgs)
         except:
-            print "'", signalArgs, "' is not a valid arguments tuple."
+            print("'", signalArgs, "' is not a valid arguments tuple.")
             raise ValueError
         
         self.__signal[str(signalName)] = args
@@ -18,7 +18,7 @@ class Connectable:
         try:
             args = tuple(slotArgs)
         except:
-            print "'", slotArgs, "' is not a valid arguments tuple."
+            print("'", slotArgs, "' is not a valid arguments tuple.")
             raise ValueError
         
         self.__slot[str(slotName)] = args

@@ -292,7 +292,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.motor.stop()
+        self.motor_hwobj.stop()
 
     def stop_moving(self):
         """
@@ -461,7 +461,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.step_editor.updateGeometry()
             self.step_editor.show()
 
-    def position_changed(self, new_position):  
+    def position_changed(self, new_position):
+        # LNLS 
+        print('Qt4_MotorSpinBoxBrick - position_changed')
         """
         Descript. :
         Args.     :
@@ -470,6 +472,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         try:
            self.position_spinbox.setValue(float(new_position))
         except:
+           print(('ERROR!!! Setting position...' + str(new_position)))
            pass
 
     def set_position_spinbox_color(self, state):
@@ -506,10 +509,14 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                     self.really_move_down()
                 return
 
-            self.set_spinbox_moving(False)
             self.stop_button.setEnabled(False)
             self.move_left_button.setEnabled(True)
             self.move_right_button.setEnabled(True)
+            # LNLS start
+            #self.set_spinbox_moving(False)
+            self.position_spinbox.setEnabled(True)
+            self.step_cbox.setEnabled(True)
+            # LNLS end            
         elif state in (self.motor_hwobj.NOTINITIALIZED, self.motor_hwobj.UNUSABLE):
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(False)
@@ -517,7 +524,13 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.move_right_button.setEnabled(False)
         elif state in (self.motor_hwobj.MOVING, self.motor_hwobj.MOVESTARTED):
             self.stop_button.setEnabled(True)
-            self.set_spinbox_moving(True)
+            # LNLS start
+            #self.set_spinbox_moving(True)
+            self.move_left_button.setEnabled(False)
+            self.move_right_button.setEnabled(False)
+            self.position_spinbox.setEnabled(False)
+            self.step_cbox.setEnabled(False)
+            # LNLS end
         elif state == self.motor_hwobj.ONLIMIT:
             self.position_spinbox.setEnabled(True)
             self.stop_button.setEnabled(False)
@@ -649,7 +662,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
         if self.motor_hwobj is not None:
             self.connect(self.motor_hwobj, QtCore.SIGNAL('limitsChanged'), self.limits_changed)
-            self.connect(self.motor_hwobj, QtCore.SIGNAL('positionChanged'), self.position_changed, instanceFilter = True)
+            self.connect(self.motor_hwobj, QtCore.SIGNAL('positionChanged'), self.position_changed, instanceFilter=True)
             self.connect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.state_changed, instanceFilter=True)
 
         self.pos_history = []

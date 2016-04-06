@@ -24,7 +24,7 @@ import logging
 import smtplib
 
 import InstanceServer
-import email.Utils
+#import email.Utils
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
@@ -34,6 +34,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 from HardwareRepository.HardwareRepository import dispatcher
+import collections
 
 
 __category__ = "Qt4_General"
@@ -500,7 +501,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                   try:
                     if not masterSync:
                       try:
-                        method.im_self.blockSignals(True)
+                        method.__self__.blockSignals(True)
                       except AttributeError:
                         pass
                     method(*method_args)
@@ -508,7 +509,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                     pass
                 finally:
                   try:
-                    method.im_self.blockSignals(False)
+                    method.__self__.blockSignals(False)
                   except AttributeError:
                     pass
         else:
@@ -517,7 +518,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                   try:
                     if not masterSync:
                       try:
-                        method.im_self.blockSignals(True)
+                        method.__self__.blockSignals(True)
                       except AttributeError:
                         pass
                     method(*method_args)
@@ -525,7 +526,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                     pass
                 finally:
                   try:
-                    method.im_self.blockSignals(False)
+                    method.__self__.blockSignals(False)
                   except AttributeError: 
                     pass
             else:
@@ -900,7 +901,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                     QtGui.QMessageBox.NoButton, QtGui.QMessageBox.NoButton, 
                     self)  # Application name (mxCuBE) is hardwired!!!
                 msg_dialog.exec_()
-                if callable(event.callback):
+                if isinstance(event.callback, collections.Callable):
                     event.callback()
 
             elif event.type() == USER_INFO_DIALOG_EVENT:
@@ -950,7 +951,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                     try:
                         smtp = smtplib.SMTP('smtp',smtplib.SMTP_PORT)
                         smtp.sendmail(event.fromaddrs, toaddrs.split(','), email_message)
-                    except smtplib.SMTPException, e:
+                    except smtplib.SMTPException as e:
                         logging.getLogger().error("Could not send mail: %s" % str(e))
                         smtp.quit()
                     else:

@@ -278,7 +278,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
             newItem.setText(6, connection['slot'])
             #self.connections_treewidget.addItem(newItem)
 
-        for window in self.configuration.windows.itervalues():
+        for window in self.configuration.windows.values():
             for connection in window["connections"]:
                 addConnection(window, window, connection)
 
@@ -482,7 +482,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         Descript. :
         """
         # erase previous connections
-        for window in self.configuration.windows.itervalues():
+        for window in self.configuration.windows.values():
             window["connections"] = []
 
             try:

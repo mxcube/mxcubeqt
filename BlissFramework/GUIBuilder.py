@@ -23,7 +23,7 @@ try:
 except ImportError:
     logging.getLogger().warning("no Hardware Repository client module could be found")
 else:
-    print "rework HardwareRepositoryBrowser"
+    print("rework HardwareRepositoryBrowser")
     #from HardwareRepository import HardwareRepositoryBrowser   
  
 
@@ -201,7 +201,7 @@ class ToolboxWindow(qt.QWidget):
         # bricks without category fall into 'General'
         self.bricksTab[""] = self.bricksTab["General"]
        
-        map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + tuple(BlissFramework.getCustomBricksDirs()))
+        list(map(self.addBricks, (BlissFramework.getStdBricksPath(), ) + tuple(BlissFramework.getCustomBricksDirs())))
 
 
     def brickTextLabel(self, brickName):
@@ -245,7 +245,7 @@ class ToolboxWindow(qt.QWidget):
         for full_filename in full_filenames:
             filename = os.path.basename(full_filename)
             
-            if filter(lambda x: filename.endswith(x), [x[0] for x in imp.get_suffixes()]):
+            if [x for x in [x[0] for x in imp.get_suffixes()] if filename.endswith(x)]:
                 brickName = filename[:filename.rfind('.')]
                 if not brickName == '__init__' and not brickName in processedBricks:
                     processedBricks.append(brickName)
@@ -285,7 +285,7 @@ class ToolboxWindow(qt.QWidget):
         if len(bricksCategories) == 0:
             return
 
-        categoryKeys = bricksCategories.keys()
+        categoryKeys = list(bricksCategories.keys())
         categoryKeys.sort()
 
         for category in categoryKeys:
@@ -336,7 +336,7 @@ class PropertyEditorWindow(qt.QWidget):
             #print id(self.propertiesTable.propertyBag)
             cb = self.__property_changed_cb[self.propertiesTable.propertyBag]
             #print cb
-        except KeyError, err:
+        except KeyError as err:
             #print 'key error', err
             return
         else:
@@ -356,7 +356,7 @@ class ToolButton(qt.QToolButton):
 
         self.setIconSet(qt.QIconSet(Icons.load(icon)))
 
-        if type(text) != types.StringType:
+        if type(text) != bytes:
             tooltip = callback
             callback = text
         else:
@@ -641,7 +641,7 @@ class GUIEditorWindow(qt.QWidget):
             if item_type == "window":
                 new_item = self.configuration.addWindow()
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     qt.QMessageBox.warning(self, "Cannot add", new_item, qt.QMessageBox.Ok)
                 else:
                     new_item["properties"].getProperty("w").setValue(qt.qApp.desktop().width())
@@ -653,7 +653,7 @@ class GUIEditorWindow(qt.QWidget):
                 
                 new_item = self.configuration.addBrick(brick_type, parent)
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     qt.QMessageBox.warning(self, "Cannot add", new_item, qt.QMessageBox.Ok)
                 else:
                     brick_name = new_item["name"]
@@ -663,7 +663,7 @@ class GUIEditorWindow(qt.QWidget):
             elif item_type == "tab":
                 new_item = self.configuration.addItem(item_type, parent)
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     qt.QMessageBox.warning(self, "Cannot add", new_item, qt.QMessageBox.Ok)
                 else:
                     item_name = new_item["name"]
@@ -674,14 +674,14 @@ class GUIEditorWindow(qt.QWidget):
                 
                 new_item = self.configuration.addItem(item_subtype, parent)
 
-                if type(new_item) == types.StringType:
+                if type(new_item) == bytes:
                     qt.QMessageBox.warning(self, "Cannot add", new_item, qt.QMessageBox.Ok)
                 else:
                     item_name = new_item["name"]
                     
                     new_list_item = self.appendItem(parentListItem, item_name, item_type, icon=item_subtype)
                         
-            if type(new_item) != types.StringType and new_item is not None:
+            if type(new_item) != bytes and new_item is not None:
                 self.connectItem(parent, new_item, new_list_item)
         finally:
             qt.qApp.restoreOverrideCursor()
@@ -1004,12 +1004,12 @@ class HWRWindow(qt.QWidget):
         
 
     def add_hwr_browser(self):
-        print "add_hwr_browser - rework to be compatible with qt3/qt4"
+        print("add_hwr_browser - rework to be compatible with qt3/qt4")
 
         return 
         try:
             #_hwr_widget = HardwareRepositoryBrowser.HardwareRepositoryBrowser
-            print "add_hwr_browser - rework"
+            print("add_hwr_browser - rework")
         except AttributeError:
             logging.getLogger().error("No Hardware Repository client found")
         else:

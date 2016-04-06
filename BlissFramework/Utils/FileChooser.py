@@ -47,7 +47,7 @@ class FileChooser(QVBox):
 	if len(file) > 0:
 	    path = os.path.join(dir, file)
 	    existingFiles = ''
-	    root, dirs, files = os.walk(dir).next()	
+	    root, dirs, files = next(os.walk(dir))	
 	
 	    for f in files+dirs:
               if f.startswith(file):

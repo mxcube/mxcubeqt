@@ -1,6 +1,7 @@
 #$Id: CustomWidgets.py,v 1.1 2004/09/14 12:23:44 guijarro Exp $
 from qt import *
 from BlissFramework import Icons
+import collections
 
 class QLineEditWithOkCancel(QHBox):
     def __init__(self, parent, text = ''):
@@ -78,11 +79,11 @@ class DialogButtonsBar(QWidget):
             QObject.connect(self.button3,SIGNAL('clicked()'),self.button3Clicked)
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
     def button1Clicked(self):
-        if callable(self.callback):
+        if isinstance(self.callback, collections.Callable):
             self.callback(str(self.button1.text()))
     def button2Clicked(self):
-        if callable(self.callback):
+        if isinstance(self.callback, collections.Callable):
             self.callback(str(self.button2.text()))
     def button3Clicked(self):
-        if callable(self.callback):
+        if isinstance(self.callback, collections.Callable):
             self.callback(str(self.button3.text()))

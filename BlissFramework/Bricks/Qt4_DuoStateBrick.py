@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import new
+#import new
 import re
 import logging
 
@@ -342,9 +342,11 @@ class WrapperHO(QtCore.QObject):
     def __init__(self, hardware_obj):
         QtCore.QObject.__init__(self)
 
-        self.setIn = new.instancemethod(lambda self: None, self)
+        #self.setIn = new.instancemethod(lambda self: None, self)
+        self.setIn = lambda self: None
         self.setOut = self.setIn 
-        self.getState = new.instancemethod(lambda self: "unknown", self)
+        #self.getState = new.instancemethod(lambda self: "unknown", self)
+        self.getState = lambda self: "unknown"
         self.dev=hardware_obj
         try:
             sClass = str(self.dev.__class__)

@@ -64,7 +64,7 @@ class MotorListBrick2(BaseComponents.BlissWidget):
         except KeyError:
             pass
         else:
-            if not self.dialogs.has_key(motor_username):
+            if motor_username not in self.dialogs:
                 m=SpecMotor.SpecVersionMotor(self.listObj.getSpecVersion(),motor_specname,motor_username)
                 dialog=MotorBrick.MotorControlDialog(self,motor_username)
 
@@ -170,7 +170,7 @@ class MotorListBrick2(BaseComponents.BlissWidget):
             for motor_mne in motors:
                 motors2[motors[motor_mne]]=motor_mne
             
-            keys=motors2.keys()
+            keys=list(motors2.keys())
             keys.sort()
             for motor_username in keys:
                 self.motors[motor_username]=motors2[motor_username]

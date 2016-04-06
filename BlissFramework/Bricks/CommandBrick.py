@@ -29,18 +29,18 @@ class ChannelLabel(QLabel):
             self.setText('-')
             return
                 
-        if type(value) == types.FloatType or type(value) == types.IntType:
+        if type(value) == float or type(value) == int:
             if self.formatString is not None:
                 self.setText('%s' % self.formatString % value)
             else:
                 self.setText('%s' % str(value))
-        elif type(value) == types.DictType:
+        elif type(value) == dict:
             text = '<table>'
-            for key, val in value.iteritems():
+            for key, val in value.items():
                 text += '<tr><td>%s</td><td>%s</td></tr>' % (key, val)
             text+='</table>'
             self.setText(text)
-        elif type(value) == types.StringType:
+        elif type(value) == bytes:
             self.setText('%s' % value)
         else:
             logging.getLogger().error('Cannot display variable value : unknown type %s', type(value))
@@ -235,7 +235,7 @@ class CommandBrick(BlissWidget):
         self.addProperty('title', 'string', '')
         self.addProperty('commands_channels', 'string', '', hidden=True)
  
-        self.__brick_properties = self.propertyBag.properties.keys()
+        self.__brick_properties = list(self.propertyBag.properties.keys())
         self.__commands_channels = {}
         
         self.defineSlot("showBrick", ())
@@ -286,7 +286,7 @@ class CommandBrick(BlissWidget):
             if self.hardwareObject is not None:
                 if not self.isRunning():
                     # we are changing hardware object in Design mode
-                    for propname in self.propertyBag.properties.keys():
+                    for propname in list(self.propertyBag.properties.keys()):
                         if not propname in self.__brick_properties:
                             self.delProperty(propname)
                 
@@ -356,9 +356,9 @@ class CommandBrick(BlissWidget):
             except:
                 return
 
-            print self.__commands_channels
+            print(self.__commands_channels)
 
-            for objname, cmdchan_info in self.__commands_channels.iteritems():
+            for objname, cmdchan_info in self.__commands_channels.items():
                 try:
                   show, expert_only = cmdchan_info
                 except:

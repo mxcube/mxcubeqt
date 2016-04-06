@@ -342,11 +342,11 @@ class MultiplePositionsBrick(BlissWidget):
         if self.hwro is not None and self.__lastPosition is not None:
             if self.hwro.mode.lower() == "absolute":
                 allpos = {}
-                for role,mot in self.hwro["motors"]._objectsByRole.iteritems():
+                for role,mot in self.hwro["motors"]._objectsByRole.items():
                     allpos[role] = mot.getPosition()
                 self.hwro.setNewPositions(self.__lastPosition, allpos)
             else:
-                for role,mot in self.hwro["motors"]._objectsByRole.iteritems():
+                for role,mot in self.hwro["motors"]._objectsByRole.items():
                     motpos = mot.getPosition()
                     savedpos = self.hwro.positions[self.__lastPosition][role]
                     offset = mot.getOffset()
@@ -360,13 +360,13 @@ class MultiplePositionsBrick(BlissWidget):
     def addPosition(self):
         if self.hwro is not None:
             pos = {}
-            for role,mot in self.hwro["motors"]._objectsByRole.iteritems():
+            for role,mot in self.hwro["motors"]._objectsByRole.items():
                 pos[role] = str(mot.getPosition())
                 
             label_str = "Enter a name for position "
             key_str = "("
             pos_str = "("
-            for key,val in pos.iteritems():
+            for key,val in pos.items():
                 key_str = key_str + key
                 pos_str = pos_str + val
             key_str = key_str+")"
@@ -473,7 +473,7 @@ class MultiplePositionConfigurator(qt.QDialog):
             self.geneSetButton.setEnabled(False)
 
         if self.hwro is not None:
-            for role,mot in self.hwro["motors"]._objectsByRole.iteritems():
+            for role,mot in self.hwro["motors"]._objectsByRole.items():
                 mne = role
                 self.motorBrickList[mne] = MultiAxisAlignmentBrick(self.frame,"configure")
                 self.motorBrickList[mne]["mnemonic"]=mot.name()
@@ -497,7 +497,7 @@ class MultiplePositionConfigurator(qt.QDialog):
         """
         Motor Bricks
         """
-        for mne,brick in self.motorBrickList.iteritems():
+        for mne,brick in self.motorBrickList.items():
             brick.close(True)
         self.motorBrickList = {}
 
@@ -513,11 +513,11 @@ class MultiplePositionConfigurator(qt.QDialog):
         if self.hwro is not None:
             if self.hwro.mode.lower() == "absolute":
                 allpos = {}
-                for role,mot in self.hwro["motors"]._objectsByRole.iteritems():
+                for role,mot in self.hwro["motors"]._objectsByRole.items():
                     allpos[role] = mot.getPosition()
                 self.hwro.setNewPositions(self.selPos, allpos)
             else:
-                for role,mot in self.hwro["motors"]._objectsByRole.iteritems():
+                for role,mot in self.hwro["motors"]._objectsByRole.items():
                     motpos = mot.getPosition()
                     savedpos = self.hwro.positions[self.selPos][role]
                     offset = mot.getOffset()
@@ -546,7 +546,7 @@ class QubRadioGroup(qt.QFrame):
         self.__selectedRadio = None
         
     def addRadio(self, name):
-        if name not in self.buttonList.keys():
+        if name not in list(self.buttonList.keys()):
             self.buttonList[name] = QubRadioButton(str(name), self)
             self.layout.addWidget(self.buttonList[name])
             self.buttonList[name].show()
@@ -555,7 +555,7 @@ class QubRadioGroup(qt.QFrame):
                          self.__positionClicked) 
 
     def isChecked(self, name):
-        if name in self.buttonList.keys():
+        if name in list(self.buttonList.keys()):
             return self.buttonList[name].isChecked()
             
         return False
@@ -564,7 +564,7 @@ class QubRadioGroup(qt.QFrame):
         return self.__selectedRadio
         
     def setChecked(self, name, value):
-        if name in self.buttonList.keys():
+        if name in list(self.buttonList.keys()):
             if value:
                 if self.__selectedRadio is not None:
                     self.buttonList[self.__selectedRadio].setChecked(False)
@@ -576,14 +576,14 @@ class QubRadioGroup(qt.QFrame):
             self.buttonList[name].setChecked(value)
 
     def deselectAll(self):
-        for name in self.buttonList.keys():
+        for name in list(self.buttonList.keys()):
             self.buttonList[name].setChecked(False)
          
     def setSpacing(self, val):
         self.layout.setSpacing(val)
 
     def clearRadioList(self):
-        for name, radio in self.buttonList.iteritems():
+        for name, radio in self.buttonList.items():
             self.disconnect(radio, qt.PYSIGNAL("PositionClicked"),
                             self.__positionClicked) 
             radio.close()

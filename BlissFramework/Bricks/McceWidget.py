@@ -167,7 +167,7 @@ class McceWidget(qt.QWidget):
             elif _val in self.freqTypes:
                 self._type = _val
             else:
-                print "--mcceWidget--setType-- ERROR : bad type : ", _val
+                print("--mcceWidget--setType-- ERROR : bad type : ", _val)
 
             if self.isGainType():
                 self.frequencyCombo.hide()
@@ -179,7 +179,7 @@ class McceWidget(qt.QWidget):
             self.typeLabel.setText("<b>Type %d</b>"%self._type)
 
         except:
-            print "unknown type"
+            print("unknown type")
 
 
 
@@ -226,19 +226,19 @@ class McceWidget(qt.QWidget):
     Adds a widget identifier _number to the signal.
     '''
     def rangeChanged(self, newValue):
-        print "--mcceWidget--user change  range ;  new value=", newValue, " number=", self._number
+        print("--mcceWidget--user change  range ;  new value=", newValue, " number=", self._number)
         self.emit(qt.PYSIGNAL("rangeChanged"), ((newValue, self._number),))
 
     def gainChanged(self, newValue):
-        print "--mcceWidget--user change  gain ;  new value=", newValue, " number=", self._number
+        print("--mcceWidget--user change  gain ;  new value=", newValue, " number=", self._number)
         self.emit(qt.PYSIGNAL("gainChanged"), ((newValue, self._number),))
 
     def frequencyChanged(self, newValue):
-        print "--mcceWidget--user change frequency ;  new value=", newValue, " number=", self._number
+        print("--mcceWidget--user change frequency ;  new value=", newValue, " number=", self._number)
         self.emit(qt.PYSIGNAL("frequencyChanged"), ((newValue, self._number),))
 
     def polarityChanged(self, newValue):
-        print "--mcceWidget--user change  polarity ;  new value=", newValue, " number=", self._number
+        print("--mcceWidget--user change  polarity ;  new value=", newValue, " number=", self._number)
         self.emit(qt.PYSIGNAL("polarityChanged"), ((newValue, self._number),))
 
 
@@ -246,19 +246,19 @@ class McceWidget(qt.QWidget):
     Functions to change parameters of an electrometer in the GUI.
     '''
     def setRange(self, val):
-        print "--McceWidget--setRange--val=%s(string)--"%val
+        print("--McceWidget--setRange--val=%s(string)--"%val)
 
         try:
             idx = MCCE_RANGE_LIST[self._type].index(val)
         except:
-            print "--McceWidget--setRange-- set range to", type(val), val
-            print "--McceWidget--setRange-- MCCE_RANGE_LIST", MCCE_RANGE_LIST
-            print "--McceWidget--setRange-- self._type=%d , val=%s"%(self._type, val)
+            print("--McceWidget--setRange-- set range to", type(val), val)
+            print("--McceWidget--setRange-- MCCE_RANGE_LIST", MCCE_RANGE_LIST)
+            print("--McceWidget--setRange-- self._type=%d , val=%s"%(self._type, val))
 
         try:
             self.rangeCombo.setCurrentItem(idx)
         except:
-            print "--McceWidget--setRange-- ERROR: pas une val de la liste des range"
+            print("--McceWidget--setRange-- ERROR: pas une val de la liste des range")
 
     def setGain(self, val):
         #print "--McceWidget--setGain-- set gain to %s (type=%d)"%(val, self._type)
@@ -269,7 +269,7 @@ class McceWidget(qt.QWidget):
             idx = MCCE_GAIN_LIST[self._type].index(int(val))
             self.gainCombo.setCurrentItem(idx)
         except:
-            print "--McceWidget--setGain-- ERROR: pas une val de la liste des gains"
+            print("--McceWidget--setGain-- ERROR: pas une val de la liste des gains")
 
     def setFreq(self, val):
         #print "--McceWidget--setFreq-- set freq to %s (type=%d)"%(val, self._type)
@@ -279,7 +279,7 @@ class McceWidget(qt.QWidget):
             idx = MCCE_FREQ_LIST[self._type].index(int(val))
             self.frequencyCombo.setCurrentItem(idx)
         except:
-            print "--McceWidget--setFreq-- ERROR: pas une val de la liste des freqs"
+            print("--McceWidget--setFreq-- ERROR: pas une val de la liste des freqs")
 
     def setPol(self, val):
         #print "--McceWidget--setPol-- set pol to", val
@@ -287,7 +287,7 @@ class McceWidget(qt.QWidget):
             idx = self._polarityList.index(val)
             self.polarityCombo.setCurrentItem(idx)
         except:
-            print "--McceWidget--setPol-- ERROR: not a good value of pol list"
+            print("--McceWidget--setPol-- ERROR: not a good value of pol list")
 
 
 class testMcceWidget (qt.QWidget):
@@ -313,7 +313,7 @@ class testMcceWidget (qt.QWidget):
                 gain = MCCE_GAIN_LIST[elec_type][0]
                 freq = 0
             else:
-                print "elec_type is not in good interval"
+                print("elec_type is not in good interval")
 
             mw = McceWidget(elec_nb, elec_type, erange, freq, gain, pol, self, "tt%d"%i)
 
@@ -330,16 +330,16 @@ class testMcceWidget (qt.QWidget):
             self.connect(mw, qt.PYSIGNAL("polarityChanged"),  self.sigSetPol)
 
     def sigSetRange(self):
-        print "sigSetRange"
+        print("sigSetRange")
 
     def sigSetGain(self):
-        print "sigSetGain"
+        print("sigSetGain")
 
     def sigSetFreq(self):
-        print "sigSetFreq"
+        print("sigSetFreq")
 
     def sigSetPol(self):
-        print "sigSetPol"
+        print("sigSetPol")
 
 
 

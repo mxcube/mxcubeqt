@@ -121,7 +121,7 @@ class MachCurrentBrick(BaseComponents.BlissWidget):
                 txt="00:00"
             self.refillCountdown.display(txt)
             self.refillCountdown.show()
-        except TypeError,ValueError:
+        except TypeError as ValueError:
             self.refillCountdown.hide()
 
         if opmsg is not None and opmsg!="" and opmsg!="unknown":

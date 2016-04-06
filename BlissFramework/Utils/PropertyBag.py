@@ -1,4 +1,4 @@
-import cPickle
+import pickle
 
 class Property:
     def __init__(self, propertyName, defaultValue = None):
@@ -63,7 +63,7 @@ class Property:
         try:
             self.setValue(value)
         except ValueError:
-            raise ValueError, "cannot set default value to %s : incompatible types." % repr(value)
+            raise ValueError("cannot set default value to %s : incompatible types." % str(value))
 
         self.defaultValue = self.value
         
@@ -95,7 +95,7 @@ class IntegerProperty(Property):
         try:
             newValue = int(propertyValue)
         except ValueError:
-            raise ValueError, "%s is not a valid integer value." % repr(propertyValue)
+            raise ValueError("%s is not a valid integer value." % repr(propertyValue))
 
         self.oldValue = self.value
         self.value = newValue
@@ -132,7 +132,7 @@ class ComboProperty(Property):
         try:
             self.choices = list(choices)
         except:
-            raise ValueError, "%s cannot be converted into a list" % repr(choices)
+            raise ValueError("%s cannot be converted into a list" % repr(choices))
 
 
     def getChoices(self):
@@ -147,7 +147,7 @@ class ComboProperty(Property):
                 self.oldValue = self.value
                 self.value = strValue
                 return
-        raise ValueError, "%s is not a valid choice for combo" % repr(str(propertyValue))
+        raise ValueError("%s is not a valid choice for combo" % repr(str(propertyValue)))
 
 
 class FloatProperty(Property):
@@ -161,7 +161,7 @@ class FloatProperty(Property):
         try:
             newValue = float(propertyValue)
         except ValueError:
-            raise ValueError, "%s is not a valid float value" % repr(propertyValue)
+            raise ValueError("%s is not a valid float value" % repr(propertyValue))
     
         self.oldValue = self.value
         self.value = newValue
@@ -284,7 +284,7 @@ class PropertyBag:
 
 
     def updateEditor(self):
-        for propname, prop in self.properties.iteritems():
+        for propname, prop in self.properties.items():
             if prop._editor is not None:
                 # the properties are being edited,
                 # refresh property editor
@@ -297,7 +297,7 @@ class PropertyBag:
 
     def delProperty(self, propertyName):
         ed = None
-        for propname, prop in self.properties.iteritems():
+        for propname, prop in self.properties.items():
             ed = prop._editor
             break
 
@@ -342,7 +342,7 @@ class PropertyBag:
 
 
     def __repr__(self):
-        return repr(cPickle.dumps(self))
+        return repr(pickle.dumps(self))
 
 
     def __str__(self):
@@ -350,7 +350,7 @@ class PropertyBag:
         
 
     def __iter__(self):
-        keys = self.properties.keys()
+        keys = list(self.properties.keys())
         keys.sort()
 
         for key in keys:

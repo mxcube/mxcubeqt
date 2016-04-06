@@ -21,7 +21,7 @@ import os
 import time
 import stat
 import sys
-import cPickle
+import pickle
 import logging
 
 from PyQt4 import QtCore
@@ -35,6 +35,7 @@ from BlissFramework.Utils import PropertyBag
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 import Qt4_Icons
 import BlissFramework
+import collections
 
 
 LOAD_GUI_EVENT = QtCore.QEvent.MaxUser
@@ -129,7 +130,9 @@ class GUISupervisor(QtGui.QWidget):
                         for item in items_list:
                             if "brick" in item:
                                 try:
-                                    props = cPickle.loads(item["properties"])
+                                    # LNLS
+                                    props = pickle.loads(item["properties"])
+                                    #props = pickle.loads(item["properties"].encode('utf8'))
                                 except:
                                     logging.getLogger().exception("could not load properties for %s", item["name"])
                                 else:
@@ -253,7 +256,7 @@ class GUISupervisor(QtGui.QWidget):
             #
             # make connections
             #        
-            widgets_dict = dict([(callable(w.objectName) and str(w.objectName()) or None, w) for w in QtGui.QApplication.allWidgets()])
+            widgets_dict = dict([(isinstance(w.objectName, collections.Callable) and str(w.objectName()) or None, w) for w in QtGui.QApplication.allWidgets()])
 
             def make_connections(items_list): 
                 for item in items_list:
@@ -335,7 +338,7 @@ class GUISupervisor(QtGui.QWidget):
                 Qt4_GUIDisplay.restoreSizes(self.configuration,window,display,configurationSuffix = '_%d' % key,moveWindowFlag = False)
                 
     def changeFontSize(self, mode):
-        widgets_dict = dict([(callable(w.name) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
+        widgets_dict = dict([(isinstance(w.name, collections.Callable) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
         
         def setFontSize(item):
             if mode == 1:

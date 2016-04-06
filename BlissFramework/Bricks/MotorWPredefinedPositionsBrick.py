@@ -26,22 +26,22 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
         #
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('showButtons', 'boolean', False)
-	self.addProperty('mode', 'combo', ('expert', 'user'), 'user')
+        self.addProperty('mode', 'combo', ('expert', 'user'), 'user')
  
         #
         # create GUI components
         #
         self.buttons = []
-	self.lblUsername = QLabel('motor :', self)
-	self.posButtonsPanel = QVButtonGroup(self)
+        self.lblUsername = QLabel('motor :', self)
+        self.posButtonsPanel = QVButtonGroup(self)
         self.lstPositions = QComboBox(self)
         self.expertPanel = QVBox(self)
-	self.motorWidget = MotorBrick.MotorBrick(self.expertPanel)
-	expertPanelButtonsBox = QGrid(2, Qt.Vertical, self.expertPanel)
+        self.motorWidget = MotorBrick.MotorBrick(self.expertPanel)
+        expertPanelButtonsBox = QGrid(2, Qt.Vertical, self.expertPanel)
         QLabel('pos. name :', expertPanelButtonsBox)
-	self.txtPositionName = QLineEdit(expertPanelButtonsBox)
+        self.txtPositionName = QLineEdit(expertPanelButtonsBox)
         QLabel('', expertPanelButtonsBox) #just a spacer in fact
-	self.cmdSetPosition = QPushButton('Set pos.', expertPanelButtonsBox)
+        self.cmdSetPosition = QPushButton('Set pos.', expertPanelButtonsBox)
 
         #
         # configure GUI components
@@ -50,12 +50,12 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
         QToolTip.add(self.lstPositions, 'Select a predefined position to move motor to')
         self.motorWidget['appearance'] = 'tiny'
         self.motorWidget['allowDoubleClick'] = True
-	self.posButtonsPanel.setInsideMargin(5)
-	self.posButtonsPanel.setInsideSpacing(0)
-	self.posButtonsPanel.setFrameStyle(QFrame.NoFrame)
-	self.posButtonsPanel.setExclusive(True)
-	expertPanelButtonsBox.setMargin(5)
-	expertPanelButtonsBox.setSpacing(5)        
+        self.posButtonsPanel.setInsideMargin(5)
+        self.posButtonsPanel.setInsideSpacing(0)
+        self.posButtonsPanel.setFrameStyle(QFrame.NoFrame)
+        self.posButtonsPanel.setExclusive(True)
+        expertPanelButtonsBox.setMargin(5)
+        expertPanelButtonsBox.setSpacing(5)        
 
         #
         # connect signals / slots
@@ -94,7 +94,7 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
         
 
     def motorStateChanged(self, state):
-	s = state == self.motor.READY
+        s = state == self.motor.READY
         
         for button in self.buttons:
             button.setEnabled(s)
@@ -122,7 +122,7 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
         for i in range(1, self.lstPositions.count()):
             if self.lstPositions.text(i) == positionName:
                 self.lstPositions.setCurrentItem(i)
-		if len(self.buttons) > 0:
+                if len(self.buttons) > 0:
                     self.buttons[i - 1].setOn(True)
                 break
                 
@@ -140,10 +140,10 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
       self.cleanPositions()
 
       if self.motor is not None:
-	  if positions is None:
+          if positions is None:
               positions = self.motor.getPredefinedPositionsList()
-	  
-	  for p in positions:
+          
+          for p in positions:
               self.lstPositions.insertItem(p)
 
               if self['showButtons']:
@@ -161,7 +161,7 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
           self.posButtonsPanel.show()
       else:
           self.lstPositions.show()
-          self.posButtonsPanel.hide()	      
+          self.posButtonsPanel.hide()              
 
 
     def cmdSetPositionClicked(self):
@@ -172,26 +172,26 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
     def setMnemonic(self, mne):
         self.getProperty('mnemonic').setValue(mne)
         
-	if self.motor is not None:
+        if self.motor is not None:
             self.disconnect(self.motor, PYSIGNAL('stateChanged'), self.motorStateChanged)
             self.disconnect(self.motor, PYSIGNAL('newPredefinedPositions'), self.fillPositions)
             self.disconnect(self.motor, PYSIGNAL('predefinedPositionChanged'), self.predefinedPositionChanged)
 
         self.motor = self.getHardwareObject(mne)
         
-	if self.motor is not None:
+        if self.motor is not None:
             self.motorWidget.setMnemonic(mne)
             self.lblUsername.setText(self.motor.userName() + ' :')
 
             self.connect(self.motor, PYSIGNAL('newPredefinedPositions'), self.fillPositions)
-	    self.connect(self.motor, PYSIGNAL('stateChanged'), self.motorStateChanged)
+            self.connect(self.motor, PYSIGNAL('stateChanged'), self.motorStateChanged)
             self.connect(self.motor, PYSIGNAL('predefinedPositionChanged'), self.predefinedPositionChanged)
             
-	    self.fillPositions()
+            self.fillPositions()
  
             if self.motor.isReady():
                 self.predefinedPositionChanged(self.motor.getCurrentPositionName(), 0)
-	else:
+        else:
             self.lblUsername.setText('motor :')
             self.cleanPositions()
           
@@ -204,7 +204,7 @@ class MotorWPredefinedPositionsBrick(BlissWidget):
                 self.expertPanel.hide()
         elif property == 'showButtons':
             self.fillPositions()
-	elif property == 'mnemonic':	
+        elif property == 'mnemonic':        
             self.setMnemonic(newValue)
         
         

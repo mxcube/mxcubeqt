@@ -237,7 +237,7 @@ class GraphBrick(BlissWidget):
         else:
             contents = []
             i = 1
-            for curve_name, curve_data in self.curveData.iteritems():
+            for curve_name, curve_data in self.curveData.items():
                 contents.append("\n#S %d %s" % (i, curve_name))
                 contents.append("#N 2")
                 contents.append("#L  %s  %s" % (self.graphWidget.xlabel() or (self.timeAxisX and "time (s.)" or "X"), self.graphWidget.ylabel() or "Y"))
@@ -261,7 +261,7 @@ class GraphBrick(BlissWidget):
     def run(self):        
         self.topPanel.hide()
 
-        for curve_name, curve_data in self.curveData.items():
+        for curve_name, curve_data in list(self.curveData.items()):
             self.graphWidget.newcurve(curve_name, curve_data.x, curve_data.y, maptoy2=curve_data.maptoy2)
 
 
@@ -281,7 +281,7 @@ class GraphBrick(BlissWidget):
         self.timeAxisX = self.chkXAxisTimeAxis.isChecked()
         self.chkElapsedTime.setEnabled(self.timeAxisX)
               
-        for curve_data in self.curveData.itervalues():
+        for curve_data in self.curveData.values():
             curve_data.clear()
             self.graphWidget.newcurve(str(curve_data.name()), x = [], y = [], maptoy2=curve_data.maptoy2)
 
@@ -395,7 +395,7 @@ class GraphBrick(BlissWidget):
             self.chkXAxisTimeAxis.setChecked(newValue)
             self.toggleXAxisTimeAxis()
         elif property == 'timeElapsedTime':
-            print "timeElapsedTime property value = ", newValue
+            print("timeElapsedTime property value = ", newValue)
             self.chkElapsedTime.setChecked(newValue)
             self.toggleElapsedTime()
         elif property == 'windowSize':
@@ -429,7 +429,7 @@ class GraphBrick(BlissWidget):
                 
         if self.curveSourceSelector.exec_loop() == QDialog.Accepted:
             curve_setup = self.curveSourceSelector.getCurveSetup()
-            print 'curve setup', curve_setup
+            print('curve setup', curve_setup)
             
             self.propertyBag.addProperty(curve_setup['name'], '', {})
             self.propertyBag.getProperty(curve_setup['name']).setValue(curve_setup)
@@ -496,7 +496,7 @@ class GraphBrick(BlissWidget):
                 x = 0
                 
                 n0 = len(curveData.x)
-                curveData.x = filter(None, [x + self.windowSize > 0 and x - t for x in curveData.x])
+                curveData.x = [_f for _f in [x + self.windowSize > 0 and x - t for x in curveData.x] if _f]
                 n = len(curveData.x)
                 
                 if n0 > n:

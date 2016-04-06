@@ -90,7 +90,7 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
         for motor in self.motors:
             motor.close()
 
-        for panel in self.panels.itervalues():
+        for panel in self.panels.values():
             self.frame.layout().remove(panel)
             panel.close()
 
@@ -101,7 +101,7 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
             if self.hardwareObject.hasObject('motors'):
                 ho = self.hardwareObject['motors']
             else:
-                print self.hardwareObject.userName(), 'is not an Equipment : no <motors> section.'
+                print(self.hardwareObject.userName(), 'is not an Equipment : no <motors> section.')
                 return
                 
             for panelName in ho.objectsNames():

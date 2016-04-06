@@ -111,7 +111,7 @@ class CameraProfileBrick(BlissWidget) :
         yData = (qimage.height()) - yData
         #yData[len(yData)/2]= 220
         xData = numpy.arange(qimage.width())
-        allPoint = numpy.array(zip(xData,yData))
+        allPoint = numpy.array(list(zip(xData,yData)))
         allPoint.shape = -1        
         aP = qt.QPointArray(len(xData))
         aP.putPoints(0,allPoint.tolist())
@@ -127,7 +127,7 @@ class CameraProfileBrick(BlissWidget) :
         xData = xData * z
         xData = qimage.width() - xData
         yData = numpy.arange(qimage.height())
-        allPoint = numpy.array(zip(xData,yData))
+        allPoint = numpy.array(list(zip(xData,yData)))
         allPoint.shape = -1
         aP = qt.QPointArray(len(xData))
         aP.putPoints(0,allPoint.tolist())

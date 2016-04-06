@@ -156,7 +156,7 @@ class LakeshoreBrick(BlissWidget):
             if self.lakeshore is not None:
                 self.lakeshore.setUnit(newValue)
         elif property == "baseTime":
-            for channel, curve_data in self.data.iteritems():
+            for channel, curve_data in self.data.items():
                 if curve_data is None:
                    continue
  
@@ -185,7 +185,7 @@ class LakeshoreBrick(BlissWidget):
         else:
             contents = ["#F Lakeshore temperatures", "#D %s" % time.ctime(time.time())]
 
-            for channel, curve_data in self.data.iteritems():
+            for channel, curve_data in self.data.items():
                 if curve_data is None:
                     continue
 
@@ -218,7 +218,7 @@ class LakeshoreBrick(BlissWidget):
             t = time.time()
             
             try:
-                t0 = min(filter(None, [d["t0"] for d in filter(None, self.data.itervalues())]))
+                t0 = min([_f for _f in [d["t0"] for d in [_f for _f in iter(self.data.values()) if _f]] if _f])
             except ValueError:
                 t0 = t
  
