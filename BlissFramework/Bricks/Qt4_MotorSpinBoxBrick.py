@@ -462,8 +462,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.step_editor.show()
 
     def position_changed(self, new_position):
-        # LNLS 
-        print('Qt4_MotorSpinBoxBrick - position_changed')
         """
         Descript. :
         Args.     :

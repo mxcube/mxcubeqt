@@ -18,7 +18,11 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+# LNLS
+# python2.7
 #import new
+# python3.4
+import types
 import logging
 import weakref
 import platform
@@ -511,8 +515,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             def tab_slot(self, page_index = self.indexOf(scroll_area)):
                 self.setCurrentIndex(page_index)
             try:
+                # LNLS
+                # python2.7
                 #self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
-                self.__dict__[slotName.replace(" ", "_")] = tab_slot
+                # python3.4
+                self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
             slotName = "hidePage_%s" % label
@@ -537,8 +544,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                   else:
                     self.showPage(page["widget"])
             try:
+              # LNLS
+              # python2.7
               #self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
-              self.__dict__[slotName.replace(" ", "_")] = tab_slot
+              # python3.4
+              self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except: 
               logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName())) 
         
@@ -547,8 +557,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.page(page_index).setEnabled(enable)
             try:
+                # LNLS
+                # python2.7
                 #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                self.__dict__[slotName.replace(" ", "_")] = tab_slot
+                # python3.4
+                self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
@@ -557,8 +570,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.setTabEnabled(page_index, enable)
             try:
+                # LNLS
+                # python2.7
                 #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                self.__dict__[slotName.replace(" ", "_")] = tab_slot
+                # python3.4
+                self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
@@ -599,8 +615,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                         self.countChanged[page_index]=False
                         self.setTabLabel(self.page(page_index),new_label)
             try:
+                # LNLS
+                # python2.7
                 #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                self.__dict__[slotName.replace(" ", "_")] = tab_slot
+                # python3.4
+                self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.name()))
 
@@ -641,8 +660,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     self.countChanged[page_index]=True
                     self.setTabLabel(self.page(page_index),new_label)
             try:
+                # LNLS
+                # python2.7
                 #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                self.__dict__[slotName.replace(" ", "_")] = tab_slot
+                # python3.4
+                self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
 
