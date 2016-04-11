@@ -14,7 +14,7 @@ PLOT_MODE = False
 def print_trace(func) :
     if TRACE_MODE :
         def f(c,*args,**keys) :
-            print(func.__name__,c.__class__.__name__,args,keys)
+            print func.func_name,c.__class__.__name__,args,keys
             return func(c,*args,**keys)
         return f
     else:
@@ -44,7 +44,7 @@ class _Plot:
             elif a < b : return -1
             else: return 0
         self._All.sort(_s)
-        AllPosition,Allfocus = list(zip(*self._All))
+        AllPosition,Allfocus = zip(*self._All)
         self.curve.setData(numpy.array(AllPosition),numpy.array(Allfocus))
         self.graph.replot()
 
@@ -290,7 +290,7 @@ class _FocusAfineState(FocusState) :
             if sucess:
                 self.__localMiddlePointRefPosition = p1[1]
                 self.__localMiddlePointRefQuality = 1 / p1[0]
-                print(self.__localMiddlePointRefPosition,self.__localMiddlePointRefQuality)
+                print self.__localMiddlePointRefPosition,self.__localMiddlePointRefQuality
                 moveVector = self.__localMiddlePointRefPosition - position
                 self.__startPosition = positions
                 self.__startFocusQuality = focusQuality

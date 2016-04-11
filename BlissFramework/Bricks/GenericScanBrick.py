@@ -365,7 +365,7 @@ class GenericScanBrick(BaseComponents.ProcedureBrick):
             args += (cttime, )
         
             self.scan.setSpecVersion(specVer)
-            print(args)
+            print args
             self.scan.startScan(*args)
                
 

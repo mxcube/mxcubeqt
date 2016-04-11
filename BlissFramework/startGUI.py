@@ -95,8 +95,8 @@ def run(GUIConfigFile=None):
     except KeyError:
         pass
 
-    bricksDirs = [_f for _f in bricksDirs if _f]
-    hoDirs = [_f for _f in hoDirs if _f]
+    bricksDirs = filter(None, bricksDirs)
+    hoDirs = filter(None, hoDirs)
     
     app = QApplication([])
     lockfile = None
@@ -110,7 +110,7 @@ def run(GUIConfigFile=None):
 
           sys.exit(1)
       else:
-          os.chmod(lock_filename,0o666)
+          os.chmod(lock_filename,0666)
           try:
              fcntl.lockf(lockfile.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
           except:
@@ -142,7 +142,7 @@ def run(GUIConfigFile=None):
           log_ok=False
       else:
           try:
-            os.chmod(log_lock_filename,0o666)
+            os.chmod(log_lock_filename,0666)
           except:
             pass
           try:
@@ -167,7 +167,7 @@ def run(GUIConfigFile=None):
             pass
           else:
             try:
-              os.chmod(log_lock_filename2,0o666)
+              os.chmod(log_lock_filename2,0666)
             except:
               pass
             try:

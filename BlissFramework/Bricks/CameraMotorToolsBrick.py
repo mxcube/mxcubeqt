@@ -257,7 +257,7 @@ class CameraMotorToolsBrick(BlissWidget):
             self.drawing = view["drawing"]
             self.view = view["view"]        
         except:
-            print("No View")
+            print "No View"
         
         """
         get calibration
@@ -272,7 +272,7 @@ class CameraMotorToolsBrick(BlissWidget):
                 self.YSize = self.YSize * 1000
                 self.ZSize = self.ZSize * 1000
         except:
-            print("No Calibration")
+            print "No Calibration"
             
         """
         get beam position
@@ -283,7 +283,7 @@ class CameraMotorToolsBrick(BlissWidget):
             self.YBeam = position["ybeam"]
             self.ZBeam = position["zbeam"]
         except:
-            print("No Beam Position")
+            print "No Beam Position"
 
         """
         get mosaic view

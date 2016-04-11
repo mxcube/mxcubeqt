@@ -14,7 +14,7 @@ class WagoPneuBrick(SynopticBrick.SynopticBrick):
         }
     
     def __init__(self, *args):
-        SynopticBrick.SynopticBrick.__init__.__func__(self, *args)
+        SynopticBrick.SynopticBrick.__init__.im_func(self, *args)
         
         self.addProperty('mnemonic', 'string')
         self.addProperty('allow_control', 'boolean')
@@ -102,7 +102,7 @@ class WagoPneuBrick(SynopticBrick.SynopticBrick):
             self.allow_control = newValue
             self.updateGUI()
         else:
-            SynopticBrick.SynopticBrick.propertyChanged.__func__(self, propertyName, oldValue, newValue)
+            SynopticBrick.SynopticBrick.propertyChanged.im_func(self, propertyName, oldValue, newValue)
 
 
 

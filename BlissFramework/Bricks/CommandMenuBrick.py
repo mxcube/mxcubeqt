@@ -3,7 +3,6 @@ from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 import logging
 from BlissFramework.Utils.CustomWidgets import DialogButtonsBar
-import collections
 
 __category__ = 'mxCuBE'
 
@@ -293,7 +292,7 @@ class MenuButton(QToolButton):
         go=True
 
         searched=True
-        if isinstance(self.isSearchDone, collections.Callable):
+        if callable(self.isSearchDone):
             searched=self.isSearchDone()
 
         if not len(self.arguments):

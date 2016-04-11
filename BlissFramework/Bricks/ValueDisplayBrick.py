@@ -9,7 +9,7 @@ __category__ = 'Synoptic'
 
 class ValueDisplayBrick(SynopticBrick.SynopticBrick):    
     def __init__(self, *args):
-        SynopticBrick.SynopticBrick.__init__.__func__(self, *args)
+        SynopticBrick.SynopticBrick.__init__.im_func(self, *args)
 
         self.addProperty('formatString', 'formatString', '+##.####')
         self.addProperty('mnemonic', 'string')
@@ -41,9 +41,9 @@ class ValueDisplayBrick(SynopticBrick.SynopticBrick):
         if value is None:
             svalue = '-'
         else:
-            if type(value) == int or type(value) == float:
+            if type(value) == types.IntType or type(value) == types.FloatType:
                 svalue = '%s' % str(self['formatString'] % value)
-            elif type(value) == bytes:
+            elif type(value) == types.StringType:
                 svalue = str(value)
             else:
 				svalue = '-'
@@ -96,4 +96,4 @@ class ValueDisplayBrick(SynopticBrick.SynopticBrick):
         elif propertyName == 'valueLabel':
             self.lblLabel.setText(newValue)
         else:
-            SynopticBrick.SynopticBrick.propertyChanged.__func__(self, propertyName, oldValue, newValue)
+            SynopticBrick.SynopticBrick.propertyChanged.im_func(self, propertyName, oldValue, newValue)

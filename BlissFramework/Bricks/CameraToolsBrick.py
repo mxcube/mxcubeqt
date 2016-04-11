@@ -130,7 +130,7 @@ class CameraToolsBrick(BlissWidget):
             self.drawing = view["drawing"]
             self.view = view["view"]        
         except:
-            print("No View")
+            print "No View"
                     
         self.configureAction()
         

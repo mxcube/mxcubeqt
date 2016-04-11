@@ -86,7 +86,7 @@ class CcdBpmBrick(BlissWidget):
         self.buildInterface()
 
     def bprint(self, msg):
-        print("CcdBpmBrick--%s"%msg)
+        print "CcdBpmBrick--%s"%msg
 
     def buildInterface(self):
         vlayout = qt.QVBoxLayout(self)

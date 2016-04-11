@@ -316,7 +316,7 @@ class LookupScanBrick(BaseGraphicScan) :
         posMot2 = []
         pointMatchNb = 0
         matchPointId = []
-        for i,(match,point) in enumerate(zip(self._matchPoints,self.__gridPoints)) :
+        for i,(match,point) in enumerate(itertools.izip(self._matchPoints,self.__gridPoints)) :
             if match :
                 posMot1.append(point[0,0])
                 posMot2.append(point[0,1])
@@ -499,14 +499,14 @@ class LookupScanBrick(BaseGraphicScan) :
                 if not allInPoints :
                     allInPoints = pInPoly
                 else:
-                    allInPoints = [x > 0 or y > 0 for x,y in zip(pInPoly,allInPoints)]
+                    allInPoints = [x > 0 or y > 0 for x,y in itertools.izip(pInPoly,allInPoints)]
 
         if not allInPoints :
             allInPoints = [True for x in range(len(self.__gridPoints))]
             
         for points in excludePolygone:
             pInPoly = polygone.points_inclusion(pointGrid,points,False)
-            allInPoints = [x > 0 and not y > 0 for x,y in zip(allInPoints,pInPoly)]
+            allInPoints = [x > 0 and not y > 0 for x,y in itertools.izip(allInPoints,pInPoly)]
         self._matchPoints = allInPoints
         self.__refreshInfoText()
 

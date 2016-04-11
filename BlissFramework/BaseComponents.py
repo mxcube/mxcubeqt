@@ -92,8 +92,8 @@ class InstanceEventFilter(QObject):
 
 class WeakMethodBound:
     def __init__(self , f):
-        self.f = weakref.ref(f.__func__)
-        self.c = weakref.ref(f.__self__)
+        self.f = weakref.ref(f.im_func)
+        self.c = weakref.ref(f.im_self)
     def __call__(self , *args):
         obj = self.c()
         if obj is None:
@@ -110,7 +110,7 @@ class WeakMethodFree:
 
 def WeakMethod(f):
     try:
-        f.__func__
+        f.im_func
     except AttributeError :
         return WeakMethodFree(f)
     return WeakMethodBound(f)
@@ -532,7 +532,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
 
     @staticmethod
     def synchronizeWithCache():
-        events=list(BlissWidget._eventsCache.values())
+        events=BlissWidget._eventsCache.values()
         ordered_events=sorted(events,key=operator.itemgetter(0))
         for event_timestamp,event_method,event_args in ordered_events:
             try:
@@ -614,16 +614,16 @@ class BlissWidget(QWidget, Connectable.Connectable):
 
 
     def connectSignalSlotFilter(self,sender,signal,slot,should_cache):
-        #print "CONNECTING ", sender, signal, slot
+	#print "CONNECTING ", sender, signal, slot
         uid=(sender, signal, hash(slot))
-        signalSlotFilter = SignalSlotFilter(signal, slot, should_cache)
+	signalSlotFilter = SignalSlotFilter(signal, slot, should_cache)
         self._signalSlotFilters[uid]=signalSlotFilter
 
-        QObject.connect(sender, signal, signalSlotFilter)
+	QObject.connect(sender, signal, signalSlotFilter)
 
 
     def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
-        signal = str(signal)
+	signal = str(signal)
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
           signal=signal[1:]
@@ -633,14 +633,12 @@ class BlissWidget(QWidget, Connectable.Connectable):
         if not isinstance(sender, QObject):
           if isinstance(sender, HardwareObject):
             #logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
-            # LNLS
-            #sender.connect(signal, slot) 
-            sender.connect(sender, signal, slot) 
+            sender.connect(signal, slot) 
             return
           else:
             _sender = emitter(sender)
         else:
-            _sender = sender
+	    _sender = sender
 
         if instanceFilter:
             self.connectSignalSlotFilter(_sender, pysignal and PYSIGNAL(signal) or SIGNAL(signal), slot, shouldCache)
@@ -653,7 +651,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
     
 
     def disconnect(self, sender, signal, slot):
-        signal = str(signal)
+	signal = str(signal)
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
           signal=signal[1:]
@@ -662,9 +660,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
 
         if isinstance(sender, HardwareObject):
           #logging.warning("You should use %s.disconnect instead of using %s.connect", sender,self)
-          # LNLS 
-          #sender.disconnect(signal, slot)
-          sender.disconnect(sender, signal, slot)
+          sender.disconnect(signal, slot)
           return
 
         # workaround for PyQt lapse
@@ -950,9 +946,9 @@ class ProcedureBrick(BlissWidget):
     def setMnemonic(self, mne):
         self.getProperty('mnemonic').setValue(mne)
 
-        proc = HardwareRepository.HardwareRepository().getProcedure(mne)
+ 	proc = HardwareRepository.HardwareRepository().getProcedure(mne)
 
-        self.__setProcedure(proc)
+	self.__setProcedure(proc)
 
 
     def __setProcedure(self, proc):
@@ -1005,7 +1001,7 @@ class ProcedureBrick(BlissWidget):
         
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
-            self.setMnemonic(newValue) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
+       	    self.setMnemonic(newValue) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
         elif property == 'equipment':
             self.setEquipment(self.getHardwareObject(newValue))
 

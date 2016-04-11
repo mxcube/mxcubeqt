@@ -2,7 +2,7 @@ import logging
 import imp
 import types
 import pprint
-import pickle
+import cPickle
 from BlissFramework.Utils import PropertyBag
 from BlissFramework import BaseLayoutItems
 from BlissFramework.BaseComponents import NullBrick
@@ -239,10 +239,10 @@ class Configuration:
             all_items.update(self.bricks)
             all_items.update(self.items)
 
-            for item in all_items.values():
+            for item in all_items.itervalues():
                 for c in item.connections:
                     if c[recv]==old_item_name:
-                        print("receiver item %s in %s has been changed to %s" % (old_item_name, item.name, new_item_name))
+                        print "receiver item %s in %s has been changed to %s" % (old_item_name, item.name, new_item_name)
                         c[recv]=new_item_name
 
             self.hasChanged=True
@@ -472,10 +472,10 @@ class Configuration:
                          self.items[child["name"]] = newItem
 
                  if newItem is not None:
-                     if type(child["properties"]) == bytes:
+                     if type(child["properties"]) == types.StringType:
                          try:
                              #print "loading properties for %s" % child["name"]
-                             newItem.setProperties(pickle.loads(child["properties"]))
+                             newItem.setProperties(cPickle.loads(child["properties"]))
                          except:
                              logging.getLogger().exception("Error: could not load properties for %s", child["name"])
                              newItem.properties = PropertyBag.PropertyBag()
@@ -519,7 +519,7 @@ class Configuration:
 
 
     def reload_brick(self, brick_cfg):
-        if type(brick_cfg) == bytes:
+        if type(brick_cfg) == types.StringType:
             brick_cfg = self.findItem(brick_cfg)
 
         brick_name = brick_cfg["name"]

@@ -68,7 +68,6 @@ from BlissFramework import Icons
 from qt import *
 
 from qttable    import QTable, QTableItem
-from functools import reduce
 
 (OFF, MOVING, ON, ERROR) = (0,1,2,3) 
 
@@ -215,7 +214,7 @@ class FilterTable( FilterTable_form ):
            self.updateCell(curfilt,axisno)
            self.updateCell(filtno,axisno)
         except:
-            print("Filtno was ",filtno)
+            print "Filtno was ",filtno
 
     def setAxisState(self,axisno,state):
         try:
@@ -224,7 +223,7 @@ class FilterTable( FilterTable_form ):
            self.item(filtno,axisno).setState( self.states[axisno] )
            self.updateCell(filtno,axisno)
         except:
-            print("Filtno was ",filtno)
+            print "Filtno was ",filtno
 
 
 class MotorizedFilterTable( FilterTable ):
@@ -239,7 +238,7 @@ class MotorizedFilterTable( FilterTable ):
         self.updateCell( filterno, axisno )
 
    def setFilters(self,axisno,filters):
-        self.filtpos[axisno] = list(range(len(filters)))
+        self.filtpos[axisno] = range(len(filters))
 
 	filts = []
         for filterno in range(len(filters)):
@@ -298,7 +297,7 @@ class FiltersBrick(BaseComponents.BlissWidget):
                     self.table.setMotor( axisno, axis.getAxisMotor() )
                     axisno += 1   
             else:
-                print("Cannot find filter object")
+                print "Cannot find filter object"
 
 
 

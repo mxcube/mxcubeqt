@@ -157,7 +157,7 @@ class CameraOffLineImageManagerBrick(BlissWidget):
                 try:
                     ho = equipment['motors']
                 except KeyError:
-                    print(equipment.userName(), 'is not an Equipment : no <motors> section.')
+                    print equipment.userName(), 'is not an Equipment : no <motors> section.'
                     return
                 for motor in ho.getDevices() :
                     self.__motor_pos_save.append(motor)
@@ -532,7 +532,7 @@ class _SavePickleItem:
     def __init__(self,checkitem,image,layer,state,cnt,masterPosition,focusPosition) :
         self.image = image
         self.textcolumn = []
-        for i in range(cnt._CameraOffLineImageManagerBrick__imageList.columns()) :
+        for i in xrange(cnt._CameraOffLineImageManagerBrick__imageList.columns()) :
             self.textcolumn.append(checkitem.text(i).latin1())
         self.layer = layer
         self.state = state == qt.QCheckListItem.On

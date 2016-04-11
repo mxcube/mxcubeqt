@@ -103,16 +103,16 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         """
         if property_value == 'mnemonic':
             if self.attenuators_hwobj is not None:
-                self.disconnect(self.attenuators_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
-                self.disconnect(self.attenuators_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
-                self.disconnect(self.attenuators_hwobj, QtCore.SIGNAL('attStateChanged'), self.transmission_state_changed)
-                self.disconnect(self.attenuators_hwobj, QtCore.SIGNAL('attFactorChanged'), self.transmission_value_changed)
+                self.disconnect(self.attenuators_hwobj, 'deviceReady', self.connected)
+                self.disconnect(self.attenuators_hwobj, 'deviceNotReady', self.disconnected)
+                self.disconnect(self.attenuators_hwobj, 'attStateChanged', self.transmission_state_changed)
+                self.disconnect(self.attenuators_hwobj, 'attFactorChanged', self.transmission_value_changed)
             self.attenuators_hwobj = self.getHardwareObject(new_value)
             if self.attenuators_hwobj is not None:
-                self.connect(self.attenuators_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
-                self.connect(self.attenuators_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
-                self.connect(self.attenuators_hwobj, QtCore.SIGNAL('attStateChanged'), self.transmission_state_changed)
-                self.connect(self.attenuators_hwobj, QtCore.SIGNAL('attFactorChanged'), self.transmission_value_changed)
+                self.connect(self.attenuators_hwobj, 'deviceReady', self.connected)
+                self.connect(self.attenuators_hwobj, 'deviceNotReady', self.disconnected)
+                self.connect(self.attenuators_hwobj, 'attStateChanged', self.transmission_state_changed)
+                self.connect(self.attenuators_hwobj, 'attFactorChanged', self.transmission_value_changed)
                 if self.attenuators_hwobj.isReady():
                     self.connected()
                     self.attenuators_hwobj.update_values() 

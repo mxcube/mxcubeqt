@@ -238,7 +238,7 @@ class ConnectionEditor(QDialog):
             newItem.setText(6, connection['slot'])
             self.lstConnections.insertItem(newItem)
 
-        for window in self.configuration.windows.values():
+        for window in self.configuration.windows.itervalues():
             for connection in window["connections"]:
                 addConnection(window, window, connection)
 
@@ -424,7 +424,7 @@ class ConnectionEditor(QDialog):
         #
         # erase previous connections
         #
-        for window in self.configuration.windows.values():
+        for window in self.configuration.windows.itervalues():
             window["connections"] = []
 
             try:

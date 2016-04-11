@@ -6,7 +6,7 @@ from BlissFramework import Icons
 import BlissFramework
 import logging
 import os
-import xmlrpc.client
+import xmlrpclib
 
 __category__ = 'gui_utils'
 
@@ -118,7 +118,7 @@ class FeedbackBrick(BaseComponents.BlissWidget):
 
             logging.getLogger().debug("Sending feedback from %s to %s" % (fromaddr,toaddrs))
             error_dict = smtp.sendmail(fromaddr, toaddrs.split(','), email_msg)
-        except smtplib.SMTPException as e:
+        except smtplib.SMTPException, e:
             logging.getLogger().error("Could not send mail: %s" % str(e))
             smtp.quit()
         else:
@@ -137,7 +137,7 @@ class FeedbackBrick(BaseComponents.BlissWidget):
             info_dialog.exec_loop()
 
             if self["jira_server"]:
-              jira_server = xmlrpc.client.Server(self["jira_server"]+"/rpc/xmlrpc")
+              jira_server = xmlrpclib.Server(self["jira_server"]+"/rpc/xmlrpc")
               auth = jira_server.jira1.login(self["jira_user"], self["jira_passwd"])
               jira_customfield = [{"customfieldId" : "customfield_10794",
                                    "values" : ["No"]},

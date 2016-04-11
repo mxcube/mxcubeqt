@@ -44,7 +44,7 @@ class ToolButton(QToolButton):
 
         self.setIconSet(QIconSet(Icons.load(icon)))
 
-        if type(text) != bytes:
+        if type(text) != types.StringType:
             tooltip = callback
             callback = text
         else:
@@ -582,7 +582,7 @@ class ControlPanelBrick(BlissWidget):
         for config in settings:
             self.__forcedSelectedGridElement = i
             
-            if type(config) == bytes:
+            if type(config) == types.StringType:
                 if config == "vertical_spacer":
                     self.cmdGridAddVSpacerClicked()
                 elif config == "horizontal_spacer":

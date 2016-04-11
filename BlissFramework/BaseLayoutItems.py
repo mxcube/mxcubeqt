@@ -44,7 +44,7 @@ class _CfgItem:
         try:
             return getattr(self, item)
         except AttributeError:
-            raise KeyError(item)
+            raise KeyError, item
 
 
     def __setitem__(self, item, value):
@@ -144,7 +144,7 @@ class WindowCfg(ContainerCfg):
             # backward compatibility!
             self._menuEditor=None
             
-        if self._menuEditor is None or type(self._menuEditor)==bytes:
+        if self._menuEditor is None or type(self._menuEditor)==types.StringType:
             self._menuEditor = MenuEditor(None, self.name)
             
         return self._menuEditor
@@ -209,7 +209,7 @@ class TabCfg(ContainerCfg):
           if prop.name.startswith("closable_"):
             closable_props[prop.name]=prop.getValue()
             
-        for prop_name in closable_props.keys():
+        for prop_name in closable_props.iterkeys():
           self.properties.delProperty(prop_name)
 
         self.slots = {}

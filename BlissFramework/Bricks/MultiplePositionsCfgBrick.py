@@ -31,7 +31,7 @@ class ospDisplay(QHBox):
 		self.vbox.show()
 														
 	def positionClicked(self):
-		for name, radio in list(self.radios.items()):
+		for name, radio in self.radios.items():
 			if radio.isChecked():
 				return name
 	

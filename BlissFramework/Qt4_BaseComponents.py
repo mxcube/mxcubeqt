@@ -766,9 +766,9 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         #python2.7
-        #signal = str(signal)
+        signal = str(signal)
         #python3.4
-        signal = str(signal.decode('utf8') if type(signal) == bytes else signal)
+        #signal = str(signal.decode('utf8') if type(signal) == bytes else signal)
 
         if signal[0].isdigit():
           pysignal = signal[0]=='9'
@@ -780,8 +780,8 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
           if isinstance(sender, HardwareObject):
             #logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
             # LNLS
-            #sender.connect(signal, slot) 
-            sender.connect(sender, signal, slot)
+            sender.connect(signal, slot) 
+            #sender.connect(sender, signal, slot)
             return
           else:
             _sender = emitter(sender)

@@ -45,12 +45,12 @@ class A2ScanBrick(BaseGraphicScan) :
     def _getHStartStopPix(self) :
         if self.__points:
             return self.__points[0],self.__points[2]
-        else: raise Exception
+        else: raise StandardError
 
     def _getVStartStopPix(self) :
         if self.__points:
             return self.__points[1],self.__points[3]
-        else: raise Exception
+        else: raise StandardError
     
     def _moveGraphicInBeam(self,beamx,beamy) :
         x1,y1,x2,y2 = self.__points
@@ -201,9 +201,9 @@ class A2ScanBrick(BaseGraphicScan) :
         timeVal,valid = stringVal.toFloat()
         argList.append(timeVal)
 
-        self._logArgs = dict(list(zip(('mot1','mot1_start','mot1_final',
+        self._logArgs = dict(zip(('mot1','mot1_start','mot1_final',
                                   'mot2','mot2_start','mot2_final',
-                                  'intervals','scan_time'),argList)))
+                                  'intervals','scan_time'),argList))
         self._logArgs['scan_type'] = 'a2scan'
         try:
             self._logArgs['scanId'] = self.SCAN_N.getValue()

@@ -72,9 +72,9 @@ class MeshScanBrick(BaseGraphicScan) :
             dialog.message('Time must be float')
             return
         argList.append(value)
-        self._logArgs = dict(list(zip(('mot1','mot1_start','mot1_final','mot1_intervals',
+        self._logArgs = dict(zip(('mot1','mot1_start','mot1_final','mot1_intervals',
                                    'mot2','mot2_start','mot2_final','mot2_intervals',
-                                   'scan_time'),argList)))
+                                   'scan_time'),argList))
         self._logArgs['scan_type'] = 'mesh'
         try:
             self._logArgs['scanId'] = self.SCAN_N.getValue()

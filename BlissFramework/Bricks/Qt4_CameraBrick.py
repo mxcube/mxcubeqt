@@ -183,24 +183,24 @@ class Qt4_CameraBrick(BlissWidget):
         if property_name == "mnemonic":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(self.graphics_manager_hwobj, 
-                                QtCore.SIGNAL('mouseMoved'),  
+                                'mouseMoved',  
                                 self.mouse_moved)
                 self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('imageScaleChanged'),        
+                                'imageScaleChanged',        
                                 self.image_scaled)
                 self.disconnect(self.graphics_manager_hwobj,
-                                QtCore.SIGNAL('infoMsg'),
+                                'infoMsg',
                                 self.set_info_msg)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value)
             if self.graphics_manager_hwobj is not None:
                 self.connect(self.graphics_manager_hwobj, 
-                             QtCore.SIGNAL('mouseMoved'), 
+                             'mouseMoved', 
                              self.mouse_moved)
                 self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('imageScaleChanged'),
+                             'imageScaleChanged',
                              self.image_scaled)
                 self.connect(self.graphics_manager_hwobj,
-                             QtCore.SIGNAL('infoMsg'),
+                             'infoMsg',
                              self.set_info_msg)
                 self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
                 #self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame() 

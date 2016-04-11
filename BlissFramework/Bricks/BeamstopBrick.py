@@ -87,7 +87,7 @@ class BeamstopBrick(DuoStateBrick):
     LABEL_CLASS=beamstopLabel
     
     def __init__(self, *args):
-        DuoStateBrick.__init__.__func__(self, *args)
+        DuoStateBrick.__init__.im_func(self, *args)
         self.alignmentDialog = BeamStopAlignmentDialog(self, "Beamstop alignment")
         self.alignmentDialog.hide()
         QObject.connect(self.alignmentDialog, PYSIGNAL("aligned"), self.beamstopAligned)
@@ -157,7 +157,7 @@ class BeamstopBrick(DuoStateBrick):
             else:
                 self.stateLabel.setButtonStopPixmap(Icons.load(newValue))
         elif propertyName=='icons':
-            DuoStateBrick.propertyChanged.__func__(self,propertyName,oldValue,newValue)
+            DuoStateBrick.propertyChanged.im_func(self,propertyName,oldValue,newValue)
         else:
             BaseComponents.BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -167,7 +167,7 @@ class BeamstopBrick(DuoStateBrick):
             #print "GO IN"
             self.beamstop.moveToPosition("in")
         else:
-            DuoStateBrick.setIn.__func__(self,False)
+            DuoStateBrick.setIn.im_func(self,False)
 
     def setOut(self,state):
         #print "BeamstopBrick.setOut",state
@@ -175,7 +175,7 @@ class BeamstopBrick(DuoStateBrick):
         if state:
             self.beamstop.moveToPosition("out")
         else:
-            DuoStateBrick.setOut.__func__(self,False)
+            DuoStateBrick.setOut.im_func(self,False)
 
     def equipmentReady(self):
         self.setEnabled(True)
@@ -225,7 +225,7 @@ class BeamstopBrick(DuoStateBrick):
     def stateChanged(self,state):
         self.stateLabel.setButtonStopEnabled(state=="moving")
         # weird Python bug : why do we need im_func sometimes?
-        DuoStateBrick.stateChanged.__func__(self,state)
+        DuoStateBrick.stateChanged.im_func(self,state)
 
     def stopClicked(self):
         for motor in self.beamstop.motors:

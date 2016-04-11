@@ -13,7 +13,6 @@ import email.Utils
 import smtplib
 import os
 from HardwareRepository.HardwareRepository import dispatcher
-import collections
 
 
 __category__ = "mxCuBE"
@@ -377,7 +376,7 @@ class InstanceListBrick(BlissWidget):
                   try:
                     if not masterSync:
                       try:
-                        method.__self__.blockSignals(True)
+                        method.im_self.blockSignals(True)
                       except AttributeError:
                         pass
                     method(*method_args)
@@ -385,7 +384,7 @@ class InstanceListBrick(BlissWidget):
                     pass
                 finally:
                   try:
-                    method.__self__.blockSignals(False)
+                    method.im_self.blockSignals(False)
                   except AttributeError:
                     pass
         else:
@@ -394,7 +393,7 @@ class InstanceListBrick(BlissWidget):
                   try:
                     if not masterSync:
                       try:
-                        method.__self__.blockSignals(True)
+                        method.im_self.blockSignals(True)
                       except AttributeError:
                         pass
                     method(*method_args)
@@ -402,7 +401,7 @@ class InstanceListBrick(BlissWidget):
                     pass
                 finally:
                   try:
-                    method.__self__.blockSignals(False)
+                    method.im_self.blockSignals(False)
                   except AttributeError: 
                     pass
             else:
@@ -551,7 +550,7 @@ class InstanceListBrick(BlissWidget):
             i=self.listBox.firstItem()
             while i is not None:
                 i.setSelectable(False)
-                i=next(i)
+                i=i.next()
             self.listBox.setSelectionMode(QListBox.NoSelection)
 
         else:
@@ -619,7 +618,7 @@ class InstanceListBrick(BlissWidget):
             i=self.listBox.firstItem()
             while i is not None:
                 i.setSelectable(False)
-                i=next(i)
+                i=i.next()
 
             #print "SELECTING",control_item,control_item.text()
             self.listBox.setSelectionMode(QListBox.Single)
@@ -736,7 +735,7 @@ class InstanceListBrick(BlissWidget):
                 msg_dialog.setFont(f)
                 msg_dialog.updateGeometry()
                 msg_dialog.exec_loop()
-                if isinstance(event.callback, collections.Callable):
+                if callable(event.callback):
                     event.callback()
 
             elif event.type() == USER_INFO_DIALOG_EVENT:
@@ -791,7 +790,7 @@ class InstanceListBrick(BlissWidget):
                     try:
                         smtp = smtplib.SMTP('smtp',smtplib.SMTP_PORT)
                         smtp.sendmail(event.fromaddrs, toaddrs.split(','), email_message)
-                    except smtplib.SMTPException as e:
+                    except smtplib.SMTPException, e:
                         logging.getLogger().error("Could not send mail: %s" % str(e))
                         smtp.quit()
                     else:

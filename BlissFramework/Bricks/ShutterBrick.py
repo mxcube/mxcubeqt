@@ -19,7 +19,7 @@ class ShutterBrick(SynopticBrick.SynopticBrick):
         }
 
     def __init__(self, *args):
-        SynopticBrick.SynopticBrick.__init__.__func__(self, *args)
+        SynopticBrick.SynopticBrick.__init__.im_func(self, *args)
 
         self.addProperty('mnemonic', 'string')
         self.shutter = None
@@ -84,4 +84,4 @@ class ShutterBrick(SynopticBrick.SynopticBrick):
         if propertyName == 'mnemonic':
             self.updateGUI()
         else:
-            SynopticBrick.SynopticBrick.propertyChanged.__func__(self, propertyName, oldValue, newValue)
+            SynopticBrick.SynopticBrick.propertyChanged.im_func(self, propertyName, oldValue, newValue)

@@ -72,7 +72,7 @@ class McceBrick(BlissWidget):
         '''
         ?
         '''
-        print("--McceBrick--configureInterface--", self._name)
+        print "--McceBrick--configureInterface--", self._name
 
         # ?? before any connection ??
         self.elecWidget.setType(self.hwo.mcce_type)
@@ -105,7 +105,7 @@ class McceBrick(BlissWidget):
         self.connect(self.elecWidget, qt.PYSIGNAL("polarityChanged"),  self.setPolarity)
 
         # First Initialization.
-        print("--McceBrick.py--first initialization--")
+        print "--McceBrick.py--first initialization--"
         self.numberToChange(self.hwo.mcce_number)
         self.rangeToChange(self.hwo.mcce_range)
         self.freqToChange(self.hwo.mcce_freq)
@@ -117,7 +117,7 @@ class McceBrick(BlissWidget):
 
     def __lastInit(self) :
         self.__idle.stop()
-        print("--McceBrick--__lastInit-- fin du timer, maintenant on peut bosser tranquille ...--", self._name)
+        print "--McceBrick--__lastInit-- fin du timer, maintenant on peut bosser tranquille ...--", self._name
         self.configureInterface()
 
 
@@ -153,7 +153,7 @@ class McceBrick(BlissWidget):
         field (usualy mcce.xml)
         '''
         if property == 'mnemonic':
-            print("--mcceBrick--propertyChanged--mnemonic")
+            print "--mcceBrick--propertyChanged--mnemonic"
             if self.hwo is not None:
                 # + close all objects previously created ???
                 self.hwo = None
@@ -163,10 +163,10 @@ class McceBrick(BlissWidget):
             self.hwo = self.getHardwareObject(self.hwoName)
 
             if self.hwo is None:
-                print("--mcceBrick--propertyChanged--ERROR-- hwo is None")
+                print "--mcceBrick--propertyChanged--ERROR-- hwo is None"
                 return
             else:
-                print("--mcceBrick--propertyChanged-- hwo OK, now connecting :", self.hwo)
+                print "--mcceBrick--propertyChanged-- hwo OK, now connecting :", self.hwo
                 self.hwo.connect(qt.PYSIGNAL("hwoConnected"), self.hwoConnected)
 
 
@@ -174,37 +174,37 @@ class McceBrick(BlissWidget):
     Functions to change the GUI widgets.
     '''
     def rangeToChange(self, val):
-        print("--val=%s(string)"%val)
+        print "--val=%s(string)"%val
         self.elecWidget.setRange(val)
 
     def freqToChange(self, val):
-        print("--mcceBrick--freqToChange--val=%s(string)"%val)
+        print "--mcceBrick--freqToChange--val=%s(string)"%val
         if self.elecWidget.isFreqType():
             self.elecWidget.setFreq(val)
 
     def gainToChange(self, val):
-        print("--mcceBrick--gainToChange--val=%s(string)"%val)
+        print "--mcceBrick--gainToChange--val=%s(string)"%val
         if self.elecWidget.isGainType():
             self.elecWidget.setGain(val)
 
     def polToChange(self, val):
-        print("--mcceBrick--polToChange--val=%s(string)"%val)
+        print "--mcceBrick--polToChange--val=%s(string)"%val
         self.elecWidget.setPol(val)
 
     def typeToChange(self, val):
-        print("--mcceBrick--typeToChange--val=%s(string)"%val)
+        print "--mcceBrick--typeToChange--val=%s(string)"%val
         self.elecWidget.setType(val)
 
     def devToChange(self, val):
-        print("--mcceBrick--devToChange--val=%s(string)"%val)
+        print "--mcceBrick--devToChange--val=%s(string)"%val
         self.elecWidget.setDSName(val)
 
     def nameToChange(self, name):
-        print("--mcceBrick--nameToChange--val=%s(string)"%name)
+        print "--mcceBrick--nameToChange--val=%s(string)"%name
         self.elecWidget.setName(name)
 
     def numberToChange(self, number):
-        print("--mcceBrick--numberToChange--val=%d(int)"%number)
+        print "--mcceBrick--numberToChange--val=%d(int)"%number
         self._number = number
         self.elecWidget.setNumber(number)
 
@@ -238,7 +238,7 @@ class McceBrick(BlissWidget):
         elif str(val)=="negative":
             self.hwo.mccePolCmd(widgetNb+1, "-")
         else:
-            print("--mcceBrick--setPolarity-- ERROR not a valid polarity", val)
+            print "--mcceBrick--setPolarity-- ERROR not a valid polarity", val
 
     def hwoConnected(self, val ):
         '''

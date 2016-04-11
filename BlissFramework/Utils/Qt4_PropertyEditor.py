@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import types
 import weakref
 import logging
@@ -25,7 +26,12 @@ import logging
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-import PropertyBag
+if sys.version_info > (3, 0):
+   StringList = list
+else:
+   StringList = QtCore.QStringList
+
+from BlissFramework.Utils import PropertyBag
 from BlissFramework import Qt4_Icons
 
 
@@ -116,7 +122,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             else:
                 self.item(row, 1).setCheckState(QtCore.Qt.Unchecked)
         elif prop.getType() == 'combo':
-            choicesList = QtCore.QStringList()
+            choicesList = StringList()
             choices = prop.getChoices()
             for choice in choices:
                 choicesList.append(choice)

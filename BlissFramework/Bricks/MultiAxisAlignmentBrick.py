@@ -46,7 +46,7 @@ class _stopIdle(qt.QTimer) :
         if not self.isActive() :
             self.start(0)
     def __stopMotor(self) :
-        for motor in self.__motors.values() :
+        for motor in self.__motors.itervalues() :
             motor.stop()
         self.__motors = {}
             
@@ -239,7 +239,7 @@ class MultiAxisAlignmentBrick(BlissWidget):
                     
                 #clean properties
                 propNames = []
-                for propertyName,prop in self.propertyBag.properties.items() :
+                for propertyName,prop in self.propertyBag.properties.iteritems() :
                     if propertyName not in ['fontSize','mnemonic','title','formatString'] :
                         propNames.append(propertyName)
                 if not self.isRunning() and oldValue is not None:
@@ -256,7 +256,7 @@ class MultiAxisAlignmentBrick(BlissWidget):
                         self.__addNewProperty(equipment)
                 self.propertyBag.properties.update(self['dynamicProperties'].properties)
                 self.propertyBag.updateEditor()
-                for name,prop in self['dynamicProperties'].properties.items() :
+                for name,prop in self['dynamicProperties'].properties.iteritems() :
                     self.__setDynamicProperty(name,prop.getValue())
             # refresh labels
                 self["formatString"] = self.getProperty("formatString").getUserValue()
@@ -313,7 +313,7 @@ class MultiAxisAlignmentBrick(BlissWidget):
         if matchResult :
             padid = int(matchResult.group(1))
         AxisName = {'hori.' : 'setH','vert.' : 'setV','rot.' : 'setR'}
-        for key,beginNameFunc in AxisName.items() :
+        for key,beginNameFunc in AxisName.iteritems() :
             if property.find(key) > -1:
                 break
         if property.find('steps') > -1 :

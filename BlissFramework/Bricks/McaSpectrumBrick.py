@@ -118,14 +118,14 @@ class McaSpectrumBrick(BlissWidget):
     def _configure(self,config):
         d = ConfigDict.ConfigDict()
         d.read(config["file"])
-        if 'concentrations' not in d:
+        if not d.has_key('concentrations'):
             d['concentrations']= {}
-        if 'attenuators' not in d:
+        if not d.has_key('attenuators'):
             d['attenuators']= {}
             d['attenuators']['Matrix'] = [1, 'Water', 1.0, 0.01, 45.0, 45.0]
-        if 'flux' in config:
+        if config.has_key('flux'):
             d['concentrations']['flux'] = float(config['flux'])
-        if 'time' in config:
+        if config.has_key('time'):
             d['concentrations']['time'] = float(config['time'])
 
         self.mcafit.mcafit.configure(d)

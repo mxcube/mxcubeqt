@@ -245,8 +245,10 @@ class ToolboxWindow(QtGui.QWidget):
             
             if [x for x in [x[0] for x in imp.get_suffixes()] if filename.endswith(x)]:
                 brickName = filename[:filename.rfind('.')]
-                if (not brickName == '__init__' and 
+
+                if (not brickName.startswith('__') and 
                     brickName.startswith('Qt4') and
+                    not 'cpython' in brickName and
                     not brickName in processedBricks):
                     processedBricks.append(brickName)
                     dirname = os.path.dirname(full_filename)

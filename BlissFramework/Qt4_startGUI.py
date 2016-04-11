@@ -137,6 +137,7 @@ def run(GUIConfigFile = None):
           hwrServer = os.environ['HARDWARE_REPOSITORY_SERVER']
       except KeyError:
           hwrServer = defaultHwrServer
+    print (hwrServer)
 
     #
     # add bricks directories and hardware objects directories from environment
