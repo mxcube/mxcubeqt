@@ -239,7 +239,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                 try:
                     method = event.method
                     arguments = event.arguments
-                except Exception, diag:
+                except (Exception, diag):
                     logging.getLogger().exception("Qt4_ProposalBrick2: problem in event! (%s)" % str(diag))
                 except:
                     logging.getLogger().exception("Qt4_ProposalBrick2: problem in event!")
@@ -248,7 +248,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                     if callable(method):
                         try:
                             method(*arguments)
-                        except Exception, diag:
+                        except Exception as diag:
                             logging.getLogger().exception("Qt4_ProposalBrick2: uncaught exception! (%s)" % str(diag))
                         except:
                             logging.getLogger().exception("Qt4_ProposalBrick2: uncaught exception!")

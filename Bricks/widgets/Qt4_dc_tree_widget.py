@@ -297,7 +297,7 @@ class DataCollectTree(QtGui.QWidget):
                 self.tree_brick.show_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 self.tree_brick.show_energy_scan_tab(item)
-	    elif isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem):
+            elif isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem):
                 self.tree_brick.show_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tree_brick.show_workflow_tab(item)
@@ -762,7 +762,7 @@ class DataCollectTree(QtGui.QWidget):
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.BusyCursor))
         try:
             self.queue_hwobj.execute()
-        except Exception, e:
+        except (Exception, e):
             raise e
         
     def stop_collection(self):

@@ -92,7 +92,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         """
         Descript. :
         """
-        self._periodic_table_widget.periodic_table.setElements(\
+ 
+        self._periodic_table_widget.set_elements(\
              energy_scan_hwobj.getElements())
 
     def single_item_selection(self, tree_item):

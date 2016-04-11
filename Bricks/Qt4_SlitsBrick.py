@@ -21,7 +21,7 @@
 [Name] Qt4_SlitsBrick
 
 [Description]
-SlitsBrick displays horizontal and vertical gap size. 
+SlitsBrick displays horizontal and vertical gap size.
 Size is estimated by related slit pairs
 Depending of the beam focusing mode user can enter gap sizes by using spinboxes.
 
@@ -39,11 +39,11 @@ Depending of the beam focusing mode user can enter gap sizes by using spinboxes.
 
 [Comments] -
 
-[Hardware Objects]	
+[Hardware Objects]
 -----------------------------------------------------------------------
 | name         | signals             | functions
 -----------------------------------------------------------------------
-| BeamSlitBox  | gapSizeChanged      | setGap() 
+| BeamSlitBox  | gapSizeChanged      | setGap()
 |  	       | statusChanged       | stopGapChange()
 |  	       | focusModeChanged    | getStepSizes()
 |  	       | gapLimitsVhanged    | gapLimits()
@@ -71,14 +71,14 @@ class Qt4_SlitsBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------	
-	self.slitbox_hwobj = None
+        # Hardware objects ----------------------------------------------------
+        self.slitbox_hwobj = None
 
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
         self.addProperty('mnemonic', 'string', '')
-        self.addProperty('formatString','formatString','###')
+        self.addProperty('formatString', 'formatString', '###')
 
         # Signals ------------------------------------------------------------
 
@@ -88,41 +88,41 @@ class Qt4_SlitsBrick(BlissWidget):
         self.main_gbox = QtGui.QGroupBox('Slits', self) #h
         hor_label = QtGui.QLabel("Horizontal:", self.main_gbox)
         self.current_hor_pos_ledit = QtGui.QLineEdit(self.main_gbox)
-	self.current_hor_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.current_hor_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
         boldFont = self.current_hor_pos_ledit.font()
         boldFont.setBold(True)
         self.current_hor_pos_ledit.setFont(boldFont)
-	self.current_hor_pos_ledit.setMaximumWidth(70)
+        self.current_hor_pos_ledit.setMaximumWidth(70)
         self.current_hor_pos_ledit.setEnabled(False)
         self.hor_pos_dspinbox = QtGui.QDoubleSpinBox(self.main_gbox)
-	self.hor_pos_dspinbox.setMaximumWidth(70)
-	self.hor_pos_dspinbox.setEnabled(False)	
-	self.set_hor_gap_button = QtGui.QPushButton(\
+        self.hor_pos_dspinbox.setMaximumWidth(70)
+        self.hor_pos_dspinbox.setEnabled(False)
+        self.set_hor_gap_button = QtGui.QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
-	self.set_hor_gap_button.setEnabled(False)
+        self.set_hor_gap_button.setEnabled(False)
         self.set_hor_gap_button.setFixedWidth(27)
-	self.stop_hor_button = QtGui.QPushButton(\
+        self.stop_hor_button = QtGui.QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
-	self.stop_hor_button.setEnabled(False)
+        self.stop_hor_button.setEnabled(False)
         self.stop_hor_button.setFixedWidth(27)
 
 	#Vertical gap
         ver_label = QtGui.QLabel("Vertical:", self.main_gbox)
         self.current_ver_pos_ledit = QtGui.QLineEdit(self.main_gbox)
-	self.current_ver_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.current_ver_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
         self.current_ver_pos_ledit.setFont(boldFont)
-	self.current_ver_pos_ledit.setMaximumWidth(70)
+        self.current_ver_pos_ledit.setMaximumWidth(70)
         self.current_ver_pos_ledit.setEnabled(False)
         self.ver_pos_dspinbox = QtGui.QDoubleSpinBox(self.main_gbox)
-	self.ver_pos_dspinbox.setMaximumWidth(70)
-	self.ver_pos_dspinbox.setEnabled(False)
-	self.set_ver_gap_button = QtGui.QPushButton(\
+        self.ver_pos_dspinbox.setMaximumWidth(70)
+        self.ver_pos_dspinbox.setEnabled(False)
+        self.set_ver_gap_button = QtGui.QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
-	self.set_ver_gap_button.setEnabled(False)
+        self.set_ver_gap_button.setEnabled(False)
         self.set_ver_gap_button.setFixedWidth(27)
-	self.stop_ver_button = QtGui.QPushButton(\
+        self.stop_ver_button = QtGui.QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
-	self.stop_ver_button.setEnabled(False)
+        self.stop_ver_button.setEnabled(False)
         self.stop_ver_button.setFixedWidth(27)
 
         # Layout --------------------------------------------------------------
@@ -138,7 +138,7 @@ class Qt4_SlitsBrick(BlissWidget):
         _main_gbox_gridlayout.addWidget(self.set_ver_gap_button, 1, 3)
         _main_gbox_gridlayout.addWidget(self.stop_ver_button, 1, 4)
         _main_gbox_gridlayout.setSpacing(2)
-        _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)        
+        _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
@@ -153,16 +153,16 @@ class Qt4_SlitsBrick(BlissWidget):
         self.set_hor_gap_button.clicked.connect(self.change_hor_gap)
         self.stop_hor_button.clicked.connect(self.stop_hor_clicked)
 
-	self.ver_pos_dspinbox.lineEdit().textChanged.\
+        self.ver_pos_dspinbox.lineEdit().textChanged.\
              connect(self.ver_gap_edited)
         self.ver_pos_dspinbox.lineEdit().returnPressed.\
              connect(self.change_ver_gap)
-	self.set_ver_gap_button.clicked.connect(self.change_ver_gap)
-	self.stop_ver_button.clicked.connect(self.stop_ver_clicked)
+        self.set_ver_gap_button.clicked.connect(self.change_ver_gap)
+        self.stop_ver_button.clicked.connect(self.stop_ver_clicked)
 
         # SizePolicies --------------------------------------------------------
 
-        # Other --------------------------------------------------------------- 
+        # Other ---------------------------------------------------------------
         self.current_hor_pos_ledit.setToolTip("Current horizontal gap size")
         self.set_hor_gap_button.setToolTip("Set new horizontal gap size")
         self.stop_hor_button.setToolTip("Stop horizontal slits movements")
@@ -172,36 +172,36 @@ class Qt4_SlitsBrick(BlissWidget):
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'mnemonic':
-	    if self.slitbox_hwobj is not None:
-		self.disconnect(self.slitbox_hwobj, QtCore.SIGNAL('gapSizeChanged'), self.gap_value_changed)
-		self.disconnect(self.slitbox_hwobj, QtCore.SIGNAL('statusChanged'), self.gap_status_changed)
-	        self.disconnect(self.slitbox_hwobj, QtCore.SIGNAL('focusModeChanged'), self.focus_mode_changed)
-	        self.disconnect(self.slitbox_hwobj, QtCore.SIGNAL('gapLimitsChanged'), self.gap_limits_changed)
-	    self.slitbox_hwobj = self.getHardwareObject(new_value)
-	    if self.slitbox_hwobj is not None:
-		self.connect(self.slitbox_hwobj, QtCore.SIGNAL('gapSizeChanged'), self.gap_value_changed)
-		self.connect(self.slitbox_hwobj, QtCore.SIGNAL('statusChanged'), self.gap_status_changed)
-                self.connect(self.slitbox_hwobj, QtCore.SIGNAL('focusModeChanged'), self.focus_mode_changed)
-	        self.connect(self.slitbox_hwobj, QtCore.SIGNAL('gapLimitsChanged'), self.gap_limits_changed)
+            if self.slitbox_hwobj is not None:
+                self.disconnect(self.slitbox_hwobj, 'gapSizeChanged', self.gap_value_changed)
+                self.disconnect(self.slitbox_hwobj, 'statusChanged', self.gap_status_changed)
+                self.disconnect(self.slitbox_hwobj, 'focusModeChanged', self.focus_mode_changed)
+                self.disconnect(self.slitbox_hwobj, 'gapLimitsChanged', self.gap_limits_changed)
+            self.slitbox_hwobj = self.getHardwareObject(new_value)
+            if self.slitbox_hwobj is not None:
+                self.connect(self.slitbox_hwobj, 'gapSizeChanged', self.gap_value_changed)
+                self.connect(self.slitbox_hwobj, 'statusChanged', self.gap_status_changed)
+                self.connect(self.slitbox_hwobj, 'focusModeChanged', self.focus_mode_changed)
+                self.connect(self.slitbox_hwobj, 'gapLimitsChanged', self.gap_limits_changed)
 
                 self.slitbox_hwobj.update_values()
-            	self.slitBoxReady()
-	    else:
+                self.slitBoxReady()
+            else:
                 self.slitBoxNotReady()
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
-    
+
     def initiate_spinboxes(self):
         stepSizes = self.slitbox_hwobj.get_step_sizes()
-	gapLimits = self.slitbox_hwobj.get_gap_limits('Hor')
-	value = int(self.slitbox_hwobj.get_gap_hor() * 1000)
-        self.hor_pos_dspinbox.setRange(int(gapLimits[0] * 1000), 
+        gapLimits = self.slitbox_hwobj.get_gap_limits('Hor')
+        value = int(self.slitbox_hwobj.get_gap_hor() * 1000)
+        self.hor_pos_dspinbox.setRange(int(gapLimits[0] * 1000),
                                        int(gapLimits[1] * 1000))
         self.hor_pos_dspinbox.setSingleStep(1)
         self.hor_pos_dspinbox.setValue(value)
-	gapLimits = self.slitbox_hwobj.get_gap_limits('Ver')
+        gapLimits = self.slitbox_hwobj.get_gap_limits('Ver')
         value = int(self.slitbox_hwobj.get_gap_ver() * 1000)
-        self.ver_pos_dspinbox.setRange(int(gapLimits[0] * 1000), 
+        self.ver_pos_dspinbox.setRange(int(gapLimits[0] * 1000),
                                        int(gapLimits[1] * 1000))
         self.ver_pos_dspinbox.setSingleStep(1)
         self.ver_pos_dspinbox.setValue(value)
@@ -214,10 +214,10 @@ class Qt4_SlitsBrick(BlissWidget):
                                            QtGui.QPalette.Button)
 
     def stop_hor_clicked(self):
-	self.slitbox_hwobj.stop_gap_move('Hor')
+        self.slitbox_hwobj.stop_gap_move('Hor')
 
     def stop_ver_clicked(self):
-	self.slitbox_hwobj.stop_gap_move('Ver')  
+        self.slitbox_hwobj.stop_gap_move('Ver')
 
     def hor_gap_edited(self, text):
         Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox.lineEdit(),
@@ -233,66 +233,72 @@ class Qt4_SlitsBrick(BlissWidget):
         val = self.hor_pos_dspinbox.value() / 1000.0
         self.slitbox_hwobj.set_gap('Hor', val)
         self.hor_pos_dspinbox.clearFocus()
-    
+ 
     def change_ver_gap(self):
         val = self.ver_pos_dspinbox.value() / 1000.0
         self.slitbox_hwobj.set_gap('Ver', val)
         self.ver_pos_dspinbox.clearFocus()
 
     def slitBoxReady(self):
-	self.main_gbox.setEnabled(True)
-	self.initiate_spinboxes()
+        self.main_gbox.setEnabled(True)
+        self.initiate_spinboxes()
 
     def slitBoxNotReady(self):
         self.main_gbox.setEnabled(False)
-    
+ 
     def gap_value_changed(self, newGap):
         if newGap[0] is None:
-	     self.current_hor_pos_ledit.setText("-")
-	#elif newGap[0] < 0:
-	#     self.current_hor_pos_ledit.setText("-")
+            self.current_hor_pos_ledit.setText("-")
+        #elif newGap[0] < 0:
+        #     self.current_hor_pos_ledit.setText("-")
         else:
-             self.current_hor_pos_ledit.setText('%d %sm' % (newGap[0] * 1000, unichr(956)))
-	if newGap[1] is None:
-	     self.current_ver_pos_ledit.setText("-")
+            self.current_hor_pos_ledit.setText('%d %sm' % (newGap[0] * 1000, unichr(956)))
+        if newGap[1] is None:
+            self.current_ver_pos_ledit.setText("-")
         #elif newGap[1] < 0:
 	#     self.current_ver_pos_ledit.setText("-")
         else:
-             gap_str= str(newGap[1] * 1000)
-             self.current_ver_pos_ledit.setText('%d %sm' % (newGap[1] * 1000, unichr(956)))
+            gap_str = str(newGap[1] * 1000)
+            self.current_ver_pos_ledit.setText('%d %sm' % (newGap[1] * 1000, unichr(956)))
 
     def gap_status_changed(self, gapHorStatus, gapVerStatus):
-	if gapHorStatus == 'Move':  #Moving
-           self.stop_hor_button.setEnabled(True)
-           Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox.lineEdit(),
-                                              Qt4_widget_colors.LIGHT_YELLOW,
-                                              QtGui.QPalette.Base)
+        if gapHorStatus == 'Move':  #Moving
+            self.stop_hor_button.setEnabled(True)
+            Qt4_widget_colors.set_widget_color(\
+                 self.hor_pos_dspinbox.lineEdit(),
+                 Qt4_widget_colors.LIGHT_YELLOW,
+                 QtGui.QPalette.Base)
         else:
-           self.stop_hor_button.setEnabled(False)
-           Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox.lineEdit(),
-                                              Qt4_widget_colors.LIGHT_GREEN,
-                                              QtGui.QPalette.Base)
+            self.stop_hor_button.setEnabled(False)
+            Qt4_widget_colors.set_widget_color(\
+                 self.hor_pos_dspinbox.lineEdit(),
+                 Qt4_widget_colors.LIGHT_GREEN,
+                 QtGui.QPalette.Base)
 
-	if gapVerStatus == 'Move':  #Moving
-           self.stop_ver_button.setEnabled(True)
-           Qt4_widget_colors.set_widget_color(self.ver_pos_dspinbox.lineEdit(),
-                                              Qt4_widget_colors.LIGHT_YELLOW,
-                                              QtGui.QPalette.Base)
+        if gapVerStatus == 'Move':  #Moving
+            self.stop_ver_button.setEnabled(True)
+            Qt4_widget_colors.set_widget_color(\
+                 self.ver_pos_dspinbox.lineEdit(),
+                 Qt4_widget_colors.LIGHT_YELLOW,
+                 QtGui.QPalette.Base)
         else:
            self.stop_ver_button.setEnabled(False)
-           Qt4_widget_colors.set_widget_color(self.ver_pos_dspinbox.lineEdit(),
-                                              Qt4_widget_colors.LIGHT_GREEN,
-                                              QtGui.QPalette.Base)
+           Qt4_widget_colors.set_widget_color(\
+                 self.ver_pos_dspinbox.lineEdit(),
+                 Qt4_widget_colors.LIGHT_GREEN,
+                 QtGui.QPalette.Base)
 
     def focus_mode_changed(self, horFocMode, verFocMode):
-	self.hor_pos_dspinbox.setEnabled(horFocMode)
-	self.set_hor_gap_button.setEnabled(horFocMode)
+        self.hor_pos_dspinbox.setEnabled(horFocMode)
+        self.set_hor_gap_button.setEnabled(horFocMode)
         self.ver_pos_dspinbox.setEnabled(verFocMode)
         self.set_ver_gap_button.setEnabled(verFocMode)
 
     def gap_limits_changed(self, newMaxLimits):
-	if newMaxLimits is not None:
-	   if newMaxLimits[0] > 0:
-	      self.hor_pos_dspinbox.setMaxValue(int(newMaxLimits[0] * 1000)) 
-           if newMaxLimits[1] > 0:
-              self.ver_pos_dspinbox.setMaxValue(int(newMaxLimits[1] * 1000))
+        if newMaxLimits is not None:
+            if newMaxLimits[0] > 0:
+                self.hor_pos_dspinbox.setMaxValue(\
+                     int(newMaxLimits[0] * 1000)) 
+            if newMaxLimits[1] > 0:
+                self.ver_pos_dspinbox.setMaxValue(\
+                     int(newMaxLimits[1] * 1000))

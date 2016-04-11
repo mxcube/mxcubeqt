@@ -106,8 +106,14 @@ class ConfirmDialog(QtGui.QDialog):
         """
         self.sample_items = []
         self.checked_items = checked_items
-        info_str_list = QtCore.QStringList()
-        file_str_list = QtCore.QStringList()
+        print ("TODO 2to3")
+        try:
+           info_str_list = QtCore.QStringList()
+           file_str_list = QtCore.QStringList()
+        except AttributeError:
+           info_str_list = []
+           file_str_list = []
+
         collection_items = []
         current_sample_item = None
         sample_treewidget_item = None

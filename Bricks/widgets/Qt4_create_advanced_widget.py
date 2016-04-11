@@ -316,7 +316,10 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def grid_treewidget_item_selection_changed(self):
         self.enable_grid_controls(False)
-        for grid_object, treewidget_item in self._grid_map.iteritems():
+        for item in self._grid_map.items():
+            grid_object = item[0]
+            treewidget_item = item[1]
+  
             if treewidget_item.isSelected():
                 grid_properties = grid_object.get_properties() 
                 cell_count = grid_properties["num_lines"] * \

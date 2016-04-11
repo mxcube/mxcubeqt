@@ -49,9 +49,16 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 import numpy.oldnumeric as Numeric
-from PyMca import McaAdvancedFit
-from PyMca import ConfigDict
+try:
+   from PyMca import McaAdvancedFit
+   from PyMca import ConfigDict
+   _pymca_exists = True
+except:
+   _pymca_exists = False
+   print ("PyMca not available")
 
+
+from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -60,9 +67,13 @@ class McaSpectrumWidget(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         self.defineSlot('set_data',())
-       
-        self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
-        self.mcafit_widget.dismissButton.hide()
+    
+        if _pymca_exists:   
+            self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
+            self.mcafit_widget.dismissButton.hide()
+        else:
+            self.mcafit_widget = TwoAxisPlotWidget(self)
+            
        
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.mcafit_widget)  

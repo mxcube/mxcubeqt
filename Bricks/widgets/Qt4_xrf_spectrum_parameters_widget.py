@@ -51,8 +51,8 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         self.other_parameters_gbox = QtGui.QGroupBox("Other parameters", _parameters_widget) 
         self.count_time_label = QtGui.QLabel("Count time:", 
                                              self.other_parameters_gbox)
-	self.count_time_ledit = QtGui.QLineEdit(self.other_parameters_gbox)
-	self.count_time_ledit.setFixedWidth(50)
+        self.count_time_ledit = QtGui.QLineEdit(self.other_parameters_gbox)
+        self.count_time_ledit.setFixedWidth(50)
         self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", \
              self.other_parameters_gbox)
         self.adjust_transmission_cbox.hide()

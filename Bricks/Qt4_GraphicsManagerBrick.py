@@ -135,16 +135,16 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         """
         if property == "mnemonic":
             if self.graphics_manager_hwobj is not None:
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL("shapeCreated"), self.shape_created)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL("shapeDeleted"), self.shape_deleted)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL("shapeSelected"), self.shape_selected)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL("centringInProgress"), self.centring_in_progress_changed)
+                self.disconnect(self.graphics_manager_hwobj, "shapeCreated", self.shape_created)
+                self.disconnect(self.graphics_manager_hwobj, "shapeDeleted", self.shape_deleted)
+                self.disconnect(self.graphics_manager_hwobj, "shapeSelected", self.shape_selected)
+                self.disconnect(self.graphics_manager_hwobj, "centringInProgress", self.centring_in_progress_changed)
             self.graphics_manager_hwobj = self.getHardwareObject(newValue)
             if self.graphics_manager_hwobj is not None:
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL("shapeCreated"), self.shape_created)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL("shapeDeleted"), self.shape_deleted)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL("shapeSelected"), self.shape_selected)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL("centringInProgress"), self.centring_in_progress_changed)
+                self.connect(self.graphics_manager_hwobj, "shapeCreated", self.shape_created)
+                self.connect(self.graphics_manager_hwobj, "shapeDeleted", self.shape_deleted)
+                self.connect(self.graphics_manager_hwobj, "shapeSelected", self.shape_selected)
+                self.connect(self.graphics_manager_hwobj, "centringInProgress", self.centring_in_progress_changed)
             else:
                 self.setEnabled(False)
         else:
@@ -156,7 +156,12 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
                     and depending on shape type also information to
                     treewidget of all points/lines/grids
         """
-        info_str_list = QtCore.QStringList()
+        print ("TODO 2to3")
+        try:
+           info_str_list = QtCore.QStringList()
+        except:
+           info_str_list = []
+
         info_str_list.append(str(self.manager_widget.shapes_treewidget.topLevelItemCount() + 1))
         info_str_list.append(shape.get_display_name())
         info_str_list.append(str(True))
