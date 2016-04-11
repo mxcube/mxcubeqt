@@ -765,10 +765,10 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        #python2.7
-        signal = str(signal)
-        #python3.4
-        #signal = str(signal.decode('utf8') if type(signal) == bytes else signal)
+        if sys.version_info> (3, 0):
+            signal = str(signal.decode('utf8') if type(signal) == bytes else signal)
+        else:
+            signal = str(signal)
 
         if signal[0].isdigit():
           pysignal = signal[0]=='9'

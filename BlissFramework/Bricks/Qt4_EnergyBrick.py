@@ -121,15 +121,15 @@ class Qt4_EnergyBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.energy_hwobj is not None:
-                self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
-                self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
-                self.disconnect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
+                self.disconnect(self.energy_hwobj, 'deviceReady', self.connected)
+                self.disconnect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
+                self.disconnect(self.energy_hwobj, 'energyChanged', self.energy_changed)
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
-                self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
-                self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
-                self.connect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
+                self.connect(self.energy_hwobj, 'deviceReady', self.connected)
+                self.connect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
+                self.connect(self.energy_hwobj, 'energyChanged', self.energy_changed)
                 self.energy_hwobj.update_values() 
                 if self.energy_hwobj.isReady():
                     self.connected()
