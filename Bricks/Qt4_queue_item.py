@@ -111,9 +111,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
         """
         if new_state != self._previous_check_state:
             self.setCheckState(0, self.checkState(0))
-            if type(self) in (BasketQueueItem, 
-                              SampleQueueItem, 
-                              DataCollectionGroupQueueItem):
+            if isinstance(self, DataCollectionGroupQueueItem):
                for index in range(self.childCount()):
                    self.child(index).setCheckState(0, self.checkState(0))  
 
@@ -309,5 +307,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Basket: BasketQueueItem, 
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.Advanced: AdvancedQueueItem,
+     queue_model_objects.XrayCentering: AdvancedQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

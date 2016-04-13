@@ -79,6 +79,7 @@ class AdvancedResultsWidget(QtGui.QWidget):
 
         executed = advanced.is_executed()
         associated_grid = advanced.get_associated_grid()
+        print 333, associated_grid
 
         self.heat_map_widget.clean_result()
         self.heat_map_widget.set_associated_data_collection(data_collection)

@@ -278,10 +278,14 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_number(acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
 
-            exp_type = str(self._advanced_methods_widget.method_combo.\
-                currentText())
-            advanced = queue_model_objects.Advanced(exp_type, dc, 
-                  shape, sample.crystals[0])
+            exp_type = str(self._advanced_methods_widget.\
+                method_combo.currentText())
+            if exp_type == "MeshScan":
+                advanced = queue_model_objects.Advanced(\
+                   dc, shape, sample.crystals[0])
+            elif exp_type == "XrayCentering":
+                advanced = queue_model_objects.XrayCentering(\
+                   dc, shape, sample.crystals[0])
 
             data_collections.append(advanced)
             self._path_template.run_number += 1

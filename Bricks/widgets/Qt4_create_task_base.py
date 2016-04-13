@@ -634,7 +634,6 @@ class CreateTaskBase(QtGui.QWidget):
     def _create_acq(self, sample):
         parameters = self._acquisition_parameters
         path_template = self._path_template
-        graphics_manager = self._graphics_manager_hwobj
         processing_parameters = self._processing_parameters
         bl_setup = self._beamline_setup_hwobj
 

@@ -127,15 +127,17 @@ class ConfirmDialog(QtGui.QDialog):
         self.conf_dialog_layout.interleave_images_num_ledit.setText("")
 
         for item in checked_items:
-            item_type_name = ""
+            #item_type_name = ""
             info_str_list.clear()
             acq_parameters = None
             path_template = None
+            item_model = item.get_model()
+            item_type_name = item_model.get_display_name()
             
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.sample_items.append(item)
                 current_sample_item = item
-                info_str_list.append(item.get_model().get_name())
+                info_str_list.append(item_model.get_name())
                 if item.mounted_style:
                     info_str_list.append("Already mounted")
                 else:
@@ -148,29 +150,26 @@ class ConfirmDialog(QtGui.QDialog):
                       QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
                 sample_treewidget_item.setExpanded(True)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem): 
-                info_str_list.append(item.get_model().get_name()) 
+                info_str_list.append(item_type_name) 
                 collection_group_treewidget_item = QtGui.QTreeWidgetItem(\
                    sample_treewidget_item,
                    info_str_list)
                 collection_group_treewidget_item.setExpanded(True)
             elif isinstance(item, Qt4_queue_item.SampleCentringQueueItem):
-                info_str_list.append(item.get_model().get_name())
+                info_str_list.append(item_type_name)
                 QtGui.QTreeWidgetItem(collection_group_treewidget_item,
                                       info_str_list) 
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                item_type_name = "Data collection"
-                acq_parameters = item.get_model().acquisitions[0].\
+                acq_parameters = item_model.acquisitions[0].\
                      acquisition_parameters
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
-                item_type_name = "Characterisation"
-                acq_parameters = item.get_model().reference_image_collection.\
+                acq_parameters = item_model.reference_image_collection.\
                     acquisitions[0].acquisition_parameters
             elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
-                item_type_name = "Advanced"
-                acq_parameters = item.get_model().reference_image_collection.\
+                acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters
 
-            path_template = item.get_model().get_path_template()
+            path_template = item_model.get_path_template()
 
             if acq_parameters and path_template:
                 info_str_list.append(item_type_name)

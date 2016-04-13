@@ -28,14 +28,21 @@ from PyQt4 import uic
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-from Qt4_sample_changer_helper import *
+from Qt4_sample_changer_helper import SampleChanger
 
 
 __category__ = "Sample changer"
 
 
 class Qt4_PlateBrick(BlissWidget):
+    """
+    Descript. :
+    """
+
     def __init__(self, *args):
+        """
+        Descript. :
+        """
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
@@ -52,7 +59,6 @@ class Qt4_PlateBrick(BlissWidget):
         # Properties ----------------------------------------------------------
         self.addProperty("mnemonic", "string", "")
         self.addProperty("icons", "string", "")
-        self.addProperty("doubleClickLoads", "boolean", True)
 
         # Signals -------------------------------------------------------------
 
@@ -88,6 +94,7 @@ class Qt4_PlateBrick(BlissWidget):
         #     self.navigation_item_double_clicked)
         self.navigation_graphicsscene.addItem(self.navigation_item)
         self.navigation_graphicsscene.update()
+        self.plate_widget.navigation_graphicsview.setEnabled(False)
  
         self.xtal_image_graphicsscene = QtGui.QGraphicsScene(self)
         self.plate_widget.xtal_image_graphicsview.setScene(\
@@ -101,6 +108,9 @@ class Qt4_PlateBrick(BlissWidget):
              QtGui.QAbstractItemView.NoEditTriggers)
 
     def propertyChanged(self, propertyName, oldValue, newValue):
+        """
+        Descript. :
+        """
         if propertyName == 'icons':
             icons_list=newValue.split()
 
@@ -118,8 +128,6 @@ class Qt4_PlateBrick(BlissWidget):
                              SampleChanger.INFO_CHANGED_EVENT,
                              self.refresh_plate_location)
                 #lf.refresh_plate_location()
-        #elif propertyName == 'doubleClickLoads':
-        #    self.doubleClickLoads.setChecked(False) #newValue)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -128,9 +136,9 @@ class Qt4_PlateBrick(BlissWidget):
         Descript. : when user double clicks on plate table then sample in
                     corresponding cell is loaded
         """
-        item = "%s%d:2" % (chr(65 + table_item.row()),
-                           table_item.column() + 1)  
-        self.plate_manipulator_hwobj.load(item)
+        self.plate_manipulator_hwobj.load_sample((table_item.row(), 
+                                                  table_item.column() + 1,
+                                                  1))
 
     def search_button_clicked(self):
         """
@@ -147,30 +155,39 @@ class Qt4_PlateBrick(BlissWidget):
                 self.clear_view()
 
     def clear_view(self):
+        """
+        Descript. :
+        """
         self.plate_widget.xtal_treewidget.clear()
         #self.plate_widget.xtal_image_label_pixmap.fill(qt.Qt.white) 
         #self.xtal_image_label.setPixmap(self.xtal_image_label_pixmap)
 
     def move_to_xtal_clicked(self):
-        xtal_item = self.xtal_map.get(\
-              self.plate_widget.xtal_treewidget.currentItem())
+        """
+        Descript. :
+        """
+        xtal_item = self.xtal_map.get(self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
             self.plate_manipulator_hwobj.load(xtal_item), 
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):
+        """
+        Descript. :
+        """
         if self.plate_manipulator_hwobj:
             self.plate_manipulator_hwobj.abort()
   
     def xtal_treewidget_current_item_changed(self, current_item):
+        """
+        Descript. :
+        """
         xtal_item = self.xtal_map.get(current_item)
-        xtal_image_string = xtal_item.getImage()
-        if xtal_image_string:
+        if xtal_item:
+            xtal_image_string = xtal_item.get_image()
             #self.xtal_image_label_pixmap.loadFromData(xtal_image_string)
             self.xtal_image_pixmap.loadFromData(xtal_image_string)
             self.xtal_image_graphics_pixmap.setPixmap(self.xtal_image_pixmap)
-            return
-            
             xtal_image_width = self.xtal_image_label_pixmap.width()
             xtal_image_height = self.xtal_image_label_pixmap.height()
             self.xtal_image_label.setFixedWidth(xtal_image_width)
@@ -180,15 +197,18 @@ class Qt4_PlateBrick(BlissWidget):
             self.xtal_image_label.set_image(xtal_image)
 
     def refresh_plate_content(self):
+        """
+        Descript. :
+        """
         self.plate_widget.xtal_treewidget.clear()
         info_str_list = QtCore.QStringList()
-        info_str_list.append(self.plate_content.Plate.Barcode)
-        info_str_list.append(self.plate_content.Plate.PlateType)
+        info_str_list.append(self.plate_content.plate.barcode)
+        info_str_list.append(self.plate_content.plate.plate_type)
         root_item = QtGui.QTreeWidgetItem(self.plate_widget.xtal_treewidget,
                                           info_str_list)
         root_item.setExpanded(True)
-        for xtal in self.plate_content.Plate.xtal_list:
-            xtal_address = "%s:%d" % (xtal.Row, xtal.Column + 1)
+        for xtal in self.plate_content.plate.xtal_list:
+            xtal_address = "%s:%d" % (xtal.row, xtal.column + 1)
             cell_treewidget_item = None
             #cell_treewidget_item = self.plate_widget.xtal_treewidget.\
             #    findItems(xtal_address, QtCore.Qt.MatchExactly, 0)[0]
@@ -196,20 +216,20 @@ class Qt4_PlateBrick(BlissWidget):
                 cell_treewidget_item = root_item
 
             info_str_list = QtCore.QStringList()
-            info_str_list.append(xtal.Sample)
-            info_str_list.append(xtal.Label)
-            info_str_list.append(xtal.Login)
-            info_str_list.append(xtal.Row)  
-            info_str_list.append(str(xtal.Column))
-            if xtal.Comments:
-                info_str_list.append(str(xtal.Comments))
+            info_str_list.append(xtal.sample)
+            info_str_list.append(xtal.label)
+            info_str_list.append(xtal.login)
+            info_str_list.append(xtal.row)  
+            info_str_list.append(str(xtal.column))
+            if xtal.comments:
+                info_str_list.append(str(xtal.comments))
             xtal_treewidget_item = QtGui.QTreeWidgetItem(\
                  cell_treewidget_item, info_str_list)
             #self.plate_widget.xtal_treewidget.ensureItemVisible(xtal_treewidget_item) 
             self.xtal_map[xtal_treewidget_item] = xtal
 
             self.plate_widget.sample_table.item(\
-                 ord(xtal.Row.upper()) - ord('A'), xtal.Column - 1).\
+                 ord(xtal.row.upper()) - ord('A'), xtal.column - 1).\
                  setBackground(Qt4_widget_colors.LIGHT_GREEN)
 
     def refresh_plate_location(self):
@@ -218,6 +238,8 @@ class Qt4_PlateBrick(BlissWidget):
         """
         loaded_sample = self.plate_manipulator_hwobj.getLoadedSample()
         new_location = self.plate_manipulator_hwobj.get_plate_location() 
+        self.plate_widget.navigation_graphicsview.setEnabled(True)
+
         if self.current_location != new_location:
             #self.plate_widget.navigation_label_painter.setBrush(.QBrush(qt.QWidget.white, qt.Qt.SolidPattern))
 
@@ -229,7 +251,7 @@ class Qt4_PlateBrick(BlissWidget):
 
             if new_location:
                 row = new_location[0]
-                col = new_location[1]
+                col = new_location[1] - 1
                 pos_x = new_location[2]
                 pos_y = new_location[3]
                 self.plate_widget.current_location_ledit.setText(\
@@ -239,10 +261,9 @@ class Qt4_PlateBrick(BlissWidget):
                 self.navigation_item.set_navigation_pos(pos_x, pos_y)
                 self.navigation_graphicsscene.update()    
                 if self.current_location:
-                    empty_item = QtGui.QTableWidgetItem("")
-                    #     QtGui.QTableWidget.Item.Never)
+                    empty_item = QtGui.QTableWidgetItem(QtGui.QIcon(), "")
                     self.plate_widget.sample_table.setItem(self.current_location[0],
-                                              self.current_location[1],
+                                              self.current_location[1] - 1,
                                               empty_item)
                 new_item = QtGui.QTableWidgetItem(Qt4_Icons.load_icon("sample_axis.png"), "")
                 self.plate_widget.sample_table.setItem(row, col, new_item)
@@ -290,11 +311,22 @@ class Qt4_PlateBrick(BlissWidget):
         self.refresh_plate_location()
 
     def navigation_item_double_clicked(self, pos_x, pos_y):
-        self.plate_manipulator_hwobj.move_to_xy(pos_x, pos_y)
+        """
+        Descript. :
+        """
+        #TODO replace this with pos_x, pos_y
+        drop = int(pos_y * self.num_drops) + 1
+        print self.current_location, drop
+        self.plate_manipulator_hwobj.load_sample((self.current_location[0],\
+              self.current_location[1], drop))
 
 class NavigationItem(QtGui.QGraphicsItem):
 
     def __init__(self, parent=None):
+        """
+        Descript. :
+        """
+
         QtGui.QGraphicsItem.__init__(self)
 
         self.parent = parent
@@ -307,13 +339,22 @@ class NavigationItem(QtGui.QGraphicsItem):
         self.__navigation_posy = None
     
     def boundingRect(self):
+        """
+        Descript. :
+        """
         return self.rect.adjusted(0, 0, 0, 0)
 
     def set_size(self, width, height):
+        """
+        Descript. :
+        """
         self.rect.setWidth(width)
         self.rect.setHeight(height)
 
     def paint(self, painter, option, widget):
+        """
+        Descript. :
+        """
         pen = QtGui.QPen(QtCore.Qt.SolidLine)
         pen.setWidth(1)
         pen.setColor(QtCore.Qt.black)
@@ -333,14 +374,23 @@ class NavigationItem(QtGui.QGraphicsItem):
                              self.__navigation_posx, self.__navigation_posy + 10)
 
     def set_navigation_pos(self, pos_x, pos_y):
+        """
+        Descript. :
+        """
         self.__navigation_posx = pos_x
         self.__navigation_posy = pos_y
         self.scene().update()
  
     def set_num_drops_per_cell(self, num_drops):
+        """
+        Descript. :
+        """
         self.__num_drops = num_drops 
  
     def mouseDoubleClickEvent(self, event):
+        """
+        Descript. :
+        """
         position = QtCore.QPointF(event.pos())
         #this is ugly.
         self.parent.navigation_item_double_clicked(\

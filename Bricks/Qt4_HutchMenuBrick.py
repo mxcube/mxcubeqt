@@ -144,13 +144,13 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringStarted'), self.centring_started)
                 self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringFailed'), self.centring_failed)
                 self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringSuccessful'), self.centring_successful)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('minidiffReady'), self.diffractometer_ready_changed)
+                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('diffractometerReady'), self.diffractometer_ready_changed)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
             if self.graphics_manager_hwobj:
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringStarted'), self.centring_started)
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringFailed'), self.centring_failed)
                 self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringSuccessful'), self.centring_successful)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('minidiffReady'), self.diffractometer_ready_changed)
+                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('diffractometerReady'), self.diffractometer_ready_changed)
         elif property_name == "enableAutoFocus":
             self.auto_focus_button.setVisible(new_value) 
         elif property_name == "enableRefreshCamera":
@@ -326,7 +326,17 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.graphics_manager_hwobj.create_grid()
 
     def diffractometer_ready_changed(self, is_ready):
-        self.setEnabled(is_ready)
+        self.centre_button.setEnabled(is_ready)
+        self.accept_button.setEnabled(is_ready)
+        self.reject_button.setEnabled(is_ready)
+        self.create_line_button.setEnabled(is_ready)
+        self.draw_grid_button.setEnabled(is_ready)
+        self.auto_focus_button.setEnabled(is_ready)
+        self.refresh_camera_button.setEnabled(is_ready)
+        self.visual_align_button.setEnabled(is_ready)
+        self.select_all_button.setEnabled(is_ready)
+        self.clear_all_button.setEnabled(is_ready)
+        self.auto_center_button.setEnabled(is_ready)
 
     def auto_focus_clicked(self):
         self.graphics_manager_hwobj.auto_focus()

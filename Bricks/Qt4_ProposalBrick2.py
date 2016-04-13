@@ -30,7 +30,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 PROPOSAL_GUI_EVENT = QtCore.QEvent.User
@@ -77,6 +77,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         #self.sessionId=None
         self.inhouseProposal = None
         self.instanceServer = None
+        self.secondary_proposals = []
 
         # Properties ----------------------------------------------------------
         self.addProperty('loginAsUser', 'boolean', True)
@@ -85,6 +86,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.addProperty('titlePrefix', 'string', '')
         self.addProperty('autoSessionUsers', 'string', '')
         self.addProperty('codes', 'string', 'fx ifx ih im ix ls mx opid')
+        self.addProperty('secondaryProposals', 'string', '')
         self.addProperty('icons', 'string', '')
         self.addProperty('serverStartDelay', 'integer', 500)
         self.addProperty('dbConnection', 'string')
@@ -649,6 +651,8 @@ class Qt4_ProposalBrick2(BlissWidget):
                 pass
         elif property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'secondaryProposals':
+            self.secondary_proposals = new_value.split() 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -764,20 +768,31 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.ispybDown()
         else: 
             self.proposal_combo.clear()
+            proposal_tooltip = "Available proposals:"
             for proposal in self.proposals:
-                code = proposal["Proposal"]["code"]
-                number = proposal["Proposal"]["number"] 
-                title = proposal["Proposal"]["title"]
-                self.proposal_combo.addItem("%s%s - %s" % (code, str(number), title))
+                proposal_info = "%s%s - %s" % (proposal["Proposal"]["code"],
+                                               proposal["Proposal"]["number"],
+                                               proposal["Proposal"]["title"])
+                self.proposal_combo.addItem(proposal_info)
+                proposal_tooltip += "\n   %s" % proposal_info
+       
             if len(self.proposals) > 1:
-                proposal_to_select = self.select_todays_proposal(self.proposals)
-                self.select_proposal(self.proposals[proposal_to_select])
-                self.proposal_combo.setCurrentIndex(proposal_to_select)
+                proposal_index = self.select_todays_proposal(self.proposals)
                 self.proposal_combo.setEnabled(True)
-                logging.getLogger("user_level_log").debug("If necessary change proposal with proposal combobox")
             else:
-                self.select_proposal(self.proposals[0])
+                proposal_tooltip = ""
+                proposal_index = 0
                 self.proposal_combo.setEnabled(False)
+
+            self.select_proposal(self.proposals[proposal_index])
+            self.proposal_combo.setCurrentIndex(proposal_index)
+            proposal_info = "%s%s - %s" % (
+                self.proposals[proposal_index]["Proposal"]["code"],
+                self.proposals[proposal_index]["Proposal"]["number"],                           
+                self.proposals[proposal_index]["Proposal"]["title"])
+            proposal_tooltip += "\nSelected proposal:\n   %s" % proposal_info
+            self.proposal_combo.setToolTip(proposal_tooltip)
+            logging.getLogger("user_level_log").info("ISPyB proposal: %s" % proposal_info)
 
     def select_todays_proposal(self, proposal_list):
         """
@@ -786,7 +801,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         for prop_index, proposal in enumerate(proposal_list):
             sessions = proposal['Session']
-            if len(sessions) > 0:
+            proposal_code_number = proposal["Proposal"]["code"] + \
+                                   proposal["Proposal"]["number"]
+            if len(sessions) > 0 and \
+               not proposal_code_number in self.secondary_proposals:
                 # Check for today's session
                 for session in sessions:
                     beamline = session['beamlineName']

@@ -165,6 +165,7 @@ class DataModelInputBinder(object):
         result = []
 
         for item in self.bindings.items():
+            key = item[0]
             widget = item[1][0]
             validator = item[1][1]
             

@@ -57,11 +57,13 @@ class DataPathWidget(QtGui.QWidget):
 
         # Graphic elements ----------------------------------------------------
         if layout == "vertical":
-            self.data_path_layout = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                "ui_files/Qt4_data_path_widget_vertical_layout.ui"))
+            self.data_path_layout = uic.loadUi(\
+                 os.path.join(os.path.dirname(__file__),
+                 "ui_files/Qt4_data_path_widget_vertical_layout.ui"))
         else:
-            self.data_path_layout = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                "ui_files/Qt4_data_path_widget_horizontal_layout.ui"))
+            self.data_path_layout = uic.loadUi(\
+                 os.path.join(os.path.dirname(__file__),
+                 "ui_files/Qt4_data_path_widget_horizontal_layout.ui"))
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtGui.QVBoxLayout(self)
@@ -70,10 +72,14 @@ class DataPathWidget(QtGui.QWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # Qt signal/slot connections ------------------------------------------ 
-        self.data_path_layout.prefix_ledit.textChanged.connect(self._prefix_ledit_change)
-        self.data_path_layout.run_number_ledit.textChanged.connect(self._run_number_ledit_change)
-        self.data_path_layout.browse_button.clicked.connect(self._browse_clicked)
-        self.data_path_layout.folder_ledit.textChanged.connect(self._folder_ledit_change)
+        self.data_path_layout.prefix_ledit.textChanged.\
+             connect(self._prefix_ledit_change)
+        self.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
+        self.data_path_layout.browse_button.clicked.\
+             connect(self._browse_clicked)
+        self.data_path_layout.folder_ledit.textChanged.\
+             connect(self._folder_ledit_change)
 
         # Other ---------------------------------------------------------------
         self._data_model_pm.bind_value_update('base_prefix', 
@@ -87,16 +93,12 @@ class DataPathWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        get_dir = QtGui.QFileDialog(self)
-        given_dir = self._base_image_dir
+        selected_dir = str(QtGui.QFileDialog.getExistingDirectory(\
+            self, "Select a directory", self._base_image_dir))
+        selecte_dir = os.path.dirname(selected_dir)
 
-        d = str(get_dir.getExistingDirectory(self, given_dir,
-                                             "Select a directory", 
-                                             QtGui.QFileDialog.ShowDirsOnly))
-        d = os.path.dirname(d)
-
-        if d is not None and len(d) > 0:
-            self.set_directory(d)
+        if selected_dir is not None and len(selected_dir) > 0:
+            self.set_directory(selected_dir)
 
     def _prefix_ledit_change(self, new_value):
         """
@@ -179,18 +181,21 @@ class DataPathWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        base_image_dir = self._base_image_dir
-        dir_parts = directory.split(base_image_dir)
-
+        #dir_parts = directory.split(self._base_image_dir)
+        self._data_model.directory = directory
+        self._base_image_dir = directory
+        
+       
+        """
+        print dir_parts 
         if len(dir_parts) > 1:
             sub_dir = dir_parts[1]        
-            self._data_model.directory = directory
             self.data_path_layout.folder_ledit.setText(sub_dir)
         else:
             self.data_path_layout.folder_ledit.setText('')
-            self._data_model.directory = base_image_dir
+        """
 
-        self.data_path_layout.base_path_ledit.setText(base_image_dir)
+        self.data_path_layout.base_path_ledit.setText(directory)
 
     def set_run_number(self, run_number):
         """

@@ -151,8 +151,8 @@ class DataCollectTree(QtGui.QWidget):
         main_layout.setSpacing(1) 
 
         # SizePolicies --------------------------------------------------------
-        self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(\
-             QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Expanding))
+        #self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(
+        #     QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
@@ -430,8 +430,8 @@ class DataCollectTree(QtGui.QWidget):
         self.selection_changed_cb(items)        
 
         checked_items = self.get_checked_items()
-        self.collect_button.setEnabled(len(checked_items) > 1) # and \
-        #     self.enable_collect_condition)
+        self.collect_button.setEnabled(len(checked_items) > 1 and \
+                                       self.enable_collect_condition)
 
     def add_empty_task_node(self):
         """
@@ -999,17 +999,19 @@ class DataCollectTree(QtGui.QWidget):
                                              get_model_root(), sample)
             self.add_to_queue([sample], self.sample_tree_widget, False)
 
-    def populate_free_pin(self):
+    def populate_free_pin(self, sample=None):
         """
         Descript. :
         """
         self.queue_model_hwobj.clear_model('free-pin')
         self.queue_model_hwobj.select_model('free-pin')
-        sample = queue_model_objects.Sample()
+        if sample is None:
+            sample = queue_model_objects.Sample()
+            sample.set_name('manually-mounted')
         sample.free_pin_mode = True
-        sample.set_name('manually-mounted')
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
+        self.set_sample_pin_icon()
 
     def populate_tree_widget(self, basket_list, sample_list, sample_changer_num):   
         """
@@ -1047,6 +1049,8 @@ class DataCollectTree(QtGui.QWidget):
             if self.is_mounted_sample_item(item):
                 item.setSelected(True)
                 item.set_mounted_style(True)
+                self.sample_tree_widget.scrollTo(self.sample_tree_widget.\
+                     indexFromItem(item))
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 item.set_mounted_style(False)
 

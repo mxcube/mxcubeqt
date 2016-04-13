@@ -281,12 +281,13 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         dbl_click = False
         if hasattr(mouse_event, "dblclick"):
             dbl_click = mouse_event.dblclick
-        if dbl_click:
-            self.mouseDoubleClickedSignal.emit(mouse_event.xdata,
-                                               mouse_event.ydata)
-        else:
-            self.mouseClickedSignal.emit(mouse_event.xdata,
-                                         mouse_event.ydata)
+        if mouse_event.xdata and mouse_event.ydata:
+            if dbl_click:
+                self.mouseDoubleClickedSignal.emit(mouse_event.xdata,
+                                                   mouse_event.ydata)
+            else:
+                self.mouseClickedSignal.emit(mouse_event.xdata,
+                                             mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
         im = self.mpl_canvas.axes.imshow(result, 
@@ -301,7 +302,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
 
             mgr = plt.get_current_fig_manager()
             #mgr.full_screen_toggle()
-            mgr.window.move(10, 10)
+            #mgr.window.move(10, 10)
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()
