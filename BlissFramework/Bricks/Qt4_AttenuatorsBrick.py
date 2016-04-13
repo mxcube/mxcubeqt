@@ -24,7 +24,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = "Qt4_General"
+__category__ = "General"
 
 
 class Qt4_AttenuatorsBrick(BlissWidget):
@@ -87,8 +87,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         self.new_value_ledit.textChanged.connect(self.input_field_changed)
 
         # Other --------------------------------------------------------------- 
-        self.group_box.setCheckable(True)
-        self.group_box.setChecked(True)
+        #self.group_box.setCheckable(True)
+        #self.group_box.setChecked(True)
         Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                        Qt4_widget_colors.LINE_EDIT_ACTIVE,
                                        QtGui.QPalette.Base)

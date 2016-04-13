@@ -15,7 +15,7 @@ import logging
 
 _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
-_formatter = logging.Formatter('* [unnamed, %(name)s] %(levelname)s %(asctime)s %(message)s')
+_formatter = logging.Formatter('%(asctime)s |%(levelname)-7s| %(message)s')
 
 
 #
@@ -91,7 +91,7 @@ loggingName = ''
 def setLoggingName(name):
     global _formatter, _hdlr, loggingName
     
-    _formatter = logging.Formatter('* [' + str(name) + ', %(name)s] %(levelname)s %(asctime)s %(message)s')
+    _formatter = logging.Formatter('%(asctime)s |%(levelname)-7s| %(message)s')
     _hdlr.setFormatter(_formatter)
 
     loggingName = name

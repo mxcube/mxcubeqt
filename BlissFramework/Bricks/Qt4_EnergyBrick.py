@@ -106,8 +106,8 @@ class Qt4_EnergyBrick(BlissWidget):
         self.stop_button.clicked.connect(self.stop_clicked)
 
         # Other --------------------------------------------------------------- 
-        self.group_box.setCheckable(True)
-        self.group_box.setChecked(True)
+        #self.group_box.setCheckable(True)
+        #self.group_box.setChecked(True)
         self.new_value_validator = QtGui.QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
         #self.new_value_ledit.setValidator(self.new_value_validator)
@@ -205,14 +205,13 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if input_field_text == "":
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
-                                               Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                               QtGui.QPalette.Base)
-        else: 
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
-                                               Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                               QtGui.QPalette.Base)
+        print self.new_value_validator.validate(input_field_text, 0)
+        color = Qt4_widget_colors.LINE_EDIT_ACTIVE
+        #if input_field_text == "" or self.new_value_validator.validate(input_field_text, 0):
+        #    color = Qt4_widget_colors.LINE_EDIT_ERROR
+        Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
+                                           color,
+                                           QtGui.QPalette.Base)
 
     def units_changed(self, unit):
         """

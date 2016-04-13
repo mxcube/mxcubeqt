@@ -46,8 +46,17 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         self.positions = None
         # Properties ----------------------------------------------------------
         self.addProperty('mnemonic', 'string', '')
-        self.addProperty('labels','string','')
+        self.addProperty('labels', 'string','')
+        self.addProperty('moveButtonIcons', 'string','') 
+        self.addProperty('alignment', 'combo', ('vertical', 'horizontal'), 'horizontal')
+        self.addProperty('defaultStep', 'string', '0.001')
+        self.addProperty('delta', 'string', '0.001')
         self.addProperty('predefinedPositions', 'string', '')
+        self.addProperty('showMoveButtons', 'boolean', True)
+        self.addProperty('showStop', 'boolean', True)
+        self.addProperty('showStep', 'boolean', True)
+        self.addProperty('showEnableButtons', 'boolean', False)
+        self.addProperty('inExpertMode', 'boolean', False)
 
         # Signals -------------------------------------------------------------
 
@@ -55,9 +64,14 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_group_box = QtGui.QGroupBox(self)
+        self.enable_motors_buttons = QtGui.QPushButton('Enable', self.main_group_box)
+        self.disable_motors_buttons = QtGui.QPushButton('Disable', self.main_group_box)
 
         # Layout -------------------------------------------------------------- 
-        self.main_groupbox_hlayout = QtGui.QHBoxLayout(self.main_group_box)
+        if self['alignment'] == 'horizontal':
+            self.main_groupbox_hlayout = QtGui.QHBoxLayout(self.main_group_box)
+        else:
+            self.main_groupbox_hlayout = QtGui.QVBoxLayout(self.main_group_box)
         self.main_groupbox_hlayout.setSpacing(2)
         self.main_groupbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -69,6 +83,8 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         # Size Policy ---------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self.enable_motors_buttons.clicked.connect(self.enable_motors)
+        self.disable_motors_buttons.clicked.connect(self.disable_motors)
 
         # Other ---------------------------------------------------------------
        
@@ -79,20 +95,35 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
                 temp_motor_hwobj = self.getHardwareObject(hwobj_name)
                 temp_motor_widget = Qt4_MotorSpinBoxBrick(self)
                 temp_motor_widget.set_motor(temp_motor_hwobj, hwobj_name)
-                temp_motor_widget.move_left_button.hide()
-                temp_motor_widget.move_right_button.hide()
-                temp_motor_widget.step_button.hide()
-                temp_motor_widget.set_line_step(10.0)
+                temp_motor_widget.move_left_button.setVisible(self['showMoveButtons'])
+                temp_motor_widget.move_right_button.setVisible(self['showMoveButtons'])
+                temp_motor_widget.step_button.setVisible(self['showStep'])
+                temp_motor_widget.stop_button.setVisible(self['showStop'])
+                temp_motor_widget.set_line_step(self['defaultStep'])
+                temp_motor_widget['defaultStep'] = self['defaultStep']
+                temp_motor_widget['delta'] = self['delta']
                 temp_motor_widget.step_changed(None)
                 self.main_groupbox_hlayout.addWidget(temp_motor_widget)
 
                 self.motor_hwobj_list.append(temp_motor_hwobj)
-                self.motor_widget_list.append(temp_motor_widget) 
+                self.motor_widget_list.append(temp_motor_widget)
+
+            self.enable_motors_buttons.setVisible(self['showEnableButtons'])
+            self.disable_motors_buttons.setVisible(self['showEnableButtons']) 
+            if self['showEnableButtons']:
+                self.main_groupbox_hlayout.addWidget(self.enable_motors_buttons)
+                self.main_groupbox_hlayout.addWidget(self.disable_motors_buttons)
             if len(self.motor_widget_labels):      
                 for index, label in enumerate(self.motor_widget_labels):
                     self.motor_widget_list[index].setLabel(label)
-        elif property_name == 'icons':
-            icons_list = new_value.split()
+        elif property_name == 'moveButtonIcons':
+            icon_list = new_value.split()
+            for index in range(len(icon_list) - 1):
+                if index % 2 == 0:
+                    self.motor_widget_list[index / 2].move_left_button.setIcon(\
+                         Qt4_Icons.load_icon(icon_list[index]))
+                    self.motor_widget_list[index / 2].move_right_button.setIcon(\
+                         Qt4_Icons.load_icon(icon_list[index + 1])) 
         elif property_name == 'labels':
             self.motor_widget_labels = new_value.split()
             if len(self.motor_widget_list):
@@ -108,6 +139,18 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
+    def set_expert_mode(self, is_expert_mode):
+        if self['inExpertMode']:
+            self.setEnabled(is_expert_mode)
+
     def predefined_position_clicked(self, predefined_position):
         for motor in self.motor_hwobj_list:
             motor.move_to_predefined_position(predefined_position.lower()) 
+    
+    def enable_motors(self):
+        for motor in self.motor_hwobj_list:
+            motor.enable_motor()
+
+    def disable_motors(self):
+        for motor in self.motor_hwobj_list:
+            motor.disable_motor()

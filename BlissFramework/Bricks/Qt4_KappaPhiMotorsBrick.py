@@ -150,7 +150,7 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         self.diffractometer_hwobj.stop_kappa_phi_move()
 
     def close_clicked(self):
-        self.diffractometer_hwobj.move_kappa_and_phi(0, 0)
+        self.diffractometer_hwobj.close_kappa()
 
     def change_position(self):
         self.diffractometer_hwobj.move_kappa_and_phi(\

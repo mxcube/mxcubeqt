@@ -246,18 +246,18 @@ def run(GUIConfigFile = None):
     #
     logLevel = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(logLevel)
-    logInfo = 'Qt4 GUI started (%s)' % (GUIConfigFile or "unnamed")
-    logInfo += ', HWRSERVER=%s' % hwrServer
-    if len(hoDirs) > 0:
-        logInfo += ', HODIRS=%s' % os.path.pathsep.join(hoDirs)
-    if len(bricksDirs) > 0:
-        logInfo += ', BRICKSDIRS=%s' % os.path.pathsep.join(bricksDirs)
-    logging.getLogger().info(logInfo)
+    logging.getLogger().info("==================================================================")
+    logging.getLogger().info("Starting MXCuBE")
+    logging.getLogger().info("Qt4 GUI file: %s" % (GUIConfigFile or "unnamed"))
+    logging.getLogger().info("Hardware repository: %s" % hwrServer) 
+    logging.getLogger().info("------------------------------------------------------------------")
 
     QtGui.QApplication.setDesktopSettingsAware(False) #use default settings
     QtCore.QObject.connect(app, QtCore.SIGNAL("lastWindowClosed()"), app.quit)
    
-    supervisor = Qt4_GUISupervisor.GUISupervisor(designMode = opts.designMode, showMaximized=opts.showMaximized, noBorder=opts.noBorder)
+    supervisor = Qt4_GUISupervisor.GUISupervisor(designMode = opts.designMode, 
+                                                 showMaximized=opts.showMaximized,
+                                                 noBorder=opts.noBorder)
 
     #BlissFramework.setDebugMode(True)
     #
