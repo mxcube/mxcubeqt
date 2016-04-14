@@ -113,6 +113,8 @@ class CreateAdvancedWidget(CreateTaskBase):
              connect(self.overlay_toggled)
         self._advanced_methods_widget.overlay_slider.valueChanged.\
              connect(self.overlay_alpha_changed) 
+        self._advanced_methods_widget.overlay_color_button.clicked.\
+             connect(self.overlay_change_color)
         self._advanced_methods_widget.move_to_grid_button.clicked.\
              connect(self.move_to_grid)
 
@@ -190,8 +192,10 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         if len(self._advanced_methods_widget.grid_treewidget.\
             selectedItems()) == 0:
-            msg = "No grid selected. Automatic grid will be used."
+            #msg = "No grid selected. Automatic grid will be used."
+            msg = "No grid selected. Continuing with automatic grid."
             logging.getLogger("user_level_log").info(msg)
+            #result = None 
         return result
             
     def update_processing_parameters(self, crystal):
@@ -204,7 +208,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         Descript. :
         """
-
         CreateTaskBase.single_item_selection(self, tree_item)
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             self._init_models()
@@ -221,6 +224,8 @@ class CreateAdvancedWidget(CreateTaskBase):
 
             # sample_data_model = self.get_sample_item(tree_item).get_model()
             #self._acq_widget.disable_inverse_beam(True)
+            #self._graphics_manager_hwobj.de_select_all()
+            self._graphics_manager_hwobj.select_shape(advanced.grid_object)
 
             self._path_template = advanced.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
@@ -234,8 +239,6 @@ class CreateAdvancedWidget(CreateTaskBase):
             self.get_acquisition_widget().use_osc_start(True)
         else:
             self.setDisabled(True)
-        #if self._advanced_methods_widget.grid_treewidget.count() > 0:
-        #    self._advanced_methods_widget.grid_treewidget.clearSelection() 
   
     def _create_task(self,  sample, shape):
         """
@@ -246,7 +249,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         if len(selected_grids) == 0:
             selected_grids.append(self._graphics_manager_hwobj.\
-                create_automatic_grid()) 
+                update_auto_grid()) 
 
         for shape in selected_grids:
             shape.set_snapshot(self._graphics_manager_hwobj.\
@@ -275,10 +278,14 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_number(acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
 
-            exp_type = str(self._advanced_methods_widget.method_combo.\
-                currentText())
-            advanced = queue_model_objects.Advanced(exp_type, dc, 
-                  shape, sample.crystals[0])
+            exp_type = str(self._advanced_methods_widget.\
+                method_combo.currentText())
+            if exp_type == "MeshScan":
+                advanced = queue_model_objects.Advanced(\
+                   dc, shape, sample.crystals[0])
+            elif exp_type == "XrayCentering":
+                advanced = queue_model_objects.XrayCentering(\
+                   dc, shape, sample.crystals[0])
 
             data_collections.append(advanced)
             self._path_template.run_number += 1
@@ -312,8 +319,11 @@ class CreateAdvancedWidget(CreateTaskBase):
             self._grid_map.pop(shape) 
 
     def grid_treewidget_item_selection_changed(self):
-        self._advanced_methods_widget.remove_grid_button.setEnabled(False)
-        for grid_object, treewidget_item in self._grid_map.iteritems():
+        self.enable_grid_controls(False)
+        for item in self._grid_map.items():
+            grid_object = item[0]
+            treewidget_item = item[1]
+  
             if treewidget_item.isSelected():
                 grid_properties = grid_object.get_properties() 
                 cell_count = grid_properties["num_lines"] * \
@@ -330,14 +340,13 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._acq_widget.acq_widget_layout.kappa_phi_ledit.setText(\
                      "%.2f" % float(centred_point.kappa_phi))
                 self._advanced_methods_widget.hor_spacing_ledit.setText(\
-                     "%.2f" % float(grid_properties["xOffset"]))
+                     "%.2f" % (float(grid_properties["xOffset"]) * 1000))
                 self._advanced_methods_widget.ver_spacing_ledit.setText(\
-                     "%.2f" % float(grid_properties["yOffset"]))
+                     "%.2f" % (float(grid_properties["yOffset"]) * 1000))
                 grid_object.setSelected(True) 
-                self._advanced_methods_widget.remove_grid_button.setEnabled(True)
+                self.enable_grid_controls(True)
             else:
                 grid_object.setSelected(False)
-        self._advanced_methods_widget.move_to_grid_button.setEnabled(True)
 
     def get_selected_grids(self):
         selected_grids = [] 
@@ -363,12 +372,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         spacing = [0, 0]
         try:
            spacing[0] = float(self._advanced_methods_widget.\
-               hor_spacing_ledit.text())
+               hor_spacing_ledit.text()) / 1000.0
         except:
            pass
         try:
            spacing[1] = float(self._advanced_methods_widget.\
-               ver_spacing_ledit.text())
+               ver_spacing_ledit.text()) / 1000.0
         except:
            pass
         return spacing
@@ -397,9 +406,28 @@ class CreateAdvancedWidget(CreateTaskBase):
             if treewidget_item.isSelected():
                 grid_object.set_fill_alpha(alpha_value)
 
+    def overlay_change_color(self):
+        color = QtGui.QColorDialog.getColor()
+        if color.isValid():
+            for grid_object, treewidget_item in self._grid_map.iteritems():
+                if treewidget_item.isSelected():
+                    grid_object.set_base_color(color)
+
     def move_grid(self, direction):
         for grid_object, treewidget_item in self._grid_map.iteritems():
             if treewidget_item.isSelected():
                 grid_object.move_by_pix(direction)
                 self._graphics_manager_hwobj.\
                      update_grid_motor_positions(grid_object)
+
+    def enable_grid_controls(self, state):
+        self._advanced_methods_widget.overlay_cbox.setEnabled(state)
+        self._advanced_methods_widget.overlay_slider.setEnabled(state)
+        self._advanced_methods_widget.overlay_color_button.setEnabled(state)
+        self._advanced_methods_widget.move_to_grid_button.setEnabled(state)
+        self._advanced_methods_widget.remove_grid_button.setEnabled(state)        
+
+        self._advanced_methods_widget.move_right_button.setEnabled(state)
+        self._advanced_methods_widget.move_left_button.setEnabled(state)
+        self._advanced_methods_widget.move_up_button.setEnabled(state)
+        self._advanced_methods_widget.move_down_button.setEnabled(state)

@@ -40,7 +40,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.beamline_test_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.available_test = None
+        self.available_tests = None
         self.com_device_list = None
 
         # Properties ---------------------------------------------------------- 
@@ -60,14 +60,15 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.test_com_page = self.beamline_test_widget.com_toolbox_page
         self.test_focus_page = self.beamline_test_widget.focus_toolbox_page
         self.test_ppu_page = self.beamline_test_widget.ppu_toolbox_page
-        self.test_profile_page = self.beamline_test_widget.profile_toolbox_page
 
         self.com_device_table = self.beamline_test_widget.comm_device_table
-        self.current_test_listwidget = self.beamline_test_widget.current_test_listbox
-        self.available_test_listwidget = self.beamline_test_widget.available_test_listbox
+        #self.current_test_listwidget = self.beamline_test_widget.current_test_listbox
+        self.available_tests_listwidget = self.beamline_test_widget.\
+             available_tests_listwidget
 
         _web_view_widget = QtGui.QWidget(self)
-        _load_last_test_button = QtGui.QPushButton("View last test", _web_view_widget)
+        _load_last_test_button = QtGui.QPushButton("View last test", \
+             _web_view_widget)
         self.test_result_browser = WebViewWidget(_web_view_widget)
 
         # Layout --------------------------------------------------------------
@@ -84,17 +85,16 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------
-        self.beamline_test_widget.add_button.clicked.connect(\
-             self.add_test_button_clicked)
-        self.beamline_test_widget.remove_button.clicked.connect(\
-             self.remove_test_button_clicked)
+        self.beamline_test_widget.execute_all_button.clicked.connect(\
+             self.execute_all_tests_clicked)
         self.beamline_test_widget.test_button.clicked.connect(\
-             self.run_test_clicked)
+             self.execute_test_clicked)
         self.beamline_test_widget.focus_modes_combo.activated.connect(\
              self.set_focus_mode_pressed)
-
-        _load_last_test_button.clicked.connect(\
-             self.load_latest_test_results)
+        self.available_tests_listwidget.itemDoubleClicked.connect(\
+             self.available_tests_double_clicked) 
+         
+        _load_last_test_button.clicked.connect(self.load_latest_test_results)
 
         # Other ---------------------------------------------------------------
         #self.beamline_test_widget.setFixedWidth(600)
@@ -117,9 +117,9 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                 self.disconnect(self.beamline_test_hwobj, 
                                 QtCore.SIGNAL('testProgress'), 
                                 self.update_test_progress)
-                #self.disconnect(self.beamline_test_hwobj, 
-                #                QtCore.SIGNAL('focModeChanged'), 
-                #                self.update_focus_status)
+                self.disconnect(self.beamline_test_hwobj, 
+                                QtCore.SIGNAL('focusingModeChanged'), 
+                                self.update_focus_status)
                 self.disconnect(self.beamline_test_hwobj, 
                                 QtCore.SIGNAL('ppuStatusChanged'), 
                                 self.update_ppu_status)
@@ -133,44 +133,35 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                 self.connect(self.beamline_test_hwobj, 
                              QtCore.SIGNAL('testProgress'), 
                              self.update_test_progress)
-                #self.connect(self.beamline_test_hwobj, 
-                #             QtCore.SIGNAL('focModeChanged'), 
-                #             self.update_focus_status)
+                self.connect(self.beamline_test_hwobj, 
+                             QtCore.SIGNAL('focusingModeChanged'), 
+                             self.update_focus_status)
                 self.connect(self.beamline_test_hwobj,
                              QtCore.SIGNAL('ppuStatusChanged'),
                              self.update_ppu_status)
                 self.connect(self.beamline_test_hwobj,
                              QtCore.SIGNAL('testFinished'),
                              self.test_finished)
-                #self.load_result_page()
+                self.update_focus_status(None, None)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    def add_test_button_clicked(self):
-        for selected_item in self.available_test_listwidget.selectedItems():
-            self.current_test_listwidget.addItem(selected_item.text())
-
-    def remove_test_button_clicked(self):
-        for index in self.current_test_listwidget.selectedIndexes():
-            self.current_test_listwidget.takeItem(index.row())
-  
-    def run_test_clicked(self):
+    def execute_test_clicked(self):
         test_list = []
         if self.test_toolbox.currentWidget() == self.test_queue_page:
-            for item_index in range(self.current_test_listwidget.count()):
-                item_key = self.available_test.keys()[self.available_test.\
-                    values().index(self.current_test_listwidget.item(item_index).text())]
-                test_list.append(item_key)
+            test_list = self.available_tests.keys()
         elif self.test_toolbox.currentWidget() == self.test_com_page:
             test_list = ['com']
         elif self.test_toolbox.currentWidget() == self.test_focus_page:
-            test_list = ['focus']
+            test_list = ['focusing']
             self.test_focus_mode()
         elif self.test_toolbox.currentWidget() == self.test_ppu_page:
             test_list = ['ppu']
-        elif self.test_toolbox.currentWidget() == self.test_profile_page:
-            test_list = ['profile']
-        self.beamline_test_hwobj.start_test_queue(test_list)
+        self.beamline_test_hwobj.start_test_queue(test_list, create_report=False)
+
+    def execute_all_tests_clicked(self):
+        self.beamline_test_hwobj.start_test_queue(\
+             self.available_tests.keys())
 
     def test_finished(self, html_filename):
         self.beamline_test_widget.progress_bar.reset()
@@ -183,16 +174,17 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.test_focus_mode()
 
     def update_test_progress(self, progress_value, progress_info):
-        self.beamline_test_widget.progress_bar.setMaximum(progress_info["progress_total"])
+        self.beamline_test_widget.progress_bar.setMaximum(\
+             progress_info["progress_total"])
         self.beamline_test_widget.progress_bar.setValue(progress_value)
         self.beamline_test_widget.progress_bar.setEnabled(True)
-        self.beamline_test_widget.progress_msg_ledit.setText(progress_info["progress_msg"])
+        self.beamline_test_widget.progress_msg_ledit.setText(\
+             progress_info["progress_msg"])
 
-    def update_focus_status(self):
+    def update_focus_status(self, focus_mode, beam_size):
         self.test_focus_mode()
 
     def update_ppu_status(self, is_error, status_text):
-        #self.beamline_test_widget.ppu_test_button.setEnabled(True)
         if is_error:
             self.beamline_test_widget.ppu_status_label.setText(\
                  "<font color='red'>PPU is not running properly</font>")
@@ -213,20 +205,15 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                 for info_index, info in enumerate(device):
                     temp_table_item = QtGui.QTableWidgetItem(info)
                     self.com_device_table.setItem(row - 1, info_index, temp_table_item)
-               
-            print "todo..."       
             #for col in range(self.com_device_table.columnCount()):
             #     self.com_device_table.adjustColumn(col)
             #self.com_device_table.adjustSize()
             self.beamline_test_widget.progress_bar.setMaximum(len(self.com_device_list))
 
     def init_test_queue(self):
-        self.available_test = self.beamline_test_hwobj.get_available_tests()
-        for value in self.available_test.values():
-            self.available_test_listwidget.addItem(value)
-        current_test_queue = self.beamline_test_hwobj.get_startup_test_list()
-        for item in current_test_queue:
-            self.current_test_listwidget.addItem(item)
+        self.available_tests = self.beamline_test_hwobj.get_available_tests()
+        for value in self.available_tests.values():
+            self.available_tests_listwidget.addItem(value)
 
     def test_focus_mode(self):
         active_mode, beam_size = self.beamline_test_hwobj.get_focus_mode()
@@ -245,12 +232,14 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             focus_modes_combo.clear()
             hor_labels = QtCore.QStringList(focus_modes)
             focus_modes_table.setHorizontalHeaderLabels(hor_labels)
-            #for col, mode in enumerate(focus_modes):
-            #    #focus_modes_table.horizontalHeader().setLabel(col, mode)
-            #    #self.focus_modesCount += 1
-            #    focus_modes_combo.insertItem(mode)
+            for col, mode in enumerate(focus_modes):
+                focus_modes_combo.addItem(mode)
         if active_mode:
-            focus_modes_combo.setCurrentText(focus_modes_combo.findText(active_mode))
+            focus_modes_combo.setCurrentIndex(\
+                 focus_modes_combo.findText(active_mode))
+        else:
+            focus_modes_combo.setCurrentIndex(-1) 
+
         focus_motors_list = self.beamline_test_hwobj.get_focus_motors()
         if focus_motors_list:
             ver_labels = QtCore.QStringList()
@@ -268,8 +257,6 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                         temp_table_item.setBackground(Qt4_widget_colors.LIGHT_RED)
                     focus_modes_table.setItem(row, col, temp_table_item) 
             focus_modes_table.setVerticalHeaderLabels(ver_labels)
-            #for col in range(focus_modes_table.numCols()):
-            #    focus_modes_table.adjustColumn(col)
 
     def set_focus_mode_pressed(self, item_index):
         self.beamline_test_hwobj.set_focus_mode(\
@@ -281,4 +268,9 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             self.test_result_browser.set_url(html_filename) 
         else:
             self.test_result_browser.set_static_page(\
-                    "<center><h1>Test result file not found</h1></center>") 
+                "<center><h1>Test result file not found</h1></center>") 
+
+    def available_tests_double_clicked(self, listwidget_item):
+        test_name = self.available_tests.keys()[self.available_tests.values().\
+             index(listwidget_item.text())]
+        self.beamline_test_hwobj.start_test_queue([test_name])

@@ -8,4 +8,5 @@ build
 .*
 .ab*
 .ik*
-
+CMakeLists.txt
+ChangeLog

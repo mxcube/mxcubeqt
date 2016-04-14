@@ -132,7 +132,6 @@ class CreateDiscreteWidget(CreateTaskBase):
             #self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_parameters = sample_model.processing_parameters
             self._processing_widget.update_data_model(self._processing_parameters)
-            self._acq_widget.disable_inverse_beam(False)
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
@@ -148,7 +147,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
 
-                self._acq_widget.disable_inverse_beam(True)
+                #self._acq_widget.disable_inverse_beam(True)
                 
                 self._path_template = dc.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
@@ -191,6 +190,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot() 
 
+        """
         if self._acq_widget.use_inverse_beam():
             total_num_images = self._acquisition_parameters.num_images
             subwedge_size = self._acq_widget.get_num_subwedges()
@@ -211,6 +211,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         else:
             tasks.extend(self.create_dc(sample, cpos=cpos))
             self._path_template.run_number += 1
+        """
+
+        tasks.extend(self.create_dc(sample, cpos=cpos))
+        self._path_template.run_number += 1
+
         return tasks
     
     def create_dc(self, sample, run_number = None, start_image = None,

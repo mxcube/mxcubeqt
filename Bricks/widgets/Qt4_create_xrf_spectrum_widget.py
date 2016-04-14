@@ -39,7 +39,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-	self.count_time = None
+        self.count_time = None
 
         self.init_models()
 
@@ -47,22 +47,24 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self, 
              data_model = self._path_template, layout = 'vertical')
 
-	_parameters_gbox = QtGui.QGroupBox('Parameters', self)
-	_count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
-	self.count_time_ledit = QtGui.QLineEdit("1", _parameters_gbox)
-        self.count_time_ledit.setMaximumWidth(75)
+        _parameters_gbox = QtGui.QGroupBox('Parameters', self)
+        _count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
+        self.count_time_ledit = QtGui.QLineEdit("1", _parameters_gbox)
+        #self.count_time_ledit.setMaximumWidth(75)
+        self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", _parameters_gbox)
 
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QtGui.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
-        _parameters_gbox_hlayout.addWidget(self.count_time_ledit)
+        _parameters_gbox_hlayout.addWidget(self.count_time_ledit) 
+        _parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
         _parameters_gbox_hlayout.addStretch(0)
         _parameters_gbox_hlayout.setSpacing(2)
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-	_main_vlayout.addWidget(self._data_path_widget)
-	_main_vlayout.addWidget(_parameters_gbox)
+        _main_vlayout.addWidget(self._data_path_widget)
+        _main_vlayout.addWidget(_parameters_gbox)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.addStretch(0)
@@ -106,12 +108,12 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
 
-	self.count_time = None
+        self.count_time = None
 
-	try:
-	   self.count_time = float(str(self.count_time_ledit.text()))
-	except:
-	   logging.getLogger("user_level_log").\
+        try:
+           self.count_time = float(str(self.count_time_ledit.text()))
+        except:
+           logging.getLogger("user_level_log").\
                 info("Incorrect count time value.")
 
         return base_result and self.count_time
@@ -122,7 +124,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
     def _create_task(self, sample, shape):
         data_collections = []
 
-	if self.count_time is not None:
+        if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
                 cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()

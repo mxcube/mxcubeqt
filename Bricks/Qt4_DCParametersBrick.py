@@ -48,8 +48,8 @@ class Qt4_DCParametersBrick(BlissWidget):
 
         # Properties ----------------------------------------------------------
         self.addProperty("session", "string", "/session")
-        self.addProperty("queue-model", "string", "/Qt4_queue-model")
-        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
+        self.addProperty("queue-model", "string", "/queue-model")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("useImageTracking", "boolean", True)
 
         # Signals ------------------------------------------------------------

@@ -82,7 +82,7 @@
             </property>
             <property name="font">
              <font>
-              <pointsize>10</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="editTriggers">
@@ -115,6 +115,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
              <widget class="QCheckBox" name="overlay_cbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Display overlay</string>
               </property>
@@ -122,6 +125,9 @@
             </item>
             <item>
              <widget class="QSlider" name="overlay_slider">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="maximum">
                <number>255</number>
               </property>
@@ -175,6 +181,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="remove_line_button">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Remove</string>
               </property>

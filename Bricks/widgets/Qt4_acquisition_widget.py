@@ -94,29 +94,27 @@ class AcquisitionWidget(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.acq_widget_layout.energies_combo.activated.connect(\
-             self.energy_selected)
-        self.acq_widget_layout.mad_cbox.toggled.connect(\
-             self.use_mad)
-        self.acq_widget_layout.inverse_beam_cbx.toggled.connect(\
-             self.set_use_inverse_beam)
+        self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
+             self.use_osc_start)
+        self.acq_widget_layout.exp_time_ledit.textChanged.connect(\
+             self.exposure_time_ledit_changed)
         self.acq_widget_layout.first_image_ledit.textChanged.connect(\
              self.first_image_ledit_change)
         self.acq_widget_layout.num_images_ledit.textChanged.connect(\
              self.num_images_ledit_change)
         self.acq_widget_layout.detector_roi_mode_combo.activated.connect(\
              self.detector_roi_mode_changed)
-
+        self.acq_widget_layout.energies_combo.activated.connect(\
+             self.energy_selected)
+        self.acq_widget_layout.mad_cbox.toggled.connect(\
+             self.use_mad)
+        
         overlap_ledit = self.acq_widget_layout.findChild(\
             QtGui.QLineEdit, "overlap_ledit")
         if overlap_ledit is not None:
             overlap_ledit.textChanged.connect(self.overlap_changed)
 
-        self.acq_widget_layout.subwedge_size_ledit.textChanged.connect(\
-             self.subwedge_size_ledit_change)
-
         # Other --------------------------------------------------------------- 
-        self.acq_widget_layout.subwedge_size_ledit.setDisabled(True)
         self.acq_widget_layout.energies_combo.setDisabled(True)
         self.acq_widget_layout.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
@@ -130,18 +128,21 @@ class AcquisitionWidget(QtGui.QWidget):
         self.exp_time_validator = QtGui.QDoubleValidator(0.0001, 10000, 4, self)
         self.first_img_validator = QtGui.QIntValidator(0, 99999, self)
         self.num_img_validator = QtGui.QIntValidator(1, 99999, self) 
-        self.disable_inverse_beam(True)
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
     def set_enable_parameter_update(self, state):
+        """
+        Descript. :
+        """
         self.enable_parameter_update = state
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if self.enable_parameter_update and \
+           not self.acq_widget_layout.osc_start_cbox.isChecked():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
@@ -152,24 +153,38 @@ class AcquisitionWidget(QtGui.QWidget):
             #self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
+        """
+        Descript. :
+        """
         if self.enable_parameter_update:
             self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
             #self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
+        """
+        Descript. :
+        """
         if self.enable_parameter_update:
             self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
             #self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
-        self.acq_widget_layout.osc_start_label.setEnabled(state)
+        """
+        Descript. :
+        """
         self.acq_widget_layout.osc_start_ledit.setEnabled(state)
 
     def use_kappa(self, state):
+        """
+        Descript. :
+        """
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
 
     def use_kappa_phi(self, state):
+        """
+        Descript. :
+        """
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
             
@@ -179,6 +194,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         self._beamline_setup_hwobj = beamline_setup
         limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
+        self.diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
 
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
@@ -215,7 +231,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if 'exposure_time' in limits_dict:
             limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
             (lower, upper) = limits
-            self.exp_time_valdidator.setRange(lower, upper, 5)
+            self.exp_time_validator.setRange(lower, upper, 5)
         
         self._acquisition_mib.bind_value_update('exp_time', 
                                                 self.acq_widget_layout.exp_time_ledit,
@@ -271,12 +287,6 @@ class AcquisitionWidget(QtGui.QWidget):
                                self.resolution_validator)
 
         self._acquisition_mib.\
-             bind_value_update('inverse_beam',
-                               self.acq_widget_layout.inverse_beam_cbx,
-                               bool,
-                               None)
-
-        self._acquisition_mib.\
              bind_value_update('shutterless',
                                self.acq_widget_layout.shutterless_cbx,
                                bool,
@@ -311,6 +321,13 @@ class AcquisitionWidget(QtGui.QWidget):
             self._path_template.start_num = int(new_value)
             widget = self.acq_widget_layout.first_image_ledit
             self.acqParametersChangedSignal.emit()
+
+    def exposure_time_ledit_changed(self, new_values):
+        """
+        Descript. :
+        """
+        if self.diffractometer_hwobj.in_plate_mode():
+            self.update_parameter_limits()
 
     def num_images_ledit_change(self, new_value):
         """
@@ -360,47 +377,6 @@ class AcquisitionWidget(QtGui.QWidget):
             self.set_energy(self.previous_energy, 0)
             energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
             self.madEnergySelectedSignal.emit('', self.previous_energy, state)
-
-    def set_use_inverse_beam(self, state):
-        """
-        Descript. :
-        """
-        if state:
-            self.acq_widget_layout.subwedge_size_ledit.setEnabled(True)
-        else:
-            self.acq_widget_layout.subwedge_size_ledit.setDisabled(True)
-
-    def use_inverse_beam(self):
-        """
-        Descript. :
-        """
-        return self.acq_widget_layout.inverse_beam_cbx.isChecked()
-
-    def get_num_subwedges(self):
-        """
-        Descript. :
-        """
-        return int(self.acq_widget_layout.subwedge_size_ledit.text())
-
-    def subwedge_size_ledit_change(self, new_value):
-        """
-        Descript. :
-        """
-        accept_input = False
-        if str(new_value).isdigit() and \
-           int(new_value) < self._acquisition_parameters.num_images:
-            accept_input = True
-
-        if accept_input:
-            Qt4_widget_colors.set_widget_color(
-                 self.acq_widget_layout.subwedge_size_ledit,
-                 Qt4_widget_colors.WHITE,
-                 QtGui.QPalette.Base)
-        else:
-            Qt4_widget_colors.set_widget_color(\
-                 self.acq_widget_layout.subwedge_size_ledit,
-                 Qt4_widget_colors.LIGHT_RED,
-                 QtGui.QPalette.Base) 
 
     def get_mad_energy(self):
         """
@@ -468,6 +444,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
+        """
+        Descript. :
+        """
         if limits:
             self.energy_validator.setBottom(limits[0])
             self.energy_validator.setTop(limits[1])
@@ -476,6 +455,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self._acquisition_mib.validate_all()
 
     def update_transmission_limits(self, limits):
+        """
+        Descript. :
+        """
         if limits:
             self.transmission_validator.setBottom(limits[0])
             self.transmission_validator.setTop(limits[1])
@@ -484,6 +466,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self._acquisition_mib.validate_all()
 
     def update_resolution_limits(self, limits):
+        """
+        Descript. :
+        """
         if limits:
             self.resolution_validator.setBottom(limits[0])
             self.resolution_validator.setTop(limits[1])
@@ -492,6 +477,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self._acquisition_mib.validate_all()
 
     def update_detector_exp_time_limits(self, limits):
+        """
+        Descript. :
+        """
         if limits:
             self.exp_time_validator.setRange(limits[0], limits[1], 4)
             self.acq_widget_layout.exp_time_ledit.setToolTip(
@@ -499,6 +487,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self._acquisition_mib.validate_all()
 
     def update_osc_range_limits(self, exp_time):
+        """
+        Descript. :
+        """
         osc_range = 40.0 * exp_time
         self.osc_range_validator.setRange(0, osc_range, 4)
         self.acq_widget_layout.osc_range_ledit.setToolTip(
@@ -506,6 +497,9 @@ class AcquisitionWidget(QtGui.QWidget):
         self._acquisition_mib.validate_all()
 
     def update_num_image_limits(self):
+        """
+        Descript. :
+        """
         try:
            osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
            osc_range = float(self.acq_widget_layout.osc_range_ledit.text())
@@ -524,7 +518,17 @@ class AcquisitionWidget(QtGui.QWidget):
               "Number of frames limit : %d" % num_image_limit)
         self._acquisition_mib.validate_all()
 
+    def update_parameter_limits(self):
+        """
+        Descript. :
+        """
+        #self.diffractometer_hwobj.get_scan_limits() 
+        pass
+
     def init_detector_roi_modes(self):
+        """
+        Descript. :
+        """
         if self._beamline_setup_hwobj is not None:
             roi_modes = self._beamline_setup_hwobj._get_roi_modes()
             if (len(roi_modes) > 0 and
@@ -540,11 +544,17 @@ class AcquisitionWidget(QtGui.QWidget):
                 #               None)
 
     def update_detector_roi_mode(self, roi_mode_index):
+        """
+        Descript. :
+        """
         if self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
             self.acq_widget_layout.detector_roi_mode_combo.\
                  setCurrentIndex(roi_mode_index)
 
     def detector_roi_mode_changed(self, roi_mode_index):
+        """
+        Descript. :
+        """
         if self._beamline_setup_hwobj is not None:
             self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(roi_mode_index)
 
@@ -577,23 +587,3 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.energy_ledit.setEnabled(state)
         self.acq_widget_layout.mad_cbox.setEnabled(state)
         self.acq_widget_layout.energies_combo.setEnabled(state)
-
-    def disable_inverse_beam(self, state):
-        """
-        Descript. :
-        """
-        self.acq_widget_layout.inverse_beam_cbx.setDisabled(state)
-        self.acq_widget_layout.subwedge_size_label.setDisabled(state)
-        self.acq_widget_layout.subwedge_size_ledit.setDisabled(state)
-
-    def hide_aperture(self, state):
-        """
-        Descript. :
-        """
-        pass
-        #if state:
-        #    self.acq_widget_layout.findChild('aperture_ledit').show()
-        #    self.acq_widget_layout.findChild('aperture_cbox').show()
-        #else:
-        #    self.acq_widget_layout.findChild('aperture_ledit').hide()
-        #    self.acq_widget_layout.findChild('aperture_cbox').hide()

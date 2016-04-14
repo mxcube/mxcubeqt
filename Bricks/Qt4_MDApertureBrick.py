@@ -121,7 +121,7 @@ class Qt4_MDApertureBrick(BlissWidget):
                 self.connect(self.aperture_hwobj, 
                              QtCore.SIGNAL('apertureChanged'), 
                              self.aperture_changed)
-                self.aperture_hwobj.update_value()
+                self.aperture_hwobj.update_values()
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
     
@@ -133,6 +133,9 @@ class Qt4_MDApertureBrick(BlissWidget):
              self.aperture_combo.currentIndex())
 
     def init_aperture_list(self):
+        """
+        Descript. :
+        """
         aperture_list = self.aperture_hwobj.get_aperture_list()
         self.aperture_combo.clear()
         for aperture in aperture_list:

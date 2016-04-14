@@ -229,8 +229,9 @@ class PolarScater(FigureCanvas):
         col_count = 0
         for sw_index, sw in enumerate(sw_list):
             bars = self.axes.bar(np.radians(sw[4]), 1, 
-                width = np.radians(sw[5]), bottom = sw[0],
-                color = Qt4_widget_colors.TASK_GROUP[sw[0]])
+                width=np.radians(sw[5]), bottom = sw[0],
+                color=sw[-1],
+                alpha=0.3)
             x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
                     bars[0].get_bbox().xmin) / 2.0 
             y_mid = bars[0].get_bbox().ymin + (bars[0].get_bbox().ymax - \
@@ -280,12 +281,13 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         dbl_click = False
         if hasattr(mouse_event, "dblclick"):
             dbl_click = mouse_event.dblclick
-        if dbl_click:
-            self.mouseDoubleClickedSignal.emit(mouse_event.xdata,
-                                               mouse_event.ydata)
-        else:
-            self.mouseClickedSignal.emit(mouse_event.xdata,
-                                         mouse_event.ydata)
+        if mouse_event.xdata and mouse_event.ydata:
+            if dbl_click:
+                self.mouseDoubleClickedSignal.emit(mouse_event.xdata,
+                                                   mouse_event.ydata)
+            else:
+                self.mouseClickedSignal.emit(mouse_event.xdata,
+                                             mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
         im = self.mpl_canvas.axes.imshow(result, 
@@ -300,7 +302,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
 
             mgr = plt.get_current_fig_manager()
             #mgr.full_screen_toggle()
-            mgr.window.move(10, 10)
+            #mgr.window.move(10, 10)
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()

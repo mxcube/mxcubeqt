@@ -31,7 +31,7 @@ from widgets.Qt4_task_toolbox_widget import TaskToolBoxWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_TaskToolBoxBrick(BlissWidget):
@@ -56,8 +56,8 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.tree_brick = None
 
         # Properties ---------------------------------------------------------- 
-        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
-        self.addProperty("queue_model", "string", "/Qt4_queue-model")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
+        self.addProperty("queue_model", "string", "/queue-model")
        
         # Signals ------------------------------------------------------------  
         self.defineSignal("getTreeBrick",())

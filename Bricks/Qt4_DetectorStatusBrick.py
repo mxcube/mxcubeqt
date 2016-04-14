@@ -113,26 +113,29 @@ class Qt4_DetectorStatusBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
      
     def status_changed(self, status, status_message):
-        self.status_label.setText("<b>%s</b>" % status.title())
-        Qt4_widget_colors.set_widget_color(self.status_label,
-           Qt4_DetectorStatusBrick.DETECTOR_STATES[status])
-        self.setToolTip(status_message)
+        if status:
+            self.status_label.setText("<b>%s</b>" % status.title())
+            Qt4_widget_colors.set_widget_color(self.status_label,
+               Qt4_DetectorStatusBrick.DETECTOR_STATES[status])
+            self.setToolTip(status_message)
 
     def temperature_changed(self, value, status_ok):
-        unit = u'\N{DEGREE SIGN}'
-        self.temperature_label.setText("   Temperature : %0.1f%s" %(value, unit))
-        if status_ok: 
-            Qt4_widget_colors.set_widget_color(self.temperature_label,
-               Qt4_DetectorStatusBrick.STATES['OK'])
-        else:
-            Qt4_widget_colors.set_widget_color(self.temperature_label,
-               Qt4_DetectorStatusBrick.STATES['BAD'])
+        if value:
+            unit = u'\N{DEGREE SIGN}'
+            self.temperature_label.setText("   Temperature : %0.1f%s" %(value, unit))
+            if status_ok: 
+                Qt4_widget_colors.set_widget_color(self.temperature_label,
+                   Qt4_DetectorStatusBrick.STATES['OK'])
+            else:
+                Qt4_widget_colors.set_widget_color(self.temperature_label,
+                   Qt4_DetectorStatusBrick.STATES['BAD'])
 
     def humidity_changed(self, value, status_ok):
-        self.humidity_label.setText("   Humidity         : %0.1f%s" %(value, chr(37)))
-        if status_ok:
-            Qt4_widget_colors.set_widget_color(self.humidity_label,
-               Qt4_DetectorStatusBrick.STATES['OK'])
-        else:
-            Qt4_widget_colors.set_widget_color(self.humidity_label,
-               Qt4_DetectorStatusBrick.STATES['BAD'])
+        if value:
+            self.humidity_label.setText("   Humidity         : %0.1f%s" %(value, chr(37)))
+            if status_ok:
+                Qt4_widget_colors.set_widget_color(self.humidity_label,
+                   Qt4_DetectorStatusBrick.STATES['OK'])
+            else:
+                Qt4_widget_colors.set_widget_color(self.humidity_label,
+                   Qt4_DetectorStatusBrick.STATES['BAD'])
