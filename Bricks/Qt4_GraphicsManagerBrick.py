@@ -156,22 +156,20 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
                     and depending on shape type also information to
                     treewidget of all points/lines/grids
         """
-        print ("TODO 2to3")
+        info_str_list = (str(self.manager_widget.shapes_treewidget.topLevelItemCount() + 1),
+                         shape.get_display_name(),
+                         str(True),
+                         str(True),
+                         str(shape.used_count)) 
+        self.__shape_map[shape] = QtGui.QTreeWidgetItem(self.manager_widget.\
+             shapes_treewidget, info_str_list)
+        self.toggle_buttons_enabled()
+
         try:
            info_str_list = QtCore.QStringList()
         except:
            info_str_list = []
 
-        info_str_list.append(str(self.manager_widget.shapes_treewidget.topLevelItemCount() + 1))
-        info_str_list.append(shape.get_display_name())
-        info_str_list.append(str(True))
-        info_str_list.append(str(True))
-        info_str_list.append(str(shape.used_count)) 
-        self.__shape_map[shape] = QtGui.QTreeWidgetItem(self.manager_widget.\
-             shapes_treewidget, info_str_list)
-        self.toggle_buttons_enabled()
-
-        info_str_list = QtCore.QStringList()
         info_str_list.append(str(shape.index))
         if shape_type == "Point":
             info_str_list.append(str(shape.get_start_position())) 

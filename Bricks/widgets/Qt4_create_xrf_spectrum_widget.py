@@ -47,9 +47,9 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self, 
              data_model = self._path_template, layout = 'vertical')
 
-	_parameters_gbox = QtGui.QGroupBox('Parameters', self)
-	_count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
-	self.count_time_ledit = QtGui.QLineEdit("1", _parameters_gbox)
+        _parameters_gbox = QtGui.QGroupBox('Parameters', self)
+        _count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
+        self.count_time_ledit = QtGui.QLineEdit("1", _parameters_gbox)
         #self.count_time_ledit.setMaximumWidth(75)
         self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", _parameters_gbox)
 

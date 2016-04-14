@@ -316,7 +316,6 @@ class Qt4_PlateBrick(BlissWidget):
         """
         #TODO replace this with pos_x, pos_y
         drop = int(pos_y * self.num_drops) + 1
-        print self.current_location, drop
         self.plate_manipulator_hwobj.load_sample((self.current_location[0],\
               self.current_location[1], drop))
 
