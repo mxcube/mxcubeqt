@@ -65,7 +65,8 @@ is sent to the recipients specified in the emailAddresses property.
 """
 import logging
 import os
-import email.Utils
+#import email.Utils
+from datetime import datetime
 import smtplib
 
 from PyQt4 import QtCore
@@ -105,7 +106,10 @@ class CustomTreeWidget(QtGui.QTreeWidget):
         #        return
         
         msg = record.getMessage().replace('\n',' ').strip()
-        info_str_list = QtCore.QStringList()
+        try: 
+           info_str_list = QtCore.QStringList()
+        except:
+           info_str_list = []
         info_str_list.append(record.getLevelName())
         info_str_list.append(record.getDate())
         info_str_list.append(record.getTime())
@@ -116,7 +120,7 @@ class CustomTreeWidget(QtGui.QTreeWidget):
             for col in range(4):
                 new_item.setBackgroundColor(col, Qt4_widget_colors.LIGH_2_GRAY)
                  
-        if self.max_log_lines > 0:
+        if self.max_log_lines and self.max_log_lines > 0:
             if self.topLevelItemCount() > self.max_log_lines:
                 self.takeTopLevelItem(0) 
         self.scrollToBottom()
@@ -185,7 +189,8 @@ class Submitfeedback(QtGui.QWidget):
         pass
 
     def submit_message(self):
-        msg_date = email.Utils.formatdate(localtime=True)
+        #msg_date = email.Utils.formatdate(localtime=True)
+        msg_date = str(datetime.now())
         
         if self.from_email_address:
             fromaddr = self.from_email_address
@@ -210,7 +215,7 @@ class Submitfeedback(QtGui.QWidget):
 
             logging.getLogger().debug("Sending feedback from %s to %s" % (fromaddr,toaddrs))
             error_dict = smtp.sendmail(fromaddr, toaddrs.split(','), email_msg)
-        except smtplib.SMTPException, e:
+        except smtplib.SMTPException as e:
             logging.getLogger().error("Could not send mail: %s" % str(e))
             smtp.quit()
         else:

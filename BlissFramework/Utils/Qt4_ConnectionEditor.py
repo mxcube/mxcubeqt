@@ -270,9 +270,9 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                 ok = ok and receiverInWindow(connection["receiver"], receiverWindow)
 
             if ok:
-                newItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_ok_small')))
+                newItem.setIcon(0, Qt4_Icons.load_icon('button_ok_small'))
             else:
-                newItem.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_cancel_small')))
+                newItem.setIcon(0, Qt4_Icons.load_icon('button_cancel_small'))
 
             newItem.setText(3, connection['signal'])
             newItem.setText(6, connection['slot'])
@@ -452,16 +452,17 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         """
         Descript. :
         """
+        parameter_list = ('',
+                          connection_dict['senderWindow'],
+                          connection_dict['senderObject'],
+                          connection_dict['signal'],
+                          connection_dict['receiverWindow'],
+                          connection_dict['receiverObject'],
+                          connection_dict['slot'])
+
         new_item = QtGui.QTreeWidgetItem(self.connections_treewidget, 
-                                         QtCore.QStringList([
-                                '',
-                                connection_dict['senderWindow'],
-                                connection_dict['senderObject'],
-                                connection_dict['signal'],
-                                connection_dict['receiverWindow'],
-                                connection_dict['receiverObject'],
-                                connection_dict['slot']]))
-        new_item.setIcon(0, QtGui.QIcon(Qt4_Icons.load('button_ok_small')))
+                                         parameter_list)
+        new_item.setIcon(0, Qt4_Icons.load_icon('button_ok_small'))
         self.connections_treewidget.addTopLevelItem(new_item)
     
     def connections_treewidget_selection_changed(self):

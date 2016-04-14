@@ -205,7 +205,6 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        print self.new_value_validator.validate(input_field_text, 0)
         color = Qt4_widget_colors.LINE_EDIT_ACTIVE
         #if input_field_text == "" or self.new_value_validator.validate(input_field_text, 0):
         #    color = Qt4_widget_colors.LINE_EDIT_ERROR
