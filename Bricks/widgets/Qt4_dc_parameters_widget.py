@@ -33,9 +33,6 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
 
 
-__category__ = 'Qt4_TaskToolbox_Tabs'
-
-
 class DCParametersWidget(QtGui.QWidget):
     def __init__(self, parent = None, name = "parameter_widget"):
 

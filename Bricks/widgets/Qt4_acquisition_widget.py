@@ -93,8 +93,8 @@ class AcquisitionWidget(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        #self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
-        #     self.use_osc_start)
+        self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
+             self.fix_osc_start)
         self.acq_widget_layout.exp_time_ledit.textChanged.connect(\
              self.exposure_time_ledit_changed)
         self.acq_widget_layout.first_image_ledit.textChanged.connect(\
@@ -130,13 +130,18 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-        self.use_osc_start(True)
+
+    def fix_osc_start(self, state):
+        """
+        """
+        self.acq_widget_layout.osc_start_ledit.setEnabled(state)
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if not self.acq_widget_layout.osc_start_ledit.hasFocus():
+        if not self.acq_widget_layout.osc_start_ledit.hasFocus() and \
+           not self.acq_widget_layout.osc_start_cbox.isChecked():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
@@ -171,7 +176,8 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         self.acq_widget_layout.osc_start_cbox.setVisible(state)
         self.acq_widget_layout.osc_start_label.setVisible(not state)
-        #self.acq_widget_layout.osc_start_ledit.setEnabled(state)
+        self.acq_widget_layout.osc_start_ledit.setEnabled(not state)
+        
 
     def use_kappa(self, state):
         """
