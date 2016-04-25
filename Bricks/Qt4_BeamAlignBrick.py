@@ -17,9 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Qt4_BeamAlignBrick
+"""
+
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
+from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
@@ -27,19 +32,19 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 __category__ = 'General'
 
 
-class Qt4_MDPhaseBrick(BlissWidget):
+class Qt4_BeamAlignBrick(BlissWidget):
     """
     Descript. :
     """
- 
+
     def __init__(self, *args):
         """
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-
+	
         # Hardware objects ----------------------------------------------------
-        self.diffractometer_hwobj = None
+        self.beam_align_hwobj = None
 
         # Internal values -----------------------------------------------------
 
@@ -51,16 +56,16 @@ class Qt4_MDPhaseBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox("Phase", self) 
-        self.phase_combobox = QtGui.QComboBox(self.group_box)
+        self.group_box = QtGui.QGroupBox('Beam align', self) 
+        self.align_button = QtGui.QPushButton("Align", self.group_box)
 
         # Layout --------------------------------------------------------------
         _group_box_vlayout = QtGui.QVBoxLayout(self.group_box)
-        _group_box_vlayout.addWidget(self.phase_combobox)
+        _group_box_vlayout.addWidget(self.align_button)
         _group_box_vlayout.addStretch()
         _group_box_vlayout.setSpacing(0)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
-
+        
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
@@ -69,63 +74,21 @@ class Qt4_MDPhaseBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.phase_combobox.activated.connect(self.change_phase)
- 
+        self.align_button.clicked.connect(self.align_beam_clicked)    
+
         # Other ---------------------------------------------------------------
-        Qt4_widget_colors.set_widget_color(self.phase_combobox,
-                                           Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
- 
+
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         """
-        if property_name == "mnemonic":
-            if self.diffractometer_hwobj is not None:
-                self.disconnect(self.diffractometer_hwobj,
-                                'minidiffPhaseChanged', 
-                                self.phase_changed)
-            self.diffractometer_hwobj = self.getHardwareObject(new_value)
-
-            if self.diffractometer_hwobj is not None:
-                self.init_phase_list()
-                
-                self.connect(self.diffractometer_hwobj,
-                             'minidiffPhaseChanged', 
-                             self.phase_changed)
-                self.diffractometer_hwobj.update_values()
+        if property_name == 'mnemonic':
+            self.beam_align_hwobj = self.getHardwareObject(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    def init_phase_list(self):
+    def align_beam_clicked(self):
         """
         Descript. :
         """
-        self.phase_combobox.clear()
-        phase_list = self.diffractometer_hwobj.get_phase_list()
-        if len(phase_list) > 0:
-           for phase in phase_list:
-               self.phase_combobox.addItem(phase)           
-           self.setEnabled(True)
-        else:
-           self.setEnabled(False)
-    
-    def change_phase(self):
-        """
-        Descript. :
-        """
-        if self.diffractometer_hwobj is not None:
-            self.diffractometer_hwobj.set_phase(self.phase_combobox.currentText())
-
-    def phase_changed(self, phase):
-        """
-        Descript. :
-        """
-        if (phase.lower() != "unknown" and
-            self.phase_combobox.count() > 0):
-            #index = self.phase_combobox.findText(phase) 
-            #self.phase_combobox.setEditText(phase)
-            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
-            self.phase_combobox.setEnabled(True)
-        else:
-            self.phase_combobox.setEnabled(False) 
+        self.beam_align_hwobj.align_beam_test()

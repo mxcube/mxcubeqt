@@ -29,7 +29,6 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-from HardwareRepository.HardwareRepository import dispatcher
 from widgets.Qt4_dc_tree_widget import DataCollectTree
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from widgets.Qt4_tree_options_dialog import TreeOptionsDialog
@@ -79,6 +78,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("enable_hutch_menu", ())
         self.defineSignal("enable_command_menu", ())
         self.defineSignal("enable_task_toolbox", ())
+        self.defineSignal("queue_is_executing", ())
 
         # Hiding and showing the tabs
         self.defineSignal("hide_sample_tab", ())
@@ -208,16 +208,16 @@ class Qt4_TreeBrick(BlissWidget):
                          self.show_workflow_tab_from_model)
 
             self.connect(self.queue_hwobj, 'queue_execute_started',
-                         self.dc_tree_widget.queue_entry_execution_started)
+                         self.queue_entry_execution_started)
 
             self.connect(self.queue_hwobj, 'queue_paused', 
-                         self.dc_tree_widget.queue_paused_handler)
+                         self.queue_paused_handler)
 
             self.connect(self.queue_hwobj, 'queue_execution_finished', 
-                         self.dc_tree_widget.queue_execution_completed)
+                         self.queue_execution_completed)
 
             self.connect(self.queue_hwobj, 'queue_stopped', 
-                         self.dc_tree_widget.queue_stop_handler)
+                         self.queue_stop_handler)
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
 
@@ -312,7 +312,6 @@ class Qt4_TreeBrick(BlissWidget):
                    two associated queue models.
         """
         self.enable_collect(logged_in)
-        
         if not logged_in:
             self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
@@ -397,25 +396,41 @@ class Qt4_TreeBrick(BlissWidget):
         """
         tree_brick['tree_brick'] = self
 
+    def queue_entry_execution_started(self, queue_entry):
+        self.emit(QtCore.SIGNAL("queue_is_executing"), True)
+        self.dc_tree_widget.queue_entry_execution_started(queue_entry)
+
+    def queue_paused_handler(self, status):
+        self.dc_tree_widget.queue_paused_handler(status)
+
+    def queue_execution_completed(self, status):
+        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
+        self.dc_tree_widget.queue_execution_completed(status)
+
+    def queue_stop_handler(self, status):
+        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
+        self.dc_tree_widget.queue_stop_handler(status)
+
     def samples_from_lims(self, samples):
         """
         Descript. :
         """
-        barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(samples)
+        barcode_samples, location_samples = \
+            self.dc_tree_widget.samples_from_lims(samples)
         l_samples = dict()            
    
         # TODO: add test for sample changer type, here code is for Robodiff only
         for location, l_sample in location_samples.iteritems():
-          if l_sample.lims_location != (None, None):
-            basket, sample = l_sample.lims_location
-            cell = int(round((basket+0.5)/3.0))
-            puck = basket-3*(cell-1)
-            new_location = (cell, puck, sample)
-            l_sample.lims_location = new_location
-            l_samples[new_location] = l_sample
-            name = l_sample.get_name()
-            l_sample.init_from_sc_sample([new_location])
-            l_sample.set_name(name)
+            if l_sample.lims_location != (None, None):
+                basket, sample = l_sample.lims_location
+                cell = int(round((basket + 0.5) / 3.0))
+                puck = basket - 3 * (cell - 1)
+                new_location = (cell, puck, sample)
+                l_sample.lims_location = new_location
+                l_samples[new_location] = l_sample
+                name = l_sample.get_name()
+                l_sample.init_from_sc_sample([new_location])
+                l_sample.set_name(name)
 
         return barcode_samples, l_samples
 
@@ -1039,7 +1054,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.update_enable_collect()
 
     def shutter_state_changed(self, state):
-        self.enable_collect_conditions["shutter"] = state == "opened"
+        if state == "closed":
+            self.enable_collect_conditions["shutter"] = False
+        else:
+            self.enable_collect_conditions["shutter"] = True
+
         self.update_enable_collect()
 
     def update_enable_collect(self):
@@ -1048,7 +1067,7 @@ class Qt4_TreeBrick(BlissWidget):
             if enable_collect:
                 logging.getLogger("user_level_log").info("Data collection is enabled")    
             else:
-                logging.getLogger("user_level_log").info("Data collect is disabled")
+                logging.getLogger("user_level_log").warning("Data collect is disabled")
                 for key, value in self.enable_collect_conditions.iteritems():
                     if value == False:
                         if key == "diffractometer":

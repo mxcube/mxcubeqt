@@ -157,12 +157,12 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         Descript. :
         """
         try:
-            val = float(str(self.new_position_ledit.text()))
+            val = float(str(self.new_value_ledit.text()))
         except (ValueError, TypeError):
             return
 
         if self.beamstop_limits is not None:
             if val < self.beamstop_limits[0] or val > self.beamstop_limits[1]:
                 return
-        self.beamstop_hwobj.set_positions(val)
-        self.new_position_ledit.setText('')
+        self.beamstop_hwobj.set_position(val)
+        self.new_value_ledit.setText('')

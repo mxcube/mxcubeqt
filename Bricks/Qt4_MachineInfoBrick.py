@@ -122,16 +122,16 @@ class Qt4_MachineInfoBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.mach_info_hwobj is not None:
-                self.disconnect(self.mach_info_hwobj, QtCore.SIGNAL('valuesChanged'), self.set_value)
-                self.disconnect(self.mach_info_hwobj, QtCore.SIGNAL('inRangeChanged'), self.set_color)
-                self.disconnect(self.mach_info_hwobj, QtCore.SIGNAL('tempHumChanged'), self.temp_hum_changed)
+                self.disconnect(self.mach_info_hwobj, 'valuesChanged', self.set_value)
+                self.disconnect(self.mach_info_hwobj, 'inRangeChanged', self.set_color)
+                self.disconnect(self.mach_info_hwobj, 'tempHumChanged', self.temp_hum_changed)
 
             self.mach_info_hwobj = self.getHardwareObject(new_value)
             if self.mach_info_hwobj is not None:
                 self.setEnabled(True)
-                self.connect(self.mach_info_hwobj, QtCore.SIGNAL('valuesChanged'), self.set_value)
-                self.connect(self.mach_info_hwobj, QtCore.SIGNAL('inRangeChanged'), self.set_color)
-                self.connect(self.mach_info_hwobj, QtCore.SIGNAL('tempHumChanged'), self.temp_hum_changed)
+                self.connect(self.mach_info_hwobj, 'valuesChanged', self.set_value)
+                self.connect(self.mach_info_hwobj, 'inRangeChanged', self.set_color)
+                self.connect(self.mach_info_hwobj, 'tempHumChanged', self.temp_hum_changed)
                 if self.mach_info_hwobj.has_cryo() is False:
                     self.cryo_label.hide()
                     self.cryo_value_label.hide()

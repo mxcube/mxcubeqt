@@ -141,16 +141,38 @@ class Qt4_HutchMenuBrick(BlissWidget):
         """
         if property_name == "graphicsManager":
             if self.graphics_manager_hwobj:  
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringStarted'), self.centring_started)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringFailed'), self.centring_failed)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringSuccessful'), self.centring_successful)
-                self.disconnect(self.graphics_manager_hwobj, QtCore.SIGNAL('diffractometerReady'), self.diffractometer_ready_changed)
+                self.disconnect(self.graphics_manager_hwobj, 
+                                'centringStarted',
+                                self.centring_started)
+                self.disconnect(self.graphics_manager_hwobj,
+                                'centringFailed',
+                                self.centring_failed)
+                self.disconnect(self.graphics_manager_hwobj,
+                                'centringSuccessful',
+                                self.centring_successful)
+                self.disconnect(self.graphics_manager_hwobj,
+                                'diffractometerReady',
+                                self.diffractometer_ready_changed)
+                self.disconnect(self.graphics_manager_hwobj, 
+                                'diffractometerPhaseChanged',
+                                self.diffractometer_phase_changed)
             self.graphics_manager_hwobj = self.getHardwareObject(new_value) 
             if self.graphics_manager_hwobj:
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringStarted'), self.centring_started)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringFailed'), self.centring_failed)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('centringSuccessful'), self.centring_successful)
-                self.connect(self.graphics_manager_hwobj, QtCore.SIGNAL('diffractometerReady'), self.diffractometer_ready_changed)
+                self.connect(self.graphics_manager_hwobj,
+                             'centringStarted',
+                             self.centring_started)
+                self.connect(self.graphics_manager_hwobj,
+                             'centringFailed',
+                             self.centring_failed)
+                self.connect(self.graphics_manager_hwobj,
+                             'centringSuccessful',
+                             self.centring_successful)
+                self.connect(self.graphics_manager_hwobj,
+                             'diffractometerReady',
+                             self.diffractometer_ready_changed)
+                self.connect(self.graphics_manager_hwobj,
+                             'diffractometerPhaseChanged',
+                             self.diffractometer_phase_changed)
         elif property_name == "enableAutoFocus":
             self.auto_focus_button.setVisible(new_value) 
         elif property_name == "enableRefreshCamera":
@@ -326,17 +348,22 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.graphics_manager_hwobj.create_grid()
 
     def diffractometer_ready_changed(self, is_ready):
-        self.centre_button.setEnabled(is_ready)
-        self.accept_button.setEnabled(is_ready)
-        self.reject_button.setEnabled(is_ready)
-        self.create_line_button.setEnabled(is_ready)
-        self.draw_grid_button.setEnabled(is_ready)
-        self.auto_focus_button.setEnabled(is_ready)
-        self.refresh_camera_button.setEnabled(is_ready)
-        self.visual_align_button.setEnabled(is_ready)
-        self.select_all_button.setEnabled(is_ready)
-        self.clear_all_button.setEnabled(is_ready)
-        self.auto_center_button.setEnabled(is_ready)
+        self.setEnabled(is_ready)
+
+    def diffractometer_phase_changed(self, phase):
+        #TODO connect this to minidiff
+        status = phase != "BeamLocation"
+        self.centre_button.setEnabled(status)
+        self.accept_button.setEnabled(status)
+        self.reject_button.setEnabled(status)
+        self.create_line_button.setEnabled(status)
+        self.draw_grid_button.setEnabled(status)
+        self.auto_focus_button.setEnabled(status)
+        self.refresh_camera_button.setEnabled(status)
+        self.visual_align_button.setEnabled(status)
+        self.select_all_button.setEnabled(status)
+        self.clear_all_button.setEnabled(status)
+        self.auto_center_button.setEnabled(status)
 
     def auto_focus_clicked(self):
         self.graphics_manager_hwobj.auto_focus()

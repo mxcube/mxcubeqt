@@ -58,6 +58,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         # Properties ---------------------------------------------------------- 
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("queue_model", "string", "/queue-model")
+        self.addProperty("useOscStartCbox", "boolean", False)
        
         # Signals ------------------------------------------------------------  
         self.defineSignal("getTreeBrick",())
@@ -173,6 +174,9 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
+
+        elif property_name == 'useOscStartCbox':
+            self.task_tool_box_widget.use_osc_start_cbox(new_value)
 
     def selection_changed(self, items):
         """
