@@ -19,7 +19,7 @@
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-
+from random import randint
 #Basic core colors
 WHITE = QtCore.Qt.white
 GRAY =  QtCore.Qt.gray
@@ -59,3 +59,12 @@ def set_widget_color(widget, color, color_role =None):
     widget_palette.setColor(color_role, color)
     widget.setAutoFillBackground(True) 
     widget.setPalette(widget_palette)
+
+def get_random_color(alpha=255):
+    return QtGui.QColor(randint(0, 255), randint(0, 255), randint(0, 255), alpha)
+
+def get_random_rgb(alpha=255):
+    return [randint(0, 255), randint(0, 255), randint(0, 255), alpha]
+
+def get_random_hex(alpha=255):
+    return "#{0:02x}{1:02x}{2:02x}".format(randint(0, 255), randint(0, 255), randint(0, 255))

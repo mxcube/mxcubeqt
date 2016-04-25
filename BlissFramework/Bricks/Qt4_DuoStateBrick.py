@@ -29,7 +29,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_DuoStateBrick(BlissWidget):
@@ -127,7 +127,8 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.wrapper_hwobj.setIn()
         else:
             self.set_in_button.blockSignals(True)
-            self.set_in_button.setState(QtGui.QPushButton.On)
+            #self.set_in_button.setState(QtGui.QPushButton.On)
+            self.set_in_button.setDown()
             self.set_in_button.blockSignals(False)
 
     def set_out(self, state):
@@ -135,7 +136,8 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.wrapper_hwobj.setOut()
         else:
             self.set_out_button.blockSignals(True)
-            self.set_out_button.setState(QtGui.QPushButton.On)
+            self.set_out_button.setDown()
+            #self.set_out_button.setState(QtGui.QPushButton.On)
             self.set_out_button.blockSignals(False)
 
     def updateLabel(self,label):

@@ -39,8 +39,8 @@ class Qt4_EnergyBrick(BlissWidget):
         # Properties ----------------------------------------------------------       
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('defaultMode', 'combo', ('keV', 'Ang'), 'keV')
-        self.addProperty('kevFormatString', 'formatString', '###.####')
-        self.addProperty('angFormatString', 'formatString', '##.###')
+        self.addProperty('kevFormatString', 'formatString', '###.#####')
+        self.addProperty('angFormatString', 'formatString', '##.####')
 
         # Signals ------------------------------------------------------------
 
@@ -196,7 +196,10 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.energy_hwobj.move_energy(float(self.new_value_ledit.text()))
+        if self.units_combobox.currentIndex() == 0:
+            self.energy_hwobj.move_energy(float(self.new_value_ledit.text()))
+        else:
+            self.energy_hwobj.move_wavelength(float(self.new_value_ledit.text()))
         self.new_value_ledit.setText("")
 
     def input_field_changed(self, input_field_text):
@@ -234,7 +237,7 @@ class Qt4_EnergyBrick(BlissWidget):
             value_limits = self.energy_hwobj.get_wavelength_limits()
             tool_tip = "Wavelength limits"
         if value_limits is not None:
-            self.new_value_validator.setRange(value_limits[0], value_limits[1], 2)    
+            self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
             self.new_value_ledit.setValidator(self.new_value_validator)
             self.new_value_ledit.setToolTip("%s %.2f : %.2f" % \
                  (tool_tip, value_limits[0], value_limits[1]))

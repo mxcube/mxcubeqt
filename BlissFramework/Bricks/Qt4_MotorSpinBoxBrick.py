@@ -79,8 +79,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot('setEnabled',())
-        self.defineSlot('setDisabled',())
         self.defineSlot('toggle_enabled',())
 
         # Graphic elements-----------------------------------------------------
@@ -345,6 +343,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 s = self.motor_hwobj.GUIstep
             except:
                 s = 1.0
+
         if self.motor_hwobj is not None:
             if self.motor_hwobj.isReady():
                 self.motor_hwobj.moveRelative(s)

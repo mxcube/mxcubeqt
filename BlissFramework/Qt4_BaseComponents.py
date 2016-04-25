@@ -715,6 +715,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
                            'hardwareObjectDiscarded', 
                            HardwareRepository.HardwareRepository())
         self.defineSlot('enable_widget', ())
+        self.defineSlot('disable_widget', ())
 
     def __run(self):
         """
@@ -1071,6 +1072,15 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
             self.setEnabled(True)
         else:
             self.setDisabled(True)
+
+    def disable_widget(self, state):
+        """
+        Descript. :
+        """
+        if state:
+            self.setDisabled(True)
+        else:
+            self.setEnabled(True)
   
 
 class NullBrick(BlissWidget):

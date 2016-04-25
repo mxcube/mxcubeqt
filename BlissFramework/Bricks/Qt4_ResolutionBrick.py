@@ -178,11 +178,11 @@ class Qt4_ResolutionBrick(BlissWidget):
 
         elif property_name == 'detectorDistance':
             if self.detector_distance_hwobj is not None:
-                self.disconnect(self.detector_distance_hwobj, QtCore.SIGNAL('deviceReady'), self.detector_distance_ready)
-                self.disconnect(self.detector_distance_hwobj, QtCore.SIGNAL('deviceNotReady'), self.detector_distance_not_ready)
-                self.disconnect(self.detector_distance_hwobj, QtCore.SIGNAL('stateChanged'),self.detector_distance_state_changed)
-                self.disconnect(self.detector_distance_hwobj, QtCore.SIGNAL('positionChanged'),self.detector_distance_changed)
-                self.disconnect(self.detector_distance_hwobj, QtCore.SIGNAL('limitsChanged'),self.detector_distance_limits_changed)
+                self.disconnect(self.detector_distance_hwobj, 'deviceReady', self.detector_distance_ready)
+                self.disconnect(self.detector_distance_hwobj, 'deviceNotReady',  self.detector_distance_not_ready)
+                self.disconnect(self.detector_distance_hwobj, 'stateChanged', self.detector_distance_state_changed)
+                self.disconnect(self.detector_distance_hwobj, 'positionChanged', self.detector_distance_changed)
+                self.disconnect(self.detector_distance_hwobj, 'limitsChanged', self.detector_distance_limits_changed)
 
             self.units_combobox.clear()
             available_units = []
@@ -195,11 +195,11 @@ class Qt4_ResolutionBrick(BlissWidget):
                 self.units_combobox.addItem('mm')
                 available_units.append('mm')
 
-                self.connect(self.detector_distance_hwobj, QtCore.SIGNAL('deviceReady'), self.detector_distance_ready)
-                self.connect(self.detector_distance_hwobj, QtCore.SIGNAL('deviceNotReady'), self.detector_distance_not_ready)
-                self.connect(self.detector_distance_hwobj, QtCore.SIGNAL('stateChanged'), self.detector_distance_state_changed)
-                self.connect(self.detector_distance_hwobj, QtCore.SIGNAL('positionChanged'), self.detector_distance_changed)
-                self.connect(self.detector_distance_hwobj, QtCore.SIGNAL('limitsChanged'), self.detector_distance_limits_changed)
+                self.connect(self.detector_distance_hwobj, 'deviceReady', self.detector_distance_ready)
+                self.connect(self.detector_distance_hwobj, 'deviceNotReady', self.detector_distance_not_ready)
+                self.connect(self.detector_distance_hwobj, 'stateChanged', self.detector_distance_state_changed)
+                self.connect(self.detector_distance_hwobj, 'positionChanged', self.detector_distance_changed)
+                self.connect(self.detector_distance_hwobj, 'limitsChanged', self.detector_distance_limits_changed)
 
                 if self.detector_distance_hwobj.isReady():
                     self.detector_distance_hwobj.update_values()
@@ -219,23 +219,23 @@ class Qt4_ResolutionBrick(BlissWidget):
         elif property_name == 'energy':
             if self.energy_hwobj is not None:
                 self.disconnect(self.energy_hwobj,
-                                QtCore.SIGNAL('moveEnergyFinished'),
+                                'moveEnergyFinished',
                                 self.energy_changed)
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.connect(self.energy_hwobj, 
-                             QtCore.SIGNAL('moveEnergyFinished'), 
+                             'moveEnergyFinished', 
                              self.energy_changed)
 
         elif property_name == 'doorInterlock':
             if self.door_interlock_hwobj is not None:
                 self.disconnect(self.door_interlock_hwobj,
-                                QtCore.SIGNAL('doorInterlockStateChanged'),
+                                'doorInterlockStateChanged',
                                 self.door_interlock_state_changed)
             self.door_interlock_hwobj = self.getHardwareObject(new_value)
             if self.door_interlock_hwobj is not None:
                 self.connect(self.door_interlock_hwobj,
-                             QtCore.SIGNAL('doorInterlockStateChanged'),
+                             'doorInterlockStateChanged',
                              self.door_interlock_state_changed)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -375,13 +375,7 @@ class Qt4_ResolutionBrick(BlissWidget):
         else:
             self.detector_distance_state_changed(None)
 
-        if self.door_interlocked:
-            self.new_value_ledit.blockSignals(True)
-            self.new_value_ledit.setText("")
-            self.new_value_ledit.blockSignals(False)
-            self.setEnabled(True)
-        else:
-            self.setEnabled(False)            
+        self.setEnabled(self.door_interlocked)            
 
     def resolution_ready(self):
         self.update_gui(resolution_ready=True)
@@ -528,5 +522,6 @@ class Qt4_ResolutionBrick(BlissWidget):
         if self.door_interlocked:
             self.setToolTip("")
         else:
-            self.setToolTip("Hutch door is not interlocked.")
-        self.update_gui()
+            self.setToolTip("Resolution change is not possible. " + \
+                            "Hutch door is not interlocked.")
+        self.setEnabled(self.door_interlocked)

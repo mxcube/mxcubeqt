@@ -233,8 +233,8 @@ class Qt4_ChatBrick(BlissWidget):
         Return    : 
         """
         if started:
-            msg="I'm moderating the chat as %s." % server_id[0]
-            self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
+            #sg="I'm moderating the chat as %s." % server_id[0]
+            #self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
             self.nickname=server_id[0]
 
     def client_closed(self,client_id):
