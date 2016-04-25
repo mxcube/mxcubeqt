@@ -93,7 +93,10 @@ class DataPathWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        selected_dir = str(QtGui.QFileDialog.getExistingDirectory(\
+        file_dialog = QtGui.QFileDialog(self)
+        file_dialog.setNameFilter("%s*" % self._base_image_dir)
+
+        selected_dir = str(file_dialog.getExistingDirectory(\
             self, "Select a directory", self._base_image_dir))
         selecte_dir = os.path.dirname(selected_dir)
 
@@ -104,19 +107,16 @@ class DataPathWidget(QtGui.QWidget):
         """
         Descript. :
         """
+        cursor_pos = self.data_path_layout.prefix_ledit.cursorPosition()
+
         if len(new_value) > 0:
             available_chars = string.ascii_lowercase + string.ascii_uppercase + \
                               string.digits + "-_"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)
         self.data_path_layout.prefix_ledit.setText(new_value)
+        self.data_path_layout.prefix_ledit.setCursorPosition(cursor_pos)
 
         self._data_model.base_prefix = str(new_value)
-        """file_name = self._data_model.get_image_file_name()
-        file_name = file_name.replace('%' + self._data_model.precision + 'd',
-                                      int(self._data_model.precision) * '#' )
-        file_name = file_name.strip(' ')
-        self.data_path_layout.file_name_value_label.setText(file_name)"""
-        
         self.update_file_name()
         self.pathTemplateChangedSignal.emit()
 
@@ -146,7 +146,8 @@ class DataPathWidget(QtGui.QWidget):
         else:
             new_image_directory = base_image_dir
             new_proc_dir = base_proc_dir
-            
+
+
         self._data_model.directory = new_image_directory
         self._data_model.process_directory = new_proc_dir 
         Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
@@ -181,21 +182,18 @@ class DataPathWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        #dir_parts = directory.split(self._base_image_dir)
-        self._data_model.directory = directory
-        self._base_image_dir = directory
-        
-       
-        """
-        print dir_parts 
+        base_image_dir = self._base_image_dir
+        dir_parts = directory.split(base_image_dir) 
+
         if len(dir_parts) > 1:
-            sub_dir = dir_parts[1]        
+            sub_dir = dir_parts[1]
+            self._data_model.directory = directory
             self.data_path_layout.folder_ledit.setText(sub_dir)
         else:
             self.data_path_layout.folder_ledit.setText('')
-        """
+            self._data_model.directory = base_image_dir
 
-        self.data_path_layout.base_path_ledit.setText(directory)
+        self.data_path_layout.base_path_ledit.setText(base_image_dir)       
 
     def set_run_number(self, run_number):
         """

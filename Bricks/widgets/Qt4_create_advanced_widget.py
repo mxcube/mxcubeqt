@@ -77,17 +77,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
-
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
-        self._acq_widget.madEnergySelectedSignal.connect(\
-             self.mad_energy_selected)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self._acq_widget.madEnergySelectedSignal.\
+             connect(self.mad_energy_selected)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
         self._advanced_methods_widget.grid_treewidget.itemSelectionChanged.\
              connect(self.grid_treewidget_item_selection_changed)
@@ -267,6 +262,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             acq.acquisition_parameters.num_images = \
                 grid_properties["num_lines"] * \
                 grid_properties["num_images_per_line"]
+            shape.set_osc_range(acq.acquisition_parameters.osc_range)
 
             processing_parameters = deepcopy(self._processing_parameters)
 
@@ -296,10 +292,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         if shape_type == "Grid":
             self._advanced_methods_widget.grid_treewidget.clearSelection()
             grid_properties = shape.get_properties()
-            info_str_list = QtCore.QStringList()
+            info_str_list = []
             info_str_list.append(grid_properties["name"])
-            info_str_list.append("%d" % grid_properties["beam_x"])
-            info_str_list.append("%d" % grid_properties["beam_y"])
+            info_str_list.append("%d" % (grid_properties["beam_x_mm"] * 1000.0))
+            info_str_list.append("%d" % (grid_properties["beam_y_mm"] * 1000.0))
             info_str_list.append("%d" % grid_properties["num_lines"])
             info_str_list.append("%d" % grid_properties["num_images_per_line"])
 

@@ -31,6 +31,9 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
     """
     Descript. :
     """
+    acqParametersChangedSignal = QtCore.pyqtSignal()
+    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, bool)
+
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None, 
                  path_template = None, layout = None):
         """
@@ -45,7 +48,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.enable_parameter_update = True
 
         # Properties ---------------------------------------------------------- 
 
@@ -93,15 +95,11 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-    def set_enable_parameter_update(self, state):
-        self.enable_parameter_update = state
-
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update and \
-           not self.acq_widget_layout.osc_start_cbox.isChecked():
+        if not self.acq_widget_layout.osc_start_cbox.hasFocus():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
@@ -115,7 +113,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if not self.acq_widget_layout.kappa_ledit.hasFocus():
             self.acq_widget_layout.kappa_ledit.setText(\
                  "%.2f" % float(new_value))
 
@@ -123,7 +121,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus():
             self.acq_widget_layout.kappa_phi_ledit.setText(\
                  "%.2f" % float(new_value))
 
@@ -265,8 +263,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        #self._acquisition_parameters.energy = energy
-        if self.enable_parameter_update:
+        if not self.acq_widget_layout.energy_ledit.hasFocus():
             self.acq_widget_layout.energy_ledit.setText(\
                  "%.4f" % float(energy))
 
@@ -274,18 +271,17 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if self.acq_widget_layout.transmission_ledit.hasFocus():
             self.acq_widget_layout.transmission_ledit.setText(\
                  "%.2f" % float(transmission))
-        #self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
-        #self._acquisition_parameters.resolution = float(resolution)
+        if not self.acq_widget_layout.resolution_ledit.hasFocus():
+            self.acq_widget_layout.resolution_ledit.setText(\
+                 "%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
         """

@@ -55,7 +55,6 @@ class AcquisitionWidget(QtGui.QWidget):
 
         # Internal variables --------------------------------------------------
         self.previous_energy = 0
-        self.enable_parameter_update = True 
 
         # Properties ---------------------------------------------------------- 
 
@@ -94,8 +93,8 @@ class AcquisitionWidget(QtGui.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
-             self.use_osc_start)
+        #self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
+        #     self.use_osc_start)
         self.acq_widget_layout.exp_time_ledit.textChanged.connect(\
              self.exposure_time_ledit_changed)
         self.acq_widget_layout.first_image_ledit.textChanged.connect(\
@@ -122,7 +121,7 @@ class AcquisitionWidget(QtGui.QWidget):
         self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
         self.kappa_validator = QtGui.QDoubleValidator(0, 360, 4, self)
         self.kappa_phi_validator = QtGui.QDoubleValidator(0, 360, 4, self)
-        self.energy_validator = QtGui.QDoubleValidator(0, 25, 4, self)
+        self.energy_validator = QtGui.QDoubleValidator(4, 25, 4, self)
         self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
         self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
         self.exp_time_validator = QtGui.QDoubleValidator(0.0001, 10000, 4, self)
@@ -131,48 +130,48 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-    def set_enable_parameter_update(self, state):
-        """
-        Descript. :
-        """
-        self.enable_parameter_update = state
+        self.use_osc_start(True)
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update and \
-           not self.acq_widget_layout.osc_start_cbox.isChecked():
+        if not self.acq_widget_layout.osc_start_ledit.hasFocus():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
             except TypeError:
                pass
             self.update_num_image_limits()
-            self.acq_widget_layout.osc_start_ledit.setText("%.2f" % osc_start_value)
+            self.acq_widget_layout.osc_start_ledit.setText(\
+                 "%.2f" % osc_start_value)
             #self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
+        if not self.acq_widget_layout.kappa_ledit.hasFocus():
+            self.acq_widget_layout.kappa_ledit.setText(\
+                 "%.2f" % float(new_value))
             #self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
+        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus():
+            self.acq_widget_layout.kappa_phi_ledit.setText(\
+                 "%.2f" % float(new_value))
             #self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
         """
         Descript. :
         """
-        self.acq_widget_layout.osc_start_ledit.setEnabled(state)
+        self.acq_widget_layout.osc_start_cbox.setVisible(state)
+        self.acq_widget_layout.osc_start_label.setVisible(not state)
+        #self.acq_widget_layout.osc_start_ledit.setEnabled(state)
 
     def use_kappa(self, state):
         """
@@ -328,6 +327,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if self.diffractometer_hwobj.in_plate_mode():
             self.update_parameter_limits()
+            self.acqParametersChangedSignal.emit()
 
     def num_images_ledit_change(self, new_value):
         """
@@ -433,15 +433,17 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.transmission_ledit.setText("%.2f" % float(transmission))
+        if not self.acq_widget_layout.transmission_ledit.hasFocus():
+            self.acq_widget_layout.transmission_ledit.setText(\
+                 "%.2f" % float(transmission))
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
+        if not self.acq_widget_layout.resolution_ledit.hasFocus():
+            self.acq_widget_layout.resolution_ledit.setText(\
+                 "%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
         """

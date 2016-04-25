@@ -80,14 +80,12 @@ class AdvancedParametersWidget(QtGui.QWidget):
         _main_hlayout.addStretch(0)
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
-                     self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
-                     self._run_number_ledit_change)
+        #self._acq_widget.acqParametersChangedSignal.\
+        #     connect(self.acq_parameters_changed)
+        #self._data_path_widget.pathTemplateChangedSignal.\
+        #     connect(self.acq_parameters_changed)
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
 
         # Ohter ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
@@ -102,33 +100,6 @@ class AdvancedParametersWidget(QtGui.QWidget):
     def set_beamline_setup(self, bl_setup):
         self._beamline_setup_hwobj = bl_setup
         self._acq_widget.set_beamline_setup(bl_setup)
-
-    def _prefix_ledit_change(self, new_value):
-        prefix = self._data_collection.acquisitions[0].\
-                 path_template.get_prefix()
-        self._data_collection.set_name(prefix)
-        self._tree_view_item.setText(0, self._data_collection.get_name())
-
-    def _run_number_ledit_change(self, new_value):
-        if str(new_value).isdigit():
-            self._data_collection.set_number(int(new_value))
-            self._tree_view_item.setText(0, self._data_collection.get_name())
-
-    def handle_path_conflict(self):
-        if self._tree_view_item:
-            dc_tree_widget = self._tree_view_item.listView().parent()
-            dc_tree_widget.check_for_path_collisions()
-            path_template = self._data_collection.acquisitions[0].path_template
-            path_conflict = self.queue_model_hwobj.\
-                        check_for_path_collisions(path_template)
-
-            if path_conflict:
-                logging.getLogger("user_level_log").\
-                    error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before collecting')
-                Qt4_widget_colors.set_widget_color(widget, Qt4_widget_colors.LIGHT_RED)
-            else:
-                Qt4_widget_colors.set_widget_color(widget, Qt4_widget_colors.LIGHT_WHITE)
 
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template

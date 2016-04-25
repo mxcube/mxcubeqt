@@ -32,7 +32,7 @@ class ProcessingWidget(QtGui.QWidget):
 
     enableProcessingSignal = QtCore.pyqtSignal(bool)
 
-    def __init__(self, parent = None, name = None, fl = 0, data_model = None):
+    def __init__(self, parent=None, name=None, fl=0, data_model=None):
 
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
         if name is not None:
@@ -44,6 +44,7 @@ class ProcessingWidget(QtGui.QWidget):
             self._model = data_model
 
         self._model_mib = DataModelInputBinder(self._model)
+        self.run_processing = False
 
         self.processing_widget = self.acq_widget_layout = uic.loadUi(
                            os.path.join(os.path.dirname(__file__),
@@ -54,7 +55,7 @@ class ProcessingWidget(QtGui.QWidget):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
        
-        self.processing_widget.space_group_cbox.\
+        self.processing_widget.space_group_combo.\
             addItems(queue_model_enumerables.XTAL_SPACEGROUPS)
         
         self._model_mib.bind_value_update('cell_a',
@@ -92,10 +93,10 @@ class ProcessingWidget(QtGui.QWidget):
                                           float,
                                           None)
 
-        self.processing_widget.space_group_cbox.activated.connect(\
-             self._space_group_change)    
-        self.processing_widget.main_groupbox.toggled.connect(
-             self._processing_enable_toggled)
+        self.processing_widget.space_group_combo.activated.\
+             connect(self._space_group_change)    
+        self.processing_widget.run_processing_cbox.stateChanged.\
+             connect(self._processing_enable_toggled)
  
 
     def _space_group_change(self, index):
@@ -109,7 +110,7 @@ class ProcessingWidget(QtGui.QWidget):
             index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
         
         self._space_group_change(index)
-        self.processing_widget.space_group_cbox.setCurrentIndex(index)
+        self.processing_widget.space_group_combo.setCurrentIndex(index)
 
     def update_data_model(self, model):
         self._model = model
@@ -117,4 +118,7 @@ class ProcessingWidget(QtGui.QWidget):
         self._set_space_group(model.space_group)
 
     def _processing_enable_toggled(self, state):
-        self.enableProcessingSignal.emit(state)
+        self.run_processing = self.processing_widget.\
+             run_processing_cbox.isChecked()
+        self.enableProcessingSignal.emit(self.processing_widget.\
+             run_processing_cbox.isChecked())

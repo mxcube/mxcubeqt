@@ -88,18 +88,13 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_widget.overlay_slider.valueChanged.\
              connect(self.overlay_alpha_changed)
 
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
-
         self._processing_widget.enableProcessingSignal.connect(\
              self._enable_processing_toggled)
 
@@ -292,6 +287,8 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_number(start_acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
             dc.set_requires_centring(False)
+            #Rename to run_autoproc and move to mib
+            dc.run_autoprocessing = self._processing_widget.run_processing
 
             data_collections.append(dc)
             self._path_template.run_number += 1

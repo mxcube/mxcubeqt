@@ -91,16 +91,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="space_group_cbox">
+           <widget class="QComboBox" name="space_group_combo">
             <property name="minimumSize">
              <size>
-              <width>75</width>
+              <width>90</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>75</width>
+              <width>90</width>
               <height>32767</height>
              </size>
             </property>

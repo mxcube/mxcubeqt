@@ -116,6 +116,12 @@ class TaskToolBoxWidget(QtGui.QWidget):
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_tree_brick(brick)
 
+    def use_osc_start_cbox(self, status):
+        for i in range(0, self.tool_box.count()):
+            acq_widget = self.tool_box.widget(i).get_acquisition_widget()
+            if acq_widget:
+                acq_widget.use_osc_start(status)
+
     def set_beamline_setup(self, beamline_setup_hwobj):
         self._beamline_setup_hwobj = beamline_setup_hwobj
         for i in range(0, self.tool_box.count()):

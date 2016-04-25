@@ -67,7 +67,14 @@
               <item>
                <widget class="QCheckBox" name="osc_start_cbox">
                 <property name="text">
-                 <string>Osciallatoin start:</string>
+                 <string>Osciallation start:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="osc_start_label">
+                <property name="text">
+                 <string>Osciallation start:</string>
                 </property>
                </widget>
               </item>

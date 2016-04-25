@@ -70,6 +70,8 @@ class HeatMapWidget(QtGui.QWidget):
         _threshold_label = QtGui.QLabel("Threshold: ", self._heat_map_tools_widget)
         self._threshold_slider = QtGui.QSlider(QtCore.Qt.Horizontal, 
                self._heat_map_tools_widget)
+        self._relaunch_processing_button = QtGui.QPushButton("Relaunch processing",
+             self._heat_map_tools_widget)
         self._create_points_button = QtGui.QPushButton("Create centring points", 
              self._heat_map_tools_widget)
 
@@ -86,6 +88,7 @@ class HeatMapWidget(QtGui.QWidget):
         _heat_map_tools_hlayout.addWidget(_threshold_label)
         _heat_map_tools_hlayout.addWidget(self._threshold_slider)
         _heat_map_tools_hlayout.addStretch(0)
+        _heat_map_tools_hlayout.addWidget(self._relaunch_processing_button)
         _heat_map_tools_hlayout.addWidget(self._create_points_button)
         _heat_map_tools_hlayout.setSpacing(2)
         _heat_map_tools_hlayout.setContentsMargins(2, 2, 2, 2)
@@ -121,12 +124,16 @@ class HeatMapWidget(QtGui.QWidget):
 
         # Qt signals and slots ------------------------------------------------
         self._score_type_cbox.activated.connect(self.score_type_changed)
-        self._threshold_slider.valueChanged.connect(\
-             self.filter_min_slider_changed)
-        self._create_points_button.clicked.connect(\
-             self.create_points_clicked)
-        self._heat_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
-        self._heat_map_plot.mouseDoubleClickedSignal.connect(self.move_to_position_clicked)
+        self._threshold_slider.valueChanged.\
+             connect(self.filter_min_slider_changed)
+        self._relaunch_processing_button.clicked.\
+             connect(self.relaunch_processing_clicked)
+        self._create_points_button.clicked.\
+             connect(self.create_points_clicked)
+        self._heat_map_plot.mouseClickedSignal.\
+             connect(self.mouse_clicked)
+        self._heat_map_plot.mouseDoubleClickedSignal.\
+             connect(self.move_to_position_clicked)
 
         # Other ---------------------------------------------------------------
         tooltip_text = "Double click to move to the position. " + \
@@ -282,7 +289,7 @@ class HeatMapWidget(QtGui.QWidget):
         self._summary_textbrowser.append("Vertical spacing: %.1f %sm" % \
             (grid_properties["yOffset"], u"\u00B5"))
         self._summary_textbrowser.append("Beam size : %.1f x %.1f %sm" % \
-            (grid_properties["beam_x"], grid_properties["beam_y"], u"\u00B5"))
+            (grid_properties["beam_x_mm"], grid_properties["beam_y_mm"], u"\u00B5"))
         self._summary_textbrowser.append("Scan range : %.1f x %.1f mm" % \
             (grid_properties["dx_mm"], grid_properties["dy_mm"]))
 
@@ -318,7 +325,7 @@ class HeatMapWidget(QtGui.QWidget):
 
     def set_results(self, results, last_results=False):
         """
-        Descript. : Displays results on the widget
+        Displays results on the widget
         """
         self.__results = results
         self.refresh()
@@ -327,6 +334,9 @@ class HeatMapWidget(QtGui.QWidget):
             self.setEnabled(True)
 
     def clean_result(self):
+        """
+        Method to clean heat map, summary log and table with best positions
+        """
         self.setEnabled(False)
         self.__results = None
         self.__associated_grid = None
@@ -338,14 +348,17 @@ class HeatMapWidget(QtGui.QWidget):
         self._best_pos_table.setSortingEnabled(False)
 
     def create_centring_point_clicked(self):
+        """
+        Creates a centring point based on the location on the location
+        on heat map.
+        """
         self.create_centring_point()
 
     def create_points_clicked(self):
         """
-        Descript. : creates new centring points based on each image score.
-                    All images are checked and if the value
-                    is over the threshold then screen x and y coordinates
-                    are estimated.
+        Creates new centring points based on each image score.
+        All images are checked and if the value is over the threshold
+         then screen x and y coordinates are estimated.
         """
         if self.__is_map_plot:
             result_display = numpy.transpose(self.__result_display)
@@ -365,7 +378,7 @@ class HeatMapWidget(QtGui.QWidget):
   
     def display_image_clicked(self):
         """
-        Decript. : displays image in image tracker (by default adxv)
+        Displays image in image tracker (by default adxv)
         """
         image, line, image_num, image_path = self.get_image_parameters_from_coord()
         if self._beamline_setup_hwobj.image_tracking_hwobj is not None:
@@ -373,7 +386,7 @@ class HeatMapWidget(QtGui.QWidget):
 
     def get_image_parameters_from_coord(self, coord_x=None, coord_y=None):
         """
-        Descript. : returns image parameters for selected heat map frame
+        returns image parameters for selected heat map frame
         """
         if not coord_x:
             coord_x = self.__selected_x
@@ -401,6 +414,9 @@ class HeatMapWidget(QtGui.QWidget):
         return image, line, image_num, image_path
 
     def get_col_row_from_image_line(self, line, image):
+        """
+        Returns col and row from image and line
+        """
         return self.__associated_grid.get_col_row_from_line_image(line, image)
 
     def create_centring_point(self, coord_x=None, coord_y=None):
@@ -490,20 +506,39 @@ class HeatMapWidget(QtGui.QWidget):
         self._best_pos_table.setSortingEnabled(True)
 
     def move_to_best_position_clicked(self):
+        """
+        Moves diffractometer motors to the selected position
+        """
         if self._best_pos_table.currentRow() > -1:
             self._beamline_setup_hwobj.diffractometer_hwobj.\
                 move_to_motors_positions(self.__results["best_positions"]\
                 [self._best_pos_table.currentRow()].get("cpos").as_dict())
 
     def create_best_centring_point_clicked(self):
+        """
+        Creates a new centring point based on the selected point
+        from the table of best positions.
+        """
         if self._best_pos_table.currentRow() > -1:
             self._beamline_setup_hwobj.diffractometer_hwobj.\
                 create_centring_point(self.__results["best_positions"]\
                 [self._best_pos_table.currentRow()].get("cpos").as_dict())   
 
     def display_best_image_clicked(self):
+        """
+        Displays image (clicked from best position table) in ADXV
+        """
         if self._best_pos_table.currentRow() > -1:
             image_path = self.__results["best_positions"]\
                [self._best_pos_table.currentRow()].get("filename")
             self._beamline_setup_hwobj.image_tracking_hwobj.\
                load_image(image_path)
+
+    def relaunch_processing_clicked(self):
+        """
+        Relaunches parallel processing
+        """
+        if self.__associated_data_collection and self.__associated_grid:
+            self._beamline_setup_hwobj.parallel_processing_hwobj.\
+                 run_processing(self.__associated_data_collection, 
+                                self.__associated_grid) 

@@ -27,12 +27,13 @@ import queue_model_objects_v1 as queue_model_objects
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget
-from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
+#from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
+from widgets.Qt4_pymca_plot_widget import PymcaPlotWidget
 
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-__category__ = 'Qt4_TaskToolbox_Tabs'
+__category__ = 'Tasks'
 
 
 class EnergyScanParametersWidget(QtGui.QWidget):
@@ -60,8 +61,10 @@ class EnergyScanParametersWidget(QtGui.QWidget):
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.position_widget.setFixedSize(450, 340)        
 
-        self.scan_plot_widget = TwoAxisPlotWidget(self, True)
-        self.result_plot_widget = TwoAxisPlotWidget(self, False)
+        self.scan_plot_widget = PymcaPlotWidget(self, True)
+        self.result_plot_widget = PymcaPlotWidget(self, False)
+        #self.scan_plot_widget = TwoAxisPlotWidget(self, True)
+        #self.result_plot_widget = TwoAxisPlotWidget(self, False)
  
         # Layout -------------------------------------------------------------
         _parameters_widget_layout = QtGui.QVBoxLayout()
@@ -90,7 +93,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.scan_plot_widget)
         _main_vlayout.addWidget(self.result_plot_widget)
-        _main_vlayout.setSpacing(2)
+        _main_vlayout.setSpacing(5)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.addStretch(0)
 
@@ -143,8 +146,14 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.result_plot_widget.setFixedWidth(width)
 
         if executed:
+            title = "Element: %s, Edge: %s" % (\
+                    self.energy_scan_model.element_symbol,
+                    self.energy_scan_model.edge)
+
             result = self.energy_scan_model.get_scan_result()
-            self.scan_plot_widget.plot_energy_scan_curve(result.data)
+            self.scan_plot_widget.plot_energy_scan_curve(result.data,
+                                                         title)
+
             self.result_plot_widget.plot_energy_scan_results(\
               result.pk, result.fppPeak, result.fpPeak, result.ip, 
               result.fppInfl, result.fpInfl, result.rm, 
@@ -178,8 +187,8 @@ class EnergyScanParametersWidget(QtGui.QWidget):
             self.energy_scan_hwobj.connect("scanNewPoint", self.energy_scan_new_point) 
             self.energy_scan_hwobj.connect("choochFinished", self.chooch_finished)
 
-    def energy_scan_started(self):
-        self.scan_plot_widget.start_new_scan()
+    def energy_scan_started(self, scan_info):
+        self.scan_plot_widget.start_new_scan(scan_info)
         self.data_path_widget.setEnabled(False)
         self.periodic_table_widget.setEnabled(False)
 

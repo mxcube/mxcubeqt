@@ -118,7 +118,7 @@ class CreateTaskBase(QtGui.QWidget):
         try:
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
-            bl_setup_hwobj.transmission_hwobj.connect('valueChanged', self.set_transmission)
+            bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
             bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
@@ -162,33 +162,11 @@ class CreateTaskBase(QtGui.QWidget):
     def _enable_processing_toggled(self, state):
         item = self._current_selected_items[0]
         model = item.get_model()
-        model.run_processing = state
+        model.run_autoprocessing = state
+        print state
 
-    def _prefix_ledit_change(self, new_value):
-        if len(self._current_selected_items) > 0:
-            item = self._current_selected_items[0]
-            model = item.get_model()
-
-            if self.isEnabled():
-                if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
-                   not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                    self._path_template.base_prefix = str(new_value)
-                    name = self._path_template.get_prefix()
-                    model.set_name(name)
-                    item.setText(0, model.get_display_name())
-        
-    def _run_number_ledit_change(self, new_value):
-        item = self._current_selected_items[0]
-        model = item.get_model()
-
-        if self.isEnabled():
-            if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
-                   not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                if str(new_value).isdigit():
-                    model.set_number(int(new_value))
-                    item.setText(0, model.get_display_name())
-
-    def handle_path_conflict(self):
+    def acq_parameters_changed(self):
+        self._data_path_widget.update_file_name()
         if self._tree_brick:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
@@ -323,9 +301,6 @@ class CreateTaskBase(QtGui.QWidget):
             if isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
                 sub_dir += str(tree_item.get_model().get_location())
             else:
-                item = self.get_sample_item(tree_item)
-                sub_dir += item.get_model().get_name()
-
                 if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
                     if item.get_model().lims_id == -1:
                         sub_dir += ''
@@ -335,7 +310,7 @@ class CreateTaskBase(QtGui.QWidget):
 
         proc_directory = self._session_hwobj.\
                          get_process_directory(sub_dir)
-    
+
         return (data_directory, proc_directory)
 
     def ispyb_logged_in(self, logged_in):
@@ -360,7 +335,8 @@ class CreateTaskBase(QtGui.QWidget):
 
                 if sample_items:
                     self._current_selected_items = sample_items
-                    self.multiple_item_selection(sample_items)
+                    self.single_item_selection(items[0])
+                    #self.multiple_item_selection(sample_items)
         else:
             self.setDisabled(True)
 
@@ -368,9 +344,8 @@ class CreateTaskBase(QtGui.QWidget):
         self.selection_changed(self._current_selected_items)
 
     def single_item_selection(self, tree_item):
-        self._graphics_manager_hwobj.de_select_all()
         sample_item = self.get_sample_item(tree_item)
-      
+
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)
@@ -405,7 +380,7 @@ class CreateTaskBase(QtGui.QWidget):
                 (data_directory, proc_directory) = self.get_default_directory(tree_item)
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
-              
+
             # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
@@ -443,9 +418,9 @@ class CreateTaskBase(QtGui.QWidget):
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
-        if self._acq_widget:
-            self._acq_widget.set_enable_parameter_update(\
-                 not isinstance(tree_item, Qt4_queue_item.TaskQueueItem)) 
+        #if self._acq_widget:
+        #    self._acq_widget.set_enable_parameter_update(\
+        #         not isinstance(tree_item, Qt4_queue_item.TaskQueueItem)) 
 
     def _update_etr(self):
         omega = self._beamline_setup_hwobj._get_omega_axis_position()
@@ -462,6 +437,7 @@ class CreateTaskBase(QtGui.QWidget):
         self._acquisition_parameters.transmission = transmission
         self._acquisition_parameters.resolution = resolution
 
+    """
     def multiple_item_selection(self, tree_items):
         tree_item = tree_items[0]
 
@@ -495,6 +471,7 @@ class CreateTaskBase(QtGui.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
 
             self.setDisabled(False)
+    """
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
@@ -519,8 +496,9 @@ class CreateTaskBase(QtGui.QWidget):
                 if len(self._current_selected_items) == 1:
                     item = self._current_selected_items[0]
                     cpos = position.get_centred_position()
-                    if cpos.kappa is not None:
+                    if hasattr(cpos, "kappa"):
                         self._acq_widget.update_kappa(cpos.kappa)
+                    if hasattr(cpos, "kappa_phi"):
                         self._acq_widget.update_kappa_phi(cpos.kappa_phi)
                     if isinstance(item, Qt4_queue_item.TaskQueueItem):
                         snapshot = self._graphics_manager_hwobj.get_scene_snapshot(position)

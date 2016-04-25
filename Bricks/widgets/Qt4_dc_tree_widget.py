@@ -67,7 +67,7 @@ class DataCollectTree(QtGui.QWidget):
         self.beamline_setup_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.enable_collect_condition = True
+        self.enable_collect_condition = None
         self.collecting = False
         self.sample_mount_method = 0
         self.centring_method = 0
@@ -782,6 +782,7 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_execution_completed(None)
 
     def queue_entry_execution_started(self, queue_entry):
+
         view_item = queue_entry.get_view()
         if isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
             self.tree_brick.show_energy_scan_tab(view_item)  
@@ -789,6 +790,9 @@ class DataCollectTree(QtGui.QWidget):
             self.tree_brick.show_xrf_spectrum_tab(view_item)
         elif isinstance(view_item, Qt4_queue_item.AdvancedQueueItem):
             self.tree_brick.show_advanced_tab(view_item)
+
+        self.sample_tree_widget.clearSelection() 
+        view_item.setSelected(True)
                
     def queue_execution_completed(self, status):
         """

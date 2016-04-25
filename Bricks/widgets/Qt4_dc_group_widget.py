@@ -118,7 +118,7 @@ class DCGroupWidget(QtGui.QWidget):
                        acq_par.osc_range * acq_par.num_images]) 
 
         for sw in sw_list:
-            color = Qt4_widget_colors.get_random_hex(alpha=50)
+            color = Qt4_widget_colors.get_random_rgb(alpha=50)
             sw.append(color)
 
         self.subwedge_table.setRowCount(0) 

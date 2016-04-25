@@ -79,15 +79,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
         
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
@@ -254,6 +250,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
+        dc.run_autoprocessing = self._processing_widget.run_processing
 
         tasks.append(dc)
 

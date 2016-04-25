@@ -68,7 +68,7 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         _other_parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
         _other_parameters_gbox_hlayout.addStretch(0)
         _other_parameters_gbox_hlayout.setSpacing(2)
-        _other_parameters_gbox_hlayout.setContentsMargins(3, 3, 3, 3)
+        _other_parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _parameters_widget_layout = QtGui.QVBoxLayout(_parameters_widget)
         _parameters_widget_layout.addWidget(self.data_path_widget)
@@ -77,15 +77,15 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         _parameters_widget_layout.setSpacing(2)
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
-        _snapshots_vlayout.addWidget(self.position_widget)
-        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
-        _snapshots_vlayout.setSpacing(2)
-        _snapshots_vlayout.addStretch(0)
+        #_snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
+        #_snapshots_vlayout.addWidget(self.position_widget)
+        #_snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
+        #_snapshots_vlayout.setSpacing(2)
+        #_snapshots_vlayout.addStretch(0)
 
         _top_widget_layout = QtGui.QHBoxLayout(_top_widget)
         _top_widget_layout.addWidget(_parameters_widget)
-        _top_widget_layout.addWidget(_snapshot_widget)
+        _top_widget_layout.addWidget(self.position_widget)
         _top_widget_layout.setSpacing(2)
         _top_widget_layout.addStretch(0)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -139,11 +139,11 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
 
         self.data_path_widget.setEnabled(not executed)
         self.other_parameters_gbox.setEnabled(not executed)    
-        self.mca_spectrum_widget.setEnabled(executed)        
+        #self.mca_spectrum_widget.setEnabled(executed)        
  
         if executed:
-            result = self.xrf_spectrum_model.get_scan_result()
-            self.mca_spectrum_widget.setData(result.mca_data, result.mca_calib, result.mca_config) 
+            result = self.xrf_spectrum_model.get_spectrum_result()
+            self.mca_spectrum_widget.set_data(result.mca_data, result.mca_calib, result.mca_config) 
         else:
             self.mca_spectrum_widget.clear()
         

@@ -70,12 +70,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
-             self.element_edge_selected)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(
-             self.handle_path_conflict)
+        self._periodic_table_widget.elementEdgeSelectedSignal.\
+             connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
     def init_models(self):
         """
