@@ -237,47 +237,101 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         if propertyName == 'mnemonic':
             if self.instance_server_hwobj is not None:
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('instanceInitializing'),self.instanceInitializing)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('serverInitialized'),self.serverInitialized)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('clientInitialized'),self.clientInitialized)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('serverClosed'),self.serverClosed)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('newClient'), self.newClient)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('haveControl'), self.haveControl)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('passControl'), self.passControl)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('wantsControl'), self.wantsControl)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('widgetUpdate'), self.widgetUpdate)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('clientChanged'), self.clientChanged)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('clientClosed'), self.clientClosed)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('widgetCall'), self.widgetCall)
+                self.disconnect(self.instance_server_hwobj,
+                                'instanceInitializing',
+                                self.instanceInitializing)
+                self.disconnect(self.instance_server_hwobj,
+                                'serverInitialized',
+                                self.serverInitialized)
+                self.disconnect(self.instance_server_hwobj,
+                                'clientInitialized',
+                                self.clientInitialized)
+                self.disconnect(self.instance_server_hwobj,
+                                'serverClosed',
+                                self.serverClosed)
+                self.disconnect(self.instance_server_hwobj,
+                                'newClient',
+                                self.newClient)
+                self.disconnect(self.instance_server_hwobj,
+                                'haveControl',
+                                self.haveControl)
+                self.disconnect(self.instance_server_hwobj,
+                                'passControl',
+                                self.passControl)
+                self.disconnect(self.instance_server_hwobj,
+                                'wantsControl',
+                                self.wantsControl)
+                self.disconnect(self.instance_server_hwobj,
+                                'widgetUpdate',
+                                self.widgetUpdate)
+                self.disconnect(self.instance_server_hwobj,
+                                'clientChanged',
+                                self.clientChanged)
+                self.disconnect(self.instance_server_hwobj,
+                                'clientClosed',
+                                self.clientClosed)
+                self.disconnect(self.instance_server_hwobj,
+                                'widgetCall',
+                                self.widgetCall)
 
             self.instance_server_hwobj = self.getHardwareObject(newValue)
 
             if self.instance_server_hwobj is not None:
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('instanceInitializing'),self.instanceInitializing)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('serverInitialized'),self.serverInitialized)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('clientInitialized'),self.clientInitialized)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('serverClosed'),self.serverClosed)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('newClient'), self.newClient)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('haveControl'), self.haveControl)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('passControl'), self.passControl)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('wantsControl'), self.wantsControl)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('widgetUpdate'), self.widgetUpdate)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('clientChanged'), self.clientChanged)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('clientClosed'), self.clientClosed)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('widgetCall'), self.widgetCall)
+                self.connect(self.instance_server_hwobj,
+                             'instanceInitializing',
+                             self.instanceInitializing)
+                self.connect(self.instance_server_hwobj,
+                             'serverInitialized',
+                             self.serverInitialized)
+                self.connect(self.instance_server_hwobj,
+                             'clientInitialized',
+                             self.clientInitialized)
+                self.connect(self.instance_server_hwobj,
+                             'serverClosed',
+                             self.serverClosed)
+                self.connect(self.instance_server_hwobj,
+                             'newClient',
+                             self.newClient)
+                self.connect(self.instance_server_hwobj,
+                             'haveControl',
+                             self.haveControl)
+                self.connect(self.instance_server_hwobj,
+                             'passControl',
+                             self.passControl)
+                self.connect(self.instance_server_hwobj,
+                             'wantsControl',
+                             self.wantsControl)
+                self.connect(self.instance_server_hwobj,
+                             'widgetUpdate',
+                             self.widgetUpdate)
+                self.connect(self.instance_server_hwobj,
+                             'clientChanged',
+                             self.clientChanged)
+                self.connect(self.instance_server_hwobj,
+                             'clientClosed',
+                             self.clientClosed)
+                self.connect(self.instance_server_hwobj,
+                             'idgetCall',
+                             self.widgetCall)
         elif propertyName=="xmlrpc_server":
             self.xmlrpc_server = self.getHardwareObject(newValue)
         elif propertyName == 'hutchtrigger':
+            if self.hutch_trigger_hwobj is not None:
+                self.disconnect(self.hutch_trigger_hwobj,
+                                "hutchTrigger",
+                                self.hutchTriggerChanged)
             self.hutch_trigger_hwobj = self.getHardwareObject(newValue)
             if self.hutch_trigger_hwobj is not None:
-                self.connect(self.hutch_trigger_hwobj,  QtCore.SIGNAL("hutchTrigger"), self.hutchTriggerChanged) 
+                self.connect(self.hutch_trigger_hwobj,
+                             "hutchTrigger",
+                             self.hutchTriggerChanged) 
         elif propertyName == 'icons':
             icons_list=newValue.split()
             try:
-                self.serverIcon=Qt4_Icons.load(icons_list[0])
-                self.clientIcon=Qt4_Icons.load(icons_list[1])
-                self.take_control_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[2])))
-                self.ask_control_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[3])))
+                self.serverIcon=Qt4_Icons.load_icon(icons_list[0])
+                self.clientIcon=Qt4_Icons.load_icon(icons_list[1])
+                self.take_control_button.setIcon(Qt4_Icons.load_icon(icons_list[2]))
+                self.ask_control_button.setIcon(Qt4_Icons.load_icon(icons_list[3]))
             except IndexError:
                 pass
         else:
@@ -406,7 +460,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                 item = QtGui.QListWidgetItem(server_print, 
                                              self.users_listwidget)
             else:
-                item = QtGui.QListWidgetItem(QtGui.QIcon(self.serverIcon),
+                item = QtGui.QListWidgetItem(self.serverIcon,
                                              server_print,
                                              self.users_listwidget)
             item.setSelected(False)
@@ -643,7 +697,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         if self.clientIcon is None:
             item = QtGui.QListWidgetItem(client_print, self.users_listwidget) 
         else:
-            item = QtGui.QListWidgetItem(QtGui.QIcon(self.clientIcon), 
+            item = QtGui.QListWidgetItem(self.clientIcon, 
                                          client_print, 
                                          self.users_listwidget)
         item.setFlags(QtCore.Qt.ItemIsEnabled)
@@ -996,8 +1050,8 @@ class LineEditInput(QtGui.QLineEdit):
         Descript. :
         """
         QtGui.QLineEdit.__init__(self, parent)
-        QtCore.QObject.connect(self, QtCore.SIGNAL('textChanged(const QString &)'), self.txtChanged)
-        QtCore.QObject.connect(self, QtCore.SIGNAL('returnPressed()'), self.retPressed)
+        self.textChanged.connect(self.txtChanged)
+        self.returnPressed.connect(self.retPressed)
         self.colorDefault=None
         self.origPalette=QtGui.QPalette(self.palette())
         self.palette2=QtGui.QPalette(self.origPalette)

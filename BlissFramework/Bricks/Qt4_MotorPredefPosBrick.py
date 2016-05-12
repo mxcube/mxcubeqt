@@ -130,14 +130,26 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                 self.label.setText(new_value)
         elif property_name == 'mnemonic':
             if self.motor_hwobj is not None:
-                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motor_state_changed)
-                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fill_positions)
-                self.disconnect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefined_position_changed)
+                self.disconnect(self.motor_hwobj,
+                                'stateChanged',
+                                self.motor_state_changed)
+                self.disconnect(self.motor_hwobj,
+                                'newPredefinedPositions',
+                                self.fill_positions)
+                self.disconnect(self.motor_hwobj,
+                                'predefinedPositionChanged',
+                                self.predefined_position_changed)
             self.motor_hwobj = self.getHardwareObject(new_value)
             if self.motor_hwobj is not None:
-                self.connect(self.motor_hwobj, QtCore.SIGNAL('newPredefinedPositions'), self.fill_positions)
-                self.connect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.motor_state_changed)
-                self.connect(self.motor_hwobj, QtCore.SIGNAL('predefinedPositionChanged'), self.predefined_position_changed)
+                self.connect(self.motor_hwobj,
+                             'newPredefinedPositions',
+                             self.fill_positions)
+                self.connect(self.motor_hwobj,
+                             'stateChanged',
+                             self.motor_state_changed)
+                self.connect(self.motor_hwobj,
+                             'predefinedPositionChanged',
+                             self.predefined_position_changed)
                 self.fill_positions()
                 if self.motor_hwobj.isReady():
                     self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)

@@ -20,6 +20,8 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from random import randint
+import numpy as np
+
 #Basic core colors
 WHITE = QtCore.Qt.white
 GRAY =  QtCore.Qt.gray
@@ -68,3 +70,6 @@ def get_random_rgb(alpha=255):
 
 def get_random_hex(alpha=255):
     return "#{0:02x}{1:02x}{2:02x}".format(randint(0, 255), randint(0, 255), randint(0, 255))
+
+def get_random_numpy_color(alpha=255):
+    return np.random.rand(3,1)

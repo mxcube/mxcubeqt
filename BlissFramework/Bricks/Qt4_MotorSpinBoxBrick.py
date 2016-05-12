@@ -74,7 +74,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.addProperty('helpDecrease', 'string', '')
         self.addProperty('helpIncrease', 'string', '')
         self.addProperty('hideInUser', 'boolean', False)
-        self.addProperty('defaultStep', 'string', '')
+        self.addProperty('defaultSteps', 'string', '')
 
         # Signals ------------------------------------------------------------
 
@@ -101,7 +101,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.position_spinbox.setMaximum(10000)
         self.position_spinbox.setMinimumSize(QtCore.QSize(75, 25))
         self.position_spinbox.setMaximumSize(QtCore.QSize(75, 25))
-        self.position_spinbox.setToolTip("Moves the motor to a specific position or step by step; right-click for motor history")
+        self.position_spinbox.setToolTip("Moves the motor to a specific " + \
+              "position or step by step; right-click for motor history")
 
         #Extra controls
         self.extra_button_box = QtGui.QWidget(self.main_gbox)
@@ -114,10 +115,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
-        self.step_cbox = QtGui.QComboBox(self.extra_button_box)
-        self.step_cbox.setEditable(True)
-        self.step_cbox.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_cbox))
-        self.step_cbox.setDuplicatesEnabled(False)
+        self.step_combo = QtGui.QComboBox(self.extra_button_box)
+        self.step_combo.setEditable(True)
+        self.step_combo.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_combo))
+        self.step_combo.setDuplicatesEnabled(False)
 
         # Layout --------------------------------------------------------------
         self.control_box_layout = QtGui.QHBoxLayout(self.control_box)
@@ -130,7 +131,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.extra_button_box_layout = QtGui.QHBoxLayout(self.extra_button_box)
         self.extra_button_box_layout.addWidget(self.stop_button)
         self.extra_button_box_layout.addWidget(self.step_button)
-        self.extra_button_box_layout.addWidget(self.step_cbox)
+        self.extra_button_box_layout.addWidget(self.step_combo)
         self.extra_button_box_layout.setSpacing(2)
         self.extra_button_box_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -165,9 +166,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         spinbox_event.contextMenuSignal.connect(self.open_history_menu) 
         self.position_spinbox.lineEdit().textEdited.connect(self.position_value_edited)
 
-        self.step_cbox.activated.connect(self.go_to_step)
-        self.step_cbox.activated.connect(self.step_changed)
-        self.step_cbox.textChanged.connect(self.step_edited)
+        self.step_combo.activated.connect(self.go_to_step)
+        self.step_combo.activated.connect(self.step_changed)
+        self.step_combo.textChanged.connect(self.step_edited)
 
         self.stop_button.clicked.connect(self.stop_motor)
         self.step_button.clicked.connect(self.open_step_editor)
@@ -199,7 +200,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        Qt4_widget_colors.set_widget_color(self.step_cbox,
+        Qt4_widget_colors.set_widget_color(self.step_combo,
                                            Qt4_widget_colors.LINE_EDIT_CHANGED, 
                                            QtGui.QPalette.Button)
 
@@ -209,7 +210,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        Qt4_widget_colors.set_widget_color(self.step_cbox.lineEdit(),
+        Qt4_widget_colors.set_widget_color(self.step_combo.lineEdit(),
              QtCore.Qt.white, QtGui.QPalette.Base)
 
     def toggle_enabled(self):
@@ -253,13 +254,13 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         self.position_spinbox.setSingleStep(float(val))
         found = False
-        for i in range(self.step_cbox.count()):
-            if float(str(self.step_cbox.itemText(i))) == float(val):
+        for i in range(self.step_combo.count()):
+            if float(str(self.step_combo.itemText(i))) == float(val):
                 found = True
-                self.step_cbox.setItemIcon(i, self.step_button_icon)
+                self.step_combo.setItemIcon(i, self.step_button_icon)
         if not found:
-            self.step_cbox.addItem(self.step_button_icon, str(val))
-            self.step_cbox.setCurrentIndex(self.step_cbox.count() - 1)
+            self.step_combo.addItem(self.step_button_icon, str(val))
+            self.step_combo.setCurrentIndex(self.step_combo.count() - 1)
 
     def go_to_step(self, step_index):
         """
@@ -267,7 +268,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        step = str(self.step_cbox.currentText())
+        step = str(self.step_combo.currentText())
         if step != "":
             self.set_line_step(step)
 
@@ -279,9 +280,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         self.step_button_icon = Qt4_Icons.load_icon(icon_name)
         self.step_button.setIcon(self.step_button_icon)
-        for i in range(self.step_cbox.count()):
-            #xt = self.step_cbox.itemText(i)
-            self.step_cbox.setItemIcon(i, self.step_button_icon)
+        for i in range(self.step_combo.count()):
+            #xt = self.step_combo.itemText(i)
+            self.step_combo.setItemIcon(i, self.step_button_icon)
             #elf.step_cbox.changeItem(self.step_button_icon, txt, i)
 
     def stop_motor(self):
@@ -452,7 +453,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.step_editor.set_motor(self.motor_hwobj, 
                                        self, 
                                        self['label'], 
-                                       self['defaultStep'])
+                                       self.default_step)
             s = self.font().pointSize()
             f = self.step_editor.font()
             f.setPointSize(s)
@@ -510,7 +511,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.stop_button.setEnabled(False)
             self.move_left_button.setEnabled(True)
             self.move_right_button.setEnabled(True)
-            self.step_cbox.setEnabled(True)
+            self.step_combo.setEnabled(True)
         elif state in (self.motor_hwobj.NOTINITIALIZED, self.motor_hwobj.UNUSABLE):
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(False)
@@ -521,7 +522,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.stop_button.setEnabled(True)
             self.move_left_button.setEnabled(False)
             self.move_right_button.setEnabled(False)
-            self.step_cbox.setEnabled(False)
+            self.step_combo.setEnabled(False)
         elif state == self.motor_hwobj.ONLIMIT:
             self.position_spinbox.setEnabled(True)
             self.stop_button.setEnabled(False)
@@ -633,9 +634,15 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         if self.motor_hwobj is not None:
-            self.disconnect(self.motor_hwobj, QtCore.SIGNAL('limitsChanged'), self.limits_changed)
-            self.disconnect(self.motor_hwobj, QtCore.PYSIGNAL('positionChanged'), self.position_changed)
-            self.disconnect(self.motor_hwobj, QtCore.PYSIGNAL('stateChanged'), self.state_changed)
+            self.disconnect(self.motor_hwobj, 
+                            'limitsChanged',
+                            self.limits_changed)
+            self.disconnect(self.motor_hwobj,
+                            'positionChanged', 
+                            self.position_changed)
+            self.disconnect(self.motor_hwobj,
+                            'stateChanged',
+                            self.state_changed)
 
         if motor_ho_name is not None:
             self.motor_hwobj = self.getHardwareObject(motor_ho_name)
@@ -643,7 +650,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         if self.motor_hwobj is None:
           # first time motor is set
             try:
-                s = float(self['defaultStep'])
+                s = float(self.default_step)
             except:
                 try:
                     s = motor_hwobj.GUIstep
@@ -652,9 +659,16 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.set_line_step(s)
 
         if self.motor_hwobj is not None:
-            self.connect(self.motor_hwobj, QtCore.SIGNAL('limitsChanged'), self.limits_changed)
-            self.connect(self.motor_hwobj, QtCore.SIGNAL('positionChanged'), self.position_changed, instanceFilter=True)
-            self.connect(self.motor_hwobj, QtCore.SIGNAL('stateChanged'), self.state_changed, instanceFilter=True)
+            self.connect(self.motor_hwobj,
+                         'limitsChanged',
+                         self.limits_changed)
+            self.connect(self.motor_hwobj,'positionChanged',
+                         self.position_changed,
+                         instanceFilter=True)
+            self.connect(self.motor_hwobj,
+                         'stateChanged',
+                         self.state_changed,
+                         instanceFilter=True)
 
         self.pos_history = []
         self.update_gui()
@@ -698,9 +712,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 self.step_button.hide()
         elif property_name == 'showStepList':
             if new_value:
-                self.step_cbox.show()
+                self.step_combo.show()
             else:
-                self.step_cbox.hide()
+                self.step_combo.hide()
         elif property_name == 'showPosition':
             if new_value:
                 self.position_spinbox.show()
@@ -725,9 +739,11 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 self.move_right_button.setToolTip("Moves the motor up (while pressed)")
             else:
                 self.move_right_button.setToolTip(new_value)
-        elif property_name == 'defaultStep':
+        elif property_name == 'defaultSteps':
             if new_value != "":
-                self.set_line_step(float(new_value))
+                default_step_list = new_value.split()
+                for default_step in default_step_list:
+                    self.set_line_step(float(default_step))
                 self.step_changed(None)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -779,9 +795,9 @@ class StepEditorDialog(QtGui. QDialog):
         self.setLayout(self.main_layout)
 
         # Qt signal/slot connections -----------------------------------------
-        self.connect(self.new_step, QtCore.SIGNAL('returnPressed()'), self.apply_clicked)
-        self.connect(self.apply_button, QtCore.SIGNAL('clicked()'), self.apply_clicked)
-        self.connect(self.close_button, QtCore.SIGNAL("clicked()"), self.accept)
+        self.new_step.returnPressed.connect(self.apply_clicked)
+        self.apply_button.clicked.connect(self.apply_clicked)
+        self.close_button.clicked.connect(self.accept)
 
         # SizePolicies --------------------------------------------------------
         self.close_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)

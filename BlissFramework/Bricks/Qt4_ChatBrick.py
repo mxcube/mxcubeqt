@@ -292,34 +292,74 @@ class Qt4_ChatBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.instance_server_hwobj is not None:
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('chatMessageReceived'), self.message_arrived)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('newClient'), self.new_client)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('serverInitialized'),self.server_initialized)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('clientInitialized'),self.client_initialized)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('serverClosed'), self.client_closed)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('wantsControl'), self.wants_control)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('haveControl'), self.have_control)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('passControl'), self.pass_control)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('clientClosed'), self.client_closed)
-                self.disconnect(self.instance_server_hwobj, QtCore.SIGNAL('clientChanged'), self.client_changed)
+                self.disconnect(self.instance_server_hwobj,
+                                'chatMessageReceived',
+                                self.message_arrived)
+                self.disconnect(self.instance_server_hwobj,
+                                'newClient',
+                                self.new_client)
+                self.disconnect(self.instance_server_hwobj,
+                                'serverInitialized',
+                                self.server_initialized)
+                self.disconnect(self.instance_server_hwobj,
+                                'clientInitialized',
+                                self.client_initialized)
+                self.disconnect(self.instance_server_hwobj,
+                                'serverClosed',
+                                self.client_closed)
+                self.disconnect(self.instance_server_hwobj,
+                                'wantsControl',
+                                self.wants_control)
+                self.disconnect(self.instance_server_hwobj,
+                                'haveControl',
+                                self.have_control)
+                self.disconnect(self.instance_server_hwobj,
+                                'passControl',
+                                self.pass_control)
+                self.disconnect(self.instance_server_hwobj,
+                                'clientClosed',
+                                self.client_closed)
+                self.disconnect(self.instance_server_hwobj,
+                                'clientChanged',
+                                self.client_changed)
 
             self.instance_server_hwobj = self.getHardwareObject(new_value)
             if self.instance_server_hwobj is not None:
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('chatMessageReceived'), self.message_arrived)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('newClient'), self.new_client)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('serverInitialized'),self.server_initialized)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('clientInitialized'),self.client_initialized)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('serverClosed'), self.client_closed)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('wantsControl'), self.wants_control)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('haveControl'), self.have_control)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('passControl'), self.pass_control)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('clientClosed'), self.client_closed)
-                self.connect(self.instance_server_hwobj, QtCore.SIGNAL('clientChanged'), self.client_changed)
+                self.connect(self.instance_server_hwobj,
+                             'chatMessageReceived',
+                             self.message_arrived)
+                self.connect(self.instance_server_hwobj,
+                             'newClient',
+                             self.new_client)
+                self.connect(self.instance_server_hwobj,
+                             'serverInitialized',
+                             self.server_initialized)
+                self.connect(self.instance_server_hwobj,
+                             'clientInitialized',
+                             self.client_initialized)
+                self.connect(self.instance_server_hwobj,
+                             'serverClosed',
+                             self.client_closed)
+                self.connect(self.instance_server_hwobj,
+                             'wantsControl',
+                             self.wants_control)
+                self.connect(self.instance_server_hwobj,
+                             'haveControl',
+                             self.have_control)
+                self.connect(self.instance_server_hwobj,
+                             'passControl',
+                             self.pass_control)
+                self.connect(self.instance_server_hwobj,
+                             'clientClosed',
+                             self.client_closed)
+                self.connect(self.instance_server_hwobj,
+                             'clientChanged',
+                             self.client_changed)
 
         elif property_name == 'icons':
             icons_list = new_value.split()
             try:
-                self.send_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[0])))
+                self.send_button.setIcon(Qt4_Icons.load_icon(icons_list[0]))
             except IndexError:
                 pass
         else:

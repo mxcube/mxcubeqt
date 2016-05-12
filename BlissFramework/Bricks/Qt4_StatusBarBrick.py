@@ -56,9 +56,11 @@ class Qt4_StatusBarBrick(BlissWidget):
         self.button = QPushButton("Add", self, "add_button")
         self.v_scroll = SpinBoxButtons(self, 'v_scroll')
         
-        QObject.connect(self.v_scroll, PYSIGNAL("scroll_up"), 
+        QObject.connect(self.v_scroll,
+                        "scroll_up", 
                         self.next_message)
-        QObject.connect(self.v_scroll, PYSIGNAL("scroll_down"), 
+        QObject.connect(self.v_scroll,
+                        "scroll_down", 
                         self.prev_message)
 
     def next_message(self):

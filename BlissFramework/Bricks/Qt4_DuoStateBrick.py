@@ -128,7 +128,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         else:
             self.set_in_button.blockSignals(True)
             #self.set_in_button.setState(QtGui.QPushButton.On)
-            self.set_in_button.setDown()
+            self.set_in_button.setDown(True)
             self.set_in_button.blockSignals(False)
 
     def set_out(self, state):
@@ -136,7 +136,7 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.wrapper_hwobj.setOut()
         else:
             self.set_out_button.blockSignals(True)
-            self.set_out_button.setDown()
+            self.set_out_button.setDown(False)
             #self.set_out_button.setState(QtGui.QPushButton.On)
             self.set_out_button.blockSignals(False)
 

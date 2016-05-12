@@ -122,14 +122,26 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
     def propertyChanged(self,property_name, old_value, new_value):
         if property_name == 'mnemonic':
             if self.diffractometer_hwobj is not None:
-                self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaMotorMoved"), self.kappa_motor_moved) 
-                self.disconnect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaPhiMotorMoved"), self.kappaphi_motor_moved)
-                self.disconnect(self.diffractometer_hwobj, Qtcore.SIGNAL('minidiffStatusChanged'),self.diffractometer_state_changed)
+                self.disconnect(self.diffractometer_hwobj,
+                                "kappaMotorMoved",
+                                self.kappa_motor_moved) 
+                self.disconnect(self.diffractometer_hwobj,
+                                "kappaPhiMotorMoved",
+                                self.kappaphi_motor_moved)
+                self.disconnect(self.diffractometer_hwobj,
+                                "minidiffStatusChanged",
+                                self.diffractometer_state_changed)
             self.diffractometer_hwobj = self.getHardwareObject(new_value)
             if self.diffractometer_hwobj is not None:
-                self.connect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaMotorMoved"), self.kappa_motor_moved)            
-                self.connect(self.diffractometer_hwobj, QtCore.SIGNAL("kappaPhiMotorMoved"), self.kappaphi_motor_moved)
-                self.connect(self.diffractometer_hwobj, QtCore.SIGNAL('minidiffStatusChanged'),self.diffractometer_state_changed)
+                self.connect(self.diffractometer_hwobj,
+                             "kappaMotorMoved",
+                             self.kappa_motor_moved)            
+                self.connect(self.diffractometer_hwobj,
+                             "kappaPhiMotorMoved",
+                             self.kappaphi_motor_moved)
+                self.connect(self.diffractometer_hwobj,
+                             "minidiffStatusChanged",
+                             self.diffractometer_state_changed)
                 self.setDisabled(self.diffractometer_hwobj.in_plate_mode())
                 self.diffractometer_state_changed("Ready")
             else:
