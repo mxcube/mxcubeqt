@@ -94,8 +94,14 @@ class Qt4_ProgressBarBrick(BlissWidget):
                 hwobj = self.getHardwareObject(hwobj_role)
                 if hwobj is not None:
                     self.hwobj_list.append(hwobj)
-                    self.connect(self.hwobj_list[-1], QtCore.SIGNAL('progressInit'), self.init_progress)
-                    self.connect(self.hwobj_list[-1], QtCore.SIGNAL('progressStep'), self.step_progress)
-                    self.connect(self.hwobj_list[-1], QtCore.SIGNAL('progressStop'), self.stop_progress)
+                    self.connect(self.hwobj_list[-1],
+                                 'progressInit',
+                                 self.init_progress)
+                    self.connect(self.hwobj_list[-1],
+                                 'progressStep',
+                                 self.step_progress)
+                    self.connect(self.hwobj_list[-1],
+                                 'progressStop',
+                                 self.stop_progress)
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)

@@ -98,7 +98,7 @@ class Qt4_CharParametersBrick(BlissWidget):
             self.toggle_page_button.setText("View parameters")
             self.parameters_widget.set_enabled(False)
 
-            if char.html_report:
+            if char.html_report is not None:
                 self.results_view.set_url(char.html_report)
             else:
                 self.results_view.set_static_page(\

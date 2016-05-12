@@ -122,7 +122,7 @@ class CreateTaskBase(QtGui.QWidget):
             bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
             bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
-            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.set_osc_start)
             bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
             bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_roi_mode)
@@ -139,31 +139,16 @@ class CreateTaskBase(QtGui.QWidget):
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
 
-    def update_osc_start(self, new_value):
+    def set_osc_start(self, new_value):
         acq_widget = self.get_acquisition_widget()
 
-        if acq_widget:
+        if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_osc_start(new_value)
-
-    def update_kappa(self, new_value):
-        acq_widget = self.get_acquisition_widget()
-
-        if acq_widget:
-            self.kappa_value = new_value
-            acq_widget.update_kappa(new_value)
-
-    def update_kappa_phi(self, new_value):
-        acq_widget = self.get_acquisition_widget()
-
-        if acq_widget:
-            self.kappa_phi_value = new_value
-            acq_widget.update_kappa_phi(new_value)
 
     def _enable_processing_toggled(self, state):
         item = self._current_selected_items[0]
         model = item.get_model()
         model.run_autoprocessing = state
-        print state
 
     def acq_parameters_changed(self):
         self._data_path_widget.update_file_name()
@@ -238,7 +223,7 @@ class CreateTaskBase(QtGui.QWidget):
     def set_detector_roi_mode(self, detector_roi_mode):
         acq_widget = self.get_acquisition_widget()
 
-        if acq_widget:
+        if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_detector_roi_mode(detector_roi_mode)
 
     def set_kappa(self, kappa):
@@ -357,8 +342,10 @@ class CreateTaskBase(QtGui.QWidget):
                 prefix = self.get_default_prefix(sample_data_model)
                 (data_directory, proc_directory) = self.get_default_directory(\
                   tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
-                self._path_template.directory = data_directory
-                self._path_template.process_directory = proc_directory
+
+                #TODO create templates to customize this
+                #self._path_template.directory = data_directory
+                #self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
             elif self._session_hwobj.get_group_name() != '':
                 base_dir = self._session_hwobj.get_base_image_directory()

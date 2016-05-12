@@ -134,7 +134,9 @@ class AdvancedParametersWidget(QtGui.QWidget):
 
         image = advanced_model.grid_object.get_snapshot()
         try:
-           image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
+           ration = image.height() / float(image.width())
+           image = image.scaled(700, 700 * ration, QtCore.Qt.KeepAspectRatio,
+                                QtCore.Qt.SmoothTransformation)
            self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
         except:
            pass 

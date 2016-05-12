@@ -274,30 +274,33 @@ class HeatMapWidget(QtGui.QWidget):
       
         if len(self.__result_display.shape) == 1:
             x_data = numpy.arange(self.__result_display.shape[0])
-            self._heat_map_plot.newcurve("Dozor result", x_data, self.__result_display)
+            self._heat_map_plot.clear()
+            self._heat_map_plot.add_curve(self.__result_display, x_data, "Dozor result")
+            #self._heat_map_plot.newcurve("Dozor result", x_data, self.__result_display)
         else:
             self._heat_map_plot.plot_result(self.__result_display)
 
-        self._summary_textbrowser.append("<b>Mesh parameters</b>")
-        grid_properties = self.__associated_grid.get_properties()
-        self._summary_textbrowser.append("Number of columns: %d" % \
-             grid_properties["steps_x"])
-        self._summary_textbrowser.append("Number of rows: %d" % \
-             grid_properties["steps_y"])
-        self._summary_textbrowser.append("Horizontal spacing: %.1f %sm" % \
-            (grid_properties["xOffset"], u"\u00B5"))
-        self._summary_textbrowser.append("Vertical spacing: %.1f %sm" % \
-            (grid_properties["yOffset"], u"\u00B5"))
-        self._summary_textbrowser.append("Beam size : %.1f x %.1f %sm" % \
-            (grid_properties["beam_x_mm"], grid_properties["beam_y_mm"], u"\u00B5"))
-        self._summary_textbrowser.append("Scan range : %.1f x %.1f mm" % \
-            (grid_properties["dx_mm"], grid_properties["dy_mm"]))
+            if self.__associated_grid: 
+                self._summary_textbrowser.append("<b>Mesh parameters</b>")
+                grid_properties = self.__associated_grid.get_properties()
+                self._summary_textbrowser.append("Number of columns: %d" % \
+                     grid_properties["steps_x"])
+                self._summary_textbrowser.append("Number of rows: %d" % \
+                     grid_properties["steps_y"])
+                self._summary_textbrowser.append("Horizontal spacing: %.1f %sm" % \
+                    (grid_properties["xOffset"], u"\u00B5"))
+                self._summary_textbrowser.append("Vertical spacing: %.1f %sm" % \
+                    (grid_properties["yOffset"], u"\u00B5"))
+                self._summary_textbrowser.append("Beam size : %.1f x %.1f %sm" % \
+                    (grid_properties["beam_x_mm"], grid_properties["beam_y_mm"], u"\u00B5"))
+                self._summary_textbrowser.append("Scan range : %.1f x %.1f mm" % \
+                    (grid_properties["dx_mm"], grid_properties["dy_mm"]))
 
-        self._summary_textbrowser.append("<b>Scan results</b>")
-        self._summary_textbrowser.append("Scan lines: %d" % \
-             grid_properties["num_lines"])
-        self._summary_textbrowser.append("Images per line: %d" % \
-             grid_properties["num_images_per_line"])
+                self._summary_textbrowser.append("<b>Scan results</b>")
+                self._summary_textbrowser.append("Scan lines: %d" % \
+                     grid_properties["num_lines"])
+                self._summary_textbrowser.append("Images per line: %d" % \
+                     grid_properties["num_images_per_line"])
         self._summary_textbrowser.append("Number of diffraction spots: %d" % \
              (self.__results["score"] > 0).sum())
 
@@ -337,7 +340,7 @@ class HeatMapWidget(QtGui.QWidget):
         """
         Method to clean heat map, summary log and table with best positions
         """
-        self.setEnabled(False)
+        #self.setEnabled(False)
         self.__results = None
         self.__associated_grid = None
         self.__associated_data_collection = None
@@ -461,7 +464,7 @@ class HeatMapWidget(QtGui.QWidget):
                          acquisition_parameters.osc_start
         osc_range = self.__associated_data_collection.acquisitions[0].\
                          acquisition_parameters.osc_range
-        if self.__is_map_plot:
+        if self.__associated_grid:
             self.__associated_grid.set_osc_range(osc_range)
             motor_pos_dict = self.__associated_grid.\
                  get_motor_pos_from_col_row(self.__selected_x, self.__selected_y)

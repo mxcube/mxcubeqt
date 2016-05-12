@@ -345,7 +345,7 @@ class DataCollectTree(QtGui.QWidget):
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
-                          " sample changer: " + e.message
+                          " sample changer: " + str(e.message)
                     logging.getLogger("user_level_log").error(msg)
                 finally:
                     self.enable_collect(True)
@@ -835,8 +835,11 @@ class DataCollectTree(QtGui.QWidget):
         if not isinstance(selected_items, list):
             selected_items = self.get_selected_items()
 
+        
         for item in selected_items:
-            if not isinstance(item, queue_model_objects.TaskGroup):
+            if type(item) not in (Qt4_queue_item.BasketQueueItem,
+                                  Qt4_queue_item.SampleQueueItem,
+                                  Qt4_queue_item.DataCollectionGroupQueueItem):
                 new_node = self.queue_model_hwobj.copy_node(item.get_model())
                 self.queue_model_hwobj.add_child(item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()

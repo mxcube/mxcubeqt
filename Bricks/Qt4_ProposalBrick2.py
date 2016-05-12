@@ -52,7 +52,7 @@ class Qt4_ProposalBrick2(BlissWidget):
     def __init__(self, *args):
         """
         Descript. : Proposal brick is used to authentificate current user.
-                    Brick can be used in two modes defined by property loginAsUser
+                    Brick can be used in two modes defined by ispyb hwobj
                     - loginAsUser = True, Brick displays combobox with all
                       proposals from ISPyB that are associated to the current user
                     - loginAsUser = False. Brick displays combobox to choose proposal
@@ -80,7 +80,6 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.secondary_proposals = []
 
         # Properties ----------------------------------------------------------
-        self.addProperty('loginAsUser', 'boolean', True)
         self.addProperty('instanceServer', 'string', '')
         self.addProperty('localLogin', 'string', '')
         self.addProperty('titlePrefix', 'string', '')
@@ -103,7 +102,9 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.defineSlot('impersonateProposal', ())
 
         # Graphic elements ----------------------------------------------------
-        self.login_as_proposal_widget = QtGui.QWidget(self)
+        self.main_gbox = QtGui.QGroupBox("ISPyB proposal", self)
+
+        self.login_as_proposal_widget = QtGui.QWidget(self.main_gbox)
         code_label = QtGui.QLabel("  Code: ", self.login_as_proposal_widget)
         self.proposal_type_combox = QtGui.QComboBox(self.login_as_proposal_widget)
         self.proposal_type_combox.setEditable(True)
@@ -117,18 +118,17 @@ class Qt4_ProposalBrick2(BlissWidget):
         #self.proposal_password_ledit.setFixedWidth(40)
         self.login_button = QtGui.QPushButton("Login", self.login_as_proposal_widget)
         self.login_button.setFixedWidth(70)
-        self.logout_button = QtGui.QPushButton("Logout", self)
+        self.logout_button = QtGui.QPushButton("Logout", self.main_gbox)
         self.logout_button.hide()
         self.logout_button.setFixedWidth(70)
         self.login_as_proposal_widget.hide()
         
 
-        self.login_as_user_widget = QtGui.QWidget(self)
-        proposal_label = QtGui.QLabel("Proposal: ", self.login_as_user_widget)
+        self.login_as_user_widget = QtGui.QWidget(self.main_gbox)
         self.proposal_combo = QtGui.QComboBox(self.login_as_user_widget)
         self.proposal_combo.setFixedWidth(140)
 
-        self.user_group_widget = QtGui.QWidget(self)
+        self.user_group_widget = QtGui.QWidget(self.main_gbox)
         #self.title_label = QtGui.QLabel(self.user_group_widget)
         #self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.user_group_label = QtGui.QLabel("  Group: ", self.user_group_widget)
@@ -160,17 +160,21 @@ class Qt4_ProposalBrick2(BlissWidget):
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
 
         _login_as_user_widget_layout = QtGui.QHBoxLayout(self.login_as_user_widget)
-        _login_as_user_widget_layout.addWidget(proposal_label)
         _login_as_user_widget_layout.addWidget(self.proposal_combo)
         _login_as_user_widget_layout.setSpacing(2)
         _login_as_user_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QHBoxLayout(self)
-        _main_vlayout.addWidget(self.login_as_proposal_widget)
-        _main_vlayout.addWidget(self.logout_button)
-        _main_vlayout.addWidget(self.login_as_user_widget)
+        _main_gboxlayout = QtGui.QHBoxLayout(self.main_gbox)
+        _main_gboxlayout.addWidget(self.login_as_proposal_widget)
+        _main_gboxlayout.addWidget(self.logout_button)
+        _main_gboxlayout.addWidget(self.login_as_user_widget)
         #_main_vlayout.addSpacing(10)
-        _main_vlayout.addWidget(self.user_group_widget)
+        _main_gboxlayout.addWidget(self.user_group_widget)
+        _main_gboxlayout.setSpacing(2)
+        _main_gboxlayout.setContentsMargins(2, 2, 2, 2)
+
+        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
@@ -633,12 +637,20 @@ class Qt4_ProposalBrick2(BlissWidget):
                self.login_as_proposal_widget.show()
         elif property_name == 'instanceServer':
             if self.instanceServer is not None:
-                self.disconnect(self.instanceServer, QtCore.SIGNAL('passControl'), self.passControl)
-                self.disconnect(self.instanceServer, QtCore.SIGNAL('haveControl'), self.haveControl)
+                self.disconnect(self.instanceServer,
+                                'passControl',
+                                self.passControl)
+                self.disconnect(self.instanceServer,
+                                'haveControl',
+                                self.haveControl)
             self.instanceServer = self.getHardwareObject(new_value)
             if self.instanceServer is not None:
-                self.connect(self.instanceServer, QtCore.SIGNAL('passControl'), self.passControl)
-                self.connect(self.instanceServer, QtCore.SIGNAL('haveControl'), self.haveControl)
+                self.connect(self.instanceServer,
+                             'passControl',
+                             self.passControl)
+                self.connect(self.instanceServer,
+                             'haveControl',
+                             self.haveControl)
         elif property_name == 'icons':
             icons_list = new_value.split()
             try:

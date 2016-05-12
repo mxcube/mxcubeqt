@@ -72,7 +72,7 @@ class DCParametersWidget(QtGui.QWidget):
         _dc_parameters_widget_layout.addWidget(self._processing_widget)
         _dc_parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
         _dc_parameters_widget_layout.setSpacing(2)
-        _dc_parameters_widget_layout.addStretch(0)
+        _dc_parameters_widget_layout.addStretch(10)
 
         _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
         _snapshots_vlayout.addWidget(self.position_widget)
@@ -184,7 +184,8 @@ class DCParametersWidget(QtGui.QWidget):
             image = data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             ration = image.height() / float(image.width())
-            image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio)
+            image = image.scaled(600, 600 * ration, QtCore.Qt.KeepAspectRatio,
+                                 QtCore.Qt.SmoothTransformation)
             self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
 
         invalid = self._acquisition_mib.validate_all()

@@ -153,7 +153,9 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         image = self.xrf_spectrum_model.centred_position.snapshot_image
         if image is not None:
             try:
-               image = image.scaled(427, 320, QtCore.Qt.KeepAspectRatio)
+               ration = image.height() / float(image.width())
+               image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio,
+                                    QtCore.Qt.SmoothTransformation)
                self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
             except:
                pass

@@ -320,4 +320,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.cax.tick_params(axis='y', labelsize=8)
 
     def clear(self): 
-        self.mpl_canvas.axes.cla()
+        self.mpl_canvas.clear()
+
+    def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None, color='blue'):
+        self.mpl_canvas.add_curve(y_axis_array, x_axis_array=None, curve_name=None, color='blue')

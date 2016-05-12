@@ -198,9 +198,12 @@ class Qt4_TreeBrick(BlissWidget):
         if property_name == 'holder_length_motor':
             self.dc_tree_widget.hl_motor_hwobj = self.getHardwareObject(new_value)
         elif property_name == "useFilterWidget":
-            self.sample_changer_widget.filter_widget.setVisible(new_value)
+            self.sample_changer_widget.filter_label.setVisible(new_value)
+            self.sample_changer_widget.filter_ledit.setVisible(new_value)
+            self.sample_changer_widget.filter_combo.setVisible(new_value)
         elif property_name == "useSampleWidget":
-            self.sample_changer_widget.sample_widget.setVisible(new_value)
+            self.sample_changer_widget.sample_label.setVisible(new_value)
+            self.sample_changer_widget.sample_combo.setVisible(new_value)
         elif property_name == 'queue':            
             self.queue_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
@@ -450,15 +453,14 @@ class Qt4_TreeBrick(BlissWidget):
         sample_list = []        
         sample_changer = None
 
-        if self.dc_tree_widget.sample_mount_method == 0:
-            self.sample_changer_widget.sample_combo.clear()
-            for sample in self.lims_samples:
-                self.sample_changer_widget.sample_combo.addItem(\
-                     "%s_%s" %(sample.sampleName, sample.proteinAcronym))
-            self.sample_changer_widget.sample_combo.setEnabled(True)
-            self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
+        self.sample_changer_widget.sample_combo.clear()
+        for sample in self.lims_samples:
+            self.sample_changer_widget.sample_combo.addItem(\
+                 "%s_%s" %(sample.sampleName, sample.proteinAcronym))
+        self.sample_changer_widget.sample_combo.setEnabled(True)
+        self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
                  
-        elif self.dc_tree_widget.sample_mount_method == 1:
+        if self.dc_tree_widget.sample_mount_method == 1:
             sample_changer = self.sample_changer_hwobj
         elif self.dc_tree_widget.sample_mount_method == 2:
             sample_changer = self.plate_manipulator_hwobj
@@ -829,6 +831,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.filter_sample_list(index)
         self.sample_changer_widget.details_button.setEnabled(index > 0) 
         self.sample_changer_widget.synch_ispyb_button.setEnabled(index < 2)
+        self.sample_changer_widget.sample_label.setEnabled(index == 0)
+        self.sample_changer_widget.sample_combo.setEnabled(index == 0)
         if index == 0:
             self.emit(QtCore.SIGNAL("hide_sample_changer_tab"), True)
             self.emit(QtCore.SIGNAL("hide_plate_manipulator_tab"), True)

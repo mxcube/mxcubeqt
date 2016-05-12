@@ -93,7 +93,8 @@ class AdvancedResultsWidget(QtGui.QWidget):
             try:
                image = associated_grid.get_snapshot()
                ratio = image.height() / float(image.width())
-               image = image.scaled(400, 400 * ratio, QtCore.Qt.KeepAspectRatio)
+               image = image.scaled(600, 600 * ratio, QtCore.Qt.KeepAspectRatio,
+                                    QtCore.Qt.SmoothTransformation)
                self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))    
             except:
                pass

@@ -106,13 +106,6 @@ class ConfirmDialog(QtGui.QDialog):
         """
         self.sample_items = []
         self.checked_items = checked_items
-        print ("TODO 2to3")
-        try:
-           info_str_list = QtCore.QStringList()
-           file_str_list = QtCore.QStringList()
-        except AttributeError:
-           info_str_list = []
-           file_str_list = []
 
         collection_items = []
         current_sample_item = None
@@ -128,7 +121,7 @@ class ConfirmDialog(QtGui.QDialog):
 
         for item in checked_items:
             #item_type_name = ""
-            info_str_list.clear()
+            info_str_list = []
             acq_parameters = None
             path_template = None
             item_model = item.get_model()
@@ -199,6 +192,9 @@ class ConfirmDialog(QtGui.QDialog):
                 file_paths = path_template.get_files_to_be_written()
                 num_images += len(file_paths)
 
+                if len(file_paths) > 20:
+                    file_paths = (file_paths[:20])
+
                 for file_path in file_paths:
                     if os.path.exists(file_path):
                         (dir_name, file_name) = os.path.split(file_path)
@@ -206,7 +202,7 @@ class ConfirmDialog(QtGui.QDialog):
                             get_display_name()
                         if sample_name is '':
                             sample_name = current_sample_item.get_model().loc_str
-                        file_str_list.clear()
+                        file_str_list = []
                         file_str_list.append(sample_name)
                         file_str_list.append(dir_name)
                         file_str_list.append(file_name)

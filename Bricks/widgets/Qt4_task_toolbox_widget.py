@@ -250,6 +250,8 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
+                        if len(items) > 1:
+                            continue
                         task_model = self.create_task_group(task_model)
                         if self.tool_box.currentWidget() in (self.discrete_page, 
                            self.char_page, self.energy_scan_page, 

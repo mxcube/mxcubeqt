@@ -147,19 +147,19 @@ class Qt4_MachineInfoBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        txt = '??? mA' if values[0] is None else '<b>%s</b> mA' % \
-	       str(self['formatString'] % abs(values[0]))
+        txt = '??? mA' if values.get("current") is None else '<b>%s</b> mA' % \
+	       str(self['formatString'] % abs(values.get("current")))
         self.current_value_label.setText(txt)
-        self.state_text_value_label.setText(values[1])
-        txt = '??? A' if values[2] is None else '%1.2e A' % \
-	       (values[2] * 1.0)   	
+        self.state_text_value_label.setText(values.get("stateText"))
+        txt = '??? A' if values["intens"]["value"] is None else '%1.2e A' % \
+	       (values["intens"]["value"] * 1.0)   	
         self.intensity_value_label.setText(txt)
-        if values[3] == 1:
+        if values.get("cryo") == 1:
             self.cryo_value_label.setText(" In place ")
-        elif values[3] == None:
-            self.cryo_value_label.setText("Unknown")
-        else:
+        elif values.get("cryo") == 0:
             self.cryo_value_label.setText("NOT IN PLACE")
+        else:
+            self.cryo_value_label.setText("Unknown")
 
     def set_color(self, value):
         """
@@ -184,7 +184,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
         if value.get('cryo') is None:
             self.cryo_value_label.setEnabled(False)
             Qt4_widget_colors.set_widget_color(self.cryo_value_label, STATES['unknown'])
-        elif value.get('intens'):
+        elif value.get('cryo'):
             Qt4_widget_colors.set_widget_color(self.cryo_value_label, STATES['ready'])
         else:
             Qt4_widget_colors.set_widget_color(self.cryo_value_label, STATES['error'])

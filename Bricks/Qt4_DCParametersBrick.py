@@ -23,6 +23,7 @@ from PyQt4 import QtGui
 
 from widgets.Qt4_dc_parameters_widget import DCParametersWidget
 from widgets.Qt4_image_tracking_widget import ImageTrackingWidget
+from widgets.Qt4_advanced_results_widget import AdvancedResultsWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -62,13 +63,21 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.toggle_page_button = QtGui.QPushButton('View Results', self)
         self.toggle_page_button.setFixedWidth(120)
         self.results_static_view = QtGui.QTextBrowser(self)
-        self.results_dynamic_view = ImageTrackingWidget(self) 
+        self.results_dynamic_view = QtGui.QWidget(self)
+        self.image_tracking_widget = ImageTrackingWidget(self.results_dynamic_view) 
+        self.advance_results_widget = AdvancedResultsWidget(self.results_dynamic_view)
+
         self.stacked_widget = QtGui.QStackedWidget(self)
         self.stacked_widget.addWidget(self.parameters_widget)
         self.stacked_widget.addWidget(self.results_static_view) 
         self.stacked_widget.addWidget(self.results_dynamic_view)
        
         # Layout -------------------------------------------------------------- 
+        _results_dynamic_view_vlayout = QtGui.QVBoxLayout(self.results_dynamic_view)
+        _results_dynamic_view_vlayout.addWidget(self.image_tracking_widget)
+        _results_dynamic_view_vlayout.addWidget(self.advance_results_widget)
+        _results_dynamic_view_vlayout.addStretch(0)
+
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.stacked_widget)
         _main_vlayout.addStretch(0)
@@ -94,11 +103,17 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.session_hwobj.get_base_process_directory()
 
         data_collection = item.get_model()
+
+        if data_collection.is_helical():
+            self.advance_results_widget.show()
+            
+        else:
+            self.advance_results_widget.hide()
         
         if data_collection.is_collected():
             self.parameters_widget.set_enabled(False)
             if self.use_image_tracking:
-                self.results_dynamic_view.set_data_collection(data_collection)
+                self.image_tracking_widget.set_data_collection(data_collection)
                 self.stacked_widget.setCurrentWidget(self.results_dynamic_view)
             else:
                 self.populate_results(data_collection)
@@ -110,6 +125,13 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.toggle_page_button.setText("View Results")
 
         self.parameters_widget.populate_widget(item)
+        #TODO 
+        #self.advance_results_widget.populate_widget(item)
+        #self.advance_results_widget.heat_map_widget.clean_result()
+        self.advance_results_widget.heat_map_widget.\
+             set_associated_data_collection(data_collection) 
+        self.advance_results_widget.heat_map_widget._summary_gbox.hide()
+
         #self.toggle_page_button.setEnabled(data_collection.is_collected())
 
     def populate_results(self, data_collection):
@@ -134,7 +156,7 @@ class Qt4_DCParametersBrick(BlissWidget):
         if self.stacked_widget.currentWidget() is self.parameters_widget:
             self.results_static_view.reload()
             if self.use_image_tracking:
-                self.results_dynamic_view.refresh()
+                self.image_tracking_widget.refresh()
                 self.stacked_widget.setCurrentWidget(self.results_dynamic_view)
             else:
                 self.results_static_view.reload()
@@ -153,8 +175,9 @@ class Qt4_DCParametersBrick(BlissWidget):
         elif property_name == 'beamline_setup':            
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
             self.parameters_widget.set_beamline_setup(self.beamline_setup_hwobj)
+            self.advance_results_widget.set_beamline_setup(self.beamline_setup_hwobj)
             if hasattr(self.beamline_setup_hwobj, "image_tracking_hwobj"):
-                self.results_dynamic_view.set_image_tracking_hwobj(\
+                self.image_tracking_widget.set_image_tracking_hwobj(\
                      self.beamline_setup_hwobj.image_tracking_hwobj)
         elif property_name == 'queue-model':            
             self.parameters_widget.queue_model_hwobj = \

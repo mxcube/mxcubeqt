@@ -119,22 +119,24 @@ class Qt4_BeamSizeBrick(BlissWidget):
 
         # Other ---------------------------------------------------------------
 
-    def propertyChanged(self, property, oldValue, newValue):
+    def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         """
-        if property == 'mnemonic':
+        if property_name == 'mnemonic':
             if self.beam_info_hwobj is not None:
-                self.disconnect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), 
-                    self.beamSizeChanged)
-            self.beam_info_hwobj = self.getHardwareObject(newValue)
+                self.disconnect(self.beam_info_hwobj,
+                                'beamInfoChanged', 
+                                self.beam_info_changed)
+            self.beam_info_hwobj = self.getHardwareObject(new_value)
             if self.beam_info_hwobj is not None:
-                self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), 
-                    self.beamSizeChanged)
+                self.connect(self.beam_info_hwobj,
+                             'beamInfoChanged', 
+                             self.beam_info_changed)
         else:
-            BlissWidget.propertyChanged(self, property, oldValue, newValue)
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
     
-    def beamSizeChanged(self, beam_info):
+    def beam_info_changed(self, beam_info):
         """
         Descript. : beam size is in mm. It is displayed in microns
         """
