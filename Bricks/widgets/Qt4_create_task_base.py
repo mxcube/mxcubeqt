@@ -81,6 +81,10 @@ class CreateTaskBase(QtGui.QWidget):
                 self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
                 self._acq_widget.init_detector_roi_modes()
+                if bl_setup.diffractometer_hwobj.in_plate_mode():
+                    self._acq_widget.set_osc_start_limits(\
+                         bl_setup.diffractometer_hwobj.get_osc_dynamic_limits())
+                    self._acq_widget.use_kappa(False)
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
@@ -157,6 +161,7 @@ class CreateTaskBase(QtGui.QWidget):
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                             check_for_path_collisions(self._path_template)
             self._data_path_widget.indicate_path_conflict(path_conflict)                    
+            self._tree_brick.dc_tree_widget.item_parameters_changed()
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -357,16 +362,16 @@ class CreateTaskBase(QtGui.QWidget):
                     self._path_template.process_directory = proc_directory
                     self._path_template.base_prefix = self.get_default_prefix()
 
-            #If no information from lims then add basket/sample info
+            # If no information from lims then add basket/sample info
             # This works if each sample is clicked, but do not work
             # when a task is assigned to the whole puck.
             # Then all samples get the same dir
             
-            if sample_data_model.lims_id == -1 and \
-               not None in (sample_data_model.location):
-                (data_directory, proc_directory) = self.get_default_directory(tree_item)
-                self._path_template.directory = data_directory
-                self._path_template.process_directory = proc_directory
+            #if sample_data_model.lims_id == -1 and \
+            #   not None in (sample_data_model.location):
+            #    (data_directory, proc_directory) = self.get_default_directory(tree_item)
+            #    self._path_template.directory = data_directory
+            #    self._path_template.process_directory = proc_directory
 
             # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
@@ -477,7 +482,6 @@ class CreateTaskBase(QtGui.QWidget):
         """
         if self._acq_widget:
             self._acq_widget.use_kappa(False)
-            self._acq_widget.use_kappa_phi(False)
 
             if position:
                 if len(self._current_selected_items) == 1:
@@ -493,7 +497,6 @@ class CreateTaskBase(QtGui.QWidget):
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
-                self._acq_widget.use_kappa_phi(True)
 
     # Should be called by the object that calls create_task,
     # and add_task.

@@ -17,8 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from copy import deepcopy
-
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
@@ -70,7 +68,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         # Other ---------------------------------------------------------------
 
     def run(self):
-        self.tools_menu = QtGui.QMenu("Graphics tools", self)
+        self.tools_menu = QtGui.QMenu("Graphics", self)
         _measure_menu = self.tools_menu.addMenu("Measure")
 
         self.measure_distance_action = _measure_menu.addAction(
@@ -138,7 +136,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         #self.camera_control_action.setEnabled(False)
 
         if self.target_menu == "menuBar":
-            BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
+            BlissWidget._menuBar.insert_menu(self.tools_menu, 3)
         elif self.target_menu == "toolBar":
             for action in self.tools_menu.actions():
                 BlissWidget._toolBar.addAction(action)

@@ -116,7 +116,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
         self._acq_widget.use_kappa(False) 
-        self._acq_widget.use_kappa_phi(False)
         self._acq_widget.acq_widget_layout.num_images_label.setEnabled(False)
         self._acq_widget.acq_widget_layout.num_images_ledit.setEnabled(False)
         for col in range(self._advanced_methods_widget.\

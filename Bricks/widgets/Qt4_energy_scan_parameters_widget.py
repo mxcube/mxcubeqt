@@ -17,11 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from PyQt4 import QtCore
 from PyQt4 import QtGui
-from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -29,6 +26,7 @@ from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget
 #from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 from widgets.Qt4_pymca_plot_widget import PymcaPlotWidget
+from widgets.Qt4_snapshot_widget import SnapshotWidget
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -56,10 +54,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.data_path_widget = DataPathWidget(_parameters_widget)
         self.data_path_widget.data_path_layout.file_name_label.setText('')
         self.data_path_widget.data_path_layout.file_name_value_label.hide()
-        _snapshot_widget = QtGui.QWidget(self)
-        self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                          'ui_files/Qt4_snapshot_widget_layout.ui'))
-        self.position_widget.setFixedSize(450, 340)        
+        self.snapshot_widget = SnapshotWidget(self)
 
         self.scan_plot_widget = PymcaPlotWidget(self, True)
         self.result_plot_widget = PymcaPlotWidget(self, False)
@@ -75,15 +70,9 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
         _parameters_widget.setLayout(_parameters_widget_layout)
 
-        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
-        _snapshots_vlayout.addWidget(self.position_widget)
-        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
-        _snapshots_vlayout.setSpacing(2)
-        _snapshots_vlayout.addStretch(0)
-
         _top_widget_hlayout = QtGui.QHBoxLayout(self)
         _top_widget_hlayout.addWidget(_parameters_widget)
-        _top_widget_hlayout.addWidget(_snapshot_widget)
+        _top_widget_hlayout.addWidget(self.snapshot_widget)
         _top_widget_hlayout.addStretch(0)
         _top_widget_hlayout.setSpacing(2)
         _top_widget_hlayout.setContentsMargins(0, 0, 0, 0)
@@ -141,7 +130,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.result_plot_widget.setEnabled(not executed)
  
         width = self.data_path_widget.width() + \
-                self.position_widget.width()
+                self.snapshot_widget.width()
         self.scan_plot_widget.setFixedWidth(width)
         self.result_plot_widget.setFixedWidth(width)
 
@@ -169,14 +158,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
              self.energy_scan_model.edge)
 
         image = self.energy_scan_model.centred_position.snapshot_image
-        if image is not None:
-            try:
-               ration = image.height() / float(image.width())
-               image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio,
-                                    QtCore.Qt.SmoothTransformation)
-               self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
-            except:
-               pass
+        self.snapshot_widget.display_snapshot(image, width=400)
 
     def element_clicked(self, symbol, energy):
         self.energy_scan_model.element_symbol = symbol

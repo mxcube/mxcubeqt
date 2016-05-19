@@ -24,6 +24,7 @@ from PyQt4 import QtGui
 from widgets.Qt4_dc_parameters_widget import DCParametersWidget
 from widgets.Qt4_image_tracking_widget import ImageTrackingWidget
 from widgets.Qt4_advanced_results_widget import AdvancedResultsWidget
+from widgets.Qt4_snapshot_widget import SnapshotWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -59,39 +60,28 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.defineSlot("populate_dc_parameter_widget",({}))
        
         # Graphic elements ---------------------------------------------------- 
+        self.tool_box = QtGui.QToolBox(self)
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
-        self.toggle_page_button = QtGui.QPushButton('View Results', self)
-        self.toggle_page_button.setFixedWidth(120)
-        self.results_static_view = QtGui.QTextBrowser(self)
-        self.results_dynamic_view = QtGui.QWidget(self)
-        self.image_tracking_widget = ImageTrackingWidget(self.results_dynamic_view) 
-        self.advance_results_widget = AdvancedResultsWidget(self.results_dynamic_view)
+        self.results_static_view = QtGui.QTextBrowser(self.tool_box)
+        self.image_tracking_widget = ImageTrackingWidget(self.tool_box) 
+        self.advance_results_widget = AdvancedResultsWidget(self.tool_box)
+        self.snapshot_widget = SnapshotWidget(self)
 
-        self.stacked_widget = QtGui.QStackedWidget(self)
-        self.stacked_widget.addWidget(self.parameters_widget)
-        self.stacked_widget.addWidget(self.results_static_view) 
-        self.stacked_widget.addWidget(self.results_dynamic_view)
-       
+        self.tool_box.addItem(self.parameters_widget, "Parameters")
+        self.tool_box.addItem(self.image_tracking_widget, "Results - ADXV control")
+        self.tool_box.addItem(self.results_static_view, "Results")
+        self.tool_box.addItem(self.advance_results_widget, "Results - Heat map")
+
         # Layout -------------------------------------------------------------- 
-        _results_dynamic_view_vlayout = QtGui.QVBoxLayout(self.results_dynamic_view)
-        _results_dynamic_view_vlayout.addWidget(self.image_tracking_widget)
-        _results_dynamic_view_vlayout.addWidget(self.advance_results_widget)
-        _results_dynamic_view_vlayout.addStretch(0)
-
-        _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.stacked_widget)
-        _main_vlayout.addStretch(0)
-        _main_vlayout.addWidget(self.toggle_page_button)
+        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout.addWidget(self.tool_box)
+        _main_vlayout.addWidget(self.snapshot_widget)
 
         # SizePolicies -------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.toggle_page_button.clicked.connect(self.toggle_page)
 
         # Other --------------------------------------------------------------- 
-        self.parameters_widget.collection_type = None
-        #self.toggle_page_button.setDisabled(True)
-        self.stacked_widget.setCurrentWidget(self.parameters_widget) 
 
     def populate_dc_parameter_widget(self, item):
         """
@@ -106,33 +96,27 @@ class Qt4_DCParametersBrick(BlissWidget):
 
         if data_collection.is_helical():
             self.advance_results_widget.show()
-            
         else:
             self.advance_results_widget.hide()
-        
-        if data_collection.is_collected():
-            self.parameters_widget.set_enabled(False)
-            if self.use_image_tracking:
-                self.image_tracking_widget.set_data_collection(data_collection)
-                self.stacked_widget.setCurrentWidget(self.results_dynamic_view)
-            else:
-                self.populate_results(data_collection)
-                self.stacked_widget.setCurrentWidget(self.results_static_view)
-            self.toggle_page_button.setText("View parameters")
-        else:
-            self.parameters_widget.set_enabled(True)
-            self.stacked_widget.setCurrentWidget(self.parameters_widget)
-            self.toggle_page_button.setText("View Results")
 
+              
+        self.snapshot_widget.display_snapshot(data_collection.\
+             acquisitions[0].acquisition_parameters.\
+             centred_position.snapshot_image,
+             width=800) 
+        if data_collection.is_collected():
+            self.parameters_widget.setEnabled(False)
+            self.results_static_view.reload()
+            self.image_tracking_widget.refresh()
+        else:
+            self.parameters_widget.setEnabled(True)
         self.parameters_widget.populate_widget(item)
         #TODO 
         #self.advance_results_widget.populate_widget(item)
-        #self.advance_results_widget.heat_map_widget.clean_result()
+        self.advance_results_widget.heat_map_widget.clean_result()
         self.advance_results_widget.heat_map_widget.\
              set_associated_data_collection(data_collection) 
         self.advance_results_widget.heat_map_widget._summary_gbox.hide()
-
-        #self.toggle_page_button.setEnabled(data_collection.is_collected())
 
     def populate_results(self, data_collection):
         """
@@ -149,23 +133,6 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.results_static_view.setText(\
                  html_template.html_report(data_collection))
         
-    def toggle_page(self):
-        """
-        Descript. :
-        """
-        if self.stacked_widget.currentWidget() is self.parameters_widget:
-            self.results_static_view.reload()
-            if self.use_image_tracking:
-                self.image_tracking_widget.refresh()
-                self.stacked_widget.setCurrentWidget(self.results_dynamic_view)
-            else:
-                self.results_static_view.reload()
-                self.stacked_widget.setCurrentWidget(self.results_static_view)
-            self.toggle_page_button.setText("View parameters")
-        else:
-            self.stacked_widget.setCurrentWidget(self.parameters_widget)
-            self.toggle_page_button.setText("View Results")
-
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
@@ -183,4 +150,11 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.parameters_widget.queue_model_hwobj = \
                  self.getHardwareObject(new_value)
         elif property_name == 'useImageTracking':
-            self.use_image_tracking = new_value
+            if new_value:
+                self.tool_box.removeItem(self.tool_box.indexOf(\
+                     self.results_static_view))
+                self.results_static_view.hide()
+            else:
+                self.tool_box.removeItem(self.tool_box.indexOf(\
+                     self.image_tracking_widget))
+                self.image_tracking_widget.hide()

@@ -59,11 +59,7 @@ class DCParametersWidget(QtGui.QWidget):
         self._data_path_widget = DataPathWidget(_dc_parameters_widget)
         self._acq_widget = AcquisitionWidget(_dc_parameters_widget, 
                                             layout = 'horizontal')
-        #self._acq_widget.setFixedHeight(170)
         self._processing_widget = ProcessingWidget(_dc_parameters_widget)
-        _snapshot_widget = QtGui.QWidget(self)
-        self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                          'ui_files/Qt4_snapshot_widget_layout.ui'))
         
         # Layout --------------------------------------------------------------
         _dc_parameters_widget_layout = QtGui.QVBoxLayout(_dc_parameters_widget)
@@ -74,15 +70,8 @@ class DCParametersWidget(QtGui.QWidget):
         _dc_parameters_widget_layout.setSpacing(2)
         _dc_parameters_widget_layout.addStretch(10)
 
-        _snapshots_vlayout = QtGui.QVBoxLayout(_snapshot_widget)
-        _snapshots_vlayout.addWidget(self.position_widget)
-        _snapshots_vlayout.setContentsMargins(0, 0, 0, 0)
-        _snapshots_vlayout.setSpacing(2)
-        _snapshots_vlayout.addStretch(10)
-
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
-        _main_hlayout.addWidget(_snapshot_widget)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.setSpacing(2)
         _main_hlayout.addStretch(0)
@@ -91,13 +80,14 @@ class DCParametersWidget(QtGui.QWidget):
         
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
-                     self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect( 
-                     self._run_number_ledit_change)
-        self._acq_widget.madEnergySelectedSignal.connect(self.mad_energy_selected)
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.acq_parameters_changed)
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
+             connect(self._prefix_ledit_change)
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
+             connect(self._run_number_ledit_change)
+        self._acq_widget.madEnergySelectedSignal.\
+             connect(self.mad_energy_selected)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
 
         # Other ---------------------------------------------------------------
 
@@ -175,21 +165,10 @@ class DCParametersWidget(QtGui.QWidget):
                                           path_template)
         self._data_path_widget.update_data_model(data_collection.\
                                            acquisitions[0].path_template)
-        
         self._processing_widget.update_data_model(data_collection.\
                                                  processing_parameters)
 
-        if data_collection.acquisitions[0].acquisition_parameters.\
-                centred_position.snapshot_image:
-            image = data_collection.acquisitions[0].\
-                acquisition_parameters.centred_position.snapshot_image
-            ration = image.height() / float(image.width())
-            image = image.scaled(600, 600 * ration, QtCore.Qt.KeepAspectRatio,
-                                 QtCore.Qt.SmoothTransformation)
-            self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
-
         invalid = self._acquisition_mib.validate_all()
-
         if invalid:
             msg = "This data collection has one or more incorrect parameters,"+\
                 " correct the fields marked in red to solve the problem."

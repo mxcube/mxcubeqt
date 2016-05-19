@@ -74,7 +74,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
         self.button_box = QtGui.QWidget(self)
         self.create_task_button = QtGui.QPushButton("  Add to queue", self.button_box)
-        self.create_task_button.setIcon(QtGui.QIcon(Qt4_Icons.load("add_row.png")))
+        self.create_task_button.setIcon(Qt4_Icons.load_icon("add_row.png"))
         msg = "Add the collection method to the selected sample"
         self.create_task_button.setToolTip(msg)
         
@@ -128,18 +128,25 @@ class TaskToolBoxWidget(QtGui.QWidget):
             self.tool_box.widget(i).set_beamline_setup(beamline_setup_hwobj)
 
         self.graphics_manager_hwobj = beamline_setup_hwobj.shape_history_hwobj
-        self.energy_scan_page.set_energy_scan_hwobj(\
-             beamline_setup_hwobj.energyscan_hwobj)
 
-        # Remove energy scan page from non tunable wavelentgh beamlines
-        if not beamline_setup_hwobj.tunable_wavelength():
+        has_energy_scan = False
+        if hasattr(beamline_setup_hwobj, 'energy_scan_hwobj'):
+            if beamline_setup_hwobj.energy_scan_hwobj and \
+               beamline_setup_hwobj.tunable_wavelength() and \
+               not beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                has_energy_scan = True
+                self.energy_scan_page.set_energy_scan_hwobj(\
+                     beamline_setup_hwobj.energyscan_hwobj)
+        if not has_energy_scan:
             self.tool_box.removeItem(self.tool_box.indexOf(self.energy_scan_page))
             self.energy_scan_page.hide()
             logging.getLogger("user_level_log").info("Energy scan task not available")
         
+
         has_xrf_spectrum = False
         if hasattr(beamline_setup_hwobj, 'xrf_spectrum_hwobj'):
-            if beamline_setup_hwobj.xrf_spectrum_hwobj:
+            if beamline_setup_hwobj.xrf_spectrum_hwobj is not None and \
+               not beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode(): 
                 has_xrf_spectrum = True
 
         if not has_xrf_spectrum:
@@ -169,17 +176,19 @@ class TaskToolBoxWidget(QtGui.QWidget):
             tree_item = tree_items[0]
 
             # Get the directory form the previous page and update 
-            # the new page with the direcotry and run_number from the old.
+            # the new page with the directory and run_number from the old.
             # IF sample, basket group selected.
             if type(tree_item) in (Qt4_queue_item.DataCollectionGroupQueueItem, \
-                                  Qt4_queue_item.SampleQueueItem, \
-                                  Qt4_queue_item.BasketQueueItem):
+                                   Qt4_queue_item.SampleQueueItem, \
+                                   Qt4_queue_item.BasketQueueItem):
                 new_pt = self.tool_box.widget(page_index)._path_template
                 previous_pt = self.tool_box.widget(self.previous_page_index)._path_template
+
                 new_pt.directory = previous_pt.directory
                 new_pt.base_prefix = previous_pt.base_prefix
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
+
             elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
                 data_collection = tree_item.get_model()
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:

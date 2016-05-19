@@ -186,6 +186,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
     def get_model(self):
         return self._data_model
 
+    def update_display_name(self):
+        self.setText(0, self._data_model.get_display_name())
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):

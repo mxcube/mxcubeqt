@@ -290,10 +290,11 @@ class Qt4_TreeBrick(BlissWidget):
             xml_rpc_server_hwobj = self.getHardwareObject(new_value)
 
             if xml_rpc_server_hwobj:
-                self.connect(xml_rpc_server_hwobj, 'add_to_queue',
+                self.connect(xml_rpc_server_hwobj,
+                             'add_to_queue',
                              self.add_to_queue)
-
-                self.connect(xml_rpc_server_hwobj, 'start_queue',
+                self.connect(xml_rpc_server_hwobj,
+                             'start_queue',
                              self.dc_tree_widget.collect_items)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -336,7 +337,7 @@ class Qt4_TreeBrick(BlissWidget):
                 self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(True)
                 if plate_sample_content:
                      plate_row_list, plate_sample_list = self.dc_tree_widget.\
-                        samples_from_plate_content(plate_row_content, plate_sample_content)
+                        samples_from_sc_content(plate_row_content, plate_sample_content)
                      self.dc_tree_widget.sample_mount_method = 2
                      self.dc_tree_widget.populate_tree_widget(plate_row_list, 
                          plate_sample_list, self.dc_tree_widget.sample_mount_method)
@@ -564,7 +565,8 @@ class Qt4_TreeBrick(BlissWidget):
             sample_index = sample.getIndex()
             basket_code = sample.getContainer().getID() or ""
             sample_name = sample.getName()
-            sc_sample_content.append((matrix, basket_index + 1, sample_index + 1, sample_name))
+            sc_sample_content.append((matrix, basket_index + 1, 
+                                      sample_index + 1, sample_name))
         return sc_basket_content, sc_sample_content
 
     def get_plate_content(self):
@@ -585,11 +587,11 @@ class Qt4_TreeBrick(BlissWidget):
             col_index = sample.getCell().getCol()
             drop_index = sample.getDrop().getWellNo()
             sample_name = sample.getName()
-
             coords = sample.getCoords()
             matrix = sample.getID() or ""
-            vial_index = ":".join(map(str, coords[1:]))
-            plate_sample_content.append((matrix, row_index, col_index, drop_index, None, coords))
+            #vial_index = ":".join(map(str, coords[1:]))
+            plate_sample_content.append((matrix, coords[0], 
+                                         coords[1], sample_name))
  
         return plate_row_content, plate_sample_content
 
@@ -988,7 +990,7 @@ class Qt4_TreeBrick(BlissWidget):
                   item_iterator += 1
                   item = item_iterator.value()
 
-        self.hide_empty_baskets()     
+        self.dc_tree_widget.hide_empty_baskets()     
 
     def filter_text_changed(self, new_text):
         item_iterator = QtGui.QTreeWidgetItemIterator(\
@@ -1019,7 +1021,7 @@ class Qt4_TreeBrick(BlissWidget):
               item = item_iterator.value()
 
         if filter_index != 3:
-            self.hide_empty_baskets()
+            self.dc_tree_widget.hide_empty_baskets()
         
     def clear_filter(self):
         item_iterator = QtGui.QTreeWidgetItemIterator(\
@@ -1029,24 +1031,6 @@ class Qt4_TreeBrick(BlissWidget):
               item.setHidden(False)
               item_iterator += 1
               item = item_iterator.value() 
-
-    def hide_empty_baskets(self):
-        item_iterator = QtGui.QTreeWidgetItemIterator(\
-             self.dc_tree_widget.sample_tree_widget) 
-        item = item_iterator.value()
-        while item:
-              hide = True
-              
-              if type(item) in(Qt4_queue_item.BasketQueueItem,
-                               Qt4_queue_item.DataCollectionGroupQueueItem): 
-                  for index in range(item.childCount()):
-                      if not item.child(index).isHidden():
-                          hide = False
-                          break
-                  item.setHidden(hide) 
-                 
-              item_iterator += 1
-              item = item_iterator.value()
 
     def diffractometer_phase_changed(self, phase):
         self.enable_collect_conditions["diffractometer"] = \

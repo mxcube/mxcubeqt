@@ -65,6 +65,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.addProperty('enableRefreshCamera', 'boolean', False)
         self.addProperty('enableVisualAlign', 'boolean', True)
         self.addProperty('enableAutoCenter', 'boolean', True)
+        self.addProperty('enableRealignBeam', 'boolean', False)
 
         # Signals -------------------------------------------------------------
         
@@ -83,10 +84,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.auto_focus_button = MonoStateButton(self, "Focus", "Eyeball")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
-        self.visual_align_button = MonoStateButton(self, "Align", "Align")
+        self.visual_align_button = MonoStateButton(self, "Kappa align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
         self.clear_all_button = MonoStateButton(self, "Clear all", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
+        self.realign_button = MonoStateButton(self, "Realign beam", "QuickRealign")
 
         # Layout -------------------------------------------------------------- 
         _main_vlayout = QtGui.QVBoxLayout(self)
@@ -102,6 +104,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _main_vlayout.addWidget(self.select_all_button)
         _main_vlayout.addWidget(self.clear_all_button)
         _main_vlayout.addWidget(self.auto_center_button)
+        _main_vlayout.addWidget(self.realign_button)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -181,6 +184,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.visual_align_button.setVisible(new_value)
         elif property_name == "enableAutoCenter":
             self.auto_center_button.setVisible(new_value)
+        elif property_name == "enableRealignBeam":
+            self.realign_button.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -373,7 +378,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
 class MonoStateButton(QtGui.QToolButton):
 
-    def __init__(self, parent, caption=None, icon=None, fixed_size=(70, 45)):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(80, 45)):
         QtGui.QToolButton.__init__(self, parent)
         self.setUsesTextLabel(True)
         if fixed_size: 
@@ -405,7 +410,7 @@ class DuoStateButton(QtGui.QToolButton):
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
         self.setUsesTextLabel(True)
         self.setText(caption)
-        self.setFixedSize(70, 45)
+        self.setFixedSize(80, 45)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 

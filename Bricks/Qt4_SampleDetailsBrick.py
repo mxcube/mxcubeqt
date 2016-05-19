@@ -63,7 +63,7 @@ class Qt4_SampleDetailsBrick(BlissWidget):
         self.sample_info_widget = uic.loadUi(
               os.path.join(os.path.dirname(__file__),
              "widgets/ui_files/Qt4_sample_info_widget_layout.ui"))
-        self.ispyb_sample_info_widget = ISPyBSampleInfoWidget(self)
+        #self.ispyb_sample_info_widget = ISPyBSampleInfoWidget(self)
 
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtGui.QHBoxLayout(_info_widget)
@@ -75,7 +75,7 @@ class Qt4_SampleDetailsBrick(BlissWidget):
 
         _main_hlayout = QtGui.QVBoxLayout(self)
         _main_hlayout.addWidget(_info_widget)
-        _main_hlayout.addWidget(self.ispyb_sample_info_widget)
+        #_main_hlayout.addWidget(self.ispyb_sample_info_widget)
         _main_hlayout.addStretch(0)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)

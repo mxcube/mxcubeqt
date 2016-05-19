@@ -17,13 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-
 import os
+
+from PyQt4 import QtGui
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_advanced_parameters_widget import AdvancedParametersWidget
 from widgets.Qt4_advanced_results_widget import AdvancedResultsWidget
+from widgets.Qt4_snapshot_widget import SnapshotWidget
 
 __category__ = 'Task'
 
@@ -40,7 +41,7 @@ class Qt4_AdvancedBrick(BlissWidget):
 
         # Properties ----------------------------------------------------------
         self.addProperty("session", "string", "/session")
-        self.addProperty("beamline_setup", "string", "/Qt4_beamline-setup")
+        self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
 
@@ -48,29 +49,24 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.defineSlot("populate_advanced_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.stacked_widget = QtGui.QStackedWidget(self)
+        self.tool_box = QtGui.QToolBox(self)
         self.parameters_widget = AdvancedParametersWidget(self) 
         self.results_widget = AdvancedResultsWidget(self)
-        self.toggle_page_button = QtGui.QPushButton('View Results', self)
-        self.toggle_page_button.setFixedWidth(120)
-        self.stacked_widget.addWidget(self.parameters_widget)
-        self.stacked_widget.addWidget(self.results_widget)
+        self.snapshot_widget = SnapshotWidget(self)
+
+        self.tool_box.addItem(self.parameters_widget, "Parameters")
+        self.tool_box.addItem(self.results_widget, "Results - Heat map")
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.stacked_widget)
-        _main_vlayout.addStretch(0)
-        _main_vlayout.addWidget(self.toggle_page_button)
+        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout.addWidget(self.tool_box)
+        _main_vlayout.addWidget(self.snapshot_widget)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.toggle_page_button.clicked.connect(self.toggle_page)
 
         # Other ---------------------------------------------------------------
-        self.stacked_widget.setCurrentWidget(self.parameters_widget)
-
-        self.toggle_page_button.setEnabled(True)
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = \
@@ -82,11 +78,13 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.results_widget.populate_widget(item)
 
         data_collection = item.get_model()
+        self.snapshot_widget.display_snapshot(\
+             data_collection.grid_object.get_snapshot())
+
         executed = data_collection.is_executed()
 
         if executed:
-            self.stacked_widget.setCurrentWidget(self.results_widget)
-            self.toggle_page_button.setText("View parameters")
+            self.tool_box.setCurrentWidget(self.results_widget)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -99,11 +97,3 @@ class Qt4_AdvancedBrick(BlissWidget):
             bl_setup = self.getHardwareObject(new_value)
             self.parameters_widget.set_beamline_setup(bl_setup)
             self.results_widget.set_beamline_setup(bl_setup)
-
-    def toggle_page(self):
-        if self.stacked_widget.currentWidget() is self.parameters_widget:
-            self.stacked_widget.setCurrentWidget(self.results_widget)
-            self.toggle_page_button.setText("View parameters")
-        else:
-            self.stacked_widget.setCurrentWidget(self.parameters_widget)
-            self.toggle_page_button.setText("View Results")   
