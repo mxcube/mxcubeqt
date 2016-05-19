@@ -55,6 +55,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
         # Internal values ----------------------------------------------------- 
         self.step_editor = None
+        self.move_step = None
         self.demand_move = 0
         self.in_expert_mode = None
 
@@ -252,14 +253,15 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.position_spinbox.setSingleStep(float(val))
+        self.move_step = float(val)
+        self.position_spinbox.setSingleStep(self.move_step)
         found = False
         for i in range(self.step_combo.count()):
-            if float(str(self.step_combo.itemText(i))) == float(val):
+            if float(str(self.step_combo.itemText(i))) == self.move_step:
                 found = True
                 self.step_combo.setItemIcon(i, self.step_button_icon)
         if not found:
-            self.step_combo.addItem(self.step_button_icon, str(val))
+            self.step_combo.addItem(self.step_button_icon, str(self.move_step))
             self.step_combo.setCurrentIndex(self.step_combo.count() - 1)
 
     def go_to_step(self, step_index):
@@ -337,17 +339,20 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if self['delta'] != "":
-            s = float(self['delta'])
+        step = 1.0
+        if self.move_step is not None:
+            step = self.move_step
+        elif self['delta'] != "":
+            step = float(self['delta'])
         else:        
             try:
-                s = self.motor_hwobj.GUIstep
+                step = self.motor_hwobj.GUIstep
             except:
-                s = 1.0
+                pass
 
-        if self.motor_hwobj is not None:
-            if self.motor_hwobj.isReady():
-                self.motor_hwobj.moveRelative(s)
+        if self.motor_hwobj.isReady():
+            self.set_position_spinbox_color(self.motor_hwobj.READY)
+            self.motor_hwobj.moveRelative(step)
 
     def really_move_down(self):
         """
@@ -355,17 +360,20 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if self['delta'] != "":
-            s = float(self['delta'])
-        else:
+        step = 1.0
+        if self.move_step is not None:
+            step = self.move_step
+        elif self['delta'] != "":
+            step = float(self['delta'])
+        else:        
             try:
-                s = self.motor_hwobj.GUIstep
+                step = self.motor_hwobj.GUIstep
             except:
-                s = 1.0
-        if self.motor_hwobj is not None:
-            if self.motor_hwobj.isReady():
-                self.set_position_spinbox_color(self.motor_hwobj.READY)
-                self.motor_hwobj.moveRelative(-s)
+                pass
+
+        if self.motor_hwobj.isReady():
+            self.set_position_spinbox_color(self.motor_hwobj.READY)
+            self.motor_hwobj.moveRelative(-step)
 
     def update_gui(self):
         """

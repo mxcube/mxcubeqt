@@ -104,12 +104,11 @@ class CustomMenuBar(QtGui.QMenuBar):
                            self.help_menu]
         #self.setwindowIcon(Qt4_Icons.load_icon("desktop_icon"))
 
-    def insert_menu(self, new_menu, position):
+    def insert_menu(self, new_menu_item, position):
         self.clear()
-        for index in range(len(self.menu_items)):
-            if index == position:
-               self.addMenu(new_menu) 
-            self.addMenu(self.menu_items[index])
+        self.menu_items.insert(position, new_menu_item)
+        for menu_item in self.menu_items:
+            self.addMenu(menu_item)
 
     def get_menu_bar(self):
         """
