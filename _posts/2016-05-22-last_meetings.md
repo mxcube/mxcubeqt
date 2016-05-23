@@ -1,11 +1,11 @@
 ---
-title: "Last meeting"
-bg: blue
+title: "Last meetings"
+bg: turquoise
 color: white
 fa-icon: users 
 ---
 
-# MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015 
+# MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
 ![alba group photo](img/alba-meeting-group.jpg)
 
@@ -33,16 +33,28 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [Unleashing full power of Eiger detector](https://drive.google.com/open?id=0B6zThwr9Jrr2eS1jZXQ5QlVLU1U)
 - [Preliminary layout and sample centring for MXCuBE 3](doc/ALBA_MxCubeMeeting_Eguiraun.pdf)
 - [Organization of MXCuBE 3 development](doc/mxcube3web.pdf)
-- [MXCuBE 3 front-end development toolchain](http://slides.com/matiasg/mxcube3_fedev_toolchain) 
+- [MXCuBE 3 front-end development toolchain](http://slides.com/matiasg/mxcube3_fedev_toolchain)
 - [Progress towards driving beamlines as a third party](doc/MXCuBE-2015-pkeller.odp)
 - [MXCuBE and EDNA at ALBA](doc/20151201_S3_ALBA_MXCuBE_and_EDNA.pdf)
 - [MXCuBE and Qt4](doc/2015_mxcube_alba_karpics_03_qt4.pdf)
 - [Advanced methods and abstraction](doc/2015_mxcube_alba_karpics_02_advanced.pdf)
 
-### Next meeting will take place in Hamburg
+# MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015 
 
-## See you soon !
+![hzb group photo](img/hzb-meeting-group.jpg)
 
+During two sunny days in Berlin we all met to discuss about
+ongoing work in our collaboration and to establish a roadmap
+for the future.
 
- 
+### Highlights
+
+* A Qt4 version of MXCuBE is in the pipe, thanks to the work
+of Ivars Karpics at EMBL Hamburg
+* A kick-off meeting will be organised between MAX-lab and
+ESRF in September to start the work on MXCuBE 3, that will
+result in a web application
+* EDNA becomes part of MXCuBE
+* A MXCuBE 2 paper is in preparation
+
 
