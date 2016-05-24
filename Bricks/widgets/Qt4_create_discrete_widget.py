@@ -47,7 +47,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             QtCore.Qt.WindowFlags(fl), "Standart")
 
         if not name:
-            self.setObjectName("Qt4_create_discrete_widget")
+            self.setObjectName("create_discrete_widget")
         self.init_models()
 
         # Hardware objects ----------------------------------------------------
@@ -87,9 +87,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
-             self._enable_processing_toggled)
+             self._run_processing_toggled)
 
         # Other ---------------------------------------------------------------
+        self._processing_widget.processing_widget.\
+             run_processing_parallel_cbox.hide()
 
     def init_models(self):
         """
@@ -250,7 +252,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
-        dc.run_autoprocessing = self._processing_widget.run_processing
+        dc.run_processing_after = self._processing_widget.processing_widget.\
+           run_processing_after_cbox.isChecked()
+        dc.run_processing_parallel = False
 
         tasks.append(dc)
 

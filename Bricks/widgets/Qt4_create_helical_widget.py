@@ -96,11 +96,13 @@ class CreateHelicalWidget(CreateTaskBase):
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
-             self._enable_processing_toggled)
+             self._run_processing_toggled)
 
         # Other ---------------------------------------------------------------
         for col in range(self._lines_widget.lines_treewidget.columnCount()):
             self._lines_widget.lines_treewidget.resizeColumnToContents(col)
+        self._processing_widget.processing_widget.\
+             run_processing_parallel_cbox.setChecked(False)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -287,8 +289,10 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_number(start_acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
             dc.set_requires_centring(False)
-            #Rename to run_autoproc and move to mib
-            dc.run_autoprocessing = self._processing_widget.run_processing
+            dc.run_processing_after = self._processing_widget.processing_widget.\
+               run_processing_after_cbox.isChecked()
+            dc.run_processing_parallel = self._processing_widget.processing_widget.\
+               run_processing_parallel_cbox.isChecked()
 
             data_collections.append(dc)
             self._path_template.run_number += 1

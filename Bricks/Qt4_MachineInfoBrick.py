@@ -69,7 +69,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
         self.state_text_value_label = QtGui.QLabel(self)
         self.state_text_value_label.setAlignment(QtCore.Qt.AlignCenter)
         #Intensity
-        self.intensity_label = QtGui.QLabel("Intensity monitor", self)
+        self.intensity_label = QtGui.QLabel("Flux", self)
         self.intensity_value_label = QtGui.QLabel(self)
         self.intensity_value_label.setAlignment(QtCore.Qt.AlignCenter)
 	#Hutch temperature
@@ -151,8 +151,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
 	       str(self['formatString'] % abs(values.get("current")))
         self.current_value_label.setText(txt)
         self.state_text_value_label.setText(values.get("stateText"))
-        txt = '??? A' if values["intens"]["value"] is None else '%1.2e A' % \
-	       (values["intens"]["value"] * 1.0)   	
+        txt = '??? photons/s' if values["flux"] is None else '%1.2e photons/s' % \
+	       (values["flux"] * 1.0)   	
         self.intensity_value_label.setText(txt)
         if values.get("cryo") == 1:
             self.cryo_value_label.setText(" In place ")
@@ -174,9 +174,9 @@ class Qt4_MachineInfoBrick(BlissWidget):
         else:
             Qt4_widget_colors.set_widget_color(self.current_value_label, STATES['error'])
         Qt4_widget_colors.set_widget_color(self.state_text_value_label, STATES['ready'])
-        if value.get('intens') is None:
+        if value.get('flux') is None:
             Qt4_widget_colors.set_widget_color(self.intensity_value_label, STATES['unknown'])
-        elif value.get('intens'):
+        elif value.get('flux'):
             Qt4_widget_colors.set_widget_color(self.intensity_value_label, STATES['ready'])
         else:
             Qt4_widget_colors.set_widget_color(self.intensity_value_label, STATES['error'])

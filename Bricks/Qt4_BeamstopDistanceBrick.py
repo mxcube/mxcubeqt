@@ -176,5 +176,5 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         if self.beamstop_limits is not None:
             if val < self.beamstop_limits[0] or val > self.beamstop_limits[1]:
                 return
-        self.beamstop_hwobj.set_position(val)
+        self.beamstop_hwobj.set_beamstop_distance(val)
         self.new_value_ledit.setText('')

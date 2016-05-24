@@ -564,8 +564,18 @@ class DataCollectTree(QtGui.QWidget):
         for item in items:
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 return True
-
         return False
+
+    def get_mounted_sample_item(self):
+        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        item = it.value()
+
+        while item:
+           if isinstance(item, Qt4_queue_item.SampleQueueItem):
+              if item.mounted_style:
+                  return item
+           it += 1
+           item = it.value()
 
     def filter_sample_list(self, option):
         """
@@ -791,8 +801,8 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_execution_completed(None)
 
     def queue_entry_execution_started(self, queue_entry):
-
         view_item = queue_entry.get_view()
+
         if isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
             self.tree_brick.show_energy_scan_tab(view_item)  
         elif isinstance(view_item, Qt4_queue_item.XRFSpectrumQueueItem):
@@ -805,7 +815,8 @@ class DataCollectTree(QtGui.QWidget):
                
     def queue_execution_completed(self, status):
         """
-        Descript. :
+        Restores normal cursors, changes collect button
+        Deselects all items and selects mounted sample
         """
         QtGui.QApplication.restoreOverrideCursor() 
         self.collecting = False
@@ -821,6 +832,10 @@ class DataCollectTree(QtGui.QWidget):
         self.parent().enable_hutch_menu(True)
         self.parent().enable_command_menu(True)
         self.parent().enable_task_toolbox(True)
+ 
+        self.sample_tree_widget.clearSelection()
+        sample_item = self.get_mounted_sample_item()
+        sample_item.setSelected(True)
         self.set_sample_pin_icon()
 
     def get_checked_items(self):

@@ -104,9 +104,12 @@ class Qt4_DCParametersBrick(BlissWidget):
              acquisitions[0].acquisition_parameters.\
              centred_position.snapshot_image,
              width=800) 
+
+        
         if data_collection.is_collected():
             self.parameters_widget.setEnabled(False)
             self.results_static_view.reload()
+            self.image_tracking_widget.set_data_collection(data_collection)
             self.image_tracking_widget.refresh()
         else:
             self.parameters_widget.setEnabled(True)

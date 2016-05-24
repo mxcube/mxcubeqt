@@ -122,12 +122,10 @@ class Qt4_PlateBrick(BlissWidget):
             self.plate_manipulator_hwobj = self.getHardwareObject(newValue)
             if self.plate_manipulator_hwobj:
                 self.init_plate_view()
-                #self.connect(self.plate_manipulator_hwobj, SampleChanger.STATE_CHANGED_EVENT,
-                #             self.sample_load_state_changed)
                 self.connect(self.plate_manipulator_hwobj, 
                              SampleChanger.INFO_CHANGED_EVENT,
                              self.refresh_plate_location)
-                #lf.refresh_plate_location()
+                self.refresh_plate_location()
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -249,7 +247,7 @@ class Qt4_PlateBrick(BlissWidget):
 
             if new_location:
                 row = new_location[0]
-                col = new_location[1] - 1
+                col = new_location[1]
                 pos_x = new_location[2]
                 pos_y = new_location[3]
                 self.plate_widget.current_location_ledit.setText(\
@@ -261,7 +259,7 @@ class Qt4_PlateBrick(BlissWidget):
                 if self.current_location:
                     empty_item = QtGui.QTableWidgetItem(QtGui.QIcon(), "")
                     self.plate_widget.sample_table.setItem(self.current_location[0],
-                                              self.current_location[1] - 1,
+                                              self.current_location[1],
                                               empty_item)
                 new_item = QtGui.QTableWidgetItem(Qt4_Icons.load_icon("sample_axis.png"), "")
                 self.plate_widget.sample_table.setItem(row, col, new_item)

@@ -456,8 +456,9 @@ class Qt4_TreeBrick(BlissWidget):
 
         self.sample_changer_widget.sample_combo.clear()
         for sample in self.lims_samples:
-            self.sample_changer_widget.sample_combo.addItem(\
-                 "%s_%s" %(sample.sampleName, sample.proteinAcronym))
+            if sample.containerSampleChangerLocation:
+                 self.sample_changer_widget.sample_combo.addItem(\
+                   "%s_%s" %(sample.sampleName, sample.proteinAcronym))
         self.sample_changer_widget.sample_combo.setEnabled(True)
         self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
                  
@@ -532,16 +533,9 @@ class Qt4_TreeBrick(BlissWidget):
         root_model = self.queue_model_hwobj.get_model_root()
         sample_model = root_model.get_children()[0]
 
-        #print sample_name
-        #print sample_model 
         sample_model.init_from_lims_object(self.lims_samples[index])
         self.dc_tree_widget.sample_tree_widget.clear()
         self.dc_tree_widget.populate_free_pin(sample_model)
-
-    #def open_tree_options_dialog(self):
-    #    self.tree_options_dialog.set_filter_lists(\
-    #         self.dc_tree_widget.sample_tree_widget)
-    #    self.tree_options_dialog.show()
 
     def get_sc_content(self):
         """
@@ -926,7 +920,6 @@ class Qt4_TreeBrick(BlissWidget):
         """
         if not parent_tree_item :
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
-        
         self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
 
     def select_last_added_item(self):

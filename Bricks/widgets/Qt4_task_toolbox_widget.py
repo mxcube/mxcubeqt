@@ -77,6 +77,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.create_task_button.setIcon(Qt4_Icons.load_icon("add_row.png"))
         msg = "Add the collection method to the selected sample"
         self.create_task_button.setToolTip(msg)
+
+        self.collect_now_button = QtGui.QPushButton("Collect", self.button_box)
+        self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
+        self.collect_now_button.hide()
         
         # Layout --------------------------------------------------------------
         _method_group_box_vlayout = QtGui.QVBoxLayout(self.method_group_box)
@@ -85,6 +89,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
         _method_group_box_vlayout.setContentsMargins(0, 0, 0, 0)
 
         _button_box_hlayout = QtGui.QHBoxLayout(self.button_box)
+        _button_box_hlayout.addWidget(self.collect_now_button)
         _button_box_hlayout.addStretch(0)
         _button_box_hlayout.addWidget(self.create_task_button)
         _button_box_hlayout.setSpacing(0)
@@ -103,8 +108,12 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
 
         # Qt signal/slot connections ------------------------------------------
-        self.create_task_button.clicked.connect(self.create_task_button_click)
-        self.tool_box.currentChanged.connect(self.current_page_changed)
+        self.create_task_button.clicked.\
+             connect(self.create_task_button_click)
+        self.collect_now_button.clicked.\
+             connect(self.collect_now_button_click)
+        self.tool_box.currentChanged.\
+             connect(self.current_page_changed)
 
         # Other ---------------------------------------------------------------   
 
@@ -311,11 +320,23 @@ class TaskToolBoxWidget(QtGui.QWidget):
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-            task_list = self.tool_box.currentWidget().create_task(sample, shape)
+            task_list = self.tool_box.currentWidget().\
+                create_task(sample, shape)
 
             for child_task_node in task_list:
-                self.tree_brick.queue_model_hwobj.add_child(task_node, child_task_node)
+                self.tree_brick.queue_model_hwobj.\
+                     add_child(task_node, child_task_node)
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
+
+    def collect_now_button_click(self):
+        if self.tool_box.currentWidget().approve_creation():
+            sample_item = self.tree_brick.dc_tree_widget.get_mounted_sample_item()
+            task_list = self.tool_box.currentWidget().\
+               create_task(sample_item.get_model(), None)
+            for task in task_list:
+                    
+                self.tree_brick.queue_model_hwobj.\
+                     add_child(sample_item, task)

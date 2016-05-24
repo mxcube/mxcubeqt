@@ -154,25 +154,27 @@ class AcquisitionWidget(QtGui.QWidget):
             self.update_num_image_limits()
             self.acq_widget_layout.osc_start_ledit.setText(\
                  "%.2f" % osc_start_value)
-            #self._acquisition_parameters.osc_start = osc_start_value
+            self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
         """
         Descript. :
         """
-        if not self.acq_widget_layout.kappa_ledit.hasFocus():
+        if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
+           new_value:
             self.acq_widget_layout.kappa_ledit.setText(\
                  "%.2f" % float(new_value))
-            #self._acquisition_parameters.kappa = float(new_value)
+            self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
         """
         Descript. :
         """
-        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus():
+        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and \
+           new_value:
             self.acq_widget_layout.kappa_phi_ledit.setText(\
                  "%.2f" % float(new_value))
-            #self._acquisition_parameters.kappa_phi = float(new_value)
+            self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
         """
@@ -181,7 +183,6 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.osc_start_cbox.setVisible(state)
         self.acq_widget_layout.osc_start_label.setVisible(not state)
         self.acq_widget_layout.osc_start_ledit.setEnabled(not state)
-        
 
     def use_kappa(self, state):
         """

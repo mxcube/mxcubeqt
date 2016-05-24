@@ -149,10 +149,12 @@ class CreateTaskBase(QtGui.QWidget):
         if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_osc_start(new_value)
 
-    def _enable_processing_toggled(self, state):
-        item = self._current_selected_items[0]
-        model = item.get_model()
-        model.run_autoprocessing = state
+    def _run_processing_toggled(self, run_processing_after, run_processing_parallel):
+        if len(self._current_selected_items) > 0:
+            item = self._current_selected_items[0]
+            model = item.get_model()
+            model.run_processing_after = run_processing_after
+            model.run_processing_parallel = run_processing_parallel
 
     def acq_parameters_changed(self):
         self._data_path_widget.update_file_name()
@@ -356,6 +358,7 @@ class CreateTaskBase(QtGui.QWidget):
                 base_dir = self._session_hwobj.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
+
                 if base_dir == self._path_template.directory:
                     (data_directory, proc_directory) = self.get_default_directory()
                     self._path_template.directory = data_directory
