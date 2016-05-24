@@ -142,7 +142,6 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
                 self.connect(self.diffractometer_hwobj,
                              "minidiffStatusChanged",
                              self.diffractometer_state_changed)
-                self.setDisabled(self.diffractometer_hwobj.in_plate_mode())
                 self.diffractometer_state_changed("Ready")
             else:
                 self.setEnabled(False)
@@ -199,6 +198,10 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         self.kappaphi_dspinbox.blockSignals(False)
 
     def diffractometer_state_changed(self, state):
+        if self.diffractometer_hwobj.in_plate_mode():
+            self.setDisabled(True)
+            return
+        
         if state == "Ready":
             self.kappa_dspinbox.setEnabled(True)
             self.kappaphi_dspinbox.setEnabled(True)

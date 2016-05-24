@@ -68,16 +68,21 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.expert_mode_action = self.file_menu.addAction("Expert mode", 
              self.expert_mode_clicked)
         self.expert_mode_action.setCheckable(True)  
+        self.reload_hwr_action = self.file_menu.addAction("Reload hardware objects",
+             self.reload_hwr_clicked)
+        self.reload_hwr_action.setEnabled(False)
         self.file_menu.addAction("Quit", self.quit_clicked)
 
         self.view_menu = self.addMenu("View")
-        self.view_toolbar_action = self.view_menu.addAction("Toolbar", 
+        self.view_toolbar_action = self.view_menu.addAction("Graphics toolbar", 
              self.view_toolbar_clicked)
         self.view_toolbar_action.setCheckable(True)
- 
-        #self.view_graphics_manager_action = self.view_menu.addAction(\
-        #     "Graphics manager", self.view_graphics_manager_clicked)
-        #self.view_graphics_manager_action.setCheckable(True)
+        self.view_maximize_action = self.view_menu.addAction("Show maximized window",
+             self.view_max_clicked)
+        self.view_normal_action = self.view_menu.addAction("Show normal window",
+             self.view_normal_clicked)
+        self.view_minimize_action = self.view_menu.addAction("Minimize window",
+             self.view_min_clicked) 
 
         self.expert_mode_action.setCheckable(True) 
         self.help_menu = self.addMenu("Help") 
@@ -193,6 +198,17 @@ class CustomMenuBar(QtGui.QMenuBar):
             if self.original_style:
                 self.setStyleSheet(self.original_style)
 
+    def reload_hwr_clicked(self):
+        hwr = HardwareRepository.HardwareRepository()
+        import reimport
+        for hwr_obj in hwr.hardwareObjects:
+            connections = hwr.hardwareObjects[hwr_obj].connect_dict
+            for sender in connections:
+                hwr.hardwareObjects[hwr_obj].disconnect(\
+                    sender, connections[sender]["signal"], connections[sender]["slot"])
+
+            reimport.reimport(hwr.hardwareObjects[hwr_obj].__module__)
+
     def whats_this_clicked(self):
         """
         Descript. :
@@ -246,8 +262,18 @@ class CustomMenuBar(QtGui.QMenuBar):
     def view_toolbar_clicked(self):
         self.viewToolBarSignal.emit(self.view_toolbar_action.isChecked())
 
-    def view_graphics_manager_clicked(self): 
+    def view_max_clicked(self):
+        QtGui.QApplication.activeWindow().showMaximized()
+
+    def view_normal_clicked(self):
+        QtGui.QApplication.activeWindow().showNormal()
+
+    def view_min_clicked(self):
+        QtGui.QApplication.activeWindow().showMinimized()
+
+    def view_graphics_manager_clicked(self):
         pass
+ 
 
 class CustomToolBar(QtGui.QToolBar):
     """
