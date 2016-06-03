@@ -813,19 +813,20 @@ class Qt4_InstanceListBrick(BlissWidget):
                     control_place="LOCAL"
                 else:
                     control_place="EXTERNAL"
-                email_subject="[MX REMOTE ACCESS] %s control is %s (proposal %s)" % (frombl,control_place,proposal)
+                email_subject="[MX REMOTE ACCESS] %s control is %s (proposal %s)" % \
+                      (frombl,control_place,proposal)
                 email_toaddrs=self["controlEmails"]
                 email_fromaddrs="%s@esrf.fr" % frombl
 
                 msg_event=UserInfoDialogEvent("I've gained control of the application.",\
                     email_fromaddrs,email_toaddrs,email_subject,is_local,\
                     self.font().pointSize())                
-                logging.getLogger('user_level_log').warning("You have gained control of the application.")
+                logging.getLogger('GUI').warning("You have gained control of the application.")
             else:
                 msg_event=MsgDialogEvent(QtGui.QMessageBox.Warning,\
                     "I've lost control of the application!",\
                     self.font().pointSize())
-                logging.getLogger('user_level_log').warning("You have lost control of the application!")
+                logging.getLogger('GUI').warning("You have lost control of the application!")
 
     def passControl(self,has_control_id):
         """

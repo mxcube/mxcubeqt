@@ -91,7 +91,7 @@ loggingName = ''
 def setLoggingName(name):
     global _formatter, _hdlr, loggingName
     
-    _formatter = logging.Formatter('%(asctime)s |%(levelname)-7s| %(message)s')
+    _formatter = logging.Formatter('%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s')
     _hdlr.setFormatter(_formatter)
 
     loggingName = name
