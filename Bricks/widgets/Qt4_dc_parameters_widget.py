@@ -173,5 +173,4 @@ class DCParametersWidget(QtGui.QWidget):
             msg = "This data collection has one or more incorrect parameters,"+\
                 " correct the fields marked in red to solve the problem."
 
-            logging.getLogger("user_level_log").\
-                warning(msg)
+            logging.getLogger("GUI").warning(msg)

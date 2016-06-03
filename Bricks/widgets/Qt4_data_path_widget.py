@@ -233,13 +233,14 @@ class DataPathWidget(QtGui.QWidget):
             Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
                 Qt4_widget_colors.LIGHT_RED, QtGui.QPalette.Base)
 
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                          ' from another task. Correct the problem before adding to queue')
+            logging.getLogger("GUI").\
+                error('The current path settings will overwrite data ' + \
+                      'from another task. Correct the problem before ' + \
+                      'adding to queue')
         else:
             # We had a conflict previous, but its corrected now !
             if self.path_conflict_state:
-                logging.getLogger("user_level_log").info('Path valid')
+                logging.getLogger("GUI").info('Path valid')
 
             Qt4_widget_colors.set_widget_color(self.data_path_layout.prefix_ledit,
                 Qt4_widget_colors.WHITE, QtGui.QPalette.Base)

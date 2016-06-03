@@ -138,7 +138,7 @@ class AcquisitionWidget(QtGui.QWidget):
     def set_osc_start_limits(self, limits):
         if not None in limits:
             self.osc_start_validator.setRange(limits[0], limits[1], 4)
-            self.update_parameter_limits()
+            self.update_osc_range_limits(limits)
 
     def update_osc_start(self, new_value):
         """
@@ -164,7 +164,7 @@ class AcquisitionWidget(QtGui.QWidget):
            new_value:
             self.acq_widget_layout.kappa_ledit.setText(\
                  "%.2f" % float(new_value))
-            self._acquisition_parameters.kappa = float(new_value)
+            #self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
         """
@@ -174,7 +174,7 @@ class AcquisitionWidget(QtGui.QWidget):
            new_value:
             self.acq_widget_layout.kappa_phi_ledit.setText(\
                  "%.2f" % float(new_value))
-            self._acquisition_parameters.kappa_phi = float(new_value)
+            #self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
         """
@@ -320,7 +320,6 @@ class AcquisitionWidget(QtGui.QWidget):
         if str(new_value).isdigit():
             #self._path_template.start_num = int(new_value)
             #widget = self.acq_widget_layout.first_image_ledit
-            self.update_parameter_limits()
             self.acqParametersChangedSignal.emit()
 
     def exposure_time_ledit_changed(self, new_values):
@@ -328,7 +327,6 @@ class AcquisitionWidget(QtGui.QWidget):
         Descript. :
         """
         if self.diffractometer_hwobj.in_plate_mode():
-            self.update_parameter_limits()
             self.acqParametersChangedSignal.emit()
 
     def num_images_ledit_change(self, new_value):
@@ -337,7 +335,6 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if str(new_value).isdigit():
             #self._path_template.num_files = int(new_value)
-            self.update_parameter_limits()
             self.acqParametersChangedSignal.emit()
 
     def overlap_changed(self, new_value):
@@ -490,18 +487,14 @@ class AcquisitionWidget(QtGui.QWidget):
                "Exposure time limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
-    def update_parameter_limits(self):
+    def update_osc_range_limits(self, limits):
         """
         Descript. :
         """
-        #exp_time = self._acquisition_parameters.exp_time
-        #print exp_time
-        #osc_range = 40.0 * exp_time
-        osc_range = self.osc_start_validator.top() - \
-                    float(self.acq_widget_layout.osc_start_ledit.text()) 
-        self.osc_range_validator.setRange(0, osc_range, 4)
+        self.osc_range_validator.setRange(limits[0], limits[1], 4)
         self.acq_widget_layout.osc_range_ledit.setToolTip(
-              "Oscillation range limits %0.2f : %0.2f" %(0, osc_range))
+              "Oscillation range limits %0.2f : %0.2f" % \
+               (limits[0], limits[1]))
         self._acquisition_mib.validate_all()
 
     def update_num_image_limits(self):

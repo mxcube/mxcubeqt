@@ -120,9 +120,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         Descript. :
         """
         base_result = CreateTaskBase.approve_creation(self)
-        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()
+        selected_element, selected_edge = self._periodic_table_widget.\
+            get_selected_element_edge()
         if not selected_element:
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 info("No element selected, please select an element.")
 
         return base_result and selected_element
@@ -134,7 +135,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         Descript. :
         """
         data_collections = []
-        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()   
+        selected_element, selected_edge = self._periodic_table_widget.\
+            get_selected_element_edge()   
 
         if selected_element:
             if not shape:
@@ -163,7 +165,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
             data_collections.append(energy_scan)
             self._path_template.run_number += 1
         else:
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 info("No element selected, please select an element.")
 
         return data_collections

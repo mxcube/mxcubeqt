@@ -510,9 +510,10 @@ class CreateTaskBase(QtGui.QWidget):
                         check_for_path_collisions(self._path_template)
 
         if path_conflict:
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                      ' from another task. Correct the problem before adding to queue')
+            logging.getLogger("GUI").\
+                error('The current path settings will overwrite data ' + \
+                      'from another task. Correct the problem before ' + \
+                      'adding to queue')
             result = False
 
         return result

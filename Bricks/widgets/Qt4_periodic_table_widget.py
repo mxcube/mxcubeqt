@@ -38,11 +38,13 @@ class PeriodicTableWidget(QtGui.QWidget):
     """ 
     elementEdgeSelectedSignal = QtCore.pyqtSignal(str, str)
 
-    def __init__(self, parent = None, name = None, fl = 0):
+    def __init__(self, parent=None, name=None, fl=0):
 
         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
+        self.selected_element = None
+        self.selected_edge = "L3"
 
         # Signals ------------------------------------------------------------
 
@@ -85,9 +87,8 @@ class PeriodicTableWidget(QtGui.QWidget):
         # Other ---------------------------------------------------------------
         for edge in EDGE_LIST:
             self.edge_combo.addItem(edge)
+        self.edge_combo.setCurrentIndex(2)
         self.edge_widget.setEnabled(False)
-        self.selected_element = None
-        self.selected_edge = "L3"
 
     def edge_selected(self, element, edge):
         self.selected_element = str(element)

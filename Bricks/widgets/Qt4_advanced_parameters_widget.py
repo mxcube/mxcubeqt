@@ -112,8 +112,7 @@ class AdvancedParametersWidget(QtGui.QWidget):
 
     def populate_widget(self, tree_view_item):
         self._tree_view_item = tree_view_item
-        advanced_model = tree_view_item.get_model()
-        self._data_collection = advanced_model.reference_image_collection
+        self._data_collection = tree_view_item.get_model()
         executed = self._data_collection.is_executed()
 
         self._acq_widget.setEnabled(not executed)
@@ -139,5 +138,4 @@ class AdvancedParametersWidget(QtGui.QWidget):
         if invalid:
             msg = "This data collection has one or more incorrect parameters,"+\
                   " correct the fields marked in red to solve the problem."
-            logging.getLogger("user_level_log").\
-                warning(msg)
+            logging.getLogger("GUI").warning(msg)

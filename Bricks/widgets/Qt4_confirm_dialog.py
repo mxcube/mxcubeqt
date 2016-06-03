@@ -158,7 +158,7 @@ class ConfirmDialog(QtGui.QDialog):
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                     acquisitions[0].acquisition_parameters
-            elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
+            elif isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters
 
@@ -241,7 +241,7 @@ class ConfirmDialog(QtGui.QDialog):
           
             if isinstance(item_model, queue_model_objects.DataCollection):
                 acq_parameters = item_model.acquisitions[0].acquisition_parameters
-            elif isinstance(item_model, queue_model_objects.Advanced):
+            elif isinstance(item_model, queue_model_objects.XrayCentering):
                 acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters 
             elif isinstance(item_model, queue_model_objects.TaskGroup):

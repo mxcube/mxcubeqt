@@ -42,6 +42,7 @@ class PymcaPlotWidget(QtGui.QWidget):
         self.realtime_plot = realtime_plot
          
         self.pymca_graph = QtBlissGraph(self)
+        self.pymca_graph.showGrid()
         self.info_label = QtGui.QLabel("", self)  
         self.info_label.setAlignment(QtCore.Qt.AlignRight)
 
@@ -67,7 +68,6 @@ class PymcaPlotWidget(QtGui.QWidget):
         self.pymca_graph.clearcurves()
         self.pymca_graph.setTitle("")
         self.info_label.setText("")
-        self.pymca_graph.setTitle("")
 
     def plot_energy_scan_curve(self, scan_result, scan_title):
         """Results are converted to two list describing
@@ -84,6 +84,8 @@ class PymcaPlotWidget(QtGui.QWidget):
         """
         Descript. :
         """
+        self.axis_x_array = []
+        self.axis_y_array = []
         self.pymca_graph.clearcurves()
         self.pymca_graph.xlabel(scan_info['xlabel'])
         self.ylabel = scan_info['ylabel']
@@ -108,7 +110,9 @@ class PymcaPlotWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        pass
+        self.pymca_graph.setx1axislimits(min(self.axis_x_array),
+                                         max(self.axis_x_array))
+        self.pymca_graph.replot()
 
     def add_new_plot_value(self, x, y):
         """
@@ -118,6 +122,10 @@ class PymcaPlotWidget(QtGui.QWidget):
             self.axis_x_array.append(x / 1000.0)
             self.axis_y_array.append(y / 1000.0)
             self.pymca_graph.newcurve("Energy", self.axis_x_array, self.axis_y_array)
+            self.pymca_graph.setx1axislimits(min(self.axis_x_array),
+                                             max(self.axis_x_array))
+            #self.pymca_graph.replot()
+            
 
     def handle_graph_signal(self, signal_info):
         """

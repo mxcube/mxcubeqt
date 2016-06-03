@@ -135,7 +135,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
             dc = tree_item.get_model()
 
-            if dc.experiment_type != queue_model_enumerables.EXPERIMENT_TYPE.HELICAL:
+            if not dc.is_helical():
                 if dc.is_executed():
                     self.setDisabled(True)
                 else:
@@ -188,29 +188,6 @@ class CreateDiscreteWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot() 
 
-        """
-        if self._acq_widget.use_inverse_beam():
-            total_num_images = self._acquisition_parameters.num_images
-            subwedge_size = self._acq_widget.get_num_subwedges()
-            osc_range = self._acquisition_parameters.osc_range
-            osc_start = self._acquisition_parameters.osc_start
-            run_number = self._path_template.run_number
-
-            subwedges = queue_model_objects.create_inverse_beam_sw(total_num_images,
-                        subwedge_size, osc_range, osc_start, run_number)
-
-            self._acq_widget.set_use_inverse_beam(False)
-
-            for sw in subwedges:
-                tasks.extend(self.create_dc(sample, sw[3], sw[0], sw[1],
-                                            sw[2], cpos=cpos,
-                                            inverse_beam = True))
-                self._path_template.run_number += 1
-        else:
-            tasks.extend(self.create_dc(sample, cpos=cpos))
-            self._path_template.run_number += 1
-        """
-
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1
 
@@ -259,3 +236,21 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks.append(dc)
 
         return tasks
+
+    def execute_task(self, sample):
+        #All this should be in queue_entry level
+        group_data = {'sessionId': self._session_hwobj.session_id,
+                      'experimentType': 'OSC'}
+        gid = self._beamline_setup_hwobj.lims_client_hwobj.\
+              _store_data_collection_group(group_data)
+        sample.lims_group_id = gid
+
+        task_list = self._create_task(sample, None)
+        task_list[0].lims_group_id = gid
+       
+        print task_list[0] 
+        param_list = queue_model_objects.to_collect_dict(task_list[0], \
+                       self._session_hwobj, sample, None)
+
+        self._beamline_setup_hwobj.collect_hwobj.collect(\
+             queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list)

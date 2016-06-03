@@ -63,20 +63,16 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
     def populate_widget(self, item):
-        advanced_model = item.get_model()
-        data_collection = advanced_model.reference_image_collection
-
-        executed = advanced_model.is_executed()
-        associated_grid = advanced_model.get_associated_grid()
+        data_collection = item.get_model()
+        executed = data_collection.is_executed()
 
         self.heat_map_widget.clean_result()
         self.heat_map_widget.set_associated_data_collection(data_collection)
-        self.heat_map_widget.set_associated_grid(associated_grid)
      
         if executed: 
-            processing_results = advanced_model.get_first_processing_results()
+            mesh_processing_results = data_collection.get_mesh_processing_results()
             if processing_results is not None: 
-                self.heat_map_widget.set_results(processing_results, True)    
+                self.heat_map_widget.set_results(mesh_processing_results, True)    
 
     def set_processing_results(self, processing_results, param, last_results):
         self.heat_map_widget.set_results(processing_results, last_results)

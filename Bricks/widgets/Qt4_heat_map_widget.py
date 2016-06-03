@@ -198,18 +198,12 @@ class HeatMapWidget(QtGui.QWidget):
 
     def set_associated_data_collection(self, data_collection):
         self.__associated_data_collection = data_collection
-        
-        #self._heat_map_plot.set_x_axis_limits((- 0.5, data_collection.\
-        #      acquisitions[0].acquisition_parameters.num_images - 0.5))
+        self.__associated_grid = self.__associated_data_collection.grid
 
-    def set_associated_grid(self, grid):
-        if grid is None:
+        if self.__associated_grid is None:
             self.__is_map_plot = False
-            #self._heat_map_plot.x1Label("Image num")
-            #self._heat_map_plot.y1Label("Score")
         else:
             self.__is_map_plot = True
-            self.__associated_grid = grid
             axis_range = self.__associated_grid.get_col_row_num()
             grid_size = self.__associated_grid.get_size_pix()
 
