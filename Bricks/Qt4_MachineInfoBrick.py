@@ -168,26 +168,36 @@ class Qt4_MachineInfoBrick(BlissWidget):
         Return.   : 
         """
         if value.get('current') is None:
-            Qt4_widget_colors.set_widget_color(self.current_value_label, STATES['unknown'])
+            Qt4_widget_colors.set_widget_color(self.current_value_label, 
+                                               STATES['unknown'])
         elif value.get('current'):
-            Qt4_widget_colors.set_widget_color(self.current_value_label, STATES['ready'])
+            Qt4_widget_colors.set_widget_color(self.current_value_label,
+                                               STATES['ready'])
         else:
-            Qt4_widget_colors.set_widget_color(self.current_value_label, STATES['error'])
-        Qt4_widget_colors.set_widget_color(self.state_text_value_label, STATES['ready'])
+            Qt4_widget_colors.set_widget_color(self.current_value_label,
+                                               STATES['error'])
+        Qt4_widget_colors.set_widget_color(self.state_text_value_label,
+                                           STATES['ready'])
         if value.get('flux') is None:
-            Qt4_widget_colors.set_widget_color(self.intensity_value_label, STATES['unknown'])
+            Qt4_widget_colors.set_widget_color(self.intensity_value_label,
+                                               STATES['unknown'])
         elif value.get('flux'):
-            Qt4_widget_colors.set_widget_color(self.intensity_value_label, STATES['ready'])
+            Qt4_widget_colors.set_widget_color(self.intensity_value_label,
+                                               STATES['ready'])
         else:
-            Qt4_widget_colors.set_widget_color(self.intensity_value_label, STATES['error'])
+            Qt4_widget_colors.set_widget_color(self.intensity_value_label,
+                                               STATES['error'])
         self.cryo_value_label.setEnabled(True)
         if value.get('cryo') is None:
             self.cryo_value_label.setEnabled(False)
-            Qt4_widget_colors.set_widget_color(self.cryo_value_label, STATES['unknown'])
+            Qt4_widget_colors.set_widget_color(self.cryo_value_label,
+                                               STATES['unknown'])
         elif value.get('cryo'):
-            Qt4_widget_colors.set_widget_color(self.cryo_value_label, STATES['ready'])
+            Qt4_widget_colors.set_widget_color(self.cryo_value_label,
+                                               STATES['ready'])
         else:
-            Qt4_widget_colors.set_widget_color(self.cryo_value_label, STATES['error'])
+            Qt4_widget_colors.set_widget_color(self.cryo_value_label,
+                                               STATES['error'])
 
     def sizeof_fmt(self, num):
         """

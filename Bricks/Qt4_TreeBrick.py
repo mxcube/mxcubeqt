@@ -64,6 +64,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.enable_collect_conditions = {}
         self.current_view = None
         self.lims_samples = None
+        self.filtered_lims_samples = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("holderLengthMotor", "string", "")
@@ -210,14 +211,17 @@ class Qt4_TreeBrick(BlissWidget):
             self.connect(self.queue_hwobj, 'show_workflow_tab',
                          self.show_workflow_tab_from_model)
 
-            self.connect(self.queue_hwobj, 'queue_execute_started',
+            self.connect(self.queue_hwobj, 'queue_entry_execute_started',
                          self.queue_entry_execution_started)
+
+            self.connect(self.queue_hwobj, 'queue_entry_execute_finished',
+                         self.queue_entry_execution_finished)
 
             self.connect(self.queue_hwobj, 'queue_paused', 
                          self.queue_paused_handler)
 
             self.connect(self.queue_hwobj, 'queue_execution_finished', 
-                         self.queue_execution_completed)
+                         self.queue_execution_finished)
 
             self.connect(self.queue_hwobj, 'queue_stopped', 
                          self.queue_stop_handler)
@@ -238,12 +242,12 @@ class Qt4_TreeBrick(BlissWidget):
             try:
                self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
             except AttributeError:
-               logging.getLogger("user_level_log").\
+               logging.getLogger("GUI").\
                     debug("Qt4_TreeBrick: sample changer hwobj not defined.")
                self.sample_changer_hwobj = None
             try:
                self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
-               logging.getLogger("user_level_log").\
+               logging.getLogger("GUI").\
                     debug("Qt4_TreeBrick: plate manipulator hwobj not defined.")
             except:
                self.plate_manipulator_hwobj = None 
@@ -278,10 +282,10 @@ class Qt4_TreeBrick(BlissWidget):
                              self.ppu_status_changed)
                 bl_setup.ppu_control_hwobj.update_values()
             if hasattr(bl_setup, "safety_shutter_hwobj"):
-               
                 self.connect(bl_setup.safety_shutter_hwobj,
                              'shutterStateChanged',
                              self.shutter_state_changed)
+                self.shutter_state_changed(bl_setup.safety_shutter_hwobj.getShutterState())
 
             has_shutter_less = bl_setup.detector_has_shutterless()
             if has_shutter_less:
@@ -404,10 +408,13 @@ class Qt4_TreeBrick(BlissWidget):
         self.emit(QtCore.SIGNAL("queue_is_executing"), True)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
 
+    def queue_entry_execution_finished(self, queue_entry, status):
+        self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
+
     def queue_paused_handler(self, status):
         self.dc_tree_widget.queue_paused_handler(status)
 
-    def queue_execution_completed(self, status):
+    def queue_execution_finished(self, status):
         self.emit(QtCore.SIGNAL("queue_is_executing"), False)
         self.dc_tree_widget.queue_execution_completed(status)
 
@@ -444,7 +451,7 @@ class Qt4_TreeBrick(BlissWidget):
         accordingly.
         """
         lims_client = self.lims_hwobj
-        log = logging.getLogger("user_level_log") 
+        log = logging.getLogger("GUI") 
 
         self.lims_samples = lims_client.get_samples(\
              self.session_hwobj.proposal_id,
@@ -452,13 +459,17 @@ class Qt4_TreeBrick(BlissWidget):
 
         basket_list = []
         sample_list = []        
+        self.filtered_lims_samples = [] 
         sample_changer = None
 
         self.sample_changer_widget.sample_combo.clear()
         for sample in self.lims_samples:
             if sample.containerSampleChangerLocation:
-                 self.sample_changer_widget.sample_combo.addItem(\
-                   "%s_%s" %(sample.sampleName, sample.proteinAcronym))
+                self.filtered_lims_samples.append(sample)
+                item_text = "%s-%s" %(sample.proteinAcronym, sample.sampleName)
+                if sample.code:
+                    item_text += " (%s)" % sample.code
+                self.sample_changer_widget.sample_combo.addItem(item_text)
         self.sample_changer_widget.sample_combo.setEnabled(True)
         self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
                  
@@ -527,13 +538,10 @@ class Qt4_TreeBrick(BlissWidget):
         Assigns lims sample to manually-mounted sample
         """
         self.dc_tree_widget.filter_sample_list(0)
-        sample_name = "manually-mounted (%s_%s)" % \
-             (self.lims_samples[index].sampleName,
-              self.lims_samples[index].proteinAcronym)
         root_model = self.queue_model_hwobj.get_model_root()
         sample_model = root_model.get_children()[0]
 
-        sample_model.init_from_lims_object(self.lims_samples[index])
+        sample_model.init_from_lims_object(self.filtered_lims_samples[index])
         self.dc_tree_widget.sample_tree_widget.clear()
         self.dc_tree_widget.populate_free_pin(sample_model)
 
@@ -598,7 +606,7 @@ class Qt4_TreeBrick(BlissWidget):
 
         :returns: None
         """
-        logging.getLogger("user_level_log").info(msg)
+        logging.getLogger("GUI").info(msg)
 
     def set_sample_pin_icon(self):
         """
@@ -871,7 +879,11 @@ class Qt4_TreeBrick(BlissWidget):
                 self.emit_set_prefix(item)
                 #self.populate_edna_parameter_widget(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                self.populate_dc_parameters_tab(item)
+                data_collection = item.get_model()
+                if data_collection.is_mesh():
+                    self.populate_advanced_widget(item)
+                else:
+                    self.populate_dc_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 self.populate_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
@@ -880,8 +892,6 @@ class Qt4_TreeBrick(BlissWidget):
                 self.populate_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.populate_workflow_tab(item)
-            elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
-                self.populate_advanced_widget(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.populate_dc_group_tab(item)
 
@@ -938,8 +948,6 @@ class Qt4_TreeBrick(BlissWidget):
            8 : Characterisation
            9 : Energy Scan
            10: XRF spectrum            
-           11: Advanced
-
         """
         self.sample_changer_widget.filter_ledit.setEnabled(\
              filter_index in (1, 2, 3))
@@ -975,8 +983,8 @@ class Qt4_TreeBrick(BlissWidget):
                       hide = not isinstance(item, Qt4_queue_item.EnergyScanQueueItem)
                   elif filter_index == 10:
                       hide = not isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem)
-                  elif filter_index == 11:
-                      hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
+                  #elif filter_index == 11:
+                  #    hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
 
                   if isinstance(item, Qt4_queue_item.TaskQueueItem):
                       item.set_hidden(hide)
@@ -1039,22 +1047,22 @@ class Qt4_TreeBrick(BlissWidget):
             self.enable_collect_conditions["shutter"] = False
         else:
             self.enable_collect_conditions["shutter"] = True
-
         self.update_enable_collect()
 
     def update_enable_collect(self):
         enable_collect = all(item == True for item in self.enable_collect_conditions.values())
         if enable_collect != self.dc_tree_widget.enable_collect_condition:
             if enable_collect:
-                logging.getLogger("user_level_log").info("Data collection is enabled")    
+                logging.getLogger("GUI").info("Data collection is enabled")    
             else:
-                logging.getLogger("user_level_log").warning("Data collect is disabled")
+                logging.getLogger("GUI").warning("Data collect is disabled")
                 for key, value in self.enable_collect_conditions.iteritems():
                     if value == False:
                         if key == "diffractometer":
-                            logging.getLogger("user_level_log").info("Diffractometer is in beam location phase")
+                            logging.getLogger("GUI").info("Diffractometer is in beam location phase")
                         elif key == "shutter":
-                            logging.getLogger("user_level_log").info("Safety shutter is closed")
+                            logging.getLogger("GUI").info("Safety shutter is closed")
                         elif key == "ppu":
-                            logging.getLogger("user_level_log").error("PPU is in error state")
+                            logging.getLogger("GUI").error("PPU is in error state")
             self.dc_tree_widget.enable_collect_condition = enable_collect
+            self.dc_tree_widget.sample_tree_widget_selection()

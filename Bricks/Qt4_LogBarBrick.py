@@ -66,7 +66,8 @@ class Qt4_LogBarBrick(BlissWidget):
         """
         Descript. :
         """
-        if record.name == 'user_level_log':
+        if record.name == 'user_level_log' or \
+           record.name == 'GUI':
             msg = record.getMessage()#.replace('\n',' ').strip()
             level = record.getLevel()
             color = Qt4_LogBarBrick.COLORS[level]

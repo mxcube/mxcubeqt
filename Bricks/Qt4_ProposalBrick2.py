@@ -215,11 +215,11 @@ class Qt4_ProposalBrick2(BlissWidget):
                                                Qt4_widget_colors.LIGHT_GREEN,
                                                QtGui.QPalette.Base)  
             msg = 'User group set to: %s' % str(self.user_group_ledit.text())
-            logging.getLogger("user_level_log").info(msg)
+            logging.getLogger("GUI").info(msg)
             self.emit(QtCore.SIGNAL("userGroupSaved"), self.user_group_ledit.text())
         else:
             msg = 'User group not valid, please enter a valid user group'
-            logging.getLogger("user_level_log").info(msg)
+            logging.getLogger("GUI").info(msg)
             Qt4_widget_colors.set_widget_color(self.user_group_ledit,
                                                Qt4_widget_colors.LIGHT_RED,
                                                QtGui.QPalette.Base)
@@ -230,7 +230,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         if self.saved_group:
             msg = 'User group changed, press set to apply change'
-            logging.getLogger("user_level_log").warning(msg)
+            logging.getLogger("GUI").warning(msg)
             Qt4_widget_colors.set_widget_color(self.user_group_ledit,
                                                Qt4_widget_colors.LINE_EDIT_CHANGED,
                                                QtGui.QPalette.Base)
@@ -368,7 +368,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                  (proposal["code"],
                   str(proposal["number"]),
                   proposal["title"])
-            logging.getLogger("user_level_log").debug(msg)  
+            logging.getLogger("GUI").debug(msg)  
 
             codes_list = self["codes"].split()
             if code not in codes_list:
@@ -776,7 +776,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.proposals = self.lims_hwobj.get_proposals_by_user(user_name)
 
         if len(self.proposals) == 0:
-            logging.getLogger("user_level_log").error("No proposals for user %s found in ISPyB" % user_name)
+            logging.getLogger("GUI").error("No proposals for user %s found in ISPyB" % user_name)
             self.ispybDown()
         else: 
             self.proposal_combo.clear()
@@ -804,7 +804,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                 self.proposals[proposal_index]["Proposal"]["title"])
             proposal_tooltip += "\nSelected proposal:\n   %s" % proposal_info
             self.proposal_combo.setToolTip(proposal_tooltip)
-            logging.getLogger("user_level_log").info("ISPyB proposal: %s" % proposal_info)
+            logging.getLogger("GUI").info("ISPyB proposal: %s" % proposal_info)
 
     def select_todays_proposal(self, proposal_list):
         """

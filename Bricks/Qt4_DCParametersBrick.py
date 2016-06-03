@@ -49,7 +49,6 @@ class Qt4_DCParametersBrick(BlissWidget):
         # Internal variables --------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty("session", "string", "/session")
         self.addProperty("queue-model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("useImageTracking", "boolean", True)
@@ -104,7 +103,6 @@ class Qt4_DCParametersBrick(BlissWidget):
              acquisitions[0].acquisition_parameters.\
              centred_position.snapshot_image,
              width=800) 
-
         
         if data_collection.is_collected():
             self.parameters_widget.setEnabled(False)
@@ -140,10 +138,9 @@ class Qt4_DCParametersBrick(BlissWidget):
         """
         Descript. :
         """
-        if property_name == 'session':
-            self.session_hwobj = self.getHardwareObject(new_value)
-        elif property_name == 'beamline_setup':            
+        if property_name == 'beamline_setup':            
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
+            self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
             self.parameters_widget.set_beamline_setup(self.beamline_setup_hwobj)
             self.advance_results_widget.set_beamline_setup(self.beamline_setup_hwobj)
             if hasattr(self.beamline_setup_hwobj, "image_tracking_hwobj"):

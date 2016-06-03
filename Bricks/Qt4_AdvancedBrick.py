@@ -40,7 +40,6 @@ class Qt4_AdvancedBrick(BlissWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty("session", "string", "/session")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
@@ -79,21 +78,17 @@ class Qt4_AdvancedBrick(BlissWidget):
 
         data_collection = item.get_model()
         self.snapshot_widget.display_snapshot(\
-             data_collection.grid_object.get_snapshot())
+             data_collection.grid.get_snapshot())
 
-        executed = data_collection.is_executed()
-
-        if executed:
-            self.tool_box.setCurrentWidget(self.results_widget)
+        self.tool_box.setCurrentWidget(self.results_widget)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Overriding BaseComponents.BlissWidget (propertyChanged object) 
         run method.
         """
-        if property_name == 'session':
-            self.session_hwobj = self.getHardwareObject(new_value)
-        elif property_name == 'beamline_setup':
+        if property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
+            self.session_hwobj = bl_setup.session_hwobj
             self.parameters_widget.set_beamline_setup(bl_setup)
             self.results_widget.set_beamline_setup(bl_setup)

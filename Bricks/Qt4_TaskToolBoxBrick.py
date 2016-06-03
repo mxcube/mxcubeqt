@@ -115,7 +115,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.task_tool_box_widget.update_data_path_model()
         path = self.session_hwobj.get_base_image_directory() + "/" + str(new_user_group)
         msg = 'Image path is: %s' % path
-        logging.getLogger('user_level_log').info(msg)
+        logging.getLogger('GUI').info(msg)
         
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
@@ -167,7 +167,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
                     graphics_manager_hwobj.connect('pointSelected', self.point_selected)
                     graphics_manager_hwobj.connect('pointDeleted', self.point_deleted) 
             else:
-                logging.getLogger('user_level_log').error('Could not load beamline setup '+\
+                logging.getLogger('GUI').error('Could not load beamline setup '+\
                                                           'check configuration !.')
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
