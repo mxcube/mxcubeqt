@@ -1,0 +1,56 @@
+<object class="EMBLBeamlineTest">
+    <device_list>/opt/embl-hh/etc/p13/app/beamline-test-tool/p13devicesList.csv</device_list>
+    <object href="/beamline-setup" role="beamline_setup"/> 
+
+    <available_tests>["ppu", "aperture", "autocentring", "alignbeam", "summary", "com"]</available_tests>
+    <!-- <startup_tests>["ppu", "aperture", "autocentring", "beamalign"]</startup_tests> -->
+    <startup_tests>["alignbeam"]</startup_tests>
+
+    <!-- <run_tests_at_startup>True</run_tests_at_startup> -->
+
+    <!-- Available tests
+ 
+    "summary": "Beamline summary",
+    "com": "Communication with beamline devices",
+    "ppu": "PPU control",
+    "focusing": "Focusing modes",
+    "aperture": "Aperture",
+    "alignbeam": "Align beam position",
+    "attenuators": "Attenuators",
+    "autocentring": "Auto centring procedure"}
+    -->
+    <tine_props>
+      <tine_prop>
+        <prop_device>/PETRA/ARCHIVER/keyword</prop_device>
+        <prop_names>("MachineStateText", "curDC")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/Energy/P13Energy</prop_device>
+        <prop_names>("Energy", "ELimitLow", "ELimitHigh", "Status")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/transmission/attenuators</prop_device>
+        <prop_names>("transmission", "status", "limits")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/collection/resolution</prop_device>
+        <prop_names>("position", "state2", "limits")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/collection/distance</prop_device>
+        <prop_names>("position", "state2", "limits")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/detector/pilatus6m</prop_device>
+        <prop_names>("temperature", "humidity", "status", "detector-mode", "frame-rate", "beam-xy")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/EMBL_ICS_IFace/ICS_PHP_Interface</prop_device>
+        <prop_names>("ABS13_0_offen", "G13_2a_SFGerteilt", "BS13_1_offen")</prop_names>
+      </tine_prop>
+      <tine_prop>
+        <prop_device>/P13/image-tracker/img-tracker</prop_device>
+        <prop_names>"status"</prop_names>
+      </tine_prop> 
+    </tine_props>
+</object>

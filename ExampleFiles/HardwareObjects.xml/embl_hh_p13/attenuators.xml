@@ -1,7 +1,7 @@
 <device class = "Attenuators"> 
-  <channel type="tine" name="chanAttValue" tinename="/P13/transmission/attenuators">transmission</channel>
-  <channel type="tine" name="chanAttState" tinename="/P13/transmission/attenuators">status</channel>
-  <channel type="tine" name="chanAttLimits" tinename="/P13/transmission/attenuators">limits</channel>  
+  <channel type="tine" name="chanAttValue" tinename="/P13/transmission/attenuator">transmission</channel>
+  <channel type="tine" name="chanAttState" tinename="/P13/transmission/attenuator">status</channel>
+  <channel type="tine" name="chanAttLimits" tinename="/P13/transmission/attenuator">limits</channel>  
   <atte>
      <label>Alum 0.09</label>
      <bits>128</bits>

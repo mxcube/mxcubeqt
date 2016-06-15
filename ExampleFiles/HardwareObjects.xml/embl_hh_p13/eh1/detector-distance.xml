@@ -10,5 +10,4 @@
 
   <epsilon>0.01</epsilon>
   <!-- <verboseUpdate>True</verboseUpdate> -->
-  <maxMotorPosition>1000</maxMotorPosition>
 </device>

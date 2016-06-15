@@ -1,6 +1,6 @@
-<equipment class="EMBLDetector">
+<object class="EMBLDetector">
   <!-- generic devices -->
-  <device hwrid="/eh1/detector-distance" role="distance_motor"/>
+  <object hwrid="/eh1/detector-distance" role="distance_motor"/>
   <!-- site specific devices -->
 
   <!-- generic channels and commands -->
@@ -9,7 +9,7 @@
   <channel type="tine" name="chanTemperature" tinename="/P13/detector/pilatus6m">temperature</channel>
   <channel type="tine" name="chanHumidity" tinename="/P13/detector/pilatus6m">humidity</channel>
   <channel type="tine" name="chanStatus" tinename="/P13/detector/pilatus6m">status</channel>
-  <channel type="tine" name="chanCollectMode" tinename="/P13/detector/pilatus6m">detector-mode</channel>
+  <channel type="tine" name="chanRoiMode" tinename="/P13/detector/pilatus6m">detector-mode</channel>
   <channel type="tine" name="chanFrameRate" tinename="/P13/detector/pilatus6m">frame-rate</channel> 
   <channel type="tine" name="chanBeamXY" tinename="/P13/detector/pilatus6m">beam-xy</channel>
 
@@ -34,5 +34,5 @@
   <tempThreshold>33.5</tempThreshold>
   <humidityThreshold>20.0</humidityThreshold>
   <tolerance>0.2</tolerance>
-  <collectModes>{"0": 0, "C18": 1, "C2": 2}</collectModes>
-</equipment>
+  <roiModes>("0", "C18", "C2")</roiModes>
+</object>

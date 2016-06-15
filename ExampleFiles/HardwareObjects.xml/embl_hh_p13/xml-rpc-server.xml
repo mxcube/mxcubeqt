@@ -1,9 +1,9 @@
-<object class = "XMLRPCServer-break" role = "XMLRPCServer">
+<object class = "XMLRPCServer" role = "XMLRPCServer">
 
   <!-- Should XML-RPC server listen on all interfaces?
        False (the default) means listen only on the interface given
        by socket.gethostname()-->
-  <all_interfaces>False </all_interfaces>
+  <all_interfaces>True</all_interfaces>
   <port>8011</port>
 
   <apis>
