@@ -25,7 +25,7 @@ MXCuBE meetings
 
 * Recall of previous meeting conclusion, Daniele, 15 min 
 * Scientific Committee discussions & recommendations, Pierre, 15 min 
-* MxCuBE at the different sites ­­ status, problems, outlook (15 min talks) 
+* MXCuBE at the different sites ­­ status, problems, outlook (15 min talks) 
 - ESRF ­ Daniele 
 - EMBL ­ Gleb 
 - MaxLab ­ Johan 
@@ -36,36 +36,36 @@ MXCuBE meetings
 
 16:20 - 18:20, Session 2, Progress ­ Development, Abstractions, Datamodels 
 
-* MxCuBE 2 overview and the most recent developments, Marcus, 40 min 
+* MXCuBE 2 overview and the most recent developments, Marcus, 40 min 
 * Abstract Sample Changer, Alexandre, 20 min 
 * Implementing Sample Changer at BESSY, Michael, 20 min 
 * Abstract model for complex crystallography experiments, Peter, 20 min 
-* Sardana & mxCuBE, Bixente & Guifré, 20 min 
+* Sardana & MXCuBE, Bixente & Guifré, 20 min 
 
 18:00 - 19:00, Round Table, Abstractions 
 
 2. Day / 14.05.2014 
 ===================
-09:00 - 10:00 Session 3, mxCuBE 2 in service 
+09:00 - 10:00 Session 3, MXCuBE 2 in service 
 
-* mxCuBE 2 user stories and future perspectives, Daniele, 20 min 
-* mxCuBE 2 on MASSIF­1, Matias, 20 min 
-* DAWN workflows integration within mxCuBE 2, Olof, 20 min 
+* MXCuBE 2 user stories and future perspectives, Daniele, 20 min 
+* MXCuBE 2 on MASSIF­1, Matias, 20 min 
+* DAWN workflows integration within MXCuBE 2, Olof, 20 min 
 
-10:00 - 10:30, Round table, Usability and layout improvements for mxCuBE 
+10:00 - 10:30, Round table, Usability and layout improvements for MXCuBE 
 10:30 - 10:45 Coffee break 
-10:45 - 11:45 Session 4, mxCuBE in ever changing world 
+10:45 - 11:45 Session 4, MXCuBE in ever changing world 
 
-* Simulation environment for mxCuBE 
-* Towards a new technology stack for mxCuBE, Matias, 20 min + 20 min 
-* Close look at what it took to make mxCuBE v2 work at SOLEIL, Martin, 20 min 
+* Simulation environment for MXCuBE 
+* Towards a new technology stack for MXCuBE, Matias, 20 min + 20 min 
+* Close look at what it took to make MXCuBE v2 work at SOLEIL, Martin, 20 min 
 
 11:45 - 12:30 Round Table, Project and code management . What can we improve? 
 12:30 - 13:30 Lunch 
 13:30 - 15:00 Round Table Discussions, Conclusions & Plans 
 
 * Objectives for the year to come 
-* Addressing risks in the development of mxCuBE 
+* Addressing risks in the development of MXCuBE 
 * Possible next meeting date & place 
 
 ***************************
@@ -140,7 +140,7 @@ Status Reports:
 
 14:15 - 14:30    Steering Committee discussions & recommendations – Marjolein Thunnissen
 
-14:30 - 15:30    MxCuBE at the sites status, problems, outlook (7 min talks including questions)
+14:30 - 15:30    MXCuBE at the sites status, problems, outlook (7 min talks including questions)
 
 * ESRF - Antonia Beteva
 * EMBL-Hamburg - Ivars Karpics
@@ -168,7 +168,7 @@ Status Reports:
 2. Day / 1.12.2015
 ====================
 
-09:00 - 11:00    Session 3. Progress around MxCuBE (Chair: EMBL/HH)
+09:00 - 11:00    Session 3. Progress around MXCuBE (Chair: EMBL/HH)
 
 * Talk 1: Alba – Integration of EDNA – Jordi Andreu
 * Talk 2: EMBL-Hamburg – MXCuBE Qt4. current status and future - Ivars Karpics
@@ -176,7 +176,7 @@ Status Reports:
 
 11:00 - 11:30    Coffee break
 
-11:30 - 13:00    Session 4. Next in MxCuBE (Chair: MaxIV)
+11:30 - 13:00    Session 4. Next in MXCuBE (Chair: MaxIV)
 
 * Talk 1: Global Phasing – Progress towards driving beamlines as a third party - Peter Keller
 * Talk 2: MaxIV – MXCuBE3 -  Antonio Milán
@@ -190,7 +190,7 @@ Status Reports:
 
     Discussion, Work packages, Conclusions & Plan Objectives for the year to come
 
-    Addressing risks in the development of MxCuBE
+    Addressing risks in the development of MXCuBE
 
     Possible next meeting date & place
 

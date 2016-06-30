@@ -1,4 +1,4 @@
-MxCuBE Documentation
+MXCuBE Documentation
 ####################
 
 MXCuBE stands for Macromolecular Xtallography CUstomized Beamline Environment.
@@ -42,7 +42,7 @@ Information for users
 * :doc:`user_manual`
 * If you cite MXCuBE, please use the reference:
 .. note:: 
-   Gabadinho, J. et al. (2010). MxCuBE: a synchrotron beamline control environment customized for macromolecular crystallography experiments. J. Synchrotron Rad. 17, 700-707
+   Gabadinho, J. et al. (2010). MXCuBE: a synchrotron beamline control environment customized for macromolecular crystallography experiments. J. Synchrotron Rad. 17, 700-707
 
 * `Article <http://www.ncbi.nlm.nih.gov/pubmed/20724792>`_
 
