@@ -5,7 +5,39 @@ color: white
 fa-icon: users 
 ---
 
-# MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
+# 9th. MXCuBE meeting @ EMBL (Hamburg), 27<sup>st</sup>-29<sup>nd</sup> of June, 2016
+
+![embl group photo](img/2016-embl-meeting-group.jpg)
+
+Photo credit: Rosemary Wilson (EMBL Hamburg)
+
+### Highlights
+
+- Three potential newcomers to the MXCuBE collaboration 
+- First experiments and diffractions with MXCuBE web version at MAXIV
+- Qt4 version deployed at HZB
+- Developers workshop to improve co-development practices
+
+To be updated...
+
+## Full list of the presentations
+
+### Status
+
+- [Status of MXCuBE @ ALBA](doc/meetings_2016_EMBL/MXCuBE-Hamburg20160627-ALBA_status_report.pdf)
+- [Status of MXCuBE @ DESY](doc/meetings_2016_EMBL/2016_EMBL_P11-Status.pdf)
+- [Status of MXCuBe @ EMBL-Hamburg](doc/meetings_2016_EMBL/)
+- [Status of MXCuBE @ ESRF](doc/meetings_2016_EMBL/)
+- [Global Phasing](doc/meetings_2016_EMBL/)
+- [Status of MXCuBE @ HZB](doc/meetings_2016_EMBL/)
+- [Status of MXCuBE @ MAX IV](doc/meetings_2016_EMBL/BIOMAX_Status_Report_JN.pdf)
+- [Status of MXCuBE @ SOLEIL](doc/meetings_2016_EMBL/pres_Hambourg_v02_a.pdf)
+
+### New developments & progress around MXCuBE
+
+To be added...
+
+# 8th. MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
 ![alba group photo](img/alba-meeting-group.jpg)
 
@@ -20,26 +52,26 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 ## Full list of the presentations
 
 ### Status
-- [Status of MXCuBE @ ESRF](doc/ESRFHighlights.odp)
-- [Status of MXCuBe @ EMBL-Hamburg](doc/2015_mxcube_alba_karpics_01_status.pdf)
-- [Status of MXCuBE @ MAX IV](doc/201511_MXCuBE-MAXlab_JN.pdf)
-- [Status of MXCuBE @ HZB](doc/20151130_mxcube-HZB.pdf)
-- [Status of MXCuBE @ SOLEIL](doc/mxCuBE_SOLEIL_Status_2015_11.pdf)
-- [Status of MXCuBE @ ALBA](doc/MXCuBEMeeting_ALBA-XALOC_Status.pdf)
-- [Status of MXCuBE @ DESY](doc/20151130_S1_MXCuBE_Status_DESY.pdf)
-- [Global Phasing](doc/gb_mxcube_alba_2015.pdf)
+- [Status of MXCuBE @ ESRF](doc/meetings_2015_ALBA/ESRFHighlights.odp)
+- [Status of MXCuBe @ EMBL-Hamburg](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_01_status.pdf)
+- [Status of MXCuBE @ MAX IV](doc/meetings_2015_ALBA/201511_MXCuBE-MAXlab_JN.pdf)
+- [Status of MXCuBE @ HZB](doc/meetings_2015_ALBA/20151130_mxcube-HZB.pdf)
+- [Status of MXCuBE @ SOLEIL](doc/meetings_2015_ALBA/mxCuBE_SOLEIL_Status_2015_11.pdf)
+- [Status of MXCuBE @ ALBA](doc/meetings_2015_ALBA/MXCuBEMeeting_ALBA-XALOC_Status.pdf)
+- [Status of MXCuBE @ DESY](doc/meetings_2015_ALBA/20151130_S1_MXCuBE_Status_DESY.pdf)
+- [Global Phasing](doc/meetings_2015_ALBA/gb_mxcube_alba_2015.pdf)
 
 ### New developments & progress around MXCuBE
 - [Unleashing full power of Eiger detector](https://drive.google.com/open?id=0B6zThwr9Jrr2eS1jZXQ5QlVLU1U)
-- [Preliminary layout and sample centring for MXCuBE 3](doc/ALBA_MxCubeMeeting_Eguiraun.pdf)
-- [Organization of MXCuBE 3 development](doc/mxcube3web.pdf)
+- [Preliminary layout and sample centring for MXCuBE 3](doc/meetings_2015_ALBA/ALBA_MxCubeMeeting_Eguiraun.pdf)
+- [Organization of MXCuBE 3 development](doc/meetings_2015_ALBA/mxcube3web.pdf)
 - [MXCuBE 3 front-end development toolchain](http://slides.com/matiasg/mxcube3_fedev_toolchain)
-- [Progress towards driving beamlines as a third party](doc/MXCuBE-2015-pkeller.odp)
-- [MXCuBE and EDNA at ALBA](doc/20151201_S3_ALBA_MXCuBE_and_EDNA.pdf)
-- [MXCuBE and Qt4](doc/2015_mxcube_alba_karpics_03_qt4.pdf)
-- [Advanced methods and abstraction](doc/2015_mxcube_alba_karpics_02_advanced.pdf)
+- [Progress towards driving beamlines as a third party](doc/meetings_2015_ALBA/MXCuBE-2015-pkeller.odp)
+- [MXCuBE and EDNA at ALBA](doc/meetings_2015_ALBA/20151201_S3_ALBA_MXCuBE_and_EDNA.pdf)
+- [MXCuBE and Qt4](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_03_qt4.pdf)
+- [Advanced methods and abstraction](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_02_advanced.pdf)
 
-# MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015 
+# 7th. MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015 
 
 ![hzb group photo](img/hzb-meeting-group.jpg)
 
@@ -56,5 +88,3 @@ ESRF in September to start the work on MXCuBE 3, that will
 result in a web application
 * EDNA becomes part of MXCuBE
 * A MXCuBE 2 paper is in preparation
-
-

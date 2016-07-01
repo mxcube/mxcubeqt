@@ -5,6 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# MXCuBE meeting @ EMBL (Hamburg), 27<sup>st</sup>-29<sup>nd</sup> of June, 2016
-
-
+# Next MXCuBE meeting @ ESRF (Grenoble, France), January, 2017
