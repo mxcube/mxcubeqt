@@ -30,3 +30,8 @@ More detailed information is available in the [docs directory]
 * [User manual] (https://github.com/mxcube/mxcube/blob/master/docs/manual/MXCuBE2_1_manual_march2015-v2.pdf).
 * [Feature overview] (https://github.com/mxcube/mxcube/blob/master/docs/source/feature_overview.rst)
 * [Overview of Graphical user interface] (https://github.com/mxcube/mxcube/blob/master/docs/source/gui_overview.rst)
+* If you cite MXCuBE, please use the reference:
+
+```
+Gabadinho, J. et al. (2010). MxCuBE: a synchrotron beamline control environment customized for macromolecular crystallography experiments. J. Synchrotron Rad. 17, 700-707
+```
