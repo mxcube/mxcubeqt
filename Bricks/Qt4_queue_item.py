@@ -186,6 +186,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
     def get_model(self):
         return self._data_model
 
+    def update_display_name(self):
+        self.setText(0, self._data_model.get_display_name())
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
@@ -210,7 +212,8 @@ class SampleQueueItem(QueueItem):
 
         if state:
             self.setIcon(0, QtGui.QIcon(PIN_PIXMAP))
-            self.setBackground(0, QtGui.QBrush(Qt4_widget_colors.SKY_BLUE)) 
+            self.setBackground(0, QtGui.QBrush(Qt4_widget_colors.PLUM)) 
+            self.setBackground(1, QtGui.QBrush(Qt4_widget_colors.PLUM))
             self.setSelected(True)
             bold_fond = self.font(1)
             bold_fond.setBold(True)
@@ -292,7 +295,7 @@ class SampleCentringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
-class AdvancedQueueItem(TaskQueueItem):
+class XrayCenteringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
@@ -306,7 +309,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Sample: SampleQueueItem,
      queue_model_objects.Basket: BasketQueueItem, 
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
-     queue_model_objects.Advanced: AdvancedQueueItem,
-     queue_model_objects.XrayCentering: AdvancedQueueItem,
+     queue_model_objects.XrayCentering: XrayCenteringQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

@@ -83,12 +83,10 @@ class CreateCharWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
 
         self._vertical_dimension_widget.space_group_ledit.activated.\
              connect(self._space_group_change)

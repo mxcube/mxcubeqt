@@ -428,7 +428,8 @@ class CharParametersWidget(QtGui.QWidget):
             image = self._data_collection.acquisitions[0].\
                 acquisition_parameters.centred_position.snapshot_image
             ration = image.height() / float(image.width())
-            image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio)
+            image = image.scaled(400, 400 * ration, QtCore.Qt.KeepAspectRatio,
+                                 QtCore.Qt.SmoothTransformation)
             self.position_widget.svideo.setPixmap(QtGui.QPixmap(image))
 
         self.toggle_permitted_range(self._char_params.use_permitted_rotation)

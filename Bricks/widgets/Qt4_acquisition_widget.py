@@ -55,7 +55,6 @@ class AcquisitionWidget(QtGui.QWidget):
 
         # Internal variables --------------------------------------------------
         self.previous_energy = 0
-        self.enable_parameter_update = True 
 
         # Properties ---------------------------------------------------------- 
 
@@ -95,7 +94,7 @@ class AcquisitionWidget(QtGui.QWidget):
 
         # Qt signal/slot connections ------------------------------------------
         self.acq_widget_layout.osc_start_cbox.stateChanged.connect(\
-             self.use_osc_start)
+             self.fix_osc_start)
         self.acq_widget_layout.exp_time_ledit.textChanged.connect(\
              self.exposure_time_ledit_changed)
         self.acq_widget_layout.first_image_ledit.textChanged.connect(\
@@ -122,7 +121,7 @@ class AcquisitionWidget(QtGui.QWidget):
         self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
         self.kappa_validator = QtGui.QDoubleValidator(0, 360, 4, self)
         self.kappa_phi_validator = QtGui.QDoubleValidator(0, 360, 4, self)
-        self.energy_validator = QtGui.QDoubleValidator(0, 25, 4, self)
+        self.energy_validator = QtGui.QDoubleValidator(4, 25, 4, self)
         self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
         self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
         self.exp_time_validator = QtGui.QDoubleValidator(0.0001, 10000, 4, self)
@@ -131,17 +130,21 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-    def set_enable_parameter_update(self, state):
+    def fix_osc_start(self, state):
         """
-        Descript. :
         """
-        self.enable_parameter_update = state
+        self.acq_widget_layout.osc_start_ledit.setEnabled(state)
+
+    def set_osc_start_limits(self, limits):
+        if not None in limits:
+            self.osc_start_validator.setRange(limits[0], limits[1], 4)
+            self.update_osc_range_limits(limits)
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update and \
+        if not self.acq_widget_layout.osc_start_ledit.hasFocus() and \
            not self.acq_widget_layout.osc_start_cbox.isChecked():
             osc_start_value = 0
             try:
@@ -149,45 +152,50 @@ class AcquisitionWidget(QtGui.QWidget):
             except TypeError:
                pass
             self.update_num_image_limits()
-            self.acq_widget_layout.osc_start_ledit.setText("%.2f" % osc_start_value)
-            #self._acquisition_parameters.osc_start = osc_start_value
+            self.acq_widget_layout.osc_start_ledit.setText(\
+                 "%.2f" % osc_start_value)
+            self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.kappa_ledit.setText("%.2f" % float(new_value))
+        if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
+           new_value:
+            self.acq_widget_layout.kappa_ledit.setText(\
+                 "%.2f" % float(new_value))
             #self._acquisition_parameters.kappa = float(new_value)
 
     def update_kappa_phi(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.kappa_phi_ledit.setText("%.2f" % float(new_value))
+        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and \
+           new_value:
+            self.acq_widget_layout.kappa_phi_ledit.setText(\
+                 "%.2f" % float(new_value))
             #self._acquisition_parameters.kappa_phi = float(new_value)
 
     def use_osc_start(self, state):
         """
         Descript. :
         """
-        self.acq_widget_layout.osc_start_ledit.setEnabled(state)
+        self.acq_widget_layout.osc_start_cbox.setVisible(state)
+        self.acq_widget_layout.osc_start_label.setVisible(not state)
+        self.acq_widget_layout.osc_start_ledit.setEnabled(not state)
 
     def use_kappa(self, state):
         """
         Descript. :
         """
+        if self._beamline_setup_hwobj is not None:
+            if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
-
-    def use_kappa_phi(self, state):
-        """
-        Descript. :
-        """
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
-            
+
     def set_beamline_setup(self, beamline_setup):
         """
         Descript. :
@@ -212,21 +220,23 @@ class AcquisitionWidget(QtGui.QWidget):
                                                 float, 
                                                 self.osc_range_validator)
 
-        if self.acq_widget_layout.findChild(QtGui.QLineEdit, "kappa_ledit"):
-            if 'kappa' in limits_dict:
-                limits = tuple(map(float, limits_dict['kappa'].split(',')))
-                (lower, upper) = limits
-                self.kappa_validator.setRange(lower, upper, 4)
-            self._acquisition_mib.bind_value_update('kappa', 
-                 self.acq_widget_layout.kappa_ledit, float, self.kappa_validator)
+        if 'kappa' in limits_dict:
+            limits = tuple(map(float, limits_dict['kappa'].split(',')))
+            (lower, upper) = limits
+            self.kappa_validator.setRange(lower, upper, 4)
+        self._acquisition_mib.bind_value_update('kappa', 
+                                                self.acq_widget_layout.kappa_ledit,
+                                                float,
+                                                self.kappa_validator)
 
-        if self.acq_widget_layout.findChild(QtGui.QLineEdit, "kappa_phi_ledit"):
-            if 'kappa_phi' in limits_dict:
-                limits = tuple(map(float, limits_dict['kappa_phi'].split(',')))
-                (lower, upper) = limits
-                self.kappa_phi_validator.setRange(lower, upper, 4)
-            self._acquisition_mib.bind_value_update('kappa_phi',     
-                 self.acq_widget_layout.kappa_phi_ledit, float, self.kappa_phi_validator)
+        if 'kappa_phi' in limits_dict:
+            limits = tuple(map(float, limits_dict['kappa_phi'].split(',')))
+            (lower, upper) = limits
+            self.kappa_phi_validator.setRange(lower, upper, 4)
+        self._acquisition_mib.bind_value_update('kappa_phi',     
+                                                self.acq_widget_layout.kappa_phi_ledit,
+                                                float,
+                                                self.kappa_phi_validator)
 
         if 'exposure_time' in limits_dict:
             limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
@@ -292,16 +302,6 @@ class AcquisitionWidget(QtGui.QWidget):
                                bool,
                                None)
 
-        """self.acq_widget_layout.osc_start_ledit.setToolTip(\
-               "Oscillation start limits %0.2f : %0.2f" %(\
-               self.osc_start_validator.bottom(),
-               self.osc_start_validator.top()))
-
-        self.acq_widget_layout.osc_range_ledit.setToolTip(\
-               "Oscillation range limits %0.2f : %0.2f" %(\
-               self.osc_ra_validator.bottom(),
-               self.osc_start_validator.top()))""" 
-
         self.set_tunable_energy(beamline_setup.tunable_wavelength())
 
         has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
@@ -318,8 +318,8 @@ class AcquisitionWidget(QtGui.QWidget):
         Descript. :
         """
         if str(new_value).isdigit():
-            self._path_template.start_num = int(new_value)
-            widget = self.acq_widget_layout.first_image_ledit
+            #self._path_template.start_num = int(new_value)
+            #widget = self.acq_widget_layout.first_image_ledit
             self.acqParametersChangedSignal.emit()
 
     def exposure_time_ledit_changed(self, new_values):
@@ -327,15 +327,14 @@ class AcquisitionWidget(QtGui.QWidget):
         Descript. :
         """
         if self.diffractometer_hwobj.in_plate_mode():
-            self.update_parameter_limits()
+            self.acqParametersChangedSignal.emit()
 
     def num_images_ledit_change(self, new_value):
         """
         Descript. :
         """
         if str(new_value).isdigit():
-            self._path_template.num_files = int(new_value)
-            widget = self.acq_widget_layout.num_images_ledit
+            #self._path_template.num_files = int(new_value)
             self.acqParametersChangedSignal.emit()
 
     def overlap_changed(self, new_value):
@@ -433,15 +432,17 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.transmission_ledit.setText("%.2f" % float(transmission))
+        if not self.acq_widget_layout.transmission_ledit.hasFocus():
+            self.acq_widget_layout.transmission_ledit.setText(\
+                 "%.2f" % float(transmission))
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
+        if not self.acq_widget_layout.resolution_ledit.hasFocus():
+            self.acq_widget_layout.resolution_ledit.setText(\
+                 "%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
         """
@@ -486,14 +487,14 @@ class AcquisitionWidget(QtGui.QWidget):
                "Exposure time limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
-    def update_osc_range_limits(self, exp_time):
+    def update_osc_range_limits(self, limits):
         """
         Descript. :
         """
-        osc_range = 40.0 * exp_time
-        self.osc_range_validator.setRange(0, osc_range, 4)
+        self.osc_range_validator.setRange(limits[0], limits[1], 4)
         self.acq_widget_layout.osc_range_ledit.setToolTip(
-              "Oscillation range limits %0.2f : %0.2f" %(0, osc_range))
+              "Oscillation range limits %0.2f : %0.2f" % \
+               (limits[0], limits[1]))
         self._acquisition_mib.validate_all()
 
     def update_num_image_limits(self):
@@ -517,13 +518,6 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.num_images_ledit.setToolTip(\
               "Number of frames limit : %d" % num_image_limit)
         self._acquisition_mib.validate_all()
-
-    def update_parameter_limits(self):
-        """
-        Descript. :
-        """
-        #self.diffractometer_hwobj.get_scan_limits() 
-        pass
 
     def init_detector_roi_modes(self):
         """

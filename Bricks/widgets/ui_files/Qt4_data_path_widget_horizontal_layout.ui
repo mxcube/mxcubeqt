@@ -247,7 +247,7 @@
                </size>
               </property>
               <property name="text">
-               <string>&lt;folder&gt;</string>
+               <string/>
               </property>
              </widget>
             </item>

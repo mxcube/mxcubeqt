@@ -1,8 +1,9 @@
-<device class="TINEDoorInterlock">
+<device class="EMBLDoorInterlock">
   <username>TINEDoorInterlock</username>
-  <command type="tine" name="cmdBreakInterlock" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">BreakInterlock13.2</command>
-  <channel type="tine" name="chanCanUnlockCond" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="100">BS13_1_offen</channel>
-  <channel type="tine" name="chanDoorInterlocked" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="100">G13_2_TI</channel>
+  <object href="/eh1/detector-distance" role="detector_distance"/>
+  <command type="tine" name="cmdBreakInterlock" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="5000">BreakInterlock13.2</command>
+  <channel type="tine" name="chanCanUnlockCond" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="1000">BS13_1_offen</channel>
+  <channel type="tine" name="chanDoorInterlocked" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="1000">G13_2_TI</channel>
 
   <canUnlockCond>3</canUnlockCond>
   <doorInterlockedCond>0</doorInterlockedCond>

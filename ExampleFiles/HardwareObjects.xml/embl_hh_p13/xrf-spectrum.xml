@@ -1,9 +1,14 @@
-<equipment class="EMBLXRFSpectrum">
-  <device hwrid="/attenuators" role="transmission"/>
-  <device hwrid="/eh1/energy" role="energy"/>
-  <device hwrid="/beam-info" role="beam_info"/>
-  <device hwrid="/dbconnection" role="dbserver"/>
-  <!-- <command type="tine" name="chan_xrf_spectrum_get" tinename="/P13/fluorescence-scan/fls-scan">get-spectrum</command>
-  <channel type="tine" name="xrfScanStatus" tinename="/P13/fluorescence-scan/fls-scan" attach="event">status</channel>
-  <channel type="tine" name="xrfScanConsts" tinename="/P13/fluorescence-scan/fls-scan">calibration-consts</channel> -->
-</equipment>
+<object class="EMBLXRFSpectrum">
+  <object hwrid="/attenuators" role="transmission"/>
+  <object hwrid="/energy" role="energy"/>
+  <object hwrid="/beam-info" role="beam_info"/>
+  <object hwrid="/dbconnection" role="dbserver"/>
+
+  <command type="tine" name="cmdSpectrumStart" tinename="/P13/fluorescence-scan/fls-scan">get-spectrum</command>
+  <channel type="tine" name="chanSpectrumStatus" tinename="/P13/fluorescence-scan/fls-scan">status</channel>
+  <channel type="tine" name="chanSpectrumConsts" tinename="/P13/fluorescence-scan/fls-scan">calibration-consts</channel>
+  <command type="tine" name="cmdAdjustTransmission" tinename="/P13/fluorescence-scan/fls-scan">find-transmission</command>
+
+  <configFile>/opt/embl-hh/etc/p13/app/mxcube/HardwareObjects.xml/p13_pymca_config.cfg</configFile>
+
+</object>

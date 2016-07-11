@@ -30,7 +30,6 @@ import queue_model_objects_v1 as queue_model_objects
 from Qt4_GraphicsLib import GraphicsItemLine
 
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 from Qt4_create_task_base import CreateTaskBase
 from Qt4_data_path_widget import DataPathWidget
 from Qt4_acquisition_widget import AcquisitionWidget
@@ -88,24 +87,21 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_widget.overlay_slider.valueChanged.\
              connect(self.overlay_alpha_changed)
 
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
-
         self._processing_widget.enableProcessingSignal.connect(\
-             self._enable_processing_toggled)
+             self._run_processing_toggled)
 
         # Other ---------------------------------------------------------------
         for col in range(self._lines_widget.lines_treewidget.columnCount()):
             self._lines_widget.lines_treewidget.resizeColumnToContents(col)
+        self._processing_widget.processing_widget.\
+             run_processing_parallel_cbox.setChecked(False)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -160,7 +156,7 @@ class CreateHelicalWidget(CreateTaskBase):
         base_result = CreateTaskBase.approve_creation(self)
    
         if len(self._lines_widget.lines_treewidget.selectedItems()) == 0:
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 warning("No lines selected, please select one or more lines.")
             return False
         else:
@@ -217,7 +213,7 @@ class CreateHelicalWidget(CreateTaskBase):
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
             data_collection = tree_item.get_model()
 
-            if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
+            if data_collection.is_helical():
                 self.setDisabled(tree_item.get_model().is_executed())
 
                 self._path_template = data_collection.get_path_template()
@@ -292,6 +288,10 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_number(start_acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
             dc.set_requires_centring(False)
+            dc.run_processing_after = self._processing_widget.processing_widget.\
+               run_processing_after_cbox.isChecked()
+            dc.run_processing_parallel = self._processing_widget.processing_widget.\
+               run_processing_parallel_cbox.isChecked()
 
             data_collections.append(dc)
             self._path_template.run_number += 1

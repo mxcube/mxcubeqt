@@ -20,6 +20,52 @@
    <property name="spacing">
     <number>4</number>
    </property>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="file_gbox">
+     <property name="title">
+      <string>Existing files that will be overwritten (first 20 images are checked):</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="margin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QTreeWidget" name="file_treewidget">
+        <property name="rootIsDecorated">
+         <bool>false</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Sample</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Directory</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>File name</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="6" column="0">
     <layout class="QHBoxLayout" name="buttons_layout">
      <item>
@@ -48,46 +94,6 @@
         <string>Cancel</string>
        </property>
       </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="4" column="0">
-    <layout class="QHBoxLayout" name="interleave_hlayout">
-     <item>
-      <widget class="QCheckBox" name="interleave_cbx">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Interleave subwedge size:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="interleave_images_num_ledit">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>70</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
@@ -174,113 +180,133 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0">
-    <layout class="QHBoxLayout" name="take_snapshots_hlayout">
-     <item>
-      <widget class="QLabel" name="take_snapshots_label">
-       <property name="text">
-        <string>Number of crystal snapshots:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="take_snapshots_combo">
-       <item>
-        <property name="text">
-         <string>0</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="skip_existing_images_cbx">
-     <property name="text">
-      <string>Skip already collected images</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0">
-    <widget class="QCheckBox" name="force_dark_cbx">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Force dark current</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="file_gbox">
+    <widget class="QGroupBox" name="interleave_groupbox">
      <property name="title">
-      <string>Existing files that will be overwritten:</string>
+      <string>Interleave</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="flat">
-      <bool>false</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>2</number>
       </property>
       <property name="margin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <item>
-       <widget class="QTreeWidget" name="file_treewidget">
-        <property name="rootIsDecorated">
+       <widget class="QCheckBox" name="interleave_cbx">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <attribute name="headerVisible">
-         <bool>true</bool>
-        </attribute>
-        <column>
-         <property name="text">
-          <string>Sample</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Directory</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>File name</string>
-         </property>
-        </column>
+        <property name="text">
+         <string>Interleave subwedge size:</string>
+        </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="interleave_images_num_ledit">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>70</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="other_groupbox">
+     <property name="title">
+      <string>Other</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="force_dark_cbx">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Force dark current</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="skip_existing_images_cbx">
+        <property name="text">
+         <string>Skip already collected images</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="take_snapshots_hlayout">
+        <item>
+         <widget class="QLabel" name="take_snapshots_label">
+          <property name="text">
+           <string>Number of crystal snapshots:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="take_snapshots_combo">
+          <item>
+           <property name="text">
+            <string>0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>4</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

@@ -2,16 +2,16 @@
 <XSDataInputMXCuBE>
     <diffractionPlan>
         <aimedCompleteness>
-            <value>9.900000e-01</value>
+            <value>0.99</value>
         </aimedCompleteness>
         <aimedIOverSigmaAtHighestResolution>
-            <value>3.000000e+00</value>
+            <value>2.00</value>
         </aimedIOverSigmaAtHighestResolution>
         <aimedMultiplicity>
-            <value>4.000000e+00</value>
+            <value>4.0</value>
         </aimedMultiplicity>
         <aimedResolution>
-            <value>3.000000e+00</value>
+            <value>0.5</value>
         </aimedResolution>
         <complexity>
             <value>min</value>
@@ -20,8 +20,23 @@
             <value>P1</value>
         </forcedSpaceGroup>
         <maxExposureTimePerDataCollection>
-            <value>30</value>
+            <value>6000</value>
         </maxExposureTimePerDataCollection>
+        <minExposureTimePerImage>
+           <value>0.040</value>
+        </minExposureTimePerImage>
+        <goniostatMaxOscillationSpeed>
+           <value>160</value>
+        </goniostatMaxOscillationSpeed>
+        <goniostatMinOscillationWidth>
+           <value>1.000000e-01</value>
+        </goniostatMinOscillationWidth>
+        <detectorDistanceMin>
+        <value>130</value>
+           </detectorDistanceMin>
+        <detectorDistanceMax>
+           <value>2400</value>
+        </detectorDistanceMax>
     </diffractionPlan>
     <experimentalCondition>
         <beam>

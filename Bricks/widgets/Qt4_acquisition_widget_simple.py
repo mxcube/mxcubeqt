@@ -31,6 +31,9 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
     """
     Descript. :
     """
+    acqParametersChangedSignal = QtCore.pyqtSignal()
+    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, bool)
+
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None, 
                  path_template = None, layout = None):
         """
@@ -45,7 +48,6 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.enable_parameter_update = True
 
         # Properties ---------------------------------------------------------- 
 
@@ -84,6 +86,10 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
              self.detector_roi_mode_changed)
 
         # Other ---------------------------------------------------------------
+        self.osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
+        self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
+        self.kappa_validator = QtGui.QDoubleValidator(0, 360, 4, self)
+        self.kappa_phi_validator = QtGui.QDoubleValidator(0, 360, 4, self)
         self.energy_validator = QtGui.QDoubleValidator(0, 25, 5, self)
         self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
         self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
@@ -93,15 +99,15 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-    def set_enable_parameter_update(self, state):
-        self.enable_parameter_update = state
+    def set_osc_start_limits(self, limits):
+        if not None in limits:
+            self.osc_start_validator.setRange(limits[0], limits[1], 4)
 
     def update_osc_start(self, new_value):
         """
         Descript. :
         """
-        if self.enable_parameter_update and \
-           not self.acq_widget_layout.osc_start_cbox.isChecked():
+        if not self.acq_widget_layout.osc_start_cbox.hasFocus():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
@@ -115,7 +121,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if not self.acq_widget_layout.kappa_ledit.hasFocus():
             self.acq_widget_layout.kappa_ledit.setText(\
                  "%.2f" % float(new_value))
 
@@ -123,7 +129,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus():
             self.acq_widget_layout.kappa_phi_ledit.setText(\
                  "%.2f" % float(new_value))
 
@@ -131,16 +137,14 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
+        if self._beamline_setup_hwobj is not None:
+            if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+                state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
-
-    def use_kappa_phi(self, state):
-        """
-        Descript. :
-        """
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
-    
+
     def update_num_images(self, index = None, num_images = None):
         """
         Descript. :
@@ -202,36 +206,45 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         self._beamline_setup_hwobj = beamline_setup
         limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
+
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
             (lower, upper) = limits
-            osc_start_validator = QtGui.QDoubleValidator(lower, upper, 4, self)
-            osc_range_validator = QtGui.QDoubleValidator(lower, upper, 4, self)
-        else:
-            osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
-            osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
+            elf.osc_start_validator.setRange(lower, upper, 4)
+            self.osc_range_validator.setRange(lower, upper, 4)
 
         self._acquisition_mib.bind_value_update('osc_start', 
                                                 self.acq_widget_layout.osc_start_ledit,
                                                 float, 
-                                                osc_start_validator)
+                                                self.osc_start_validator)
 
         self._acquisition_mib.bind_value_update('osc_range', 
                                                 self.acq_widget_layout.osc_range_ledit,
                                                 float, 
-                                                osc_range_validator)
+                                                self.osc_range_validator)
 
-        kappa_validator = QtGui.QDoubleValidator(-30, 180, 2, self)
+        if 'kappa' in limits_dict:
+            limits = tuple(map(float, limits_dict['kappa'].split(',')))
+            (lower, upper) = limits
+            self.kappa_validator.setRange(lower, upper, 4)
         self._acquisition_mib.bind_value_update('kappa', 
                                                 self.acq_widget_layout.kappa_ledit,
-                                                float, 
-                                                kappa_validator)
+                                                float,
+                                                self.kappa_validator)
 
-        kappa_phi_validator = QtGui.QDoubleValidator(-30, 180, 2, self)
-        self._acquisition_mib.bind_value_update('kappa_phi', 
+        if 'kappa_phi' in limits_dict:
+            limits = tuple(map(float, limits_dict['kappa_phi'].split(',')))
+            (lower, upper) = limits
+            self.kappa_phi_validator.setRange(lower, upper, 4)
+        self._acquisition_mib.bind_value_update('kappa_phi',     
                                                 self.acq_widget_layout.kappa_phi_ledit,
-                                                float, 
-                                                kappa_phi_validator)
+                                                float,
+                                                self.kappa_phi_validator)
+
+        if 'exposure_time' in limits_dict:
+            limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
+            (lower, upper) = limits
+            self.exp_time_validator.setRange(lower, upper, 5)
 
         self._acquisition_mib.bind_value_update('exp_time',
                               self.acq_widget_layout.exp_time_ledit,
@@ -265,8 +278,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        #self._acquisition_parameters.energy = energy
-        if self.enable_parameter_update:
+        if not self.acq_widget_layout.energy_ledit.hasFocus():
             self.acq_widget_layout.energy_ledit.setText(\
                  "%.4f" % float(energy))
 
@@ -274,18 +286,17 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
+        if self.acq_widget_layout.transmission_ledit.hasFocus():
             self.acq_widget_layout.transmission_ledit.setText(\
                  "%.2f" % float(transmission))
-        #self._acquisition_parameters.transmission = float(transmission)
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        if self.enable_parameter_update:
-            self.acq_widget_layout.resolution_ledit.setText("%.3f" % float(resolution))
-        #self._acquisition_parameters.resolution = float(resolution)
+        if not self.acq_widget_layout.resolution_ledit.hasFocus():
+            self.acq_widget_layout.resolution_ledit.setText(\
+                 "%.3f" % float(resolution))
 
     def update_energy_limits(self, limits):
         """

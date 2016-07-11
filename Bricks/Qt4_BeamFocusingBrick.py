@@ -86,12 +86,12 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         if property_name == "mnemonic":
             if self.beam_focusing_hwobj is not None:
                 self.disconnect(self.beam_focusing_hwobj, 
-                                QtCore.SIGNAL('focusingModeChanged'), 
+                                'focusingModeChanged', 
                                 self.focus_mode_changed)
             self.beam_focusing_hwobj = self.getHardwareObject(new_value)
             if self.beam_focusing_hwobj is not None:
                 self.connect(self.beam_focusing_hwobj, 
-                             QtCore.SIGNAL('focusingModeChanged'), 
+                             'focusingModeChanged', 
                              self.focus_mode_changed)
                 mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
                 self.focus_mode_changed(mode, beam_size)

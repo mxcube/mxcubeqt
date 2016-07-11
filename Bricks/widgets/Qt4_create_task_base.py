@@ -81,6 +81,10 @@ class CreateTaskBase(QtGui.QWidget):
                 self._acq_widget.set_beamline_setup(bl_setup)
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
                 self._acq_widget.init_detector_roi_modes()
+                if bl_setup.diffractometer_hwobj.in_plate_mode():
+                    self._acq_widget.set_osc_start_limits(\
+                         bl_setup.diffractometer_hwobj.get_osc_dynamic_limits())
+                    self._acq_widget.use_kappa(False)
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
@@ -118,11 +122,11 @@ class CreateTaskBase(QtGui.QWidget):
         try:
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
-            bl_setup_hwobj.transmission_hwobj.connect('valueChanged', self.set_transmission)
+            bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
             bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
             bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
-            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.set_osc_start)
             bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
             bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_roi_mode)
@@ -139,61 +143,27 @@ class CreateTaskBase(QtGui.QWidget):
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
 
-    def update_osc_start(self, new_value):
+    def set_osc_start(self, new_value):
         acq_widget = self.get_acquisition_widget()
 
-        if acq_widget:
+        if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_osc_start(new_value)
 
-    def update_kappa(self, new_value):
-        acq_widget = self.get_acquisition_widget()
-
-        if acq_widget:
-            self.kappa_value = new_value
-            acq_widget.update_kappa(new_value)
-
-    def update_kappa_phi(self, new_value):
-        acq_widget = self.get_acquisition_widget()
-
-        if acq_widget:
-            self.kappa_phi_value = new_value
-            acq_widget.update_kappa_phi(new_value)
-
-    def _enable_processing_toggled(self, state):
-        item = self._current_selected_items[0]
-        model = item.get_model()
-        model.run_processing = state
-
-    def _prefix_ledit_change(self, new_value):
+    def _run_processing_toggled(self, run_processing_after, run_processing_parallel):
         if len(self._current_selected_items) > 0:
             item = self._current_selected_items[0]
             model = item.get_model()
+            model.run_processing_after = run_processing_after
+            model.run_processing_parallel = run_processing_parallel
 
-            if self.isEnabled():
-                if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
-                   not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                    self._path_template.base_prefix = str(new_value)
-                    name = self._path_template.get_prefix()
-                    model.set_name(name)
-                    item.setText(0, model.get_display_name())
-        
-    def _run_number_ledit_change(self, new_value):
-        item = self._current_selected_items[0]
-        model = item.get_model()
-
-        if self.isEnabled():
-            if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
-                   not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                if str(new_value).isdigit():
-                    model.set_number(int(new_value))
-                    item.setText(0, model.get_display_name())
-
-    def handle_path_conflict(self):
+    def acq_parameters_changed(self):
+        self._data_path_widget.update_file_name()
         if self._tree_brick:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                             check_for_path_collisions(self._path_template)
             self._data_path_widget.indicate_path_conflict(path_conflict)                    
+            self._tree_brick.dc_tree_widget.item_parameters_changed()
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -260,7 +230,7 @@ class CreateTaskBase(QtGui.QWidget):
     def set_detector_roi_mode(self, detector_roi_mode):
         acq_widget = self.get_acquisition_widget()
 
-        if acq_widget:
+        if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_detector_roi_mode(detector_roi_mode)
 
     def set_kappa(self, kappa):
@@ -323,9 +293,6 @@ class CreateTaskBase(QtGui.QWidget):
             if isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
                 sub_dir += str(tree_item.get_model().get_location())
             else:
-                item = self.get_sample_item(tree_item)
-                sub_dir += item.get_model().get_name()
-
                 if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
                     if item.get_model().lims_id == -1:
                         sub_dir += ''
@@ -335,7 +302,7 @@ class CreateTaskBase(QtGui.QWidget):
 
         proc_directory = self._session_hwobj.\
                          get_process_directory(sub_dir)
-    
+
         return (data_directory, proc_directory)
 
     def ispyb_logged_in(self, logged_in):
@@ -360,7 +327,8 @@ class CreateTaskBase(QtGui.QWidget):
 
                 if sample_items:
                     self._current_selected_items = sample_items
-                    self.multiple_item_selection(sample_items)
+                    self.single_item_selection(items[0])
+                    #self.multiple_item_selection(sample_items)
         else:
             self.setDisabled(True)
 
@@ -368,9 +336,8 @@ class CreateTaskBase(QtGui.QWidget):
         self.selection_changed(self._current_selected_items)
 
     def single_item_selection(self, tree_item):
-        self._graphics_manager_hwobj.de_select_all()
         sample_item = self.get_sample_item(tree_item)
-      
+
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)
@@ -382,30 +349,33 @@ class CreateTaskBase(QtGui.QWidget):
                 prefix = self.get_default_prefix(sample_data_model)
                 (data_directory, proc_directory) = self.get_default_directory(\
                   tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
-                self._path_template.directory = data_directory
-                self._path_template.process_directory = proc_directory
+
+                #TODO create templates to customize this
+                #self._path_template.directory = data_directory
+                #self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
             elif self._session_hwobj.get_group_name() != '':
                 base_dir = self._session_hwobj.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
+
                 if base_dir == self._path_template.directory:
                     (data_directory, proc_directory) = self.get_default_directory()
                     self._path_template.directory = data_directory
                     self._path_template.process_directory = proc_directory
                     self._path_template.base_prefix = self.get_default_prefix()
 
-            #If no information from lims then add basket/sample info
+            # If no information from lims then add basket/sample info
             # This works if each sample is clicked, but do not work
             # when a task is assigned to the whole puck.
             # Then all samples get the same dir
             
-            if sample_data_model.lims_id == -1 and \
-               not None in (sample_data_model.location):
-                (data_directory, proc_directory) = self.get_default_directory(tree_item)
-                self._path_template.directory = data_directory
-                self._path_template.process_directory = proc_directory
-              
+            #if sample_data_model.lims_id == -1 and \
+            #   not None in (sample_data_model.location):
+            #    (data_directory, proc_directory) = self.get_default_directory(tree_item)
+            #    self._path_template.directory = data_directory
+            #    self._path_template.process_directory = proc_directory
+
             # Get the next available run number at this level of the model.
             self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                 get_next_run_number(self._path_template)
@@ -443,9 +413,9 @@ class CreateTaskBase(QtGui.QWidget):
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
-        if self._acq_widget:
-            self._acq_widget.set_enable_parameter_update(\
-                 not isinstance(tree_item, Qt4_queue_item.TaskQueueItem)) 
+        #if self._acq_widget:
+        #    self._acq_widget.set_enable_parameter_update(\
+        #         not isinstance(tree_item, Qt4_queue_item.TaskQueueItem)) 
 
     def _update_etr(self):
         omega = self._beamline_setup_hwobj._get_omega_axis_position()
@@ -462,6 +432,7 @@ class CreateTaskBase(QtGui.QWidget):
         self._acquisition_parameters.transmission = transmission
         self._acquisition_parameters.resolution = resolution
 
+    """
     def multiple_item_selection(self, tree_items):
         tree_item = tree_items[0]
 
@@ -495,6 +466,7 @@ class CreateTaskBase(QtGui.QWidget):
                 self._data_path_widget.update_data_model(self._path_template)
 
             self.setDisabled(False)
+    """
 
     # Called by the owning widget (task_toolbox_widget) when
     # one or several centred positions are selected.
@@ -513,14 +485,14 @@ class CreateTaskBase(QtGui.QWidget):
         """
         if self._acq_widget:
             self._acq_widget.use_kappa(False)
-            self._acq_widget.use_kappa_phi(False)
 
             if position:
                 if len(self._current_selected_items) == 1:
                     item = self._current_selected_items[0]
                     cpos = position.get_centred_position()
-                    if cpos.kappa is not None:
+                    if hasattr(cpos, "kappa"):
                         self._acq_widget.update_kappa(cpos.kappa)
+                    if hasattr(cpos, "kappa_phi"):
                         self._acq_widget.update_kappa_phi(cpos.kappa_phi)
                     if isinstance(item, Qt4_queue_item.TaskQueueItem):
                         snapshot = self._graphics_manager_hwobj.get_scene_snapshot(position)
@@ -528,7 +500,6 @@ class CreateTaskBase(QtGui.QWidget):
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
-                self._acq_widget.use_kappa_phi(True)
 
     # Should be called by the object that calls create_task,
     # and add_task.
@@ -539,9 +510,10 @@ class CreateTaskBase(QtGui.QWidget):
                         check_for_path_collisions(self._path_template)
 
         if path_conflict:
-            logging.getLogger("user_level_log").\
-                error('The current path settings will overwrite data' +\
-                      ' from another task. Correct the problem before adding to queue')
+            logging.getLogger("GUI").\
+                error('The current path settings will overwrite data ' + \
+                      'from another task. Correct the problem before ' + \
+                      'adding to queue')
             result = False
 
         return result

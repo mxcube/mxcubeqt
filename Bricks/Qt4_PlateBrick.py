@@ -122,12 +122,10 @@ class Qt4_PlateBrick(BlissWidget):
             self.plate_manipulator_hwobj = self.getHardwareObject(newValue)
             if self.plate_manipulator_hwobj:
                 self.init_plate_view()
-                #self.connect(self.plate_manipulator_hwobj, SampleChanger.STATE_CHANGED_EVENT,
-                #             self.sample_load_state_changed)
                 self.connect(self.plate_manipulator_hwobj, 
                              SampleChanger.INFO_CHANGED_EVENT,
                              self.refresh_plate_location)
-                #lf.refresh_plate_location()
+                self.refresh_plate_location()
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
@@ -136,9 +134,8 @@ class Qt4_PlateBrick(BlissWidget):
         Descript. : when user double clicks on plate table then sample in
                     corresponding cell is loaded
         """
-        self.plate_manipulator_hwobj.load_sample((table_item.row(), 
-                                                  table_item.column() + 1,
-                                                  1))
+        self.plate_manipulator_hwobj.load_sample(\
+            (table_item.row() + 1, table_item.column() * self.num_drops + 1))
 
     def search_button_clicked(self):
         """
@@ -188,13 +185,12 @@ class Qt4_PlateBrick(BlissWidget):
             #self.xtal_image_label_pixmap.loadFromData(xtal_image_string)
             self.xtal_image_pixmap.loadFromData(xtal_image_string)
             self.xtal_image_graphics_pixmap.setPixmap(self.xtal_image_pixmap)
-            xtal_image_width = self.xtal_image_label_pixmap.width()
-            xtal_image_height = self.xtal_image_label_pixmap.height()
-            self.xtal_image_label.setFixedWidth(xtal_image_width)
-            self.xtal_image_label.setFixedHeight(xtal_image_height)
-            pos_x = int(xtal_image_width * xtal_item.offsetX)
-            pos_y = int(xtal_image_height * xtal_item.offsetY)
-            self.xtal_image_label.set_image(xtal_image)
+            #xtal_image_width = self.xtal_image_pixmap.width()
+            #xtal_image_height = self.xtal_image_pixmap.height()
+            #self.xtal_image_pixmap.setFixedWidth(xtal_image_width)
+            #self.xtal_image_pixmap.setFixedHeight(xtal_image_height)
+            #pos_x = int(xtal_image_width * xtal_item.offsetX)
+            #pos_y = int(xtal_image_height * xtal_item.offsetY)
 
     def refresh_plate_content(self):
         """
@@ -251,7 +247,7 @@ class Qt4_PlateBrick(BlissWidget):
 
             if new_location:
                 row = new_location[0]
-                col = new_location[1] - 1
+                col = new_location[1]
                 pos_x = new_location[2]
                 pos_y = new_location[3]
                 self.plate_widget.current_location_ledit.setText(\
@@ -263,7 +259,7 @@ class Qt4_PlateBrick(BlissWidget):
                 if self.current_location:
                     empty_item = QtGui.QTableWidgetItem(QtGui.QIcon(), "")
                     self.plate_widget.sample_table.setItem(self.current_location[0],
-                                              self.current_location[1] - 1,
+                                              self.current_location[1],
                                               empty_item)
                 new_item = QtGui.QTableWidgetItem(Qt4_Icons.load_icon("sample_axis.png"), "")
                 self.plate_widget.sample_table.setItem(row, col, new_item)
@@ -316,8 +312,9 @@ class Qt4_PlateBrick(BlissWidget):
         """
         #TODO replace this with pos_x, pos_y
         drop = int(pos_y * self.num_drops) + 1
-        self.plate_manipulator_hwobj.load_sample((self.current_location[0],\
-              self.current_location[1], drop))
+        self.plate_manipulator_hwobj.load_sample(\
+             (self.current_location[0] + 1, 
+              (self.current_location[1] - 1) * self.num_drops + drop))
 
 class NavigationItem(QtGui.QGraphicsItem):
 

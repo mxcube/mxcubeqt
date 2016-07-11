@@ -70,12 +70,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
-             self.element_edge_selected)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(
-             self.handle_path_conflict)
+        self._periodic_table_widget.elementEdgeSelectedSignal.\
+             connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
     def init_models(self):
         """
@@ -122,9 +120,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         Descript. :
         """
         base_result = CreateTaskBase.approve_creation(self)
-        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()
+        selected_element, selected_edge = self._periodic_table_widget.\
+            get_selected_element_edge()
         if not selected_element:
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 info("No element selected, please select an element.")
 
         return base_result and selected_element
@@ -136,7 +135,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         Descript. :
         """
         data_collections = []
-        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()   
+        selected_element, selected_edge = self._periodic_table_widget.\
+            get_selected_element_edge()   
 
         if selected_element:
             if not shape:
@@ -165,7 +165,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
             data_collections.append(energy_scan)
             self._path_template.run_number += 1
         else:
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 info("No element selected, please select an element.")
 
         return data_collections

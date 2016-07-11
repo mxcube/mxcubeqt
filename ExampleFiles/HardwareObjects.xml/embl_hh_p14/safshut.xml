@@ -1,6 +1,4 @@
-<device class="TINEIcsShutter">
-  <username>TINEIcsShutter</username>
-
+<device class="EMBLSafetyShutter">
   <command type="tine" name="cmdOpenShutter" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">OpenBeamShutter14.1</command>
   <command type="tine" name="cmdCloseShutter" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">CloseBeamShutter14.1</command>
   <channel type="tine" name="chanCollectStatus" tinename="/P14/collection/mx-standard" attach="event">status</channel>

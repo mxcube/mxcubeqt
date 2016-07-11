@@ -1,5 +1,5 @@
 <device class="MicrodiffMotor">
   <exporter_address>p14md301.embl-hamburg.de:9001</exporter_address>
   <motor_name>Omega</motor_name>
-  <object href="/ccd/limavideo" role="camera"/>
+  <object href="/Qt4_lima-video" role="camera"/>
 </device>

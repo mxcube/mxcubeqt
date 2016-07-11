@@ -24,7 +24,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_MDPhaseBrick(BlissWidget):
@@ -39,7 +39,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.minidiff_hwobj = None
+        self.diffractometer_hwobj = None
 
         # Internal values -----------------------------------------------------
 
@@ -55,18 +55,16 @@ class Qt4_MDPhaseBrick(BlissWidget):
         self.phase_combobox = QtGui.QComboBox(self.group_box)
 
         # Layout --------------------------------------------------------------
-        _group_box_vlayout = QtGui.QVBoxLayout(self)
+        _group_box_vlayout = QtGui.QVBoxLayout(self.group_box)
         _group_box_vlayout.addWidget(self.phase_combobox)
         _group_box_vlayout.addStretch()
         _group_box_vlayout.setSpacing(0)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.group_box.setLayout(_group_box_vlayout)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_main_vlayout)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
 
@@ -78,31 +76,33 @@ class Qt4_MDPhaseBrick(BlissWidget):
                                            Qt4_widget_colors.LIGHT_GREEN,
                                            QtGui.QPalette.Button)
  
-    def propertyChanged(self, property, oldValue, newValue):
+    def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         """
-        if property == "mnemonic":
-            if self.minidiff_hwobj is not None:
-                self.disconnect(self.minidiff_hwobj, QtCore.SIGNAL('minidiffPhaseChanged'), 
-                     self.phase_changed)
-            self.minidiff_hwobj = self.getHardwareObject(newValue)
+        if property_name == "mnemonic":
+            if self.diffractometer_hwobj is not None:
+                self.disconnect(self.diffractometer_hwobj,
+                                'minidiffPhaseChanged', 
+                                self.phase_changed)
+            self.diffractometer_hwobj = self.getHardwareObject(new_value)
 
-            if self.minidiff_hwobj is not None:
+            if self.diffractometer_hwobj is not None:
                 self.init_phase_list()
                 
-                self.connect(self.minidiff_hwobj, QtCore.SIGNAL('minidiffPhaseChanged'), 
-                     self.phase_changed)
-                self.minidiff_hwobj.update_values()
+                self.connect(self.diffractometer_hwobj,
+                             'minidiffPhaseChanged', 
+                             self.phase_changed)
+                self.diffractometer_hwobj.update_values()
         else:
-            BlissWidget.propertyChanged(self, property, oldValue, newValue)
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def init_phase_list(self):
         """
         Descript. :
         """
         self.phase_combobox.clear()
-        phase_list = self.minidiff_hwobj.get_phase_list()
+        phase_list = self.diffractometer_hwobj.get_phase_list()
         if len(phase_list) > 0:
            for phase in phase_list:
                self.phase_combobox.addItem(phase)           
@@ -114,8 +114,8 @@ class Qt4_MDPhaseBrick(BlissWidget):
         """
         Descript. :
         """
-        if self.minidiff_hwobj is not None:
-            self.minidiff_hwobj.set_phase(self.phase_combobox.currentText())
+        if self.diffractometer_hwobj is not None:
+            self.diffractometer_hwobj.set_phase(self.phase_combobox.currentText())
 
     def phase_changed(self, phase):
         """

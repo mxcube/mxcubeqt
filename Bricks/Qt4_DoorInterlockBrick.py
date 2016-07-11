@@ -111,10 +111,14 @@ class Qt4_DoorInterlockBrick(BlissWidget):
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name=='mnemonic':
             if self.door_interlock_hwobj is not None:
-                self.disconnect(self.door_interlock_hwobj, QtCore.SIGNAL('doorInterlockStateChanged'), self.state_changed)
+                self.disconnect(self.door_interlock_hwobj,
+                                'doorInterlockStateChanged',
+                                self.state_changed)
             self.door_interlock_hwobj = self.getHardwareObject(new_value)
             if self.door_interlock_hwobj is not None:
-                self.connect(self.door_interlock_hwobj, QtCore.SIGNAL('doorInterlockStateChanged'), self.state_changed)
+                self.connect(self.door_interlock_hwobj,
+                             'doorInterlockStateChanged',
+                             self.state_changed)
                 self.state_changed(self.door_interlock_hwobj.getState())
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)

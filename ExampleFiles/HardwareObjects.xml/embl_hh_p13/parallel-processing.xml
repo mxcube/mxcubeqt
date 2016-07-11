@@ -1,0 +1,5 @@
+<object class="ParallelProcessing">
+  <object href="/mxcollect" role="collect"/>
+  <object href="/eh1/diff-beamstop" role="beamstop"/> 
+  <processing_command>/to_be_defined/edna_dozor.sh</processing_command>
+</object>

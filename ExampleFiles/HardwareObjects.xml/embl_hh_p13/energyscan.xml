@@ -1,18 +1,39 @@
-<equipment class="EMBLEnergyScan">
-  <device hwrid="/eh1/energy-motor" role="energy"/>
-  <device hwrid="/eh1/resolution" role="resolution"/>   
-  <device hwrid="/attenuators" role="transmission"/>
-  <device hwrid="/mach-info" role="machcurrent"/>
-  <device hwrid="/beam-info" role="beam_info"/>
-  <device hwrid="/dbconnection" role="dbserver"/>
-  <!-- <channel type="tine" name="energyScanStart" tinename="/P13/fluorescence-scan/fls-scan" attach="event">start</channel>
-  <channel type="tine" name="energyScanStatus" tinename="/P13/fluorescence-scan/fls-scan" attach="event">status</channel>	
-  <command type="tine" name="energyScanAbort" tinename="/P13/fluorescence-scan/fls-scan">abort</command>  -->
+<object class="EMBLEnergyScan">
+  <object hwrid="/energy" role="energy"/>
+  <object hwrid="/eh1/resolution" role="resolution"/>
+  <object hwrid="/attenuators" role="transmission"/>
+  <object hwrid="/beam-info" role="beam_info"/>
+  <object hwrid="/dbconnection" role="dbserver"/>
 
-  <energy2WavelengthConstant>12.3980</energy2WavelengthConstant>
-  <defaultWavelength>0.976</defaultWavelength>
+  <channel type="tine" name="energyScanStart" tinename="/P13/fluorescence-scan/fls-scan" attach="event">start</channel>
+  <channel type="tine" name="energyScanStatus" tinename="/P13/fluorescence-scan/fls-scan" attach="event">status</channel>	
+  <command type="tine" name="energyScanAbort" tinename="/P13/fluorescence-scan/fls-scan">abort</command>
   <theoritical_edge_threshold>5</theoritical_edge_threshold>
   <elements>
+    <element>
+      <symbol>K</symbol>
+      <energy>K</energy>
+    </element>
+    <element>
+      <symbol>Ca</symbol>
+      <energy>K</energy>
+    </element>
+    <element>
+      <symbol>Sc</symbol>
+      <energy>K</energy>
+    </element>
+    <element>
+      <symbol>Ti</symbol>
+      <energy>K</energy>
+    </element>
+    <element>
+      <symbol>V</symbol>
+      <energy>K</energy>
+    </element>
+    <element>
+      <symbol>Cr</symbol>
+      <energy>K</energy>
+    </element>
     <element>
       <symbol>Mn</symbol>
       <energy>K</energy>
@@ -68,6 +89,43 @@
     <element>
       <symbol>Mo</symbol>
       <energy>K</energy>
+    </element>
+    
+    <element>
+      <symbol>Ag</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Cd</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>In</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Sn</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Sb</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Te</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>I</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Xe</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Cs</symbol>
+      <energy>L</energy>
     </element>
     <element>
       <symbol>Sm</symbol>
@@ -156,4 +214,4 @@
       <directory>rm</directory>
     </defaultenergy>
   </mad>
-</equipment>
+</object>

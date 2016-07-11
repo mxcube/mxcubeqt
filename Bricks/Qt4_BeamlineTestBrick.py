@@ -115,32 +115,32 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         if property_name == 'mnemonic':
             if self.beamline_test_hwobj is not None:
                 self.disconnect(self.beamline_test_hwobj, 
-                                QtCore.SIGNAL('testProgress'), 
+                                'testProgress', 
                                 self.update_test_progress)
                 self.disconnect(self.beamline_test_hwobj, 
-                                QtCore.SIGNAL('focusingModeChanged'), 
+                                'focusingModeChanged', 
                                 self.update_focus_status)
                 self.disconnect(self.beamline_test_hwobj, 
-                                QtCore.SIGNAL('ppuStatusChanged'), 
+                                'ppuStatusChanged', 
                                 self.update_ppu_status)
                 self.disconnect(self.beamline_test_hwobj, 
-                                QtCore.SIGNAL('testFinished'), 
+                                'testFinished', 
                                 self.test_finished)
             self.beamline_test_hwobj = self.getHardwareObject(new_value)
             if self.beamline_test_hwobj is not None:
                 self.init_com_table()                
                 self.init_test_queue()
                 self.connect(self.beamline_test_hwobj, 
-                             QtCore.SIGNAL('testProgress'), 
+                             'testProgress', 
                              self.update_test_progress)
                 self.connect(self.beamline_test_hwobj, 
-                             QtCore.SIGNAL('focusingModeChanged'), 
+                             'focusingModeChanged', 
                              self.update_focus_status)
                 self.connect(self.beamline_test_hwobj,
-                             QtCore.SIGNAL('ppuStatusChanged'),
+                             'ppuStatusChanged',
                              self.update_ppu_status)
                 self.connect(self.beamline_test_hwobj,
-                             QtCore.SIGNAL('testFinished'),
+                             'testFinished',
                              self.test_finished)
                 self.update_focus_status(None, None)
         else:

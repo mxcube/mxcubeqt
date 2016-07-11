@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
-    <height>159</height>
+    <width>369</width>
+    <height>186</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
    <item>
     <widget class="QGroupBox" name="main_groupbox">
      <property name="title">
-      <string>Processing parameters</string>
+      <string>Processing</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -91,16 +91,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="space_group_cbox">
+           <widget class="QComboBox" name="space_group_combo">
             <property name="minimumSize">
              <size>
-              <width>75</width>
+              <width>90</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>75</width>
+              <width>90</width>
               <height>32767</height>
              </size>
             </property>
@@ -389,9 +389,28 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="run_processing_cbox">
+         <widget class="QCheckBox" name="run_processing_after_cbox">
           <property name="text">
            <string>Run processing after collection</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="run_processing_parallel_cbox">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Run parallel processing</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

@@ -1,19 +1,19 @@
 <object class="EMBLCollect">
   <object href="/mini-diff" role="diffractometer"/>
+  <object href="/Qt4_graphics-manager" role="graphics_manager"/>
   <object href="/safshut" role="safety_shutter"/>
   <object href="/beam-info" role="beam_info"/>
   <object href="/mach-info" role="machine_current"/>
-  <object href="/eh1/detector" role="detector"/>
-  <object href="/eh1/energy" role="energy"/>
+  <object href="/energy" role="energy"/>
   <object href="/eh1/detector" role="detector"/>
   <object href="/eh1/resolution" role="resolution"/>
   <object href="/attenuators" role="transmission"/>
   <object href="/auto-processing" role="auto_processing"/>
-  <object href="/dbconnection" role="dbserver"/>
+  <object href="/dbconnection" role="lims_client"/>
 
   <channel type="tine" name="collectFrame" tinename="/P13/collection/mx-standard" attach="event">frame</channel>
   <channel type="tine" name="collectStatus" tinename="/P13/collection/mx-standard" attach="event">status</channel>
-  <channel type="tine" name="collectError" tinename="/P13/collection/mx-standard" attach="event">error</channel>
+  <channel type="tine" name="collectError" tinename="/P13/collection/mx-standard" attach="event">error</channel> 
 
   <command type="tine" name="collectDescription" tinename="/P13/collection/mx-standard">description</command>
   <command type="tine" name="collectDetector" tinename="/P13/collection/mx-standard">detector</command>
@@ -39,6 +39,11 @@
   <command type="tine" name="collectUnitCell" tinename="/P13/collection/xds">unit-cell</command>
   <command type="tine" name="collectStart" tinename="/P13/collection/mx-standard">collect</command>
   <command type="tine" name="collectAbort"   tinename="/P13/collection/mx-standard">abort</command>
+
+  <command type="tine" name="collectXdsDataRange" tinename="/P13/collection/xds">data-range</command>
+
+
+  <useEDNA>True</useEDNA>
 
   <input_files_server>localhost:5698</input_files_server>
   <monochromator>Si(111)</monochromator>

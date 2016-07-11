@@ -22,6 +22,7 @@
 
 import logging
 import gevent
+from datetime import datetime
 from collections import namedtuple
 
 from PyQt4 import QtCore
@@ -67,7 +68,7 @@ class DataCollectTree(QtGui.QWidget):
         self.beamline_setup_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.enable_collect_condition = True
+        self.enable_collect_condition = None
         self.collecting = False
         self.sample_mount_method = 0
         self.centring_method = 0
@@ -130,7 +131,16 @@ class DataCollectTree(QtGui.QWidget):
         self.continue_button.setDisabled(True)
         self.continue_button.setToolTip("Pause after current data collection")
 
-        self.sample_tree_widget = QtGui.QTreeWidget(self)
+        self.tree_splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
+        current_widget = QtGui.QWidget(self.tree_splitter)
+        current_label = QtGui.QLabel("<b>Current</b>", current_widget)
+        current_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.sample_tree_widget = QtGui.QTreeWidget(current_widget)
+
+        history_widget = QtGui.QWidget(self.tree_splitter)
+        history_label = QtGui.QLabel("<b>History</b>", history_widget)
+        history_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.history_tree_widget = QtGui.QTreeWidget(history_widget)
 
         # Layout --------------------------------------------------------------
         button_widget_grid_layout = QtGui.QGridLayout(self.button_widget) 
@@ -143,9 +153,21 @@ class DataCollectTree(QtGui.QWidget):
         button_widget_grid_layout.setColumnStretch(2, 1)
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
+
+        current_widget_layout = QtGui.QVBoxLayout(current_widget)
+        current_widget_layout.addWidget(current_label)
+        current_widget_layout.addWidget(self.sample_tree_widget)
+        current_widget_layout.setContentsMargins(2, 2, 2, 2)
+        current_widget_layout.setSpacing(1)
+
+        history_widget_layout = QtGui.QVBoxLayout(history_widget)
+        history_widget_layout.addWidget(history_label)
+        history_widget_layout.addWidget(self.history_tree_widget)
+        history_widget_layout.setContentsMargins(2, 2, 2, 2)
+        history_widget_layout.setSpacing(1)
         
         main_layout = QtGui.QVBoxLayout(self)
-        main_layout.addWidget(self.sample_tree_widget)
+        main_layout.addWidget(self.tree_splitter)
         main_layout.addWidget(self.button_widget)
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(1) 
@@ -181,6 +203,14 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self.setAttribute(QtCore.Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
+
+        self.history_tree_widget.setColumnCount(3)
+        self.history_tree_widget.setColumnWidth(0, 80)
+        self.history_tree_widget.setColumnWidth(1, 50)
+        #self.history_tree_widget.header().setDefaultSectionSize(250)
+        self.history_tree_widget.header().hide()
+        self.history_tree_widget.setRootIsDecorated(False)
+        self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
     def eventFilter(self, _object, event):
         """
@@ -246,8 +276,7 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         self.check_for_path_collisions()
-        #items = self.get_selected_items()
-        #for item in items:
+        self.sample_tree_widget_selection()
              
     def item_changed(self, item, column):
         """
@@ -266,6 +295,11 @@ class DataCollectTree(QtGui.QWidget):
 
         if isinstance(item, Qt4_queue_item.QueueItem):
             item.update_check_state(item.checkState(0))
+
+    def item_parameters_changed(self):
+        items = self.get_selected_items()
+        for item in items:
+            item.update_display_name()
 
     def context_collect_item(self):
         """
@@ -292,7 +326,11 @@ class DataCollectTree(QtGui.QWidget):
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 self.tree_brick.show_sample_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                self.tree_brick.show_datacollection_tab(item)
+                data_collection = item.get_model()
+                if data_collection.is_mesh():
+                    self.tree_brick.show_advanced_tab(item)
+                else:
+                    self.tree_brick.show_datacollection_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 self.tree_brick.show_char_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
@@ -301,8 +339,6 @@ class DataCollectTree(QtGui.QWidget):
                 self.tree_brick.show_xrf_spectrum_tab(item)
             elif isinstance(item, Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tree_brick.show_workflow_tab(item)
-            elif isinstance(item, Qt4_queue_item.AdvancedQueueItem):
-                self.tree_brick.show_advanced_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.tree_brick.show_dcg_tab(item)
         #elif len(items) == 0:
@@ -345,12 +381,12 @@ class DataCollectTree(QtGui.QWidget):
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
-                          " sample changer: " + e.message
-                    logging.getLogger("user_level_log").error(msg)
+                          " sample changer: " + str(e.message)
+                    logging.getLogger("GUI").error(msg)
                 finally:
                     self.enable_collect(True)
             else:
-                logging.getLogger("user_level_log").\
+                logging.getLogger("GUI").\
                   info('Its not possible to mount samples in free pin mode')
 
     def centring_done(self, success, centring_info):
@@ -362,7 +398,7 @@ class DataCollectTree(QtGui.QWidget):
         else:
             msg = "Loop centring failed or was cancelled, " +\
                   "please continue manually."
-            logging.getLogger("user_level_log").warning(msg)
+            logging.getLogger("GUI").warning(msg)
 
     def unmount_sample(self):
         """
@@ -379,7 +415,7 @@ class DataCollectTree(QtGui.QWidget):
 
         if len(items) == 1:
             self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 info("All centred positions associated with this " + \
                      "sample will be lost.")
 
@@ -560,8 +596,18 @@ class DataCollectTree(QtGui.QWidget):
         for item in items:
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
                 return True
-
         return False
+
+    def get_mounted_sample_item(self):
+        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        item = it.value()
+
+        while item:
+           if isinstance(item, Qt4_queue_item.SampleQueueItem):
+              if item.mounted_style:
+                  return item
+           it += 1
+           item = it.value()
 
     def filter_sample_list(self, option):
         """
@@ -581,25 +627,28 @@ class DataCollectTree(QtGui.QWidget):
             self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
-            try:
-                loaded_sample = self.beamline_setup_hwobj.\
-                    sample_changer_hwobj.getLoadedSample()
-                loaded_sample_loc = loaded_sample.getCoords() 
-            except:
-                pass
 
-            try:
-                loaded_sample = self.beamline_setup_hwobj.\
-                    plate_manipulator_hwobj.getLoadedSample()
-                loaded_sample_loc = loaded_sample.getCoords()
-            except:
-                pass
-
+            if self.beamline_setup_hwobj.diffractometer_hwobj.\
+                in_plate_mode():
+                try:
+                   loaded_sample = self.beamline_setup_hwobj.\
+                       plate_manipulator_hwobj.getLoadedSample()
+                   loaded_sample_loc = loaded_sample.getCoords()
+                except:
+                   pass
+            else:
+                try:
+                   loaded_sample = self.beamline_setup_hwobj.\
+                       sample_changer_hwobj.getLoadedSample()
+                   loaded_sample_loc = loaded_sample.getCoords() 
+                except:
+                   pass
             it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()
         
             while item:
                 if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                    #TODO fix this to actual plate sample!!!
                     if item.get_model().location == loaded_sample_loc:
                         item.setSelected(True)
                         item.setHidden(False)
@@ -608,6 +657,8 @@ class DataCollectTree(QtGui.QWidget):
 
                 it += 1
                 item = it.value()
+
+            self.hide_empty_baskets()
 
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
             self.sample_tree_widget.clear()
@@ -677,7 +728,7 @@ class DataCollectTree(QtGui.QWidget):
             self.queue_hwobj.disable(True)
         
         if self.queue_hwobj.is_disabled():
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 error('Can not start collect, see the tasks marked' +\
                       ' in the tree and solve the prorblems.')
             
@@ -720,7 +771,8 @@ class DataCollectTree(QtGui.QWidget):
                 if self.beamline_setup_hwobj.plate_manipulator_hwobj is not None:
                     if not self.beamline_setup_hwobj.plate_manipulator_hwobj.hasLoadedSample():
                        result = False
-                    elif item.get_model().location_plate == self.beamline_setup_hwobj.\
+                    #TODO remove :2 and check full location
+                    elif item.get_model().location == self.beamline_setup_hwobj.\
                              plate_manipulator_hwobj.getLoadedSample().getCoords():
                        result = True
             elif self.beamline_setup_hwobj.sample_changer_hwobj is not None:
@@ -729,7 +781,6 @@ class DataCollectTree(QtGui.QWidget):
                 elif item.get_model().location == self.beamline_setup_hwobj.\
                         sample_changer_hwobj.getLoadedSample().getCoords():
                     result = True
-
         return result
 
     def collect_items(self, items = [], checked_items = []):
@@ -783,16 +834,63 @@ class DataCollectTree(QtGui.QWidget):
 
     def queue_entry_execution_started(self, queue_entry):
         view_item = queue_entry.get_view()
+
         if isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
             self.tree_brick.show_energy_scan_tab(view_item)  
         elif isinstance(view_item, Qt4_queue_item.XRFSpectrumQueueItem):
             self.tree_brick.show_xrf_spectrum_tab(view_item)
-        elif isinstance(view_item, Qt4_queue_item.AdvancedQueueItem):
-            self.tree_brick.show_advanced_tab(view_item)
-               
+        elif isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
+            data_collection = view_item.get_model()
+            if data_collection.is_mesh():
+                self.tree_brick.show_advanced_tab(view_item)
+
+        self.sample_tree_widget.clearSelection() 
+        view_item.setSelected(True)
+
+    def queue_entry_execution_finished(self, queue_entry, status):
+
+        print "queue_entry_execution_finished... ", queue_entry, status
+        view_item = queue_entry.get_view()
+        item_model = queue_entry.get_data_model()
+
+        item_type = None
+        item_icon = None
+        if isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
+            if item_model.is_helical():
+                item_type = "Helical"
+                item_icon = "Line"
+            elif item_model.is_mesh():
+                item_type = "Mesh"
+                item_icon = "Grid"
+            else:
+                item_type = "OSC"
+                item_icon = "Point"
+        elif isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
+            item_type = "Energy scan"
+            item_icon = "EnergyScan2"
+        elif isinstance(view_item, Qt4_queue_item.XRFSpectrumQueueItem):
+            item_type = "XRF spectrum"
+            item_icon = "LineGraph"
+
+        if item_type:
+            info_str_list = QtCore.QStringList()
+            info_str_list.append(datetime.now().strftime("%H:%M:%S"))
+            info_str_list.append(item_type)
+            info_str_list.append(status)
+
+            temp_treewidget_item = QtGui.QTreeWidgetItem(info_str_list)
+            if status != "Successful": 
+                temp_treewidget_item.setBackgroundColor(0, Qt4_widget_colors.LIGHT_RED)
+                temp_treewidget_item.setBackgroundColor(1, Qt4_widget_colors.LIGHT_RED)
+                temp_treewidget_item.setBackgroundColor(2, Qt4_widget_colors.LIGHT_RED)
+            if item_icon:
+                temp_treewidget_item.setIcon(0, Qt4_Icons.load_icon(item_icon))
+            self.history_tree_widget.insertTopLevelItem(0, temp_treewidget_item)
+
     def queue_execution_completed(self, status):
         """
-        Descript. :
+        Restores normal cursors, changes collect button
+        Deselects all items and selects mounted sample
         """
         QtGui.QApplication.restoreOverrideCursor() 
         self.collecting = False
@@ -808,6 +906,10 @@ class DataCollectTree(QtGui.QWidget):
         self.parent().enable_hutch_menu(True)
         self.parent().enable_command_menu(True)
         self.parent().enable_task_toolbox(True)
+ 
+        self.sample_tree_widget.clearSelection()
+        sample_item = self.get_mounted_sample_item()
+        sample_item.setSelected(True)
         self.set_sample_pin_icon()
 
     def get_checked_items(self):
@@ -831,8 +933,11 @@ class DataCollectTree(QtGui.QWidget):
         if not isinstance(selected_items, list):
             selected_items = self.get_selected_items()
 
+        
         for item in selected_items:
-            if not isinstance(item, queue_model_objects.TaskGroup):
+            if type(item) not in (Qt4_queue_item.BasketQueueItem,
+                                  Qt4_queue_item.SampleQueueItem,
+                                  Qt4_queue_item.DataCollectionGroupQueueItem):
                 new_node = self.queue_model_hwobj.copy_node(item.get_model())
                 self.queue_model_hwobj.add_child(item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
@@ -956,6 +1061,7 @@ class DataCollectTree(QtGui.QWidget):
             sample_list.append(sample)
         return basket_list, sample_list
 
+    """
     def samples_from_plate_content(self, plate_row_content, plate_sample_content):
         row_list = []
         sample_list = []
@@ -966,10 +1072,10 @@ class DataCollectTree(QtGui.QWidget):
             row_list.append(basket)
         for sample_info in plate_sample_content:
             sample = queue_model_objects.Sample()
-            sample.init_from_plate_sample(sample_info)
+            sample.init_from_sc_sample(sample_info)
             sample_list.append(sample)
-
         return row_list, sample_list
+    """
 
     def samples_from_lims(self, lims_sample_list):
         """
@@ -1027,15 +1133,15 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.clear()
         self.queue_model_hwobj.select_model(mode_str)
 
-        for basket in basket_list:
+        for basket_index, basket in enumerate(basket_list):
             self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
                                              get_model_root(), basket)
             basket.set_enabled(False)
             for sample in sample_list:
-                 if sample.location[0] == basket.get_location():
-                     basket.add_sample(sample)
-                     self.queue_model_hwobj.add_child(basket, sample)
-                     sample.set_enabled(False)
+                if sample.location[0] == basket_index + 1:
+                    basket.add_sample(sample)
+                    self.queue_model_hwobj.add_child(basket, sample)
+                    sample.set_enabled(False)
         self.set_sample_pin_icon()
 
     def set_sample_pin_icon(self):
@@ -1049,8 +1155,8 @@ class DataCollectTree(QtGui.QWidget):
             if self.is_mounted_sample_item(item):
                 item.setSelected(True)
                 item.set_mounted_style(True)
-                self.sample_tree_widget.scrollTo(self.sample_tree_widget.\
-                     indexFromItem(item))
+                #self.sample_tree_widget.scrollTo(self.sample_tree_widget.\
+                #     indexFromItem(item))
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 item.set_mounted_style(False)
 
@@ -1108,3 +1214,21 @@ class DataCollectTree(QtGui.QWidget):
         if self.last_added_item:
             self.sample_tree_widget.clearSelection()
             self.last_added_item.setSelected(True) 
+
+    def hide_empty_baskets(self):
+        item_iterator = QtGui.QTreeWidgetItemIterator(\
+             self.sample_tree_widget)
+        item = item_iterator.value()
+        while item:
+              hide = True
+
+              if type(item) in(Qt4_queue_item.BasketQueueItem,
+                               Qt4_queue_item.DataCollectionGroupQueueItem):
+                  for index in range(item.childCount()):
+                      if not item.child(index).isHidden():
+                          hide = False
+                          break
+                  item.setHidden(hide)
+
+              item_iterator += 1
+              item = item_iterator.value()

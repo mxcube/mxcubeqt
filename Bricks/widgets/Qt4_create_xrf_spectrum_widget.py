@@ -51,7 +51,10 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
         self.count_time_ledit = QtGui.QLineEdit("1", _parameters_gbox)
         #self.count_time_ledit.setMaximumWidth(75)
-        self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", _parameters_gbox)
+        self.adjust_transmission_cbox = QtGui.QCheckBox(\
+             "Adjust transmission", _parameters_gbox)
+        self.adjust_transmission_cbox.setChecked(True)
+        
 
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QtGui.QHBoxLayout(_parameters_gbox)
@@ -72,38 +75,37 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self.adjust_transmission_cbox.stateChanged.connect(\
+             self.adjust_transmission_state_changed)
 
         # Other ---------------------------------------------------------------
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self.enery_scan = queue_model_objects.XRFSpectrum()
+        self.xrf_spectrum_model = queue_model_objects.XRFSpectrum()
         self._path_template.start_num = 1
         self._path_template.num_files = 1
         self._path_template.suffix = 'raw'
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-        escan_model = tree_item.get_model()
+        self.xrf_spectrum_model = tree_item.get_model()
 
         if isinstance(tree_item, Qt4_queue_item.XRFSpectrumQueueItem):
-            if tree_item.get_model().is_executed():
+            if self.xrf_spectrum_model.is_executed():
                 self.setDisabled(True)
             else:
                 self.setDisabled(False)    
 
-            if escan_model.get_path_template():
-                self._path_template = escan_model.get_path_template()
+            if self.xrf_spectrum_model.get_path_template():
+                self._path_template = self.xrf_spectrum_model.get_path_template()
 
             self._data_path_widget.update_data_model(self._path_template)
         elif not(isinstance(tree_item, Qt4_queue_item.SampleQueueItem) or \
                  isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem)):
             self.setDisabled(True)
-
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
@@ -113,7 +115,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         try:
            self.count_time = float(str(self.count_time_ledit.text()))
         except:
-           logging.getLogger("user_level_log").\
+           logging.getLogger("GUI").\
                 info("Incorrect count time value.")
 
         return base_result and self.count_time
@@ -142,11 +144,15 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
             xrf_spectrum = queue_model_objects.XRFSpectrum(sample, path_template, cpos)
             xrf_spectrum.set_name(path_template.get_prefix())
             xrf_spectrum.set_number(path_template.run_number)
-            xrf_spectrum.count_time = self.count_time
+            xrf_spectrum.count_time = self.count_time  
+            xrf_spectrum.adjust_transmission = self.adjust_transmission_cbox.isChecked()
             
             data_collections.append(xrf_spectrum)
         else:
-            logging.getLogger("user_level_log").\
+            logging.getLogger("GUI").\
                 info("No count time specified.") 
 
         return data_collections
+
+    def adjust_transmission_state_changed(self, state):
+        self.xrf_spectrum_model.adjust_transmission = state > 0

@@ -59,7 +59,6 @@ class Qt4_MDApertureBrick(BlissWidget):
     """
     Descript. :
     """
- 
     def __init__(self, *args):
         """
         Descript. :
@@ -80,12 +79,15 @@ class Qt4_MDApertureBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox("Aperture", self)
-        self.aperture_combo = QtGui.QComboBox(self.main_gbox)
-        self.aperture_combo.setMinimumWidth(100)
+        self.aperture_diameter_combo = QtGui.QComboBox(self.main_gbox)
+        self.aperture_diameter_combo.setMinimumWidth(100)
+        self.aperture_position_combo = QtGui.QComboBox(self.main_gbox)
+        self.aperture_position_combo.setMinimumWidth(100)
 
         # Layout --------------------------------------------------------------
         _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
-        _main_gbox_vlayout.addWidget(self.aperture_combo)
+        _main_gbox_vlayout.addWidget(self.aperture_diameter_combo)
+        _main_gbox_vlayout.addWidget(self.aperture_position_combo)
         _main_gbox_vlayout.addStretch()
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -97,14 +99,22 @@ class Qt4_MDApertureBrick(BlissWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------
-        self.aperture_combo.activated.connect(self.change_aperture)
+        self.aperture_diameter_combo.activated.\
+             connect(self.change_diameter)
+        self.aperture_position_combo.activated.\
+             connect(self.change_position)
+         
  
         # SizePolicies --------------------------------------------------------
 
         # Other --------------------------------------------------------------- 
-        Qt4_widget_colors.set_widget_color(self.aperture_combo,
-                                           Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
+        Qt4_widget_colors.set_widget_color(self.aperture_diameter_combo,
+             Qt4_widget_colors.LIGHT_GREEN, QtGui.QPalette.Button)
+        Qt4_widget_colors.set_widget_color(self.aperture_position_combo,
+             Qt4_widget_colors.LIGHT_GREEN, QtGui.QPalette.Button)
+
+        self.aperture_diameter_combo.setMinimumWidth(100)
+        self.aperture_position_combo.setMinimumWidth(100)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -113,43 +123,89 @@ class Qt4_MDApertureBrick(BlissWidget):
         if property_name == "mnemonic":
             if self.aperture_hwobj is not None:
                 self.disconnect(self.aperture_hwobj, 
-                                QtCore.SIGNAL('apertureChanged'), 
-                                self.aperture_changed)
+                                'diameterIndexChanged', 
+                                self.diameter_changed)
+                self.disconnect(self.aperture_hwobj,
+                                'positionChanged',
+                                self.position_changed)
             self.aperture_hwobj = self.getHardwareObject(new_value)
             if self.aperture_hwobj is not None:
-                self.init_aperture_list()
+                self.init_aperture()
                 self.connect(self.aperture_hwobj, 
-                             QtCore.SIGNAL('apertureChanged'), 
-                             self.aperture_changed)
+                             'diameterIndexChanged', 
+                             self.diameter_changed)
+                self.connect(self.aperture_hwobj,
+                             'positionChanged',
+                             self.position_changed)
                 self.aperture_hwobj.update_values()
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def set_expert_mode(self, in_expert_mode):
+        """ 
+        """
+        self.aperture_position_combo.setEnabled(in_expert_mode)
     
-    def change_aperture(self):
+    def change_diameter(self):
         """
         Descript. :
         """
-        self.aperture_hwobj.set_active_position(\
-             self.aperture_combo.currentIndex())
+        self.aperture_hwobj.set_diameter_index(\
+             self.aperture_diameter_combo.currentIndex())
 
-    def init_aperture_list(self):
+    def change_position(self):
         """
         Descript. :
         """
-        aperture_list = self.aperture_hwobj.get_aperture_list()
-        self.aperture_combo.clear()
-        for aperture in aperture_list:
-            self.aperture_combo.addItem(aperture)
+        self.aperture_hwobj.set_position(\
+             self.aperture_position_combo.currentIndex())
 
-    def aperture_changed(self, pos_index, size):
+    def init_aperture(self):
         """
         Descript. :
         """
-        if pos_index is None:
-            self.aperture_combo.setEnabled(False)
+        aperture_size_list = self.aperture_hwobj.get_diameter_list()
+        self.aperture_diameter_combo.clear()
+        for aperture_size in aperture_size_list:
+            self.aperture_diameter_combo.addItem("%d%s" %(aperture_size, unichr(956)))
+
+        aperture_position_list = self.aperture_hwobj.get_position_list()
+        self.aperture_position_combo.clear()
+        for aperture_position in aperture_position_list:
+            self.aperture_position_combo.addItem(aperture_position)
+
+        self.aperture_diameter_combo.blockSignals(True)
+        self.aperture_diameter_combo.setCurrentIndex(-1)
+        self.aperture_diameter_combo.blockSignals(False)
+
+        self.aperture_position_combo.blockSignals(True)
+        self.aperture_position_combo.setCurrentIndex(-1) 
+        self.aperture_position_combo.blockSignals(False)
+        
+
+    def diameter_changed(self, diameter_index, diameter_size):
+        """
+        Descript. :
+        """
+        self.aperture_diameter_combo.blockSignals(True)
+        if diameter_index is None:
+            self.aperture_diameter_combo.setEnabled(False)
+            self.aperture_diameter_combo.setCurrentIndex(-1)
         else:
-            self.aperture_combo.setEnabled(True)
-            self.aperture_combo.blockSignals(True)
-            self.aperture_combo.setCurrentIndex(pos_index)
-            self.aperture_combo.blockSignals(False)
+            self.aperture_diameter_combo.setEnabled(True)
+            self.aperture_diameter_combo.setCurrentIndex(diameter_index)
+        self.aperture_diameter_combo.blockSignals(False)
 
+    def position_changed(self, position):
+        """
+        Descript. :
+        """
+        self.aperture_position_combo.blockSignals(True)
+        if position is None:
+            self.aperture_position_combo.setEnabled(False)
+            self.aperture_position_combo.setCurrentIndex(-1)
+        else:
+            self.aperture_position_combo.setEnabled(True)
+            self.aperture_position_combo.setCurrentIndex(\
+                 self.aperture_position_combo.findText(position))
+        self.aperture_position_combo.blockSignals(False)

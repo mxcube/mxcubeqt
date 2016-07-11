@@ -55,6 +55,7 @@ class WebViewWidget(QtGui.QWidget):
          
         if QWEBVIEW_AVAILABLE:
             self.web_page_viewer = QWebView(self)
+            self.web_page_viewer.settings().setObjectCacheCapacities(0,0,0)
 
         _navigation_bar_hlayout = QtGui.QHBoxLayout(self.navigation_bar)
         _navigation_bar_hlayout.addWidget(self.home_button)
@@ -95,8 +96,10 @@ class WebViewWidget(QtGui.QWidget):
     def go_to_home_page(self):
         """
         """
+        print "go_to_home_page: ", self.home_url
         self.url_ledit.setText(self.home_url)
         self.web_page_viewer.load(QtCore.QUrl(self.home_url))
+        self.web_page_viewer.show()
 
     def go_back(self):
         """

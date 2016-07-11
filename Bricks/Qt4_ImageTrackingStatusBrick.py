@@ -81,20 +81,20 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
         self.state_label.setAlignment(QtCore.Qt.AlignCenter)
         self.state_changed("unknown")
         
-    def propertyChanged(self, property, oldValue, newValue):
-        if property == 'mnemonic':
+    def propertyChanged(self, property_name, old_value, new_value):
+        if property_name == 'mnemonic':
             if self.image_tracking_hwobj is not None:
                 self.disconnect(self.image_tracking_hwobj, 
-                                QtCore.SIGNAL('stateChanged'), 
+                                'stateChanged', 
                                 self.state_changed)
-            self.image_tracking_hwobj = self.getHardwareObject(newValue)
+            self.image_tracking_hwobj = self.getHardwareObject(new_value)
             if self.image_tracking_hwobj is not None:
                 self.image_tracking_cbox.blockSignals(True)
                 self.image_tracking_cbox.setChecked(\
                      self.image_tracking_hwobj.is_tracking_enabled() == True)
                 self.image_tracking_cbox.blockSignals(False)
                 self.connect(self.image_tracking_hwobj, 
-                             QtCore.SIGNAL('stateChanged'), 
+                             'stateChanged', 
                              self.state_changed)
                 self.image_tracking_hwobj.update_values()
                 self.setEnabled(True)
@@ -102,10 +102,9 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
                 self.setEnabled(False)
 
         else:
-            BlissWidget.propertyChanged(self,property,oldValue,newValue)
+            BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
     def image_tracking_cbox_changed(self, state):
-        print "set_tracking"
         self.image_tracking_hwobj.set_image_tracking_state(state)
 
     def state_changed(self, state, state_label = None):

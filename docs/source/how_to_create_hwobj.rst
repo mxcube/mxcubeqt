@@ -70,7 +70,7 @@ Write necessary hardware object:
 
 .. note::
 
-   Device type defined in xml should much the class type in the hwobj.
+   Device type defined in xml should match the class type in the hwobj.
 
 Other information
 *****************

@@ -1,0 +1,7 @@
+<device class="Qt4_LimaVideo"> 
+   <type>Prosilica</type> 
+   <address>169.254.1.10</address> 
+   <mirror>(True, False)</mirror> 
+   <imageType>rgb</imageType>	
+   <interval>40</interval>	
+</device>

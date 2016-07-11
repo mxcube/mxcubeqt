@@ -94,7 +94,7 @@ class Qt4_SlitsBrick(BlissWidget):
         self.current_hor_pos_ledit.setFont(boldFont)
         self.current_hor_pos_ledit.setMaximumWidth(70)
         self.current_hor_pos_ledit.setEnabled(False)
-        self.hor_pos_dspinbox = QtGui.QDoubleSpinBox(self.main_gbox)
+        self.hor_pos_dspinbox = QtGui.QSpinBox(self.main_gbox)
         self.hor_pos_dspinbox.setMaximumWidth(70)
         self.hor_pos_dspinbox.setEnabled(False)
         self.set_hor_gap_button = QtGui.QPushButton(\
@@ -113,7 +113,7 @@ class Qt4_SlitsBrick(BlissWidget):
         self.current_ver_pos_ledit.setFont(boldFont)
         self.current_ver_pos_ledit.setMaximumWidth(70)
         self.current_ver_pos_ledit.setEnabled(False)
-        self.ver_pos_dspinbox = QtGui.QDoubleSpinBox(self.main_gbox)
+        self.ver_pos_dspinbox = QtGui.QSpinBox(self.main_gbox)
         self.ver_pos_dspinbox.setMaximumWidth(70)
         self.ver_pos_dspinbox.setEnabled(False)
         self.set_ver_gap_button = QtGui.QPushButton(\
@@ -124,6 +124,9 @@ class Qt4_SlitsBrick(BlissWidget):
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
         self.stop_ver_button.setEnabled(False)
         self.stop_ver_button.setFixedWidth(27)
+
+        self.test_button = QtGui.QPushButton("Test", self.main_gbox)
+        self.test_button.hide()
 
         # Layout --------------------------------------------------------------
         _main_gbox_gridlayout = QtGui.QGridLayout(self.main_gbox)
@@ -139,6 +142,8 @@ class Qt4_SlitsBrick(BlissWidget):
         _main_gbox_gridlayout.addWidget(self.stop_ver_button, 1, 4)
         _main_gbox_gridlayout.setSpacing(2)
         _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
+
+        _main_gbox_gridlayout.addWidget(self.test_button, 0, 5)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
@@ -159,6 +164,8 @@ class Qt4_SlitsBrick(BlissWidget):
              connect(self.change_ver_gap)
         self.set_ver_gap_button.clicked.connect(self.change_ver_gap)
         self.stop_ver_button.clicked.connect(self.stop_ver_clicked)
+
+        self.test_button.clicked.connect(self.test_clicked)
 
         # SizePolicies --------------------------------------------------------
 
@@ -253,6 +260,7 @@ class Qt4_SlitsBrick(BlissWidget):
         #     self.current_hor_pos_ledit.setText("-")
         else:
             self.current_hor_pos_ledit.setText('%d %sm' % (newGap[0] * 1000, unichr(956)))
+
         if newGap[1] is None:
             self.current_ver_pos_ledit.setText("-")
         #elif newGap[1] < 0:
@@ -260,6 +268,13 @@ class Qt4_SlitsBrick(BlissWidget):
         else:
             gap_str = str(newGap[1] * 1000)
             self.current_ver_pos_ledit.setText('%d %sm' % (newGap[1] * 1000, unichr(956)))
+
+        Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox.lineEdit(),
+                                           Qt4_SlitsBrick.CONNECTED_COLOR,
+                                           QtGui.QPalette.Button)
+        Qt4_widget_colors.set_widget_color(self.ver_pos_dspinbox.lineEdit(),
+                                           Qt4_SlitsBrick.CONNECTED_COLOR,
+                                           QtGui.QPalette.Button)
 
     def gap_status_changed(self, gapHorStatus, gapVerStatus):
         if gapHorStatus == 'Move':  #Moving
@@ -302,3 +317,12 @@ class Qt4_SlitsBrick(BlissWidget):
             if newMaxLimits[1] > 0:
                 self.ver_pos_dspinbox.setMaxValue(\
                      int(newMaxLimits[1] * 1000))
+
+    def test_clicked(self):
+        counter = 0
+        for j in range (10):
+            for i in range(5):
+               gap_mm = 0.2 * (i + 1)
+               self.slitbox_hwobj.set_gap('Hor', gap_mm)
+               self.slitbox_hwobj.set_gap('Ver', gap_mm)
+               counter += 1

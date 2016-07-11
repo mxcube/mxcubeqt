@@ -33,7 +33,6 @@ from Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_acquisition_widget import AcquisitionWidget
 from queue_model_enumerables_v1 import EXPERIMENT_TYPE
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN
 
 
 class CreateAdvancedWidget(CreateTaskBase):
@@ -77,17 +76,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.handle_path_conflict)
-
-        self._acq_widget.acqParametersChangedSignal.connect(\
-             self.handle_path_conflict)
-        self._acq_widget.madEnergySelectedSignal.connect(\
-             self.mad_energy_selected)
+        self._acq_widget.acqParametersChangedSignal.\
+             connect(self.acq_parameters_changed)
+        self._acq_widget.madEnergySelectedSignal.\
+             connect(self.mad_energy_selected)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.acq_parameters_changed)
 
         self._advanced_methods_widget.grid_treewidget.itemSelectionChanged.\
              connect(self.grid_treewidget_item_selection_changed)
@@ -121,7 +115,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
         self._acq_widget.use_kappa(False) 
-        self._acq_widget.use_kappa_phi(False)
         self._acq_widget.acq_widget_layout.num_images_label.setEnabled(False)
         self._acq_widget.acq_widget_layout.num_images_ledit.setEnabled(False)
         for col in range(self._advanced_methods_widget.\
@@ -140,7 +133,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         Descript. :
         """
-        self._advanced = queue_model_objects.Advanced()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
@@ -184,18 +176,26 @@ class CreateAdvancedWidget(CreateTaskBase):
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
+    def set_beamline_setup(self, bl_setup_hwobj):
+        """
+        In plate mode osciallation is start is in the middle of grid
+        """
+        CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
+
+        if bl_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+            self._acq_widget.acq_widget_layout.osc_start_label.\
+                 setText("Oscillation middle:")
+
     def approve_creation(self):
         """
         Descript. :
         """
         result = CreateTaskBase.approve_creation(self)
 
-        if len(self._advanced_methods_widget.grid_treewidget.\
-            selectedItems()) == 0:
-            #msg = "No grid selected. Automatic grid will be used."
+        if len(self._advanced_methods_widget.\
+           grid_treewidget.selectedItems()) == 0:
             msg = "No grid selected. Continuing with automatic grid."
-            logging.getLogger("user_level_log").info(msg)
-            #result = None 
+            logging.getLogger("GUI").info(msg)
         return result
             
     def update_processing_parameters(self, crystal):
@@ -215,8 +215,8 @@ class CreateAdvancedWidget(CreateTaskBase):
                                                 self._path_template)            
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
-        elif isinstance(tree_item, Qt4_queue_item.AdvancedQueueItem):
-            advanced = tree_item.get_model()
+        elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
+            data_collection = tree_item.get_model()
             if tree_item.get_model().is_executed():
                 self.setDisabled(True)
             else:
@@ -225,12 +225,10 @@ class CreateAdvancedWidget(CreateTaskBase):
             # sample_data_model = self.get_sample_item(tree_item).get_model()
             #self._acq_widget.disable_inverse_beam(True)
             #self._graphics_manager_hwobj.de_select_all()
-            self._graphics_manager_hwobj.select_shape(advanced.grid_object)
+            self._graphics_manager_hwobj.select_shape(data_collection.grid)
 
-            self._path_template = advanced.get_path_template()
+            self._path_template = data_collection.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
-
-            data_collection = advanced.reference_image_collection
 
             self._acquisition_parameters = data_collection.acquisitions[0].\
                                            acquisition_parameters
@@ -244,22 +242,22 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         Descript. :
         """
-        data_collections = []
+        tasks = []
         selected_grids = self.get_selected_grids() 
 
         if len(selected_grids) == 0:
             selected_grids.append(self._graphics_manager_hwobj.\
                 update_auto_grid()) 
 
-        for shape in selected_grids:
-            shape.set_snapshot(self._graphics_manager_hwobj.\
-                  get_scene_snapshot(shape))
+        for grid in selected_grids:
+            grid.set_snapshot(self._graphics_manager_hwobj.\
+                  get_scene_snapshot(grid))
 
-            grid_properties = shape.get_properties()
+            grid_properties = grid.get_properties()
 
             acq = self._create_acq(sample)
             acq.acquisition_parameters.centred_position = \
-                shape.get_centred_position()
+                grid.get_centred_position()
             acq.acquisition_parameters.mesh_range = \
                 [grid_properties["dx_mm"], grid_properties["dy_mm"]]
             acq.acquisition_parameters.num_lines = \
@@ -267,6 +265,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             acq.acquisition_parameters.num_images = \
                 grid_properties["num_lines"] * \
                 grid_properties["num_images_per_line"]
+            grid.set_osc_range(acq.acquisition_parameters.osc_range)
 
             processing_parameters = deepcopy(self._processing_parameters)
 
@@ -277,29 +276,31 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_name(acq.path_template.get_prefix())
             dc.set_number(acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
+            dc.set_requires_centring(False)
+            dc.grid = grid
 
             exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
-            if exp_type == "MeshScan":
-                advanced = queue_model_objects.Advanced(\
-                   dc, shape, sample.crystals[0])
+            if exp_type == "Mesh":
+                dc.run_processing_parallel = "MeshScan"
+                tasks.append(dc)
             elif exp_type == "XrayCentering":
-                advanced = queue_model_objects.XrayCentering(\
-                   dc, shape, sample.crystals[0])
-
-            data_collections.append(advanced)
+                xray_centering = queue_model_objects.XrayCentering(\
+                   dc, sample.crystals[0])
+                dc.run_processing_parallel = "XrayCentering"
+                tasks.append(xray_centering)
             self._path_template.run_number += 1
 
-            return data_collections            
+            return tasks
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Grid":
             self._advanced_methods_widget.grid_treewidget.clearSelection()
             grid_properties = shape.get_properties()
-            info_str_list = QtCore.QStringList()
+            info_str_list = []
             info_str_list.append(grid_properties["name"])
-            info_str_list.append("%d" % grid_properties["beam_x"])
-            info_str_list.append("%d" % grid_properties["beam_y"])
+            info_str_list.append("%d" % (grid_properties["beam_x_mm"] * 1000.0))
+            info_str_list.append("%d" % (grid_properties["beam_y_mm"] * 1000.0))
             info_str_list.append("%d" % grid_properties["num_lines"])
             info_str_list.append("%d" % grid_properties["num_images_per_line"])
 
@@ -320,19 +321,25 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def grid_treewidget_item_selection_changed(self):
         self.enable_grid_controls(False)
+      
+        osc_dynamic_limits = None
+        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+            osc_dynamic_limits = self._beamline_setup_hwobj.\
+                diffractometer_hwobj.get_osc_dynamic_limits()
+
         for item in self._grid_map.items():
-            grid_object = item[0]
+            grid = item[0]
             treewidget_item = item[1]
   
             if treewidget_item.isSelected():
-                grid_properties = grid_object.get_properties() 
+                grid_properties = grid.get_properties() 
                 cell_count = grid_properties["num_lines"] * \
                              grid_properties["num_images_per_line"]
                 self._acq_widget.acq_widget_layout.num_images_ledit.setText(\
                      "%d" % cell_count)
                 self._acq_widget.acq_widget_layout.first_image_ledit.setText(\
                      "%d" % grid_properties["first_image_num"])
-                centred_point = grid_object.get_centred_position()
+                centred_point = grid.get_centred_position()
                 self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
                      "%.2f" % float(centred_point.phi))
                 self._acq_widget.acq_widget_layout.kappa_ledit.setText(\
@@ -343,10 +350,22 @@ class CreateAdvancedWidget(CreateTaskBase):
                      "%.2f" % (float(grid_properties["xOffset"]) * 1000))
                 self._advanced_methods_widget.ver_spacing_ledit.setText(\
                      "%.2f" % (float(grid_properties["yOffset"]) * 1000))
-                grid_object.setSelected(True) 
+
+             
+                if osc_dynamic_limits:
+                    osc_range_limits = \
+                        (0, 
+                         abs(osc_dynamic_limits[1] - osc_dynamic_limits[0]) /\
+                         float(grid_properties["num_images_per_line"]))
+                    self._acq_widget.update_osc_range_limits(osc_range_limits)
+                    self._acq_widget.acq_widget_layout.osc_range_ledit.\
+                         setText("%.2f" % (abs(osc_range_limits[1] -\
+                                               osc_range_limits[0]))) 
+
+                grid.setSelected(True) 
                 self.enable_grid_controls(True)
             else:
-                grid_object.setSelected(False)
+                grid.setSelected(False)
 
     def get_selected_grids(self):
         selected_grids = [] 

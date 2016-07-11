@@ -5,9 +5,17 @@
    <channel type="exporter" name="State">State</channel>
    <channel type="exporter" name="CurrentPhase">CurrentPhase</channel> 
 
+   <object href="/Qt4_lima-video" role="camera"/>
+  
    <numRows>8</numRows>
-   <numColls>12</numColls>
+   <numCols>12</numCols>
    <numDrops>3</numDrops>
-   <referencePosX>0.65</referencePosX>
+   <crimsWsRoot>https://lolita.embl-hamburg.de</crimsWsRoot>
+
+   <!-- <numRows>9</numRows>
+   <numColls>9</numColls>
+   <numDrops>1</numDrops>-->
+
+   <referencePosX>0.75</referencePosX>
 </equipment>
 

@@ -1,4 +1,5 @@
 <device class="MicrodiffLight">
   <exporter_address>p13md201.embl-hamburg.de:9001</exporter_address>
-  <motor_name>FrontLight</motor_name>
+  <channel type="exporter" name="chanLightValue">FrontLightLevel</channel>
+  <limits>[0, 100]</limits>
 </device>

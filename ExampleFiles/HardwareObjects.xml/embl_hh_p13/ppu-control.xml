@@ -1,4 +1,4 @@
-<procedure class="PPUControl">
+<procedure class="EMBLPPUControl">
   <command type="tine" name="furkaRestart" tinename="/P13/ppu/ppu-cmd">furka-restart-self</command>
   <command type="tine" name="allStatus" tinename="/P13/ppu/ppu-cmd">all-status</command>
   <command type="tine" name="allRestart" tinename="/P13/ppu/ppu-cmd">all-restart-self</command>

@@ -1,8 +1,9 @@
-<equipment class="EMBLEnergyScan">
-  <device hwrid="/eh1/energy" role="energy"/>
-  <device hwrid="/attenuators" role="transmission"/>
-  <device hwrid="/beam-info" role="beam_info"/>
-  <device hwrid="/dbconnection" role="dbserver"/>
+<object class="EMBLEnergyScan">
+  <object hwrid="/energy" role="energy"/>
+  <object hwrid="/eh1/resolution" role="resolution"/>
+  <object hwrid="/attenuators" role="transmission"/>
+  <object hwrid="/beam-info" role="beam_info"/>
+  <object hwrid="/dbconnection" role="dbserver"/>
 
   <channel type="tine" name="energyScanStart" tinename="/P14/fluorescence-scan/fls-scan" attach="event">start</channel>
   <channel type="tine" name="energyScanStatus" tinename="/P14/fluorescence-scan/fls-scan" attach="event">status</channel>	
@@ -11,6 +12,8 @@
   <energy2WavelengthConstant>12.3980</energy2WavelengthConstant>
   <defaultWavelength>0.976</defaultWavelength>
   <theoritical_edge_threshold>5</theoritical_edge_threshold>
+  <numPoints>60</numPoints> 
+
   <elements>
     <element>
       <symbol>Mn</symbol>
@@ -155,4 +158,4 @@
       <directory>rm</directory>
     </defaultenergy>
   </mad>
-</equipment>
+</object>

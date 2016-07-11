@@ -100,19 +100,21 @@ class Qt4_DetectorStatusBrick(BlissWidget):
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.detector_hwobj is not None:
-                self.disconnect(self.detector_hwobj, QtCore.SIGNAL('temperatureChanged'), self.temperature_changed)
-                self.disconnect(self.detector_hwobj, QtCore.SIGNAL('humidityChanged'), self.humidity_changed)
-                self.disconnect(self.detector_hwobj, QtCore.SIGNAL('statusChanged'), self.status_changed)
+                self.disconnect(self.detector_hwobj, 'temperatureChanged', self.temperature_changed)
+                self.disconnect(self.detector_hwobj, 'humidityChanged', self.humidity_changed)
+                self.disconnect(self.detector_hwobj, 'statusChanged', self.status_changed)
 	    self.detector_hwobj = self.getHardwareObject(new_value)
             if self.detector_hwobj is not None:
-                self.connect(self.detector_hwobj, QtCore.SIGNAL('temperatureChanged'), self.temperature_changed)
-                self.connect(self.detector_hwobj, QtCore.SIGNAL('humidityChanged'), self.humidity_changed)
-                self.connect(self.detector_hwobj, QtCore.SIGNAL('statusChanged'), self.status_changed)
+                self.connect(self.detector_hwobj, 'temperatureChanged', self.temperature_changed)
+                self.connect(self.detector_hwobj, 'humidityChanged', self.humidity_changed)
+                self.connect(self.detector_hwobj, 'statusChanged', self.status_changed)
                 self.detector_hwobj.update_values()             
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
      
     def status_changed(self, status, status_message):
+        """
+        """
         if status:
             self.status_label.setText("<b>%s</b>" % status.title())
             Qt4_widget_colors.set_widget_color(self.status_label,
@@ -120,22 +122,26 @@ class Qt4_DetectorStatusBrick(BlissWidget):
             self.setToolTip(status_message)
 
     def temperature_changed(self, value, status_ok):
-        if value:
+        """
+        """
+        if value is not None:
             unit = u'\N{DEGREE SIGN}'
             self.temperature_label.setText("   Temperature : %0.1f%s" %(value, unit))
-            if status_ok: 
-                Qt4_widget_colors.set_widget_color(self.temperature_label,
-                   Qt4_DetectorStatusBrick.STATES['OK'])
-            else:
-                Qt4_widget_colors.set_widget_color(self.temperature_label,
-                   Qt4_DetectorStatusBrick.STATES['BAD'])
+        if status_ok: 
+            Qt4_widget_colors.set_widget_color(self.temperature_label,
+                Qt4_DetectorStatusBrick.STATES['OK'])
+        else:
+            Qt4_widget_colors.set_widget_color(self.temperature_label,
+                Qt4_DetectorStatusBrick.STATES['BAD'])
 
     def humidity_changed(self, value, status_ok):
-        if value:
+        """
+        """
+        if value is not None:
             self.humidity_label.setText("   Humidity         : %0.1f%s" %(value, chr(37)))
-            if status_ok:
-                Qt4_widget_colors.set_widget_color(self.humidity_label,
-                   Qt4_DetectorStatusBrick.STATES['OK'])
-            else:
-                Qt4_widget_colors.set_widget_color(self.humidity_label,
-                   Qt4_DetectorStatusBrick.STATES['BAD'])
+        if status_ok:
+            Qt4_widget_colors.set_widget_color(self.humidity_label,
+                Qt4_DetectorStatusBrick.STATES['OK'])
+        else:
+            Qt4_widget_colors.set_widget_color(self.humidity_label,
+                Qt4_DetectorStatusBrick.STATES['BAD'])

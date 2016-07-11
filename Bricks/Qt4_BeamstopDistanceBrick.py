@@ -95,14 +95,26 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.beamstop_hwobj is not None:
-                self.disconnect(self.beamstop_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
-                self.disconnect(self.beamstop_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
-                self.disconnect(self.beamstop_hwobj, QtCore.SIGNAL('beamstopDistanceChanged'), self.beamstop_distance_changed)
+                self.disconnect(self.beamstop_hwobj,
+                                'deviceReady',
+                                self.connected)
+                self.disconnect(self.beamstop_hwobj,
+                                'deviceNotReady',
+                                self.disconnected)
+                self.disconnect(self.beamstop_hwobj,
+                                'beamstopDistanceChanged',
+                                self.beamstop_distance_changed)
             self.beamstop_hwobj = self.getHardwareObject(new_value)
             if self.beamstop_hwobj is not None:
-                self.connect(self.beamstop_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
-                self.connect(self.beamstop_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
-                self.connect(self.beamstop_hwobj, QtCore.SIGNAL('beamstopDistanceChanged'), self.beamstop_distance_changed)
+                self.connect(self.beamstop_hwobj,
+                             'deviceReady',
+                             self.connected)
+                self.connect(self.beamstop_hwobj,
+                             'deviceNotReady',
+                             self.disconnected)
+                self.connect(self.beamstop_hwobj,
+                             'beamstopDistanceChanged',
+                             self.beamstop_distance_changed)
                 if self.beamstop_hwobj.isReady():
                     self.connected()
                     self.beamstop_hwobj.update_values()
@@ -157,12 +169,12 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         Descript. :
         """
         try:
-            val = float(str(self.new_position_ledit.text()))
+            val = float(str(self.new_value_ledit.text()))
         except (ValueError, TypeError):
             return
 
         if self.beamstop_limits is not None:
             if val < self.beamstop_limits[0] or val > self.beamstop_limits[1]:
                 return
-        self.beamstop_hwobj.set_positions(val)
-        self.new_position_ledit.setText('')
+        self.beamstop_hwobj.set_distance(val)
+        self.new_value_ledit.setText('')
