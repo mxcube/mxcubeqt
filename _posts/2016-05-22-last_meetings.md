@@ -11,31 +11,39 @@ fa-icon: users
 
 Photo credit: Rosemary Wilson (EMBL Hamburg)
 
-### Highlights
+MXCuBE collaboration is expanding and three potential newcomers joined the meeting:
 
-- Three potential newcomers to the MXCuBE collaboration 
+- Elettra sychrotron, Italy
+- IMCA-CAT, USA
+- LNLS, Brazil
+
+### Other highlights
+
+- Announcement of Qt3xit: all development on Qt4 and web GUI
 - First experiments and diffractions with MXCuBE web version at MAXIV
-- Qt4 version deployed at HZB
-- Developers workshop to improve co-development practices
+- Qt4 version of MXCuBE deployed at HZB and in testing at ALBA and DESY
+- Developers workshop to improve co-development
 
-To be updated...
+![embl group photo](img/2016-embl-developers.jpg)
+
+Photo credit: Alejandro De Maria Antolinos (ESRF)
 
 ## Full list of the presentations
 
-### Status
+### Status reports
 
 - [Status of MXCuBE @ ALBA](doc/meetings_2016_EMBL/MXCuBE-Hamburg20160627-ALBA_status_report.pdf)
 - [Status of MXCuBE @ DESY](doc/meetings_2016_EMBL/2016_EMBL_P11-Status.pdf)
-- [Status of MXCuBe @ EMBL-Hamburg](doc/meetings_2016_EMBL/)
-- [Status of MXCuBE @ ESRF](doc/meetings_2016_EMBL/)
-- [Global Phasing](doc/meetings_2016_EMBL/)
-- [Status of MXCuBE @ HZB](doc/meetings_2016_EMBL/)
+- [Status of MXCuBE @ ESRF](doc/meetings_2016_EMBL/ESRFHighlights.pdf)
 - [Status of MXCuBE @ MAX IV](doc/meetings_2016_EMBL/BIOMAX_Status_Report_JN.pdf)
 - [Status of MXCuBE @ SOLEIL](doc/meetings_2016_EMBL/pres_Hambourg_v02_a.pdf)
 
 ### New developments & progress around MXCuBE
 
-To be added...
+- [MXCuBE at Elettra](doc/meetings_2016_EMBL/mxcube_elettra.pdf)
+- [IMCA-CAT: Getting to Know You](doc/meetings_2016_EMBL/muir-imca-cat.pdf)
+- [Integration of MD3 from the HardwareObjects aspect](doc/meetings_2016_EMBL/integration_of_MD3.pdf)
+- [Implementation of the Abstract Beamline Interface](doc/meetings_2016_EMBL/PK-MXCuBE-2016-06.pdf)
 
 # 8th. MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
