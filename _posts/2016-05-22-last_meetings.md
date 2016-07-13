@@ -34,6 +34,7 @@ Photo credit: Alejandro De Maria Antolinos (ESRF)
 
 - [Status of MXCuBE @ ALBA](doc/meetings_2016_EMBL/MXCuBE-Hamburg20160627-ALBA_status_report.pdf)
 - [Status of MXCuBE @ DESY](doc/meetings_2016_EMBL/2016_EMBL_P11-Status.pdf)
+- [Status of MXCuBE @ EMBL-Hamburg](doc/meetings_2016_EMBL/01_mxcube_karpics_status.pdf)
 - [Status of MXCuBE @ ESRF](doc/meetings_2016_EMBL/ESRFHighlights.pdf)
 - [Status of MXCuBE @ MAX IV](doc/meetings_2016_EMBL/BIOMAX_Status_Report_JN.pdf)
 - [Status of MXCuBE @ SOLEIL](doc/meetings_2016_EMBL/pres_Hambourg_v02_a.pdf)
@@ -42,8 +43,11 @@ Photo credit: Alejandro De Maria Antolinos (ESRF)
 
 - [MXCuBE at Elettra](doc/meetings_2016_EMBL/mxcube_elettra.pdf)
 - [IMCA-CAT: Getting to Know You](doc/meetings_2016_EMBL/muir-imca-cat.pdf)
+- [MXCuBE Qt4: current status](doc/meetings_2016_EMBL/02_mxcube_karpics_qt.pdf)
 - [Integration of MD3 from the HardwareObjects aspect](doc/meetings_2016_EMBL/integration_of_MD3.pdf)
 - [Implementation of the Abstract Beamline Interface](doc/meetings_2016_EMBL/PK-MXCuBE-2016-06.pdf)
+- [Implementing mesh scan, interleaved collection and other potential methods in MXCuBE](doc/meetings_2016_EMBL/03_mxcube_karpics_collect_methods.pdf)
+- [Python3 support and other developments](doc/meetings_2016_EMBL/04_mxcube_karpics_ongoing_dev.pdf)
 
 # 8th. MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
