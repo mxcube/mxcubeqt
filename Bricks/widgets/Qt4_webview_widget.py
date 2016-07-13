@@ -96,7 +96,6 @@ class WebViewWidget(QtGui.QWidget):
     def go_to_home_page(self):
         """
         """
-        print "go_to_home_page: ", self.home_url
         self.url_ledit.setText(self.home_url)
         self.web_page_viewer.load(QtCore.QUrl(self.home_url))
         self.web_page_viewer.show()

@@ -132,12 +132,13 @@ class DataCollectTree(QtGui.QWidget):
         self.continue_button.setToolTip("Pause after current data collection")
 
         self.tree_splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
-        current_widget = QtGui.QWidget(self.tree_splitter)
-        current_label = QtGui.QLabel("<b>Current</b>", current_widget)
-        current_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.sample_tree_widget = QtGui.QTreeWidget(current_widget)
+        #current_widget = QtGui.QWidget(self.tree_splitter)
+        #current_label = QtGui.QLabel("<b>Current</b>", current_widget)
+        #current_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.sample_tree_widget = QtGui.QTreeWidget(self)
 
         history_widget = QtGui.QWidget(self.tree_splitter)
+        history_widget.hide()
         history_label = QtGui.QLabel("<b>History</b>", history_widget)
         history_label.setAlignment(QtCore.Qt.AlignCenter)
         self.history_tree_widget = QtGui.QTreeWidget(history_widget)
@@ -154,20 +155,21 @@ class DataCollectTree(QtGui.QWidget):
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
 
-        current_widget_layout = QtGui.QVBoxLayout(current_widget)
-        current_widget_layout.addWidget(current_label)
-        current_widget_layout.addWidget(self.sample_tree_widget)
-        current_widget_layout.setContentsMargins(2, 2, 2, 2)
-        current_widget_layout.setSpacing(1)
+        #current_widget_layout = QtGui.QVBoxLayout(current_widget)
+        #current_widget_layout.addWidget(current_label)
+        #current_widget_layout.addWidget(self.sample_tree_widget)
+        #current_widget_layout.setContentsMargins(2, 2, 2, 2)
+        #current_widget_layout.setSpacing(1)
 
-        history_widget_layout = QtGui.QVBoxLayout(history_widget)
-        history_widget_layout.addWidget(history_label)
-        history_widget_layout.addWidget(self.history_tree_widget)
-        history_widget_layout.setContentsMargins(2, 2, 2, 2)
-        history_widget_layout.setSpacing(1)
+        #history_widget_layout = QtGui.QVBoxLayout(history_widget)
+        #history_widget_layout.addWidget(history_label)
+        #history_widget_layout.addWidget(self.history_tree_widget)
+        #history_widget_layout.setContentsMargins(2, 2, 2, 2)
+        #history_widget_layout.setSpacing(1)
         
         main_layout = QtGui.QVBoxLayout(self)
-        main_layout.addWidget(self.tree_splitter)
+        main_layout.addWidget(self.sample_tree_widget)
+        #main_layout.addWidget(self.tree_splitter)
         main_layout.addWidget(self.button_widget)
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(1) 
@@ -204,13 +206,13 @@ class DataCollectTree(QtGui.QWidget):
         self.setAttribute(QtCore.Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
 
-        self.history_tree_widget.setColumnCount(3)
-        self.history_tree_widget.setColumnWidth(0, 80)
-        self.history_tree_widget.setColumnWidth(1, 50)
+        #self.history_tree_widget.setColumnCount(3)
+        #self.history_tree_widget.setColumnWidth(0, 80)
+        #self.history_tree_widget.setColumnWidth(1, 50)
         #self.history_tree_widget.header().setDefaultSectionSize(250)
-        self.history_tree_widget.header().hide()
-        self.history_tree_widget.setRootIsDecorated(False)
-        self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        #self.history_tree_widget.header().hide()
+        #self.history_tree_widget.setRootIsDecorated(False)
+        #self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
     def eventFilter(self, _object, event):
         """
@@ -848,8 +850,6 @@ class DataCollectTree(QtGui.QWidget):
         view_item.setSelected(True)
 
     def queue_entry_execution_finished(self, queue_entry, status):
-
-        print "queue_entry_execution_finished... ", queue_entry, status
         view_item = queue_entry.get_view()
         item_model = queue_entry.get_data_model()
 

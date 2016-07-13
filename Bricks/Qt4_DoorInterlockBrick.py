@@ -17,8 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
@@ -27,7 +25,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = "Qt4_General"
+__category__ = "General"
 
 
 class Qt4_DoorInterlockBrick(BlissWidget):

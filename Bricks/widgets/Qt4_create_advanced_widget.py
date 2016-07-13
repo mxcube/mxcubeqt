@@ -182,9 +182,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
-        if bl_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-            self._acq_widget.acq_widget_layout.osc_start_label.\
-                 setText("Oscillation middle:")
+        self._acq_widget.acq_widget_layout.osc_start_label.\
+             setText("Oscillation middle:")
 
     def approve_creation(self):
         """
@@ -237,6 +236,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             self.get_acquisition_widget().use_osc_start(True)
         else:
             self.setDisabled(True)
+        self.grid_treewidget_item_selection_changed()
   
     def _create_task(self,  sample, shape):
         """
@@ -281,7 +281,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
             exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
-            if exp_type == "Mesh":
+            if exp_type == "MeshScan":
                 dc.run_processing_parallel = "MeshScan"
                 tasks.append(dc)
             elif exp_type == "XrayCentering":
@@ -355,12 +355,14 @@ class CreateAdvancedWidget(CreateTaskBase):
                 if osc_dynamic_limits:
                     osc_range_limits = \
                         (0, 
-                         abs(osc_dynamic_limits[1] - osc_dynamic_limits[0]) /\
+                         min(centred_point.phi - osc_dynamic_limits[0],
+                             osc_dynamic_limits[1] - centred_point.phi) /\
                          float(grid_properties["num_images_per_line"]))
+
                     self._acq_widget.update_osc_range_limits(osc_range_limits)
-                    self._acq_widget.acq_widget_layout.osc_range_ledit.\
-                         setText("%.2f" % (abs(osc_range_limits[1] -\
-                                               osc_range_limits[0]))) 
+                    self._acq_widget.update_num_images_limits(\
+                         grid_properties["num_lines"] * \
+                         grid_properties["num_images_per_line"])
 
                 grid.setSelected(True) 
                 self.enable_grid_controls(True)

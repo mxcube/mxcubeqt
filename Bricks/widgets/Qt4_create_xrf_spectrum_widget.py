@@ -116,7 +116,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
            self.count_time = float(str(self.count_time_ledit.text()))
         except:
            logging.getLogger("GUI").\
-                info("Incorrect count time value.")
+                error("Incorrect count time value.")
 
         return base_result and self.count_time
 
@@ -150,7 +150,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
             data_collections.append(xrf_spectrum)
         else:
             logging.getLogger("GUI").\
-                info("No count time specified.") 
+                error("No count time specified.") 
 
         return data_collections
 

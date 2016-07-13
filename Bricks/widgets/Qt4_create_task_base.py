@@ -213,7 +213,7 @@ class CreateTaskBase(QtGui.QWidget):
             
             if acq_widget:
                 acq_widget.previous_energy = energy
-                acq_widget.set_energy(energy, wavelength)
+                acq_widget.update_energy(energy, wavelength)
 
     def set_transmission(self, trans):
         acq_widget = self.get_acquisition_widget()
@@ -397,9 +397,9 @@ class CreateTaskBase(QtGui.QWidget):
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            (data_directory, proc_directory) = self.get_default_directory(tree_item)
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
+            #(data_directory, proc_directory) = self.get_default_directory(tree_item)
+            #self._path_template.directory = data_directory
+            #self._path_template.process_directory = proc_directory
 
             #Update energy transmission and resolution
             if self._acq_widget:
@@ -431,6 +431,8 @@ class CreateTaskBase(QtGui.QWidget):
         self._acquisition_parameters.energy = energy
         self._acquisition_parameters.transmission = transmission
         self._acquisition_parameters.resolution = resolution
+
+        self._acq_widget.value_changed_list = []
 
     """
     def multiple_item_selection(self, tree_items):

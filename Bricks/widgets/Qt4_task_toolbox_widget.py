@@ -84,7 +84,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
         self.collect_now_button = QtGui.QPushButton("Collect Now", self.button_box)
         self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
-        #self.collect_now_button.hide()
+        self.collect_now_button.hide()
         
         # Layout --------------------------------------------------------------
         #_method_group_box_vlayout = QtGui.QVBoxLayout(self.method_group_box)

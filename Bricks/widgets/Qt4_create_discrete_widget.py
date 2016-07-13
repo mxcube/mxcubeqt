@@ -248,7 +248,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         task_list = self._create_task(sample, None)
         task_list[0].lims_group_id = gid
        
-        print task_list[0] 
         param_list = queue_model_objects.to_collect_dict(task_list[0], \
                        self._session_hwobj, sample, None)
 

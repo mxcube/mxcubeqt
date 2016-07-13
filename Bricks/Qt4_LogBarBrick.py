@@ -26,16 +26,19 @@ from widgets.Qt4_log_bar_widget import LogBarWidget
 from BlissFramework.Utils import Qt4_GUILogHandler
 
 
-__category__ = 'Qt4_Log'
+__category__ = 'Log'
 
 
 class Qt4_LogBarBrick(BlissWidget):
     """
     Descript. :
     """
-    COLORS = {logging.NOTSET: 'lightgrey', logging.DEBUG: 'darkgreen', 
-              logging.INFO: 'darkblue', logging.WARNING: 'orange', 
-              logging.ERROR: 'red', logging.CRITICAL: 'black' }
+    COLORS = {logging.NOTSET: 'lightgrey',
+              logging.DEBUG: 'darkgreen', 
+              logging.INFO: 'darkblue',
+              logging.WARNING: 'orange', 
+              logging.ERROR: 'red',
+              logging.CRITICAL: 'black'}
 
     def __init__(self, *args):
         """
@@ -43,17 +46,41 @@ class Qt4_LogBarBrick(BlissWidget):
         """
         BlissWidget.__init__(self, *args)
 
+        # Hardware objects ----------------------------------------------------
+
+        # Internal values -----------------------------------------------------
+        self.max_log_lines = -1
+
+        # Properties ----------------------------------------------------------
+        self.addProperty('maxLogLines', 'integer', -1)
+
+        # Signals -------------------------------------------------------------
+
+        # Slots ---------------------------------------------------------------
+
+        # Graphic elements ----------------------------------------------------
         self._status_bar_widget = LogBarWidget(self)
+
+        # Layout --------------------------------------------------------------
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(self._status_bar_widget)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
-        self.setLayout(_main_hlayout)
 
+        # SizePolicies --------------------------------------------------------
         self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
                            QtGui.QSizePolicy.Fixed)
 
+        # Qt signal/slot connections ------------------------------------------
+
+        # Other ---------------------------------------------------------------
         Qt4_GUILogHandler.GUILogHandler().register(self)
+
+    def propertyChanged(self, property_name, old_value, new_value):
+        if property_name == 'maxLogLines':
+            self.max_log_lines = new_value
+        else:
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def customEvent(self, event):
         """
@@ -79,5 +106,12 @@ class Qt4_LogBarBrick(BlissWidget):
 
             if level == logging.WARNING or level == logging.ERROR:
                 self._status_bar_widget.toggle_background_color()
+            text_document = self._status_bar_widget.text_edit.document()
+            if self.max_log_lines > -1 and \
+               text_document.blockCount() > self.max_log_lines:
+                cursor = QtGui.QTextCursor(text_document.firstBlock())
+                cursor.select(QtGui.QTextCursor.BlockUnderCursor)
+                cursor.removeSelectedText()
+                cursor.deleteChar()
 
     appendLogRecord = append_log_record
