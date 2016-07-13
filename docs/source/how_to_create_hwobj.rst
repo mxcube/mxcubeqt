@@ -31,9 +31,9 @@ Write necessary hardware object:
 .. code-block:: python
 
    # Available types are: Object, Device, Equipment and Procedure
-   from HardwareRepository.BaseHardwareObjects import Object
+   from HardwareRepository.BaseHardwareObjects import HardwareObject
 
-   class TestHardwareObject(self, name)
+   class TestHardwareObject(HardwareObject)
 
        # use __init__ to define all internal variables
        def __init__(self, name):   
