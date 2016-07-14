@@ -27,7 +27,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_spin_box_buttons import SpinBoxButtons
 
 
-__category__ = 'Qt4_General'
+__category__ = 'General'
 
 
 class Qt4_StatusBarBrick(BlissWidget):

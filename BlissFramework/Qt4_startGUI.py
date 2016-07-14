@@ -88,6 +88,8 @@ def run(GUIConfigFile = None):
     parser.add_option('', '--bricksDirs', action = 'store', type = 'string', 
                       help = 'Additional directories for bricks search path (you can also use the CUSTOM_BRICKS_PATH environment variable)', 
                       dest = 'bricksDirs', metavar = 'dir1'+os.path.pathsep+'dir2...dirN', default = '')
+    parser.add_option('', '--logTemplate', action = 'store', type = 'string',
+                      help = 'Log template', dest = 'logTemplate', default='')
     parser.add_option('', '--hardwareRepository', action = 'store', type = 'string', 
                       help = 'Hardware Repository Server host:port (default to %s) (you can also use HARDWARE_REPOSITORY_SERVER the environment variable)' % defaultHwrServer, 
                       metavar = 'HOST:PORT', dest = 'hardwareRepositoryServer', default = '')                   
@@ -124,6 +126,7 @@ def run(GUIConfigFile = None):
     # get config from arguments
     #
     logFile = opts.logFile        
+    log_template = opts.logTemplate
     hoDirs = opts.hardwareObjectsDirs.split(os.path.pathsep)
     bricksDirs = opts.bricksDirs.split(os.path.pathsep)
 
@@ -186,7 +189,7 @@ def run(GUIConfigFile = None):
     # set log name and log file
     #
     if GUIConfigFile:
-        BlissFramework.setLoggingName(os.path.basename(GUIConfigFile))
+        BlissFramework.setLoggingName(os.path.basename(GUIConfigFile), log_template)
 
     log_lockfile = None
     if len(logFile) > 0:
@@ -246,11 +249,11 @@ def run(GUIConfigFile = None):
     #
     logLevel = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(logLevel)
-    logging.getLogger().info("==================================================================")
+    print ("=================================================================================")
     logging.getLogger().info("Starting MXCuBE")
     logging.getLogger().info("Qt4 GUI file: %s" % (GUIConfigFile or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwrServer) 
-    logging.getLogger().info("------------------------------------------------------------------")
+    print ("---------------------------------------------------------------------------------")
 
     QtGui.QApplication.setDesktopSettingsAware(False) #use default settings
     QtCore.QObject.connect(app, QtCore.SIGNAL("lastWindowClosed()"), app.quit)

@@ -75,7 +75,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.addProperty('helpDecrease', 'string', '')
         self.addProperty('helpIncrease', 'string', '')
         self.addProperty('hideInUser', 'boolean', False)
-        self.addProperty('defaultSteps', 'string', '')
+        self.addProperty('defaultSteps', 'string', '180 90 45 30 10')
 
         # Signals ------------------------------------------------------------
 
@@ -452,16 +452,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         if self.isRunning():
             if self.step_editor is None:
                 self.step_editor = StepEditorDialog(self)
-                icons_list = self['icons'].split()
-                try:
-                    self.step_editor.setIcon(Qt4_icons.load_icon(icons_list[4]))
-                except IndexError:
-                    pass
-
             self.step_editor.set_motor(self.motor_hwobj, 
                                        self, 
                                        self['label'], 
-                                       self.default_step)
+                                       self['default_steps'])
             s = self.font().pointSize()
             f = self.step_editor.font()
             f.setPointSize(s)
@@ -637,7 +631,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
     def set_motor(self, motor, motor_ho_name = None):
         """
-        Descript. :
+        . :
         Args.     :
         Return.   : 
         """
@@ -783,24 +777,21 @@ class StepEditorDialog(QtGui. QDialog):
         self.close_button = QtGui.QPushButton("Dismiss", self.button_box)
 
         # Layout --------------------------------------------------------------
-        self.button_box_layout = QtGui.QHBoxLayout()
+        self.button_box_layout = QtGui.QHBoxLayout(self.button_box)
         self.button_box_layout.addWidget(self.apply_button)
         self.button_box_layout.addWidget(self.close_button)
-        self.button_box.setLayout(self.button_box_layout)
 
-        self.grid_layout = QtGui.QGridLayout()
+        self.grid_layout = QtGui.QGridLayout(self.grid)
         self.grid_layout.addWidget(label1, 0, 0)
         self.grid_layout.addWidget(self.current_step, 0, 1)
         self.grid_layout.addWidget(label2, 1, 0)
         self.grid_layout.addWidget(self.new_step, 1, 1)
-        self.grid.setLayout(self.grid_layout)
 
-        self.main_layout = QtGui.QVBoxLayout()
+        self.main_layout = QtGui.QVBoxLayout(self)
         self.main_layout.addWidget(self.grid)
         self.main_layout.addWidget(self.button_box)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.main_layout)
 
         # Qt signal/slot connections -----------------------------------------
         self.new_step.returnPressed.connect(self.apply_clicked)
@@ -808,11 +799,15 @@ class StepEditorDialog(QtGui. QDialog):
         self.close_button.clicked.connect(self.accept)
 
         # SizePolicies --------------------------------------------------------
-        self.close_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        self.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
+        self.close_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
+                                        QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                           QtGui.QSizePolicy.Minimum)
  
         # Other ---------------------------------------------------------------
         self.setWindowTitle("Motor step editor")
+        self.apply_button.setIcon(Qt4_Icons.load_icon("Check"))
+        self.close_button.setIcon(Qt4_Icons.load_icon("Delete"))
 
     def set_motor(self, motor, brick, name, default_step):
         self.motor_hwobj = motor
@@ -837,11 +832,7 @@ class StepEditorDialog(QtGui. QDialog):
         self.brick.set_line_step(val)
         self.new_step.setText('')
         self.current_step.setText(str(val))
-
-    def set_Icons(self, apply_icon, dismiss_icon):
-        self.apply_button.setIcon(Qt4_Icons.load_icon(apply_icon))
-        self.close_button.setIcon(Qt4_Icons.load_icon(dismiss_icon))
-
+        self.close()
 
 class SpinBoxEvent(QtCore.QObject):
     returnPressedSignal = QtCore.pyqtSignal()

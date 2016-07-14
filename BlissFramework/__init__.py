@@ -88,10 +88,12 @@ def _frameworkTraceFunction(frame, event, arg):
 
 loggingName = ''
 
-def setLoggingName(name):
+def setLoggingName(name, logging_formatter=''):
     global _formatter, _hdlr, loggingName
-    
-    _formatter = logging.Formatter('%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s')
+    logging_formatter.replace(' ', '') 
+    if logging_formatter == '':
+        logging_formatter = '%(asctime)s |%(name)-7s|%(levelname)-7s| %(message)s'
+    _formatter = logging.Formatter(logging_formatter)
     _hdlr.setFormatter(_formatter)
 
     loggingName = name

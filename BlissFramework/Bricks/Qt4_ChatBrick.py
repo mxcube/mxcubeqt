@@ -19,7 +19,6 @@
 
 import os
 import time
-import logging
 import InstanceServer
 
 from PyQt4 import QtGui
@@ -27,10 +26,9 @@ from PyQt4 import QtCore
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-#import BlissFramework
 
 
-__category__ = "Qt4_General"
+__category__ = "General"
 
 
 class Qt4_ChatBrick(BlissWidget):
