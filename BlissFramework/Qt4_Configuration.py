@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+#import yaml
 import logging
 import imp
 import types
@@ -454,7 +454,6 @@ class Configuration:
         Descript. :
         """
         try:
-            #IK yaml
             cfg = repr(self.windows_list)
         except:
             logging.getLogger().exception("panic: an exception occured while serializing GUI objects")
@@ -468,9 +467,8 @@ class Configuration:
             else:
                 config_file.write(cfg)
                 config_file.close()
-
-                with open("/tmp/mxcube_gui.yaml", 'w') as outfile:
-                    outfile.write(yaml.dump(cfg, default_flow_style=True) )
+                #with open("/tmp/mxcube_gui.yaml", 'w') as outfile:
+                #    outfile.write(yaml.dump(cfg, default_flow_style=True) )
                 self.hasChanged=False
             
             return True
