@@ -401,14 +401,14 @@ class BrickCfg(_CfgItem):
 
         # bricks have their own thing for properties
         if brick is not None:
-            self.setProperties(brick.propertyBag)
+            self.setProperties(brick.property_bag)
         
     def setProperties(self, properties):
         """
         Descript. :
         """
         self.brick.setPersistentPropertyBag(properties)
-        self.properties = self.brick.propertyBag
+        self.properties = self.brick.property_bag
 
     def rename(self, new_name):
         """

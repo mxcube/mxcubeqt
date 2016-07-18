@@ -46,6 +46,9 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         """
         QtGui.QTableWidget.__init__(self, parent)
 
+        self.display_hwobj = False
+        self.property_bag = None
+
         self.setObjectName("configurationTable")
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Sunken)
@@ -57,8 +60,8 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                                         self.trUtf8('Values'), 
                                         self.trUtf8('')])
         
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        self.propertyBag = None
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                           QtGui.QSizePolicy.Expanding)
 
         self.cellChanged.connect(self.OnCellChanged)
         
@@ -69,45 +72,55 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         for i in range(self.rowCount()):
             self.removeRow(i)
         self.setRowCount(0)
-        self.propertyBag = None
+        self.property_bag = None
 
         
-    def setPropertyBag(self, propertyBag, showHidden=False):
+    def set_property_bag(self, property_bag, show_hidden=False, display_hwobj=False):
         """
         Descript. :
         """
+        self.display_hwobj = display_hwobj
         self.clear()           
-        if self.propertyBag is not None:
-            for prop in self.propertyBag:
+
+        if self.property_bag is not None:
+            for prop in self.property_bag:
                 prop._editor = None
 
-        self.propertyBag = propertyBag
+        self.property_bag = property_bag
 
-        if self.propertyBag is not None:
-            self.setRowCount(len(self.propertyBag))
-           
+        if self.property_bag is not None:
             i = 0
-            self.setRowCount(len(self.propertyBag))
-            for prop in self.propertyBag:
+            for prop in self.property_bag:
                 prop._editor = weakref.ref(self)
-                
-                if not showHidden and prop.hidden:
+                prop_name = prop.getName()
+     
+                if not show_hidden and prop.hidden:
                     continue
+                if display_hwobj: 
+                    if not prop_name.startswith("hwobj_"):
+                        continue
+                    else:
+                        prop_name = prop_name.replace("hwobj_", "")
+                        
 
-                tempTableItem = QtGui.QTableWidgetItem(prop.getName())
-                tempTableItem.setFlags(QtCore.Qt.ItemIsEnabled)
+                self.setRowCount(i + 1)
+                temp_table_item = QtGui.QTableWidgetItem(prop_name)
+                temp_table_item.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.blockSignals(True) 
-                self.setItem(i, 0, tempTableItem)
+                self.setItem(i, 0, temp_table_item)
                 self.setWidgetFromProperty(i, prop)
                 self.blockSignals(False)
                 
-                validationPanel = ValidationTableItem(self)
-                self.setCellWidget(i, 2, validationPanel)
-                validationPanel.OK.clicked.connect(self.OnValidateClick)
-                validationPanel.Cancel.clicked.connect(self.OnInvalidateClick)
-                validationPanel.Reset.clicked.connect(self.OnResetClick)
+                validation_panel = ValidationTableItem(self)
+                self.setCellWidget(i, 2, validation_panel)
+                validation_panel.ok_button.clicked.\
+                     connect(self.on_validate_click)
+                validation_panel.cancel_button.clicked.\
+                     connect(self.on_invalidate_click)
+                validation_panel.reset_button.clicked.\
+                     connect(self.on_reset_click)
                 i += 1
-            #self.setRowCount(i)
+            self.setEnabled(i > 0)    
         self.resizeColumnsToContents()    
         
     def setWidgetFromProperty(self, row, prop):
@@ -115,8 +128,8 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         Descript. :
         """
         if prop.getType() == 'boolean':
-            newPropertyItem = QtGui.QTableWidgetItem(QtCore.QString(""))
-            self.setItem(row, 1, newPropertyItem)
+            new_property_item = QtGui.QTableWidgetItem(QtCore.QString(""))
+            self.setItem(row, 1, new_property_item)
             if prop.getUserValue():
                 self.item(row, 1).setCheckState(QtCore.Qt.Checked)
             else:
@@ -126,30 +139,33 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             choices = prop.getChoices()
             for choice in choices:
                 choicesList.append(choice)
-            newPropertyItem = ComboBoxTableItem(self, row, 1, choicesList)
-            newPropertyItem.setCurrentIndex(newPropertyItem.findText(prop.getUserValue()))
-            self.setCellWidget(row, 1, newPropertyItem)
+            new_property_item = ComboBoxTableItem(self, row, 1, choicesList)
+            new_property_item.setCurrentIndex(new_property_item.findText(prop.getUserValue()))
+            self.setCellWidget(row, 1, new_property_item)
         elif prop.getType() == 'file':
-            newPropertyItem = FileTableItem(self, row, 1, prop.getUserValue(), prop.getFilter())
-            self.setCellWidget(row, 1, newPropertyItem)
+            new_property_item = FileTableItem(self, row, 1, prop.getUserValue(), prop.getFilter())
+            self.setCellWidget(row, 1, new_property_item)
         elif prop.getType() == 'color':
-            newPropertyItem = ColorTableItem(self, row, 1, prop.getUserValue())
-            self.setCellWidget(row, 1, newPropertyItem)
+            new_property_item = ColorTableItem(self, row, 1, prop.getUserValue())
+            self.setCellWidget(row, 1, new_property_item)
         else:                                           
             if prop.getUserValue() is None:
-                tempTableItem = QtGui.QTableWidgetItem("")
+                temp_table_item = QtGui.QTableWidgetItem("")
             else:
-                tempTableItem = QtGui.QTableWidgetItem(str(prop.getUserValue()))  
-            self.setItem(row, 1, tempTableItem)
+                temp_table_item = QtGui.QTableWidgetItem(str(prop.getUserValue()))  
+            self.setItem(row, 1, temp_table_item)
 
     def OnCellChanged(self, row, col):
         """
         Descript. :
         """
         col += 1
+        prop_name = str(self.item(row, 0).text())
+        if self.display_hwobj:
+            prop_name = "hwobj_" + prop_name
 
-        item_property = self.propertyBag.getProperty(str(self.item(row, 0).text()))
-        oldValue = item_property.getUserValue()
+        item_property = self.property_bag.getProperty(prop_name)
+        old_value = item_property.getUserValue()
 
         if item_property.getType() == 'boolean':
             item_property.setValue(self.item(row, 1).checkState())
@@ -164,43 +180,48 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 item_property.setValue(str(self.item(row, 1).text()))
             except:
                 logging.getLogger().error('Cannot assign value %s to property %s' % \
-                        (str(self.item(row, 1).text()), item_property.getName()))
+                        (str(self.item(row, 1).text()), prop_name))
 
             if item_property.getUserValue() is None:
                 self.item(row, 1).setText('')
             else:
                 self.item(row, 1).setText(str(item_property.getUserValue()))
 
-        if not oldValue == item_property.getUserValue():
-            self.emit(QtCore.SIGNAL('propertyChanged'), item_property.getName(), 
-                      oldValue, item_property.getUserValue())
+        if not old_value == item_property.getUserValue():
+            self.emit(QtCore.SIGNAL('propertyChanged'),
+                      prop_name, 
+                      old_value, item_property.getUserValue())
 
-    def OnValidateClick(self):
+    def on_validate_click(self):
         """
         Descript. :
         """
         self.endEdit(self.currentRow(), 1, 1, 0) #current row, col 1, accept = 1, replace = 0
         self.activateNextCell()
         
-    def OnInvalidateClick(self):
+    def on_invalidate_click(self):
         """
         Descript. :
         """
         self.endEdit(self.currentRow(), 1, 0, 0) #current row, col 1, accept = 0, replace = 0
 
-    def OnResetClick(self):
+    def on_reset_click(self):
         """
         Descript. :
         """
         self.endEdit(self.currentRow(), 1, 0, 0)
+        prop_name = str(self.item(row, 0).text())
+        if self.display_hwobj:
+            prop_name = "hwobj_" + prop_name
+ 
 
-        property = self.propertyBag.getProperty(str(self.text(self.currentRow(), 0)))
+        prop = self.property_bag.getProperty(prop_name)
 
-        defaultValue = property.getDefaultValue()
-        if not defaultValue == None:
-            property.setValue(defaultValue)
+        default_value = prop.getDefaultValue()
+        if not default_value == None:
+            prop.setValue(default_value)
         
-        self.setWidgetFromProperty(self.currentRow(), property)
+        self.setWidgetFromProperty(self.currentRow(), prop)
 
     def beginEdit(self, row, col, replace):
         """
@@ -219,9 +240,12 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             self.item(row, 2).setEnabled(0)
 
             if accept:
-                prop = self.propertyBag.getProperty(str(self.text(row, 0)))
+                prop_name = str(self.item(row, 0).text())
+                if self.display_hwobj:
+                    prop_name = "hwobj_" + prop_name
+                prop = self.property_bag.getProperty(prop_name)
 
-                oldValue = prop.getUserValue()
+                old_value = prop.getUserValue()
             
                 if prop.getType() == 'boolean':
                     prop.setValue(self.item(row, 1).isChecked())
@@ -231,15 +255,16 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                     try:
                         prop.setValue(str(self.text(row, 1)))
                     except:
-                        logging.getLogger().error('Cannot assign value to property')
+                        logging.getLogger().error('Cannot assign value to property %s' % prop_name)
 
                     if prop.getUserValue() is None:
                         self.setText(row, 1, '')
                     else:
                         self.setText(row, 1, str(prop.getUserValue()))
 
-                if not oldValue == prop.getUserValue():
-                    self.emit(QtCore.SIGNAL('propertyChanged'), (property.getName(), oldValue, property.getUserValue(), ))
+                if not old_value == prop.getUserValue():
+                    self.emit(QtCore.SIGNAL('propertyChanged'), 
+                              (prop_name, old_value, prop.getUserValue(), ))
 
         return QTable.endEdit(self, row, col, accept, replace)
 
@@ -256,37 +281,36 @@ class ValidationTableItem(QtGui.QWidget):
 
         QtGui.QWidget.__init__(self, parent)
        
-        self.OK = QtGui.QToolButton(parent)
-        self.OK.setAutoRaise(True)
-        self.OK.setIcon(QtGui.QIcon(Qt4_Icons.load('button_ok_small'))) #QPixmap(Icons.tinyOK)))
-        self.Cancel = QtGui.QToolButton(parent)
-        self.Cancel.setAutoRaise(True)
-        self.Cancel.setIcon(QtGui.QIcon(Qt4_Icons.load('button_cancel_small'))) #QPixmap(Icons.tinyCancel)))
-        self.Reset = QtGui.QToolButton(parent)
-        self.Reset.setIcon(QtGui.QIcon(Qt4_Icons.load('button_default_small'))) #QPixmap(Icons.defaultXPM)))
-        self.Reset.setAutoRaise(True)
+        self.ok_button = QtGui.QToolButton(parent)
+        self.ok_button.setAutoRaise(True)
+        self.ok_button.setIcon(Qt4_Icons.load_icon('button_ok_small'))
+        self.cancel_button = QtGui.QToolButton(parent)
+        self.cancel_button.setAutoRaise(True)
+        self.cancel_button.setIcon(Qt4_Icons.load_icon('button_cancel_small'))
+        self.reset_button = QtGui.QToolButton(parent)
+        self.reset_button.setIcon(Qt4_Icons.load_icon('button_default_small'))
+        self.reset_button.setAutoRaise(True)
         self.setEnabled(False)
 
-        main_layout = QtGui.QHBoxLayout()
-        main_layout.addWidget(self.OK)
-        main_layout.addWidget(self.Cancel)
-        main_layout.addWidget(self.Reset)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0,0,0,0)
-        self.setLayout(main_layout)
+        _main_layout = QtGui.QHBoxLayout(self)
+        _main_layout.addWidget(self.ok_button)
+        _main_layout.addWidget(self.cancel_button)
+        _main_layout.addWidget(self.reset_button)
+        _main_layout.setSpacing(0)
+        _main_layout.setContentsMargins(0,0,0,0)
 
     def setEnabled(self, enabled):
         """
         Descript. :
         """
         if enabled:
-            self.Reset.setEnabled(True)
-            self.OK.setEnabled(True)
-            self.Cancel.setEnabled(True)
+            self.reset_button.setEnabled(True)
+            self.ok_button.setEnabled(True)
+            self.cancel_button.setEnabled(True)
         else:
-            self.Reset.setEnabled(False)
-            self.OK.setEnabled(False)
-            self.Cancel.setEnabled(False)
+            self.reset_button.setEnabled(False)
+            self.ok_button.setEnabled(False)
+            self.cancel_button.setEnabled(False)
 
 class ComboBoxTableItem(QtGui.QComboBox):
     """
@@ -303,7 +327,7 @@ class ComboBoxTableItem(QtGui.QComboBox):
         self.col = col
         self.row = row  
         self.parent = parent
-        QtCore.QObject.connect(self, QtCore.SIGNAL('currentIndexChanged(int)'), self.current_index_changed)
+        self.currentIndexChanged.connect(self.current_index_changed)
 
     def current_index_changed(self, index): 
         """
@@ -449,7 +473,7 @@ class Dialog(QtGui.QDialog):
     Descript. :
     """
 
-    def __init__(self, propertyBag):
+    def __init__(self, property_bag):
         """
         Descript. :
         """
@@ -457,7 +481,7 @@ class Dialog(QtGui.QDialog):
 
         self.setCaption("Configuration Editor")
         self.propertiesTable = ConfigurationTable(self)
-        self.propertiesTable.setPropertyBag(propertyBag)
+        self.propertiesTable.setPropertyBag(property_bag)
         cmdClose = QPushButton('Close', self)
         
         self.connect(self.propertiesTable, PYSIGNAL('propertyChanged'), PYSIGNAL('propertyChanged'))

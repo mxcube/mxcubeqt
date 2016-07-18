@@ -686,7 +686,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Connectable.Connectable.__init__(self)
         QtGui.QFrame.__init__(self, parent)
         self.setObjectName(widgetName)
-        self.propertyBag = PropertyBag.PropertyBag()
+        self.property_bag = PropertyBag.PropertyBag()
                 
         self.__enabledState = True #saved enabled state
         self.__loadedHardwareObjects = []
@@ -779,10 +779,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         if not isinstance(sender, QtCore.QObject):
           if isinstance(sender, HardwareObject):
-            #logging.warning("You should use %s.connect instead of using %s.connect", sender, self)
-            # LNLS
             sender.connect(signal, slot) 
-            #sender.connect(sender, signal, slot)
             return
           else:
             _sender = emitter(sender)
@@ -810,9 +807,6 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
           pysignal=True
 
         if isinstance(sender, HardwareObject):
-          #logging.warning("You should use %s.disconnect instead of using %s.connect", sender,self)
-          # LNLS
-          #sender.disconnect(signal, slot)
           sender.disconnect(sender, signal, slot)
           return
 
@@ -902,15 +896,15 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        if id(persistentPropertyBag) != id(self.propertyBag):
+        if id(persistentPropertyBag) != id(self.property_bag):
             for property in persistentPropertyBag:
                 #
                 # persistent properties are set
                 # 
-                if property.getName() in self.propertyBag.properties:
-                    self.propertyBag.getProperty(property.getName()).setValue(property.getUserValue())
+                if property.getName() in self.property_bag.properties:
+                    self.property_bag.getProperty(property.getName()).setValue(property.getUserValue())
                 elif property.hidden:
-                    self.propertyBag[property.getName()] = property
+                    self.property_bag[property.getName()] = property
         
         self.readProperties()
                             
@@ -918,13 +912,13 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        for prop in self.propertyBag:
+        for prop in self.property_bag:
             self._propertyChanged(prop.getName(), None, prop.getUserValue())
         
     """
     def editProperties(self):
-        if not self.propertyBag.isEmpty():
-            editor = self.propertyBag.editor()
+        if not self.property_bag.isEmpty():
+            editor = self.property_bag.editor()
             self.connect(editor, PYSIGNAL('propertyChanged'), self._propertyChanged)
             editor.exec_loop()
     """
@@ -933,31 +927,31 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        self.propertyBag.addProperty(*args, **kwargs)
+        self.property_bag.addProperty(*args, **kwargs)
                
     def getProperty(self, property_name):
         """
         Descript. :
         """
-        return self.propertyBag.getProperty(property_name)
+        return self.property_bag.getProperty(property_name)
 
     def showProperty(self, property_name):
         """
         Descript. :
         """
-        return self.propertyBag.showProperty(property_name)
+        return self.property_bag.showProperty(property_name)
 
     def hideProperty(self, property_name):
         """
         Descript. :
         """
-        return self.propertyBag.hideProperty(property_name)
+        return self.property_bag.hideProperty(property_name)
 
     def delProperty(self, property_name):
         """
         Descript. :
         """
-        return self.propertyBag.delProperty(property_name)
+        return self.property_bag.delProperty(property_name)
     
     def getHardwareObject(self, hardware_object_name):
         """
@@ -998,13 +992,13 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. : Direct access tp properties values
         """
-        return self.propertyBag[property_name]
+        return self.property_bag[property_name]
         
     def __setitem__(self, property_name, value):
         """
         Descript. :
         """
-        p = self.propertyBag.getProperty(property_name)
+        p = self.property_bag.getProperty(property_name)
         oldValue = p.getValue()
         p.setValue(value)
 
@@ -1091,7 +1085,7 @@ class NullBrick(BlissWidget):
         """
         BlissWidget.__init__(self, *args)
 
-        self.propertyBag = PropertyBag.PropertyBag()
+        self.property_bag = PropertyBag.PropertyBag()
 
     """
     def setShelf(self, shelf):
@@ -1102,13 +1096,13 @@ class NullBrick(BlissWidget):
                 #
                 # persistent properties are set
                 # 
-                self.propertyBag[property.getName()] = property
+                self.property_bag[property.getName()] = property
     """
     def setPersistentPropertyBag(self, persistentPropertyBag):
         """
         Descript. :
         """
-        self.propertyBag = persistentPropertyBag
+        self.property_bag = persistentPropertyBag
         
     def sizeHint(self):
         """

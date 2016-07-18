@@ -325,41 +325,48 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
         self.setWindowTitle("Properties")
 
         self.properties_table = Qt4_PropertyEditor.Qt4_ConfigurationTable(self)
+        self.hwobj_properties_table = Qt4_PropertyEditor.Qt4_ConfigurationTable(self)  
+
         self.__property_changed_cb = weakref.WeakKeyDictionary()
 
-        QtCore.QObject.connect(self.properties_table, QtCore.SIGNAL("propertyChanged"), self.property_changed)
+        QtCore.QObject.connect(self.properties_table,
+                               QtCore.SIGNAL("propertyChanged"),
+                               self.property_changed)
 
-        _main_vlayout = QtGui.QHBoxLayout()
+        _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.properties_table)
-        _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0,0,0,0)
-        self.setLayout(_main_vlayout)
+        _main_vlayout.addWidget(QtGui.QLabel("Hardware objects:", self))
+        _main_vlayout.addWidget(self.hwobj_properties_table)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                           QtGui.QSizePolicy.Expanding)
 
     def editProperties(self, property_bag):
         """
         Descript. :
         """
-        self.properties_table.setPropertyBag(property_bag)
+        self.properties_table.set_property_bag(property_bag)
+        self.hwobj_properties_table.set_property_bag(property_bag, display_hwobj=True) 
 
     def property_changed(self, *args):
         """
         Descript. :
         """
         try:
-            cb = self.__property_changed_cb[self.properties_table.propertyBag]
+            cb = self.__property_changed_cb[self.properties_table.property_bag]
         except KeyError as err:
             return
         else:
             cb(*args)
             
-    def addProperties(self, propertyBag, property_changed_cb):
+    def addProperties(self, property_bag, property_changed_cb):
         """
         Descript. :
         """
-        self.__property_changed_cb[propertyBag] = property_changed_cb
-        self.editProperties(propertyBag)
+        self.__property_changed_cb[property_bag] = property_changed_cb
+        self.editProperties(property_bag)
     
 
 class ToolButton(QtGui.QToolButton):
@@ -700,7 +707,9 @@ class GUIEditorWindow(QtGui.QWidget):
         Descript. :
         """
         if self.configuration.isBrick(new_item):
-            self.emit(QtCore.SIGNAL("newItem"), new_item["brick"].propertyBag, new_item["brick"]._propertyChanged)
+            self.emit(QtCore.SIGNAL("newItem"), 
+                      new_item["brick"].property_bag,
+                      new_item["brick"]._propertyChanged)
         else:
             if parent is not None:
                 parentref = weakref.ref(parent)
@@ -824,7 +833,8 @@ class GUIEditorWindow(QtGui.QWidget):
         if currentItem:
             item_cfg = self.configuration.findItem(str(currentItem.text(0)))
 
-            try:
+            #try:
+            if True: 
                 if self.configuration.isContainer(item_cfg):
                     self._addItem(currentItem, item_type, item_subtype)
                 else:
@@ -832,8 +842,8 @@ class GUIEditorWindow(QtGui.QWidget):
                     parentItem = currentItem.parent()
                 
                     self._addItem(parentItem, item_type, item_subtype)
-            except:
-                QtGui.QMessageBox.warning(self, "Cannot add %s" % item_type, "Please select a suitable parent container", QtGui.QMessageBox.Ok)
+            #except:
+            #    QtGui.QMessageBox.warning(self, "Cannot add %s" % item_type, "Please select a suitable parent container", QtGui.QMessageBox.Ok)
     
     def add_hbox_clicked(self):
         """
@@ -968,7 +978,7 @@ class GUIEditorWindow(QtGui.QWidget):
             def _itemRightClicked(id, item_name=item_name):
                 item_cfg=self.configuration.reload_brick(item_name)
                 item = self.tree_widget.findItem(item_name, 0)
-                self.emit(QtCore.SIGNAL("newItem"), (item_cfg["brick"].propertyBag, item_cfg["brick"]._propertyChanged))
+                self.emit(QtCore.SIGNAL("newItem"), (item_cfg["brick"].property_bag, item_cfg["brick"]._propertyChanged))
                 self.item_selected(item)
                 
             QtCore.QObject.connect(popup_menu, QtCore.SIGNAL("activated(int)"), _itemRightClicked)
@@ -1446,42 +1456,52 @@ class GUIBuilder(QtGui.QMainWindow):
         """
         Descript. :
         """
-        if True: #try:
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             
-            if self.filename is not None:
-                if os.path.exists(self.filename):
-                    should_create_startup_script=False
-                else:
-                    should_create_startup_script=True
+        if self.filename is not None:
+            if os.path.exists(self.filename):
+                should_create_startup_script=False
+            else:
+                should_create_startup_script=True
                     
-                if self.configuration.save(self.filename):
-                    self.setWindowTitle("GUI Builder - %s" % self.filename)
-                    QtGui.QApplication.restoreOverrideCursor()
-                    QtGui.QMessageBox.information(self, "Success", "Qt4_Configuration have been saved successfully to\n%s" % self.filename, QtGui.QMessageBox.Ok)
+            if self.configuration.save(self.filename):
+                self.setWindowTitle("GUI Builder - %s" % self.filename)
+                QtGui.QApplication.restoreOverrideCursor()
+                QtGui.QMessageBox.information(
+                    self,
+                    "Success", 
+                    "Qt4_Configuration have been saved " + \
+                    "successfully to\n%s" % self.filename, 
+                    QtGui.QMessageBox.Ok)
 
-                    if should_create_startup_script:
-                        if QtGui.QMessageBox.question(self, "Launch script",
-                                                   "Do you want to create a startup script for the new GUI ?",
-                                                   QtGui.QMessageBox.Yes, QtGui.QMessageBox.No) == QtGui.QMessageBox.Yes:
-                            try:
-                                hwr_server = HardwareRepository.HardwareRepository().serverAddress
-                            except:
-                                hwr_server = ""
-                            else:
-                                pid = subprocess.Popen("newGUI --just-script %s %s" % (self.filename, hwr_server), shell=True).pid
-                    return True
-                else:
-                    QtGui.QApplication.restoreOverrideCursor()
-                    QtGui.QMessageBox.warning(self, "Error", "Could not save configuration to file %s !" % self.filename, QtGui.QMessageBox.Ok)
-
-                    return False
+                if should_create_startup_script:
+                    if QtGui.QMessageBox.question(
+                          self,
+                          "Launch script",
+                          "Do you want to create a startup script " + \
+                          "for the new GUI ?",
+                          QtGui.QMessageBox.Yes,
+                          QtGui.QMessageBox.No) == QtGui.QMessageBox.Yes:
+                        try:
+                            hwr_server = HardwareRepository.\
+                               HardwareRepository().serverAddress
+                        except:
+                            hwr_server = ""
+                        else:
+                            pid = subprocess.Popen("newGUI --just-script %s %s" % (\
+                               self.filename, hwr_server), shell=True).pid
+                return True
             else:
                 QtGui.QApplication.restoreOverrideCursor()
-                self.save_as_clicked()
-        #finally:
-        #    QtGui.QApplication.restoreOverrideCursor()
-
+                QtGui.QMessageBox.warning(
+                    self,
+                    "Error",
+                    "Could not save configuration to file %s !" % self.filename,
+                    QtGui.QMessageBox.Ok)
+                return False
+        else:
+            QtGui.QApplication.restoreOverrideCursor()
+            self.save_as_clicked()
 
     def save_as_clicked(self):
         """

@@ -130,7 +130,6 @@ class GUISupervisor(QtGui.QWidget):
                         for item in items_list:
                             if "brick" in item:
                                 try:
-                                    # LNLS
                                     props = pickle.loads(item["properties"])
                                     #props = pickle.loads(item["properties"].encode('utf8'))
                                 except:
