@@ -146,6 +146,7 @@ class CreateCharWidget(CreateTaskBase):
         """
         self._char_params.space_group = queue_model_enumerables.\
                                         XTAL_SPACEGROUPS[index]
+
     def _set_space_group(self, space_group):
         """
         Descript. :
@@ -172,6 +173,7 @@ class CreateCharWidget(CreateTaskBase):
         self._char = queue_model_objects.Characterisation()
         self._char_params = self._char.characterisation_parameters
         self._processing_parameters = queue_model_objects.ProcessingParameters()
+        #self._set_space_group(self._processing_parameters.space_group)
 
         if self._beamline_setup_hwobj is not None:            
             self._acquisition_parameters = self._beamline_setup_hwobj.\
@@ -219,13 +221,15 @@ class CreateCharWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-            self._init_models()
-            self._set_space_group(self._char_params.space_group)
+            self._init_models() 
+            if self._char_params.space_group > 0:
+                self._set_space_group(self._char_params.space_group)
+            else:
+                sample_model = tree_item.get_model()
+                self._set_space_group(sample_model.processing_parameters.space_group)
             self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                self._path_template)
+                                               self._path_template)
             self._char_params_mib.set_model(self._char_params)
-            #self._char_params = copy.deepcopy(self._char_params)
-            #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.CharacterisationQueueItem):

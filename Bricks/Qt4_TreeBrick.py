@@ -74,6 +74,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
         self.addProperty("useFilterWidget", "boolean", True)
         self.addProperty("useSampleWidget", "boolean", True)
+        self.addProperty("scOneName", "string", "Sample changer")
+        self.addProperty("scTwoName", "string", "Plate")
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_hutch_menu", ())
@@ -300,6 +302,10 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(xml_rpc_server_hwobj,
                              'start_queue',
                              self.dc_tree_widget.collect_items)
+        elif property_name == 'scOneName':
+              self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
+        elif property_name == 'scTwoName':
+              self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 

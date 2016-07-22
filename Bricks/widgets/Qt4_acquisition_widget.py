@@ -52,6 +52,7 @@ class AcquisitionWidget(QtGui.QWidget):
 
         # Hardware objects ----------------------------------------------------
         self._beamline_setup_hwobj = None
+        self._diffractometer_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.previous_energy = 0
@@ -107,6 +108,17 @@ class AcquisitionWidget(QtGui.QWidget):
              self.energy_selected)
         self.acq_widget_layout.mad_cbox.toggled.connect(\
              self.use_mad)
+
+        self.acq_widget_layout.osc_range_ledit.textChanged.connect(\
+             self.set_osc_range) 
+        self.acq_widget_layout.osc_start_ledit.textChanged.connect(\
+             self.set_osc_start)
+        self.acq_widget_layout.energy_ledit.textChanged.connect(\
+             self.set_energy)
+        self.acq_widget_layout.transmission_ledit.textChanged.connect(\
+             self.set_transmission)
+        self.acq_widget_layout.resolution_ledit.textChanged.connect(\
+             self.set_resolution)
         
         overlap_ledit = self.acq_widget_layout.findChild(\
             QtGui.QLineEdit, "overlap_ledit")
@@ -114,6 +126,8 @@ class AcquisitionWidget(QtGui.QWidget):
             overlap_ledit.textChanged.connect(self.overlap_changed)
 
         # Other --------------------------------------------------------------- 
+        self.value_changed_list = []
+
         self.acq_widget_layout.energies_combo.setDisabled(True)
         self.acq_widget_layout.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
@@ -130,35 +144,56 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
+        if self.acq_widget_layout.findChild(QtGui.QPushButton, "set_max_osc_range_button"):
+            self.acq_widget_layout.set_max_osc_range_button.hide()
+
     def fix_osc_start(self, state):
         """
+        Fix osc start, so the lineEdit do not change when osc is changed
         """
         self.acq_widget_layout.osc_start_ledit.setEnabled(state)
 
     def set_osc_start_limits(self, limits):
+        """
+        Sets osc start limits
+        """
         if not None in limits:
             self.osc_start_validator.setRange(limits[0], limits[1], 4)
-            self.update_osc_range_limits(limits)
+            self.update_osc_range_limits()
+            self.update_num_images_limits()
+
+    def set_osc_start(self, osc_start):
+        if "osc_start" not in self.value_changed_list:
+            self.value_changed_list.append("osc_start")
+        self.update_osc_range_limits()
+        self.update_num_images_limits()
 
     def update_osc_start(self, new_value):
         """
-        Descript. :
+        Updates osc line edit
         """
-        if not self.acq_widget_layout.osc_start_ledit.hasFocus() and \
+        if "osc_start" not in self.value_changed_list and \
+           not self.acq_widget_layout.osc_start_ledit.hasFocus() and \
            not self.acq_widget_layout.osc_start_cbox.isChecked():
             osc_start_value = 0
             try:
                osc_start_value = round(float(new_value), 2)
             except TypeError:
                pass
-            self.update_num_image_limits()
+    
             self.acq_widget_layout.osc_start_ledit.setText(\
                  "%.2f" % osc_start_value)
             self._acquisition_parameters.osc_start = osc_start_value
 
+            self.update_osc_range_limits() 
+            self.update_num_images_limits()
+
+    def set_osc_range(self, new_value):
+        self.update_num_images_limits()
+
     def update_kappa(self, new_value):
         """
-        Descript. :
+        Updates kappa value
         """
         if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
            new_value:
@@ -188,8 +223,8 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if self._beamline_setup_hwobj is not None:
-            if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        if self._diffractometer_hwobj is not None:
+            if self._diffractometer_hwobj.in_plate_mode():
                 state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
@@ -202,7 +237,8 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         self._beamline_setup_hwobj = beamline_setup
         limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
-        self.diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
+        self._diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
+        
 
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
@@ -326,8 +362,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if self.diffractometer_hwobj.in_plate_mode():
-            self.acqParametersChangedSignal.emit()
+        self.acqParametersChangedSignal.emit()
 
     def num_images_ledit_change(self, new_value):
         """
@@ -370,10 +405,10 @@ class AcquisitionWidget(QtGui.QWidget):
             (name, energy) = self.get_mad_energy()
 
             if energy != 0:
-                self.set_energy(energy, 0)
+                self.set_energy(energy)
             self.madEnergySelectedSignal.emit(name, energy, state)
         else:
-            self.set_energy(self.previous_energy, 0)
+            self.set_energy(self.previous_energy)
             energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
             self.madEnergySelectedSignal.emit('', self.previous_energy, state)
 
@@ -418,29 +453,46 @@ class AcquisitionWidget(QtGui.QWidget):
         if self.acq_widget_layout.mad_cbox.isChecked():
             (name, energy) = self.get_mad_energy()
             if energy != 0:
-                self.set_energy(energy, 0)
+                self.set_energy(energy)
 
             self.madEnergySelectedSignal.emit(name, energy, True)
 
-    def set_energy(self, energy, wav):
+    def set_energy(self, energy):
+        if "energy" not in self.value_changed_list:
+            self.value_changed_list.append("energy") 
+
+    def update_energy(self, energy, wav):
         """
         Descript. :
         """
-        self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
+        if "energy" not in self.value_changed_list and \
+           not self.acq_widget_layout.energy_ledit.hasFocus():
+            self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
+
+    def set_transmission(self, transmission):
+        if "transmission" not in self.value_changed_list:
+            self.value_changed_list.append("transmission")
 
     def update_transmission(self, transmission):
         """
         Descript. :
         """
-        if not self.acq_widget_layout.transmission_ledit.hasFocus():
+        if "transmission" not in self.value_changed_list and \
+           not self.acq_widget_layout.transmission_ledit.hasFocus():
             self.acq_widget_layout.transmission_ledit.setText(\
                  "%.2f" % float(transmission))
+            self._acquisition_parameters.transmission = float(transmission)
+           
+    def set_resolution(self, resolution):
+        if "resolution" not in self.value_changed_list:
+            self.value_changed_list.append("resolution") 
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
-        if not self.acq_widget_layout.resolution_ledit.hasFocus():
+        if "resolution" not in self.value_changed_list and \
+           not self.acq_widget_layout.resolution_ledit.hasFocus():
             self.acq_widget_layout.resolution_ledit.setText(\
                  "%.3f" % float(resolution))
 
@@ -452,7 +504,7 @@ class AcquisitionWidget(QtGui.QWidget):
             self.energy_validator.setBottom(limits[0])
             self.energy_validator.setTop(limits[1])
             self.acq_widget_layout.energy_ledit.setToolTip(\
-               "Energy limits %0.3f : %0.3f" %(limits[0], limits[1]))
+               "Energy limits %0.3f : %0.3f\n4 digits precision." %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
     def update_transmission_limits(self, limits):
@@ -463,7 +515,8 @@ class AcquisitionWidget(QtGui.QWidget):
             self.transmission_validator.setBottom(limits[0])
             self.transmission_validator.setTop(limits[1])
             self.acq_widget_layout.transmission_ledit.setToolTip(\
-               "Transmission limits %0.3f : %0.3f" %(limits[0], limits[1]))
+               "Transmission limits %0.3f : %0.3f\n4 digits precision." %\
+               (limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
     def update_resolution_limits(self, limits):
@@ -474,7 +527,8 @@ class AcquisitionWidget(QtGui.QWidget):
             self.resolution_validator.setBottom(limits[0])
             self.resolution_validator.setTop(limits[1])
             self.acq_widget_layout.resolution_ledit.setToolTip(
-               "Resolution limits %0.3f : %0.3f" %(limits[0], limits[1]))
+               "Resolution limits %0.4f : %0.4f\n4 digits precision." %\
+               (limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
     def update_detector_exp_time_limits(self, limits):
@@ -484,40 +538,52 @@ class AcquisitionWidget(QtGui.QWidget):
         if limits:
             self.exp_time_validator.setRange(limits[0], limits[1], 4)
             self.acq_widget_layout.exp_time_ledit.setToolTip(
-               "Exposure time limits %0.3f : %0.3f" %(limits[0], limits[1]))
+               "Exposure time limits %0.4f : %0.4f\n4 digits precision." % \
+               (limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
-    def update_osc_range_limits(self, limits):
+    def update_osc_range_limits(self, limits=None):
+        """Updates osc range limits.
+           Osc range limits are changed if a plate is used.
+           - For simple oscillation osc_range is defined by osc_start and 
+             osc_start top limit.
+           - For mesh osc_range is defined by number of images per line
+             and osc in the middle of mesh  
         """
-        Descript. :
-        """
-        self.osc_range_validator.setRange(limits[0], limits[1], 4)
-        self.acq_widget_layout.osc_range_ledit.setToolTip(
-              "Oscillation range limits %0.2f : %0.2f" % \
-               (limits[0], limits[1]))
-        self._acquisition_mib.validate_all()
 
-    def update_num_image_limits(self):
-        """
-        Descript. :
-        """
-        try:
-           osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
-           osc_range = float(self.acq_widget_layout.osc_range_ledit.text())
-        except ValueError:
-           return
+        if self._diffractometer_hwobj.in_plate_mode():
+            if limits is None:
+                osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
+                limits = [0, abs(self.osc_start_validator.top() - osc_start)]
 
-        if osc_range == 0:
-            return
-        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-            num_image_limit = int((self.osc_start_validator.top() - osc_start) / osc_range)
-        else:
-            num_image_limit = 99999
+            self.osc_range_validator.setRange(limits[0], limits[1], 4)
+            self.acq_widget_layout.osc_range_ledit.setToolTip(
+                "Oscillation range limits %0.4f : %0.4f\n4 digits precision." % \
+                (limits[0], limits[1]))
+            self._acquisition_mib.validate_all()
 
-        self.num_img_validator.setTop(num_image_limit)
-        self.acq_widget_layout.num_images_ledit.setToolTip(\
-              "Number of frames limit : %d" % num_image_limit)
-        self._acquisition_mib.validate_all()
+    def update_num_images_limits(self, num_images_limits=None):
+        """Updates number of images limit
+           Method used if plate mode.
+        """
+        if self._diffractometer_hwobj.in_plate_mode():
+           if num_images_limits is None:
+               try:
+                  osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
+                  osc_range = float(self.acq_widget_layout.osc_range_ledit.text())
+               except ValueError:
+                  return
+
+               if osc_range == 0:
+                   return
+
+               num_images_limits = int((self.osc_start_validator.top() - \
+                                        osc_start) / osc_range)
+
+           self.num_img_validator.setTop(num_images_limits)
+           self.acq_widget_layout.num_images_ledit.setToolTip(\
+               "Number of images limits : %d" % num_images_limits)
+           self._acquisition_mib.validate_all()
 
     def init_detector_roi_modes(self):
         """

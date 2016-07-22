@@ -181,7 +181,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
             
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
-        self.collect_now_button.setHidden(page_index > 0)
+        #self.collect_now_button.setHidden(page_index > 0)
 
         if len(tree_items) > 0:        
             tree_item = tree_items[0]

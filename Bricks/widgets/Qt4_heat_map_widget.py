@@ -295,7 +295,7 @@ class HeatMapWidget(QtGui.QWidget):
                      grid_properties["num_lines"])
                 self._summary_textbrowser.append("Images per line: %d" % \
                      grid_properties["num_images_per_line"])
-        self._summary_textbrowser.append("Number of diffraction spots: %d" % \
+        self._summary_textbrowser.append("Number of frames with diffraction spots: %d" % \
              (self.__results["score"] > 0).sum())
 
     def filter_min_slider_changed(self, value):

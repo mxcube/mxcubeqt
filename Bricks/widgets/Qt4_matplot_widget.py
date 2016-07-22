@@ -259,6 +259,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         """
         QtGui.QWidget.__init__(self, parent)
 
+        self.im = None
         self.mpl_canvas = MplCanvas(self)
         self.ntb = NavigationToolbar(self.mpl_canvas, self)
 
@@ -290,19 +291,20 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
                                              mouse_event.ydata)
 
     def plot_result(self, result, last_result=None):
-        im = self.mpl_canvas.axes.imshow(result, 
-                    interpolation='none',  aspect='auto',
-                    extent=[0, result.shape[1], 0, result.shape[0]])
-        im.set_cmap('hot')
-        if result.max() > 0:
-            self.add_divider()
-            plt.colorbar(im, cax = self.cax)
-            #self.mpl_canvas.draw()
+        if self.im is None:
+            self.im = self.mpl_canvas.axes.imshow(result, 
+                      interpolation='none',  aspect='auto',
+                      extent=[0, result.shape[1], 0, result.shape[0]])
+            self.im.set_cmap('hot')
+        else:
+            self.im.set_data(result)
             self.mpl_canvas.fig.canvas.draw_idle()
 
-            mgr = plt.get_current_fig_manager()
-            #mgr.full_screen_toggle()
-            #mgr.window.move(10, 10)
+        #if result.max() > 0:
+        #    self.add_divider()
+        #    plt.colorbar(im, cax = self.cax)
+        #    self.mpl_canvas.fig.canvas.draw_idle()
+        #    #mgr = plt.get_current_fig_manager()
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()
@@ -320,6 +322,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.cax.tick_params(axis='y', labelsize=8)
 
     def clear(self): 
+        self.im = None
         self.mpl_canvas.clear()
 
     def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None, color='blue'):
