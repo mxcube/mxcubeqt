@@ -59,6 +59,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
         self.defineSlot('setColDir', ())
          
         # Graphic elements ----------------------------------------------------
+        self.disc_value_label = None
 
         # Layout --------------------------------------------------------------
         self.main_vlayout = QtGui.QVBoxLayout(self)
@@ -86,6 +87,11 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 self.mach_info_hwobj.update_values() 
             else:
                 self.setEnabled(False)
+
+            self.disc_label = QtGui.QLabel("Storage disc space", self)
+            self.disc_value_label = QtGui.QLabel(self)
+            self.main_vlayout.addWidget(self.disc_label)
+            self.main_vlayout.addWidget(self.disc_value_label)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -107,11 +113,6 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 self.main_vlayout.addWidget(temp_label)
                 self.main_vlayout.addWidget(temp_value_label)
                 self.value_label_list.append(temp_value_label)
-
-            self.disc_label = QtGui.QLabel("Storage disc space", self)
-            self.disc_value_label = QtGui.QLabel(self)
-            self.main_vlayout.addWidget(self.disc_label)
-            self.main_vlayout.addWidget(self.disc_value_label)
             self.graphics_initialized = True
 
        
@@ -129,23 +130,6 @@ class Qt4_MachineInfoBrick(BlissWidget):
                  Qt4_widget_colors.set_widget_color(\
                      self.value_label_list[index],
                      STATES['error'])
-
-
-        return
-
-        txt = '??? mA' if values.get("current") is None else '<b>%s</b> mA' % \
-	       str(self['formatString'] % abs(values.get("current")))
-        self.current_value_label.setText(txt)
-        self.state_text_value_label.setText(values.get("stateText"))
-        txt = '??? photons/s' if values["flux"] is None else '%1.2e photons/s' % \
-	       (values["flux"] * 1.0)   	
-        self.intensity_value_label.setText(txt)
-        if values.get("cryo") == 1:
-            self.cryo_value_label.setText(" In place ")
-        elif values.get("cryo") == 0:
-            self.cryo_value_label.setText("NOT IN PLACE")
-        else:
-            self.cryo_value_label.setText("Unknown")
 
     def sizeof_fmt(self, num):
         """
