@@ -36,6 +36,7 @@ Photo credit: Alejandro De Maria Antolinos (ESRF)
 - [Status of MXCuBE @ DESY](doc/meetings_2016_EMBL/2016_EMBL_P11-Status.pdf)
 - [Status of MXCuBE @ EMBL-Hamburg](doc/meetings_2016_EMBL/01_mxcube_karpics_status.pdf)
 - [Status of MXCuBE @ ESRF](doc/meetings_2016_EMBL/ESRFHighlights.pdf)
+- [Status of MXCuBE @ HZB](doc/meetings_2016_EMBL/mxcube_workshop_bessy2_status_2016-06-27.pdf)
 - [Status of MXCuBE @ MAX IV](doc/meetings_2016_EMBL/BIOMAX_Status_Report_JN.pdf)
 - [Status of MXCuBE @ SOLEIL](doc/meetings_2016_EMBL/pres_Hambourg_v02_a.pdf)
 
