@@ -36,6 +36,7 @@ import queue_model_objects_v1 as queue_model_objects
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_confirm_dialog import ConfirmDialog
+from widgets.Qt4_plate_navigator_widget import PlateNavigatorWidget
 from queue_model_enumerables_v1 import CENTRING_METHOD
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
@@ -143,6 +144,9 @@ class DataCollectTree(QtGui.QWidget):
         history_label.setAlignment(QtCore.Qt.AlignCenter)
         self.history_tree_widget = QtGui.QTreeWidget(history_widget)
         
+        self.plate_navigator_cbox = QtGui.QCheckBox("Plate navigator", self)
+        self.plate_navigator_widget = PlateNavigatorWidget(self)
+        self.plate_navigator_widget.hide()
 
         # Layout --------------------------------------------------------------
         button_widget_grid_layout = QtGui.QGridLayout(self.button_widget) 
@@ -171,6 +175,8 @@ class DataCollectTree(QtGui.QWidget):
         main_layout = QtGui.QVBoxLayout(self)
         #main_layout.addWidget(self.sample_tree_widget)
         main_layout.addWidget(self.tree_splitter)
+        main_layout.addWidget(self.plate_navigator_cbox)
+        main_layout.addWidget(self.plate_navigator_widget)
         main_layout.addWidget(self.button_widget)
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(1) 
@@ -197,11 +203,14 @@ class DataCollectTree(QtGui.QWidget):
 
         self.history_tree_widget.itemDoubleClicked.connect(self.item_double_click)
 
+        self.plate_navigator_cbox.stateChanged.\
+             connect(self.use_plate_navigator)
+
         # Other ---------------------------------------------------------------    
         self.sample_tree_widget.setColumnCount(3)
         #self.sample_tree_widget.setColumnWidth(0, 150)
         self.sample_tree_widget.setColumnWidth(1, 130)
-        self.sample_tree_widget.header().setDefaultSectionSize(250)
+        self.sample_tree_widget.header().setDefaultSectionSize(280)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
@@ -216,6 +225,9 @@ class DataCollectTree(QtGui.QWidget):
         self.history_tree_widget.header().hide()
         self.history_tree_widget.setRootIsDecorated(False)
         self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+
+    def init_plate_navigator(self, plate_navigator_hwobj):
+        self.plate_navigator_widget.init_plate_view(plate_navigator_hwobj)
 
     def eventFilter(self, _object, event):
         """
@@ -300,6 +312,9 @@ class DataCollectTree(QtGui.QWidget):
 
         if isinstance(item, Qt4_queue_item.QueueItem):
             item.update_check_state(item.checkState(0))
+
+    def use_plate_navigator(self, state):
+        self.plate_navigator_widget.setVisible(state)
 
     def item_parameters_changed(self):
         items = self.get_selected_items()
@@ -620,7 +635,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
-        self.confirm_dialog.set_plate_mode(False)       
+        self.confirm_dialog.set_plate_mode(False)      
         self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_tree_widget.clear()

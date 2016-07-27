@@ -298,7 +298,7 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
             self.im.set_cmap('hot')
         else:
             self.im.set_data(result)
-            self.mpl_canvas.fig.canvas.draw_idle()
+        self.mpl_canvas.fig.canvas.draw_idle()
 
         #if result.max() > 0:
         #    self.add_divider()

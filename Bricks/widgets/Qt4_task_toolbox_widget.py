@@ -201,7 +201,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                     get_next_run_number(new_pt)
 
             elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
-                self.collect_now_button.show()
+                #self.collect_now_button.show()
                 data_collection = tree_item.get_model()
                 if data_collection.is_helical():
                     if self.tool_box.currentWidget() == self.helical_page:
@@ -234,6 +234,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
         title = "<b>Collection method template</b>"
 
         if len(items) == 1:
+            data_model = items[0].get_model()
             editing_collection = True
 
             if isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
@@ -242,10 +243,9 @@ class TaskToolBoxWidget(QtGui.QWidget):
             else:
                 self.create_task_button.setEnabled(True)
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
-                data_collection = items[0].get_model()
-                if data_collection.is_helical():
+                if data_model.is_helical():
                     self.tool_box.setCurrentWidget(self.helical_page)
-                elif data_collection.is_mesh():
+                elif data_model.is_mesh():
                     self.tool_box.setCurrentWidget(self.advanced_page)
                 else:
                     self.tool_box.setCurrentWidget(self.discrete_page)
@@ -259,9 +259,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
                 self.tool_box.setCurrentWidget(self.workflow_page)
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
                 editing_collection = False
+                title = "<b>Sample: %s</b>" % data_model.get_display_name()
 
             if editing_collection:
-                title = "<b>Queue entry parameters</b>"
+                title = "<b>Data collection: %s</b>" % data_model.get_display_name()
         self.method_label.setText(title) 
 
         current_page = self.tool_box.currentWidget()

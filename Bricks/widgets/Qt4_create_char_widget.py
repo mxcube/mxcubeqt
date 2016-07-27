@@ -181,27 +181,6 @@ class CreateCharWidget(CreateTaskBase):
 
             self._char_params = self._beamline_setup_hwobj.\
                                 get_default_characterisation_parameters()
-            try:
-                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-                transmission = round(float(transmission), 1)
-            except AttributeError:
-                transmission = 0
-
-            try:
-                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 3)
-            except AttributeError:
-                resolution = 0
-
-            try:
-                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-                energy = round(float(energy), 4)
-            except AttributeError:
-                energy = 0
-
-            self._acquisition_parameters.resolution = resolution
-            self._acquisition_parameters.energy = energy
-            self._acquisition_parameters.transmission = transmission
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         

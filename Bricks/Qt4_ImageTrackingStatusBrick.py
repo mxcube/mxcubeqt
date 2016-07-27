@@ -36,7 +36,7 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
               'disabled': Qt4_widget_colors.LIGHT_GRAY,
               'error': Qt4_widget_colors.LIGHT_RED,
               'tracking': Qt4_widget_colors.LIGHT_GREEN,
-              'ready': Qt4_widget_colors.LIGHT_GREEN}
+              'ready': Qt4_widget_colors.LIGHT_BLUE}
 
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)

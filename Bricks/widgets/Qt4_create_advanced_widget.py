@@ -138,6 +138,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         Descript. :
         """
+        CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
@@ -155,31 +156,8 @@ class CreateAdvancedWidget(CreateTaskBase):
                        self._advanced_methods_widget.method_combo.addItem(method)
                 else:
                    self.setEnabled(False)    
-            try:
-                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-                transmission = round(float(transmission), 1)
-            except AttributeError:
-                transmission = 0
-
-            try:
-                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 3)
-            except AttributeError:
-                resolution = 0
-
-            try:
-                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-                energy = round(float(energy), 4)
-            except AttributeError:
-                energy = 0
-
-            self._acquisition_parameters.resolution = resolution
-            self._acquisition_parameters.energy = energy
-            self._acquisition_parameters.transmission = transmission
 
             self.grid_treewidget_item_selection_changed()
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def set_beamline_setup(self, bl_setup_hwobj):
         """

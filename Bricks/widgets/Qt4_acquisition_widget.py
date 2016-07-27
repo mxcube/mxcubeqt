@@ -110,15 +110,15 @@ class AcquisitionWidget(QtGui.QWidget):
              self.use_mad)
 
         self.acq_widget_layout.osc_range_ledit.textChanged.connect(\
-             self.set_osc_range) 
+             self.osc_range_ledit_changed) 
         self.acq_widget_layout.osc_start_ledit.textChanged.connect(\
-             self.set_osc_start)
+             self.osc_start_ledit_changed)
         self.acq_widget_layout.energy_ledit.textChanged.connect(\
-             self.set_energy)
+             self.energy_ledit_changed)
         self.acq_widget_layout.transmission_ledit.textChanged.connect(\
-             self.set_transmission)
+             self.transmission_ledit_changed)
         self.acq_widget_layout.resolution_ledit.textChanged.connect(\
-             self.set_resolution)
+             self.resolution_ledit_changed)
         
         overlap_ledit = self.acq_widget_layout.findChild(\
             QtGui.QLineEdit, "overlap_ledit")
@@ -131,16 +131,26 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.energies_combo.setDisabled(True)
         self.acq_widget_layout.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
-        self.osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
-        self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
-        self.kappa_validator = QtGui.QDoubleValidator(0, 360, 4, self)
-        self.kappa_phi_validator = QtGui.QDoubleValidator(0, 360, 4, self)
-        self.energy_validator = QtGui.QDoubleValidator(4, 25, 4, self)
-        self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
-        self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
-        self.exp_time_validator = QtGui.QDoubleValidator(0.0001, 10000, 4, self)
-        self.first_img_validator = QtGui.QIntValidator(0, 99999, self)
-        self.num_img_validator = QtGui.QIntValidator(1, 99999, self) 
+        self.osc_start_validator = QtGui.QDoubleValidator(\
+             -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit)
+        self.osc_range_validator = QtGui.QDoubleValidator(\
+             -10000, 10000, 4, self.acq_widget_layout.osc_range_ledit)
+        self.kappa_validator = QtGui.QDoubleValidator(\
+             0, 360, 4, self.acq_widget_layout.kappa_ledit)
+        self.kappa_phi_validator = QtGui.QDoubleValidator(\
+             0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
+        self.energy_validator = QtGui.QDoubleValidator(\
+             4, 25, 4, self.acq_widget_layout.energy_ledit)
+        self.resolution_validator = QtGui.QDoubleValidator(\
+             0, 15, 3, self.acq_widget_layout.resolution_ledit)
+        self.transmission_validator = QtGui.QDoubleValidator(\
+             0, 100, 3, self.acq_widget_layout.transmission_ledit)
+        self.exp_time_validator = QtGui.QDoubleValidator(\
+             0.0001, 10000, 4, self.acq_widget_layout.exp_time_ledit)
+        self.first_img_validator = QtGui.QIntValidator(\
+             0, 99999, self.acq_widget_layout.first_image_ledit)
+        self.num_img_validator = QtGui.QIntValidator(\
+             1, 99999, self.acq_widget_layout.num_images_ledit) 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
@@ -162,7 +172,7 @@ class AcquisitionWidget(QtGui.QWidget):
             self.update_osc_range_limits()
             self.update_num_images_limits()
 
-    def set_osc_start(self, osc_start):
+    def osc_start_ledit_changed(self, osc_start):
         if "osc_start" not in self.value_changed_list:
             self.value_changed_list.append("osc_start")
         self.update_osc_range_limits()
@@ -181,14 +191,13 @@ class AcquisitionWidget(QtGui.QWidget):
             except TypeError:
                pass
     
-            self.acq_widget_layout.osc_start_ledit.setText(\
-                 "%.2f" % osc_start_value)
+            self.acq_widget_layout.osc_start_ledit.setText(str(osc_start_value))
             self._acquisition_parameters.osc_start = osc_start_value
 
             self.update_osc_range_limits() 
             self.update_num_images_limits()
 
-    def set_osc_range(self, new_value):
+    def osc_range_ledit_changed(self, new_value):
         self.update_num_images_limits()
 
     def update_kappa(self, new_value):
@@ -197,9 +206,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
            new_value:
-            self.acq_widget_layout.kappa_ledit.setText(\
-                 "%.2f" % float(new_value))
-            #self._acquisition_parameters.kappa = float(new_value)
+            self.acq_widget_layout.kappa_ledit.setText(str(new_value))
 
     def update_kappa_phi(self, new_value):
         """
@@ -207,9 +214,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and \
            new_value:
-            self.acq_widget_layout.kappa_phi_ledit.setText(\
-                 "%.2f" % float(new_value))
-            #self._acquisition_parameters.kappa_phi = float(new_value)
+            self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
 
     def use_osc_start(self, state):
         """
@@ -319,18 +324,24 @@ class AcquisitionWidget(QtGui.QWidget):
                                self.acq_widget_layout.energy_ledit,
                                float,
                                self.energy_validator)
+        self.update_energy_limits((self.energy_validator.bottom(),
+                                   self.energy_validator.top()))
 
         self._acquisition_mib.\
              bind_value_update('transmission',
                                self.acq_widget_layout.transmission_ledit,
                                float,
                                self.transmission_validator)
+        self.update_transmission_limits((self.transmission_validator.bottom(),
+                                         self.transmission_validator.top()))
 
         self._acquisition_mib.\
              bind_value_update('resolution',
                                self.acq_widget_layout.resolution_ledit,
                                float,
                                self.resolution_validator)
+        self.update_resolution_limits((self.resolution_validator.bottom(),
+                                       self.resolution_validator.top()))
 
         self._acquisition_mib.\
              bind_value_update('shutterless',
@@ -457,7 +468,7 @@ class AcquisitionWidget(QtGui.QWidget):
 
             self.madEnergySelectedSignal.emit(name, energy, True)
 
-    def set_energy(self, energy):
+    def energy_ledit_changed(self, energy):
         if "energy" not in self.value_changed_list:
             self.value_changed_list.append("energy") 
 
@@ -467,9 +478,9 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if "energy" not in self.value_changed_list and \
            not self.acq_widget_layout.energy_ledit.hasFocus():
-            self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
+            self.acq_widget_layout.energy_ledit.setText(str(energy))
 
-    def set_transmission(self, transmission):
+    def transmission_ledit_changed(self, transmission):
         if "transmission" not in self.value_changed_list:
             self.value_changed_list.append("transmission")
 
@@ -477,13 +488,10 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        if "transmission" not in self.value_changed_list and \
-           not self.acq_widget_layout.transmission_ledit.hasFocus():
-            self.acq_widget_layout.transmission_ledit.setText(\
-                 "%.2f" % float(transmission))
-            self._acquisition_parameters.transmission = float(transmission)
+        if "transmission" not in self.value_changed_list:
+            self.acq_widget_layout.transmission_ledit.setText(str(transmission))
            
-    def set_resolution(self, resolution):
+    def resolution_ledit_changed(self, resolution):
         if "resolution" not in self.value_changed_list:
             self.value_changed_list.append("resolution") 
 
@@ -493,8 +501,7 @@ class AcquisitionWidget(QtGui.QWidget):
         """
         if "resolution" not in self.value_changed_list and \
            not self.acq_widget_layout.resolution_ledit.hasFocus():
-            self.acq_widget_layout.resolution_ledit.setText(\
-                 "%.3f" % float(resolution))
+            self.acq_widget_layout.resolution_ledit.setText(str(resolution))
 
     def update_energy_limits(self, limits):
         """
@@ -504,7 +511,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self.energy_validator.setBottom(limits[0])
             self.energy_validator.setTop(limits[1])
             self.acq_widget_layout.energy_ledit.setToolTip(\
-               "Energy limits %0.3f : %0.3f\n4 digits precision." %(limits[0], limits[1]))
+               "Energy limits %0.4f : %0.4f keV\n" % \
+               (limits[0], limits[1]) + \
+               "4 digits precision.")
             self._acquisition_mib.validate_all()
 
     def update_transmission_limits(self, limits):
@@ -515,8 +524,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self.transmission_validator.setBottom(limits[0])
             self.transmission_validator.setTop(limits[1])
             self.acq_widget_layout.transmission_ledit.setToolTip(\
-               "Transmission limits %0.3f : %0.3f\n4 digits precision." %\
-               (limits[0], limits[1]))
+               "Transmission limits %0.2f : %0.2f %%\n" % \
+               (limits[0], limits[1]) + \
+               "2 digits precision.")
             self._acquisition_mib.validate_all()
 
     def update_resolution_limits(self, limits):
@@ -527,8 +537,9 @@ class AcquisitionWidget(QtGui.QWidget):
             self.resolution_validator.setBottom(limits[0])
             self.resolution_validator.setTop(limits[1])
             self.acq_widget_layout.resolution_ledit.setToolTip(
-               "Resolution limits %0.4f : %0.4f\n4 digits precision." %\
-               (limits[0], limits[1]))
+               "Resolution limits %0.4f : %0.4f %s\n" % \
+               (limits[0], limits[1], chr(197)) + 
+               "4 digits precision.")
             self._acquisition_mib.validate_all()
 
     def update_detector_exp_time_limits(self, limits):
@@ -538,8 +549,9 @@ class AcquisitionWidget(QtGui.QWidget):
         if limits:
             self.exp_time_validator.setRange(limits[0], limits[1], 4)
             self.acq_widget_layout.exp_time_ledit.setToolTip(
-               "Exposure time limits %0.4f : %0.4f\n4 digits precision." % \
-               (limits[0], limits[1]))
+               "Exposure time limits %0.4f s : %0.4f s\n" % \
+               (limits[0], limits[1]) + \
+               "5 digits precision.")
             self._acquisition_mib.validate_all()
 
     def update_osc_range_limits(self, limits=None):

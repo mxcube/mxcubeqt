@@ -86,14 +86,22 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
              self.detector_roi_mode_changed)
 
         # Other ---------------------------------------------------------------
-        self.osc_start_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
-        self.osc_range_validator = QtGui.QDoubleValidator(-10000, 10000, 4, self)
-        self.kappa_validator = QtGui.QDoubleValidator(0, 360, 4, self)
-        self.kappa_phi_validator = QtGui.QDoubleValidator(0, 360, 4, self)
-        self.energy_validator = QtGui.QDoubleValidator(0, 25, 5, self)
-        self.resolution_validator = QtGui.QDoubleValidator(0, 15, 3, self)
-        self.transmission_validator = QtGui.QDoubleValidator(0, 100, 3, self)
-        self.exp_time_validator = QtGui.QDoubleValidator(0, 10000, 5, self)
+        self.osc_start_validator = QtGui.QDoubleValidator(\
+             -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit)
+        self.osc_range_validator = QtGui.QDoubleValidator(\
+             -10000, 10000, 4, self.acq_widget_layout.osc_range_ledit)
+        self.kappa_validator = QtGui.QDoubleValidator(\
+             0, 360, 4, self.acq_widget_layout.kappa_ledit)
+        self.kappa_phi_validator = QtGui.QDoubleValidator(\
+             0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
+        self.energy_validator = QtGui.QDoubleValidator(\
+             0, 25, 5, self.acq_widget_layout.energy_ledit)
+        self.resolution_validator = QtGui.QDoubleValidator(\
+             0, 15, 3, self.acq_widget_layout.resolution_ledit)
+        self.transmission_validator = QtGui.QDoubleValidator(\
+             0, 100, 3, self.acq_widget_layout.transmission_ledit)
+        self.exp_time_validator = QtGui.QDoubleValidator(\
+             0, 10000, 5, self.acq_widget_layout.exp_time_ledit)
         self.acq_widget_layout.num_images_cbox.setCurrentIndex(1)
 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
@@ -108,30 +116,21 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """
         if not self.acq_widget_layout.osc_start_cbox.hasFocus():
-            osc_start_value = 0
-            try:
-               osc_start_value = round(float(new_value), 2)
-            except TypeError:
-               pass
-            self.acq_widget_layout.osc_start_ledit.setText(\
-                 "%.2f" % osc_start_value)
-            #self._acquisition_parameters.osc_start = osc_start_value
+            self.acq_widget_layout.osc_start_ledit.setText(str(osc_start_value))
 
     def update_kappa(self, new_value):
         """
         Descript. :
         """
         if not self.acq_widget_layout.kappa_ledit.hasFocus():
-            self.acq_widget_layout.kappa_ledit.setText(\
-                 "%.2f" % float(new_value))
+            self.acq_widget_layout.kappa_ledit.setText(str(new_value))
 
     def update_kappa_phi(self, new_value):
         """
         Descript. :
         """
         if not self.acq_widget_layout.kappa_phi_ledit.hasFocus():
-            self.acq_widget_layout.kappa_phi_ledit.setText(\
-                 "%.2f" % float(new_value))
+            self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
 
     def use_kappa(self, state):
         """
@@ -279,24 +278,21 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """
         if not self.acq_widget_layout.energy_ledit.hasFocus():
-            self.acq_widget_layout.energy_ledit.setText(\
-                 "%.4f" % float(energy))
+            self.acq_widget_layout.energy_ledit.setText(str(energy))
 
     def update_transmission(self, transmission):
         """
         Descript. :
         """
         if self.acq_widget_layout.transmission_ledit.hasFocus():
-            self.acq_widget_layout.transmission_ledit.setText(\
-                 "%.2f" % float(transmission))
+            self.acq_widget_layout.transmission_ledit.setText(str(transmission))
 
     def update_resolution(self, resolution):
         """
         Descript. :
         """
         if not self.acq_widget_layout.resolution_ledit.hasFocus():
-            self.acq_widget_layout.resolution_ledit.setText(\
-                 "%.3f" % float(resolution))
+            self.acq_widget_layout.resolution_ledit.setText(str(resolution))
 
     def update_energy_limits(self, limits):
         """

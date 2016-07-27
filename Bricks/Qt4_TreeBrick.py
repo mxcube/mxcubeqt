@@ -29,8 +29,10 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-from widgets.Qt4_dc_tree_widget import DataCollectTree
+
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
+
+from widgets.Qt4_dc_tree_widget import DataCollectTree
 from widgets.Qt4_tree_options_dialog import TreeOptionsDialog
 
 
@@ -76,6 +78,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("useSampleWidget", "boolean", True)
         self.addProperty("scOneName", "string", "Sample changer")
         self.addProperty("scTwoName", "string", "Plate")
+        self.addProperty("usePlateNavigator", "boolean", False)
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_hutch_menu", ())
@@ -247,12 +250,15 @@ class Qt4_TreeBrick(BlissWidget):
                logging.getLogger("GUI").\
                     debug("Qt4_TreeBrick: sample changer hwobj not defined.")
                self.sample_changer_hwobj = None
-            try:
+
+            #try:
+            if True:
                self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
+               self.dc_tree_widget.init_plate_navigator(self.plate_manipulator_hwobj)
                logging.getLogger("GUI").\
                     debug("Qt4_TreeBrick: plate manipulator hwobj not defined.")
-            except:
-               self.plate_manipulator_hwobj = None 
+            #except:
+            #   self.plate_manipulator_hwobj = None 
 
             if self.sample_changer_hwobj is not None:
                 self.connect(self.sample_changer_hwobj, 
@@ -267,7 +273,7 @@ class Qt4_TreeBrick(BlissWidget):
                              self.sample_load_state_changed)
                 self.connect(self.plate_manipulator_hwobj,
                              SampleChanger.INFO_CHANGED_EVENT,
-                             self.set_sample_pin_icon)
+                             self.plate_info_changed)
 
             # This is to enable/disable collection button
             # Could be much more generic
@@ -306,6 +312,8 @@ class Qt4_TreeBrick(BlissWidget):
               self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == 'scTwoName':
               self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
+        #elif property_name == 'usePlateNavigator':
+        #      self.dc_tree_widget.show_plate_navigator_cbox.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -329,7 +337,8 @@ class Qt4_TreeBrick(BlissWidget):
         if not logged_in:
             self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
-         
+            self.dc_tree_widget.plate_navigator_cbox.setVisible(False)
+
             if self.sample_changer_hwobj is not None and \
                self.diffractometer_hwobj.use_sample_changer():
                 sc_basket_content, sc_sample_content = self.get_sc_content()
@@ -340,9 +349,11 @@ class Qt4_TreeBrick(BlissWidget):
                     self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
                          self.dc_tree_widget.sample_mount_method)
                     self.sample_changer_widget.details_button.setText("Show SC-details")
-   
+ 
             if self.plate_manipulator_hwobj is not None and \
                self.diffractometer_hwobj.in_plate_mode():
+                if self['usePlateNavigator']:
+                    self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
                 self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(True)
                 if plate_sample_content:
@@ -418,6 +429,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
 
     def queue_paused_handler(self, status):
+        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
         self.dc_tree_widget.queue_paused_handler(status)
 
     def queue_execution_finished(self, status):
@@ -633,6 +645,10 @@ class Qt4_TreeBrick(BlissWidget):
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
         Qt4_widget_colors.set_widget_color(self.sample_changer_widget.details_button,
                                            QtGui.QColor(s_color))
+
+    def plate_info_changed(self):
+        self.set_sample_pin_icon()
+        self.dc_tree_widget.plate_navigator_widget.refresh_plate_location() 
 
     def show_sample_centring_tab(self):
         """

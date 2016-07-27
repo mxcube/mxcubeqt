@@ -115,9 +115,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_helical_values")
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
 
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)

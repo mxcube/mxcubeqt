@@ -433,6 +433,7 @@ class CreateTaskBase(QtGui.QWidget):
         self._acquisition_parameters.resolution = resolution
 
         self._acq_widget.value_changed_list = []
+        self._acq_widget._acquisition_mib.clear_edit()
 
     """
     def multiple_item_selection(self, tree_items):
@@ -550,19 +551,22 @@ class CreateTaskBase(QtGui.QWidget):
                 if temp_tasks[0].requires_centring():
                     kappa = None
                     kappa_phi = None
-                    task_label = 'sample-centring'
+                    task_label = "Centring"
                     if isinstance(temp_tasks[0], queue_model_objects.DataCollection):
                         kappa = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa
                         kappa_phi = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa_phi
-                        if kappa and kappa_phi:
-                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                        if kappa is not None and \
+                           kappa_phi is not None:
+                            task_label = "Centring (kappa=%0.1f,phi=%0.1f)" %\
+                                         (kappa, kappa_phi)
                     elif isinstance(temp_tasks[0], queue_model_objects.Characterisation):
                         kappa = temp_tasks[0].reference_image_collection.\
                                acquisitions[0].acquisition_parameters.kappa
                         kappa_phi = temp_tasks[0].reference_image_collection.\
                                acquisitions[0].acquisition_parameters.kappa_phi
                         if kappa and kappa_phi:
-                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                            task_label = "Centring (kappa=%0.1f,phi=%0.1f)"  % \
+                                         (kappa, kappa_phi)
                     sc = queue_model_objects.SampleCentring(task_label, kappa, kappa_phi)
                     tasks.append(sc)
 
