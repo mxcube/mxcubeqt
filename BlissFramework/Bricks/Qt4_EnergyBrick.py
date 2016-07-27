@@ -39,7 +39,7 @@ class Qt4_EnergyBrick(BlissWidget):
         # Properties ----------------------------------------------------------       
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('defaultMode', 'combo', ('keV', 'Ang'), 'keV')
-        self.addProperty('kevFormatString', 'formatString', '###.#####')
+        self.addProperty('kevFormatString', 'formatString', '##.####')
         self.addProperty('angFormatString', 'formatString', '##.####')
 
         # Signals ------------------------------------------------------------
@@ -110,7 +110,6 @@ class Qt4_EnergyBrick(BlissWidget):
         #self.group_box.setChecked(True)
         self.new_value_validator = QtGui.QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
-        #self.new_value_ledit.setValidator(self.new_value_validator)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -196,11 +195,19 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if self.units_combobox.currentIndex() == 0:
-            self.energy_hwobj.move_energy(float(self.new_value_ledit.text()))
-        else:
-            self.energy_hwobj.move_wavelength(float(self.new_value_ledit.text()))
-        self.new_value_ledit.setText("")
+        input_field_text = self.new_value_ledit.text()
+
+        if self.new_value_validator.validate(input_field_text, 0)[0] == \
+           QtGui.QValidator.Acceptable:
+            if self.units_combobox.currentIndex() == 0:
+                self.energy_hwobj.move_energy(float(input_field_text))
+            else:
+                self.energy_hwobj.move_wavelength(float(input_field_text))
+            self.new_value_ledit.setText("")
+            Qt4_widget_colors.set_widget_color(\
+                 self.new_value_ledit,
+                 Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                 QtGui.QPalette.Base)
 
     def input_field_changed(self, input_field_text):
         """
@@ -208,12 +215,17 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        color = Qt4_widget_colors.LINE_EDIT_ACTIVE
-        #if input_field_text == "" or self.new_value_validator.validate(input_field_text, 0):
-        #    color = Qt4_widget_colors.LINE_EDIT_ERROR
-        Qt4_widget_colors.set_widget_color(self.new_value_ledit, 
-                                           color,
-                                           QtGui.QPalette.Base)
+        if self.new_value_validator.validate(input_field_text, 0)[0] == \
+           QtGui.QValidator.Acceptable:
+            Qt4_widget_colors.set_widget_color(\
+                self.new_value_ledit,
+                Qt4_widget_colors.LINE_EDIT_CHANGED,
+                QtGui.QPalette.Base)
+        else:
+           Qt4_widget_colors.set_widget_color(\
+                self.new_value_ledit,
+                Qt4_widget_colors.LINE_EDIT_ERROR,
+                QtGui.QPalette.Base)
 
     def units_changed(self, unit):
         """
@@ -232,15 +244,17 @@ class Qt4_EnergyBrick(BlissWidget):
         value_limits = [0, 10]
         if self.units_combobox.currentIndex() == 0:
             value_limits = self.energy_hwobj.get_energy_limits()
-            tool_tip = "Energy limits" 
+            self.group_box.setTitle("Energy")
+            self.new_value_ledit.setToolTip(\
+                 "Energy limits %.4f : %.4f keV" % \
+                 (value_limits[0], value_limits[1]))
         else:
             value_limits = self.energy_hwobj.get_wavelength_limits()
-            tool_tip = "Wavelength limits"
-        if value_limits is not None:
-            self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
-            self.new_value_ledit.setValidator(self.new_value_validator)
-            self.new_value_ledit.setToolTip("%s %.2f : %.2f" % \
-                 (tool_tip, value_limits[0], value_limits[1]))
+            self.group_box.setTitle("Wavelength")
+            self.new_value_ledit.setToolTip(\
+                 "Wavelength limits %.4f : %.4f %s" % \
+                 (value_limits[0], value_limits[1], chr(197)))
+        self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
    
     def stop_clicked(self):
         """

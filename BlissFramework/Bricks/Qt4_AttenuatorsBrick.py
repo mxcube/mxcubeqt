@@ -42,13 +42,10 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         self.attenuators_hwobj = None
 
         # Internal variables --------------------------------------------------
-        self.transmission_limits = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('formatString', 'formatString', '###.##')
-        self.addProperty('filtersMode', 'combo', ('Expert', 'Enabled', 
-                         'Disabled'), 'Expert')
 
         # Signals ------------------------------------------------------------
 
@@ -78,22 +75,18 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         _main_vlayout.addWidget(self.group_box)
 
         # SizePolicies --------------------------------------------------------
-        #self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-        #                   QtGui.QSizePolicy.Fixed)
-
 
         # Qt signal/slot connections ------------------------------------------
         self.new_value_ledit.returnPressed.connect(self.current_value_changed)
         self.new_value_ledit.textChanged.connect(self.input_field_changed)
 
         # Other --------------------------------------------------------------- 
-        #self.group_box.setCheckable(True)
-        #self.group_box.setChecked(True)
         Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                        Qt4_widget_colors.LINE_EDIT_ACTIVE,
                                        QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(0, 100, 2, self.new_value_ledit)
-        #self.instanceSynchronize("newTransmission")
+        self.new_value_validator = QtGui.QDoubleValidator(\
+             0, 100, 2, self.new_value_ledit)
+        self.new_value_ledit.setToolTip("Transmission limits 0 : 100 %")
 
     def propertyChanged(self, property_value, old_value, new_value):
         """
@@ -103,16 +96,32 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         """
         if property_value == 'mnemonic':
             if self.attenuators_hwobj is not None:
-                self.disconnect(self.attenuators_hwobj, 'deviceReady', self.connected)
-                self.disconnect(self.attenuators_hwobj, 'deviceNotReady', self.disconnected)
-                self.disconnect(self.attenuators_hwobj, 'attStateChanged', self.transmission_state_changed)
-                self.disconnect(self.attenuators_hwobj, 'attFactorChanged', self.transmission_value_changed)
+                self.disconnect(self.attenuators_hwobj,
+                                'deviceReady',
+                                self.connected)
+                self.disconnect(self.attenuators_hwobj,
+                                'deviceNotReady',
+                                self.disconnected)
+                self.disconnect(self.attenuators_hwobj,
+                                'attStateChanged',
+                                self.transmission_state_changed)
+                self.disconnect(self.attenuators_hwobj,
+                                'attFactorChanged',
+                                self.transmission_value_changed)
             self.attenuators_hwobj = self.getHardwareObject(new_value)
             if self.attenuators_hwobj is not None:
-                self.connect(self.attenuators_hwobj, 'deviceReady', self.connected)
-                self.connect(self.attenuators_hwobj, 'deviceNotReady', self.disconnected)
-                self.connect(self.attenuators_hwobj, 'attStateChanged', self.transmission_state_changed)
-                self.connect(self.attenuators_hwobj, 'attFactorChanged', self.transmission_value_changed)
+                self.connect(self.attenuators_hwobj,
+                             'deviceReady',
+                             self.connected)
+                self.connect(self.attenuators_hwobj,
+                             'deviceNotReady',
+                             self.disconnected)
+                self.connect(self.attenuators_hwobj,
+                             'attStateChanged',
+                             self.transmission_state_changed)
+                self.connect(self.attenuators_hwobj,
+                             'attFactorChanged',
+                             self.transmission_value_changed)
                 if self.attenuators_hwobj.isReady():
                     self.connected()
                     self.attenuators_hwobj.update_values() 
@@ -129,14 +138,17 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if input_field_text == "":
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
-                                               Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                               QtGui.QPalette.Base)
+        if self.new_value_validator.validate(input_field_text, 0)[0] == \
+           QtGui.QValidator.Acceptable:
+            Qt4_widget_colors.set_widget_color(\
+                self.new_value_ledit,
+                Qt4_widget_colors.LINE_EDIT_CHANGED,
+                QtGui.QPalette.Base)
         else:
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
-                                               Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                               QtGui.QPalette.Base)
+           Qt4_widget_colors.set_widget_color(\
+                self.new_value_ledit,
+                Qt4_widget_colors.LINE_EDIT_ERROR,
+                QtGui.QPalette.Base)
 
     def current_value_changed(self):
         """
@@ -144,8 +156,17 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.attenuators_hwobj.setTransmission(float(self.new_value_ledit.text()))
-        self.new_value_ledit.setText("") 
+        input_field_text = self.new_value_ledit.text()
+
+        if self.new_value_validator.validate(input_field_text, 0)[0] == \
+           QtGui.QValidator.Acceptable:
+            self.attenuators_hwobj.setTransmission(\
+                 float(input_field_text))
+            self.new_value_ledit.setText("") 
+            Qt4_widget_colors.set_widget_color(\
+                 self.new_value_ledit,
+                 Qt4_widget_colors.LINE_EDIT_ACTIVE,
+                 QtGui.QPalette.Base)
 
     def connected(self):
         """
@@ -179,6 +200,6 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         """
         try:
            new_values_str = self['formatString'] % new_value
-           self.transmission_ledit.setText("%s%%" % new_values_str)
+           self.transmission_ledit.setText("%s %%" % new_values_str)
         except:
            pass
