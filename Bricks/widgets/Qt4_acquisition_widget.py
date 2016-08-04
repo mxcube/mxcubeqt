@@ -292,8 +292,8 @@ class AcquisitionWidget(QtGui.QWidget):
         if 'number_of_images' in limits_dict:
             limits = tuple(map(int, limits_dict['number_of_images'].split(',')))
             (lower, upper) = limits
-            self.num_img_valdidator.setRange(lower, upper)
-            self.first_img_valdidator.setRange(lower, upper)
+            self.num_img_validator.setRange(lower, upper)
+            self.first_img_validator.setRange(lower, upper)
         
         self._acquisition_mib.bind_value_update('first_image', 
                                                 self.acq_widget_layout.first_image_ledit,

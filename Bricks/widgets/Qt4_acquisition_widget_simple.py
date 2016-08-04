@@ -209,7 +209,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
             (lower, upper) = limits
-            elf.osc_start_validator.setRange(lower, upper, 4)
+            self.osc_start_validator.setRange(lower, upper, 4)
             self.osc_range_validator.setRange(lower, upper, 4)
 
         self._acquisition_mib.bind_value_update('osc_start', 
