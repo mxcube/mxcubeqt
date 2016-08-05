@@ -241,11 +241,6 @@ class Qt4_ResolutionBrick(BlissWidget):
         Args.     : 
         Return    : None
         """
-        print input_field_text
-        print self.new_value_validator.top(), self.new_value_validator.bottom()
-
-        print self.new_value_validator.validate(input_field_text, 0)
-        print QtGui.QValidator.Acceptable
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
            QtGui.QValidator.Acceptable:
             Qt4_widget_colors.set_widget_color(\
@@ -479,9 +474,8 @@ class Qt4_ResolutionBrick(BlissWidget):
                 Qt4_widget_colors.set_widget_color(self.new_value_ledit, color)
 
     def detector_distance_state_changed(self, state):
-        #if state is None:
-        #    #Fix this TODO
-        #    return
+        if state is None:
+            return
 
         color = Qt4_ResolutionBrick.STATE_COLORS[state]
         unit = self.units_combobox.currentText()

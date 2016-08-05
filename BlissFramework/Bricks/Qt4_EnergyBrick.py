@@ -241,7 +241,6 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        value_limits = [0, 10]
         if self.units_combobox.currentIndex() == 0:
             value_limits = self.energy_hwobj.get_energy_limits()
             self.group_box.setTitle("Energy")

@@ -291,7 +291,7 @@ class PropertyBag:
                 editor = prop._editor()
               
                 if editor is not None:
-                    editor.setPropertyBag(self)
+                    editor.set_property_bag(self)
                 break
                     
 
@@ -309,7 +309,7 @@ class PropertyBag:
             try:
                 editor = ed()
                 if editor is not None:
-                    editor.setPropertyBag(self)
+                    editor.set_property_bag(self)
             except TypeError:
                 pass
             
@@ -328,7 +328,7 @@ class PropertyBag:
             if prop._editor is not None:
                 editor = prop._editor()
                 if editor is not None:
-                    editor.setPropertyBag(self)
+                    editor.set_property_bag(self)
 
 
     def showProperty(self, propertyName):
@@ -338,7 +338,7 @@ class PropertyBag:
             if prop._editor is not None:
                 editor = prop._editor()
                 if editor is not None:
-                    editor.setPropertyBag(self)
+                    editor.set_property_bag(self)
 
 
     def __repr__(self):
