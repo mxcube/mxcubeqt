@@ -111,6 +111,8 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_validator = QtGui.QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
 
+        self.instance_synchronize("energy_ledit", "new_value_ledit")
+
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. : Event triggered when user property changed in the property

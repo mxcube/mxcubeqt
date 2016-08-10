@@ -88,6 +88,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
              0, 100, 2, self.new_value_ledit)
         self.new_value_ledit.setToolTip("Transmission limits 0 : 100 %")
 
+        self.instance_synchronize("transmission_ledit", "new_value_ledit")
+
     def propertyChanged(self, property_value, old_value, new_value):
         """
         Descript. :

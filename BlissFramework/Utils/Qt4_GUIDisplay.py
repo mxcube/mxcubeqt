@@ -27,15 +27,17 @@ import logging
 import weakref
 import platform
 import webbrowser
+import collections
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, LabelCfg, WindowCfg, ContainerCfg, TabCfg
-from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
-import collections
+from BlissFramework.Utils import Qt4_widget_colors
+from BlissFramework.Qt4_BaseComponents import BlissWidget
+from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, LabelCfg, WindowCfg, ContainerCfg, TabCfg
+
+from HardwareRepository import HardwareRepository
 
 
 __version__ = '2.2'
@@ -70,7 +72,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.expert_mode_action.setCheckable(True)  
         self.reload_hwr_action = self.file_menu.addAction("Reload hardware objects",
              self.reload_hwr_clicked)
-        self.reload_hwr_action.setEnabled(False)
+        #self.reload_hwr_action.setEnabled(False)
         self.file_menu.addAction("Quit", self.quit_clicked)
 
         self.view_menu = self.addMenu("View")
@@ -199,15 +201,29 @@ class CustomMenuBar(QtGui.QMenuBar):
                 self.setStyleSheet(self.original_style)
 
     def reload_hwr_clicked(self):
+        """Reloads hardware objects
+        """
         hwr = HardwareRepository.HardwareRepository()
         import reimport
         for hwr_obj in hwr.hardwareObjects:
+ 
             connections = hwr.hardwareObjects[hwr_obj].connect_dict
-            for sender in connections:
-                hwr.hardwareObjects[hwr_obj].disconnect(\
-                    sender, connections[sender]["signal"], connections[sender]["slot"])
 
-            reimport.reimport(hwr.hardwareObjects[hwr_obj].__module__)
+            #for sender in connections:
+            #    print connections[sender]["signal"], connections[sender]["slot"]
+            #    hwr.hardwareObjects[hwr_obj].disconnect(\
+            #        sender, connections[sender]["signal"], connections[sender]["slot"])
+
+            reload(hwr.hardwareObjects[hwr_obj].__class__)
+
+        #from  HardwareRepository import BaseHardwareObjects
+        #reimport.reimport(BaseHardwareObjects)
+ 
+        #for hwr_obj in hwr.hardwareObjects:    
+        ##    for sender in connections:
+        #        print connections[sender]["signal"], connections[sender]["slot"]
+        #        hwr.hardwareObjects[hwr_obj].connect(\
+        #            sender, connections[sender]["signal"], connections[sender]["slot"])
 
     def whats_this_clicked(self):
         """
@@ -294,6 +310,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
     """
     Descript. :
     """
+    brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = QtCore.pyqtSignal(str, int)
 
     class Spacer(QtGui.QFrame):
         """
@@ -515,7 +533,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             QtGui.QApplication.emit(self, QtCore.SIGNAL('tab_changed'), index, page)
 
             tab_name = self.objectName()
-            BlissWidget.updateTabWidget(tab_name,index)
+            BlissWidget.update_tab_widget(tab_name, index)
 
 
         def hasCountChanged(self,tab_index):

@@ -126,6 +126,11 @@ class Qt4_ResolutionBrick(BlissWidget):
 
         self.units_combobox.addItem(chr(197))
         self.units_combobox.addItem("mm")
+        self.instance_synchronize("group_box",
+                                  "resolution_ledit",
+                                  "detector_distance_ledit",
+                                  "new_value_ledit",
+                                  "units_combobox")
 
     def propertyChanged(self, property_name, old_value, new_value):
         """

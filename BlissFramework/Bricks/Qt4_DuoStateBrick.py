@@ -54,28 +54,25 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.__expertMode = False
        
         # Properties ----------------------------------------------------------
-        self.addProperty('mnemonic','string','')
-        self.addProperty('forceNoControl','boolean',False)
+        self.addProperty('mnemonic', 'string', '')
+        self.addProperty('forceNoControl', 'boolean', False)
         self.addProperty('expertModeControlOnly', 'boolean', False)
-        self.addProperty('icons','string','')
-        self.addProperty('in','string','in')
-        self.addProperty('out','string','out')
-        self.addProperty('setin','string','Set in')
-        self.addProperty('setout','string','Set out')
-        self.addProperty('username','string','')
-        self.defineSlot('allowControl',())
+        self.addProperty('icons', 'string', '')
+        self.addProperty('in', 'string', 'in')
+        self.addProperty('out', 'string', 'out')
+        self.addProperty('setin', 'string', 'Set in')
+        self.addProperty('setout', 'string', 'Set out')
+        self.addProperty('username', 'string', '')
 
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        #@self.defineSignal('duoStateBrickIn',())
-        #@self.defineSignal('duoStateBrickOut',())
-        #self.defineSignal('duoStateBrickMoving',())
+        self.defineSlot('allowControl', ())
       
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox("none", self)
         self.main_gbox.setAlignment(QtCore.Qt.AlignCenter)
-        self.state_label = QtGui.QLabel('<b>unknown</b>', self.main_gbox)
+        self.state_label = QtGui.QLineEdit('unknown', self.main_gbox)
 
         self.buttons_widget = QtGui.QWidget(self.main_gbox)
         self.set_in_button = QtGui.QPushButton("Set in", self.buttons_widget)
@@ -110,9 +107,15 @@ class Qt4_DuoStateBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(QtCore.Qt.AlignCenter)
         self.state_label.setToolTip("Shows the current control state")
+        self.state_label.setFrame(False)
+        bold_font = self.state_label.font()
+        bold_font.setBold(True)
+        self.state_label.setFont(bold_font)
+
         self.set_in_button.setToolTip("Changes the control state")
         self.set_out_button.setToolTip("Changes the control state")           
 
+        self.instance_synchronize("state_label")
 
     def setExpertMode(self, expert):
         self.__expertMode = expert
@@ -153,12 +156,14 @@ class Qt4_DuoStateBrick(BlissWidget):
         if color is None:
             color = Qt4_widget_colors.GROUP_BOX_GRAY
 
-        Qt4_widget_colors.set_widget_color(self.state_label, color)
+        Qt4_widget_colors.set_widget_color(self.state_label,
+                                           color,
+                                           QtGui.QPalette.Base)
         #self.state_label.setPaletteBackgroundColor(QColor(color))
         if len(state_label) > 0:
-            self.state_label.setText('<b>%s</b>' % state_label)
+            self.state_label.setText('%s' % state_label)
         else:
-            self.state_label.setText('<b>%s</b>' % state)
+            self.state_label.setText('%s' % state)
         try:
             in_enable=self.STATES[state][1]
             out_enable=self.STATES[state][2]

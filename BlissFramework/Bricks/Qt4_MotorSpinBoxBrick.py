@@ -180,7 +180,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.move_right_button.released.connect(self.stop_moving)
 
         # Other ---------------------------------------------------------------
-        #self.instanceSynchronize("position_spinbox","step_list")
+        self.instance_synchronize("position_spinbox", "step_combo")
  
     def setExpertMode(self, mode):
         """

@@ -82,6 +82,10 @@ class BlissSplashScreen(QtGui.QSplashScreen):
 
 
 class GUISupervisor(QtGui.QWidget):
+
+    brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = QtCore.pyqtSignal(str, int)
+
     def __init__(self, designMode=False, showMaximized=False, noBorder=False):
         QtGui.QWidget.__init__(self)
 
@@ -242,6 +246,7 @@ class GUISupervisor(QtGui.QWidget):
         #
         self.windows = Qt4_GUIDisplay.display(config, noBorder=self.noBorder)
         main_window = None
+
         if len(self.windows) > 0:
             main_window = self.windows[0]
             main_window.configuration = config
