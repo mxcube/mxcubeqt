@@ -72,7 +72,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox("none", self)
         self.main_gbox.setAlignment(QtCore.Qt.AlignCenter)
-        self.state_label = QtGui.QLineEdit('unknown', self.main_gbox)
+        self.state_ledit = QtGui.QLineEdit('unknown', self.main_gbox)
 
         self.buttons_widget = QtGui.QWidget(self.main_gbox)
         self.set_in_button = QtGui.QPushButton("Set in", self.buttons_widget)
@@ -88,7 +88,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         _buttons_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
-        _main_gbox_vlayout.addWidget(self.state_label)
+        _main_gbox_vlayout.addWidget(self.state_ledit)
         _main_gbox_vlayout.addWidget(self.buttons_widget)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(4, 4, 4, 4)
@@ -105,17 +105,18 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.set_out_button.toggled.connect(self.set_out)
 
         # Other ---------------------------------------------------------------
-        self.state_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.state_label.setToolTip("Shows the current control state")
-        self.state_label.setFrame(False)
-        bold_font = self.state_label.font()
+        self.state_ledit.setAlignment(QtCore.Qt.AlignCenter)
+        self.state_ledit.setToolTip("Shows the current control state")
+        self.state_ledit.setFrame(False)
+        bold_font = self.state_ledit.font()
         bold_font.setBold(True)
-        self.state_label.setFont(bold_font)
+        self.state_ledit.setFont(bold_font)
+        self.state_ledit.setFixedHeight(20)
 
         self.set_in_button.setToolTip("Changes the control state")
         self.set_out_button.setToolTip("Changes the control state")           
 
-        self.instance_synchronize("state_label")
+        self.instance_synchronize("state_ledit")
 
     def setExpertMode(self, expert):
         self.__expertMode = expert
@@ -146,7 +147,7 @@ class Qt4_DuoStateBrick(BlissWidget):
     def updateLabel(self,label):
         self.main_gbox.setTitle(label)
 
-    def stateChanged(self,state,state_label=""):
+    def stateChanged(self,state,state_ledit=""):
         state = str(state)
         try:
             color=self.STATES[state][0]
@@ -156,14 +157,14 @@ class Qt4_DuoStateBrick(BlissWidget):
         if color is None:
             color = Qt4_widget_colors.GROUP_BOX_GRAY
 
-        Qt4_widget_colors.set_widget_color(self.state_label,
+        Qt4_widget_colors.set_widget_color(self.state_ledit,
                                            color,
                                            QtGui.QPalette.Base)
-        #self.state_label.setPaletteBackgroundColor(QColor(color))
-        if len(state_label) > 0:
-            self.state_label.setText('%s' % state_label)
+        #self.state_ledit.setPaletteBackgroundColor(QColor(color))
+        if len(state_ledit) > 0:
+            self.state_ledit.setText('%s' % state_label)
         else:
-            self.state_label.setText('%s' % state)
+            self.state_ledit.setText('%s' % state)
         try:
             in_enable=self.STATES[state][1]
             out_enable=self.STATES[state][2]
@@ -420,14 +421,14 @@ class WrapperHO(QtCore.QObject):
         self.dev.openShutter()
     def setOutShutter(self):
         self.dev.closeShutter()
-    def stateChangedShutter(self, state, state_label=None):
+    def stateChangedShutter(self, state, state_ledit=None):
         try:
             state=WrapperHO.shutterStateDict[state]
         except KeyError:
             state='error'
-        if not state_label:
-            state_label=""
-        self.duoStateChangedSignal.emit(state, state_label)
+        if not state_ledit:
+            state_ledit=""
+        self.duoStateChangedSignal.emit(state, state_ledit)
     def getStateShutter(self):
         state=self.dev.getShutterState()
         try:

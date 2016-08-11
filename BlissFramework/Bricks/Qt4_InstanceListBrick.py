@@ -153,12 +153,12 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.xmlrpc_server = None
 
         # Internal values -----------------------------------------------------
-        self.give_control_chboxDialog = None
+        self.give_control_msgbox = None
         self.timeout_left = -1
         self.my_proposal = None
         self.in_control = None
         self.connections = {}
-        self.server_icon = Qt4_Icons.load_icon("Home")
+        self.server_icon = Qt4_Icons.load_icon("Home2")
         self.client_icon = Qt4_Icons.load_icon("User2")
 
         # Graphic elements ----------------------------------------------------
@@ -195,8 +195,6 @@ class Qt4_InstanceListBrick(BlissWidget):
         nick_validator = QtGui.QRegExpValidator(reg_exp, self.nickname_ledit)
         self.nickname_ledit.setValidator(nick_validator)
 
-        self.client_icon = None
-        self.server_icon = None
         self.external_user_info_dialog = ExternalUserInfoDialog()
 
         # Layout --------------------------------------------------------------
@@ -429,7 +427,6 @@ class Qt4_InstanceListBrick(BlissWidget):
             local = BlissWidget.INSTANCE_LOCATION_EXTERNAL
         BlissWidget.setInstanceLocation(local)
 
-        #TODO fix this to use activeWindow
         for widget in QtGui.QApplication.allWidgets():
             if hasattr(widget, "configuration"):
                 active_window = widget
@@ -462,41 +459,15 @@ class Qt4_InstanceListBrick(BlissWidget):
             BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_SLAVE)
 
             server_print = self.instance_server_hwobj.idPrettyPrint(server_id)
-            if self.client_icon is None:
-                item = QtGui.QListWidgetItem(server_print,
-                                             self.users_listwidget)
-            else:
-                item = QtGui.QListWidgetItem(self.server_icon,
-                                             server_print,
-                                             self.users_listwidget)
+            item = QtGui.QListWidgetItem(self.server_icon,
+                                         server_print,
+                                         self.users_listwidget)
             item.setSelected(False)
             self.nickname_ledit.setText(my_nickname)
             self.connections[server_id[0]] = (item, server_id[1])
             item.setFlags(QtCore.Qt.ItemIsEnabled)
-            #item.setSelectable(False)
             self.have_control(False, gui_only=True)
             self.init_name(my_nickname)
-            #self.give_control_chbox.setChecked(False)
-
-            camera_brick = None
-
-            for w in QtGui.QApplication.allWidgets():
-                if isinstance(w, BlissWidget):
-                    if "CameraBrick" in str(w.__class__):
-                        camera_brick = w
-                        camera_brick.installEventFilter(self)
-                        break
-
-            # find the video brick, make sure it is hidden when collecting data
-            # and that it is shown again when DC is finished
-            def disable_video(w=camera_brick):
-                w.disable_update()
-            self.__disable_video = disable_video
-            def enable_video(w=camera_brick):
-                w.enable_update()
-            self.__enable_video = enable_video
-            dispatcher.connect(self.__disable_video, "collect_started")
-            dispatcher.connect(self.__enable_video, "collect_finished")
 
             msg_event = MsgDialogEvent(QtGui.QMessageBox.Information,
                 "Successfully connected to the server application.",
@@ -680,7 +651,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         #f.setPointSize(s)
         #take_control_dialog.setFont(f)
         #take_control_dialog.updateGeometry()
-        if take_control_dialog.exec_loop() == QtGui.QMessageBox.Ok:
+        if take_control_dialog.exec_() == QtGui.QMessageBox.Ok:
             self.instance_server_hwobj.takeControl()
 
     def run(self):
@@ -713,12 +684,9 @@ class Qt4_InstanceListBrick(BlissWidget):
         Descript. :
         """
         client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-        if self.client_icon is None:
-            item = QtGui.QListWidgetItem(client_print, self.users_listwidget)
-        else:
-            item = QtGui.QListWidgetItem(self.client_icon,
-                                         client_print,
-                                         self.users_listwidget)
+        item = QtGui.QListWidgetItem(self.client_icon,
+                                     client_print,
+                                     self.users_listwidget)
         item.setFlags(QtCore.Qt.ItemIsEnabled)
         self.connections[client_id[0]] = (item, client_id[1])
 
@@ -782,6 +750,12 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         Descript. :
         """
+        camera_brick = None
+        for widget in QtGui.QApplication.allWidgets():
+            if isinstance(widget, BlissWidget):
+                if "CameraBrick" in str(widget.__class__):
+                    widget.set_control_mode(have_control)
+
         if not gui_only:
             if have_control:
                 BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_MASTER)
@@ -949,18 +923,18 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         Descript. :
         """
-        if self.give_control_chboxDialog is not None:
+        if self.give_control_msgbox is not None:
             if self.timeout_left in (30, 20, 10):
                 self.instance_server_hwobj.sendChatMessage(\
                      InstanceServer.ChatInstanceMessage.PRIORITY_LOW,
                      "%s will have control in %d seconds..." % \
-                     (self.give_control_chboxDialog.nickname,
+                     (self.give_control_msgbox.nickname,
                       self.timeout_left))
             self.timeout_left -= 1
             if self.timeout_left == 0:
-                self.give_control_chboxDialog.done(QtGui.QMessageBox.Yes)
+                self.give_control_msgbox.done(QtGui.QMessageBox.Yes)
             else:
-                self.give_control_chboxDialog.setButtonText(\
+                self.give_control_msgbox.setButtonText(\
                      QtGui.QMessageBox.Yes,
                      "Allow (%d secs)" % self.timeout_left)
 
@@ -976,23 +950,24 @@ class Qt4_InstanceListBrick(BlissWidget):
                     logging.getLogger().exception("Problem in event!")
                 else:
                     client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-                    self.give_control_chboxDialog.nickname = client_print
-                    self.give_control_chboxDialog.setButtonText(\
+                    self.give_control_msgbox.nickname = client_print
+                    self.give_control_msgbox.setButtonText(\
                          QtGui.QMessageBox.Yes,
                          "Allow (%d secs)" % self.timeout_left)
-                    self.give_control_chboxDialog.setButtonText(\
+                    self.give_control_msgbox.setButtonText(\
                          QtGui.QMessageBox.No,
                          "Deny")
                     self.timeout_timer.start(1000)
-                    res = self.give_control_chboxDialog.show()
+                    res = self.give_control_msgbox.exec_()
                     self.timeout_timer.stop()
+
                     if res == QtGui.QMessageBox.Yes:
                         self.instance_server_hwobj.giveControl(client_id)
                     else:
                         self.instance_server_hwobj.sendChatMessage(\
                              InstanceServer.ChatInstanceMessage.PRIORITY_HIGH,
                              "Control denied for %s!" % client_print)
-                    self.give_control_chboxDialog = None
+                    self.give_control_msgbox = None
 
             elif event.type() == START_SERVER_EVENT:
                 if self.instance_server_hwobj is not None:
@@ -1016,7 +991,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                     event.msg, event.icon_type, QtGui.QMessageBox.Ok,\
                     QtGui.QMessageBox.NoButton, QtGui.QMessageBox.NoButton,
                     self)
-                msg_dialog.show()
+                msg_dialog.exec_()
                 if isinstance(event.callback, collections.Callable):
                     event.callback()
 
@@ -1073,11 +1048,11 @@ class Qt4_InstanceListBrick(BlissWidget):
         Descript. :
         """
         if BlissWidget.isInstanceModeMaster() \
-        and self.give_control_chboxDialog is None \
+        and self.give_control_msgbox is None \
         and self.allow_timeout_control_chbox.isChecked():
             self.timeout_left = self['giveControlTimeout']
             client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-            self.give_control_chboxDialog = QtGui.QMessageBox(
+            self.give_control_msgbox = QtGui.QMessageBox(
                 "Pass control", \
                 "The user %s wants to have control " % client_print + \
                 "of the application!", \
@@ -1339,7 +1314,7 @@ class ExternalUserInfoDialog(QtGui.QDialog):
 
     def show(self):
         self.validate_parameters()
-        return QtGui.QDialog.exec_loop(self)
+        return QtGui.QDialog.exec_(self)
 
     def validate_parameters(self):
         if len(str(self.name_input.text())) \

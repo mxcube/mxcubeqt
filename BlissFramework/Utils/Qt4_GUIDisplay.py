@@ -751,6 +751,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.execution_mode=kwargs.get('executionMode', False)
         self.preview_items = []
         self.currentWindow = None
+        self.base_caption = ""
         self.setWindowTitle("GUI preview")
  
         self.central_widget = QtGui.QWidget(self.widget())
@@ -820,12 +821,17 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.emit(QtCore.SIGNAL("isHidden"), ())
         return ret
     
-    def setCaption(self, *args):
+    def set_caption(self, caption):
         """
         Descript. :
         """
-        ret = QtGui.QWidget.setWindowTitle(self, *args)
+        ret = QtGui.QWidget.setWindowTitle(self, caption)
+        self.base_caption = caption 
         return ret
+
+    def update_instance_caption(self, instance_caption):
+        QtGui.QWidget.setWindowTitle(self, self.base_caption + instance_caption)
+         
 
     def exitExpertMode(self, *args):
         """
@@ -1217,7 +1223,7 @@ def display(configuration, noBorder=False):
     for window in configuration.windows_list:
         display = WindowDisplayWidget(None, window["name"], executionMode=True, noBorder=noBorder)
         windows.append(display)
-        display.setCaption(window["properties"]["caption"])
+        display.set_caption(window["properties"]["caption"])
         display.drawPreview(window, id(display))
         if window["properties"]["show"]:
             display._show=True

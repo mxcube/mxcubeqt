@@ -230,6 +230,15 @@ class Qt4_CameraBrick(BlissWidget):
              self.image_scale_menu.setEnabled(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def set_control_mode(self, have_control):
+        if have_control:
+            self.graphics_manager_hwobj.hide_info_msg()
+        else:
+            self.graphics_manager_hwobj.display_info_msg(\
+                 ["", "Controls are disabled in the Slave mode",
+                  "", "Ask for control to be able to control MXCuBE"
+                  ""], hide_msg=False)
    
     def set_expert_mode(self, is_expert_mode):
         self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
