@@ -56,19 +56,23 @@ def loadBrick(brick_type, brick_name):
             #classObj = getattr(module, brick_type)
             classObj = getattr(module, brick_type)
         except AttributeError:
-            logging.getLogger().error('Cannot load brick %s : cannot found class %s in module', brick_name, brick_type)
+            logging.getLogger().error(\
+                  "Cannot load brick %s : " % brick_name + \
+                  "cannot found class %s in module" % brick_type)
             return NullBrick(None, brick_name)
         else:
             try:
                 newInstance = classObj(None, brick_name)
             except:
-                logging.getLogger().exception('Cannot load brick %s : initialization failed', brick_name)
+                logging.getLogger().exception(\
+                   "Cannot load brick %s : initialization failed", brick_name)
                 return NullBrick(None, brick_name)
             else:
                 newInstance._BlissWidget__stop()
                 return newInstance
     else:
-        logging.getLogger().error("Cannot load brick %s : module could not be loaded.", brick_name)
+        logging.getLogger().error("Cannot load brick %s : " % brick_name + \
+                                  "module could not be loaded.")
         return NullBrick(None, brick_name)
     
 

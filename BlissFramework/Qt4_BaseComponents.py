@@ -744,12 +744,29 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         self.setWhatsThis("%s (%s)\n" % (widget_name, self.__class__.__name__))
 
-        self.addProperty('fontSize', 'string', str(self.font().pointSize()))
-        self.addProperty('frame', 'boolean', False)
-        self.addProperty('instanceAllowAlways', 'boolean', False)
-        self.addProperty('instanceAllowConnected', 'boolean', False)
-        self.addProperty('fixedWidth', 'integer', '-1')
-        self.addProperty('fixedHeight', 'integer', '-1')
+        self.addProperty('fontSize',
+                         'string',
+                         str(self.font().pointSize()))
+        self.addProperty('frame',
+                         'boolean',
+                         False,
+                         comment="Draw a frame around the widget")
+        self.addProperty('instanceAllowAlways',
+                         'boolean',
+                         False,
+                         comment="Allow to control brick in all modes")
+        self.addProperty('instanceAllowConnected',
+                         'boolean',
+                         False,
+                         comment="Allow to control brick in slave mode")
+        self.addProperty('fixedWidth',
+                         'integer',
+                         '-1',
+                         comment="Set fixed width in pixels")
+        self.addProperty('fixedHeight',
+                         'integer',
+                         '-1',
+                         comment="Set fixed height in pixels")
 
         dispatcher.connect(self.__hardwareObjectDiscarded,
                            'hardwareObjectDiscarded',

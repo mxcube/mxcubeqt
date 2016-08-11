@@ -341,7 +341,7 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+                           QtGui.QSizePolicy.Minimum)
 
     def editProperties(self, property_bag):
         """

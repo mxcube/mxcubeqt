@@ -53,12 +53,13 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Sunken)
         self.setContentsMargins(0, 3, 0, 3)
-        self.setColumnCount(3)
+        self.setColumnCount(4)
         self.setSelectionMode(QtGui.QTableWidget.NoSelection)
 
-        self.setHorizontalHeaderLabels([self.trUtf8('Properties'),  
-                                        self.trUtf8('Values'), 
-                                        self.trUtf8('')])
+        self.setHorizontalHeaderLabels([self.trUtf8('Property'),  
+                                        self.trUtf8('Value'), 
+                                        self.trUtf8(''),
+                                        self.trUtf8('Comment')])
         
         self.setSizePolicy(QtGui.QSizePolicy.Expanding,
                            QtGui.QSizePolicy.Expanding)
@@ -96,12 +97,15 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
      
                 if not show_hidden and prop.hidden:
                     continue
+
                 if display_hwobj: 
                     if not prop_name.startswith("hwobj_"):
                         continue
                     else:
                         prop_name = prop_name.replace("hwobj_", "")
-                        
+                else:
+                    if prop_name.startswith("hwobj_"):
+                        continue
 
                 self.setRowCount(i + 1)
                 temp_table_item = QtGui.QTableWidgetItem(prop_name)
@@ -109,6 +113,11 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 self.blockSignals(True) 
                 self.setItem(i, 0, temp_table_item)
                 self.setWidgetFromProperty(i, prop)
+
+                temp_table_item = QtGui.QTableWidgetItem(prop.comment)
+                temp_table_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                self.setItem(i, 3, temp_table_item)
+                
                 self.blockSignals(False)
                 
                 validation_panel = ValidationTableItem(self)
@@ -121,7 +130,11 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                      connect(self.on_reset_click)
                 i += 1
             self.setEnabled(i > 0)    
-        self.resizeColumnsToContents()    
+        self.resizeColumnsToContents()
+        self.setFixedHeight((self.rowCount() + 1)  * \
+                            (self.rowHeight(0) + 2) + 20)
+        #self.adjustSize()
+        self.parent().adjustSize()
         
     def setWidgetFromProperty(self, row, prop):
         """

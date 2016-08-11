@@ -9,6 +9,7 @@ class Property:
         self.oldValue = None
         self.hidden = False
         self._editor = None
+        self.comment = ""
 
         if defaultValue is None:
             self.defaultValue = None
@@ -70,6 +71,12 @@ class Property:
         if not setAsValue: 
             self.value = savedValue
             self.oldValue = savedOldValue
+
+    def set_comment(self, comment):
+        self.comment = comment
+
+    def get_comment(self):
+        return comment
 
 
 class StringProperty(Property):
@@ -252,7 +259,7 @@ class PropertyBag:
         self.properties = {}
     
         
-    def addProperty(self, propertyName, propertyType, arg1 = None, arg2 = None, hidden = False):
+    def addProperty(self, propertyName, propertyType, arg1=None, arg2=None, comment="", hidden=False):
         if propertyType == 'string':
             if arg1 is None:
                 arg1 = ''
@@ -277,7 +284,9 @@ class PropertyBag:
         else:
             newProperty = Property(propertyName, arg1)
 
+        newProperty.comment = comment
         newProperty.hidden = hidden
+
         self.properties[propertyName] = newProperty
 
         self.updateEditor()
