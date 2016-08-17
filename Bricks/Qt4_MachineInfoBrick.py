@@ -22,6 +22,9 @@ import os
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
+from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
+
+from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
@@ -46,14 +49,28 @@ class Qt4_MachineInfoBrick(BlissWidget):
 
         # Internal values -----------------------------------------------------
         self.graphics_initialized = None
+        self.disc_label = None
+        self.disc_value_label = None
         self.value_label_list = []
 
-        # Properties ---------------------------------------------------------- 
-        self.addProperty('mnemonic', 'string', '')
-        self.addProperty('formatString', 'formatString', '###.#')
-        self.addProperty('diskThreshold', 'float', '200')
+        # Properties (name, type, default value, comment)---------------------- 
+        self.addProperty('diskThreshold',
+                         'float',
+                         200,
+                         comment='Disk threshold')
+        self.addProperty('maxPlotPoints',
+                         'integer',
+                         100,
+                         comment="Maximal number of plot points")
+        self.addProperty('showDiskSize',
+                         'boolean',
+                         True,
+                         comment="Display information about disk size")
 
-        # Signals ------------------------------------------------------------
+        # Properties for hwobj initialization ---------------------------------
+        self.addProperty('hwobj_mach_info', 'string', '')
+
+        # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
         self.defineSlot('setColDir', ())
@@ -63,7 +80,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
 
         # Layout --------------------------------------------------------------
         self.main_vlayout = QtGui.QVBoxLayout(self)
-        self.main_vlayout.setSpacing(2)
+        self.main_vlayout.setSpacing(1)
         self.main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
@@ -77,21 +94,27 @@ class Qt4_MachineInfoBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if property_name == 'mnemonic':
+        if property_name == 'hwobj_mach_info':
             if self.mach_info_hwobj is not None:
-                self.disconnect(self.mach_info_hwobj, 'valuesChanged', self.set_value)
+                self.disconnect(self.mach_info_hwobj,
+                                'valuesChanged',
+                                self.set_value)
             self.mach_info_hwobj = self.getHardwareObject(new_value)
             if self.mach_info_hwobj is not None:
                 self.setEnabled(True)
-                self.connect(self.mach_info_hwobj, 'valuesChanged', self.set_value)
+                self.connect(self.mach_info_hwobj,
+                             'valuesChanged',
+                             self.set_value)
                 self.mach_info_hwobj.update_values() 
             else:
                 self.setEnabled(False)
 
-            self.disc_label = QtGui.QLabel("Storage disc space", self)
-            self.disc_value_label = QtGui.QLabel(self)
-            self.main_vlayout.addWidget(self.disc_label)
-            self.main_vlayout.addWidget(self.disc_value_label)
+        if property_name == 'showDiskSize':
+            if new_value:
+                self.disc_label = QtGui.QLabel("Storage disc space", self)
+                self.disc_value_label = QtGui.QLabel(self)
+                self.main_vlayout.addWidget(self.disc_label)
+                self.main_vlayout.addWidget(self.disc_value_label)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -103,33 +126,13 @@ class Qt4_MachineInfoBrick(BlissWidget):
         """
         if not self.graphics_initialized:
             for item in values_list:
-                temp_label = QtGui.QLabel(item["title"], self)
-                temp_value_label = QtGui.QLabel(self)
-                temp_value_label.setAlignment(QtCore.Qt.AlignCenter)
-                if "bold" in item:
-                    bold_font = temp_value_label.font()
-                    bold_font.setPointSize(14)
-                    temp_value_label.setFont(bold_font)
-                self.main_vlayout.addWidget(temp_label)
-                self.main_vlayout.addWidget(temp_value_label)
-                self.value_label_list.append(temp_value_label)
+                temp_widget = CustomInfoWidget(self)
+                temp_widget.init_info(item, self['maxPlotPoints'])
+                self.value_label_list.append(temp_widget)
+                self.main_vlayout.addWidget(temp_widget)
             self.graphics_initialized = True
-
-       
-        for index in range(len(values_list)):
-            self.value_label_list[index].setText(str(values_list[index]['value'])) 
-            if values_list[index]['in_range'] is None:
-                 Qt4_widget_colors.set_widget_color(\
-                     self.value_label_list[index], 
-                     STATES['unknown'])
-            elif values_list[index]['in_range']:
-                 Qt4_widget_colors.set_widget_color(\
-                     self.value_label_list[index],
-                     STATES['ready'])
-            else:
-                 Qt4_widget_colors.set_widget_color(\
-                     self.value_label_list[index],
-                     STATES['error'])
+        for index, value in enumerate(values_list):
+            self.value_label_list[index].update_info(value)
 
     def sizeof_fmt(self, num):
         """
@@ -162,24 +165,102 @@ class Qt4_MachineInfoBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        p = '/' + dataDir.split('/')[1]
-        dataDir = p
-        if os.path.exists(dataDir):
-            st = os.statvfs(dataDir)
-            total = st.f_blocks * st.f_frsize
-            free = st.f_bavail * st.f_frsize
-            perc = st.f_bavail / float(st.f_blocks)
-            txt = 'Total: %s\nFree:  %s (%s)' % (self.sizeof_fmt(total),
-                                               self.sizeof_fmt(free),
-                                               '{0:.0%}'.format(perc))  
-            if free / 2 ** 30 > self['diskThreshold']:
-                Qt4_widget_colors.set_widget_color(self.disc_value_label,
+        if self.disc_label:
+            p = '/' + dataDir.split('/')[1]
+            dataDir = p
+            if os.path.exists(dataDir):
+                st = os.statvfs(dataDir)
+                total = st.f_blocks * st.f_frsize
+                free = st.f_bavail * st.f_frsize
+                perc = st.f_bavail / float(st.f_blocks)
+                txt = 'Total: %s\nFree:  %s (%s)' % (self.sizeof_fmt(total),
+                                                     self.sizeof_fmt(free),
+                                                     '{0:.0%}'.format(perc))  
+                if free / 2 ** 30 > self['diskThreshold']:
+                    Qt4_widget_colors.set_widget_color(self.disc_value_label,
                                                    STATES['ready'])
+                else:
+                    Qt4_widget_colors.set_widget_color(self.disc_value_label,
+                                                       STATES['error'])
             else:
+                txt = 'Not available'
                 Qt4_widget_colors.set_widget_color(self.disc_value_label,
-                                                   STATES['error'])
-        else:
-            txt = 'Not available'
-            Qt4_widget_colors.set_widget_color(self.disc_value_label,
                                                    STATES['unknown'])
-        self.disc_value_label.setText(txt)
+            self.disc_value_label.setText(txt)
+
+
+class CustomInfoWidget(QtGui.QWidget):
+
+    def __init__(self, *args):
+        """
+        Descript. :
+        """
+        QtGui.QWidget.__init__(self, *args)
+
+        self.value_plot = None
+
+        self.title_label = QtGui.QLabel(self)
+        self.value_widget = QtGui.QWidget(self)
+        self.value_label = QtGui.QLabel(self.value_widget)
+        self.value_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.history_button = QtGui.QPushButton(\
+             Qt4_Icons.load_icon("LineGraph"), "", self.value_widget)
+        self.history_button.hide()
+        self.history_button.setFixedWidth(22)
+        self.history_button.setFixedHeight(22)
+
+        _value_widget_hlayout = QtGui.QHBoxLayout(self.value_widget)
+        _value_widget_hlayout.addWidget(self.value_label)
+        _value_widget_hlayout.addWidget(self.history_button) 
+        _value_widget_hlayout.setSpacing(2)
+        _value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
+
+        self.main_vlayout = QtGui.QVBoxLayout(self)
+        self.main_vlayout.addWidget(self.title_label)
+        self.main_vlayout.addWidget(self.value_widget)
+        self.main_vlayout.setSpacing(1)
+        self.main_vlayout.setContentsMargins(0, 0, 0, 0)
+
+        self.history_button.clicked.connect(self.open_history_view)
+
+    def init_info(self, info_dict, max_plot_points=None):
+        self.title_label.setText(info_dict.get("title", "???"))
+        self.history_button.setVisible(info_dict.get("history", False))
+        font = self.value_label.font()
+        if info_dict.get("font"): 
+            font.setPointSize(info_dict.get("font"))
+        if info_dict.get("bold"): 
+            font.setBold(True)
+        self.value_label.setFont(font)
+
+        if info_dict.get("history"):
+            self.history_button.show() 
+            self.value_plot = TwoAxisPlotWidget(self, realtime_plot=True)
+            self.value_plot.hide()
+            self.main_vlayout.addWidget(self.value_plot)
+            self.value_plot.set_tight_layout()
+            self.value_plot.clear()
+            self.value_plot.set_max_plot_point(max_plot_points)
+        self.update_info(info_dict)
+
+    def update_info(self, info_dict):
+        if info_dict.get("value_str"): 
+            self.value_label.setText(info_dict.get("value_str"))
+        else:
+            self.value_label.setText(str(info_dict.get("value"))) 
+
+        if info_dict.get('in_range') is None:
+            Qt4_widget_colors.set_widget_color(self.value_label,
+                                               Qt4_widget_colors.GRAY)
+        elif info_dict.get('in_range') == True:
+            Qt4_widget_colors.set_widget_color(self.value_label,
+                                               Qt4_widget_colors.LIGHT_BLUE)
+        else:
+            Qt4_widget_colors.set_widget_color(self.value_label,
+                                               Qt4_widget_colors.LIGHT_RED)
+        value = info_dict.get('value')
+        if type(value) in (int, float) and self.value_plot:
+            self.value_plot.add_new_plot_value(value)
+
+    def open_history_view(self):
+        self.value_plot.setVisible(not self.value_plot.isVisible())

@@ -235,11 +235,10 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
         if len(items) == 1:
             data_model = items[0].get_model()
-            editing_collection = True
+            title = "<b>%s</b>" % data_model.get_display_name()
 
             if isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(False)
-                editing_collection = False
             else:
                 self.create_task_button.setEnabled(True)
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
@@ -258,12 +257,8 @@ class TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
-                editing_collection = False
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
-
-            if editing_collection:
-                title = "<b>Data collection: %s</b>" % data_model.get_display_name()
-        self.method_label.setText(title) 
+            self.method_label.setText(title) 
 
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)

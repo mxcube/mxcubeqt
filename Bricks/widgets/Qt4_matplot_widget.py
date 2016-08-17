@@ -45,7 +45,7 @@ class TwoAxisPlotWidget(QtGui.QWidget):
     Descript. :
     """
 
-    def __init__(self, parent, realtime_plot = False):
+    def __init__(self, parent, realtime_plot=False):
         """
         Descript. :
         """
@@ -68,6 +68,7 @@ class TwoAxisPlotWidget(QtGui.QWidget):
         Descript. :
         """
         self._two_axis_figure_canvas.clear()
+        self._two_axis_figure_canvas.set_title("")
 
     def plot_energy_scan_curve(self, energy_scan_result):
         """
@@ -103,23 +104,31 @@ class TwoAxisPlotWidget(QtGui.QWidget):
         """
         self._two_axis_figure_canvas.set_title("Scan finished")
 
-    def add_new_plot_value(self, x, y):
+    def add_new_plot_value(self, y, x=None):
         """
         Descript. :
         """
         if self._realtime_plot:
-            self._two_axis_figure_canvas.append_new_point(x, y)
+            self._two_axis_figure_canvas.append_new_point(y, x)
+
+    def set_tight_layout(self):
+        self._two_axis_figure_canvas.axes.xaxis.set_visible(False)
+        #self._two_axis_figure_canvas.fig.tight_layout()
+
+    def set_max_plot_point(self, max_points):
+        self._two_axis_figure_canvas.set_max_plot_points(max_points)
 
 class MplCanvas(FigureCanvas):
     """
     Descript. : Class to draw plots on canvas
     """
 
-    def __init__(self, parent = None, width = 5, height=4, dpi = 60):
+    def __init__(self, parent = None, width=5, height=4, dpi=60):
         """
         Descript. :
         """
         self.mouse_position = [0, 0]
+        self.max_plot_points = None
 
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
@@ -139,6 +148,9 @@ class MplCanvas(FigureCanvas):
         #clear all axes after plot is called
         self.axes.hold(not real_time)
 
+    def set_max_plot_points(self, max_points):
+        self.max_plot_points = max_points
+
     def clear(self):
         self.curves = []
         self.axes.cla()
@@ -153,11 +165,20 @@ class MplCanvas(FigureCanvas):
                  label = curve_name, linewidth = 2, color = color))
         self.draw()
 
-    def append_new_point(self, x, y):
-        self._axis_x_array = np.append(self._axis_x_array, x)
+    def append_new_point(self, y, x=None):
         self._axis_y_array = np.append(self._axis_y_array, y)
-        self.axes.plot(self._axis_x_array, self._axis_y_array, linewidth=2)
-        self.set_title("Scan in progress. Please wait...")
+        if self.max_plot_points:
+            if self._axis_y_array.size > self.max_plot_points:
+                self._axis_y_array = np.delete(self._axis_y_array, 0)
+
+        if x:
+            self._axis_x_array = np.append(self._axis_x_array, x)
+            self.axes.plot(self._axis_x_array, self._axis_y_array, linewidth=2)
+        else:  
+            self.axes.plot(self._axis_y_array, linewidth=2)
+        self.axes.grid(True)
+        self.draw()
+        #self.set_title("Scan in progress. Please wait...")
 
     def set_axes_labels(self, x_label, y_label):
         self.axes.set_xlabel(x_label)
