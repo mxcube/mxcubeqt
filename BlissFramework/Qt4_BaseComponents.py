@@ -639,7 +639,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         BlissWidget.update_widget(brick_name,
                                   widget_name,
                                   "setText",
-                                  (str(text), ),
+                                  (text, ),
                                   master_sync)
 
     @staticmethod
