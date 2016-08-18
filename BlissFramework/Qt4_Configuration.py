@@ -194,25 +194,23 @@ class Configuration:
     def find_parent(self, item_name, nodeset=[], parent=None):
         """Finds parent of an item
         """
-        index = 0
+        iter_index = 0
         for item in nodeset:
             if item["name"] == item_name:
-                return (parent, index)
+                return (parent, iter_index)
             else:
-                parent_item, index = self.find_parent(item_name,
-                                                     nodeset=item["children"],
-                                                     parent=item)
+                parent_item, item_index = self.find_parent(\
+                    item_name, nodeset=item["children"], parent=item)
                 if parent_item is not None:
-                    return (parent_item, index)
-            index += 1
+                    return (parent_item, item_index)
+            iter_index += 1
 
         return (None, -1)
 
     def find_all_children(self, parent_item):
         """Returns a list of all children
         """
-        return parent_item["children"] + sum([self.find_all_children(child) \
-               for child in parent_item["children"]], [])
+        return parent_item["children"] + sum([self.find_all_children(child) for child in parent_item["children"]], [])
 
     def find_item(self, item_name, nodeset=None):
         """
@@ -308,16 +306,15 @@ class Configuration:
 
     def remove(self, item_name):
         """Removes item"""
+
         parent, index = self.find_parent(item_name, self.windows_list)
 
         if parent is not None:
             try:
                 del self.items[item_name]
             except KeyError:
-                try:
-                    del self.bricks[item_name]
-                except KeyError:
-                    pass
+                del self.bricks[item_name]
+
             parent.removeChild(index)
             self.has_changed = True
 
@@ -331,7 +328,6 @@ class Configuration:
                 self.windows_list.remove(window)
                 del self.windows[item_name]
                 self.has_changed = True
-
                 return True
 
     def move_up(self, item_name):
@@ -427,7 +423,7 @@ class Configuration:
 
     def dump_tree(self):
         """Prints window list"""
-        windows_list = []
+        wl = []
         for window_cfg in self.windows_list:
             children = []
 
@@ -440,12 +436,13 @@ class Configuration:
 
                 return children
 
-            windows_list.append({"name": window_cfg["name"],
-                                 "children": add_children(window_cfg)})
-        pprint.pprint(windows_list)
+            wl.append({"name": window_cfg["name"],
+                       "children": add_children(window_cfg)})
+        pprint.pprint(wl)
 
     def save(self, filename):
         """Saves config"""
+
         try:
             cfg = repr(self.windows_list)
         except:

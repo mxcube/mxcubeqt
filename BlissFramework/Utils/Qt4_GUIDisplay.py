@@ -1062,7 +1062,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             for item_widget in self.preview_items:
                 if item_widget.objectName() == name:
                     self.preview_items.remove(item_widget) 
-                    #item_widget.setParent(None)
+                    item_widget.hide()
                     item_widget.deleteLater()
 
     def add_widget(self, child, parent):
