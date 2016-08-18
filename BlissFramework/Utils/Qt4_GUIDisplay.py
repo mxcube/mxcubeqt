@@ -1215,13 +1215,13 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         return QtGui.QSizePolicy(_getSizePolicyFlag(hsizepolicy), _getSizePolicyFlag(vsizepolicy))
 
 
-def display(configuration, noBorder=False):
+def display(configuration, no_border=False):
     """
     Descript. :
     """
     windows = []
     for window in configuration.windows_list:
-        display = WindowDisplayWidget(None, window["name"], executionMode=True, noBorder=noBorder)
+        display = WindowDisplayWidget(None, window["name"], executionMode=True, no_border=no_border)
         windows.append(display)
         display.set_caption(window["properties"]["caption"])
         display.drawPreview(window, id(display))

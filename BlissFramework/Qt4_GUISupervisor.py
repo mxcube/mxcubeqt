@@ -17,118 +17,129 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""GUISupervisor"""
+
 import os
-import time
 import stat
-import sys
 import pickle
 import logging
+import collections
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-from HardwareRepository import HardwareRepository
+from BlissFramework import Qt4_Icons
 from BlissFramework import Qt4_Configuration
 from BlissFramework import Qt4_GUIBuilder
 from BlissFramework.Utils import Qt4_GUIDisplay
-from BlissFramework.Utils import PropertyBag
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-import Qt4_Icons
-import BlissFramework
-import collections
+
+from HardwareRepository import HardwareRepository
 
 
 LOAD_GUI_EVENT = QtCore.QEvent.MaxUser
 
 
 class BlissSplashScreen(QtGui.QSplashScreen):
+    """Splash screen when mxcube is loading"""
+
     def __init__(self, pixmap):
+        """init"""
+
         QtGui.QSplashScreen.__init__(self, pixmap)
 
-        self.guiName = ' '
-        self.repaint()
-        
-    def mousePressEvent(self,e):
-        e.accept()
-
-    def setGUIName(self, name):
-        self.guiName = str(name)
-        if len(self.guiName) == 0:
-            self.guiName = ' '
-            
+        self.gui_name = None
         self.repaint()
 
+    def set_gui_name(self, name):
+        """Sets gui name"""
+
+        self.gui_name = str(name)
+        if len(self.gui_name) == 0:
+            self.gui_name = ' '
+        self.repaint()
 
     def drawContents(self, painter):
-        x0 = 10
-        x1 = 390
-        y0 = 340
-        y1 = 340 + painter.fontMetrics().height()
+        """draws splash screen"""
+
+        top_x = 10
+        top_y = 340
+        right_x = 390
+        bot_y = 340 + painter.fontMetrics().height()
         pxsize = 14
         painter.font().setPixelSize(pxsize)
         painter.setPen(QtGui.QPen(QtCore.Qt.black))
-        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), 
-                         QtCore.QPoint(x1, y1)), 
-                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, 
+        painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
+                         QtCore.QPoint(right_x, bot_y)),
+                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop,
                          "Loading MXCuBE")
-        painter.font().setPixelSize(pxsize*2.5)
+        painter.font().setPixelSize(pxsize * 2.5)
         painter.font().setPixelSize(pxsize)
-        y0 = y1
-        y1 += 3 + painter.fontMetrics().height()
-        painter.drawText(QtCore.QRect(QtCore.QPoint(x0, y0), 
-                         QtCore.QPoint(x1, y1)), 
-                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, 
+        top_y = bot_y
+        bot_y += 3 + painter.fontMetrics().height()
+        painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
+                         QtCore.QPoint(right_x, bot_y)),
+                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom,
                          "Please wait...")
 
 
 class GUISupervisor(QtGui.QWidget):
+    """GUI supervisor"""
 
     brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
     tabChangedSignal = QtCore.pyqtSignal(str, int)
 
-    def __init__(self, designMode=False, showMaximized=False, noBorder=False):
+    def __init__(self, design_mode=False, show_maximized=False, no_border=False):
+        """init"""
+
         QtGui.QWidget.__init__(self)
 
-        self.launchInDesignMode = designMode
-        self.hardwareRepository = HardwareRepository.HardwareRepository()
-        self.showMaximized = showMaximized
-        self.noBorder = noBorder
+        self.framework = None
+        self.gui_config_file = None
+        self.configuration = None
+
+        self.launch_in_design_mode = design_mode
+        self.hardware_repository = HardwareRepository.HardwareRepository()
+        self.show_maximized = show_maximized
+        self.no_border = no_border
         self.windows = []
-        #self.splashScreen = BlissSplashScreen(Qt4_Icons.load('splash'), QtCore.Qt.WA_DeleteOnClose)
-        self.splashScreen = BlissSplashScreen(Qt4_Icons.load('splash'))
-        self.splashScreen.show()
+        self.splash_screen = BlissSplashScreen(Qt4_Icons.load_pixmap('splash'))
+        self.splash_screen.show()
         self.timestamp = 0
 
     def load_gui(self, gui_config_file):
+        """Loads gui"""
+
         self.configuration = Qt4_Configuration.Configuration()
         self.gui_config_file = gui_config_file
 
         if self.gui_config_file:
-            if hasattr(self, "splashScreen"):
-                self.splashScreen.setGUIName(os.path.splitext(os.path.basename(gui_config_file))[0])
-        
+            if hasattr(self, "splash_screen"):
+                self.splash_screen.set_gui_name(os.path.splitext(\
+                     os.path.basename(gui_config_file))[0])
+
             if os.path.exists(gui_config_file):
                 filestat = os.stat(gui_config_file)
                 self.timestamp = filestat[stat.ST_MTIME]
 
                 if filestat[stat.ST_SIZE] == 0:
-                    # empty file
-                    return self.newGUI()
+                    return self.new_gui()
 
-                #
-                # open existing file
-                #
                 try:
-                    f = open(gui_config_file)
+                    gui_file = open(gui_config_file)
                 except:
-                    logging.getLogger().exception("Cannot open file %s", gui_config_file)
-                    QtGui.QMessageBox.warning(self, "Error", "Could not open file %s !" % gui_config_file, QtGui.QMessageBox.Ok)
+                    logging.getLogger().exception("Cannot open file %s",
+                                                  gui_config_file)
+                    QtGui.QMessageBox.warning(self, "Error",
+                           "Could not open file %s !" % gui_config_file,
+                           QtGui.QMessageBox.Ok)
                 else:
-                    #
                     # find mnemonics to speed up loading
                     # (using the 'require' feature from Hardware Repository)
-                    #
-                    def getMnemonics(items_list):
+
+                    def __get_mnemonics(items_list):
+                        """Gets mnemonics"""
+
                         mne_list = []
 
                         for item in items_list:
@@ -137,55 +148,65 @@ class GUISupervisor(QtGui.QWidget):
                                     props = pickle.loads(item["properties"])
                                     #props = pickle.loads(item["properties"].encode('utf8'))
                                 except:
-                                    logging.getLogger().exception("could not load properties for %s", item["name"])
+                                    logging.getLogger().exception(\
+                                        "Could not load properties for %s" % \
+                                        item["name"])
                                 else:
-                                    item["properties"]=props
-                                    """
+                                    item["properties"] = props
                                     try:
-                                        mne_list.append(props["mnemonic"])
+                                        for prop in props:
+                                            prop_value = prop.getValue()
+                                            if type(prop_value) == type('') and \
+                                               prop_value.startswith("/"):
+                                                mne_list.append(prop_value)
                                     except:
-                                        pass
-                                    """
-                                    try:
-                                      for prop in props:
-                                        prop_value = prop.getValue()
-                                        if type(prop_value)==type('') and prop_value.startswith("/"):
-                                          mne_list.append(prop_value)
-                                    except:
-                                      logging.exception("could not build list of required hardware objects")
+                                        logging.exception("Could not " + \
+                                          "build list of required " + \
+                                          "hardware objects")
 
                                 continue
 
-                            mne_list += getMnemonics(item["children"])
+                            mne_list += __get_mnemonics(item["children"])
 
                         return mne_list
 
-                    raw_config = eval(f.read())
-                    mnemonics = getMnemonics(raw_config)
-                    self.hardwareRepository.require(mnemonics)
-                    f.close()
+                    failed_msg = "Cannot read configuration from file %s. " % \
+                                 gui_config_file
+                    failed_msg += "Starting in designer mode with clean GUI."
+
+                    try:
+                        raw_config = eval(gui_file.read())
+                    except:
+                        logging.getLogger().exception(failed_msg)
+
+                    mnemonics = __get_mnemonics(raw_config)
+                    self.hardware_repository.require(mnemonics)
+                    gui_file.close()
 
                     try:
                         config = Qt4_Configuration.Configuration(raw_config)
                     except:
-                        logging.getLogger().exception("Cannot read configuration from file %s", gui_config_file)
-                        QtGui.QMessageBox.warning(self, "Error", "Could not read configuration\nfrom file %s" % gui_config_file, QtGui.QMessageBox.Ok)    
+                        logging.getLogger().exception(failed_msg)
+                        QtGui.QMessageBox.warning(self, "Error", failed_msg,
+                                                  QtGui.QMessageBox.Ok)
                     else:
                         self.configuration = config
 
                     if len(self.configuration.windows) == 0:
-                        self.launchInDesignMode = True
-                                        
-                    if self.launchInDesignMode:
+                        return self.new_gui()
+
+                    if self.launch_in_design_mode:
                         self.framework = Qt4_GUIBuilder.GUIBuilder()
 
                         QtGui.QApplication.setActiveWindow(self.framework)
-                         
+
                         self.framework.filename = gui_config_file
                         self.framework.configuration = config
-                        self.framework.setWindowTitle("GUI Builder - %s" % gui_config_file)
-                        self.framework.gui_editor_window.set_configuration(config)
-                        self.framework.gui_editor_window.draw_window_preview()  
+                        self.framework.setWindowTitle("GUI Builder - %s" % \
+                                                      gui_config_file)
+                        self.framework.gui_editor_window.\
+                             set_configuration(config)
+                        self.framework.gui_editor_window.draw_window_preview()
                         self.framework.show()
 
                         return self.framework
@@ -193,251 +214,184 @@ class GUISupervisor(QtGui.QWidget):
                         main_window = self.execute(self.configuration)
                         return main_window
 
-        return self.newGUI()
+        return self.new_gui()
 
-            
-    def newGUI(self):
-        #
-        # new GUI
-        #
+    def new_gui(self):
+        """Starts new gui"""
+
         self.timestamp = 0
-        self.launchInDesignMode = True
+        self.launch_in_design_mode = True
 
         self.framework = Qt4_GUIBuilder.GUIBuilder()
 
-        #tGui.QApplication.setMainWidget(self.framework)
         QtGui.QApplication.setActiveWindow(self.framework)
         self.framework.show()
         self.framework.new_clicked(self.gui_config_file)
-        
+
         return self.framework
-             
 
-    def reloadGUI(self):
-        msg = "Are you sure you want to reload the GUI ?\n" +\
-              "This will stop the current application and restart it." 
-        if (QtGui.QMessageBox.question(self, "Reload GUI", msg, 
-             QtGui.QMessageBox.Yes, QtGui.QMessageBox.No, 
-             QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Yes):
-
-            self.finalize()
-
-            win0 = self.windows[0]
-            for window in self.windows[1:]:
-                window.close(True)
-            self.windows=[]
-
-            # for first window, delete all children one by one
-            # (instead of deleting the window itself : indeed it's causing
-            # a stop of the whole app. because of "last window closed" signal)
-            for child in win0.children():
-                if hasattr(child, "close"):
-                    child.close(True)
-
-            self.execute(self.configuration)
-
-            # now let's destroy the window !
-            win0.close(True)
-            
-        
     def execute(self, config):
-        #
-        # start in execution mode
-        #
-        self.windows = Qt4_GUIDisplay.display(config, noBorder=self.noBorder)
+        """Start in execution mode"""
+
+        self.windows = Qt4_GUIDisplay.display(config,
+                                              no_border=self.no_border)
         main_window = None
 
         if len(self.windows) > 0:
             main_window = self.windows[0]
             main_window.configuration = config
             QtGui.QApplication.setActiveWindow(main_window)
-            if self.noBorder:
+            if self.no_border:
                 main_window.move(0, 0)
-                w = QtGui.QApplication.desktop().width()
-                h = QtGui.QApplicaitoj.desktop().height()
-                main_window.resize(QtCore.QSize(w,h))
-                
-            #
-            # make connections
-            #        
-            widgets_dict = dict([(isinstance(w.objectName, collections.Callable) and str(w.objectName()) or None, w) for w in QtGui.QApplication.allWidgets()])
+                width = QtGui.QApplication.desktop().width()
+                height = QtGui.QApplication.desktop().height()
+                main_window.resize(QtCore.QSize(width, height))
 
-            def make_connections(items_list): 
+            # make connections
+            widgets_dict = dict([(isinstance(w.objectName, \
+                collections.Callable) and str(w.objectName()) or None, w) \
+                for w in QtGui.QApplication.allWidgets()])
+
+            def make_connections(items_list):
+                """Creates connections"""
+
                 for item in items_list:
                     try:
                         sender = widgets_dict[item["name"]]
                     except KeyError:
-                        logging.getLogger().error("Could not find receiver widget %s", item["name"])
+                        logging.getLogger().error(\
+                            "Could not find receiver widget %s" % \
+                            item["name"])
                     else:
                         for connection in item["connections"]:
-                            _receiver = connection["receiver"] or connection["receiverWindow"]
+                            _receiver = connection["receiver"] or \
+                                connection["receiverWindow"]
                             try:
                                 receiver = widgets_dict[_receiver]
                             except KeyError:
-                                logging.getLogger().error("Could not find receiver widget %s", _receiver)
+                                logging.getLogger().error("Could not find " + \
+                                   "receiver widget %s", _receiver)
                             else:
                                 try:
                                     slot = getattr(receiver, connection["slot"])
                                 except AttributeError:
-                                    logging.getLogger().error("No slot '%s' in receiver %s", connection["slot"], _receiver)
+                                    logging.getLogger().error(\
+                                       "No slot '%s' " % connection["slot"] + \
+                                       "in receiver %s" % _receiver)
                                 else:
-                                    sender.connect(sender, QtCore.SIGNAL(connection["signal"]), slot)
+                                    sender.connect(sender,
+                                        QtCore.SIGNAL(connection["signal"]),
+                                        slot)
                     make_connections(item["children"])
-                                        
+
             make_connections(config.windows_list)
 
-            #
             # set run mode for every brick
-            #
             BlissWidget.setRunMode(True)
 
-            if self.showMaximized:
+            if self.show_maximized:
                 main_window.showMaximized()
             else:
                 main_window.show()
 
             for window in self.windows:
-                """window._fontSizeMinusKey = QtGui.QShortcut(window)
-                window._fontSizeMinusKey.setKey(QtCore.Qt.CTRL + QtCore.Qt.Key_Minus)
-                window._fontSizePlusKey = QtGui.QShortcut(window)
-                window._fontSizePlusKey.setKey(QtCore.Qt.CTRL + QtCore.Qt.Key_Plus)
-                window._fontSizeAsteriskKey = QtGui.QShortcut(window)
-                window._fontSizeAsteriskKey.setKey(QtCore.Qt.CTRL + QtCore.Qt.Key_Asterisk)
-                window._whatsThisKey = QtGui.QShortcut(window)
-                window._whatsThisKey.setKey(QtCore.Qt.Key_F1)
-                window._reloadKey = QtGui.QShortcut(window)
-                window._reloadKey.setKey(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_F5)
-
-                window._splitterPositionAccel = QtGui.QShortcut(window)
-                for key in [QtCore.Qt.Key_F9, QtCore.Qt.Key_F10, QtCore.Qt.Key_F11, QtCore.Qt.Key_F12] :
-                    window._splitterPositionAccel.setKey(QtCore.Qt.SHIFT+key)
-                    window._splitterPositionAccel.setKey(QtCore.Qt.CTRL+key)
-                    window._splitterPositionAccel.setKey(key)
-
-                QtCore.QObject.connect(window._splitterPositionAccel, QtCore.SIGNAL('activated()'),self.saveOrReloadSize)
-                QtCore.QObject.connect(window._fontSizeMinusKey, QtCore.SIGNAL('activated()'), self.changeFontSize)
-                QtCore.QObject.connect(window._whatsThisAccel, QtCore.SIGNAL('activated()'), BlissWidget.updateWhatsThis)
-                QtCore.QObject.connect(window._reloadAccel, QtCore.SIGNAL('activated()'), self.reloadGUI)"""
-
                 if window._show:
                     window.show()
 
         if BlissWidget._menuBar:
             BlissWidget._menuBar.set_exp_mode(False)
-        
+
         return main_window
-                
-    def saveOrReloadSize(self,key) :
-        if key & (QtCore.Qt.SHIFT|QtCore.Qt.CTRL) :
-            key &= ~(QtCore.Qt.SHIFT|QtCore.Qt.CTRL)
-            keyname = 'F%d' % ((key - qt.Qt.Key_F9) + 9)
-            self.saveSize('_%d' % key)
-            QtGui.QMessageBox.information(self,'Position and size',
-                                          'This configuration is saved on key %s' % 
-                                          keyname,
-                                          QtGui.QMessageBox.Default)
-        else:
-            for display in self.windows:
-                window = self.configuration.windows[str(display.name())]
-                Qt4_GUIDisplay.restoreSizes(self.configuration,window,display,configurationSuffix = '_%d' % key,moveWindowFlag = False)
-                
-    def changeFontSize(self, mode):
-        widgets_dict = dict([(isinstance(w.name, collections.Callable) and w.name() or None, w) for w in qt.QApplication.allWidgets()])
-        
-        def setFontSize(item):
-            if mode == 1:
-                i = -1
-            elif mode == 2:
-                i = 1
-            else:
-                i = 0
-                
-            if self.configuration.is_brick(item):
-                if i == 0:
-                    item.brick['fontSize'] = 9
-                else:
-                    item.brick['fontSize']=int(item.brick['fontSize'])+i
-            else:
-                prop = item.properties.properties.get('fontSize', None)
-                if prop is not None:
-                    if i == 0:
-                        prop.setValue(9)
-                    else:
-                        prop.setValue(prop.getValue()+i)
-                    w = widgets_dict[item.name]
-                    f = w.font()
-                    f.setPointSize(prop.getValue())
-                    w.setFont(f)
-
-        [setFontSize(child) for child in sum([self.configuration.find_all_children(window) for window in self.configuration.windows_list], [])]
-
 
     def finalize(self):
+        """Finalize gui load"""
+
         BlissWidget.setRunMode(False) # call .stop() for each brick
 
-        self.hardwareRepository.close()
+        self.hardware_repository.close()
 
         QtGui.QApplication.sendPostedEvents()
         QtGui.QApplication.processEvents()
 
-        self.saveSize()
-        
-    def saveSize(self,configurationSuffix = '') :
-        if not self.launchInDesignMode:
+        self.save_size()
+
+    def save_size(self, configuration_suffix=''):
+        """Saves window size and coordinates in the gui file"""
+
+        if not self.launch_in_design_mode:
             # save windows positions
             for window in self.windows:
                 window_cfg = self.configuration.windows[str(window.objectName())]
 
-                window_cfg["properties"].getProperty("x%s" % configurationSuffix).setValue(window.x())
-                window_cfg["properties"].getProperty("y%s" % configurationSuffix).setValue(window.y())
-                window_cfg["properties"].getProperty("w%s" % configurationSuffix).setValue(window.width())
-                window_cfg["properties"].getProperty("h%s" % configurationSuffix).setValue(window.height())
+                window_cfg["properties"].getProperty(\
+                    "x%s" % configuration_suffix).setValue(window.x())
+                window_cfg["properties"].getProperty(\
+                    "y%s" % configuration_suffix).setValue(window.y())
+                window_cfg["properties"].getProperty(\
+                    "w%s" % configuration_suffix).setValue(window.width())
+                window_cfg["properties"].getProperty(\
+                    "h%s" % configuration_suffix).setValue(window.height())
 
-                splitters =  self.configuration.find_all_children_by_type("splitter", window_cfg)
+                splitters = self.configuration.find_all_children_by_type(\
+                    "splitter", window_cfg)
                 if len(splitters):
-                    for sw in window.queryList("QSplitter"):
+                    for widget in window.queryList("QSplitter"):
                         try:
-                            splitter = splitters[sw.name()]
-                            splitter["properties"].getProperty("sizes%s" % configurationSuffix).setValue(sw.sizes())
+                            splitter = splitters[widget.name()]
+                            splitter["properties"].getProperty("sizes%s" % \
+                               configuration_suffix).setValue(widget.sizes())
                         except KeyError:
                             continue
-                        
+
             # save GUI file only if it is not more recent
             # (to prevent overwritting file if it has been modified in the meantime)
             if self.gui_config_file and os.path.exists(self.gui_config_file):
                 ts = os.stat(self.gui_config_file)[stat.ST_MTIME]
                 if ts <= self.timestamp:
-                    if configurationSuffix == '':
-                        logging.getLogger().debug("saving configuration file to keep windows pos. and sizes")
+                    if configuration_suffix == '':
+                        logging.getLogger().debug("Saving configuration " + \
+                            "file to keep windows pos. and sizes")
                     self.configuration.save(self.gui_config_file)
 
+    def finish_init(self, gui_config_file):
+        """Finalize gui init"""
 
-    def finishInit(self, gui_config_file):
         while True:
             try:
-                self.hardwareRepository.connect()
+                self.hardware_repository.connect()
             except:
-                logging.getLogger().exception('Timeout while trying to connect to Hardware Repository server.')
-                
-                message = """Timeout while connecting to Hardware Repository server ;
-                make sure the Hardware Repository Server is running on host %s.""" % str(self.hardwareRepository.serverAddress).split(':')[0]
-                a = QtGui.QMessageBox.warning(None, 'Cannot connect to Hardware Repository', message, QtGui.QMessageBox.Retry, QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton)
-                if a == QtGui.QMessageBox.Cancel:
-                    logging.getLogger().warning('Gave up trying to connect to Hardware Repository server.')
+                logging.getLogger().exception("Timeout while trying to " + \
+                    "connect to Hardware Repository server.")
+                message = \
+                   "Timeout while connecting to Hardware " + \
+                   "Repository server.\nMake sure the Hardware " + \
+                   "Repository Server is running on host:\n%s." % \
+                   str(self.hardware_repository.serverAddress).split(':')[0]
+                if QtGui.QMessageBox.warning(None,
+                       "Cannot connect to Hardware Repository", message,
+                       QtGui.QMessageBox.Retry, QtGui.QMessageBox.Cancel,
+                       QtGui.QMessageBox.NoButton) == \
+                   QtGui.QMessageBox.Cancel:
+                    logging.getLogger().warning("Gave up trying to " + \
+                       "connect to Hardware Repository server.")
                     break
             else:
-                logging.getLogger().info('Connected to Hardware Repository server %s', self.hardwareRepository.serverAddress)
+                logging.getLogger().info("Connected to Hardware " + \
+                    "Repository server %s" % \
+                    self.hardware_repository.serverAddress)
                 break
 
         try:
             main_widget = None
-            main_widget=self.load_gui(gui_config_file)
+            main_widget = self.load_gui(gui_config_file)
             if main_widget:
-                self.splashScreen.finish(main_widget)
-            del self.splashScreen
+                self.splash_screen.finish(main_widget)
+            del self.splash_screen
         except:
             logging.getLogger().exception("exception while loading GUI file")
             QtGui.QApplication.exit()
 
     def customEvent(self, event):
-        self.finishInit(event.data)
+        """Custom event"""
+
+        self.finish_init(event.data)

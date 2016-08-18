@@ -461,6 +461,9 @@ class GUIEditorWindow(QtGui.QWidget):
         self.root_element.setText(0, QtCore.QString("GUI tree"))
         self.root_element.setExpanded(True)
 
+        self.connection_editor_window = Qt4_ConnectionEditor.\
+             Qt4_ConnectionEditor(self.configuration)
+
         # Layout --------------------------------------------------------------
         _toolbox_hlayout = QtGui.QHBoxLayout(_tools_widget)
         _toolbox_hlayout.addWidget(_add_window_toolbutton)
@@ -591,11 +594,6 @@ class GUIEditorWindow(QtGui.QWidget):
     def show_connections_clicked(self):
         """Show dialog with connection table between bricks"""
 
-        self.connection_editor_window = \
-            Qt4_ConnectionEditor.Qt4_ConnectionEditor(self.configuration)
-        #width = QtGui.QApplication.desktop().width()
-        #height = QtGui.QApplication.desktop().height()
-        #self.connection_editor_window.resize(0.85 * width, 0.7 * height)
         self.connection_editor_window.show()
 
     def update_properties(self, item_cfg):
@@ -1208,8 +1206,9 @@ class GUIBuilder(QtGui.QMainWindow):
         self.log_window.resize(QtCore.QSize(sw * 0.8, sh * 0.2))
         self.property_editor_window = Qt4_PropertyEditorWindow(None)
         self.gui_preview_window = GUIPreviewWindow(None)
-
         self.configuration = self.gui_editor_window.configuration
+        self.connection_editor_window = Qt4_ConnectionEditor.\
+             Qt4_ConnectionEditor(self.configuration)
 
         file_new_action = self.create_action(\
              "&New...", self.new_clicked, QtGui.QKeySequence.New,
@@ -1242,6 +1241,10 @@ class GUIBuilder(QtGui.QMainWindow):
         show_gui_preview_action = self.create_action(\
              "GUI preview", self.show_gui_preview_window,
              tip="GUI preview")
+        show_connections_action = self.create_action(\
+             "Connections", self.show_connection_editor,
+             tip="Show connection editor")
+
         show_log_windowAction = self.create_action(\
              "Log", self.show_log_window, tip="Show log")
         show_gui_action = self.create_action(\
@@ -1251,6 +1254,7 @@ class GUIBuilder(QtGui.QMainWindow):
         window_menu = self.menuBar().addMenu("&Window")
         window_menu_actions = (show_propery_editor_windowAction,
                                show_gui_preview_action,
+                               show_connections_action,
                                show_log_windowAction,
                                show_gui_action)
         self.add_actions(window_menu, window_menu_actions)
@@ -1458,6 +1462,11 @@ class GUIBuilder(QtGui.QMainWindow):
 
         self.gui_preview_window.show()
 
+    def show_connection_editor(self):
+        """Shows connection editor"""
+
+        self.connection_editor_window.show()
+
     def show_log_window(self):
         """Shows log"""
 
@@ -1491,12 +1500,17 @@ class GUIBuilder(QtGui.QMainWindow):
             logging.getLogger().error("Sorry, could not find Hardware Repository server")
         else:
             custom_bricks_dirs = os.path.pathsep.join(BlissFramework.getCustomBricksDirs())
+            print "%s -title " % terminal + \
+              "%s -e Qt4_startGUI.py " % os.path.basename(self.filename) + \
+              "--bricksDirs=%s " % custom_bricks_dirs + \
+              "%s" % (hwr_server and "--hardwareRepository=%s " % hwr_server or "") + \
+              "%s" % self.filename
             pid = subprocess.Popen(\
               "%s -title " % terminal + \
-              "%s -e startGUI " % os.path.basename(self.filename) + \
+              "%s -e Qt4_startGUI " % os.path.basename(self.filename) + \
               "--bricksDirs=%s " % custom_bricks_dirs + \
-              "%s" % hwr_server and "--hardwareRepository=%s " %  + \
-              "%s" % hwr_server or "", self.filename, shell=True).pid
+              "%s" % (hwr_server and "--hardwareRepository=%s " % hwr_server or "") + \
+              "%s" % self.filename, shell=True).pid
 
             logging.getLogger().debug("GUI launched, pid is %d", pid)
 
