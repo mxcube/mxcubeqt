@@ -594,6 +594,7 @@ class GUIEditorWindow(QtGui.QWidget):
     def show_connections_clicked(self):
         """Show dialog with connection table between bricks"""
 
+        self.connection_editor_window.show_connections(self.configuration)
         self.connection_editor_window.show()
 
     def update_properties(self, item_cfg):
@@ -1207,8 +1208,6 @@ class GUIBuilder(QtGui.QMainWindow):
         self.property_editor_window = Qt4_PropertyEditorWindow(None)
         self.gui_preview_window = GUIPreviewWindow(None)
         self.configuration = self.gui_editor_window.configuration
-        self.connection_editor_window = Qt4_ConnectionEditor.\
-             Qt4_ConnectionEditor(self.configuration)
 
         file_new_action = self.create_action(\
              "&New...", self.new_clicked, QtGui.QKeySequence.New,
@@ -1248,7 +1247,7 @@ class GUIBuilder(QtGui.QMainWindow):
         show_log_windowAction = self.create_action(\
              "Log", self.show_log_window, tip="Show log")
         show_gui_action = self.create_action(\
-             "Launch GUI", self.launch_gui_cicked,
+             "Launch GUI", self.launch_gui_clicked,
              tip="launch GUI (as a separate process)")
 
         window_menu = self.menuBar().addMenu("&Window")
@@ -1438,7 +1437,8 @@ class GUIBuilder(QtGui.QMainWindow):
     def quit_clicked(self):
         """Quit"""
 
-        if self.gui_editor_window.configuration.has_changed:
+        if self.gui_editor_window.configuration.has_changed or \
+           self.gui_editor_window.connection_editor_window.has_changed:
             if QtGui.QMessageBox.warning(self, "Please confirm",
                  "Are you sure you want to quit ?\n" + \
                  "Your changes will be lost.",
@@ -1465,7 +1465,9 @@ class GUIBuilder(QtGui.QMainWindow):
     def show_connection_editor(self):
         """Shows connection editor"""
 
-        self.connection_editor_window.show()
+        self.gui_editor_window.connection_editor_window.\
+             show_connections(self.configuration)
+        self.gui_editor_window.connection_editor_window.show()
 
     def show_log_window(self):
         """Shows log"""
@@ -1478,7 +1480,7 @@ class GUIBuilder(QtGui.QMainWindow):
         event.ignore()
         self.quit_clicked()
 
-    def launch_gui_cicked(self):
+    def launch_gui_clicked(self):
         """Starts gui"""
 
         if self.gui_editor_window.configuration.has_changed or \
@@ -1500,11 +1502,6 @@ class GUIBuilder(QtGui.QMainWindow):
             logging.getLogger().error("Sorry, could not find Hardware Repository server")
         else:
             custom_bricks_dirs = os.path.pathsep.join(BlissFramework.getCustomBricksDirs())
-            print "%s -title " % terminal + \
-              "%s -e Qt4_startGUI.py " % os.path.basename(self.filename) + \
-              "--bricksDirs=%s " % custom_bricks_dirs + \
-              "%s" % (hwr_server and "--hardwareRepository=%s " % hwr_server or "") + \
-              "%s" % self.filename
             pid = subprocess.Popen(\
               "%s -title " % terminal + \
               "%s -e Qt4_startGUI " % os.path.basename(self.filename) + \
