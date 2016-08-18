@@ -1237,7 +1237,7 @@ def restoreSizes(configuration, window, display, configurationSuffix="",moveWind
     """
     Descript. :
     """
-    splitters = configuration.findAllChildrenWType("splitter", window)
+    splitters = configuration.find_all_children_by_type("splitter", window)
     
     if len(splitters):
         for sw in display.queryList("QSplitter"):

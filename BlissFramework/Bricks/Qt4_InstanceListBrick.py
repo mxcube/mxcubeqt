@@ -523,6 +523,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         Descript. :
         """
+        print timestamp, method, method_args, master_sync
         if self.instance_server_hwobj.isServer():
             BlissWidget.addEventToCache(timestamp, method, *method_args)
             if not master_sync or BlissWidget.shouldRunEvent():
@@ -533,6 +534,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                                 method.__self__.blockSignals(True)
                             except AttributeError:
                                 pass
+                        
                         method(*method_args)
                     except:
                         pass
@@ -542,8 +544,11 @@ class Qt4_InstanceListBrick(BlissWidget):
                     except AttributeError:
                         pass
         else:
-            #TODO fix addEventToCache
+            print method, method.__self__
+            method.__self__.blockSignals(True)
             method(*method_args)
+
+            method.__self__.blockSignals(False)
             return
 
             if not master_sync or BlissWidget.shouldRunEvent():

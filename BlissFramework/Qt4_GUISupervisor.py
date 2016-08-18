@@ -352,7 +352,7 @@ class GUISupervisor(QtGui.QWidget):
             else:
                 i = 0
                 
-            if self.configuration.isBrick(item):
+            if self.configuration.is_brick(item):
                 if i == 0:
                     item.brick['fontSize'] = 9
                 else:
@@ -369,7 +369,7 @@ class GUISupervisor(QtGui.QWidget):
                     f.setPointSize(prop.getValue())
                     w.setFont(f)
 
-        [setFontSize(child) for child in sum([self.configuration.findAllChildren(window) for window in self.configuration.windows_list], [])]
+        [setFontSize(child) for child in sum([self.configuration.find_all_children(window) for window in self.configuration.windows_list], [])]
 
 
     def finalize(self):
@@ -393,7 +393,7 @@ class GUISupervisor(QtGui.QWidget):
                 window_cfg["properties"].getProperty("w%s" % configurationSuffix).setValue(window.width())
                 window_cfg["properties"].getProperty("h%s" % configurationSuffix).setValue(window.height())
 
-                splitters =  self.configuration.findAllChildrenWType("splitter", window_cfg)
+                splitters =  self.configuration.find_all_children_by_type("splitter", window_cfg)
                 if len(splitters):
                     for sw in window.queryList("QSplitter"):
                         try:

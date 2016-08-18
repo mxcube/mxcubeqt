@@ -17,10 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Configuration
+"""
+
 #import yaml
 import logging
 import imp
-import types
 import pprint
 import pickle
 from BlissFramework.Utils import PropertyBag
@@ -29,9 +31,7 @@ from BlissFramework.Qt4_BaseComponents import NullBrick
 
 
 def loadModule(brick_name):
-    """
-    Descript. :
-    """
+    """Loads module"""
     fp = None
     try:
         fp, path_name, description = imp.find_module(brick_name)
@@ -45,16 +45,14 @@ def loadModule(brick_name):
         return mod
 
 
-def loadBrick(brick_type, brick_name):
-    """
-    Descript. :
-    """
+def load_brick(brick_type, brick_name):
+    """Loads brick"""
     module = loadModule(brick_type)
 
     if module is not None:
         try:
             #classObj = getattr(module, brick_type)
-            classObj = getattr(module, brick_type)
+            class_obj = getattr(module, brick_type)
         except AttributeError:
             logging.getLogger().error(\
                   "Cannot load brick %s : " % brick_name + \
@@ -62,43 +60,39 @@ def loadBrick(brick_type, brick_name):
             return NullBrick(None, brick_name)
         else:
             try:
-                newInstance = classObj(None, brick_name)
+                new_instance = class_obj(None, brick_name)
             except:
                 logging.getLogger().exception(\
                    "Cannot load brick %s : initialization failed", brick_name)
                 return NullBrick(None, brick_name)
             else:
-                newInstance._BlissWidget__stop()
-                return newInstance
+                new_instance._BlissWidget__stop()
+                return new_instance
     else:
         logging.getLogger().error("Cannot load brick %s : " % brick_name + \
                                   "module could not be loaded.")
         return NullBrick(None, brick_name)
-    
+
 
 class Configuration:
-    """
-    Descript. :
-    """
-    classes = { "hbox": Qt4_BaseLayoutItems.ContainerCfg,
-                "vbox": Qt4_BaseLayoutItems.ContainerCfg,
-                "vgroupbox": Qt4_BaseLayoutItems.ContainerCfg,
-                "hgroupbox": Qt4_BaseLayoutItems.ContainerCfg,
-                "hspacer": Qt4_BaseLayoutItems.SpacerCfg,
-                "vspacer": Qt4_BaseLayoutItems.SpacerCfg,
-                "label": Qt4_BaseLayoutItems.LabelCfg,
-                "icon": Qt4_BaseLayoutItems.IconCfg,
-                "tab": Qt4_BaseLayoutItems.TabCfg,
-                "hsplitter": Qt4_BaseLayoutItems.SplitterCfg,
-                "vsplitter": Qt4_BaseLayoutItems.SplitterCfg }
+    """Configuration of a BlissWidget"""
+    classes = {"hbox": Qt4_BaseLayoutItems.ContainerCfg,
+               "vbox": Qt4_BaseLayoutItems.ContainerCfg,
+               "vgroupbox": Qt4_BaseLayoutItems.ContainerCfg,
+               "hgroupbox": Qt4_BaseLayoutItems.ContainerCfg,
+               "hspacer": Qt4_BaseLayoutItems.SpacerCfg,
+               "vspacer": Qt4_BaseLayoutItems.SpacerCfg,
+               "label": Qt4_BaseLayoutItems.LabelCfg,
+               "icon": Qt4_BaseLayoutItems.IconCfg,
+               "tab": Qt4_BaseLayoutItems.TabCfg,
+               "hsplitter": Qt4_BaseLayoutItems.SplitterCfg,
+               "vsplitter": Qt4_BaseLayoutItems.SplitterCfg}
 
 
-    def __init__(self, config = None):
-        """
-        Descript. :
-        """
-        self.hasChanged = False
-        
+    def __init__(self, config=None):
+        """__init__ method"""
+        self.has_changed = False
+
         if config is None:
             self.windows_list = []
             self.windows = {}
@@ -106,10 +100,12 @@ class Configuration:
             self.items = {}
         else:
             self.load(config)
-       
-    def findContainer(self, container_name):
-        """
-        Descript. :
+
+    def find_container(self, container_name):
+        """Returns container
+
+        :param container_name: name of container
+        :type container_name: str
         """
         try:
             parent = self.windows[container_name]
@@ -119,102 +115,106 @@ class Configuration:
             except KeyError:
                 return
         return parent
-    
-    def addWindow(self):
+
+    def add_window(self):
+        """Adds window to the list of windows
+
+        :returns: added Window
         """
-        Descript. :
-        """
-        i = sum([ x.startswith("window") and 1 or 0 for x in self.windows ])
+        i = sum([x.startswith("window") and 1 or 0 for x in self.windows])
         window_name = "window%d" % i
         while window_name in self.windows:
-            i+=1
+            i += 1
             window_name = "window%d" % i
 
         self.windows_list.append(Qt4_BaseLayoutItems.WindowCfg(window_name))
-                            
         self.windows[window_name] = self.windows_list[-1]
+        self.has_changed = True
 
-        self.hasChanged = True
-        
         return self.windows_list[-1]
 
-    def addItem(self, item_type, parent):
-        """
-        Descript. :
+    def add_item(self, item_type, parent):
+        """Adds item to the gui
+
+        :param item_type: config class of the item
+        :type item_type: class
+        :param parent: parent
+        :type parent: widget
         """
         if parent is None:
             logging.getLogger().error("Invalid parent container")
             return
-        
+
         if item_type in Configuration.classes:
-            i = sum([ x.startswith(item_type) and 1 or 0 for x in self.items ])
+            i = sum([x.startswith(item_type) and 1 or 0 for x in self.items])
             item_name = "%s%d" % (item_type, i)
             while item_name in self.items:
-                i+=1
+                i += 1
                 item_name = "%s%d" % (item_type, i)
 
-            cfgClass = Configuration.classes[item_type]
-            error = parent.addChild(cfgClass(item_name, item_type))
+            cfg_class = Configuration.classes[item_type]
+            error = parent.addChild(cfg_class(item_name, item_type))
             if len(error) == 0:
                 self.items[item_name] = parent["children"][-1]
-
-                self.hasChanged = True
-                
+                self.has_changed = True
                 return parent["children"][-1]
             else:
                 return error
         else:
-            logging.getLogger().error("Item of this type (%s) does not exist.", item_type)
+            logging.getLogger().error(\
+                "Item of this type (%s) does not exist.", item_type)
 
-    def addBrick(self, brick_type, parent):
+    def add_brick(self, brick_type, parent):
+        """Adds brick to the gui
+
+        :param brick_type: brick type
+        :type brick_type: class
+        :param parent: parent
+        :type parent: widget
         """
-        Descript. :
-        """
-        i = sum([ x.startswith(brick_type) and 1 or 0 for x in self.bricks ])
+        i = sum([x.startswith(brick_type) and 1 or 0 for x in self.bricks])
         brick_name = "%s%d" % (brick_type, i)
         while brick_name in self.bricks:
-            i+=1
-            brick_name="%s%d" % (brick_type, i)
+            i += 1
+            brick_name = "%s%d" % (brick_type, i)
 
-        brick = loadBrick(brick_type, brick_name)
+        brick = load_brick(brick_type, brick_name)
+        error = parent.addChild(Qt4_BaseLayoutItems.BrickCfg(brick_name,
+                                                             brick_type,
+                                                             brick))
 
-        error = parent.addChild(Qt4_BaseLayoutItems.BrickCfg(brick_name, brick_type, brick))
-        
         if len(error) == 0:
-           
             self.bricks[brick_name] = parent["children"][-1]
-
-            self.hasChanged = True
-                
+            self.has_changed = True
             return parent["children"][-1]
         else:
             brick.close(True)
-            
             return error
-       
-    def findParent(self, item_name, nodeset=[], parent=None):
+
+    def find_parent(self, item_name, nodeset=[], parent=None):
+        """Finds parent of an item
         """
-        Descript. :
-        """
-        i = 0
+        index = 0
         for item in nodeset:
             if item["name"] == item_name:
-                return (parent, i)
+                return (parent, index)
             else:
-                p, index = self.findParent(item_name, nodeset=item["children"], parent=item)
-                if p is not None:
-                    return (p, index)
-            i+=1
+                parent_item, index = self.find_parent(item_name,
+                                                     nodeset=item["children"],
+                                                     parent=item)
+                if parent_item is not None:
+                    return (parent_item, index)
+            index += 1
 
         return (None, -1)
 
-    def findAllChildren(self, parent_item):
+    def find_all_children(self, parent_item):
+        """Returns a list of all children
         """
-        Descript. :
-        """
-        return parent_item["children"] + sum([self.findAllChildren(child) for child in parent_item["children"]], [])
-        
-    def findItem(self, item_name, nodeset = None):
+        return parent_item["children"] + sum([self.find_all_children(child) \
+               for child in parent_item["children"]], [])
+
+    def find_item(self, item_name, nodeset=None):
         """
         Descript. :
         """
@@ -225,40 +225,37 @@ class Configuration:
             if item["name"] == item_name:
                 return item
             else:
-                _item = self.findItem(item_name, item["children"])
-                
+                _item = self.find_item(item_name, item["children"])
+
                 if _item is not None:
                     return _item
-        
-    def findAllChildrenWType(self, item_type, parent_item):
-        """
-        Descript. : valid types are: brick, container, splitter...
+
+    def find_all_children_by_type(self, item_type, parent_item):
+        """Find all children with w type
+           Valid types are: brick, container, splitter...
         """
         try:
             t = getattr(Qt4_BaseLayoutItems, "%sCfg" % str(item_type).title())
         except AttributeError:
             return {}
-        
-        def findChildrenWType(item_type, item):
+
+        def find_children_by_type(item_type, item):
             children = {}
 
             for child in item["children"]:
                 if isinstance(child, t):
-                    children[child["name"]]=child
-                children.update(findChildrenWType(item_type, child))
+                    children[child["name"]] = child
+                children.update(find_children_by_type(item_type, child))
 
             return children
-        
-        return findChildrenWType(item_type, parent_item)
+
+        return find_children_by_type(item_type, parent_item)
 
     def rename(self, parent_item_name, child_pos, new_item_name):
-        """
-        Descript. :
-        """
-        parent_item = self.findItem(parent_item_name)
+        """Renames item"""
+        parent_item = self.find_item(parent_item_name)
 
         if parent_item is None:
-            # window
             item = self.windows_list[child_pos]
         else:
             item = parent_item["children"][child_pos]
@@ -268,7 +265,7 @@ class Configuration:
         if new_item_name == old_item_name:
             return None
 
-        if self.findItem(new_item_name):
+        if self.find_item(new_item_name):
             # new name conflicts with existing item !
             return old_item_name
         else:
@@ -280,15 +277,15 @@ class Configuration:
             recv = "receiver"
             if old_item_name in self.items:
                 del self.items[old_item_name]
-                self.items[new_item_name]=item
+                self.items[new_item_name] = item
             elif old_item_name in self.bricks:
                 del self.bricks[old_item_name]
-                self.bricks[new_item_name]=item
+                self.bricks[new_item_name] = item
             elif old_item_name in self.windows:
                 del self.windows[old_item_name]
-                self.windows[new_item_name]=item
+                self.windows[new_item_name] = item
                 recv = "receiverWindow"
-            
+
             all_items = {}
             all_items.update(self.windows)
             all_items.update(self.bricks)
@@ -299,19 +296,19 @@ class Configuration:
                     connections = item["connections"]
                 else:
                     connections = item.connections
-                for c in connections:
-                    if c[recv]==old_item_name:
-                        print("receiver item %s in %s has been changed to %s" % (old_item_name, item.name, new_item_name))
-                        c[recv]=new_item_name
+                for connection in connections:
+                    if connection[recv] == old_item_name:
+                        logging.getLogger().debug(\
+                           "Receiver item %s in "  % old_item_name + \
+                           "%s has been changed to " % item.name + \
+                           "%s" % new_item_name)
+                        connection[recv] = new_item_name
 
-            self.hasChanged=True
-        
+            self.has_changed = True
 
     def remove(self, item_name):
-        """
-        Descript. :
-        """
-        parent, i = self.findParent(item_name, self.windows_list)
+        """Removes item"""
+        parent, index = self.find_parent(item_name, self.windows_list)
 
         if parent is not None:
             try:
@@ -321,11 +318,9 @@ class Configuration:
                     del self.bricks[item_name]
                 except KeyError:
                     pass
+            parent.removeChild(index)
+            self.has_changed = True
 
-            parent.removeChild(i)
-
-            self.hasChanged = True
-            
             return True
         else:
             try:
@@ -334,69 +329,66 @@ class Configuration:
                 return False
             else:
                 self.windows_list.remove(window)
-
                 del self.windows[item_name]
-                
-                self.hasChanged = True
-                
+                self.has_changed = True
+
                 return True
 
-    def moveUp(self, item_name):
+    def move_up(self, item_name):
+        """Moves an item up in the hierarchy
+
+        :returns: The name of the new item's parent
         """
-        Descript. : Move an item up in the hierarchy
-                    Return the name of the new item's parent
-        """
-        parent, index = self.findParent(item_name, self.windows_list)
+        parent, index = self.find_parent(item_name, self.windows_list)
 
         if parent is None:
             return None
 
         item = parent["children"][index]
-
-        assert item["name"]==item_name
-        
+        assert item["name"] == item_name
         if index == 0:
             # cannot move
             return None
         else:
             del parent["children"][index]
-            parent["children"].insert(index-1, item)
-            self.hasChanged=True
+            parent["children"].insert(index - 1, item)
+            self.has_changed = True
+
             return parent["name"]
-        
-    def moveDown(self, item_name):
+
+    def move_down(self, item_name):
+        """Move an item down in the hierarchy
+        :returns: the name of its new parent item
         """
-        Descript. : Move an item down in the hierarchy
-                    Return the name of its new parent item
-        """
-        parent, index = self.findParent(item_name, self.windows_list)
+        parent, index = self.find_parent(item_name, self.windows_list)
         if parent is None:
             return None
-        
-        item = parent["children"][index]
 
-        assert item["name"]==item_name
-        
+        item = parent["children"][index]
+        assert item["name"] == item_name
+
         try:
-            nextItem = parent["children"][index + 1]
+            next_item = parent["children"][index + 1]
         except IndexError:
             return None
         else:
             del parent["children"][index]
-            parent["children"].insert(index+1, item)
-            self.hasChanged=True
+            parent["children"].insert(index + 1, item)
+            self.has_changed = True
+
             return parent["name"]
 
-    def moveItem(self, source_item_name, target_item_name):
-        """
-        Descript. : Move an item to another place in the hierarchy
-                    Mainly useful for drag'n'drop on the list elements.
+    def move_item(self, source_item_name, target_item_name):
+        """Move an item to another place in the hierarchy
+           Mainly useful for drag'n'drop on the tree.
         """
         if source_item_name == target_item_name:
             return False
-        
-        source_parent_cfg, source_item_pos = self.findParent(source_item_name, self.windows_list)
-        target_parent_cfg, target_item_pos = self.findParent(target_item_name, self.windows_list)
+
+        source_parent_cfg, source_item_pos = \
+            self.find_parent(source_item_name, self.windows_list)
+        target_parent_cfg, target_item_pos = \
+            self.find_parent(target_item_name, self.windows_list)
 
         if source_parent_cfg is None:
             # cannot drag an entire window
@@ -408,37 +400,34 @@ class Configuration:
             # we are dropping on a window
             target_item_cfg = self.windows[target_item_name]
 
-            if not self.isContainer(source_item_cfg):
+            if not self.is_container(source_item_cfg):
                 return False
         else:
             target_item_cfg = target_parent_cfg["children"][target_item_pos]
-        
-        if target_item_cfg in self.findAllChildren(source_item_cfg):
+
+        if target_item_cfg in self.find_all_children(source_item_cfg):
             # cannot move a parent in a child
             return False
-            
+
         del source_parent_cfg["children"][source_item_pos]
 
-        if self.isContainer(target_item_cfg):
+        if self.is_container(target_item_cfg):
             target_item_cfg["children"].insert(0, source_item_cfg)
         else:
-            target_parent_cfg["children"].insert(target_item_pos, source_item_cfg)    
+            target_parent_cfg["children"].insert(target_item_pos,
+                                                 source_item_cfg)
 
-        self.hasChanged=True
-        
+        self.has_changed = True
+
         return True
 
     def dump(self):
-        """
-        Descript. :
-        """
+        """Prints config"""
         pprint.pprint(self.windows_list)
 
     def dump_tree(self):
-        """
-        Descript. :
-        """
-        wl = []
+        """Prints window list"""
+        windows_list = []
         for window_cfg in self.windows_list:
             children = []
 
@@ -446,144 +435,147 @@ class Configuration:
                 children = []
 
                 for child in item_cfg["children"]:
-                    children.append({ "name": child["name"], "children": add_children(child) })
+                    children.append({"name": child["name"],
+                                     "children": add_children(child)})
 
                 return children
-            
-            wl.append({ "name": window_cfg["name"], "children": add_children(window_cfg) })
-        pprint.pprint(wl)
-                
+
+            windows_list.append({"name": window_cfg["name"],
+                                 "children": add_children(window_cfg)})
+        pprint.pprint(windows_list)
+
     def save(self, filename):
-        """
-        Descript. :
-        """
+        """Saves config"""
         try:
             cfg = repr(self.windows_list)
         except:
-            logging.getLogger().exception("panic: an exception occured while serializing GUI objects")
+            logging.getLogger().exception("An exception occured " + \
+                                          "while serializing GUI objects")
             return False
-        else:   
+        else:
             try:
                 config_file = open(filename, "w")
             except:
-                logging.getLogger().exception("Cannot save configuration to %s", filename)
+                logging.getLogger().exception(\
+                    "Cannot save configuration to %s", filename)
                 return False
             else:
                 config_file.write(cfg)
                 config_file.close()
                 #with open("/tmp/mxcube_gui.yaml", 'w') as outfile:
-                #    outfile.write(yaml.dump(cfg, default_flow_style=True) )
-                self.hasChanged=False
-            
+                #    outfile.write(yaml.dump(cfg, default_flow_style=True))
+                self.has_changed = False
+
             return True
 
-
     def load(self, config):
-        """
-        Descript. :
-        """
+        """Loads config"""
         self.windows_list = []
         self.windows = {}
         self.bricks = {}
         self.items = {}
-        self.hasChanged=False
+        self.has_changed = False
         self.windows_list = config
 
-        def loadChildren(children):
-            i = 0
+        def load_children(children):
+            """Loads children"""
+            index = 0
             for child in children:
-                newItem = None
-                
+                new_item = None
+
                 if "brick" in child:
-                    b = loadBrick(child["type"], child["name"])
-                    child["brick"] = b
+                    brick = load_brick(child["type"], child["name"])
+                    child["brick"] = brick
 
-                    newItem = Qt4_BaseLayoutItems.BrickCfg(child["name"], child["type"])
+                    new_item = Qt4_BaseLayoutItems.BrickCfg(child["name"],
+                                                            child["type"])
 
-                    newItem["brick"] = b
-                    self.bricks[child["name"]] = newItem
-                else:  
+                    new_item["brick"] = brick
+                    self.bricks[child["name"]] = new_item
+                else:
                     if child["type"] == "window":
-                        newItem = Qt4_BaseLayoutItems.WindowCfg(child["name"])
-                        self.windows[child["name"]] = newItem
+                        new_item = Qt4_BaseLayoutItems.WindowCfg(child["name"])
+                        self.windows[child["name"]] = new_item
                     else:
-                        newItemClass = Configuration.classes[child["type"]]
-                        newItem = newItemClass(child["name"], child["type"])
-                        self.items[child["name"]] = newItem
+                        NewItemClass = Configuration.classes[child["type"]]
+                        new_item = NewItemClass(child["name"],
+                                                child["type"])
+                        self.items[child["name"]] = new_item
 
-                if newItem is not None:
+                if new_item is not None:
                     if type(child["properties"]) == bytes:
                     #if type(child["properties"]) == str:
                         try:
-                            newItem.setProperties(pickle.loads(child["properties"]))
+                            new_item.setProperties(pickle.loads(child["properties"]))
                             #newItem.setProperties(pickle.loads(child["properties"].encode('utf8')))
                         except:
-                            logging.getLogger().exception("Error: could not load properties for %s", child["name"])
-                            newItem.properties = PropertyBag.PropertyBag()
+                            logging.getLogger().exception(\
+                                "Error: could not load properties " + \
+                                "for %s", child["name"])
+                            new_item.properties = PropertyBag.PropertyBag()
                     else:
-                        newItem.setProperties(child["properties"])
-                         
-                    child["properties"] = newItem.properties
-                 
-                    try:
-                      newItemSignals = newItem["signals"]
-                      newItemSlots = newItem["slots"]
-                    except:
-                      newItem.__dict__ = child
-                    else:
-                      newItem.__dict__ = child
-                      newItem.slots = newItemSlots
-                      newItem.signals = newItemSignals                     
-                      children[i] = newItem
-                     
-                    loadChildren(child["children"])
-                i += 1
-                         
-        loadChildren(self.windows_list)
+                        new_item.setProperties(child["properties"])
 
-    def isContainer(self, item):
+                    child["properties"] = new_item.properties
+
+                    try:
+                        new_item_signals = new_item["signals"]
+                        new_item_slots = new_item["slots"]
+                    except:
+                        new_item.__dict__ = child
+                    else:
+                        new_item.__dict__ = child
+                        new_item.slots = new_item_slots
+                        new_item.signals = new_item_signals
+                        children[index] = new_item
+
+                    load_children(child["children"])
+                index += 1
+        load_children(self.windows_list)
+
+    def is_container(self, item):
         """
-        Descript. :
+        :returns: True if item is container
         """
         return isinstance(item, Qt4_BaseLayoutItems.ContainerCfg)
 
-    def isSpacer(self, item):
+    def is_spacer(self, item):
         """
-        Descript. :
+        :returns: True if item is a spacer
         """
         return isinstance(item, Qt4_BaseLayoutItems.SpacerCfg)
 
-    def isWindow(self, item):
+    def is_window(self, item):
         """
-        Descript. :
+        :returns: True if item is a window
         """
         return isinstance(item, Qt4_BaseLayoutItems.WindowCfg)
 
-    def isBrick(self, item):
+    def is_brick(self, item):
         """
-        Descript. :
+        :returns: True if item is a brick
         """
         return isinstance(item, Qt4_BaseLayoutItems.BrickCfg)
 
     def reload_brick(self, brick_cfg):
-        """
-        Descript. :
+        """Reloads brick
         """
         if type(brick_cfg) == bytes:
-            brick_cfg = self.findItem(brick_cfg)
+            brick_cfg = self.find_item(brick_cfg)
 
         brick_name = brick_cfg["name"]
         brick_type = brick_cfg["type"]
-        
-        parent, index = self.findParent(brick_name, self.windows_list)
+
+        parent, index = self.find_parent(brick_name, self.windows_list)
 
         if parent is not None:
-            brick = loadBrick(brick_type, brick_name)
+            brick = load_brick(brick_type, brick_name)
 
             old_brick_cfg = parent["children"][index]
-            new_brick_cfg = Qt4_BaseLayoutItems.BrickCfg(brick_name, brick_type, brick)
-            parent["children"][index]=new_brick_cfg
-            
+            new_brick_cfg = Qt4_BaseLayoutItems.BrickCfg(brick_name,
+                                                         brick_type,
+                                                         brick)
+            parent["children"][index] = new_brick_cfg
             new_brick_cfg.setProperties(old_brick_cfg["properties"])
-                
+
             return new_brick_cfg
