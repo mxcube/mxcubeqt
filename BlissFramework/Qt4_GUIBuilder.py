@@ -358,7 +358,6 @@ class Qt4_PropertyEditorWindow(QtGui.QWidget):
 
     def property_changed(self, *args):
         """Property changed callback"""
-
         try:
             property_changed_cb = self.__property_changed_cb[\
                self.properties_table.property_bag]
@@ -655,7 +654,6 @@ class GUIEditorWindow(QtGui.QWidget):
 
     def draw_window_preview(self):
         """Draws GUI"""
-
         container_name = self.root_element.child(0).text(0)
         container_cfg, window_id, container_ids, selected_item = \
              self.prepare_window_preview(container_name, None, "")
@@ -1052,40 +1050,40 @@ class GUIEditorWindow(QtGui.QWidget):
 
         if item:
             item_name = str(item.text(0))
-            old_parent = item.parent()
+            old_parent_item = item.parent()
 
             if direction == "up":
                 new_parent = self.configuration.move_up(item_name)
 
                 if new_parent is not None:
-                    new_parent_list = self.tree_widget.findItems(\
+                    new_parent_item_list = self.tree_widget.findItems(\
                          QtCore.QString(new_parent),
                          QtCore.Qt.MatchRecursive, 0)
-                    new_parent = new_parent_list[0]
+                    new_parent_item = new_parent_item_list[0]
 
-                    item_index = old_parent.indexOfChild(item)
-                    old_parent.takeChild(item_index)
-                    if new_parent == old_parent:
+                    item_index = old_parent_item.indexOfChild(item)
+                    old_parent_item.takeChild(item_index)
+                    if new_parent_item == old_parent_item:
                         item_index -= 1
-                        old_parent.insertChild(item_index, item)
+                        old_parent_item.insertChild(item_index, item)
                     else:
-                        new_parent.insertChild(0, item)
+                        new_parent_item.insertChild(0, item)
             else:
                 new_parent = self.configuration.move_down(item_name)
 
                 if new_parent is not None:
-                    new_parent_list = self.tree_widget.findItems(\
+                    new_parent_item_list = self.tree_widget.findItems(\
                          QtCore.QString(new_parent),
                          QtCore.Qt.MatchRecursive, 0)
-                    new_parent = new_parent_item_list[0]
+                    new_parent_item = new_parent_item_list[0]
 
-                    item_index = old_parent.indexOfChild(item)
-                    old_parent.takeChild(item_index)
-                    if new_parent == old_parent:
+                    item_index = old_parent_item.indexOfChild(item)
+                    old_parent_item.takeChild(item_index)
+                    if new_parent_item == old_parent_item:
                         item_index += 1
-                        old_parent.insertChild(item_index, item)
+                        old_parent_item.insertChild(item_index, item)
                     else:
-                        new_parent.addChild(item)
+                        new_parent_item.addChild(item)
 
             if new_parent is not None:
                 self.update_window_preview(new_parent)
@@ -1147,8 +1145,8 @@ class GUIPreviewWindow(QtGui.QWidget):
             self.window_preview_box.setTitle("Window preview: %s%s" % \
                                              (container_cfg["name"], title))
 
-        self.window_preview.drawPreview(container_cfg, window_id,
-                                        container_ids, selected_item)
+        self.window_preview.draw_preview(container_cfg, window_id,
+                                         container_ids, selected_item)
 
     def update_window(self, container_cfg, window_id,
                      container_ids, selected_item):
@@ -1160,8 +1158,8 @@ class GUIPreviewWindow(QtGui.QWidget):
             self.window_preview_box.setTitle("Window preview: %s%s" % \
                                              (container_cfg["name"], title))
 
-        self.window_preview.updatePreview(container_cfg, window_id,
-                                          container_ids, selected_item)
+        self.window_preview.update_preview(container_cfg, window_id,
+                                           container_ids, selected_item)
 
     def add_window_widget(self, window_cfg):
         """Refresh preview after adding a window"""
@@ -1343,9 +1341,9 @@ class GUIBuilder(QtGui.QMainWindow):
     def open_clicked(self):
         """Open gui file"""
 
-        filename = str(QtGui.QFileDialog.getOpenFileName(os.environ["HOME"],
-                       "GUI file (*.gui)", self, "Save file",
-                       "Choose a GUI file to open"))
+        filename = str(QtGui.QFileDialog.getOpenFileName(self,
+            "Open file", os.environ["HOME"],
+            "GUI file (*.gui)", "Choose a GUI file to open"))
 
         if len(filename) > 0:
             try:

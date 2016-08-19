@@ -276,11 +276,13 @@ def run(gui_config_file=None):
 
     if lockfile is not None:
         filename = lockfile.name
-        try:
+        if True:
+        #try:
+            
             lockfile.close()
             os.unlink(filename)
-        except:
-            logging.getLogger().error("Problem removing the lock file")
+        #except:
+        #    logging.getLogger().error("Problem removing the lock file")
 
     if log_lockfile is not None:
         filename = log_lockfile.name

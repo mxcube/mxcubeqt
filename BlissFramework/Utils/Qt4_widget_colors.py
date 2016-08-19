@@ -52,7 +52,7 @@ TREE_ITEM_COLLECTION = QtGui.QColor(255, 230, 210)
 TASK_GROUP = ["#B0DBFF", "#E57935", "#B1FF52"]
 
 
-def set_widget_color(widget, color, color_role =None):
+def set_widget_color(widget, color, color_role=None):
     """
     Descript. :
     """

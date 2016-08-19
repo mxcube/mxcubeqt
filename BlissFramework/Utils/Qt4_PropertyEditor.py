@@ -31,8 +31,9 @@ if sys.version_info > (3, 0):
 else:
    StringList = QtCore.QStringList
 
-from BlissFramework.Utils import PropertyBag
 from BlissFramework import Qt4_Icons
+from BlissFramework.Utils import PropertyBag
+from BlissFramework.Utils import Qt4_widget_colors
 
 
 class Qt4_ConfigurationTable(QtGui.QTableWidget):
@@ -419,90 +420,64 @@ class ColorTableItem(QtGui.QWidget):
         self.row = row
         self.parent = parent
 
-        self.cmdChangeColor = QtGui.QPushButton('Color...', parent)
-        self.cmdResetColor = QtGui.QPushButton('reset', parent)
+        self.change_color_button = QtGui.QPushButton('Color...', parent)
+        self.reset_color_button = QtGui.QPushButton('reset', parent)
 
-        main_layout = QtGui.QHBoxLayout()
-        main_layout.addWidget(self.cmdChangeColor)
-        main_layout.addWidget(self.cmdResetColor)
+        main_layout = QtGui.QHBoxLayout(self)
+        main_layout.addWidget(self.change_color_button)
+        main_layout.addWidget(self.reset_color_button)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0,0,0,0)
-        self.setLayout(main_layout)
 
-        self.cmdChangeColor.clicked.connect(self.cmdChangeColorClicked)
-        self.cmdResetColor.clicked.connect(self.cmdResetColorClicked)
-        self.setColor(color)
+        self.change_color_button.clicked.connect(self.change_color_clicked)
+        self.reset_color_button.clicked.connect(self.reset_color_clicked)
+        self.set_color(color)
 
         #main_layout = QtGui.QVBoxLayout()
         #main_layout.addWidget(hbox) 
         #self.setLayout(main_layout) 
 
-    def setColor(self, color):
+    def set_color(self, color):
         """
         Descript. :
         """
-        try:
-          rgb = color.rgb()
-        except:
-          try:
-            self.qtcolor = QtGui.QColor(color)
-          except:
-            self.qtcolor = QtGui.QtColor(QtCore.Qt.green)
-            self.color = self.qtcolor.rgb()
-          else:
-            self.color = self.qtcolor.rgb()
-        else:
-          self.qtcolor=color
-          self.color=rgb
-
-        if self.cmdChangeColor is not None: 
-            palette = self.cmdChangeColor.palette()
-            palette.setColor(QtGui.QPalette.Button, self.qtcolor)
-            #palette.setColor(QtGui.QPalette.Inactive, self.qtcolor)
-
-            self.cmdChangeColor.setPalette(palette)
-            #                    setStyleSheet("background-color: red")
-            #self.cmdChangeColor.setPaletteBackgroundColor(self.qtcolor)
-
-        self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'), self.row, self.col)
-
-    def cmdChangeColorClicked(self):
-        """
-        Descript. :
-        """
-        newColor = QtGui.QColorDialog.getColor(self.qtcolor or QtGui.QColor("white"), None, 'Select a color')
-        if newColor.isValid():
-            self.setColor(newColor)
-
-    def cmdResetColorClicked(self):
-        """
-        Descript. :
-        """
-        self.setColor(None)
-    
-
-class Dialog(QtGui.QDialog):
-    """
-    Descript. :
-    """
-
-    def __init__(self, property_bag):
-        """
-        Descript. :
-        """
-        QtGui.QDialog.__init__(self, None, None, Qt.WDestructiveClose)
-
-        self.setCaption("Configuration Editor")
-        self.propertiesTable = ConfigurationTable(self)
-        self.propertiesTable.setPropertyBag(property_bag)
-        cmdClose = QPushButton('Close', self)
+        if not color:
+            self.qtcolor = None
+            self.color = None
+            Qt4_widget_colors.set_widget_color(\
+                self.change_color_button,
+                Qt4_widget_colors.BUTTON_ORIGINAL,
+                QtGui.QPalette.Button)
+        else:         
+            try:
+                rgb = color.rgb()
+            except:
+                try:
+                    self.qtcolor = QtGui.QColor(color)
+                except:
+                    self.qtcolor = QtGui.QtColor(QtCore.Qt.green)
+                    self.color = self.qtcolor.rgb()
+                else:
+                    self.color = self.qtcolor.rgb()
+            else:
+                self.qtcolor = color
+                self.color = rgb
         
-        self.connect(self.propertiesTable, PYSIGNAL('propertyChanged'), PYSIGNAL('propertyChanged'))
-        self.connect(cmdClose, SIGNAL('clicked()'), self.close)
+            Qt4_widget_colors.set_widget_color(self.change_color_button,
+                                               self.qtcolor,
+                                               QtGui.QPalette.Button)
+        self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'),
+                         self.row, self.col)
 
-        QVBoxLayout(self, 0, 0)
-        self.layout().setResizeMode(QLayout.FreeResize)
-        self.layout().addWidget(self.propertiesTable)
-        self.layout().addWidget(cmdClose)
-        
-        self.setFixedHeight(500)
+    def change_color_clicked(self):
+        """Opens color dialog to choose color"""
+
+        new_color = QtGui.QColorDialog.getColor(\
+            self.qtcolor or QtGui.QColor("white"), None, 'Select a color')
+        if new_color.isValid():
+            self.set_color(new_color)
+
+    def reset_color_clicked(self):
+        """Resets color"""
+
+        self.set_color(None)
