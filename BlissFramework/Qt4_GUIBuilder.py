@@ -1367,7 +1367,7 @@ class GUIBuilder(QtGui.QMainWindow):
                     else:
                         self.filename = filename
                         self.configuration = new_config
-                        self.setCaption("GUI Builder - %s" % filename)
+                        self.setWindowTitle("GUI Builder - %s" % filename)
                         self.gui_editor_window.set_configuration(new_config)
                 finally:
                     gui_file.close()
