@@ -67,7 +67,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
              available_tests_listwidget
 
         _web_view_widget = QtGui.QWidget(self)
-        _load_last_test_button = QtGui.QPushButton("View last test", \
+        _load_last_test_button = QtGui.QPushButton("View last results", \
              _web_view_widget)
         self.test_result_browser = WebViewWidget(_web_view_widget)
 
@@ -195,7 +195,10 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.beamline_test_widget.ppu_restart_button.setEnabled(is_error)  
                   
     def init_com_table(self):
-        self.com_device_list = self.beamline_test_hwobj.get_device_list()
+        try:
+            self.com_device_list = self.beamline_test_hwobj.get_device_list()
+        except:
+            self.com_device_list = None
 
         if self.com_device_list:
             row = 0
@@ -209,6 +212,8 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             #     self.com_device_table.adjustColumn(col)
             #self.com_device_table.adjustSize()
             self.beamline_test_widget.progress_bar.setMaximum(len(self.com_device_list))
+        else:
+            self.test_com_page.setEnabled(False)
 
     def init_test_queue(self):
         self.available_tests = self.beamline_test_hwobj.get_available_tests()
@@ -216,7 +221,12 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             self.available_tests_listwidget.addItem(value)
 
     def test_focus_mode(self):
+        if not hasattr(self.beamline_test_hwobj, "get_focus_mode"):
+            self.test_focus_page.setEnabled(False)
+            return
+
         active_mode, beam_size = self.beamline_test_hwobj.get_focus_mode()
+
         if active_mode is None:
             self.beamline_test_widget.focus_mode_label.setText(\
                  "<font color='red'>No focusing mode detected<font>")
