@@ -262,28 +262,28 @@ class DataCollectTree(QtGui.QWidget):
         item = self.sample_tree_widget.currentItem()
 
         if item:
+            add_remove = True
+            add_details = False
             self.item_menu.addAction("Rename", self.rename_treewidget_item)
             if isinstance(item, Qt4_queue_item.TaskQueueItem):
-                self.item_menu.addSeparator()
-                self.item_menu.addAction("Cut", self.cut_item)
-                self.item_menu.addAction("Copy", self.copy_item)
-                paste_action = self.item_menu.addAction("Paste", self.paste_item)
-                paste_action.setEnabled(self.item_copy is not None)
-                self.item_menu.addSeparator()
-                self.item_menu.addAction("Save in file", self.save_item)
-                self.item_menu.addAction("Load from file", self.load_item)
-                self.item_menu.addAction("Insert from file", self.insert_item)
-                self.item_menu.addSeparator()
-                self.item_menu.addAction("Remove", self.delete_click)
-                self.item_menu.addAction("Details", self.show_details)
+                if not isinstance(item.get_model(),
+                                  queue_model_objects.SampleCentring):
+                    self.item_menu.addSeparator()
+                    self.item_menu.addAction("Cut", self.cut_item)
+                    self.item_menu.addAction("Copy", self.copy_item)
+                    paste_action = self.item_menu.addAction("Paste", self.paste_item)
+                    paste_action.setEnabled(self.item_copy is not None)
+                    self.item_menu.addSeparator()
+                    self.item_menu.addAction("Save in file", self.save_item)
+                    self.item_menu.addAction("Load from file", self.load_item)
+                    add_details = True
+                else:
+                    self.item_menu.addSeparator()
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.item_menu.addSeparator()
                 paste_action = self.item_menu.addAction("Paste", self.paste_item)
                 paste_action.setEnabled(self.item_copy is not None)
-                self.item_menu.addSeparator()
-                self.item_menu.addAction("Insert from file", self.insert_item)
-                self.item_menu.addSeparator()
-                self.item_menu.addAction("Remove", self.delete_click)
+                add_details = True
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 paste_action = self.item_menu.addAction("Paste", self.paste_item)
                 paste_action.setEnabled(self.item_copy is not None)
@@ -297,17 +297,20 @@ class DataCollectTree(QtGui.QWidget):
                             self.item_menu.addAction("Un-Mount", self.unmount_sample)
                         else:
                             self.item_menu.addAction("Mount", self.mount_sample)
-
                 self.item_menu.addSeparator()
-                self.item_menu.addAction("Insert from file", self.insert_item)
-                self.item_menu.addSeparator()
-                self.item_menu.addAction("Details", self.show_details)
+                add_remove = False
+                add_details = True
             elif isinstance(item, Qt4_queue_item.BasketQueueItem):
                 paste_action = self.item_menu.addAction("Paste", self.paste_item)
                 paste_action.setEnabled(self.item_copy is not None)
                 self.item_menu.addSeparator()
-                self.item_menu.addAction("Insert from file", self.insert_item)
-                self.item_menu.addSeparator()
+                add_remove = False
+            
+            self.item_menu.addAction("Insert from file", self.insert_item)
+            self.item_menu.addSeparator()
+            if add_remove:
+                self.item_menu.addAction("Remove", self.delete_click) 
+            if add_details:
                 self.item_menu.addAction("Details", self.show_details)
             self.item_menu.popup(QtGui.QCursor.pos())
         
@@ -1320,7 +1323,7 @@ class DataCollectTree(QtGui.QWidget):
         """Paste item. If item was cut then remove item from clipboard"""
 
         for item in self.get_selected_items():
-            parent_nodes = ()
+            parent_nodes = []
             if new_node is None:
                 new_node = self.queue_model_hwobj.copy_node(self.item_copy[0])
             else:
@@ -1339,9 +1342,11 @@ class DataCollectTree(QtGui.QWidget):
                 parent_nodes = [item.get_model()]
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
                 #If sample was selected then a new task group is created
-                parent_nodes = [self.create_task_group(item)]
+                parent_nodes = [self.create_task_group(item.get_model())]
             elif isinstance(item, Qt4_queue_item.BasketQueueItem): 
-                parent_nodes = item.get_model().get_sample_list()
+                for sample in item.get_model().get_sample_list():
+                    parent_nodes.append(self.create_task_group(sample))
+                
             for parent_node in parent_nodes:
                 self.queue_model_hwobj.add_child(parent_node, new_node)
         self.sample_tree_widget_selection()
@@ -1378,7 +1383,7 @@ class DataCollectTree(QtGui.QWidget):
         self.delete_click(items_to_apply)     
 
     def insert_item(self, apply_once=False):
-        """Loads item from a file"""
+        """Inserts item from a file"""
 
         filename = str(QtGui.QFileDialog.getOpenFileName(self,
             "Open file", os.environ["HOME"],
@@ -1398,8 +1403,7 @@ class DataCollectTree(QtGui.QWidget):
                 if load_file:
                     load_file.close() 
 
-    def create_task_group(self, sample_item, ref_item=None):
-        sample_item_model = sample_item.get_model()
+    def create_task_group(self, sample_item_model, ref_item=None):
         task_group_node = queue_model_objects.TaskGroup()
         
         #This is ugly and could be much nicer
