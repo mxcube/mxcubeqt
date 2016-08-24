@@ -19,9 +19,11 @@
 #
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
+import os
 
 import logging
 import gevent
+import jsonpickle
 from datetime import datetime
 from collections import namedtuple
 
@@ -79,11 +81,13 @@ class DataCollectTree(QtGui.QWidget):
         self.collect_tree_task = None
         self.user_stopped = False
         self.last_added_item = None
+        self.item_copy = None
         
         self.selection_changed_cb = None
         self.collect_stop_cb = None
         #self.clear_centred_positions_cb = None
         self.run_cb = None
+        self.item_menu = None
 
         # Signals ------------------------------------------------------------
 
@@ -254,34 +258,61 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        menu = QtGui.QMenu(self.sample_tree_widget)
+        self.item_menu = QtGui.QMenu(self.sample_tree_widget)
         item = self.sample_tree_widget.currentItem()
 
         if item:
-            menu.addAction("Rename", self.rename_treewidget_item)
-            if isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
-                menu.addSeparator()
-                menu.addAction("Remove", self.delete_click)
+            add_remove = True
+            add_details = False
+            self.item_menu.addAction("Rename", self.rename_treewidget_item)
+            if isinstance(item, Qt4_queue_item.TaskQueueItem):
+                if not isinstance(item.get_model(),
+                                  queue_model_objects.SampleCentring):
+                    self.item_menu.addSeparator()
+                    self.item_menu.addAction("Cut", self.cut_item)
+                    self.item_menu.addAction("Copy", self.copy_item)
+                    paste_action = self.item_menu.addAction("Paste", self.paste_item)
+                    paste_action.setEnabled(self.item_copy is not None)
+                    self.item_menu.addSeparator()
+                    self.item_menu.addAction("Save in file", self.save_item)
+                    self.item_menu.addAction("Load from file", self.load_item)
+                    add_details = True
+                else:
+                    self.item_menu.addSeparator()
+            elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                self.item_menu.addSeparator()
+                paste_action = self.item_menu.addAction("Paste", self.paste_item)
+                paste_action.setEnabled(self.item_copy is not None)
+                add_details = True
             elif isinstance(item, Qt4_queue_item.SampleQueueItem):
+                paste_action = self.item_menu.addAction("Paste", self.paste_item)
+                paste_action.setEnabled(self.item_copy is not None)
+                self.item_menu.addSeparator()
                 if not item.get_model().free_pin_mode:
                     if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                         self.plate_sample_to_mount = item
-                        menu.addAction("Move", self.mount_sample)
+                        self.item_menu.addAction("Move", self.mount_sample)
                     else:
                         if self.is_mounted_sample_item(item):
-                            menu.addAction("Un-Mount", self.unmount_sample)
+                            self.item_menu.addAction("Un-Mount", self.unmount_sample)
                         else:
-                            menu.addAction("Mount", self.mount_sample)
-
-                menu.addSeparator()
-                menu.addAction("Details", self.show_details)
-            else:
-                menu.addSeparator()
-                menu.addAction("Remove", self.delete_click)
-                menu.addSeparator()
-                menu.addAction("Details", self.show_details)
-            menu.popup(QtGui.QCursor.pos())
-
+                            self.item_menu.addAction("Mount", self.mount_sample)
+                self.item_menu.addSeparator()
+                add_remove = False
+                add_details = True
+            elif isinstance(item, Qt4_queue_item.BasketQueueItem):
+                paste_action = self.item_menu.addAction("Paste", self.paste_item)
+                paste_action.setEnabled(self.item_copy is not None)
+                self.item_menu.addSeparator()
+                add_remove = False
+            
+            self.item_menu.addAction("Insert from file", self.insert_item)
+            self.item_menu.addSeparator()
+            if add_remove:
+                self.item_menu.addAction("Remove", self.delete_click) 
+            if add_details:
+                self.item_menu.addAction("Details", self.show_details)
+            self.item_menu.popup(QtGui.QCursor.pos())
         
     def item_double_click(self):
         """
@@ -958,12 +989,14 @@ class DataCollectTree(QtGui.QWidget):
         if not isinstance(selected_items, list):
             selected_items = self.get_selected_items()
 
-        
         for item in selected_items:
             if type(item) not in (Qt4_queue_item.BasketQueueItem,
                                   Qt4_queue_item.SampleQueueItem,
                                   Qt4_queue_item.DataCollectionGroupQueueItem):
                 new_node = self.queue_model_hwobj.copy_node(item.get_model())
+                new_node.acquisitions[0].acquisition_parameters.\
+                centred_position.snapshot_image = self.beamline_setup_hwobj.\
+                shape_history_hwobj.get_scene_snapshot()
                 self.queue_model_hwobj.add_child(item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
  
@@ -1272,3 +1305,126 @@ class DataCollectTree(QtGui.QWidget):
               #    item.setHidden(hide)
               item_iterator += 1
               item = item_iterator.value()
+
+    def cut_item(self):
+        """Cut selected item"""
+
+        item = self.sample_tree_widget.currentItem()
+        self.item_copy = (item.get_model(), True)
+        self.delete_click([item])
+
+    def copy_item(self):
+        """Makes a copy of the selected item"""
+
+        item = self.sample_tree_widget.currentItem()
+        self.item_copy = (item.get_model(), False)
+
+    def paste_item(self, new_node=None):
+        """Paste item. If item was cut then remove item from clipboard"""
+
+        for item in self.get_selected_items():
+            parent_nodes = []
+            if new_node is None:
+                new_node = self.queue_model_hwobj.copy_node(self.item_copy[0])
+            else:
+                #we have to update run number
+                new_node.acquisitions[0].path_template.run_number = \
+                    self.queue_model_hwobj.get_next_run_number(\
+                    new_node.acquisitions[0].path_template)
+
+            new_node.acquisitions[0].acquisition_parameters.\
+                centred_position.snapshot_image = self.beamline_setup_hwobj.\
+                shape_history_hwobj.get_scene_snapshot() 
+
+            if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                parent_nodes = [item.get_model().get_parent()]
+            elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                parent_nodes = [item.get_model()]
+            elif isinstance(item, Qt4_queue_item.SampleQueueItem):
+                #If sample was selected then a new task group is created
+                parent_nodes = [self.create_task_group(item.get_model())]
+            elif isinstance(item, Qt4_queue_item.BasketQueueItem): 
+                for sample in item.get_model().get_sample_list():
+                    parent_nodes.append(self.create_task_group(sample))
+                
+            for parent_node in parent_nodes:
+                self.queue_model_hwobj.add_child(parent_node, new_node)
+        self.sample_tree_widget_selection()
+
+        if self.item_copy[1]:
+            self.item_copy = None
+        
+    def save_item(self):
+        """Saves a single item in a file"""
+
+        filename = str(QtGui.QFileDialog.getSaveFileName(\
+            self, "Choose a filename to save selected item",
+            os.environ["HOME"]))
+        if not filename.endswith(".dat"):
+            filename += ".dat"
+
+        save_file = None
+        try:
+           save_file = open(filename, 'w')
+           items_to_save = []
+           for item in self.get_selected_items():
+               items_to_save.append(item.get_model())
+           save_file.write(jsonpickle.encode(items_to_save))
+        except:
+           logging.getLogger().exception("Cannot save file %s", filename)
+           if save_file:
+               save_file.close()
+
+    def load_item(self):
+        """Load item from a template saved in a file"""
+
+        items_to_apply = self.get_selected_items()
+        self.insert_item(apply_once=True)
+        self.delete_click(items_to_apply)     
+
+    def insert_item(self, apply_once=False):
+        """Inserts item from a file"""
+
+        filename = str(QtGui.QFileDialog.getOpenFileName(self,
+            "Open file", os.environ["HOME"],
+            "Item file (*.dat)", "Choose a itemfile to open"))
+        if len(filename) > 0:
+            load_file = None
+            try: 
+                load_file = open(filename, 'r')
+                for item in jsonpickle.decode(load_file.read()):
+                    self.item_copy = (item, True)
+                    self.paste_item(item)
+                    if apply_once:
+                        break
+            except:
+                logging.getLogger().exception(\
+                    "Cannot insert an item from file %s", filename)
+                if load_file:
+                    load_file.close() 
+
+    def create_task_group(self, sample_item_model, ref_item=None):
+        task_group_node = queue_model_objects.TaskGroup()
+        
+        #This is ugly and could be much nicer
+        if isinstance(self.item_copy[0], queue_model_objects.DataCollection):
+            if self.item_copy[0].is_helical():
+                group_name = "Helical"
+            elif self.item_copy[0].is_mesh():
+                group_name = "Advanced"
+            else:
+                group_name = "Standart"
+        elif isinstance(self.item_copy[0], queue_model_objects.Characterisation):
+            group_name = "Characterisation" 
+        elif isinstance(self.item_copy[0], queue_model_objects.EnergyScan):
+            group_name = "Energy scan"
+        elif isinstance(self.item_copy[0], queue_model_objects.XRFSpectrum):
+            group_name = "XRF spectrum"
+
+        task_group_node.set_name(group_name)
+        num = sample_item_model.get_next_number_for_name(group_name)
+        task_group_node.set_number(num)
+            
+        self.queue_model_hwobj.add_child(sample_item_model, task_group_node)
+
+        return task_group_node
