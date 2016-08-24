@@ -337,6 +337,9 @@ class TaskToolBoxWidget(QtGui.QWidget):
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
+            new_node.acquisitions[0].acquisition_parameters.\
+                centred_position.snapshot_image = self._beamline_setup_hwobj.\
+                shape_history_hwobj.get_scene_snapshot()
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
 
     def collect_now_button_click(self):
