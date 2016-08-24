@@ -224,7 +224,8 @@ class DataCollectTree(QtGui.QWidget):
         self.history_tree_widget.header().setDefaultSectionSize(80)
         self.history_tree_widget.header().hide()
         self.history_tree_widget.setRootIsDecorated(False)
-        self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        #self.sample_tree_widget.setSelectionMode(\
+        #     QtGui.QAbstractItemView.MultiSelection)
 
     def init_plate_navigator(self, plate_navigator_hwobj):
         self.plate_navigator_widget.init_plate_view(plate_navigator_hwobj)

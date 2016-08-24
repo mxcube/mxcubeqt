@@ -337,6 +337,8 @@ class CreateTaskBase(QtGui.QWidget):
 
     def single_item_selection(self, tree_item):
         sample_item = self.get_sample_item(tree_item)
+        if self._data_path_widget:
+            self._data_path_widget.enable_macros = False
 
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
@@ -392,6 +394,7 @@ class CreateTaskBase(QtGui.QWidget):
 
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
+                self._data_path_widget.enable_macros = True
             self.setDisabled(False)
 
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
@@ -408,6 +411,7 @@ class CreateTaskBase(QtGui.QWidget):
                                                    self._path_template)
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
+                self._data_path_widget.enable_macros = True
             self.setDisabled(False)          
 
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):
@@ -582,6 +586,14 @@ class CreateTaskBase(QtGui.QWidget):
         pass
 
     def _create_path_template(self, sample, path_template):
+        """Creates path template and expands macro keywords:
+           %n : container name (dewar, puck, etc)
+           %c : container number
+           %u : username
+           %p : sample position
+           %s : sample name
+        """
+
         bl_setup = self._beamline_setup_hwobj
 
         acq_path_template = copy.deepcopy(path_template)
@@ -604,6 +616,34 @@ class CreateTaskBase(QtGui.QWidget):
                                           replace('<acronym>', acronym)
             acq_path_template.process_directory = acq_path_template.process_directory.\
                                                   replace('<acronym>', acronym)
+
+        #TODO create a method get_user_name in Session hwobj
+        user_name = ""
+        if os.getenv("SUDO_USER"):
+            user_name = os.getenv("SUDO_USER")
+        else:
+            user_name = os.getenv("USER")
+ 
+        # expand macro keywords in the directory path
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%c', str(sample.location[0]))
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%p', str(sample.location[1]))
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%s', str(sample.name))
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%u', user_name)
+ 
+        # expand macro keywords in the prefix
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%c', str(sample.location[0]))
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%p', str(sample.location[1]))
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%s', str(sample.name))
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%u', user_name)
+        acq_path_template.base_prefix
 
         #acq_path_template.suffix = bl_setup.suffix
 
