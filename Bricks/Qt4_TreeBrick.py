@@ -389,10 +389,11 @@ class Qt4_TreeBrick(BlissWidget):
             if self.dc_tree_widget.sample_mount_method < 2:
                 self.sample_changer_widget.synch_ispyb_button.setEnabled(True)
 
+            #self.queue_model_hwobj.load_on_start()
+
         self.dc_tree_widget.sample_tree_widget_selection()
         self.dc_tree_widget.set_sample_pin_icon()
 
-        #self.queue_model_hwobj.load_on_start()
 
     def enable_collect(self, state):
         """
@@ -1113,7 +1114,7 @@ class Qt4_TreeBrick(BlissWidget):
         """Loads queue from file"""
             
         loaded_model_index = self.dc_tree_widget.load_queue()
-        if loaded_model_index:
+        if loaded_model_index is not None:
             self.sample_changer_widget.filter_cbox.\
                  setCurrentIndex(loaded_model_index)
             self.mount_mode_combo_changed(loaded_model_index)
