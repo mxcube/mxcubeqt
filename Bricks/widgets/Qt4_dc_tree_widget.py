@@ -15,10 +15,11 @@
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 #
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
+
 import os
 
 import logging
@@ -562,6 +563,7 @@ class DataCollectTree(QtGui.QWidget):
                     If entry is a collection then it is selected and 
                     selection callback is raised.
         """
+
         view_item = None
         parent_tree_item = self.get_item_by_model(parent)
 
@@ -994,9 +996,8 @@ class DataCollectTree(QtGui.QWidget):
                                   Qt4_queue_item.SampleQueueItem,
                                   Qt4_queue_item.DataCollectionGroupQueueItem):
                 new_node = self.queue_model_hwobj.copy_node(item.get_model())
-                new_node.acquisitions[0].acquisition_parameters.\
-                centred_position.snapshot_image = self.beamline_setup_hwobj.\
-                shape_history_hwobj.get_scene_snapshot()
+                new_node.set_snapshot(self.beamline_setup_hwobj.\
+                         shape_history_hwobj.get_scene_snapshot())
                 self.queue_model_hwobj.add_child(item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
  
@@ -1332,9 +1333,8 @@ class DataCollectTree(QtGui.QWidget):
                     self.queue_model_hwobj.get_next_run_number(\
                     new_node.acquisitions[0].path_template)
 
-            new_node.acquisitions[0].acquisition_parameters.\
-                centred_position.snapshot_image = self.beamline_setup_hwobj.\
-                shape_history_hwobj.get_scene_snapshot() 
+            new_node.set_snapshot(self.beamline_setup_hwobj.\
+                shape_history_hwobj.get_scene_snapshot())
 
             if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 parent_nodes = [item.get_model().get_parent()]
@@ -1428,3 +1428,43 @@ class DataCollectTree(QtGui.QWidget):
         self.queue_model_hwobj.add_child(sample_item_model, task_group_node)
 
         return task_group_node
+
+    def save_queue(self):
+        """Saves queue in the file"""
+
+        filename = str(QtGui.QFileDialog.getSaveFileName(\
+            self, "Choose a filename to save selected item",
+            os.environ["HOME"]))
+        if not filename.endswith(".dat"):
+            filename += ".dat"
+        self.queue_model_hwobj.save_queue(filename)
+
+    def load_queue(self):
+        """Loads queue from file"""
+
+        filename = str(QtGui.QFileDialog.getOpenFileName(self,
+            "Open file", os.environ["HOME"],
+            "Item file (*.dat)", "Choose queue file to open"))
+        if len(filename) > 0:
+            self.sample_tree_widget.clear()
+            loaded_model = self.queue_model_hwobj.load_queue(filename, 
+               self.beamline_setup_hwobj.shape_history_hwobj.get_scene_snapshot())
+            #this could be much better
+            model_map = {"free-pin" : 0,
+                         "ispyb" : 1,
+                         "plate" : 2}
+            return model_map[loaded_model]
+
+    def auto_save_queue(self):
+        """Enable/disable queue autosave"""
+        pass
+
+    def undo_queue(self):
+        """Undo last change"""
+
+        pass
+
+    def redo_queue(self):
+        """Redo last changed"""
+
+        pass 

@@ -142,12 +142,16 @@ class DataPathWidget(QtGui.QWidget):
         base_proc_dir = self._base_process_dir
         new_sub_dir = str(new_value).strip(' ')
 
+        cursor_pos = self.data_path_layout.folder_ledit.cursorPosition()
         if len(new_value) > 0:
             available_chars = string.ascii_lowercase + string.ascii_uppercase + \
-                              string.digits + "-_"
+                              string.digits + "-_" 
             if self.enable_macros:
                 available_chars += "%"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)
+
+        self.data_path_layout.folder_ledit.setText(new_value)
+        self.data_path_layout.folder_ledit.setCursorPosition(cursor_pos)
 
         if len(new_sub_dir) > 0:
             if new_sub_dir[0] == os.path.sep:
