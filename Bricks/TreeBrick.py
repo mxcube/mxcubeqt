@@ -38,6 +38,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
+        self.addProperty("sample_changer", 'boolean', True)
 
         # Qt - Slots
         # From ProposalBrick2
@@ -230,6 +231,24 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.connect(xml_rpc_server_hwobj, 'start_queue',
                              self.dc_tree_widget.collect_items)
 
+        elif property_name == 'sample_changer':
+            if not new_value:
+                self.sample_changer_widget.child('details_button').hide()
+                self.sample_changer_widget.child('synch_button').hide()
+                self.sample_changer_widget.child('filter_cbox').hide()
+                self.sample_changer_widget.child('filter_label').hide()
+                """
+                self.sample_changer_widget.child('filter_cbox').removeItem(0)
+                self.sample_changer_widget.child('filter_cbox').removeItem(1)
+                self.sample_changer_widget.child('filter_cbox').removeItem(1)
+                self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+                """
+                self.sample_changer_widget.child('centring_cbox').setCurrentItem(0)
+                self.sample_changer_widget.child('centring_cbox').removeItem(1)
+                self.sample_changer_widget.child('centring_cbox').removeItem(1)
+                self.sample_changer_widget.child('centring_cbox').removeItem(1)
+                self.dc_tree_widget.set_centring_method(0)
+
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,
                     is_inhouse = None):
@@ -278,16 +297,17 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         if not logged_in:
             self.dc_tree_widget.populate_free_pin()
-            self.sample_changer_widget.child('filter_cbox').setCurrentItem(2)
-            self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(False)
+            if self.sample_changer_hwobj:
+                self.sample_changer_widget.child('filter_cbox').setCurrentItem(2)
+                self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(False)
 
-            sc_basket_content, sc_sample_content = self.get_sc_content()
-            if sc_basket_content and sc_sample_content:
-                sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
-                       sc_basket_content, sc_sample_content)
+                sc_basket_content, sc_sample_content = self.get_sc_content()
+                if sc_basket_content and sc_sample_content:
+                    sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                        sc_basket_content, sc_sample_content)
 
-            self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
-            self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
+                self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
+                self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
 
             if self.dc_tree_widget.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 plate_sample_content = self.get_plate_content()
