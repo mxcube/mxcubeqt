@@ -266,7 +266,7 @@
                                                 <cstring>resolution_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Resolution (Å):</string>
+                                                <string>Detector distance (mm):</string>
                                             </property>
                                         </widget>
                                         <widget class="QLabel">
