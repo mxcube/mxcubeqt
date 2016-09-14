@@ -503,10 +503,7 @@ class ProposalBrick2(BlissWidget):
 
         if self.ldapConnection == None:
             return self.refuseLogin(False,'Not connected to LDAP, unable to verify password.')
-        if self.dbConnection == None:
-            return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
-
-        self._do_login(prop_type,prop_number,prop_password, self.dbConnection.beamline_name)
+        self._do_login(prop_type,prop_number,prop_password)
 
     def passControl(self,has_control_id):
         pass
@@ -547,8 +544,19 @@ class ProposalBrick2(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
-    def _do_login(self, proposal_code,proposal_number,proposal_password,beamline_name, impersonate=False):
-        login_info = self.dbConnection.login(proposal_code+proposal_number, proposal_password, self.ldapConnection)
+    def _do_login(self, proposal_code,proposal_number,proposal_password):
+        if proposal_code in ('inhouse', 'visitor'):
+            login_name = proposal_number
+        else:
+            login_name = proposal_code+proposal_number
+        try:
+            prop_dict={'code':proposal_code, 'number':proposal_number, 'title':'', 'proposalId':''}
+            now=time.strftime("%Y-%m-%d %H:%M:S")
+            ses_dict={'sessionId':'', 'startDate':now, 'endDate':now, 'comments':''}
+            self.acceptLogin(prop_dict,{'person':login_name},{'name':'ESRF'},ses_dict,{})
+        except Exception, e:
+            self.refuseLogin("Could not log in: %s" % str(e))
+
         try: 
             self.acceptLogin(login_info['Proposal'],\
                 login_info['person'],\
