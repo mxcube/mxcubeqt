@@ -309,9 +309,9 @@ class ProposalBrick2(BlissWidget):
                 tooltip+='Comments: '+comments 
             QToolTip.add(self.titleLabel, tooltip)
             self.titleLabel.show()
-            self.user_group_label.show()
-            self.user_group_ledit.show()
-            self.user_group_save_button.show()
+            #self.user_group_label.show()
+            #self.user_group_ledit.show()
+            #self.user_group_save_button.show()
         
             try:
                 end_time=session['endDate'].split()[1]
@@ -354,9 +354,11 @@ class ProposalBrick2(BlissWidget):
           self.loginBox.hide()
           self.titleLabel.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
           self.titleLabel.show()
+          """
           self.user_group_label.show()
           self.user_group_ledit.show()
           self.user_group_save_button.show()
+          """
 
           self.session_hwobj.proposal_code = ""
           self.session_hwobj.session_id = 1
