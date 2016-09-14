@@ -87,8 +87,9 @@ class CreateTaskBase(qt.QWidget):
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
         # ISPyB
-        if tab_index is 0 and self._session_hwobj.proposal_code:
-            self.update_selection()
+        if self._session_hwobj:
+            if tab_index is 0 and self._session_hwobj.proposal_code:
+                self.update_selection()
 
     def set_beamline_setup(self, bl_setup_hwobj):
         self._beamline_setup_hwobj = bl_setup_hwobj
