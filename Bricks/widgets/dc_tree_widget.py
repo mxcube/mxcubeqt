@@ -798,6 +798,8 @@ class DataCollectTree(qt.QWidget):
             self.add_to_queue([sample], self.sample_list_view, False)
 
     def populate_free_pin(self):
+        self.queue_hwobj.clear()
+        self.sample_list_view.clear()
         self.queue_model_hwobj.clear_model('free-pin')
         self.queue_model_hwobj.select_model('free-pin')
         sample = queue_model_objects.Sample()
