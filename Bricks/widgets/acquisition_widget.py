@@ -439,6 +439,7 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('energies_combo').hide()
 
     def disable_inverse_beam(self, state):
+        """
         if state:
             self.acq_widget_layout.child('inverse_beam_cbx').hide()
             self.acq_widget_layout.child('subwedge_size_label').hide()
@@ -447,6 +448,8 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('inverse_beam_cbx').show()
             self.acq_widget_layout.child('subwedge_size_label').show()
             self.acq_widget_layout.child('subwedge_size_ledit').show()
+        """
+        pass
 
     def hide_aperture(self, state):
         pass
