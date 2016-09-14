@@ -44,6 +44,7 @@ class CreateTaskBase(qt.QWidget):
          self._energy_scan_result = None
          self._session_hwobj = None
          self._beamline_setup_hwobj = None
+         self._processing_parameters = None
          
          qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
                             self.tab_changed)
