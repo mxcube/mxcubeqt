@@ -58,7 +58,7 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tool_box.addItem(self.workflow_page, "Advanced")
 
         self.add_pixmap = Icons.load("add_row.png")
-        self.create_task_button = qt.QPushButton("  Add to queue", self)
+        self.create_task_button = qt.QPushButton("Add to queue", self)
         self.create_task_button.setIconSet(qt.QIconSet(self.add_pixmap))
         msg = "Add the collection method to the selected sample"
         qt.QToolTip.add(self.create_task_button, msg)
@@ -68,8 +68,8 @@ class TaskToolBoxWidget(qt.QWidget):
         self.button_hlayout = qt.QHBoxLayout(None)
         self.spacer = qt.QSpacerItem(1, 20, qt.QSizePolicy.Expanding,
                                      qt.QSizePolicy.Minimum)
-        self.button_hlayout.addItem(self.spacer)
         self.button_hlayout.addWidget(self.create_task_button)
+        self.button_hlayout.addItem(self.spacer)
         self.method_group_box.layout().setSpacing(10)
         self.method_group_box.layout().addLayout(self.button_hlayout)
 
