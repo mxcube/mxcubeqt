@@ -355,7 +355,6 @@ class ProposalBrick2(BlissWidget):
           
         # find if we are using ldap, dbconnection, etc. or not
         if None in (self.ldapConnection, self.dbConnection):
-          self.loginBox.hide()
           self.titleLabel.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
           self.titleLabel.show()
           """
