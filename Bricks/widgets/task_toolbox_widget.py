@@ -85,13 +85,16 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         self.tree_brick = brick
 
-        for i in range(0, self.tool_box.count()):
-            self.tool_box.item(i).set_tree_brick(brick)
+        self.tool_box.item(0).set_tree_brick(brick)
+        #for i in range(0, self.tool_box.count()):
+        #    self.tool_box.item(i).set_tree_brick(brick)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
         self._beamline_setup_hwobj = beamline_setup_hwobj
-        for i in range(0, self.tool_box.count()):
-            self.tool_box.item(i).set_beamline_setup(beamline_setup_hwobj)
+        
+        #for i in range(0, self.tool_box.count()):
+        #    self.tool_box.item(i).set_beamline_setup(beamline_setup_hwobj)
+        self.tool_box.item(0).set_beamline_setup(beamline_setup_hwobj)
 
         self.shape_history = beamline_setup_hwobj.shape_history_hwobj
         self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
@@ -104,11 +107,16 @@ class TaskToolBoxWidget(qt.QWidget):
         else:
             self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
 
-    def update_data_path_model(self):
+    def update_data_path_model_multi(self):
         for i in range(0, self.tool_box.count()):
             item = self.tool_box.item(i)
             item.init_data_path_model()
             item.update_selection()
+
+    def update_data_path_model(self):
+        item = self.tool_box.item(0)
+        item.init_data_path_model()
+        item.update_selection()
 
             
     def ispyb_logged_in(self, logged_in):
@@ -117,9 +125,9 @@ class TaskToolBoxWidget(qt.QWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
-        #import pdb;pdb.set_trace()
-        for i in range(0, self.tool_box.count()):
-            self.tool_box.item(i).ispyb_logged_in(logged_in)
+        self.tool_box.item(0).ispyb_logged_in(logged_in)
+        #for i in range(0, self.tool_box.count()):
+        #    self.tool_box.item(i).ispyb_logged_in(logged_in)
             
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
