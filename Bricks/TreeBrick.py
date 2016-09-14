@@ -654,6 +654,9 @@ class TreeBrick(BaseComponents.BlissWidget):
             self.emit(qt.PYSIGNAL("hide_sample_tab"), (True,))
         
     def selection_changed(self, items):
+        if len(items) == 0:
+            #self.emit(qt.PYSIGNAL("selection_changed"), (None,))
+            return
         if len(items) == 1:
             item = items[0]
             if isinstance(item, queue_item.SampleQueueItem):
