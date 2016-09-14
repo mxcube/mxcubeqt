@@ -411,12 +411,12 @@
                                             </property>
                                         </widget>
                                         <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>num_passes_label</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Number of passes:</string>
-                                            </property>
+                                          <property name="name">
+                                            <cstring>exp_time_label</cstring>
+                                          </property>
+                                          <property name="text">
+                                            <string>Exposure time (s):</string>
+                                          </property>
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
@@ -472,7 +472,7 @@
                                         </widget>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>num_passes_ledit</cstring>
+                                                <cstring>exp_time_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
