@@ -327,12 +327,15 @@ class ProposalBrick2(BlissWidget):
                 expiration_time=0
 
         is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
-        win_title="%s (%s-%s)" % (self["titlePrefix"],\
-            self.dbConnection.translate(proposal["code"],'gui'),\
-            proposal["number"])
+        try:
+            cc = self.dbConnection.translate(proposal["code"],'gui')
+        except AttributeError:
+            cc = proposal["code"]
+
+        win_title="%s (%s-%s)" % (self["titlePrefix"], cc,proposal["number"])
         self.emit(PYSIGNAL("setWindowTitle"),(win_title,))
         self.emit(PYSIGNAL("sessionSelected"),\
-            (session_id,self.dbConnection.translate(proposal["code"],'gui'),\
+            (session_id,cc,\
             str(proposal["number"]),\
             proposal["proposalId"],\
             session["startDate"],\
