@@ -96,15 +96,17 @@ class CreateTaskBase(qt.QWidget):
 
         try:
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
-            bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
-            bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
-            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+            if bl_setup_hwobj.transmission_hwobj is not None:
+                bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
+            if bl_setup_hwobj.resolution_hwobj is not None:
+                bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
+            if bl_setup_hwobj.omega_axis_hwobj is not None:
+                bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
             #TODO discuss dynamic value limits
             #bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
             #bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
             #bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
-            if bl_setup_hwobj.omega_axis_hwobj is not None:
-                bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.update_osc_start)
+
             if bl_setup_hwobj.kappa_axis_hwobj is not None:
                 bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
             if bl_setup_hwobj.kappa_phi_axis_hwobj is not None:
