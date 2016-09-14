@@ -114,11 +114,12 @@ class TaskToolBoxWidget(qt.QWidget):
             self.xrf_spectrum_page.hide()
 
         # Remove energy scan page from non tunable wavelentgh beamlines
-        if not beamline_setup_hwobj.tunable_wavelength():
-            self.tool_box.removeItem(self.energy_scan_page)
-            self.energy_scan_page.hide()
-        else:
-            self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
+        if self.energy_scan_page:
+            if not beamline_setup_hwobj.tunable_wavelength():
+                self.tool_box.removeItem(self.energy_scan_page)
+                self.energy_scan_page.hide()
+            else:
+                self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
 
     def update_data_path_model_multi(self):
         for i in range(0, self.tool_box.count()):
