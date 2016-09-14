@@ -6,7 +6,6 @@ import queue_model_objects_v1 as queue_model_objects
 import sys
 import ShapeHistory as shape_history
 
-from PeriodicTableBrick import PeriodicTableBrick
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
 
