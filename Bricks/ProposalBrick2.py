@@ -372,7 +372,8 @@ class ProposalBrick2(BlissWidget):
           self.emit(PYSIGNAL("setWindowTitle"), (self["titlePrefix"],))
           self.emit(PYSIGNAL("loggedIn"), (False, ))
           self.emit(PYSIGNAL("sessionSelected"),(None, ))
-          self.emit(PYSIGNAL("loggedIn"), (True, ))
+          if self.dbConnection:
+              self.emit(PYSIGNAL("loggedIn"), (True, ))
           self.emit(PYSIGNAL("sessionSelected"), (self.session_hwobj.session_id,
                                                   str(os.environ["USER"]),
                                                   0,
