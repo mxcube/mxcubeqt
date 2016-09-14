@@ -107,6 +107,8 @@ class TaskToolBoxWidget(qt.QWidget):
         if not beamline_setup_hwobj.data_analysis_hwobj:
             self.tool_box.removeItem(self.char_page)
             self.char_page.hide()
+        self.tool_box.removeItem(self.helical_page)
+        self.helical_page.hide()
         if not beamline_setup_hwobj.xrf_spectrum_hwobj:
             self.tool_box.removeItem(self.xrf_spectrum_page)
             self.xrf_spectrum_page.hide()
