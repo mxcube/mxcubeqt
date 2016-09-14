@@ -35,11 +35,15 @@ class DCParametersWidget(qt.QWidget):
         widget = qtui.QWidgetFactory.create(widget_ui)
         widget.reparent(self, qt.QPoint(0, 0))
         self.position_widget = widget
+
         self._processing_gbox = qt.QVGroupBox('Processing', self, 
                                            'processing_gbox')
 
         self.processing_widget = ProcessingWidget(self._processing_gbox)
-        
+
+        #hide all unnecessary fields
+        self._processing_gbox.hide()
+
         v_layout = qt.QVBoxLayout(self, 11, 10, "main_layout")
         rone_hlayout = qt.QHBoxLayout(v_layout, 10, "rone")
         rone_vlayout = qt.QVBoxLayout(rone_hlayout)

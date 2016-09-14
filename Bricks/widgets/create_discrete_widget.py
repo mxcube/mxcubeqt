@@ -11,7 +11,6 @@ from widgets.processing_widget import ProcessingWidget
 from widgets.acquisition_widget import AcquisitionWidget
 from create_task_base import CreateTaskBase
 
-
 class CreateDiscreteWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
         CreateTaskBase.__init__(self, parent, name, fl, 'Standard')
@@ -41,17 +40,18 @@ class CreateDiscreteWidget(CreateTaskBase):
                            'create_dc_path_widget',
                            data_model=self._path_template,
                            layout='vertical')
-
+        """
         self._processing_gbox = qt.QVGroupBox('Processing', self,
                                               'processing_gbox')
 
         self._processing_widget = \
             ProcessingWidget(self._processing_gbox,
                              data_model=self._processing_parameters)
+        """
         
         v_layout.addWidget(self._acq_gbox)
         v_layout.addWidget(self._data_path_gbox)
-        v_layout.addWidget(self._processing_gbox)
+        #v_layout.addWidget(self._processing_gbox)
         v_layout.addStretch()
 
         dp_layout = self._data_path_widget.data_path_widget_layout
@@ -77,7 +77,7 @@ class CreateDiscreteWidget(CreateTaskBase):
     def init_models(self):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
-        self._processing_parameters = queue_model_objects.ProcessingParameters()
+        #self._processing_parameters = queue_model_objects.ProcessingParameters()
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -119,8 +119,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
             #self._processing_parameters = copy.deepcopy(self._processing_parameters)
-            self._processing_parameters = sample_model.processing_parameters
-            self._processing_widget.update_data_model(self._processing_parameters)
+            #self._processing_parameters = sample_model.processing_parameters
+            #self._processing_widget.update_data_model(self._processing_parameters)
             self._acq_widget.disable_inverse_beam(False)
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
@@ -147,11 +147,14 @@ class CreateDiscreteWidget(CreateTaskBase):
                                                     self._path_template)
                 self.get_acquisition_widget().use_osc_start(True)
                 if len(dc.acquisitions) == 1:
-                    self.select_shape_with_cpos(self._acquisition_parameters.\
-                                                centred_position)
+                    try:
+                        self.select_shape_with_cpos(self._acquisition_parameters.\
+                                                        centred_position)
+                    except AttributeError:
+                        pass
 
-                self._processing_parameters = dc.processing_parameters
-                self._processing_widget.update_data_model(self._processing_parameters)
+                #self._processing_parameters = dc.processing_parameters
+                #self._processing_widget.update_data_model(self._processing_parameters)
             else:
                 self.setDisabled(True)
         else:
@@ -235,9 +238,10 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         acq.acquisition_parameters.centred_position = cpos
 
-        processing_parameters = copy.deepcopy(self._processing_parameters)
-        dc = queue_model_objects.DataCollection([acq], sample.crystals[0],
-                                                processing_parameters)
+        #processing_parameters = copy.deepcopy(self._processing_parameters)
+        #dc = queue_model_objects.DataCollection([acq], sample.crystals[0],
+        #                                        processing_parameters)
+        dc = queue_model_objects.DataCollection([acq], sample.crystals[0],None)
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE

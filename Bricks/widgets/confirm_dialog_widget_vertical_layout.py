@@ -103,6 +103,11 @@ class ConfirmDialogWidgetVerticalLayout(QWidget):
 	self.take_snapshots_cbox.clear()
         for i in self.snapshots_list:
           self.take_snapshots_cbox.insertItem(self.__tr(str(i)))
+
+        #hide all unnecessary fields
+        self.force_dark_cbx.hide()
+        self.take_snapshots_label.hide()
+        self.take_snapshots_cbox.hide()
 		
         self.missing_one_cbx.setText(self.__tr("Missing box one"))
         self.missing_two_cbx.setText(self.__tr("Missing box two"))

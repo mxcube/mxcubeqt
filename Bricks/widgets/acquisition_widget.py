@@ -252,6 +252,7 @@ class AcquisitionWidget(qt.QWidget):
                                bool,
                                None)
 
+
         te = beamline_setup.tunable_wavelength()
         self.set_tunable_energy(te)
 
@@ -267,6 +268,19 @@ class AcquisitionWidget(qt.QWidget):
 
         has_aperture = self._beamline_setup.has_aperture()
         self.hide_aperture(has_aperture)
+
+        #hide all unnnecessary fields
+        self.acq_widget_layout.child('inverse_beam_cbx').hide()
+        self.acq_widget_layout.child('subwedge_size_ledit').hide()
+        self.acq_widget_layout.child('subwedge_size_label').hide()
+        #self.acq_widget_layout.child('energy_ledit').hide()
+        #self.acq_widget_layout.child('energy_label').hide()
+        self.acq_widget_layout.child('energies_combo').hide()
+        self.acq_widget_layout.child('mad_cbox').hide()
+        self.acq_widget_layout.child('detector_mode_label').hide()
+        self.acq_widget_layout.child('detector_mode_combo').hide()
+        self.acq_widget_layout.child('shutterless_cbx').hide()
+
 
     def first_image_ledit_change(self, new_value):
         if str(new_value).isdigit():
@@ -413,11 +427,16 @@ class AcquisitionWidget(qt.QWidget):
             self.acq_widget_layout.child('mad_cbox').setChecked(False)
             self.acq_widget_layout.child('energies_combo').setEnabled(False)
             self.acq_widget_layout.child('energies_combo').setCurrentItem(0)
+            self.acq_widget_layout.child('energies_combo').hide()
+            self.acq_widget_layout.child('mad_cbox').hide()
 
     def set_tunable_energy(self, state):
         self.acq_widget_layout.child('energy_ledit').setEnabled(state)
         self.acq_widget_layout.child('mad_cbox').setEnabled(state)
         self.acq_widget_layout.child('energies_combo').setEnabled(state)
+        if not state:
+            self.acq_widget_layout.child('mad_cbox').hide()
+            self.acq_widget_layout.child('energies_combo').hide()
 
     def disable_inverse_beam(self, state):
         if state:
