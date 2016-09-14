@@ -194,7 +194,8 @@ class ResolutionBrick(BlissWidget):
 
 
     def resolutionLimitsChanged(self,limits):
-        logging.getLogger().info("Resolution limits changed to (%3.3f, %3.3f)", *limits)
+        if not None in limits:
+            logging.getLogger().info("Resolution limits changed to (%3.3f, %3.3f)", *limits)
         self.resolutionLimits=limits
         #self.resolutionThread.wait()
         #self.resolutionThread=None
