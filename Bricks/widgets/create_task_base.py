@@ -322,8 +322,11 @@ class CreateTaskBase(qt.QWidget):
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
 
-        proc_directory = self._session_hwobj.\
-                         get_process_directory(sub_dir)
+        try:
+            proc_directory = self._session_hwobj.\
+                get_process_directory(sub_dir)
+        except AttributeError:
+            proc_directory = ''
     
         return (data_directory, proc_directory)
 
