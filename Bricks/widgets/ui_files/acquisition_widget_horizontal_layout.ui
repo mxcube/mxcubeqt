@@ -420,10 +420,10 @@
                                         </widget>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>exp_time_label</cstring>
+                                                <cstring>transmission_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Exposure time (s):</string>
+                                                <string>Transmission (%):</string>
                                             </property>
                                         </widget>
                                         <spacer>
@@ -489,7 +489,7 @@
                                         </widget>
                                         <widget class="QLineEdit">
                                             <property name="name">
-                                                <cstring>exp_time_ledit</cstring>
+                                                <cstring>transmission_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
