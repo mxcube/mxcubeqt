@@ -251,7 +251,8 @@ class ProposalBrick2(BlissWidget):
 
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self,proposal,person,laboratory,session,localcontact):
-        self.dbConnection.enable()
+        if self.dbConnection:
+            self.dbConnection.enable()
         self.session_hwobj.proposal_code = proposal['code']
         self.session_hwobj.session_id = session['sessionId']
         self.session_hwobj.proposal_id = proposal['proposalId']
