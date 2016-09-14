@@ -1,7 +1,10 @@
 import logging
-from qt import *
+#from qt import *
 from BlissFramework.BaseComponents import BlissWidget
-from PyMca import QPeriodicTable
+try:
+    from PyMca import QPeriodicTable
+except ImportError:
+    from PyMca5.PyMca import QPeriodicTable
 
 __category__ = 'mxCuBE'
 

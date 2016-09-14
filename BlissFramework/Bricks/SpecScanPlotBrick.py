@@ -7,7 +7,10 @@ __category__ = 'Scans'
 import logging
 
 from qt import *
-from PyMca.QtBlissGraph import QtBlissGraph
+try:
+    from PyMca.QtBlissGraph import QtBlissGraph
+except ImportError:
+    from PyMca5.PyMca.QtBlissGraph import QtBlissGraph
 from BlissFramework.BaseComponents import BlissWidget
 try:
   from SpecClient_gevent import SpecScan
