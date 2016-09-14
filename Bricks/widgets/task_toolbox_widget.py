@@ -35,14 +35,18 @@ class TaskToolBoxWidget(qt.QWidget):
         font = self.tool_box.font()
         font.setPointSize(10)
         self.tool_box.setFont(font)
-        
+
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         self.discrete_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.helical_page.setBackgroundMode(qt.QWidget.PaletteBackground)
-        self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
+        try:
+            self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
+        except NameError:
+            self.energy_scan_page = None
+
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
         self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
         
