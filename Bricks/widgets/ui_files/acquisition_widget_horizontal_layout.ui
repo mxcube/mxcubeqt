@@ -277,12 +277,12 @@
                                                 <string>Transmission (%):</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLabel">
+                                        <widget class="QCheckBox">
                                             <property name="name">
                                                 <cstring>kappa_phi_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Phi:</string>
+                                                <string>Chi:</string>
                                             </property>
                                         </widget>
                                     </vbox>
