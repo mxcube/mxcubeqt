@@ -269,14 +269,6 @@
                                                 <string>Detector distance (mm):</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>transmission_label</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Transmission (%):</string>
-                                            </property>
-                                        </widget>
                                         <widget class="QCheckBox">
                                             <property name="name">
                                                 <cstring>kappa_phi_label</cstring>
@@ -332,23 +324,6 @@
                                         <widget class="QLineEdit">
                                             <property name="name">
                                                 <cstring>resolution_ledit</cstring>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>75</width>
-                                                    <height>0</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>75</width>
-                                                    <height>32767</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>transmission_ledit</cstring>
                                             </property>
                                             <property name="minimumSize">
                                                 <size>
