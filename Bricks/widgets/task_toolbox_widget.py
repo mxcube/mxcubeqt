@@ -97,8 +97,19 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tool_box.item(0).set_beamline_setup(beamline_setup_hwobj)
 
         self.shape_history = beamline_setup_hwobj.shape_history_hwobj
-        self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
-        self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
+        if beamline_setup_hwobj.workflow_hwobj:
+            self.workflow_page.set_workflow(beamline_setup_hwobj.workflow_hwobj)
+            self.workflow_page.set_shape_history(beamline_setup_hwobj.shape_history_hwobj)
+        else:
+            self.tool_box.removeItem(self.workflow_page)
+            self.workflow_page.hide()
+
+        if not beamline_setup_hwobj.data_analysis_hwobj:
+            self.tool_box.removeItem(self.char_page)
+            self.char_page.hide()
+        if not beamline_setup_hwobj.xrf_spectrum_hwobj:
+            self.tool_box.removeItem(self.xrf_spectrum_page)
+            self.xrf_spectrum_page.hide()
 
         # Remove energy scan page from non tunable wavelentgh beamlines
         if not beamline_setup_hwobj.tunable_wavelength():
