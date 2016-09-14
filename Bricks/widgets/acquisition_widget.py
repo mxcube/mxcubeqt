@@ -58,6 +58,7 @@ class AcquisitionWidget(qt.QWidget):
                      create(os.path.join(os.path.dirname(__file__),
                                          'ui_files/acquisition_widget_vertical_layout.ui'))
 
+
         widget.reparent(self, qt.QPoint(0, 0))
         self.acq_widget_layout = widget
         h_layout.addWidget(self.acq_widget_layout)
@@ -86,11 +87,11 @@ class AcquisitionWidget(qt.QWidget):
                            self.num_images_ledit_change)
 
         overlap_ledit = self.acq_widget_layout.child('overlap_ledit')
-        
         if overlap_ledit:
             qt.QObject.connect(self.acq_widget_layout.child('overlap_ledit'),
                                qt.SIGNAL("textChanged(const QString &)"),
                                self.overlap_changed)
+            
 
         qt.QObject.connect(self.acq_widget_layout.child('subwedge_size_ledit'),
                            qt.SIGNAL("textChanged(const QString &)"),
@@ -99,6 +100,14 @@ class AcquisitionWidget(qt.QWidget):
         qt.QObject.connect(self.acq_widget_layout.child('osc_start_cbox'),
                            qt.SIGNAL("toggled(bool)"),
                            self.osc_start_cbox_click)
+
+        qt.QObject.connect(self.acq_widget_layout.child('kappa_label'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.kappa_label_click)
+
+        qt.QObject.connect(self.acq_widget_layout.child('kappa_phi_label'),
+                           qt.SIGNAL("toggled(bool)"),
+                           self.kappa_phi_label_click)
 
         self.acq_widget_layout.child('subwedge_size_ledit').setDisabled(True)
         self.acq_widget_layout.child('energies_combo').setDisabled(True)
@@ -115,6 +124,14 @@ class AcquisitionWidget(qt.QWidget):
         self.update_osc_start(self._beamline_setup._get_omega_axis_position())
         self.acq_widget_layout.child('osc_start_ledit').setEnabled(state)
 
+    def kappa_label_click(self, state):
+        self.update_kappa(self._beamline_setup._get_kappa_axis_position())
+        self.acq_widget_layout.child('kappa_ledit').setEnabled(state)
+
+    def kappa_phi_label_click(self, state):
+        self.update_kappa_phi(self._beamline_setup._get_kappa_phi_axis_position())
+        self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(state)
+
     def update_osc_start(self, new_value):
         if not self.acq_widget_layout.child('osc_start_cbox').isChecked():
             osc_start_ledit = self.acq_widget_layout.child('osc_start_ledit')
@@ -129,24 +146,46 @@ class AcquisitionWidget(qt.QWidget):
             self._acquisition_parameters.osc_start = osc_start_value
 
     def update_kappa(self, new_value):
-        self.acq_widget_layout.child('kappa_ledit').\
-             setText("%.2f" % float(new_value))
+        if not self.acq_widget_layout.child('kappa_label').isChecked():
+            kappa_ledit = self.acq_widget_layout.child('kappa_ledit')
+            kappa_value = 0
+
+            try:
+                kappa_value = round(float(new_value),2)
+            except TypeError:
+                pass
+            
+            kappa_ledit.setText("%.2f" % kappa_value)
+            self._acquisition_parameters.kappa = kappa_value
 
     def update_kappa_phi(self, new_value):
-        self.acq_widget_layout.child('kappa_phi_ledit').\
-             setText("%.2f" % float(new_value))
+        if not self.acq_widget_layout.child('kappa_phi_label').isChecked():
+            kappa_ledit = self.acq_widget_layout.child('kappa_phi_ledit')
+            kappa_value = 0
+
+            try:
+                kappa_value = round(float(new_value),2)
+            except TypeError:
+                pass
+            
+            kappa_ledit.setText("%.2f" % kappa_value)
+            self._acquisition_parameters.kappa_phi = kappa_value
 
     def use_osc_start(self, state):
         self.acq_widget_layout.child('osc_start_cbox').setChecked(state)
         self.acq_widget_layout.child('osc_start_cbox').setDisabled(state)
 
     def use_kappa(self, state):
-        if self.layout_type == "vertical":
-            self.acq_widget_layout.child('kappa_ledit').setEnabled(state)
+        self.acq_widget_layout.child('kappa_label').setChecked(state)
+        self.acq_widget_layout.child('kappa_label').setDisabled(state)
+        #if self.layout_type == "vertical":
+        #    self.acq_widget_layout.child('kappa_ledit').setEnabled(state)
 
     def use_kappa_phi(self, state):
-        if self.layout_type == "vertical":
-            self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(state)
+        self.acq_widget_layout.child('kappa_phi_label').setChecked(state)
+        self.acq_widget_layout.child('kappa_phi_label').setDisabled(state)
+        #if self.layout_type == "vertical":
+        #    self.acq_widget_layout.child('kappa_phi_ledit').setEnabled(state)
             
     def set_beamline_setup(self, beamline_setup):
         self._beamline_setup = beamline_setup
@@ -170,12 +209,12 @@ class AcquisitionWidget(qt.QWidget):
         self._acquisition_mib.bind_value_update('osc_range', osc_range_ledit,
                                                 float, osc_range_validator)
 
-        kappa_validator = qt.QDoubleValidator(0, 360, 2, self)
+        kappa_validator = qt.QDoubleValidator(-46, 3, 2, self)
         kappa_ledit = self.acq_widget_layout.child('kappa_ledit')
         self._acquisition_mib.bind_value_update('kappa', kappa_ledit,
                                                 float, kappa_validator)
 
-        kappa_phi_validator = qt.QDoubleValidator(0, 360, 2, self)
+        kappa_phi_validator = qt.QDoubleValidator(-95, 500, 2, self)
         kappa_phi_ledit = self.acq_widget_layout.child('kappa_phi_ledit')
         self._acquisition_mib.bind_value_update('kappa_phi', kappa_phi_ledit,
                                                 float, kappa_phi_validator)

@@ -92,12 +92,12 @@
                                                 <string>Detector mode:</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLabel">
+                                        <widget class="QCheckBox">
                                             <property name="name">
                                                 <cstring>kappa_label</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Kappa:</string>
+                                                <string>Gamma:</string>
                                             </property>
                                         </widget>
                                     </vbox>
