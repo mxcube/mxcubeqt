@@ -1,10 +1,8 @@
 import qt
 import queue_model_objects_v1 as queue_model_objects
 
-#from PyMca import QPeriodicTable
 from PeriodicTableBrick import PeriodicTableBrick
 from widgets.data_path_widget import DataPathWidget
-#from SpecScanPlotBrick import SpecScanPlotBrick
 
 
 class EnergyScanParametersWidget(qt.QWidget):
