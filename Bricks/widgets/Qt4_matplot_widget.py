@@ -89,7 +89,6 @@ class TwoAxisPlotWidget(QtGui.QWidget):
         self._two_axis_figure_canvas.clear()
         self._two_axis_figure_canvas.set_axes_labels("energy", "counts")
         self._two_axis_figure_canvas.set_title("Scan started")
-
     def plot_energy_scan_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
                      chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
         self._two_axis_figure_canvas.add_curve(\
@@ -132,6 +131,8 @@ class MplCanvas(FigureCanvas):
 
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
+        self.single_curve = None
+
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
@@ -153,6 +154,7 @@ class MplCanvas(FigureCanvas):
 
     def clear(self):
         self.curves = []
+        self.single_curve = None
         self.axes.cla()
         self.axes.grid(True)
 
@@ -167,17 +169,30 @@ class MplCanvas(FigureCanvas):
 
     def append_new_point(self, y, x=None):
         self._axis_y_array = np.append(self._axis_y_array, y)
+        self._axis_x_array = np.arange(len(self._axis_y_array)) 
+
         if self.max_plot_points:
             if self._axis_y_array.size > self.max_plot_points:
                 self._axis_y_array = np.delete(self._axis_y_array, 0)
 
-        if x:
-            self._axis_x_array = np.append(self._axis_x_array, x)
-            self.axes.plot(self._axis_x_array, self._axis_y_array, linewidth=2)
+        if self.single_curve is None:
+            self.single_curve, = self.axes.plot(self._axis_y_array,
+                                                linewidth=2)
         else:  
-            self.axes.plot(self._axis_y_array, linewidth=2)
+           self.single_curve.set_xdata(self._axis_x_array)
+           self.single_curve.set_ydata(self._axis_y_array)
+           #Need both of these in order to rescale
+        self.axes.relim()
+        self.axes.autoscale_view()
+        #We need to draw *and* flush
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
         self.axes.grid(True)
-        self.draw()
+       
+        #TODO move y lims as propery 
+        self.axes.set_ylim((0, self._axis_y_array.max() + \
+                               self._axis_y_array.max() * 0.05))
+        #self.draw()
         #self.set_title("Scan in progress. Please wait...")
 
     def set_axes_labels(self, x_label, y_label):
@@ -319,13 +334,14 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
             self.im.set_cmap('hot')
         else:
             self.im.set_data(result)
-        self.mpl_canvas.fig.canvas.draw_idle()
+
+        self.im.autoscale()
+        self.mpl_canvas.fig.canvas.draw()
+        self.mpl_canvas.fig.canvas.flush_events()
 
         #if result.max() > 0:
         #    self.add_divider()
         #    plt.colorbar(im, cax = self.cax)
-        #    self.mpl_canvas.fig.canvas.draw_idle()
-        #    #mgr = plt.get_current_fig_manager()
 
     def get_current_coord(self):
         return self.mpl_canvas.get_mouse_coord()

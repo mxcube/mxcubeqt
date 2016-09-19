@@ -537,5 +537,4 @@ class HeatMapWidget(QtGui.QWidget):
         """
         if self.__associated_data_collection and self.__associated_grid:
             self._beamline_setup_hwobj.parallel_processing_hwobj.\
-                 run_processing(self.__associated_data_collection, 
-                                self.__associated_grid) 
+                 run_processing(self.__associated_data_collection)

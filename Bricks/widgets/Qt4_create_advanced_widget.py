@@ -194,9 +194,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         CreateTaskBase.single_item_selection(self, tree_item)
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-            self._init_models()
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                self._path_template)            
+            #self._init_models()
+            ##self._acq_widget.update_data_model(self._acquisition_parameters,
+            #                                    self._path_template)            
+            pass
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):

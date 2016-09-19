@@ -105,16 +105,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 self.connect(self.mach_info_hwobj,
                              'valuesChanged',
                              self.set_value)
-                self.mach_info_hwobj.update_values() 
             else:
                 self.setEnabled(False)
-
-        if property_name == 'showDiskSize':
-            if new_value:
-                self.disc_label = QtGui.QLabel("Storage disc space", self)
-                self.disc_value_label = QtGui.QLabel(self)
-                self.main_vlayout.addWidget(self.disc_label)
-                self.main_vlayout.addWidget(self.disc_value_label)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -124,13 +116,18 @@ class Qt4_MachineInfoBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if not self.graphics_initialized:
+        if self.graphics_initialized is None:
             for item in values_list:
                 temp_widget = CustomInfoWidget(self)
                 temp_widget.init_info(item, self['maxPlotPoints'])
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
-            self.graphics_initialized = True
+            if self['showDiskSize']:
+                self.disc_label = QtGui.QLabel("Storage disc space", self)
+                self.disc_value_label = QtGui.QLabel(self)
+                self.main_vlayout.addWidget(self.disc_label)
+                self.main_vlayout.addWidget(self.disc_value_label)
+        self.graphics_initialized = True
         for index, value in enumerate(values_list):
             self.value_label_list[index].update_info(value)
 
