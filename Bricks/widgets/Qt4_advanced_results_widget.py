@@ -75,4 +75,5 @@ class AdvancedResultsWidget(QtGui.QWidget):
                 self.heat_map_widget.set_results(processing_results, True)
 
     def set_processing_results(self, processing_results, param, last_results):
+        self.setEnabled(last_results)
         self.heat_map_widget.set_results(processing_results, last_results)

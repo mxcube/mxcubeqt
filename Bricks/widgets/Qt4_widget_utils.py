@@ -45,14 +45,22 @@ class DataModelInputBinder(object):
 
     def __ledit_update_value(self, field_name, widget, new_value, type_fn, validator): 
         if not self.bindings[field_name][3]:
+            origin_value = new_value
+            if type_fn == float and validator:
+                pattern = "%." + str(validator.decimals()) + 'f'
+                new_value = QtCore.QString(pattern % float(new_value))
             if self.__validated(field_name,
                                 validator,
                                 self.bindings[field_name][0], 
                                 new_value):
+                if isinstance(widget, QtGui.QLineEdit):
+                    if type_fn is float and validator:
+                        widget.setText('{:g}'.format(round(float(origin_value), \
+                                       validator.decimals())))
                 try:
-                    setattr(self.__model, field_name, type_fn(new_value)) 
+                    setattr(self.__model, field_name, type_fn(origin_value)) 
                 except ValueError:
-                    if new_value != '':
+                    if origin_value != '':
                         raise
                 else:
                     dispatcher.send("model_update", self.__model, field_name, self)
@@ -118,7 +126,9 @@ class DataModelInputBinder(object):
 
             if isinstance(widget, QtGui.QLineEdit):
                 if type_fn is float and validator:
-                    widget.setText(str(round(float(getattr(self.__model, field_name)), validator.decimals())))
+                    value = float(getattr(self.__model, field_name))
+                    widget.setText('{:g}'.format(round(float(value), \
+                                       validator.decimals())))
                 else:
                     widget.setText(str(getattr(self.__model, field_name)))
              
