@@ -288,6 +288,10 @@ class Qt4_TreeBrick(BlissWidget):
                              SampleChanger.INFO_CHANGED_EVENT,
                              self.plate_info_changed)
 
+            self.connect(bl_setup.shape_history_hwobj,
+                         "shapeChanged",
+                         self.dc_tree_widget.shape_changed)
+
             # This is to enable/disable collection button
             # Could be much more generic
             if hasattr(bl_setup, "diffractometer_hwobj"):

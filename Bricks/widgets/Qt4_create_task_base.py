@@ -138,6 +138,7 @@ class CreateTaskBase(QtGui.QWidget):
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
             self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
+            self._graphics_manager_hwobj.connect('shapeChanged', self.shape_changed)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
@@ -672,6 +673,9 @@ class CreateTaskBase(QtGui.QWidget):
         return
 
     def shape_created(self, shape, shape_type):
+        return
+
+    def shape_changed(self, shape, shape_type):
         return
 
     def mad_energy_selected(self, name, energy, state):

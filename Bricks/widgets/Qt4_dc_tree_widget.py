@@ -72,6 +72,7 @@ class DataCollectTree(QtGui.QWidget):
         self.beamline_setup_hwobj = None
 
         # Internal values -----------------------------------------------------
+        self.item_iterator = None
         self.enable_collect_condition = None
         self.collecting = False
         self.sample_mount_method = 0
@@ -1275,9 +1276,9 @@ class DataCollectTree(QtGui.QWidget):
             self.last_added_item.setSelected(True) 
 
     def hide_empty_baskets(self):
-        item_iterator = QtGui.QTreeWidgetItemIterator(\
+        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
              self.sample_tree_widget)
-        item = item_iterator.value()
+        item = self.item_iterator.value()
         while item:
               hide = True
 
@@ -1289,13 +1290,13 @@ class DataCollectTree(QtGui.QWidget):
                           break
                   item.setHidden(hide)
 
-              item_iterator += 1
-              item = item_iterator.value()
+              self.item_iterator += 1
+              item = self.item_iterator.value()
 
     def delete_empty_finished_items(self):
-        item_iterator = QtGui.QTreeWidgetItemIterator(\
+        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
              self.sample_tree_widget)
-        item = item_iterator.value()
+        item = self.item_iterator.value()
         while item:
               #if type(item) in(Qt4_queue_item.BasketQueueItem,
               #                 Qt4_queue_item.DataCollectionGroupQueueItem):
@@ -1304,8 +1305,8 @@ class DataCollectTree(QtGui.QWidget):
               #            hide = False
               #            break
               #    item.setHidden(hide)
-              item_iterator += 1
-              item = item_iterator.value()
+              self.item_iterator += 1
+              item = self.item_iterator.value()
 
     def cut_item(self):
         """Cut selected item"""
@@ -1468,3 +1469,19 @@ class DataCollectTree(QtGui.QWidget):
         """Redo last changed"""
 
         pass 
+
+    def shape_changed(self, shape, shape_type):
+        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
+             self.sample_tree_widget)
+        item = self.item_iterator.value()
+        while item:
+              item_model = item.get_model()
+              if shape_type == "Line" and \
+                 isinstance(item_model, queue_model_objects.DataCollection):
+                  if item_model.is_helical():
+                      (cp_start, cp_end) = item_model.get_centred_positions()
+                      item_model.set_centred_positions((cp_end, cp_start))
+                      item.update_display_name()
+              self.item_iterator += 1
+              item = self.item_iterator.value()
+ 
