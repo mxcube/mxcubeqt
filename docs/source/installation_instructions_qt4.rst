@@ -157,5 +157,5 @@ Other information
 
 * :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
-* :doc:`how_to_defined_gui`
+* :doc:`how_to_define_qt_gui`
 

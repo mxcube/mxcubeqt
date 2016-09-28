@@ -17,6 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import decimal
+
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
@@ -41,24 +43,55 @@ class DataModelInputBinder(object):
         setattr(self.__model, field_name, new_value)
         dispatcher.send("model_update", self.__model, field_name, self)
 
-    def __ledit_update_value(self, field_name, new_value, type_fn, validator):
-        if self.__validated(validator, self.bindings[field_name][0], 
+    def __ledit_update_value(self, field_name, widget, new_value, type_fn, validator): 
+        if not self.bindings[field_name][3]:
+            origin_value = new_value
+            if type_fn == float and validator:
+                pattern = "%." + str(validator.decimals()) + 'f'
+                new_value = QtCore.QString(pattern % float(new_value))
+            if self.__validated(field_name,
+                                validator,
+                                self.bindings[field_name][0], 
+                                new_value):
+                if isinstance(widget, QtGui.QLineEdit):
+                    if type_fn is float and validator:
+                        widget.setText('{:g}'.format(round(float(origin_value), \
+                                       validator.decimals())))
+                try:
+                    setattr(self.__model, field_name, type_fn(origin_value)) 
+                except ValueError:
+                    if origin_value != '':
+                        raise
+                else:
+                    dispatcher.send("model_update", self.__model, field_name, self)
+        #self.bindings[field_name][3] = False
+
+    def __ledit_text_edited(self, field_name, widget, new_value, type_fn, validator):
+        self.bindings[field_name][3] = True
+        if self.__validated(field_name,
+                            validator,
+                            self.bindings[field_name][0],
                             new_value):
             try:
-                setattr(self.__model, field_name, type_fn(new_value)) 
+                setattr(self.__model, field_name, type_fn(new_value))
             except ValueError:
                 if new_value != '':
                     raise
             else:
                 dispatcher.send("model_update", self.__model, field_name, self)
 
-    def __validated(self, validator, widget, new_value):
+    def __validated(self, field_name, validator, widget, new_value):
         if validator:
             if validator.validate(new_value, widget.cursorPosition())[0] \
                     == QtGui.QValidator.Acceptable:
-                Qt4_widget_colors.set_widget_color(widget, 
-                                                   QtCore.Qt.white,
-                                                   QtGui.QPalette.Base) 
+                if self.bindings[field_name][3]:
+                    Qt4_widget_colors.set_widget_color(widget,
+                                           Qt4_widget_colors.LINE_EDIT_CHANGED,
+                                           QtGui.QPalette.Base)
+                else:
+                    Qt4_widget_colors.set_widget_color(widget, 
+                                                       QtCore.Qt.white,
+                                                       QtGui.QPalette.Base) 
                 return True
             else:
                 Qt4_widget_colors.set_widget_color(widget, 
@@ -84,7 +117,7 @@ class DataModelInputBinder(object):
         if data_binder == self:
             return
         try:
-            widget, validator, type_fn = self.bindings[field_name]
+            widget, validator, type_fn, edited = self.bindings[field_name]
         except KeyError:
             return
    
@@ -93,12 +126,12 @@ class DataModelInputBinder(object):
 
             if isinstance(widget, QtGui.QLineEdit):
                 if type_fn is float and validator:
-                    pattern = "%." + str(validator.decimals()) + 'f'
-                    widget.setText(pattern % float(getattr(self.__model, field_name)))
+                    value = float(getattr(self.__model, field_name))
+                    widget.setText('{:g}'.format(round(float(value), \
+                                       validator.decimals())))
                 else:
                     widget.setText(str(getattr(self.__model, field_name)))
-
-                widget.setText(str(getattr(self.__model, field_name)))
+             
             elif isinstance(widget, QtGui.QLabel):        
                 widget.setText(str(getattr(self.__model, field_name)))
             elif isinstance(widget, QtGui.QComboBox):
@@ -111,16 +144,25 @@ class DataModelInputBinder(object):
         
 
     def bind_value_update(self, field_name, widget, type_fn, validator = None):
-        self.bindings[field_name] = (widget, validator, type_fn)
+        self.bindings[field_name] = [widget, validator, type_fn, False]
 
         if isinstance(widget, QtGui.QLineEdit):        
             QtCore.QObject.connect(widget, 
                             QtCore.SIGNAL("textChanged(const QString &)"), 
                             lambda new_value: \
                                 self.__ledit_update_value(field_name,
+                                                          widget,
                                                           new_value,
                                                           type_fn, 
                                                           validator))
+            QtCore.QObject.connect(widget,
+                            QtCore.SIGNAL("textEdited(const QString &)"),
+                            lambda new_value: \
+                                self.__ledit_text_edited(field_name,
+                                                         widget,
+                                                         new_value,
+                                                         type_fn,
+                                                         validator))
             if type_fn is float and validator:
                 pattern = "%." + str(validator.decimals()) + 'f'
                 widget.setText(pattern % float(getattr(self.__model, field_name)))
@@ -171,7 +213,8 @@ class DataModelInputBinder(object):
             
             if validator:
                 if isinstance(widget, QtGui.QLineEdit):
-                    if not self.__validated(validator,
+                    if not self.__validated(key,
+                                            validator,
                                             widget, 
                                             widget.text()):
                         result.append(key)
@@ -182,3 +225,8 @@ class DataModelInputBinder(object):
                     pass
 
         return result
+
+
+    def clear_edit(self):
+        for key in self.bindings.keys():
+            self.bindings[key][3] = False

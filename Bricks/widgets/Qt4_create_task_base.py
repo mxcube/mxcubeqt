@@ -138,6 +138,7 @@ class CreateTaskBase(QtGui.QWidget):
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
             self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
+            self._graphics_manager_hwobj.connect('shapeChanged', self.shape_changed)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
@@ -213,7 +214,7 @@ class CreateTaskBase(QtGui.QWidget):
             
             if acq_widget:
                 acq_widget.previous_energy = energy
-                acq_widget.set_energy(energy, wavelength)
+                acq_widget.update_energy(energy, wavelength)
 
     def set_transmission(self, trans):
         acq_widget = self.get_acquisition_widget()
@@ -337,6 +338,8 @@ class CreateTaskBase(QtGui.QWidget):
 
     def single_item_selection(self, tree_item):
         sample_item = self.get_sample_item(tree_item)
+        if self._data_path_widget:
+            self._data_path_widget.enable_macros = False
 
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
@@ -392,14 +395,15 @@ class CreateTaskBase(QtGui.QWidget):
 
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
+                self._data_path_widget.enable_macros = True
             self.setDisabled(False)
 
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
-            (data_directory, proc_directory) = self.get_default_directory(tree_item)
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
+            #(data_directory, proc_directory) = self.get_default_directory(tree_item)
+            #self._path_template.directory = data_directory
+            #self._path_template.process_directory = proc_directory
 
             #Update energy transmission and resolution
             if self._acq_widget:
@@ -408,6 +412,7 @@ class CreateTaskBase(QtGui.QWidget):
                                                    self._path_template)
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
+                self._data_path_widget.enable_macros = True
             self.setDisabled(False)          
 
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionGroupQueueItem):
@@ -431,6 +436,9 @@ class CreateTaskBase(QtGui.QWidget):
         self._acquisition_parameters.energy = energy
         self._acquisition_parameters.transmission = transmission
         self._acquisition_parameters.resolution = resolution
+
+        self._acq_widget.value_changed_list = []
+        self._acq_widget._acquisition_mib.clear_edit()
 
     """
     def multiple_item_selection(self, tree_items):
@@ -548,19 +556,22 @@ class CreateTaskBase(QtGui.QWidget):
                 if temp_tasks[0].requires_centring():
                     kappa = None
                     kappa_phi = None
-                    task_label = 'sample-centring'
+                    task_label = "Centring"
                     if isinstance(temp_tasks[0], queue_model_objects.DataCollection):
                         kappa = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa
                         kappa_phi = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa_phi
-                        if kappa and kappa_phi:
-                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                        if kappa is not None and \
+                           kappa_phi is not None:
+                            task_label = "Centring (kappa=%0.1f,phi=%0.1f)" %\
+                                         (kappa, kappa_phi)
                     elif isinstance(temp_tasks[0], queue_model_objects.Characterisation):
                         kappa = temp_tasks[0].reference_image_collection.\
                                acquisitions[0].acquisition_parameters.kappa
                         kappa_phi = temp_tasks[0].reference_image_collection.\
                                acquisitions[0].acquisition_parameters.kappa_phi
                         if kappa and kappa_phi:
-                            task_label = 'sample-centring (kappa: %0.2f, phi: %0.2f)' %(kappa, kappa_phi)
+                            task_label = "Centring (kappa=%0.1f,phi=%0.1f)"  % \
+                                         (kappa, kappa_phi)
                     sc = queue_model_objects.SampleCentring(task_label, kappa, kappa_phi)
                     tasks.append(sc)
 
@@ -576,6 +587,14 @@ class CreateTaskBase(QtGui.QWidget):
         pass
 
     def _create_path_template(self, sample, path_template):
+        """Creates path template and expands macro keywords:
+           %n : container name (dewar, puck, etc)
+           %c : container number
+           %u : username
+           %p : sample position
+           %s : sample name
+        """
+
         bl_setup = self._beamline_setup_hwobj
 
         acq_path_template = copy.deepcopy(path_template)
@@ -598,6 +617,34 @@ class CreateTaskBase(QtGui.QWidget):
                                           replace('<acronym>', acronym)
             acq_path_template.process_directory = acq_path_template.process_directory.\
                                                   replace('<acronym>', acronym)
+
+        #TODO create a method get_user_name in Session hwobj
+        user_name = ""
+        if os.getenv("SUDO_USER"):
+            user_name = os.getenv("SUDO_USER")
+        else:
+            user_name = os.getenv("USER")
+ 
+        # expand macro keywords in the directory path
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%c', str(sample.location[0]))
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%p', str(sample.location[1]))
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%s', str(sample.name))
+        acq_path_template.directory = acq_path_template.directory.\
+            replace('%u', user_name)
+ 
+        # expand macro keywords in the prefix
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%c', str(sample.location[0]))
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%p', str(sample.location[1]))
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%s', str(sample.name))
+        acq_path_template.base_prefix = acq_path_template.base_prefix.\
+            replace('%u', user_name)
+        acq_path_template.base_prefix
 
         #acq_path_template.suffix = bl_setup.suffix
 
@@ -626,6 +673,9 @@ class CreateTaskBase(QtGui.QWidget):
         return
 
     def shape_created(self, shape, shape_type):
+        return
+
+    def shape_changed(self, shape, shape_type):
         return
 
     def mad_energy_selected(self, name, energy, state):

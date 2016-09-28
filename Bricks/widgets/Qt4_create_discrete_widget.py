@@ -53,7 +53,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.previous_energy = None
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
@@ -100,6 +99,14 @@ class CreateDiscreteWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
+
+        if self._beamline_setup_hwobj is not None:
+            has_shutter_less = self._beamline_setup_hwobj.\
+                               detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
+
+            self._acquisition_parameters = self._beamline_setup_hwobj.\
+                get_default_acquisition_parameters("default_acquisition_values")
 
     def set_tunable_energy(self, state):
         """
@@ -248,7 +255,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         task_list = self._create_task(sample, None)
         task_list[0].lims_group_id = gid
        
-        print task_list[0] 
         param_list = queue_model_objects.to_collect_dict(task_list[0], \
                        self._session_hwobj, sample, None)
 

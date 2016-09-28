@@ -24,11 +24,10 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
-import time
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = "Qt4_General"
+__category__ = "General"
 
 
 class Qt4_ProgressBarBrick(BlissWidget):

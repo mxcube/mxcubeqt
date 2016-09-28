@@ -84,8 +84,10 @@ class CreateHelicalWidget(CreateTaskBase):
              self.remove_line_button_clicked)  
         self._lines_widget.overlay_cbox.stateChanged.connect(\
              self.overlay_toggled)
-        self._lines_widget.overlay_slider.valueChanged.\
-             connect(self.overlay_alpha_changed)
+        self._lines_widget.overlay_slider.valueChanged.connect(\
+             self.overlay_alpha_changed)
+        self._lines_widget.swap_points_button.clicked.connect(\
+             self.swap_points_clicked)
 
         self._acq_widget.acqParametersChangedSignal.\
              connect(self.acq_parameters_changed)
@@ -115,9 +117,6 @@ class CreateHelicalWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_helical_values")
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-            self._path_template = queue_model_objects.PathTemplate()
 
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
@@ -145,12 +144,18 @@ class CreateHelicalWidget(CreateTaskBase):
             self.lines_treewidget_selection_changed()
 
     def shape_deleted(self, shape, shape_type):
-        if self._lines_map.get(shape):
+        if shape_type == "Line" and self._lines_map.get(shape):
             shape_index = self._lines_widget.lines_treewidget.\
                  indexFromItem(self._lines_map[shape])
             self._lines_widget.lines_treewidget.\
                  takeTopLevelItem(shape_index.row())
             self._lines_map.pop(shape)
+
+    def shape_changed(self, shape, shape_type):
+        lines_treewidget_item = self._lines_map.get(shape)
+        if lines_treewidget_item:
+            lines_treewidget_item.setText(1, "%d" % shape.get_points_index()[0])
+            lines_treewidget_item.setText(2, "%d" % shape.get_points_index()[1])
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
@@ -303,6 +308,7 @@ class CreateHelicalWidget(CreateTaskBase):
         for shape, list_item in self._lines_map.iteritems():
             self._graphics_manager_hwobj.select_shape(shape, list_item.isSelected())
             self._lines_widget.remove_line_button.setEnabled(True)
+            self._lines_widget.swap_points_button.setEnabled(True)
             #shape.setSelected(list_item.isSelected())
 
     def create_line_button_clicked(self):
@@ -331,3 +337,8 @@ class CreateHelicalWidget(CreateTaskBase):
         for line, treewidget_item in self._lines_map.iteritems():
             if treewidget_item.isSelected():
                 line.set_fill_alpha(alpha_value)
+
+    def swap_points_clicked(self):
+        for line, treewidget_item in self._lines_map.iteritems():
+            if treewidget_item.isSelected():
+                self._graphics_manager_hwobj.swap_line_points(line)

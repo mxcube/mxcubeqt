@@ -52,6 +52,7 @@ class CreateCharWidget(CreateTaskBase):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
+        self._vertical_dimension_widget = None
         self._current_selected_item = None
         self.init_models()
         self._char_params_mib = DataModelInputBinder(self._char_params)
@@ -66,7 +67,7 @@ class CreateCharWidget(CreateTaskBase):
 
         self._vertical_dimension_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_vertical_crystal_dimension_widget_layout.ui'))
-        
+
         self._char_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_characterise_simple_widget_vertical_layout.ui')) 
 
@@ -146,17 +147,20 @@ class CreateCharWidget(CreateTaskBase):
         """
         self._char_params.space_group = queue_model_enumerables.\
                                         XTAL_SPACEGROUPS[index]
+
     def _set_space_group(self, space_group):
         """
         Descript. :
         """
         index  = 0
-        
-        if space_group in XTAL_SPACEGROUPS:
-            index = XTAL_SPACEGROUPS.index(space_group)
+     
+        if self._vertical_dimension_widget: 
+            if space_group in XTAL_SPACEGROUPS:
+                index = XTAL_SPACEGROUPS.index(space_group)
 
-        self._space_group_change(index)
-        self._vertical_dimension_widget.space_group_ledit.setCurrentIndex(index)
+            self._space_group_change(index)
+            self._vertical_dimension_widget.space_group_ledit.\
+                 setCurrentIndex(index)
 
     def init_models(self):
         """
@@ -172,6 +176,7 @@ class CreateCharWidget(CreateTaskBase):
         self._char = queue_model_objects.Characterisation()
         self._char_params = self._char.characterisation_parameters
         self._processing_parameters = queue_model_objects.ProcessingParameters()
+        self._set_space_group(self._processing_parameters.space_group)
 
         if self._beamline_setup_hwobj is not None:            
             self._acquisition_parameters = self._beamline_setup_hwobj.\
@@ -179,27 +184,6 @@ class CreateCharWidget(CreateTaskBase):
 
             self._char_params = self._beamline_setup_hwobj.\
                                 get_default_characterisation_parameters()
-            try:
-                transmission = self._beamline_setup_hwobj.transmission_hwobj.getAttFactor()
-                transmission = round(float(transmission), 1)
-            except AttributeError:
-                transmission = 0
-
-            try:
-                resolution = self._beamline_setup_hwobj.resolution_hwobj.getPosition()
-                resolution = round(float(resolution), 3)
-            except AttributeError:
-                resolution = 0
-
-            try:
-                energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
-                energy = round(float(energy), 4)
-            except AttributeError:
-                energy = 0
-
-            self._acquisition_parameters.resolution = resolution
-            self._acquisition_parameters.energy = energy
-            self._acquisition_parameters.transmission = transmission
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
         
@@ -219,13 +203,13 @@ class CreateCharWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-            self._init_models()
-            self._set_space_group(self._char_params.space_group)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                self._path_template)
+            #self._init_models() 
+            if self._char_params.space_group == "":
+                sample_model = tree_item.get_model()
+                self._set_space_group(sample_model.processing_parameters.space_group)
+            #self._acq_widget.update_data_model(self._acquisition_parameters,
+            #                                   self._path_template)
             self._char_params_mib.set_model(self._char_params)
-            #self._char_params = copy.deepcopy(self._char_params)
-            #self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.CharacterisationQueueItem):

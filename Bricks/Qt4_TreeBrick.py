@@ -29,9 +29,10 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-from widgets.Qt4_dc_tree_widget import DataCollectTree
+
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
-from widgets.Qt4_tree_options_dialog import TreeOptionsDialog
+
+from widgets.Qt4_dc_tree_widget import DataCollectTree
 
 
 __category__ = 'General'
@@ -74,6 +75,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
         self.addProperty("useFilterWidget", "boolean", True)
         self.addProperty("useSampleWidget", "boolean", True)
+        self.addProperty("scOneName", "string", "Sample changer")
+        self.addProperty("scTwoName", "string", "Plate")
+        self.addProperty("usePlateNavigator", "boolean", False)
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_hutch_menu", ())
@@ -139,8 +143,6 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.run_cb = self.run
         #self.dc_tree_widget.clear_centred_positions_cb = \
         #    self.clear_centred_positions
-        self.tree_options_dialog = TreeOptionsDialog(self, 'Tree options Dialog')
-        self.tree_options_dialog.setModal(True)
 
         # Layout --------------------------------------------------------------
         main_layout = QtGui.QVBoxLayout(self)
@@ -176,9 +178,28 @@ class Qt4_TreeBrick(BlissWidget):
 
     # Framework 2 method
     def run(self):
-        """
-        Descript. :
-        """
+        """Adds save, load and auto save menus to the menubar
+           Emits signals to close tabs"""
+
+        self.tools_menu = QtGui.QMenu("Queue", self)
+        self.tools_menu.addAction("Save",
+                                  self.queue_save_clicked)
+        self.tools_menu.addAction("Load",
+                                  self.queue_load_clicked)
+        self.queue_autosave_action = self.tools_menu.addAction(\
+             "Auto save", self.queue_autosave_clicked)
+        self.queue_autosave_action.setCheckable(True)
+        self.queue_autosave_action.setEnabled(False)
+
+        self.queue_undo_action = self.tools_menu.addAction(\
+             "Undo last action", self.queue_undo_clicked)
+        self.queue_undo_action.setEnabled(False)
+        self.queue_redo_action = self.tools_menu.addAction(\
+             "Redo last action", self.queue_redo_clicked)
+        self.queue_redo_action.setEnabled(False)
+
+        BlissWidget._menuBar.insert_menu(self.tools_menu, 1) 
+
         self.emit(QtCore.SIGNAL("hide_dc_parameters_tab"), True)
         self.emit(QtCore.SIGNAL("hide_dcg_tab"), True)
         self.emit(QtCore.SIGNAL("hide_sample_centring_tab"), False)
@@ -239,18 +260,18 @@ class Qt4_TreeBrick(BlissWidget):
             self.session_hwobj = bl_setup.session_hwobj
             self.lims_hwobj = bl_setup.lims_client_hwobj
 
-            try:
+            if bl_setup.sample_changer_hwobj is not None:
                self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
-            except AttributeError:
+            else:
                logging.getLogger("GUI").\
                     debug("Qt4_TreeBrick: sample changer hwobj not defined.")
-               self.sample_changer_hwobj = None
-            try:
+
+            if bl_setup.plate_manipulator_hwobj is not None:
                self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
+               self.dc_tree_widget.init_plate_navigator(self.plate_manipulator_hwobj)
+            else:
                logging.getLogger("GUI").\
                     debug("Qt4_TreeBrick: plate manipulator hwobj not defined.")
-            except:
-               self.plate_manipulator_hwobj = None 
 
             if self.sample_changer_hwobj is not None:
                 self.connect(self.sample_changer_hwobj, 
@@ -265,7 +286,11 @@ class Qt4_TreeBrick(BlissWidget):
                              self.sample_load_state_changed)
                 self.connect(self.plate_manipulator_hwobj,
                              SampleChanger.INFO_CHANGED_EVENT,
-                             self.set_sample_pin_icon)
+                             self.plate_info_changed)
+
+            self.connect(bl_setup.shape_history_hwobj,
+                         "shapeChanged",
+                         self.dc_tree_widget.shape_changed)
 
             # This is to enable/disable collection button
             # Could be much more generic
@@ -300,6 +325,12 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(xml_rpc_server_hwobj,
                              'start_queue',
                              self.dc_tree_widget.collect_items)
+        elif property_name == 'scOneName':
+              self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
+        elif property_name == 'scTwoName':
+              self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
+        #elif property_name == 'usePlateNavigator':
+        #      self.dc_tree_widget.show_plate_navigator_cbox.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -323,7 +354,8 @@ class Qt4_TreeBrick(BlissWidget):
         if not logged_in:
             self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
-         
+            self.dc_tree_widget.plate_navigator_cbox.setVisible(False)
+
             if self.sample_changer_hwobj is not None and \
                self.diffractometer_hwobj.use_sample_changer():
                 sc_basket_content, sc_sample_content = self.get_sc_content()
@@ -334,9 +366,11 @@ class Qt4_TreeBrick(BlissWidget):
                     self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
                          self.dc_tree_widget.sample_mount_method)
                     self.sample_changer_widget.details_button.setText("Show SC-details")
-   
+ 
             if self.plate_manipulator_hwobj is not None and \
                self.diffractometer_hwobj.in_plate_mode():
+                if self['usePlateNavigator']:
+                    self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
                 self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(True)
                 if plate_sample_content:
@@ -359,8 +393,11 @@ class Qt4_TreeBrick(BlissWidget):
             if self.dc_tree_widget.sample_mount_method < 2:
                 self.sample_changer_widget.synch_ispyb_button.setEnabled(True)
 
+            #self.queue_model_hwobj.load_on_start()
+
         self.dc_tree_widget.sample_tree_widget_selection()
         self.dc_tree_widget.set_sample_pin_icon()
+
 
     def enable_collect(self, state):
         """
@@ -412,6 +449,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
 
     def queue_paused_handler(self, status):
+        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
         self.dc_tree_widget.queue_paused_handler(status)
 
     def queue_execution_finished(self, status):
@@ -627,6 +665,10 @@ class Qt4_TreeBrick(BlissWidget):
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
         Qt4_widget_colors.set_widget_color(self.sample_changer_widget.details_button,
                                            QtGui.QColor(s_color))
+
+    def plate_info_changed(self):
+        self.set_sample_pin_icon()
+        self.dc_tree_widget.plate_navigator_widget.refresh_plate_location() 
 
     def show_sample_centring_tab(self):
         """
@@ -1066,3 +1108,32 @@ class Qt4_TreeBrick(BlissWidget):
                             logging.getLogger("GUI").error("PPU is in error state")
             self.dc_tree_widget.enable_collect_condition = enable_collect
             self.dc_tree_widget.sample_tree_widget_selection()
+
+    def queue_save_clicked(self):
+        """Saves queue in the file"""
+     
+        self.dc_tree_widget.save_queue()
+
+    def queue_load_clicked(self):
+        """Loads queue from file"""
+            
+        loaded_model_index = self.dc_tree_widget.load_queue()
+        if loaded_model_index is not None:
+            self.sample_changer_widget.filter_cbox.\
+                 setCurrentIndex(loaded_model_index)
+            self.mount_mode_combo_changed(loaded_model_index)
+
+    def queue_autosave_clicked(self):
+        """Enable/disable queue autosave"""
+
+        self.dc_tree_widget.auto_save_queue()
+
+    def queue_undo_clicked(self):
+        """If queue autosave is enabled then undo last change"""
+
+        self.dc_tree_widget.undo_queue()
+
+    def queue_redo_clicked(self):
+        """If queue autosave is enable then redo last changed"""
+
+        self.dc_tree_widget.redo_queue()

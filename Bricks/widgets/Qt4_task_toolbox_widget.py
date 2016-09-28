@@ -84,7 +84,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
         self.collect_now_button = QtGui.QPushButton("Collect Now", self.button_box)
         self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
-        #self.collect_now_button.hide()
+        self.collect_now_button.hide()
         
         # Layout --------------------------------------------------------------
         #_method_group_box_vlayout = QtGui.QVBoxLayout(self.method_group_box)
@@ -181,7 +181,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
             
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
-        self.collect_now_button.setHidden(page_index > 0)
+        #self.collect_now_button.setHidden(page_index > 0)
 
         if len(tree_items) > 0:        
             tree_item = tree_items[0]
@@ -201,7 +201,7 @@ class TaskToolBoxWidget(QtGui.QWidget):
                     get_next_run_number(new_pt)
 
             elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
-                self.collect_now_button.show()
+                #self.collect_now_button.show()
                 data_collection = tree_item.get_model()
                 if data_collection.is_helical():
                     if self.tool_box.currentWidget() == self.helical_page:
@@ -234,18 +234,17 @@ class TaskToolBoxWidget(QtGui.QWidget):
         title = "<b>Collection method template</b>"
 
         if len(items) == 1:
-            editing_collection = True
+            data_model = items[0].get_model()
+            title = "<b>%s</b>" % data_model.get_display_name()
 
             if isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(False)
-                editing_collection = False
             else:
                 self.create_task_button.setEnabled(True)
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
-                data_collection = items[0].get_model()
-                if data_collection.is_helical():
+                if data_model.is_helical():
                     self.tool_box.setCurrentWidget(self.helical_page)
-                elif data_collection.is_mesh():
+                elif data_model.is_mesh():
                     self.tool_box.setCurrentWidget(self.advanced_page)
                 else:
                     self.tool_box.setCurrentWidget(self.discrete_page)
@@ -258,11 +257,8 @@ class TaskToolBoxWidget(QtGui.QWidget):
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
-                editing_collection = False
-
-            if editing_collection:
-                title = "<b>Queue entry parameters</b>"
-        self.method_label.setText(title) 
+                title = "<b>Sample: %s</b>" % data_model.get_display_name()
+            self.method_label.setText(title) 
 
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)
@@ -282,8 +278,6 @@ class TaskToolBoxWidget(QtGui.QWidget):
 
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
-                        if len(items) > 1:
-                            continue
                         task_model = self.create_task_group(task_model)
                         if self.tool_box.currentWidget() in (self.discrete_page, 
                            self.char_page, self.energy_scan_page, 
@@ -343,6 +337,9 @@ class TaskToolBoxWidget(QtGui.QWidget):
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
+            new_node.acquisitions[0].acquisition_parameters.\
+                centred_position.snapshot_image = self._beamline_setup_hwobj.\
+                shape_history_hwobj.get_scene_snapshot()
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
 
     def collect_now_button_click(self):

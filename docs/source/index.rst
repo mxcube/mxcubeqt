@@ -50,12 +50,24 @@ Information for users
 Information for developers
 **************************
 
+Installation instructions
+=========================
 * :doc:`installation_instructions_qt4`
 * :doc:`installation_instructions_web`
+
+Tutorials and How to's
+======================
 * :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
 * :doc:`how_to_define_qt_gui` 
+* :doc:`tutorial_qt_gui`
+
+API
+===
 * :doc:`packages/HardwareObjects`
 * :doc:`packages/example_files`
+
+Other information
+*****************
 * :doc:`mxcube_meetings`
 * :doc:`changelog`

@@ -158,6 +158,8 @@ class ConfirmDialog(QtGui.QDialog):
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                     acquisitions[0].acquisition_parameters
+                self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(\
+                    self.conf_dialog_layout.take_snapshots_combo.count() - 1)
             elif isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters

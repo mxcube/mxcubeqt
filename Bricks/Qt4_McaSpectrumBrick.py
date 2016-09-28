@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
 
 from PyQt4 import QtGui
@@ -32,7 +31,7 @@ import numpy.oldnumeric as Numeric
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Qt4_General'
+__category__ = "General"
 
 
 class Qt4_McaSpectrumBrick(BlissWidget):

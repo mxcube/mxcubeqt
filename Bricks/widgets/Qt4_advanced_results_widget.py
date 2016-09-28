@@ -70,9 +70,10 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self.heat_map_widget.set_associated_data_collection(data_collection)
      
         if executed: 
-            mesh_processing_results = data_collection.get_mesh_processing_results()
-            if processing_results is not None: 
-                self.heat_map_widget.set_results(mesh_processing_results, True)    
+            processing_results = data_collection.get_parallel_processing_result()
+            if processing_results is not None:
+                self.heat_map_widget.set_results(processing_results, True)
 
     def set_processing_results(self, processing_results, param, last_results):
+        self.setEnabled(last_results)
         self.heat_map_widget.set_results(processing_results, last_results)
