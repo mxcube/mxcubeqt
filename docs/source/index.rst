@@ -8,7 +8,7 @@ agreement has been signed for the development of MXCuBE with the following
 partners:
 
 * `ESRF <http://www.esrf.eu>`_
-* `Soleil <http://www.synchrotron-soleil.fr/>`_
+* `SOLEIL <http://www.synchrotron-soleil.fr/>`_
 * `Max lab <https://www.maxlab.lu.se/>`_
 * `HZB <http://www.helmholtz-berlin.de/>`_
 * `EMBL <http://www.embl.org/>`_
@@ -19,12 +19,12 @@ partners:
 Latest news about the MXCuBE project can be found in the `project website <http://mxcube.github.io/mxcube/>`_.
 
 
-MXCuBE consist of separated data acquisition control layer and graphical user interface.
+MXCuBE consist of data acquisition control layer and a graphical user interface.
 
 .. rubric:: Data acquisition control
 
-Data acquisition control is based on Hardware Objects as Python classes associated with a configuration XML file. Hardware Objects are instanciated by the `Hardware Repository <http://github.com/mxcube/HardwareRepository>`_.
-Each Hardware Object should be based on an abstract class, defining a common API for MXCuBE. Then, implementation differs at each site depending on hardware and beamline specificities.
+Data acquisition control is based on HardwareObjects. HardwareObjects are python classes, each associated with a configuration XML file. Hardware Objects are instantiated by the `Hardware Repository <http://github.com/mxcube/HardwareRepository>`_.
+Each Hardware Object should be based on an abstract class, defining a common API for MXCuBE. The implementation may then differ at sites depending on beamline equipment specificities.
 See the :doc:`design_overview` and :doc:`feature_overview` for more details.
 
 .. rubric:: Graphical user interface
