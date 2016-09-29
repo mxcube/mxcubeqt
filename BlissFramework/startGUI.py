@@ -14,7 +14,6 @@ from qt import *
 import BlissFramework
 from BlissFramework import GUISupervisor
 from BlissFramework.Utils import ErrorHandler
-from BlissFramework.Utils import terminal_server
 from BlissFramework.Utils import GUILogHandler
 
 from HardwareRepository import HardwareRepository
@@ -60,6 +59,7 @@ def run(GUIConfigFile=None):
             sys.exit(1)
 
     if opts.webServerPort:
+        from BlissFramework.Utils import terminal_server
         interpreter = terminal_server.InteractiveInterpreter()
         terminal_server.set_interpreter(interpreter) 
         gevent.spawn(terminal_server.serve_forever, opts.webServerPort)
