@@ -178,8 +178,10 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         if len(self._advanced_methods_widget.\
            grid_treewidget.selectedItems()) == 0:
-            msg = "No grid selected. Continuing with automatic grid."
-            logging.getLogger("GUI").info(msg)
+            msg = "No grid selected. Please select a grid to continue!"
+            logging.getLogger("GUI").error(msg)
+            result = False
+
         return result
             
     def update_processing_parameters(self, crystal):
@@ -269,12 +271,13 @@ class CreateAdvancedWidget(CreateTaskBase):
             dc.set_requires_centring(False)
             dc.grid = grid
 
+     
             exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
             if exp_type == "MeshScan":
                 dc.run_processing_parallel = "MeshScan"
                 tasks.append(dc)
-            elif exp_type == "XrayCentering":
+            elif exp_type == "XrayCentring":
                 xray_centering = queue_model_objects.XrayCentering(\
                    dc, sample.crystals[0])
                 dc.run_processing_parallel = "XrayCentering"

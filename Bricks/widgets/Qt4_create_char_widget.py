@@ -209,7 +209,7 @@ class CreateCharWidget(CreateTaskBase):
                 self._set_space_group(sample_model.processing_parameters.space_group)
             #self._acq_widget.update_data_model(self._acquisition_parameters,
             #                                   self._path_template)
-            self._char_params_mib.set_model(self._char_params)
+            #self._char_params_mib.set_model(self._char_params)
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.CharacterisationQueueItem):

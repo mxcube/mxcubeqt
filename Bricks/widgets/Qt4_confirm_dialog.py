@@ -113,6 +113,7 @@ class ConfirmDialog(QtGui.QDialog):
         collection_group_treewidget_item = None
         num_images = 0
         file_exists = False
+        interleave_items = 0
 
         self.conf_dialog_layout.summary_treewidget.clear()
         self.conf_dialog_layout.file_treewidget.clear()
@@ -155,6 +156,7 @@ class ConfirmDialog(QtGui.QDialog):
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 acq_parameters = item_model.acquisitions[0].\
                      acquisition_parameters
+                interleave_items += 1
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                     acquisitions[0].acquisition_parameters
@@ -217,7 +219,7 @@ class ConfirmDialog(QtGui.QDialog):
                         file_exists = True
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)
-        self.conf_dialog_layout.interleave_cbx.setEnabled(len(checked_items) > 3)
+        self.conf_dialog_layout.interleave_cbx.setEnabled(interleave_items > 1)
 
         num_samples = len(self.sample_items)
         num_collections = len(collection_items)
@@ -243,6 +245,9 @@ class ConfirmDialog(QtGui.QDialog):
           
             if isinstance(item_model, queue_model_objects.DataCollection):
                 acq_parameters = item_model.acquisitions[0].acquisition_parameters
+            elif isinstance(item_model, queue_model_objects.Characterisation):
+                acq_parameters = item_model.reference_image_collection.\
+                     acquisitions[0].acquisition_parameters
             elif isinstance(item_model, queue_model_objects.XrayCentering):
                 acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters 
@@ -253,7 +258,6 @@ class ConfirmDialog(QtGui.QDialog):
                       interleave_images_num_ledit.text())
                 except:
                     pass
-            
             if acq_parameters: 
                 acq_parameters.take_snapshots = int(self.conf_dialog_layout.\
                     take_snapshots_combo.currentText())

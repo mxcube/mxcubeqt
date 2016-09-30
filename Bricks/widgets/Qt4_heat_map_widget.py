@@ -299,6 +299,7 @@ class HeatMapWidget(QtGui.QWidget):
              (self.__results["score"] > 0).sum())
 
     def filter_min_slider_changed(self, value):
+        self.__associated_grid.set_min_score(self._threshold_slider.value() / 100.0)
         self.refresh()
 
     def mouse_clicked(self, pos_x, pos_y):

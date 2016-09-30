@@ -42,6 +42,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
             self.setObjectName(name)
 
         # Hardware objects ----------------------------------------------------
+        self.energy_scan_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.energy_scan_model = queue_model_objects.EnergyScan()
@@ -180,8 +181,8 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.energy_scan_model.edge = energy
 
     def set_enegy_scan_hwobj(self, energy_scan_hwobj):
-        self.energy_scan_hwobj = energy_scan_hwobj
-        if self.energy_scan_hwobj:
+        if self.energy_scan_hwobj is None:
+            self.energy_scan_hwobj = energy_scan_hwobj
             self.energy_scan_hwobj.connect("energyScanStarted", self.energy_scan_started)
             self.energy_scan_hwobj.connect("scanNewPoint", self.energy_scan_new_point) 
             self.energy_scan_hwobj.connect("choochFinished", self.chooch_finished)

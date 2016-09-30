@@ -116,7 +116,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """
         if not self.acq_widget_layout.osc_start_cbox.hasFocus():
-            self.acq_widget_layout.osc_start_ledit.setText(str(osc_start_value))
+            self.acq_widget_layout.osc_start_ledit.setText(str(new_value))
 
     def update_kappa(self, new_value):
         """

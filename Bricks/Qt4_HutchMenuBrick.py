@@ -153,9 +153,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.disconnect(self.graphics_manager_hwobj,
                                 'centringSuccessful',
                                 self.centring_successful)
-                self.disconnect(self.graphics_manager_hwobj,
-                                'diffractometerReady',
-                                self.diffractometer_ready_changed)
+                #self.disconnect(self.graphics_manager_hwobj,
+                #                'diffractometerReady',
+                #                self.diffractometer_ready_changed)
                 self.disconnect(self.graphics_manager_hwobj, 
                                 'diffractometerPhaseChanged',
                                 self.diffractometer_phase_changed)
@@ -170,9 +170,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.connect(self.graphics_manager_hwobj,
                              'centringSuccessful',
                              self.centring_successful)
-                self.connect(self.graphics_manager_hwobj,
-                             'diffractometerReady',
-                             self.diffractometer_ready_changed)
+                #self.connect(self.graphics_manager_hwobj,
+                #             'diffractometerReady',
+                #             self.diffractometer_ready_changed)
                 self.connect(self.graphics_manager_hwobj,
                              'diffractometerPhaseChanged',
                              self.diffractometer_phase_changed)

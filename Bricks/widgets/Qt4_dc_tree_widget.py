@@ -168,7 +168,7 @@ class DataCollectTree(QtGui.QWidget):
 
         current_widget_layout = QtGui.QVBoxLayout(current_widget)
         current_widget_layout.addWidget(current_label)
-        current_widget_layout.addWidget(self.sample_tree_widget)
+        #current_widget_layout.addWidget(self.sample_tree_widget)
         current_widget_layout.setContentsMargins(2, 2, 2, 2)
         current_widget_layout.setSpacing(1)
 
@@ -179,8 +179,8 @@ class DataCollectTree(QtGui.QWidget):
         history_widget_layout.setSpacing(1)
         
         main_layout = QtGui.QVBoxLayout(self)
-        #main_layout.addWidget(self.sample_tree_widget)
-        main_layout.addWidget(self.tree_splitter)
+        main_layout.addWidget(self.sample_tree_widget)
+        #main_layout.addWidget(self.tree_splitter)
         main_layout.addWidget(self.plate_navigator_cbox)
         main_layout.addWidget(self.plate_navigator_widget)
         main_layout.addWidget(self.button_widget)
@@ -583,7 +583,8 @@ class DataCollectTree(QtGui.QWidget):
             view_item.setExpanded(True)
 
         self.queue_model_hwobj.view_created(view_item, task)
-        self.collect_button.setDisabled(False)
+        #self.collect_button.setDisabled(False)
+        self.sample_tree_widget_selection()
 
         self.last_added_item = view_item
 
@@ -753,17 +754,11 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         if state:
-            self.parent().enable_hutch_menu(True)
-            self.parent().enable_command_menu(True)
-            self.parent().enable_task_toolbox(True)
             self.continue_button.setText('Continue')
             Qt4_widget_colors.set_widget_color(self.continue_button, 
                                                Qt4_widget_colors.LIGHT_YELLOW, 
                                                QtGui.QPalette.Button)
         else:
-            self.parent().enable_hutch_menu(False)
-            self.parent().enable_command_menu(False)
-            self.parent().enable_task_toolbox(False)
             self.continue_button.setText('Pause')
             Qt4_widget_colors.set_widget_color(
                               self.continue_button, 
@@ -862,7 +857,6 @@ class DataCollectTree(QtGui.QWidget):
                           QtGui.QPalette.Button)
         self.collect_button.setIcon(self.stop_icon)
         self.continue_button.setEnabled(True)
-        self.parent().enable_hutch_menu(False)
         self.run_cb()
 
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.BusyCursor))
@@ -962,9 +956,9 @@ class DataCollectTree(QtGui.QWidget):
                           QtGui.QPalette.Button)
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
-        self.parent().enable_hutch_menu(True)
-        self.parent().enable_command_menu(True)
-        self.parent().enable_task_toolbox(True)
+        #self.parent().enable_hutch_menu(True)
+        #self.parent().enable_command_menu(True)
+        #self.parent().enable_task_toolbox(True)
  
         self.sample_tree_widget.clearSelection()
         sample_item = self.get_mounted_sample_item()
