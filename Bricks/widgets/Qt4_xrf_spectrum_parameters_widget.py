@@ -147,8 +147,8 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         self.snapshot_widget.display_snapshot(image, width=400)
 
     def set_xrf_spectrum_hwobj(self, xrf_spectrum_hwobj):
-        self.xrf_spectrum_hwobj = xrf_spectrum_hwobj
-        if self.xrf_spectrum_hwobj:
+        if self.xrf_spectrum_hwobj is None:
+            self.xrf_spectrum_hwobj = xrf_spectrum_hwobj
             self.xrf_spectrum_hwobj.connect("xrfSpectrumFinished",
                                             self.spectrum_finished)
 

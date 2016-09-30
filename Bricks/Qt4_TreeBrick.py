@@ -80,10 +80,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("usePlateNavigator", "boolean", False)
 
         # Signals ------------------------------------------------------------
-        self.defineSignal("enable_hutch_menu", ())
-        self.defineSignal("enable_command_menu", ())
-        self.defineSignal("enable_task_toolbox", ())
-        self.defineSignal("queue_is_executing", ())
+        self.defineSignal("enable_widgets", ())
 
         # Hiding and showing the tabs
         self.defineSignal("hide_sample_tab", ())
@@ -248,7 +245,6 @@ class Qt4_TreeBrick(BlissWidget):
                          self.queue_stop_handler)
         elif property_name == 'queue_model':
             self.queue_model_hwobj = self.getHardwareObject(new_value)
-
             self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
             self.dc_tree_widget.confirm_dialog.queue_model_hwobj = self.queue_model_hwobj
             self.connect(self.queue_model_hwobj, 'child_added',
@@ -291,15 +287,14 @@ class Qt4_TreeBrick(BlissWidget):
             self.connect(bl_setup.shape_history_hwobj,
                          "shapeChanged",
                          self.dc_tree_widget.shape_changed)
-
-            # This is to enable/disable collection button
-            # Could be much more generic
-            if hasattr(bl_setup, "diffractometer_hwobj"):
-                self.connect(bl_setup.diffractometer_hwobj, 
-                             "minidiffPhaseChanged",
-                             self.diffractometer_phase_changed)
-                self.diffractometer_phase_changed(\
-                     bl_setup.diffractometer_hwobj.get_current_phase())
+            self.connect(bl_setup.shape_history_hwobj,
+                         "diffractometerReady",
+                         self.diffractometer_ready_changed)
+            self.connect(bl_setup.diffractometer_hwobj, 
+                         "minidiffPhaseChanged",
+                         self.diffractometer_phase_changed)
+            self.diffractometer_phase_changed(\
+                 bl_setup.diffractometer_hwobj.get_current_phase())
 
             if hasattr(bl_setup, "ppu_control_hwobj"):
                 self.connect(bl_setup.ppu_control_hwobj,
@@ -410,24 +405,6 @@ class Qt4_TreeBrick(BlissWidget):
         """
         self.dc_tree_widget.enable_collect(state)
 
-    def enable_hutch_menu(self, state):
-        """
-        Descript. :
-        """
-        self.emit(QtCore.SIGNAL("enable_hutch_menu"), state)
-
-    def enable_command_menu(self, state):
-        """
-        Descript. :
-        """
-        self.emit(QtCore.SIGNAL("enable_command_menu"), state)
-
-    def enable_task_toolbox(self, state):
-        """
-        Descript. :
-        """
-        self.emit(QtCore.SIGNAL("enable_task_toolbox"), state)
-
     def get_tree_brick(self, tree_brick):
         """
         Gets the reference to the tree brick. Used to get a reference from
@@ -442,23 +419,26 @@ class Qt4_TreeBrick(BlissWidget):
         tree_brick['tree_brick'] = self
 
     def queue_entry_execution_started(self, queue_entry):
-        self.emit(QtCore.SIGNAL("queue_is_executing"), True)
+        self.emit(QtCore.SIGNAL("enable_widgets"), False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
 
     def queue_paused_handler(self, status):
-        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
+        self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_paused_handler(status)
 
     def queue_execution_finished(self, status):
-        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
+        self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_execution_completed(status)
 
     def queue_stop_handler(self, status):
-        self.emit(QtCore.SIGNAL("queue_is_executing"), False)
+        self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_stop_handler(status)
+
+    def diffractometer_ready_changed(self, status):
+        self.emit(QtCore.SIGNAL("enable_widgets"), status) 
 
     def samples_from_lims(self, samples):
         """

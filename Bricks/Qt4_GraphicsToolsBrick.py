@@ -178,25 +178,32 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         self.graphics_manager_hwobj.start_measure_area(wait_click = True)
 
     def create_point_click_clicked(self): 
-        self.graphics_manager_hwobj.start_centring(tree_click=True)
+        if self.isEnabled():
+            self.graphics_manager_hwobj.start_centring(tree_click=True)
 
     def create_point_current_clicked(self):
-        self.graphics_manager_hwobj.start_centring()
+        if self.isEnabled():
+            self.graphics_manager_hwobj.start_centring()
 
     def create_line_clicked(self):
-        self.graphics_manager_hwobj.create_line()
+        if self.isEnabled():
+            self.graphics_manager_hwobj.create_line()
 
     def create_grid_clicked(self):
-        self.graphics_manager_hwobj.create_grid()
+        if self.isEnabled():
+            self.graphics_manager_hwobj.create_grid()
 
     def select_all_points_clicked(self):
-        self.graphics_manager_hwobj.select_all_points()
+        if self.isEnabled():
+            self.graphics_manager_hwobj.select_all_points()
 
     def deselect_all_items_clicked(self):
-        self.graphics_manager_hwobj.de_select_all() 
+        if self.isEnabled():
+            self.graphics_manager_hwobj.de_select_all() 
 
     def clear_all_items_clicked(self):
-        self.graphics_manager_hwobj.clear_all()
+        if self.isEnabled():
+            self.graphics_manager_hwobj.clear_all()
 
     def move_beam_mark_manual(self):
         self.graphics_manager_hwobj.start_move_beam_mark()
