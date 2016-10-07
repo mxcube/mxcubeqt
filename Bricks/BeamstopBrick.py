@@ -197,7 +197,6 @@ class BeamstopBrick(DuoStateBrick):
     def setupClicked(self):
         self.alignmentDialog.show() #exec_loop()
 
-
     def beamstopAligned(self):
         try:
             bstopz = self.beamstop.getDeviceByRole("vertical")
@@ -218,23 +217,21 @@ class BeamstopBrick(DuoStateBrick):
 
         QMessageBox.warning(self, "Beamstop alignment", "An error occured while trying to save beamstop positions.", QMessageBox.Cancel)
 
-
     def positionChanged(self, positionName = ""):
-        #print "BeamstopBrick.positionChanged",positionName
         if positionName in ("in", "unknown"):
             self.stateLabel.setButtonEnabled(True)
         else:
             self.stateLabel.setButtonEnabled(False)
 
-        if positionName in ("in", "out"):
-            self.stateChanged(positionName)
+        if self.beamstop.getState() == "MOVING":
+            self.stateChanged("moving")
         else:
-            if self.beamstop.getState()=="MOVING":
-                self.stateChanged("moving")
-            else:
-                self.stateChanged("unknown")
+            self.stateChanged(positionName)
 
     def stateChanged(self,state):
+        state = state.lower()
+        if state != "moving":
+            state = self.beamstop.getPosition()
         self.stateLabel.setButtonStopEnabled(state=="moving")
         # weird Python bug : why do we need im_func sometimes?
         DuoStateBrick.stateChanged.im_func(self,state)
