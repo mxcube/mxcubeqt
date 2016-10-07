@@ -676,8 +676,7 @@ class DataCollectParametersWidget(QWidget):
         except Exception,diag:
             template=""
         else:
-            if (first_image+number_images-1)>999:
-                image_number_format="####"
+            image_number_format="#"*len(str(number_images))
 
             template="%s_%d_%s" % (self.paramDict['prefix'].text(),run_number,image_number_format)
             if self.imageFileSuffix is not None:
