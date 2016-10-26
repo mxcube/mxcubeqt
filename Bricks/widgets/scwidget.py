@@ -23,8 +23,9 @@ class SCWidget(QWidget):
 
 
         LayoutWidget = QWidget(self,"layout14")
-        LayoutWidget.setGeometry(QRect(0,0,370,850))
         layout14 = QVBoxLayout(LayoutWidget,11,6,"layout14")
+        QHBoxLayout(self)
+        self.layout().addWidget(LayoutWidget)
 
         self.lvSC = QListView(LayoutWidget,"lvSC")
         self.lvSC.addColumn(self.__tr("Column 1"))

@@ -50,11 +50,6 @@ class SCBrick(BaseComponents.BlissWidget):
         self.widget.ckShowEmptySlots.setChecked(True)
         qt.QObject.connect(self.widget.ckShowEmptySlots,qt.SIGNAL('clicked()'),self.onShowEmptySlots)
         
-        
-
-        self._timer = qt.QTimer()
-        self._timer.connect(self._timer, qt.SIGNAL("timeout()"), self._timer_1s)
-        self._timer.start(1000)
         self.widget.lbImage.hide()        
         #           
         
@@ -96,10 +91,6 @@ class SCBrick(BaseComponents.BlissWidget):
         #    logging.getLogger("user_level_log").exception ("Error loading image: " + str(sys.exc_info()[1]))
         
         
-    def _timer_1s(self):
-        if self.device is not None:
-            pass
-        
     def propertyChanged(self, property, oldValue, newValue):
         logging.getLogger("user_level_log").info("Property Changed: " + str(property) + " = " + str(newValue))
         if property == 'hwobj':
@@ -134,29 +125,9 @@ class SCBrick(BaseComponents.BlissWidget):
             self.inversed_image=newValue
                 
    
-    def onStateChanged(self, state,former):
-        former_state=self.state
+    def onStateChanged(self, state, former):
         self.state=string.lower(str(state))
         logging.getLogger("user_level_log").info( "State = " + str(state) )
-        
-        #ready = (self.device.getState() == SampleChanger.SampleChangerState.Ready)
-        #if ready:        
-        #self._updateTable()
-
-        """        
-        if self._isReady():
-            try:
-                self.phase = self.device.getPhase()
-            except:
-                self.phase = "Unknown"
-            if former_state=="running":
-                info=self.device.getTaskInfo()
-                if info[0].lower().startswith("move table to shelf"):
-                    exception = info[5].strip()
-                    if (len(exception)>0) & (exception!="null"):
-                        logging.getLogger("user_level_log").exception("Sample loading error: " + exception)
-        """
-                        
         self._updateButtons()        
         self.emit(qt.PYSIGNAL("stateChanged"), (state, ))
         
@@ -164,7 +135,6 @@ class SCBrick(BaseComponents.BlissWidget):
         self.widget.txtState.setText(str(status))
         
     def onInfoChanged(self):
-        
         if self._changedStructure(self.root):
             self._createTable()
         else:                        
@@ -365,12 +335,10 @@ class SCBrick(BaseComponents.BlissWidget):
             
       
     def _loadSample(self):
-        if self.device is not None:
-            self.device.load(wait=False)
+        return self.onMenuLoad()
             
     def _unloadSample(self):
-        if self.device is not None:
-            self.device.unload(wait=False)
+        return self.onMenuUnload()
 
     def _setOperMode(self):
         if self.device is not None:
@@ -552,10 +520,3 @@ class SCBrick(BaseComponents.BlissWidget):
         if self.root is not None:                                                      
             self._updateItem(self.root)            
             self._checkVisibility(self.root,self.widget.ckShowEmptySlots.isOn())
-                    
-
-
-
-        
-        
-
