@@ -92,7 +92,7 @@
     <start_image_number>1</start_image_number>
     <run_number>1</run_number>
     <overlap>0</overlap>
-    <number_of_images>0</number_of_images>
+    <number_of_images>1</number_of_images>
     <detector_mode>1</detector_mode>
   </default_advanced_values>
  </object>

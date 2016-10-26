@@ -4,6 +4,8 @@
   <object href="/eh1/diff-kappa" role="kappa_axis"/>
   <object href="/eh1/diff-kappaphi" role="kappa_phi_axis"/>
   <object href="/eh1/detector" role="detector"/>
+  <object href="/eh1/diff-backLight" role="back_light"/>
+  <object href="/eh1/diff-beamstop" role="beamstop"/>
 
   <object href="/attenuators" role="transmission"/>
   <object href="/beam-info" role="beam_info"/>
@@ -11,6 +13,7 @@
   <object href="/mini-diff" role="diffractometer"/>
   <object href="/mxcollect" role="collect"/>
   <object href="/safshut" role="safety_shutter"/>
+  <object href="/fast-shut" role="fast_shutter"/>
   <object href="/sc-generic" role="sample_changer"/>
   <object href="/session" role="session"/>
   
@@ -30,7 +33,7 @@
        and used as a queue_entry. If queue entry is missing
        then queue skip exception will be raised.
   -->
-  <advancedMethods>["MeshScan", "XrayCentring", "LineScan"]</advancedMethods>
+  <advancedMethods>["MeshScan"]</advancedMethods>
 
   <!-- Is it possible to change the beam wavelentgh.
        Should perhaps be associated with the diffractometer -->

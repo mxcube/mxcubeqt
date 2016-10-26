@@ -3,7 +3,7 @@
   <object href="/Qt4_graphics-manager" role="graphics_manager"/>
   <object href="/safshut" role="safety_shutter"/>
   <object href="/beam-info" role="beam_info"/>
-  <object href="/mach-info" role="machine_current"/>
+  <object href="/mach-info" role="machine_info"/>
   <object href="/energy" role="energy"/>
   <object href="/eh1/detector" role="detector"/>
   <object href="/eh1/resolution" role="resolution"/>
@@ -14,6 +14,7 @@
   <channel type="tine" name="collectFrame" tinename="/P13/collection/mx-standard" attach="event">frame</channel>
   <channel type="tine" name="collectStatus" tinename="/P13/collection/mx-standard" attach="event">status</channel>
   <channel type="tine" name="collectError" tinename="/P13/collection/mx-standard" attach="event">error</channel> 
+  <channel type="tine" name="guillotineState" tinename="/P13/P13DetTrans.CDI/GuillCmd" size="2">RECV</channel>
 
   <command type="tine" name="collectDescription" tinename="/P13/collection/mx-standard">description</command>
   <command type="tine" name="collectDetector" tinename="/P13/collection/mx-standard">detector</command>
@@ -41,6 +42,8 @@
   <command type="tine" name="collectAbort"   tinename="/P13/collection/mx-standard">abort</command>
 
   <command type="tine" name="collectXdsDataRange" tinename="/P13/collection/xds">data-range</command>
+  <command type="tine" name="cmdCloseGuillotine"   tinename="/P13/collection/shutter">close</command>
+
 
 
   <useEDNA>True</useEDNA>
