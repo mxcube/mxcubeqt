@@ -11,5 +11,4 @@
    <object href="/eh1/detector-distance" role="detector_distance"/>
 
    <useUpdateTimer>False</useUpdateTimer>
-   <log_filename>/opt/embl-hh/var/log/mxcube/marvin.log</log_filename>
 </equipment>
