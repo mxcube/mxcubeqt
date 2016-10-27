@@ -2,13 +2,13 @@
   <username>TINEDoorInterlock</username>
   <object href="/eh1/detector-distance" role="detector_distance"/>
   <command type="tine" name="cmdBreakInterlock" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="5000">BreakInterlock13.2</command>
-  <channel type="tine" name="chanCanUnlockCond" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="1000">BS13_1_offen</channel>
-  <channel type="tine" name="chanDoorInterlocked" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange" timeout="1000">G13_2_TI</channel>
+  <channel type="tine" name="chanCanUnlockCond" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange">BS13_1_offen</channel>
+  <channel type="tine" name="chanDoorInterlocked" tinename="/P13/EMBL_ICS_IFace/ICS_PHP_Interface" attach="datachange">G13_2_TI</channel>
 
   <canUnlockCond>3</canUnlockCond>
   <doorInterlockedCond>0</doorInterlockedCond>
   <executeCommandsBeforeUnlock>True</executeCommandsBeforeUnlock>
 
   <beforeUnlockCommandsPresent>True</beforeUnlockCommandsPresent>
-  <beforeUnlockCommands>[{"address":"/P13/MD/MD_0","property":"startSetPhase","type":"query","argument":"Transfer"}, {"address":"/P13/P13DetTrans/DetDistance","property":"Move.START","argument":"1300","type":"set"}]</beforeUnlockCommands>
+  <beforeUnlockCommands>[{"address":"/P13/MD/MD_0","property":"startSetPhase","type":"query","argument":"Transfer"}, {"address":"/P13/P13DetTrans/DetDistance","property":"Move.START","argument":"1250","type":"set"}]</beforeUnlockCommands>
 </device>

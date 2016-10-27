@@ -14,7 +14,9 @@
   <channel type="tine" name="collectFrame" tinename="/P14/collection/mx-standard" attach="event">frame</channel>
   <channel type="tine" name="collectStatus" tinename="/P14/collection/mx-standard" attach="event">status</channel>
   <channel type="tine" name="collectError" tinename="/P14/collection/mx-standard" attach="event">Error</channel>
-  <channel type="tine" name="guillotineState" tinename="/P14/collection/shutter">state</channel>
+  <!-- <channel type="tine" name="guillotineState" tinename="/P14/collection/shutter">state</channel> -->
+
+  <channel type="tine" name="guillotineState" tinename="P14/P14ExpTbl.CDI/GuillCmd" size="2">RECV</channel> 
 
   <command type="tine" name="collectDescription" tinename="/P14/collection/mx-standard">description</command>
   <command type="tine" name="collectDetector" tinename="/P14/collection/mx-standard">detector</command>
