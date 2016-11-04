@@ -168,16 +168,16 @@ class QueueItem(qt.QCheckListItem):
         return last_child
 
     def setOn(self, state):
-        if self._checkable:
-            qt.QCheckListItem.setOn(self, state)
+        if not self._checkable:
+            state = False
 
-            if self._queue_entry:
-                self._queue_entry.set_enabled(state)
+        if self._queue_entry:
+            self._queue_entry.set_enabled(state)
 
-            if self._data_model:
-                self._data_model.set_enabled(state)
-        else:
-            qt.QCheckListItem.setOn(self, False)
+        if self._data_model:
+            self._data_model.set_enabled(state)
+
+        qt.QCheckListItem.setOn(self, state)
 
     def set_checkable(self, state):
         self._checkable = state
