@@ -990,9 +990,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_widget.filter_ledit.setEnabled(\
              filter_index in (2, 3, 4))
         self.clear_filter()
-        if filter_index == 0:
-            self.clear_filter() 
-        else:
+        if filter_index > 0:
             item_iterator = QtGui.QTreeWidgetItemIterator(\
                   self.dc_tree_widget.sample_tree_widget)
             item = item_iterator.value()
@@ -1025,7 +1023,8 @@ class Qt4_TreeBrick(BlissWidget):
                       hide = not isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem)
                   #elif filter_index == 11:
                   #    hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
-                  if isinstance(item, Qt4_queue_item.TaskQueueItem):
+                  if isinstance(item, Qt4_queue_item.TaskQueueItem) and not \
+                     isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                       item.set_hidden(hide)
                   item_iterator += 1
                   item = item_iterator.value()
