@@ -109,15 +109,15 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.mad_cbox.toggled.connect(\
              self.use_mad)
 
-        self.acq_widget_layout.osc_range_ledit.textChanged.connect(\
-             self.osc_range_ledit_changed) 
-        self.acq_widget_layout.osc_start_ledit.textChanged.connect(\
+        self.acq_widget_layout.osc_start_ledit.textEdited.connect(\
              self.osc_start_ledit_changed)
-        self.acq_widget_layout.energy_ledit.textChanged.connect(\
+        self.acq_widget_layout.osc_range_ledit.textEdited.connect(\
+             self.osc_range_ledit_changed)
+        self.acq_widget_layout.energy_ledit.textEdited.connect(\
              self.energy_ledit_changed)
-        self.acq_widget_layout.transmission_ledit.textChanged.connect(\
+        self.acq_widget_layout.transmission_ledit.textEdited.connect(\
              self.transmission_ledit_changed)
-        self.acq_widget_layout.resolution_ledit.textChanged.connect(\
+        self.acq_widget_layout.resolution_ledit.textEdited.connect(\
              self.resolution_ledit_changed)
         
         overlap_ledit = self.acq_widget_layout.findChild(\
@@ -173,6 +173,8 @@ class AcquisitionWidget(QtGui.QWidget):
             self.update_num_images_limits()
 
     def osc_start_ledit_changed(self, osc_start):
+        """Fixes osc start edit"""
+
         if "osc_start" not in self.value_changed_list:
             self.value_changed_list.append("osc_start")
         self.update_osc_range_limits()

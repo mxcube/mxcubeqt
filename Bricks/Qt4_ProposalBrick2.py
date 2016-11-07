@@ -686,6 +686,8 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.ispybDown()
         else:
             self.select_proposal(prop)
+            BlissWidget.set_status_info("user", "%s%s@%s" % \
+               (proposal_code, str(proposal_number), beamline_name))
 
     def proposal_combo_activated(self, item_index):
         self.select_proposal(self.proposals[item_index])
@@ -805,6 +807,9 @@ class Qt4_ProposalBrick2(BlissWidget):
             proposal_tooltip += "\nSelected proposal:\n   %s" % proposal_info
             self.proposal_combo.setToolTip(proposal_tooltip)
             logging.getLogger("GUI").info("ISPyB proposal: %s" % proposal_info)
+
+            BlissWidget.set_status_info("user", "%s@%s" % \
+               (user_name, self.lims_hwobj.beamline_name))
 
     def select_todays_proposal(self, proposal_list):
         """

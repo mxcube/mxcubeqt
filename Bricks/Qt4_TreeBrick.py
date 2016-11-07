@@ -1,4 +1,4 @@
-#
+
 #  Project: MXCuBE
 #  https://github.com/mxcube.
 #
@@ -421,24 +421,39 @@ class Qt4_TreeBrick(BlissWidget):
     def queue_entry_execution_started(self, queue_entry):
         self.emit(QtCore.SIGNAL("enable_widgets"), False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
+        BlissWidget.set_status_info("status", "Queue started")
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
+       
+        if queue_entry.get_type_str() not in ["Sample", "Basket", ""]: 
+            BlissWidget.set_status_info("action", "%s : %s" % \
+                (queue_entry.get_type_str(), status))
 
     def queue_paused_handler(self, status):
         self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_paused_handler(status)
+        BlissWidget.set_status_info("status", "Queue paused")
 
     def queue_execution_finished(self, status):
         self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_execution_completed(status)
+        if status == "Failed": 
+            BlissWidget.set_status_info("status", "Queue execution failed")
+        else:
+            BlissWidget.set_status_info("status", "")
 
     def queue_stop_handler(self, status):
         self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_stop_handler(status)
+        BlissWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
         self.emit(QtCore.SIGNAL("enable_widgets"), status) 
+        if status:
+            BlissWidget.set_status_info("diffractometer", "Ready")
+        else:
+            BlissWidget.set_status_info("diffractometer", "Not ready")
 
     def samples_from_lims(self, samples):
         """
@@ -960,19 +975,20 @@ class Qt4_TreeBrick(BlissWidget):
     def filter_combo_changed(self, filter_index):
         """Filters sample treewidget based on the selected filter criteria:
            0 : No filter
-           1 : Sample name
-           2 : Protein name
-           3 : Basket index
-           4 : Executed
-           5 : Not executed
-           6 : OSC
-           7 : Helical
-           8 : Characterisation
-           9 : Energy Scan
-           10: XRF spectrum            
+           1 : Star 
+           2 : Sample name
+           3 : Protein name
+           4 : Basket index
+           5 : Executed
+           6 : Not executed
+           7 : OSC
+           8 : Helical
+           9 : Characterisation
+           10: Energy Scan
+           11: XRF spectrum            
         """
         self.sample_changer_widget.filter_ledit.setEnabled(\
-             filter_index in (1, 2, 3))
+             filter_index in (2, 3, 4))
         self.clear_filter()
         if filter_index == 0:
             self.clear_filter() 
@@ -983,31 +999,32 @@ class Qt4_TreeBrick(BlissWidget):
             while item:
                   hide = False
                   item_model = item.get_model() 
-                  if filter_index == 4:
-                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                          hide = not item_model.is_executed()
+                  if filter_index == 1:
+                      hide = not item.has_star()
                   elif filter_index == 5:
                       if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                          hide = item_model.is_executed()
+                          hide = not item_model.is_executed()
                   elif filter_index == 6:
+                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                          hide = item_model.is_executed()
+                  elif filter_index == 7:
                       if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                           hide = item_model.is_helical()
                       else:
                           hide = True
-                  elif filter_index == 7:
+                  elif filter_index == 8:
                       if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                           hide = not item_model.is_helical()
                       else:
                           hide = True
-                  elif filter_index == 8:
-                      hide = not isinstance(item, Qt4_queue_item.CharacterisationQueueItem)
                   elif filter_index == 9:
-                      hide = not isinstance(item, Qt4_queue_item.EnergyScanQueueItem)
+                      hide = not isinstance(item, Qt4_queue_item.CharacterisationQueueItem)
                   elif filter_index == 10:
+                      hide = not isinstance(item, Qt4_queue_item.EnergyScanQueueItem)
+                  elif filter_index == 11:
                       hide = not isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem)
                   #elif filter_index == 11:
                   #    hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
-
                   if isinstance(item, Qt4_queue_item.TaskQueueItem):
                       item.set_hidden(hide)
                   item_iterator += 1
@@ -1051,7 +1068,7 @@ class Qt4_TreeBrick(BlissWidget):
              self.dc_tree_widget.sample_tree_widget)
         item = item_iterator.value()
         while item:
-              item.setHidden(False)
+              item.set_hidden(False)
               item_iterator += 1
               item = item_iterator.value() 
 

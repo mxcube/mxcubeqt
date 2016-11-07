@@ -391,6 +391,11 @@
             </item>
             <item>
              <property name="text">
+              <string>Star</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>Sample name</string>
              </property>
             </item>

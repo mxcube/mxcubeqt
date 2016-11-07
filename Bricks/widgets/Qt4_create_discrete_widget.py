@@ -89,8 +89,8 @@ class CreateDiscreteWidget(CreateTaskBase):
              self._run_processing_toggled)
 
         # Other ---------------------------------------------------------------
-        self._processing_widget.processing_widget.\
-             run_processing_parallel_cbox.hide()
+        #self._processing_widget.processing_widget.\
+        #     run_processing_parallel_cbox.hide()
 
     def init_models(self):
         """
@@ -238,7 +238,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
         dc.run_processing_after = self._processing_widget.processing_widget.\
            run_processing_after_cbox.isChecked()
-        dc.run_processing_parallel = False
+        dc.run_processing_parallel = self._processing_widget.processing_widget.\
+           run_processing_parallel_cbox.isChecked() and \
+           acq.acquisition_parameters.num_images > 19
 
         tasks.append(dc)
 

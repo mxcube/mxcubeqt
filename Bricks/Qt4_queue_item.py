@@ -55,6 +55,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
         self._checkable = True
         self._previous_check_state = False
         self._font_is_bold = False
+        self._star = False
         self.setText(1, '')         
  
     def listView(self):
@@ -104,6 +105,11 @@ class QueueItem(QtGui.QTreeWidgetItem):
         self.setHidden(hidden)
         for index in range(self.childCount()):
             self.child(index).setHidden(hidden)
+
+        if self._queue_entry:
+            self._queue_entry.set_enabled(not hidden)
+        if self._data_model:
+            self._data_model.set_enabled(not hidden)
 
     def update_check_state(self, new_state):
         """
@@ -189,6 +195,12 @@ class QueueItem(QtGui.QTreeWidgetItem):
     def update_display_name(self):
         self.setText(0, self._data_model.get_display_name())
 
+    def set_star(self, state):
+        self._star = state
+
+    def has_star(self):
+        return self._star == True
+
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
         #kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
@@ -201,7 +213,7 @@ class SampleQueueItem(QueueItem):
     def update_pin_icon(self):
         dc_tree_widget = self.listView().parent()
 
-        if  dc_tree_widget._loaded_sample_item:
+        if dc_tree_widget._loaded_sample_item:
             dc_tree_widget._loaded_sample_item.setIcon(0, QtGui.QPixmap())
             
         dc_tree_widget._loaded_sample_item = self

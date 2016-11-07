@@ -89,6 +89,7 @@ class TwoAxisPlotWidget(QtGui.QWidget):
         self._two_axis_figure_canvas.clear()
         self._two_axis_figure_canvas.set_axes_labels("energy", "counts")
         self._two_axis_figure_canvas.set_title("Scan started")
+
     def plot_energy_scan_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
                      chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
         self._two_axis_figure_canvas.add_curve(\
@@ -158,13 +159,16 @@ class MplCanvas(FigureCanvas):
         self.axes.cla()
         self.axes.grid(True)
 
-    def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None, color='blue'):
+    def add_curve(self, y_axis_array, x_axis_array=None, label=None,
+           linestyle="-", color='blue', marker=None):
         if x_axis_array is None:
             self.curves.append(self.axes.plot(y_axis_array, 
-                 label = curve_name, linewidth = 2, color = color))
+                 label=label, linewidth=2, linestyle=linestyle,
+                 color=color, marker=marker))
         else:
             self.curves.append(self.axes.plot(x_axis_array, y_axis_array, 
-                 label = curve_name, linewidth = 2, color = color))
+                 label=label, linewidth=2, linestyle=linestyle,
+                 color=color, marker=marker))
         self.draw()
 
     def append_new_point(self, y, x=None):
@@ -174,6 +178,7 @@ class MplCanvas(FigureCanvas):
         if self.max_plot_points:
             if self._axis_y_array.size > self.max_plot_points:
                 self._axis_y_array = np.delete(self._axis_y_array, 0)
+                self._axis_x_array = np.delete(self._axis_x_array, 0)
 
         if self.single_curve is None:
             self.single_curve, = self.axes.plot(self._axis_y_array,
@@ -298,6 +303,9 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.im = None
         self.mpl_canvas = MplCanvas(self)
         self.ntb = NavigationToolbar(self.mpl_canvas, self)
+        self.selection_xrange = None
+        self.selection_span = None
+        self.mouse_clicked = None
 
         _main_vlayout = QtGui.QVBoxLayout(self)
         _main_vlayout.addWidget(self.mpl_canvas)
@@ -310,11 +318,14 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
 
         self.mpl_canvas.axes.grid(True)
         self.mpl_canvas.fig.canvas.mpl_connect(\
-             "button_press_event", self.mouse_clicked)
+             "button_press_event", self.button_pressed)
+        self.mpl_canvas.fig.canvas.mpl_connect(\
+             "button_release_event", self.mouse_released)
+        self.mpl_canvas.fig.canvas.mpl_connect(\
+             "motion_notify_event", self.motion_notify_event)
+        #self.setFixedSize(1000, 700)
 
-        self.setFixedSize(1000, 700)
-
-    def mouse_clicked(self, mouse_event):
+    def button_pressed(self, mouse_event):
         dbl_click = False
         if hasattr(mouse_event, "dblclick"):
             dbl_click = mouse_event.dblclick
@@ -323,8 +334,40 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
                 self.mouseDoubleClickedSignal.emit(mouse_event.xdata,
                                                    mouse_event.ydata)
             else:
+                self.mouse_clicked = True
                 self.mouseClickedSignal.emit(mouse_event.xdata,
                                              mouse_event.ydata)
+
+    def mouse_released(self, mouse_event):
+        self.mouse_clicked = False
+
+    def motion_notify_event(self, mouse_event):
+        QtGui.QApplication.restoreOverrideCursor()
+        if self.selection_xrange and mouse_event.xdata:
+            do_update = False
+            (x_start, x_end) = self.mpl_canvas.axes.get_xlim()
+            delta = abs((x_end - x_start) / 50.0)
+            if abs(self.selection_xrange[0] - mouse_event.xdata) < delta:
+                QtGui.QApplication.setOverrideCursor(\
+                    QtGui.QCursor(QtCore.Qt.SizeHorCursor))
+                if self.mouse_clicked: 
+                    self.selection_xrange[0] = mouse_event.xdata
+                    do_update = True
+            elif abs(self.selection_xrange[1] - mouse_event.xdata) < delta:
+                QtGui.QApplication.setOverrideCursor(\
+                    QtGui.QCursor(QtCore.Qt.SizeHorCursor))
+                if self.mouse_clicked:
+                    self.selection_xrange[1] = mouse_event.xdata 
+                    do_update = True
+
+            if do_update:
+                self.selection_span.set_xy([[self.selection_xrange[0], 0],
+                                            [self.selection_xrange[0], 1],
+                                            [self.selection_xrange[1], 1],
+                                            [self.selection_xrange[1], 0],
+                                            [self.selection_xrange[0], 0]])
+                self.mpl_canvas.fig.canvas.draw()
+                self.mpl_canvas.fig.canvas.flush_events()
 
     def plot_result(self, result, last_result=None):
         if self.im is None:
@@ -360,7 +403,33 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
 
     def clear(self): 
         self.im = None
+        self.selection_xrange = None
+        self.selection_span = None
         self.mpl_canvas.clear()
 
-    def add_curve(self, y_axis_array, x_axis_array=None, curve_name=None, color='blue'):
-        self.mpl_canvas.add_curve(y_axis_array, x_axis_array=None, curve_name=None, color='blue')
+    def add_curve(self, y_axis_array, x_axis_array=None, label=None,
+            linestyle='-', color='blue', marker=None):
+        self.mpl_canvas.add_curve(y_axis_array,
+                                  x_axis_array=None,
+                                  label=None,
+                                  linestyle=linestyle,
+                                  color=color,
+                                  marker=marker)
+        self.set_x_axis_limits((x_axis_array.min() - 1,
+                                x_axis_array.max() + 1))
+
+    def enable_selection_range(self):
+        (x_start, x_end) = self.mpl_canvas.axes.get_xlim()
+        offset = abs((x_end - x_start) / 10.0)
+        self.selection_xrange = [x_start + offset, x_end - offset]
+
+        self.selection_span = self.mpl_canvas.axes.axvspan(\
+             self.selection_xrange[0], self.selection_xrange[1],
+             facecolor='g', alpha=0.3)
+        self.mpl_canvas.fig.canvas.draw()
+        self.mpl_canvas.fig.canvas.flush_events()
+
+    def enable_legend(self):
+        self.mpl_canvas.axes.legend()
+        self.mpl_canvas.fig.canvas.draw()
+        self.mpl_canvas.fig.canvas.flush_events()

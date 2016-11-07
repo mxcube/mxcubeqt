@@ -154,8 +154,10 @@ class CreateTaskBase(QtGui.QWidget):
         if len(self._current_selected_items) > 0:
             item = self._current_selected_items[0]
             model = item.get_model()
-            model.run_processing_after = run_processing_after
-            model.run_processing_parallel = run_processing_parallel
+            if isinstance(model, queue_model_objects.DataCollection):
+                model.run_processing_after = run_processing_after
+                model.run_processing_parallel = run_processing_parallel and \
+                  model.acquisitions[0].acquisition_parameters.num_images > 19
 
     def acq_parameters_changed(self):
         self._data_path_widget.update_file_name()
