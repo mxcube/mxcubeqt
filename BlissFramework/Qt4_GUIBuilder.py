@@ -108,7 +108,8 @@ class GUITreeWidget(QtGui.QTreeWidget):
     def dragEnterEvent(self, event):
         """Drag start event"""
 
-        self.drag_source_item = self.itemAt(event.pos())
+        if self.drag_source_item is None:
+            self.drag_source_item = self.selectedItems()[0]
         event.accept()
 
     def dropEvent(self, event):
@@ -119,6 +120,7 @@ class GUITreeWidget(QtGui.QTreeWidget):
             self.emit(QtCore.SIGNAL("dragdrop"),
                       self.drag_source_item,
                       self.drag_target_item)
+            self.drag_source_item = None
         event.accept()
 
 
@@ -993,8 +995,10 @@ class GUIEditorWindow(QtGui.QWidget):
         dragged_item_name = source_item.text(0)
         dropped_on_item_name = target_item.text(0)
 
+        print dragged_item_name, dropped_on_item_name
         source_item_parent_name = str(source_item.parent().text(0))
         target_item_parent_name = str(target_item.parent().text(0))
+        print source_item_parent_name, target_item_parent_name
 
         # find common ancestor
         target_item_ancestors = [target_item.parent()]
@@ -1022,6 +1026,7 @@ class GUIEditorWindow(QtGui.QWidget):
               indexOfChild(source_item))
         target_cfg_item = self.configuration.find_item(dropped_on_item_name)
 
+        print 222, self.configuration.is_container(target_cfg_item)
         if self.configuration.is_container(target_cfg_item):
             # have to insert in the container
             target_item.addChild(source_item)

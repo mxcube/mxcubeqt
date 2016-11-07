@@ -24,6 +24,7 @@ import os
 # python2.7
 #import new
 # python3.4
+import time
 import types
 import logging
 import weakref
@@ -209,22 +210,21 @@ class CustomMenuBar(QtGui.QMenuBar):
         for hwr_obj in hwr.hardwareObjects:
 
             connections = hwr.hardwareObjects[hwr_obj].connect_dict
+            for sender in connections:
+                hwr.hardwareObjects[hwr_obj].disconnect(\
+                    sender, connections[sender]["signal"], connections[sender]["slot"])
 
-            #for sender in connections:
-            #    print connections[sender]["signal"], connections[sender]["slot"]
-            #    hwr.hardwareObjects[hwr_obj].disconnect(\
-            #        sender, connections[sender]["signal"], connections[sender]["slot"])
+            #reload(hwr.hardwareObjects[hwr_obj].__class__)
 
-            reload(hwr.hardwareObjects[hwr_obj].__class__)
+        from HardwareRepository import BaseHardwareObjects
+        import Qt4_VideoMockup
+        reimport.reimport(BaseHardwareObjects)
+        reimport.reimport(Qt4_VideoMockup)
 
-        #from  HardwareRepository import BaseHardwareObjects
-        #reimport.reimport(BaseHardwareObjects)
-
-        #for hwr_obj in hwr.hardwareObjects:
-        ##    for sender in connections:
-        #        print connections[sender]["signal"], connections[sender]["slot"]
-        #        hwr.hardwareObjects[hwr_obj].connect(\
-        #            sender, connections[sender]["signal"], connections[sender]["slot"])
+        for hwr_obj in hwr.hardwareObjects:
+            for sender in connections:
+                hwr.hardwareObjects[hwr_obj].connect(\
+                    sender, connections[sender]["signal"], connections[sender]["slot"])
 
     def whats_this_clicked(self):
         """Whats this"""
@@ -771,22 +771,26 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.central_widget.show()
 
-        self.toolbar = CustomToolBar(self)
-        self.toolbar.hide()
-        self.menubar = CustomMenuBar(self)
-        self.menubar.hide()
-        self.statusbar = QtGui.QStatusBar(self)
-        self.statusbar.hide()
+        self._toolbar = CustomToolBar(self)
+        self._toolbar.hide()
+        self._menubar = CustomMenuBar(self)
+        self._menubar.hide()
+        self._statusbar = QtGui.QStatusBar(self)
+        self._statusbar.hide()
+
+        #_statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
+        #_statusbar_hlayout.setSpacing(2)
+        #_statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.menubar)
-        _main_vlayout.addWidget(self.toolbar)
+        _main_vlayout.addWidget(self._menubar)
+        _main_vlayout.addWidget(self._toolbar)
         _main_vlayout.addWidget(self.central_widget)
-        _main_vlayout.addWidget(self.statusbar)
+        _main_vlayout.addWidget(self._statusbar)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
+        self._menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
         self.setWindowFlags(self.windowFlags() |
                             QtCore.Qt.WindowMaximizeButtonHint)
@@ -803,15 +807,50 @@ class WindowDisplayWidget(QtGui.QScrollArea):
     def set_menu_bar(self, menu_data, exp_pwd, execution_mode):
         """Sets menu bar"""
 
-        self.menubar.configure(menu_data, exp_pwd, execution_mode)
-        self.menubar.show()
-        BlissWidget._menuBar = self.menubar
-        BlissWidget._toolBar = self.toolbar
+        self._menubar.configure(menu_data, exp_pwd, execution_mode)
+        self._menubar.show()
+        BlissWidget._menuBar = self._menubar
+        BlissWidget._toolBar = self._toolbar
 
     def set_status_bar(self):
         """Sets statusbar"""
+ 
+        self._statusbar_user_label = QtGui.QLabel("-")
+        self._statusbar_state_label = QtGui.QLabel(" | <b>State: </b>")
+        self._statusbar_state_value = QtGui.QLabel("Ready")
+        self._statusbar_diffractometer_label = QtGui.QLabel(" | <b>Diffractometer: </b>")
+        self._statusbar_diffractometer_value = QtGui.QLabel("-")
+        self._statusbar_action_label = QtGui.QLabel(" | <b>Last action: </b>")
+        self._statusbar_action_value = QtGui.QLabel("-")
+        
+        self._statusbar.addWidget(self._statusbar_user_label)
+        self._statusbar.addWidget(self._statusbar_state_label)
+        self._statusbar.addWidget(self._statusbar_state_value)
+        self._statusbar.addWidget(self._statusbar_diffractometer_label)
+        self._statusbar.addWidget(self._statusbar_diffractometer_value)
+        self._statusbar.addWidget(self._statusbar_action_label)
+        self._statusbar.addWidget(self._statusbar_action_value)
+         
+        self._statusbar.show()
+        BlissWidget._statusBar = self._statusbar
 
-        self.statusbar.show()
+    def update_status_info(self, info_type, info_message):
+        """Updates status info"""
+
+        if info_message == "":
+            info_message = "Ready"
+
+        if info_type == "user":
+            self._statusbar_user_label.setText(info_message)
+        elif info_type == "status":
+            self._statusbar_state_value.setText(info_message)
+        elif info_type == "diffractometer":
+            self._statusbar_diffractometer_value.setText(info_message)
+        elif info_type == "action":
+            self._statusbar_action_value.setText("%s (%s)" % (info_message,
+                                      time.strftime("%Y-%m-%d %H:%M:%S")))
+        elif info_type == "edna":
+            self._statusbar_edna_value.setText(info_message)
 
     def show(self, *args):
         """Show"""
@@ -846,7 +885,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if len(args) > 0:
             if args[0]:
                 return
-        self.menubar.set_exp_mode(False)
+        self._menubar.set_exp_mode(False)
 
     def add_item(self, item_cfg, parent):
         """Adds item to the gui"""

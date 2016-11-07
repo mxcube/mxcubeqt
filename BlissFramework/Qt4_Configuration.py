@@ -514,18 +514,19 @@ class Configuration:
                         new_item.setProperties(child["properties"])
 
                     child["properties"] = new_item.properties
+                    new_item.__dict__ = child
 
-                    try:
-                        new_item_signals = new_item["signals"]
-                        new_item_slots = new_item["slots"]
-                    except:
-                        new_item.__dict__ = child
-                    else:
-                        new_item.__dict__ = child
-                        new_item.slots = new_item_slots
-                        new_item.signals = new_item_signals
-                        children[index] = new_item
-
+                    #try:
+                    #    new_item_signals = new_item["signals"]
+                    #    new_item_slots = new_item["slots"]
+                    #except:
+                    #    new_item.__dict__ = child
+                    #else:
+                    #    new_item.__dict__ = child
+                    #    new_item.slots = new_item_slots
+                    #    new_item.signals = new_item_signals
+                    #    children[index] = new_item
+                    children[index] = new_item
                     load_children(child["children"])
                 index += 1
         load_children(self.windows_list)

@@ -62,6 +62,7 @@ class Qt4_CameraBrick(BlissWidget):
 
         # Graphic elements-----------------------------------------------------
         self.info_widget = QtGui.QWidget(self)
+        self.display_beam_size_cbox = QtGui.QCheckBox("Display beam size", self)
         self.coord_label = QtGui.QLabel(":", self)
         self.info_label = QtGui.QLabel(self)
         self.camera_control_dialog = CameraControlDialog(self)
@@ -154,6 +155,7 @@ class Qt4_CameraBrick(BlissWidget):
       
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
+        _info_widget_hlayout.addWidget(self.display_beam_size_cbox)
         _info_widget_hlayout.addWidget(self.coord_label)
         _info_widget_hlayout.addStretch(0)
         _info_widget_hlayout.addWidget(self.info_label)
@@ -166,6 +168,8 @@ class Qt4_CameraBrick(BlissWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Qt signal/slot connections -----------------------------------------
+        self.display_beam_size_cbox.stateChanged.connect(\
+             self.display_beam_size_state_changed)
 
         # SizePolicies --------------------------------------------------------
         self.info_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
@@ -230,6 +234,9 @@ class Qt4_CameraBrick(BlissWidget):
              self.image_scale_menu.setEnabled(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def display_beam_size_state_changed(self, state):
+        self.graphics_manager_hwobj.display_beam_size(state)
 
     def set_control_mode(self, have_control):
         if have_control:
@@ -316,7 +323,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj.move_beam_mark_auto()
 
     def mouse_moved(self, x, y):
-        self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" %(x, y))
+        self.coord_label.setText("Cursor X: <b>%d</b> Y: <b>%d</b>" %(x, y))
 
     def select_all_points_clicked(self):
         self.graphics_manager_hwobj.select_all_points()
