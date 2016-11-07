@@ -418,10 +418,10 @@ class AcquisitionWidget(QtGui.QWidget):
             (name, energy) = self.get_mad_energy()
 
             if energy != 0:
-                self.set_energy(energy)
+                self.update_energy(energy)
             self.madEnergySelectedSignal.emit(name, energy, state)
         else:
-            self.set_energy(self.previous_energy)
+            self.update_energy(self.previous_energy)
             energy = self._beamline_setup_hwobj.energy_hwobj.getCurrentEnergy()
             self.madEnergySelectedSignal.emit('', self.previous_energy, state)
 
@@ -466,7 +466,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if self.acq_widget_layout.mad_cbox.isChecked():
             (name, energy) = self.get_mad_energy()
             if energy != 0:
-                self.set_energy(energy)
+                self.update_energy(energy)
 
             self.madEnergySelectedSignal.emit(name, energy, True)
 
@@ -474,7 +474,7 @@ class AcquisitionWidget(QtGui.QWidget):
         if "energy" not in self.value_changed_list:
             self.value_changed_list.append("energy") 
 
-    def update_energy(self, energy, wav):
+    def update_energy(self, energy, wav=None):
         """
         Descript. :
         """

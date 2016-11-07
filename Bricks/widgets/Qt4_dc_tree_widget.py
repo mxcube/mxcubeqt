@@ -993,8 +993,9 @@ class DataCollectTree(QtGui.QWidget):
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
         while item: 
-            if item.checkState(0) > 0:
-               checked_items.append(item)   
+            if item.checkState(0) > 0 and not \
+               item.isHidden():
+                checked_items.append(item)
             it += 1
             item = it.value()
         return checked_items
