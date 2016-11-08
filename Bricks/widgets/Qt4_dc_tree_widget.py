@@ -104,6 +104,7 @@ class DataCollectTree(QtGui.QWidget):
         self.play_icon = Qt4_Icons.load_icon("VCRPlay.png")
         self.stop_icon = Qt4_Icons.load_icon("Stop.png")
         self.ispyb_icon = Qt4_Icons.load_icon("SampleChanger2.png")
+        self.star_icon = Qt4_Icons.load_icon("star")
         self.caution_icon = Qt4_Icons.load_icon("Caution2.png")
         
         self.button_widget = QtGui.QWidget(self)                
@@ -267,6 +268,11 @@ class DataCollectTree(QtGui.QWidget):
             add_remove = True
             add_details = False
             self.item_menu.addAction("Rename", self.rename_treewidget_item)
+            if item.has_star():
+                self.item_menu.addAction("Remove star", self.remove_star_treewidget_item)
+            else:
+                self.item_menu.addAction("Add star", self.add_star_treewidget_item)
+           
             if isinstance(item, Qt4_queue_item.TaskQueueItem):
                 if not isinstance(item.get_model(),
                                   queue_model_objects.SampleCentring):
@@ -411,6 +417,20 @@ class DataCollectTree(QtGui.QWidget):
             items[0].setFlags(QtCore.Qt.ItemIsSelectable |
                               QtCore.Qt.ItemIsEnabled)
             items[0].get_model().set_name(items[0].text(0))
+
+    def add_star_treewidget_item(self):
+        items = self.get_selected_items()
+        for item in items:
+            item.set_star(True)
+            if item.has_star():
+                item.setIcon(0, self.star_icon) 
+
+    def remove_star_treewidget_item(self):
+        items = self.get_selected_items()
+        for item in items:
+            item.set_star(False)        
+            if not item.has_star():
+                item.setIcon(0, QtGui.QIcon())
 
     def mount_sample(self):
         """
@@ -973,8 +993,9 @@ class DataCollectTree(QtGui.QWidget):
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
         while item: 
-            if item.checkState(0) > 0:
-               checked_items.append(item)   
+            if item.checkState(0) > 0 and not \
+               item.isHidden():
+                checked_items.append(item)
             it += 1
             item = it.value()
         return checked_items
@@ -1234,6 +1255,10 @@ class DataCollectTree(QtGui.QWidget):
                 if do_it:
                     item.setOn(False)        
                 """
+             
+            if item.has_star():
+                item.setIcon(0, Qt4_Icons.load_icon("star"))
+
             it += 1
             item = it.value()
 
@@ -1257,7 +1282,10 @@ class DataCollectTree(QtGui.QWidget):
                          conflict = True
                          item.setIcon(0, self.caution_icon)
                      else:
-                         item.setIcon(0, QtGui.QIcon())
+                         if item.has_star():
+                             item.setIcon(0, self.star_icon)
+                         else:
+                             item.setIcon(0, QtGui.QIcon())
                          
             it += 1
             item = it.value()
@@ -1282,7 +1310,8 @@ class DataCollectTree(QtGui.QWidget):
                       if not item.child(index).isHidden():
                           hide = False
                           break
-                  item.setHidden(hide)
+                  if hide:
+                      item.set_hidden(hide)
 
               self.item_iterator += 1
               item = self.item_iterator.value()

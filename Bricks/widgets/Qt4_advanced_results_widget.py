@@ -35,6 +35,7 @@ class AdvancedResultsWidget(QtGui.QWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
+        self._initialized = None
         self._tree_view_item = None
         self._half_widget_size = 900
 
@@ -56,10 +57,12 @@ class AdvancedResultsWidget(QtGui.QWidget):
 
     def set_beamline_setup(self, bl_setup):
         if hasattr(bl_setup, 'parallel_processing_hwobj'):
-            if bl_setup.parallel_processing_hwobj:
+            if bl_setup.parallel_processing_hwobj and \
+            not self._initialized:
                 bl_setup.parallel_processing_hwobj.connect(
                          'paralleProcessingResults', 
                          self.set_processing_results)
+                self._initialized = True
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
     def populate_widget(self, item):

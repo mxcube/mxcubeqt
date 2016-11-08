@@ -265,12 +265,35 @@ class HeatMapWidget(QtGui.QWidget):
         self.__filter_min_value = self.__result_display.max() * \
              self._threshold_slider.value() / 100.0
         self.__result_display[self.__result_display < self.__filter_min_value] = 0
-      
+    
         if len(self.__result_display.shape) == 1:
-            x_data = numpy.arange(self.__result_display.shape[0])
+            x_data = numpy.arange(1, self.__result_display.shape[0] + 1)
             self._heat_map_plot.clear()
-            self._heat_map_plot.add_curve(self.__result_display, x_data, "Dozor result")
-            #self._heat_map_plot.newcurve("Dozor result", x_data, self.__result_display)
+            #self._heat_map_plot.add_curve(self.__result_display, x_data, "Dozor result")
+            self._heat_map_plot.add_curve(self.__results["score"],
+                                          x_data,
+                                          label="Total score",
+                                          color="r")
+            self._heat_map_plot.add_curve(self.__results["spots_num"],
+                                          x_data,
+                                          label="Number of spots",
+                                          linestyle="None",
+                                          color="b",
+                                          marker="o")
+            self._heat_map_plot.add_curve(self.__results["spots_int_aver"],
+                                          x_data,
+                                          label="Int aver",
+                                          linestyle="None",
+                                          color="g",
+                                          marker="s")
+            self._heat_map_plot.add_curve(self.__results["spots_resolution"],
+                                          x_data,
+                                          linestyle="None",
+                                          label="Resolution",
+                                          color="m",
+                                          marker="s")
+            self._heat_map_plot.enable_selection_range()
+            self._heat_map_plot.enable_legend()
         else:
             self._heat_map_plot.plot_result(self.__result_display)
 

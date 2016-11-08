@@ -68,8 +68,8 @@ class Qt4_DCParametersBrick(BlissWidget):
 
         self.tool_box.addItem(self.parameters_widget, "Parameters")
         self.tool_box.addItem(self.image_tracking_widget, "Results - ADXV control")
-        self.tool_box.addItem(self.results_static_view, "Results")
-        self.tool_box.addItem(self.advance_results_widget, "Results - Heat map")
+        self.tool_box.addItem(self.results_static_view, "Results - Summary")
+        self.tool_box.addItem(self.advance_results_widget, "Results - Parallel processing")
 
         # Layout -------------------------------------------------------------- 
         _main_vlayout = QtGui.QHBoxLayout(self)
@@ -93,16 +93,15 @@ class Qt4_DCParametersBrick(BlissWidget):
 
         data_collection = item.get_model()
 
-        if data_collection.is_helical():
-            self.advance_results_widget.show()
-        else:
-            self.advance_results_widget.hide()
-
+        #if data_collection.is_helical():
+        #    self.advance_results_widget.show()
+        #else:
+        #    self.advance_results_widget.hide()
               
         self.snapshot_widget.display_snapshot(data_collection.\
              acquisitions[0].acquisition_parameters.\
              centred_position.snapshot_image,
-             width=800) 
+             width=400) 
         
         if data_collection.is_collected():
             self.parameters_widget.setEnabled(False)
@@ -111,13 +110,9 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.image_tracking_widget.refresh()
         else:
             self.parameters_widget.setEnabled(True)
+
         self.parameters_widget.populate_widget(item)
-        #TODO 
-        #self.advance_results_widget.populate_widget(item)
-        self.advance_results_widget.heat_map_widget.clean_result()
-        self.advance_results_widget.heat_map_widget.\
-             set_associated_data_collection(data_collection) 
-        self.advance_results_widget.heat_map_widget._summary_gbox.hide()
+        self.advance_results_widget.populate_widget(item)
 
     def populate_results(self, data_collection):
         """
