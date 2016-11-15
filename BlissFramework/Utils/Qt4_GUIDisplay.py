@@ -34,6 +34,7 @@ import collections
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
+from functools import partial
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -81,6 +82,11 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.view_toolbar_action = self.view_menu.addAction(\
              "Graphics toolbar", self.view_toolbar_clicked)
         self.view_toolbar_action.setCheckable(True)
+        self.view_menu.addSeparator()
+        
+        self.view_windows_menu = self.view_menu.addMenu("Windows")
+        self.view_windows_menu.setEnabled(False)
+
         self.view_maximize_action = self.view_menu.addAction(\
              "Show maximized window", self.view_max_clicked)
         self.view_normal_action = self.view_menu.addAction(\
@@ -303,6 +309,23 @@ class CustomMenuBar(QtGui.QMenuBar):
         """Show minimized window"""
 
         QtGui.QApplication.activeWindow().showMinimized()
+
+    def append_windows_links(self, windows_list):
+        """If there are more than one window then appends names
+           of available windows to the menu Windows
+        """
+        if len(windows_list) > 1:
+            self.view_windows_menu.setEnabled(True)
+            self.preview_windows = {}
+            for window in windows_list:
+                self.preview_windows[window.base_caption] = window
+                temp_menu = self.view_windows_menu.addAction(window.base_caption, 
+                           partial(self.view_window, window.base_caption))
+            
+    def view_window(self, window_caption):
+        """Displays selected window"""
+        self.preview_windows[window_caption].show()
+        self.preview_windows[window_caption].activateWindow()
 
 
 class CustomToolBar(QtGui.QToolBar):
@@ -800,9 +823,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """Toggle toolbar visibility"""
 
         if state:
-            self.toolbar.show()
+            self._toolbar.show()
         else:
-            self.toolbar.hide()
+            self._toolbar.hide()
 
     def set_menu_bar(self, menu_data, exp_pwd, execution_mode):
         """Sets menu bar"""
@@ -816,20 +839,16 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """Sets statusbar"""
  
         self._statusbar_user_label = QtGui.QLabel("-")
-        self._statusbar_state_label = QtGui.QLabel(" | <b>State: </b>")
-        self._statusbar_state_value = QtGui.QLabel("Ready")
-        self._statusbar_diffractometer_label = QtGui.QLabel(" | <b>Diffractometer: </b>")
-        self._statusbar_diffractometer_value = QtGui.QLabel("-")
-        self._statusbar_action_label = QtGui.QLabel(" | <b>Last action: </b>")
-        self._statusbar_action_value = QtGui.QLabel("-")
+        self._statusbar_state_label = QtGui.QLabel(" <b>State: </b>")
+        self._statusbar_diffractometer_label = QtGui.QLabel(" <b>Diffractometer: </b>")
+        self._statusbar_sc_label = QtGui.QLabel(" <b>Sample changer: </b>")
+        self._statusbar_action_label = QtGui.QLabel(" <b>Last collect: </b>")
         
         self._statusbar.addWidget(self._statusbar_user_label)
         self._statusbar.addWidget(self._statusbar_state_label)
-        self._statusbar.addWidget(self._statusbar_state_value)
         self._statusbar.addWidget(self._statusbar_diffractometer_label)
-        self._statusbar.addWidget(self._statusbar_diffractometer_value)
+        self._statusbar.addWidget(self._statusbar_sc_label)
         self._statusbar.addWidget(self._statusbar_action_label)
-        self._statusbar.addWidget(self._statusbar_action_value)
          
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
@@ -843,14 +862,18 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if info_type == "user":
             self._statusbar_user_label.setText(info_message)
         elif info_type == "status":
-            self._statusbar_state_value.setText(info_message)
+            self._statusbar_state_label.setText(\
+                " <b>State: </b> %s" % info_message)
         elif info_type == "diffractometer":
-            self._statusbar_diffractometer_value.setText(info_message)
+            self._statusbar_diffractometer_label.setText(\
+                " <b>Diffractometer: </b>%s" % info_message)
+        elif info_type == "sc":
+            self._statusbar_sc_label.setText(\
+                " <b>Sample changer: </b> %s" % info_message)
         elif info_type == "action":
-            self._statusbar_action_value.setText("%s (%s)" % (info_message,
-                                      time.strftime("%Y-%m-%d %H:%M:%S")))
-        elif info_type == "edna":
-            self._statusbar_edna_value.setText(info_message)
+            self._statusbar_action_label.setText(\
+                " <b>Last collect: </b> %s (%s)" % \
+                (info_message, time.strftime("%Y-%m-%d %H:%M:%S")))
 
     def show(self, *args):
         """Show"""
@@ -1222,12 +1245,15 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         return QtGui.QSizePolicy(_get_size_policy_flag(hsizepolicy),
                                  _get_size_policy_flag(vsizepolicy))
 
+    def append_windows_links(self, window_list):
+        self._menubar.append_windows_links(window_list)
 
 def display(configuration, no_border=False):
     """Display window"""
 
     windows = []
     for window in configuration.windows_list:
+        BlissWidget.set_status_info("status", window["name"])
         display = WindowDisplayWidget(None, window["name"],
             execution_mode=True, no_border=no_border)
         windows.append(display)
@@ -1239,6 +1265,10 @@ def display(configuration, no_border=False):
             display._show = False
         display.hide()
         restoreSizes(configuration, window, display)
+
+    for window in windows:
+        window.append_windows_links(windows)
+
     return windows
 
 def restoreSizes(configuration, window, display, configuration_suffix="", move_window_flag=True):

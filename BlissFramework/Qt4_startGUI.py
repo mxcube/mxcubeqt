@@ -79,14 +79,14 @@ def run(gui_config_file=None):
                       default='')
     parser.add_option('', '--logLevel', action='store', type='string',
                       help='Log level', dest='logLevel', default='INFO')
+    parser.add_option('', '--logTemplate', action='store', type='string',
+                      help='Log template', dest='logTemplate', default='')
     parser.add_option('', '--bricksDirs', action='store', type='string',
                       help="Additional directories for bricks search " + \
                            "path (you can also use the CUSTOM_BRICKS_PATH " + \
                            "environment variable)",
                       dest='bricksDirs', metavar='dir1'+os.path.pathsep+\
                       'dir2...dirN', default='')
-    parser.add_option('', '--logTemplate', action='store', type='string',
-                      help='Log template', dest='logTemplate', default='')
     parser.add_option('', '--hardwareRepository', action='store', type='string',
                       help="Hardware Repository Server host:port (default" + \
                       " to %s) (you can also use " % default_hwr_server+ \
@@ -106,6 +106,10 @@ def run(gui_config_file=None):
     parser.add_option('', '--no-border', action='store_true', dest='noBorder',
                       default=False,
                       help="does not show borders on main window")
+    parser.add_option('', '--style', action='store', type='string',
+                      help="Visual style of the application (windows, motif," + \
+                           "cde, plastique, windowsxp, or macintosh)",
+                      dest='appStyle', default=None)
 
     (opts, args) = parser.parse_args()
 
@@ -121,6 +125,7 @@ def run(gui_config_file=None):
     log_template = opts.logTemplate
     hwobj_directory = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directory = opts.bricksDirs.split(os.path.pathsep)
+    app_style = opts.appStyle
 
     if opts.hardwareRepositoryServer:
         hwr_server = opts.hardwareRepositoryServer
@@ -150,6 +155,8 @@ def run(gui_config_file=None):
           hwobj_directory if _directory]
 
     main_application = QtGui.QApplication([])
+    if app_style:
+        main_application.setStyle(app_style)
     lockfile = None
 
     if not opts.designMode and gui_config_file:
