@@ -68,7 +68,6 @@ class Qt4_TreeBrick(BlissWidget):
         self.filtered_lims_samples = None
 
         # Properties ---------------------------------------------------------- 
-        self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("queue", "string", "/queue")
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
@@ -78,6 +77,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("scOneName", "string", "Sample changer")
         self.addProperty("scTwoName", "string", "Plate")
         self.addProperty("usePlateNavigator", "boolean", False)
+        self.addProperty("useHistoryView", "boolean", True)
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_widgets", ())
@@ -276,6 +276,9 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(self.sample_changer_hwobj,
                              SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
+                self.connect(self.sample_changer_hwobj,
+                             SampleChanger.STATUS_CHANGED_EVENT,
+                             self.sample_changer_status_changed)
             if self.plate_manipulator_hwobj is not None:
                 self.connect(self.plate_manipulator_hwobj,
                              SampleChanger.STATE_CHANGED_EVENT,
@@ -326,6 +329,9 @@ class Qt4_TreeBrick(BlissWidget):
               self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
         #elif property_name == 'usePlateNavigator':
         #      self.dc_tree_widget.show_plate_navigator_cbox.setVisible(new_value)
+        elif property_name == 'useHistoryView':
+              self.dc_tree_widget.history_table_widget.setVisible(new_value)
+              self.dc_tree_widget.history_enable_cbox.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -660,6 +666,9 @@ class Qt4_TreeBrick(BlissWidget):
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
         Qt4_widget_colors.set_widget_color(self.sample_changer_widget.details_button,
                                            QtGui.QColor(s_color))
+
+    def sample_changer_status_changed(self, state):
+        BlissWidget.set_status_info("sc", state)
 
     def plate_info_changed(self):
         self.set_sample_pin_icon()

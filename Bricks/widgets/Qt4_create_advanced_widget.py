@@ -442,7 +442,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 grid_object.set_spacing(spacing, adjust_size=\
                      self._advanced_methods_widget.adjust_size_cbox.isChecked())
                 break
-        self.grid_treewidget_item_selection_changed()
+        #self.grid_treewidget_item_selection_changed()
 
     def move_to_grid(self):
         """Moves diffractometer to the center of the grid

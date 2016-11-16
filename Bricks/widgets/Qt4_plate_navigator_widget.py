@@ -36,7 +36,7 @@ class PlateNavigatorWidget(QtGui.QWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.current_location = None
+        self.__current_location = None
  
         # Graphic elements ----------------------------------------------------
         self.plate_navigator_table = QtGui.QTableWidget(self)
@@ -50,6 +50,7 @@ class PlateNavigatorWidget(QtGui.QWidget):
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
+        #self.plate_navigator_cell.setSizePolicy
 
         # Qt signal/slot connections ------------------------------------------
         self.plate_navigator_table.itemDoubleClicked.\
@@ -64,7 +65,9 @@ class PlateNavigatorWidget(QtGui.QWidget):
         self.navigation_graphicsscene.addItem(self.navigation_item)
         self.navigation_graphicsscene.update()
         self.plate_navigator_cell.setEnabled(False)
-
+        font = self.plate_navigator_table.font()
+        font.setPointSize(8)
+        self.plate_navigator_table.setFont(font)
         self.plate_navigator_table.setEditTriggers(\
              QtGui.QAbstractItemView.NoEditTriggers)
 
@@ -84,32 +87,23 @@ class PlateNavigatorWidget(QtGui.QWidget):
         new_location = self.plate_manipulator_hwobj.get_plate_location()
         self.plate_navigator_cell.setEnabled(True)
 
-        if self.current_location != new_location:
-            #self.plate_widget.navigation_label_painter.setBrush(.QBrush(qt.QWidget.white, qt.Qt.SolidPattern))
-
-            #for drop_index in range(self.num_drops):
-            #    pos_y = float(drop_index + 1) / (self.num_drops + 1) * \
-            #         self.plate_widget.navigation_graphicsview.height()
-            #    self.navigation_graphicsscene.drawLine(58, pos_y - 2, 62, pos_y + 2)
-            #    self.navigation_graphicsscene.drawLine(62, pos_y - 2, 58, pos_y + 2)
-
-            if new_location:
-                row = new_location[0]
-                col = new_location[1]
-                pos_x = new_location[2]
-                pos_y = new_location[3]
-                pos_x *= self.plate_navigator_cell.width()
-                pos_y *= self.plate_navigator_cell.height()
-                self.navigation_item.set_navigation_pos(pos_x, pos_y)
-                self.plate_navigator_cell.update()
-                if self.current_location:
-                    empty_item = QtGui.QTableWidgetItem(QtGui.QIcon(), "")
-                    self.plate_navigator_table.setItem(self.current_location[0],
-                                              self.current_location[1],
-                                              empty_item)
-                new_item = QtGui.QTableWidgetItem(Qt4_Icons.load_icon("sample_axis.png"), "")
-                self.plate_navigator_table.setItem(row, col, new_item)
-            self.current_location = new_location
+        if new_location and self.__current_location != new_location:
+            row = new_location[0]
+            col = new_location[1]
+            pos_x = new_location[2]
+            pos_y = new_location[3]
+            pos_x *= self.plate_navigator_cell.width()
+            pos_y *= self.plate_navigator_cell.height()
+            self.navigation_item.set_navigation_pos(pos_x, pos_y)
+            self.plate_navigator_cell.update()
+            if self.__current_location:
+                empty_item = QtGui.QTableWidgetItem(QtGui.QIcon(), "")
+                self.plate_navigator_table.setItem(self.__current_location[0],
+                                                   self.__current_location[1] - 1,
+                                                   empty_item)
+            new_item = QtGui.QTableWidgetItem(Qt4_Icons.load_icon("sample_axis"), "")
+            self.plate_navigator_table.setItem(row, col - 1, new_item)
+            self.__current_location = new_location
 
     def init_plate_view(self, plate_manipulator_hwobj):
         """Initalizes plate info
@@ -141,13 +135,14 @@ class PlateNavigatorWidget(QtGui.QWidget):
                 temp_item = QtGui.QTableWidgetItem()
                 self.plate_navigator_table.setItem(row, col, temp_item)
 
-        table_height = 25 * (self.num_rows + 1) + 20
-        table_width = 25 * (self.num_cols + 1) + 15
+        table_height = 25 * (self.num_rows + 1)
+        table_width = 25 * (self.num_cols + 1)
         self.plate_navigator_table.setFixedWidth(table_width)
         self.plate_navigator_table.setFixedHeight(table_height)
         self.plate_navigator_cell.setFixedHeight(table_height)
+        #self.plate_navigator_cell.setFixedWidth(50)
         self.setFixedHeight(table_height + 2)
-        self.navigation_item.set_size(120, table_height)
+        self.navigation_item.set_size(50, table_height)
         self.navigation_item.set_num_drops_per_cell(plate_info['num_drops'])
         self.refresh_plate_location()
 
@@ -158,8 +153,8 @@ class PlateNavigatorWidget(QtGui.QWidget):
         #TODO replace this with pos_x, pos_y
         drop = int(pos_y * self.num_drops) + 1
         self.plate_manipulator_hwobj.load_sample(\
-             (self.current_location[0] + 1,
-              (self.current_location[1] - 1) * self.num_drops + drop))
+             (self.__current_location[0] + 1,
+              (self.__current_location[1] - 1) * self.num_drops + drop))
 
     def navigation_table_double_clicked(self, table_item):
         """Moves to the col/row double clicked by user
