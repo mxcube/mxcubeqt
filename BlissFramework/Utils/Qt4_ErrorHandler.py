@@ -18,7 +18,11 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging, sys, traceback
-from PyQt4 import QtGui
+
+try:
+    from PyQt5.QtWidgets import QApplication
+except:
+    from PyQt4.QtGui import QApplication
 
 _handler = None
 
@@ -78,7 +82,7 @@ class __Handler:
         """
         if type == KeyboardInterrupt:
           #qt.qApp.quit()
-          QtGui.QApplication.quit()
+          QApplication.quit()
           return
         try: 
             exception = traceback.format_exception(type, value, tb)

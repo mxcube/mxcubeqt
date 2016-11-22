@@ -19,18 +19,22 @@
 
 """Connection editor"""
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+try:
+   from PyQt5 import QtCore
+   from PyQt5.QtWidgets import *
+except:
+   from PyQt4 import QtCore
+   from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 
 
-class Qt4_ConnectionEditor(QtGui.QDialog):
+class Qt4_ConnectionEditor(QDialog):
     """Connection editor"""
 
     def __init__(self, configuration):
         """init"""
-        QtGui.QDialog.__init__(self, None)
+        QDialog.__init__(self, None)
 
         # Internal values -----------------------------------------------------
         self.has_changed = None
@@ -44,70 +48,70 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        top_panel = QtGui.QWidget(self)
+        top_panel = QWidget(self)
 
-        emitter_panel = QtGui.QWidget(top_panel)
-        self.emitter_windows_listwidget = QtGui.QListWidget(emitter_panel)
-        self.emitter_objects_listwidget = QtGui.QListWidget(emitter_panel)
-        self.emitter_signals_listwidget = QtGui.QListWidget(emitter_panel)
+        emitter_panel = QWidget(top_panel)
+        self.emitter_windows_listwidget = QListWidget(emitter_panel)
+        self.emitter_objects_listwidget = QListWidget(emitter_panel)
+        self.emitter_signals_listwidget = QListWidget(emitter_panel)
         self.emitter_objects_listwidget.setSortingEnabled(True)
         self.emitter_signals_listwidget.setSortingEnabled(True)
 
-        receiver_panel = QtGui.QWidget(top_panel)
-        self.receiver_windows_listwidget = QtGui.QListWidget(emitter_panel)
-        self.receiver_objects_listwidget = QtGui.QListWidget(emitter_panel)
-        self.receiver_slots_listwidget = QtGui.QListWidget(emitter_panel)
+        receiver_panel = QWidget(top_panel)
+        self.receiver_windows_listwidget = QListWidget(emitter_panel)
+        self.receiver_objects_listwidget = QListWidget(emitter_panel)
+        self.receiver_slots_listwidget = QListWidget(emitter_panel)
         self.receiver_objects_listwidget.setSortingEnabled(True)
         self.receiver_slots_listwidget.setSortingEnabled(True)
 
-        self.add_connection_button = QtGui.QPushButton('Add connection', self)
+        self.add_connection_button = QPushButton('Add connection', self)
 
-        self.connections_treewidget = QtGui.QTreeWidget(self)
+        self.connections_treewidget = QTreeWidget(self)
 
-        button_panel = QtGui.QWidget(self)
-        self.remove_connection_button = QtGui.QPushButton(\
+        button_panel = QWidget(self)
+        self.remove_connection_button = QPushButton(\
              'Remove connection', button_panel)
-        self.ok_button = QtGui.QPushButton('OK', button_panel)
-        self.cancel_button = QtGui.QPushButton('Cancel', button_panel)
+        self.ok_button = QPushButton('OK', button_panel)
+        self.cancel_button = QPushButton('Cancel', button_panel)
 
         # Layout --------------------------------------------------------------
-        emitter_panel_layout = QtGui.QGridLayout(emitter_panel)
-        emitter_panel_layout.addWidget(QtGui.QLabel('<h3>Emitters</h3>', self),
+        emitter_panel_layout = QGridLayout(emitter_panel)
+        emitter_panel_layout.addWidget(QLabel('<h3>Emitters</h3>', self),
                                        0, 1, QtCore.Qt.AlignHCenter)
-        emitter_panel_layout.addWidget(QtGui.QLabel('Windows', self), 1, 0)
-        emitter_panel_layout.addWidget(QtGui.QLabel('Objects', self), 1, 1)
-        emitter_panel_layout.addWidget(QtGui.QLabel('Signals', self), 1, 2)
+        emitter_panel_layout.addWidget(QLabel('Windows', self), 1, 0)
+        emitter_panel_layout.addWidget(QLabel('Objects', self), 1, 1)
+        emitter_panel_layout.addWidget(QLabel('Signals', self), 1, 2)
         emitter_panel_layout.addWidget(self.emitter_windows_listwidget, 2, 0)
         emitter_panel_layout.addWidget(self.emitter_objects_listwidget, 2, 1)
         emitter_panel_layout.addWidget(self.emitter_signals_listwidget, 2, 2)
 
-        receiver_panel_layout = QtGui.QGridLayout(receiver_panel)
+        receiver_panel_layout = QGridLayout(receiver_panel)
         receiver_panel_layout.addWidget(\
-             QtGui.QLabel('<h3>Receivers</h3>', self), 0, 1,
+             QLabel('<h3>Receivers</h3>', self), 0, 1,
              QtCore.Qt.AlignHCenter)
-        receiver_panel_layout.addWidget(QtGui.QLabel('Windows', self), 1, 0)
-        receiver_panel_layout.addWidget(QtGui.QLabel('Objects', self), 1, 1)
-        receiver_panel_layout.addWidget(QtGui.QLabel('Slots', self), 1, 2)
+        receiver_panel_layout.addWidget(QLabel('Windows', self), 1, 0)
+        receiver_panel_layout.addWidget(QLabel('Objects', self), 1, 1)
+        receiver_panel_layout.addWidget(QLabel('Slots', self), 1, 2)
         receiver_panel_layout.addWidget(self.receiver_windows_listwidget, 2, 0)
         receiver_panel_layout.addWidget(self.receiver_objects_listwidget, 2, 1)
         receiver_panel_layout.addWidget(self.receiver_slots_listwidget, 2, 2)
 
-        top_panel_layout = QtGui.QHBoxLayout(top_panel)
+        top_panel_layout = QHBoxLayout(top_panel)
         top_panel_layout.addWidget(emitter_panel)
         top_panel_layout.addWidget(receiver_panel)
         top_panel_layout.setSpacing(0)
         top_panel_layout.setContentsMargins(0, 0, 0, 0)
 
-        button_panel_layout = QtGui.QHBoxLayout(button_panel)
+        button_panel_layout = QHBoxLayout(button_panel)
         button_panel_layout.addWidget(self.remove_connection_button)
         button_panel_layout.addStretch(0)
         button_panel_layout.addWidget(self.ok_button, QtCore.Qt.AlignRight)
         button_panel_layout.addWidget(self.cancel_button, QtCore.Qt.AlignRight)
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(top_panel)
         main_layout.addWidget(self.add_connection_button)
-        main_layout.addWidget(QtGui.QLabel(\
+        main_layout.addWidget(QLabel(\
              '<h3>Established connections</h3>', self))
         main_layout.addWidget(self.connections_treewidget)
         main_layout.addWidget(button_panel)
@@ -115,16 +119,16 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         main_layout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self.add_connection_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                                 QtGui.QSizePolicy.Fixed)
-        self.remove_connection_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                                    QtGui.QSizePolicy.Fixed)
-        self.ok_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                     QtGui.QSizePolicy.Fixed)
-        self.cancel_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                         QtGui.QSizePolicy.Fixed)
-        self.connections_treewidget.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                                  QtGui.QSizePolicy.Expanding)
+        self.add_connection_button.setSizePolicy(QSizePolicy.Fixed,
+                                                 QSizePolicy.Fixed)
+        self.remove_connection_button.setSizePolicy(QSizePolicy.Fixed,
+                                                    QSizePolicy.Fixed)
+        self.ok_button.setSizePolicy(QSizePolicy.Fixed,
+                                     QSizePolicy.Fixed)
+        self.cancel_button.setSizePolicy(QSizePolicy.Fixed,
+                                         QSizePolicy.Fixed)
+        self.connections_treewidget.setSizePolicy(QSizePolicy.Expanding,
+                                                  QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         self.emitter_windows_listwidget.currentItemChanged.connect(\
@@ -250,7 +254,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         def __add_connection(sender_window, sender, connection):
             """Adds connection"""
 
-            new_item = QtGui.QTreeWidgetItem(self.connections_treewidget)
+            new_item = QTreeWidgetItem(self.connections_treewidget)
 
             window_name = sender_window["name"]
             new_item.setText(1, window_name)
@@ -413,7 +417,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         if sender_window_item:
             sender_window_name = str(sender_window_item.text())
         else:
-            QtGui.QMessageBox.warning(self, 'Cannot add connection',
+            QMessageBox.warning(self, 'Cannot add connection',
                                       'Missing sender window.')
             return
 
@@ -427,7 +431,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         if signal_item:
             signal_name = str(signal_item.text())
         else:
-            QtGui.QMessageBox.warning(self, 'Cannot add connection',
+            QMessageBox.warning(self, 'Cannot add connection',
                                       'Missing signal.')
             return
 
@@ -435,7 +439,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         if receiver_window_item:
             receiver_window_name = str(receiver_window_item.text())
         else:
-            QtGui.QMessageBox.warning(self, 'Cannot add connection',
+            QMessageBox.warning(self, 'Cannot add connection',
                                       'Missing receiver window.')
             return
 
@@ -449,7 +453,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
         if slot_item:
             slot_name = str(slot_item.text())
         else:
-            QtGui.QMessageBox.warning(self, 'Cannot add connection',
+            QMessageBox.warning(self, 'Cannot add connection',
                                       'Missing slot.')
             return
 
@@ -472,7 +476,7 @@ class Qt4_ConnectionEditor(QtGui.QDialog):
                           connection_dict['receiverObject'],
                           connection_dict['slot'])
 
-        new_item = QtGui.QTreeWidgetItem(self.connections_treewidget,
+        new_item = QTreeWidgetItem(self.connections_treewidget,
                                          parameter_list)
         new_item.setIcon(0, Qt4_Icons.load_icon('button_ok_small'))
         self.connections_treewidget.addTopLevelItem(new_item)

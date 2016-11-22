@@ -5,6 +5,7 @@ class Connectable:
 
 
     def defineSignal(self, signalName, signalArgs):
+        setattr(self, signalName, signalArgs)
         try:
             args = tuple(signalArgs)
         except:

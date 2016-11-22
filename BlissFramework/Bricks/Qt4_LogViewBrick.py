@@ -63,14 +63,26 @@ handlers. The LogView brick is the GUI log handler.
 The email feedback feature allows users to report any problem : an email
 is sent to the recipients specified in the emailAddresses property.
 """
-import logging
 import os
+import sys
+import logging
 #import email.Utils
 from datetime import datetime
 import smtplib
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5 import QtCore
+    from PyQt5.QtWidgets import *
+    StringList = list
+else:
+    from PyQt4 import QtCore
+    from PyQt4.QtGui import *
+
+    if sys.version_info > (3, 0):
+        StringList = list
+    else:
+        StringList = QtCore.QStringList
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -81,13 +93,13 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 __category__ = 'Log'
 
 
-class CustomTreeWidget(QtGui.QTreeWidget):
+class CustomTreeWidget(QTreeWidget):
 
     def __init__(self, parent, tab_label):
-        QtGui.QTreeWidget.__init__(self, parent)
+        QTreeWidget.__init__(self, parent)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Minimum,
+                           QSizePolicy.Expanding)
         self.tab_label = tab_label
         self.unread_messages = 0
         self.max_log_lines = None
@@ -97,7 +109,7 @@ class CustomTreeWidget(QtGui.QTreeWidget):
         self.setHeaderLabels(["Level", "Date", "Time", "Message"])
 
         self.contextMenuEvent = self.show_context_menu
-        self.clipboard = QtGui.QApplication.clipboard()
+        self.clipboard = QApplication.clipboard()
  
     def add_log_line(self, record):
         msg = record.getMessage().replace('\n', ' ').strip()
@@ -110,7 +122,7 @@ class CustomTreeWidget(QtGui.QTreeWidget):
         info_str_list.append(record.getDate())
         info_str_list.append(record.getTime())
         info_str_list.append(record.getMessage())
-        new_item = QtGui.QTreeWidgetItem(info_str_list)
+        new_item = QTreeWidgetItem(info_str_list)
         self.addTopLevelItem(new_item)
         if self.topLevelItemCount() % 10 == 0:
             for col in range(4):
@@ -125,11 +137,11 @@ class CustomTreeWidget(QtGui.QTreeWidget):
         self.max_log_lines = max_log_lines
 
     def show_context_menu(self, context_menu_event):
-        menu = QtGui.QMenu(self)
+        menu = QMenu(self)
         menu.addAction("Clear", self.clear)
         menu.addAction("Copy", self.copy_log)
         menu.addAction("Save log", self.save_log)
-        menu.popup(QtGui.QCursor.pos())
+        menu.popup(QCursor.pos())
 
     def copy_log(self):
         self.clipboard.clear(mode=self.clipboard.Clipboard)
@@ -142,7 +154,7 @@ class CustomTreeWidget(QtGui.QTreeWidget):
 
     def save_log(self):
         self.copy_log()
-        filename = QtCore.QString(QtGui.QFileDialog.getSaveFileName(\
+        filename = QtCore.QString(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save under", "/tmp"))
         if len(filename) > 0:
             log_file = open(filename, "w")
@@ -150,12 +162,12 @@ class CustomTreeWidget(QtGui.QTreeWidget):
             log_file.close()
         
 
-class Submitfeedback(QtGui.QWidget):
+class Submitfeedback(QWidget):
     """Widget to submit a feedback email
     """
 
     def __init__(self, parent, email_addresses, tab_label):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
 
@@ -175,14 +187,14 @@ class Submitfeedback(QtGui.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        __label = QtGui.QLabel("<b>%s</b>" % "\n".join(msg), self)
-        __msg_label = QtGui.QLabel('Message:', self)
+        __label = QLabel("<b>%s</b>" % "\n".join(msg), self)
+        __msg_label = QLabel('Message:', self)
 
-        self.submit_button = QtGui.QToolButton(self)
-        self.message_textedit = QtGui.QTextEdit(self)
+        self.submit_button = QToolButton(self)
+        self.message_textedit = QTextEdit(self)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(__label)
         _main_vlayout.addWidget(__msg_label)
         _main_vlayout.addWidget(self.message_textedit)
@@ -198,7 +210,8 @@ class Submitfeedback(QtGui.QWidget):
         # Other ---------------------------------------------------------------
         self.message_textedit.setToolTip("Write here your comments or feedback")
         self.submit_button.setText('Submit')
-        self.submit_button.setUsesTextLabel(True)
+        print "TODO setUsesTextLabel"
+        #self.submit_button.setUsesTextLabel(True)
         self.submit_button.setIcon(Qt4_Icons.load_icon('Envelope'))
         self.submit_button.setToolTip("Click here to send your feedback " + \
                                       "to the authors of this software")
@@ -241,8 +254,8 @@ class Submitfeedback(QtGui.QWidget):
             if len(error_dict):
                 logging.getLogger().error(str(error_dict))
 
-            QtGui.QMessageBox.information(self, "Thank you!",
-                "Your comments have been submitted.", QtGui.QMessageBox.Ok)
+            QMessageBox.information(self, "Thank you!",
+                "Your comments have been submitted.", QMessageBox.Ok)
             self.message_textedit.clear()
 
 
@@ -284,7 +297,7 @@ class Qt4_LogViewBrick(BlissWidget):
         self.defineSlot('tabSelected', ())
 
         # Graphic elements ----------------------------------------------------
-        self.tab_widget = QtGui.QTabWidget(self)
+        self.tab_widget = QTabWidget(self)
 
         self.details_log = CustomTreeWidget(self.tab_widget,
                                             "Errors and warnings")
@@ -310,14 +323,14 @@ class Qt4_LogViewBrick(BlissWidget):
                                "Submit feedback")
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.tab_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Minimum,
+                           QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
 
