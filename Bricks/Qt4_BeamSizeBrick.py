@@ -46,8 +46,13 @@ Sizes are estimated by related HO
 -----------------------------------------------------------------------
 """
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -81,18 +86,18 @@ class Qt4_BeamSizeBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox('Beam size', self)
-        hor_label = QtGui.QLabel("Horizontal:", self.main_gbox)
-        self.hor_size_ledit = QtGui.QLineEdit(self.main_gbox)
+        self.main_gbox = QGroupBox('Beam size', self)
+        hor_label = QLabel("Horizontal:", self.main_gbox)
+        self.hor_size_ledit = QLineEdit(self.main_gbox)
         self.hor_size_ledit.setMaximumWidth(70)
         self.hor_size_ledit.setEnabled(False)
-        self.hor_size_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.hor_size_ledit.setAlignment(Qt.AlignRight)
 
-        ver_label = QtGui.QLabel("Vertical:", self.main_gbox)
-        self.ver_size_ledit = QtGui.QLineEdit(self.main_gbox)
+        ver_label = QLabel("Vertical:", self.main_gbox)
+        self.ver_size_ledit = QLineEdit(self.main_gbox)
         self.ver_size_ledit.setMaximumWidth(70)
         self.ver_size_ledit.setEnabled(False)
-        self.ver_size_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.ver_size_ledit.setAlignment(Qt.AlignRight)
 
         bold_font = self.hor_size_ledit.font()
         bold_font.setBold(True)
@@ -100,7 +105,7 @@ class Qt4_BeamSizeBrick(BlissWidget):
         self.ver_size_ledit.setFont(bold_font)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_gridlayout = QtGui.QGridLayout(self.main_gbox)
+        _main_gbox_gridlayout = QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(hor_label, 0, 0)
         _main_gbox_gridlayout.addWidget(self.hor_size_ledit, 0, 1)
         _main_gbox_gridlayout.addWidget(ver_label, 1, 0)
@@ -108,7 +113,7 @@ class Qt4_BeamSizeBrick(BlissWidget):
         _main_gbox_gridlayout.setSpacing(2)
         _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)

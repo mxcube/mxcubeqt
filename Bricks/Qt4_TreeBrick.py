@@ -78,7 +78,7 @@ class Qt4_TreeBrick(BlissWidget):
     set_directory = pyqtSignal(str)
     set_prefix = pyqtSignal(str)
     set_sample = pyqtSignal('PyQt_PyObject')
-    get_tree_brick = pyqtSignal('PyQt_PyObject')
+    get_tree_brick = pyqtSignal(BlissWidget)
 
     def __init__(self, *args):
         """
@@ -356,18 +356,17 @@ class Qt4_TreeBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    @pyqtSlot()
+    @pyqtSlot(int, str, str, int, str, str, bool)
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,
                     is_inhouse = None):
         """
         Descript. :
         """
-        self.session_hwobj.set_session_start_date(start_date)
+        self.session_hwobj.set_session_start_date(str(start_date))
 
     @pyqtSlot()
     def set_requested_tree_brick(self):
-        print "get_tree_brick.emit(self) " 
         self.get_tree_brick.emit(self)
   
     @pyqtSlot(bool)
@@ -713,7 +712,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_widget.details_button.setText("Show SC-details")
         self.hide_dc_parameters.emit(True)
         self.populate_sample_details.emit(item.get_model())
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_sample_centring_tab.emit(False)
         self.hide_sample_tab.emit(False)
         self.hide_sample_changer_tab.emit(True)
@@ -730,7 +729,7 @@ class Qt4_TreeBrick(BlissWidget):
         """
         self.sample_changer_widget.details_button.setText("Show SC-details")
         self.hide_dc_parameters_tab.emit(True)
-        self.hide_dcg_tabe.emit(False)
+        self.hide_dcg_tab.emit(False)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
         self.hide_char_parameters_tab.emit(True)
@@ -751,7 +750,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC-details")
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_dc_parameters_tab.emit(False)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
@@ -774,7 +773,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC-details")
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_dc_parameters_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
@@ -797,7 +796,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC-details")
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_dc_parameters_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
@@ -820,7 +819,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC")
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_dc_parameters_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
@@ -843,7 +842,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC")
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_dc_parameters_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
@@ -866,7 +865,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC-details")
-        self.hide_dcg_tabe.emit(True)
+        self.hide_dcg_tab.emit(True)
         self.hide_dc_parameters_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
@@ -912,7 +911,7 @@ class Qt4_TreeBrick(BlissWidget):
         else:
             self.current_view = self.sample_changer_widget
             self.hide_dc_parameters_tab.emit(True)
-            self.hide_dcg_tabe.emit(True)
+            self.hide_dcg_tab.emit(True)
             if self.dc_tree_widget.sample_mount_method == 1:
                 self.hide_sample_changer_tab.emit(False)
                 self.sample_changer_widget.details_button.setText("Hide SC-details")
@@ -956,7 +955,7 @@ class Qt4_TreeBrick(BlissWidget):
         """
         Descript. :
         """
-        directory = self.session_hwobj.get_base_image_directory()
+        directory = str(self.session_hwobj.get_base_image_directory())
         self.set_directory.emit(directory)
 
     def emit_set_prefix(self, item):

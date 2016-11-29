@@ -19,8 +19,13 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 
@@ -79,7 +84,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
         self.disc_value_label = None
 
         # Layout --------------------------------------------------------------
-        self.main_vlayout = QtGui.QVBoxLayout(self)
+        self.main_vlayout = QVBoxLayout(self)
         self.main_vlayout.setSpacing(1)
         self.main_vlayout.setContentsMargins(2, 2, 2, 2)
 
@@ -123,8 +128,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
             if self['showDiskSize']:
-                self.disc_label = QtGui.QLabel("Storage disc space", self)
-                self.disc_value_label = QtGui.QLabel(self)
+                self.disc_label = QLabel("Storage disc space", self)
+                self.disc_value_label = QLabel(self)
                 self.main_vlayout.addWidget(self.disc_label)
                 self.main_vlayout.addWidget(self.disc_value_label)
         self.graphics_initialized = True
@@ -186,33 +191,33 @@ class Qt4_MachineInfoBrick(BlissWidget):
             self.disc_value_label.setText(txt)
 
 
-class CustomInfoWidget(QtGui.QWidget):
+class CustomInfoWidget(QWidget):
 
     def __init__(self, *args):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
 
         self.value_plot = None
 
-        self.title_label = QtGui.QLabel(self)
-        self.value_widget = QtGui.QWidget(self)
-        self.value_label = QtGui.QLabel(self.value_widget)
-        self.value_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.history_button = QtGui.QPushButton(\
+        self.title_label = QLabel(self)
+        self.value_widget = QWidget(self)
+        self.value_label = QLabel(self.value_widget)
+        self.value_label.setAlignment(Qt.AlignCenter)
+        self.history_button = QPushButton(\
              Qt4_Icons.load_icon("LineGraph"), "", self.value_widget)
         self.history_button.hide()
         self.history_button.setFixedWidth(22)
         self.history_button.setFixedHeight(22)
 
-        _value_widget_hlayout = QtGui.QHBoxLayout(self.value_widget)
+        _value_widget_hlayout = QHBoxLayout(self.value_widget)
         _value_widget_hlayout.addWidget(self.value_label)
         _value_widget_hlayout.addWidget(self.history_button) 
         _value_widget_hlayout.setSpacing(2)
         _value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.main_vlayout = QtGui.QVBoxLayout(self)
+        self.main_vlayout = QVBoxLayout(self)
         self.main_vlayout.addWidget(self.title_label)
         self.main_vlayout.addWidget(self.value_widget)
         self.main_vlayout.setSpacing(1)

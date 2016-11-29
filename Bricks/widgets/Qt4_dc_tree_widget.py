@@ -606,7 +606,6 @@ class DataCollectTree(QWidget):
                     selection callback is raised.
         """
 
-        print "------------------------------------ add_to_view ", parent, task
         view_item = None
         parent_tree_item = self.get_item_by_model(parent)
 

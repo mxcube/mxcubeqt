@@ -19,13 +19,17 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+else:
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 
-from widgets.Qt4_ispyb_widget import ISPyBSampleInfoWidget
+#from widgets.Qt4_ispyb_widget import ISPyBSampleInfoWidget
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
@@ -56,7 +60,7 @@ class Qt4_SampleDetailsBrick(BlissWidget):
         self.defineSlot("populate_sample_details", ({}))
 
         # Graphic elements ----------------------------------------------------
-        _info_widget = QtGui.QWidget(self)
+        _info_widget = QWidget(self)
         self.crystal_widget = uic.loadUi(\
              os.path.join(os.path.dirname(__file__),
              "widgets/ui_files/Qt4_crystal_widget_layout.ui"))
@@ -66,14 +70,14 @@ class Qt4_SampleDetailsBrick(BlissWidget):
         #self.ispyb_sample_info_widget = ISPyBSampleInfoWidget(self)
 
         # Layout --------------------------------------------------------------
-        _info_widget_hlayout = QtGui.QHBoxLayout(_info_widget)
+        _info_widget_hlayout = QHBoxLayout(_info_widget)
         _info_widget_hlayout.addWidget(self.sample_info_widget)
         _info_widget_hlayout.addWidget(self.crystal_widget)
         _info_widget_hlayout.addStretch(0)
         _info_widget_hlayout.setSpacing(0)
         _info_widget_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_hlayout = QtGui.QVBoxLayout(self)
+        _main_hlayout = QVBoxLayout(self)
         _main_hlayout.addWidget(_info_widget)
         #_main_hlayout.addWidget(self.ispyb_sample_info_widget)
         _main_hlayout.addStretch(0)

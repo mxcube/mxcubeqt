@@ -21,9 +21,15 @@ import os
 import copy
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+    QStringList = list
+else:
+    from PyQt4.QtCore import QStringList
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -64,7 +70,7 @@ class CreateHelicalWidget(CreateTaskBase):
              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
@@ -130,12 +136,12 @@ class CreateHelicalWidget(CreateTaskBase):
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
             self._lines_widget.lines_treewidget.clearSelection()
-            info_str_list = QtCore.QStringList()
+            info_str_list = QStringList()
             info_str_list.append(shape.get_display_name())
             info_str_list.append("%d" % shape.get_points_index()[0])
             info_str_list.append("%d" % shape.get_points_index()[1])
             
-            lines_treewidget_item = QtGui.QTreeWidgetItem(\
+            lines_treewidget_item = QTreeWidgetItem(\
                 self._lines_widget.lines_treewidget,
                 info_str_list)
             lines_treewidget_item.setSelected(True)

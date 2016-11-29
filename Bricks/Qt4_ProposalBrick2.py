@@ -54,10 +54,7 @@ class Qt4_ProposalBrick2(BlissWidget):
     Descript. :
     """
 
-    sessionSelected = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 
-                                 'PyQt_PyObject', 'PyQt_PyObject',
-                                 'PyQt_PyObject', 'PyQt_PyObject',
-                                 'PyQt_PyObject')
+    sessionSelected = pyqtSignal(int, str, str, int, str, str, bool)
     setWindowTitle = pyqtSignal(str)
     loggedIn = pyqtSignal(bool)
     userGroupSaved = pyqtSignal(str)
@@ -335,7 +332,7 @@ class Qt4_ProposalBrick2(BlissWidget):
        
         # Emit signals clearing the proposal and session
         self.setWindowTitle.emit(self["titlePrefix"])
-        self.sessionSelected.emit(None, None, None, None, None, None, None)
+        #self.sessionSelected.emit(None, None, None, None, None, None, None)
         self.loggedIne.mit(False)
 
     def resetProposal(self):
@@ -482,14 +479,14 @@ class Qt4_ProposalBrick2(BlissWidget):
     
             self.setWindowTitle.emit(self["titlePrefix"])
             #self.loggedIn.emit(False)
-            self.sessionSelected.emit(None, None, None, None, None, None, None)
+            #self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(True)
             self.sessionSelected.emit(self.session_hwobj.session_id,
                  str(os.environ["USER"]), 0, '', '',
                  self.session_hwobj.session_id, False)
         else: 
             self.setWindowTitle.emit(self["titlePrefix"])
-            self.sessionSelected.emit(None, None, None, None, None, None, None)
+            #self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(False)
 
             if self.login_as_user:

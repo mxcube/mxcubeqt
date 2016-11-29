@@ -45,10 +45,15 @@ the fit configuration file well as
 import os
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
 
-import numpy.oldnumeric as Numeric
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import QVBoxLayout
+else:
+    from PyQt4.QtGui import QVBoxLayout
+
+#import numpy.oldnumeric as Numeric
+import numpy as np
 try:
    from PyMca import McaAdvancedFit
    from PyMca import ConfigDict
@@ -75,7 +80,7 @@ class McaSpectrumWidget(BlissWidget):
             self.mcafit_widget = TwoAxisPlotWidget(self)
             
        
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.mcafit_widget)  
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -86,13 +91,13 @@ class McaSpectrumWidget(BlissWidget):
             if os.path.exists(config.get("file", "")):
                 self._configure(config)
                 configured = True
-            data = Numeric.array(data)
-            x = Numeric.array(data[:,0]).astype(Numeric.Float)
-            y = Numeric.array(data[:,1]).astype(Numeric.Float)
+            data = np.array(data)
+            x = np.array(data[:,0]).astype(np.float)
+            y = np.array(data[:,1]).astype(np.float)
             xmin = float(config["min"])
             xmax = float(config["max"])
             #self.mcafit_widget.refreshWidgets()
-            calib = Numeric.ravel(calib).tolist()
+            calib = np.ravel(calib).tolist()
             """kw = {}
             kw.update(config)
             kw['xmin'] = xmin
@@ -143,6 +148,6 @@ class McaSpectrumWidget(BlissWidget):
 
     def clear(self):
         #TODO make with clear
-        x = Numeric.array([0]).astype(Numeric.Float)
-        y = Numeric.array([0]).astype(Numeric.Float)
+        x = np.array([0]).astype(np.float)
+        y = np.array([0]).astype(np.float)
         self.mcafit_widget.setdata(x, y)

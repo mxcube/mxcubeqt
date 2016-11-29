@@ -24,6 +24,7 @@ if BlissFramework.get_gui_version() == "QT5":
     from PyQt5.QtWidgets import *
     from PyQt5.QtCore import Qt
     from PyQt5.QtGui import *
+    QString = str
 else:
     from PyQt4.QtCore import Qt, QString
     from PyQt4.QtGui import *

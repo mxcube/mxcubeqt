@@ -17,8 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import QMenu
+else:
+    from PyQt4.QtGui import QMenu
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -68,7 +71,7 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         # Other ---------------------------------------------------------------
 
     def run(self):
-        self.tools_menu = QtGui.QMenu("Graphics", self)
+        self.tools_menu = QMenu("Graphics", self)
         _measure_menu = self.tools_menu.addMenu("Measure")
 
         self.measure_distance_action = _measure_menu.addAction(

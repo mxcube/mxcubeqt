@@ -128,7 +128,6 @@ class TaskToolBoxWidget(QWidget):
         """
         Sets the tree brick of each page in the toolbox.
         """
-        print 111, "set_tree_brick, ", brick  
         self.tree_brick = brick
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_tree_brick(brick)

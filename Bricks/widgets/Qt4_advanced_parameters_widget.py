@@ -19,8 +19,11 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -29,9 +32,9 @@ from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_acquisition_widget import AcquisitionWidget
 
 
-class AdvancedParametersWidget(QtGui.QWidget):
+class AdvancedParametersWidget(QWidget):
     def __init__(self, parent = None, name = "advanced_parameters_widget"):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
         self._queue_model_hwobj = None
@@ -48,20 +51,20 @@ class AdvancedParametersWidget(QtGui.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _dc_parameters_widget = QtGui.QWidget(self)
+        _dc_parameters_widget = QWidget(self)
         self._data_path_widget = DataPathWidget(_dc_parameters_widget)
         self._acq_widget = AcquisitionWidget(_dc_parameters_widget,
                                             layout = 'horizontal')
 
         # Layout --------------------------------------------------------------
-        _dc_parameters_widget_layout = QtGui.QVBoxLayout(_dc_parameters_widget)
+        _dc_parameters_widget_layout = QVBoxLayout(_dc_parameters_widget)
         _dc_parameters_widget_layout.addWidget(self._data_path_widget)
         _dc_parameters_widget_layout.addWidget(self._acq_widget)
         _dc_parameters_widget_layout.setSpacing(2)
         _dc_parameters_widget_layout.addStretch(10)
         _dc_parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)

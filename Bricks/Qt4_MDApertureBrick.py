@@ -45,8 +45,12 @@ Apertures are allowed according the bam focusing mode.
 -----------------------------------------------------------------------
 """
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPalette
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -78,21 +82,21 @@ class Qt4_MDApertureBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox("Aperture", self)
-        self.aperture_diameter_combo = QtGui.QComboBox(self.main_gbox)
+        self.main_gbox = QGroupBox("Aperture", self)
+        self.aperture_diameter_combo = QComboBox(self.main_gbox)
         self.aperture_diameter_combo.setMinimumWidth(100)
-        self.aperture_position_combo = QtGui.QComboBox(self.main_gbox)
+        self.aperture_position_combo = QComboBox(self.main_gbox)
         self.aperture_position_combo.setMinimumWidth(100)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
+        _main_gbox_vlayout = QVBoxLayout(self.main_gbox)
         _main_gbox_vlayout.addWidget(self.aperture_diameter_combo)
         _main_gbox_vlayout.addWidget(self.aperture_position_combo)
         _main_gbox_vlayout.addStretch()
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.addSpacing(0)
@@ -109,9 +113,9 @@ class Qt4_MDApertureBrick(BlissWidget):
 
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.aperture_diameter_combo,
-             Qt4_widget_colors.LIGHT_GREEN, QtGui.QPalette.Button)
+             Qt4_widget_colors.LIGHT_GREEN, QPalette.Button)
         Qt4_widget_colors.set_widget_color(self.aperture_position_combo,
-             Qt4_widget_colors.LIGHT_GREEN, QtGui.QPalette.Button)
+             Qt4_widget_colors.LIGHT_GREEN, QPalette.Button)
 
         self.aperture_diameter_combo.setMinimumWidth(100)
         self.aperture_position_combo.setMinimumWidth(100)

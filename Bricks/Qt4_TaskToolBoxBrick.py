@@ -121,13 +121,12 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         msg = 'Image path is: %s' % path
         logging.getLogger('GUI').info(msg)
 
-    @pyqtSlot('PyQt_PyObject')
+    @pyqtSlot(BlissWidget)
     def set_tree_brick(self, brick):
-        print 111, brick
         self.tree_brick = brick
         self.task_tool_box_widget.set_tree_brick(brick)
     
-    @pyqtSlot(int, str, int, str, 'PyQt_PyObject', str, bool)
+    @pyqtSlot(int, str, str, int, str, str, bool)
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):

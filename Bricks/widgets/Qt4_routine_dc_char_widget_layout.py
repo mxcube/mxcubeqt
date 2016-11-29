@@ -16,11 +16,16 @@
 
 import sys
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 
-class RoutineDCWidgetLayout(QtGui.QWidget):
+class RoutineDCWidgetLayout(QWidget):
     """
     Descript. :
     """
@@ -30,7 +35,7 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
         Descript. :
         """
 
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(flags))
+        QWidget.__init__(self, parent, Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("RoutineDCWidgetLayout")
@@ -40,23 +45,23 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.min_dose_radio = QtGui.QRadioButton(self)
-        self.min_time_radio = QtGui.QRadioButton(self)
-        self.dose_time_bgroup = QtGui.QButtonGroup(self)
+        self.min_dose_radio = QRadioButton(self)
+        self.min_time_radio = QRadioButton(self)
+        self.dose_time_bgroup = QButtonGroup(self)
         self.dose_time_bgroup.addButton(self.min_dose_radio)
         self.dose_time_bgroup.addButton(self.min_time_radio)
-        self.dose_limit_cbx = QtGui.QCheckBox(self)
-        self.time_limit_cbx = QtGui.QCheckBox(self)
-        self.dose_ledit = QtGui.QLineEdit(self)
-        self.dose_ledit.setMinimumSize(QtCore.QSize(50,0))
-        self.dose_ledit.setMaximumSize(QtCore.QSize(50,32767))
-        self.time_ledit = QtGui.QLineEdit(self)
-        self.time_ledit.setMinimumSize(QtCore.QSize(50,0))
-        self.time_ledit.setMaximumSize(QtCore.QSize(50,32767))
-        self.radiation_damage_cbx = QtGui.QCheckBox(self)
+        self.dose_limit_cbx = QCheckBox(self)
+        self.time_limit_cbx = QCheckBox(self)
+        self.dose_ledit = QLineEdit(self)
+        self.dose_ledit.setMinimumSize(50, 0)
+        self.dose_ledit.setMaximumSize(50, 32767)
+        self.time_ledit = QLineEdit(self)
+        self.time_ledit.setMinimumSize(50, 0)
+        self.time_ledit.setMaximumSize(50, 32767)
+        self.radiation_damage_cbx = QCheckBox(self)
 
         # Layout --------------------------------------------------------------
-        _main_gridlayout = QtGui.QGridLayout(self)
+        _main_gridlayout = QGridLayout(self)
         _main_gridlayout.addWidget(self.min_dose_radio, 0, 0) #, 2, 1)
         _main_gridlayout.addWidget(self.min_time_radio, 1, 0)
         _main_gridlayout.addWidget(self.dose_limit_cbx, 0, 1)
@@ -92,4 +97,4 @@ class RoutineDCWidgetLayout(QtGui.QWidget):
         """
         Descript. :
         """
-        return QtGui.QApplication.translate("RoutineDCWidgetLayout",s,c)
+        return QApplication.translate("RoutineDCWidgetLayout",s,c)

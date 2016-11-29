@@ -18,7 +18,11 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import QVBoxLayout
+else:
+    from PyQt4.QtGui import QVBoxLayout
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_dc_group_widget import DCGroupWidget
@@ -36,7 +40,7 @@ class Qt4_DCGBrick(BlissWidget):
 
         self.dc_group_widget = DCGroupWidget(self)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.dc_group_widget)
 
         # Qt-Slots

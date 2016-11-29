@@ -19,7 +19,11 @@
 
 import os
 
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_advanced_parameters_widget import AdvancedParametersWidget
@@ -48,7 +52,7 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.defineSlot("populate_advanced_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.tool_box = QtGui.QToolBox(self)
+        self.tool_box = QToolBox(self)
         self.parameters_widget = AdvancedParametersWidget(self) 
         self.results_widget = AdvancedResultsWidget(self)
         self.snapshot_widget = SnapshotWidget(self)
@@ -57,7 +61,7 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.tool_box.addItem(self.results_widget, "Results - Heat map")
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout = QHBoxLayout(self)
         _main_vlayout.addWidget(self.tool_box)
         _main_vlayout.addWidget(self.snapshot_widget)
 

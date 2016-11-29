@@ -21,9 +21,16 @@
 """
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+    QStringList = list
+else:
+    from PyQt4.QtCore import Qt, QStringList
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -62,18 +69,18 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_groupbox = QtGui.QGroupBox("Graphics items", self)
+        self.main_groupbox = QGroupBox("Graphics items", self)
         self.manager_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
             'widgets/ui_files/Qt4_graphics_manager_layout.ui'))
 
         # Layout --------------------------------------------------------------
-        _groupbox_vlayout = QtGui.QVBoxLayout(self)
+        _groupbox_vlayout = QVBoxLayout(self)
         _groupbox_vlayout.addWidget(self.manager_widget)
         _groupbox_vlayout.setSpacing(0)
         _groupbox_vlayout.setContentsMargins(0, 0, 0, 0)
         self.main_groupbox.setLayout(_groupbox_vlayout)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_groupbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -161,20 +168,17 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
                          str(True),
                          str(True),
                          str(shape.used_count)) 
-        self.__shape_map[shape] = QtGui.QTreeWidgetItem(self.manager_widget.\
+        self.__shape_map[shape] = QTreeWidgetItem(self.manager_widget.\
              shapes_treewidget, info_str_list)
         self.toggle_buttons_enabled()
 
-        try:
-           info_str_list = QtCore.QStringList()
-        except:
-           info_str_list = []
+        info_str_list = QStringList()
 
         info_str_list.append(str(shape.index))
         if shape_type == "Point":
             info_str_list.append(str(shape.get_start_position())) 
             self.manager_widget.point_treewidget.clearSelection()
-            point_treewidget_item = QtGui.QTreeWidgetItem(\
+            point_treewidget_item = QTreeWidgetItem(\
                  self.manager_widget.point_treewidget, info_str_list)
             point_treewidget_item.setSelected(True)
             self.__point_map[shape] = point_treewidget_item
@@ -183,13 +187,13 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             info_str_list.append("Point %d" % start_index)
             info_str_list.append("Point %d" % end_index)
             self.manager_widget.line_treewidget.clearSelection()
-            line_treewidget_item = QtGui.QTreeWidgetItem(\
+            line_treewidget_item = QTreeWidgetItem(\
                  self.manager_widget.line_treewidget, info_str_list)
             line_treewidget_item.setSelected(True)
             self.__line_map[shape] = line_treewidget_item
         elif shape_type == "Grid":
             self.manager_widget.grid_treewidget.clearSelection()
-            grid_treewidget_item = QtGui.QTreeWidgetItem(\
+            grid_treewidget_item = QTreeWidgetItem(\
                  self.manager_widget.grid_treewidget, info_str_list)
             grid_treewidget_item.setSelected(True)
             self.__grid_map[shape] = grid_treewidget_item
@@ -223,7 +227,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
 
     def shape_selected(self, shape, selected_state):
         if shape in self.__shape_map:
-            self.__shape_map[shape].setData(4, QtCore.Qt.DisplayRole, str(selected_state)) 
+            self.__shape_map[shape].setData(4, Qt.DisplayRole, str(selected_state)) 
             self.__shape_map[shape].setSelected(selected_state)
             if self.__point_map.get(shape):
                 self.__point_map[shape].setSelected(selected_state)
@@ -249,7 +253,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             self.setFixedHeight(20)
   
     def change_color_clicked(self):
-        color = QtGui.QColorDialog.getColor()
+        color = QColorDialog.getColor()
         if color.isValid():
             for item in self.graphics_manager_hwobj.get_selected_shapes():
                 item.set_base_color(color)
@@ -257,12 +261,12 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
     def display_all_button_clicked(self):
         for shape, treewidget_item in self.__shape_map.iteritems():
             shape.show()
-            treewidget_item.setData(3, QtCore.Qt.DisplayRole, "True")
+            treewidget_item.setData(3, Qt.DisplayRole, "True")
 
     def hide_all_button_clicked(self):
         for shape, treewidget_item in self.__shape_map.iteritems():
             shape.hide()
-            treewidget_item.setData(3, QtCore.Qt.DisplayRole, "False")
+            treewidget_item.setData(3, Qt.DisplayRole, "False")
 
     def clear_all_button_clicked(self):
         self.graphics_manager_hwobj.clear_all()
@@ -280,7 +284,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.graphics_manager_hwobj.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
-        menu = QtGui.QMenu(self.manager_widget.shapes_treewidget)
+        menu = QMenu(self.manager_widget.shapes_treewidget)
 
     def get_spacing(self):
         spacing = [0, 0]

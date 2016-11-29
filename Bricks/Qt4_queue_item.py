@@ -51,7 +51,8 @@ class QueueItem(QTreeWidgetItem):
         """
         Descript. :
         """
-        QTreeWidgetItem.__init__(self, args[0], args[2])
+        print args, kwargs
+        QTreeWidgetItem.__init__(self, args[0])
         self.deletable = kwargs.pop('deletable', False)
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
