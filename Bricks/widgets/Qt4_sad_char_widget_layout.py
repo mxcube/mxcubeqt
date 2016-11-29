@@ -71,29 +71,3 @@ class SADWidgetLayout(QWidget):
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_main_vlayout)
-
-        # Other ---------------------------------------------------------------
-
-        self.languageChange()
-
-    def languageChange(self):
-        """
-        Descript. :
-        """
-        self.setWindowTitle(self.__tr("SADWidget"))
-        self.optimised_sad_cbx.setText(self.__tr("Optimised SAD"))
-        self.automatic_resolution_radio.setText(self.__trUtf8("\x52\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x20\x73\x65\x6c\x65\x63\x74\x65\x64\x20\x61\x75\x74\x6f\x6d\x61\x74\x69\x63\x61\x6c\x6c\x79\x2c\x20\x72\x6f\x74\x61\x74\x69\x6f\x6e\x20\x69\x6e\x74\x65\x72\x76\x61\x6c\x3a\x20\x33\x36\x30\xc2\xb0"))
-        self.optimal_sad_radio.setText(self.__tr("Optimal SAD for given resolution:"))
-
-
-    def __tr(self, s, c = None):
-        """
-        Descript. :
-        """
-        return QApplication.translate("SADWidgetLayout", s, c)
-
-    def __trUtf8(self, s, c = None):
-        """
-        Descript. :
-        """
-        return QApplication.translate("SADWidgetLayout", s, c, QApplication.UnicodeUTF8)

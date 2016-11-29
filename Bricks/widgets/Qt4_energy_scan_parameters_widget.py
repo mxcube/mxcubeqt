@@ -17,8 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -34,9 +37,9 @@ from BlissFramework.Utils import Qt4_widget_colors
 __category__ = 'Tasks'
 
 
-class EnergyScanParametersWidget(QtGui.QWidget):
+class EnergyScanParametersWidget(QWidget):
     def __init__(self, parent = None, name = "energy_scan_tab_widget"):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -49,8 +52,8 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        _top_widget = QtGui.QWidget(self) 
-        _parameters_widget = QtGui.QWidget(_top_widget)  
+        _top_widget = QWidget(self) 
+        _parameters_widget = QWidget(_top_widget)  
         self.periodic_table_widget =  PeriodicTableWidget(_parameters_widget)
         self.data_path_widget = DataPathWidget(_parameters_widget)
         self.data_path_widget.data_path_layout.file_name_label.setText('')
@@ -64,7 +67,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         #self.chooch_plot_widget = TwoAxisPlotWidget(self, False)
  
         # Layout -------------------------------------------------------------
-        _parameters_widget_layout = QtGui.QVBoxLayout()
+        _parameters_widget_layout = QVBoxLayout()
         _parameters_widget_layout.addWidget(self.periodic_table_widget)
         _parameters_widget_layout.addWidget(self.data_path_widget)
         _parameters_widget_layout.addStretch(0)
@@ -72,7 +75,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
         _parameters_widget.setLayout(_parameters_widget_layout)
 
-        _top_widget_hlayout = QtGui.QHBoxLayout(self)
+        _top_widget_hlayout = QHBoxLayout(self)
         _top_widget_hlayout.addWidget(_parameters_widget)
         _top_widget_hlayout.addWidget(self.snapshot_widget)
         _top_widget_hlayout.addStretch(0)
@@ -80,7 +83,7 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         _top_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         _top_widget.setLayout(_top_widget_hlayout) 
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.scan_actual_plot_widget)
         _main_vlayout.addWidget(self.scan_result_plot_widget)
@@ -92,10 +95,10 @@ class EnergyScanParametersWidget(QtGui.QWidget):
         self.setLayout(_main_vlayout)
       
         # SizePolicies --------------------------------------------------------
-        self.scan_actual_plot_widget.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                            QtGui.QSizePolicy.Expanding)
-        self.chooch_plot_widget.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                              QtGui.QSizePolicy.Expanding)
+        self.scan_actual_plot_widget.setSizePolicy(QSizePolicy.Fixed,
+                                                   QSizePolicy.Expanding)
+        self.chooch_plot_widget.setSizePolicy(QSizePolicy.Fixed,
+                                              QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         #qt.QObject.connect(self.periodic_table_widget, qt.PYSIGNAL('edgeSelected'), 

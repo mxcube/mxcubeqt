@@ -142,7 +142,9 @@ class DCGroupWidget(QWidget):
             #sw.append(color)
             for col in range(7):
                 self.subwedge_table.setItem(row, col, QTableWidgetItem(param_list[col]))
-                color = QColor(sw[-1])
+                color = QColor(int(sw[-1][0] * 255),
+                               int(sw[-1][0] * 255),
+                               int(sw[-1][0] * 255))
                 color.setAlpha(100)
                 self.subwedge_table.item(row, col).setBackground(color)
                 #     QtGui.QColor(Qt4_widget_colors.TASK_GROUP[sw[0]]))

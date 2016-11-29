@@ -33,11 +33,9 @@ if BlissFramework.get_gui_version() == "QT5":
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
     from PyQt5.QtCore import Qt, QEvent
-    from PyQt5 import uic 
 else:
     from PyQt4.QtGui import *
     from PyQt4.QtCore import Qt, QEvent
-    from PyQt4 import uic
 
 import Qt4_queue_item
 import queue_entry
@@ -180,8 +178,6 @@ class DataCollectTree(QWidget):
         main_layout.setSpacing(1) 
 
         # SizePolicies --------------------------------------------------------
-        #self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(
-        #     QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)

@@ -530,6 +530,9 @@ class CurrentSampleView(CurrentView):
                 "%s %d:%02d" % (txt, location[0], location[1]))
 
 class StatusView(QWidget):
+
+    statusMsgChangedSignal = pyqtSignal(str, QColor)
+
     def __init__(self, parent):
         QWidget.__init__(self, parent)
 
@@ -738,6 +741,9 @@ class ScanBasketsView(QWidget):
             self.buttonSelect.hide()
 
 class Qt4_SampleChangerBrick3(BlissWidget):
+
+    sampleGotLoadedSignal = pyqtSignal()
+
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 

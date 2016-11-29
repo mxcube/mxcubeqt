@@ -134,6 +134,9 @@ class TwoAxisPlotWidget(QWidget):
     def set_max_plot_point(self, max_points):
         self._two_axis_figure_canvas.set_max_plot_points(max_points)
 
+    def showGrid(self):
+        pass
+
 class MplCanvas(FigureCanvas):
     """
     Descript. : Class to draw plots on canvas
@@ -358,7 +361,7 @@ class TwoDimenisonalPlotWidget(QWidget):
         self.mouse_clicked = False
 
     def motion_notify_event(self, mouse_event):
-        QtGui.QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
         if self.selection_xrange and mouse_event.xdata:
             do_update = False
             (x_start, x_end) = self.mpl_canvas.axes.get_xlim()

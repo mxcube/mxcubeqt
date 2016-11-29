@@ -192,6 +192,7 @@ class Qt4_TreeBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         self.enable_collect(False)
         #self.setFixedWidth(315) 
+        #self.sample_changer_widget.setFixedHeight(46)
         self.dc_tree_widget.set_centring_method(1)
 
     # Framework 2 method
@@ -852,6 +853,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(False)
+        self.populate_advanced_tab(item)
+
+    def populate_advanced_tab(self, item):
         self.populate_advanced_widget.emit(item)
 
     def show_workflow_tab_from_model(self):
@@ -935,7 +939,7 @@ class Qt4_TreeBrick(BlissWidget):
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 data_collection = item.get_model()
                 if data_collection.is_mesh():
-                    self.populate_advanced_widget(item)
+                    self.populate_advanced_tab(item)
                 else:
                     self.populate_dc_parameters_tab(item)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):

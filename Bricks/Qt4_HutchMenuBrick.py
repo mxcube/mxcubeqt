@@ -90,10 +90,11 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.auto_focus_button = MonoStateButton(self, "Focus", "Eyeball")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
-        self.visual_align_button = MonoStateButton(self, "Kappa align", "Align")
+        self.visual_align_button = MonoStateButton(self, "Visual align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
         self.clear_all_button = MonoStateButton(self, "Clear all", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
+        self.auto_center_button.setText("Auto")
         self.realign_button = MonoStateButton(self, "Realign beam", "QuickRealign")
 
         # Layout -------------------------------------------------------------- 
@@ -383,15 +384,16 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
 class MonoStateButton(QToolButton):
 
-    def __init__(self, parent, caption=None, icon=None, fixed_size=(80, 45)):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(75, 40)):
         QToolButton.__init__(self, parent)
-        self.setUsesTextLabel(True)
-        if fixed_size: 
-            self.setFixedSize(fixed_size[0], fixed_size[1])
-        self.setSizePolicy(QSizePolicy.Fixed,
-                           QSizePolicy.Fixed)
+
+        self.setFixedSize(fixed_size[0], fixed_size[1])
+        #self.setSizePolicy(QSizePolicy.Fixed,
+        #                   QSizePolicy.Fixed)
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         if caption:
             self.setText(caption)
+            self.setWindowIconText(caption)
         if icon:
             self.setIcon(Qt4_Icons.load_icon(icon))
             
@@ -410,13 +412,14 @@ class DuoStateButton(QToolButton):
         Return    : 
         """
         QToolButton.__init__(self, parent)
+
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.executing = False
         self.run_icon = None
         self.stop_icon = None
         self.standard_color = self.palette().color(QPalette.Window)
-        self.setUsesTextLabel(True)
         self.setText(caption)
-        self.setFixedSize(80, 45)
+        self.setFixedSize(75, 40)
         self.setSizePolicy(QSizePolicy.Fixed,
                            QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
