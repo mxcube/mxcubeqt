@@ -17,8 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import QTreeWidgetItem
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import * 
+
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -29,22 +36,22 @@ import queue_model_objects_v1 as queue_model_objects
 PIN_PIXMAP = Qt4_Icons.load("sample_axis.png")
 
 
-class QueueItem(QtGui.QTreeWidgetItem):
+class QueueItem(QTreeWidgetItem):
     """
     Use this class to create a new type of item for the collect tree/queue.
     """
-    normal_brush = QtGui.QBrush(QtCore.Qt.black)
-    highlighted_brush = QtGui.QBrush(QtGui.QColor(128, 128, 128))
-    normal_pen = QtGui.QPen(QtCore.Qt.black)
-    highlighted_pen = QtGui.QPen(QtGui.QColor(128, 128, 128))
-    bg_brush = QtGui.QBrush(QtGui.QColor(0, 128, 0))
-    bg_normal_brush = QtGui.QBrush(QtCore.Qt.white)
+    normal_brush = QBrush(Qt.black)
+    highlighted_brush = QBrush(QColor(128, 128, 128))
+    normal_pen = QPen(Qt.black)
+    highlighted_pen = QPen(QColor(128, 128, 128))
+    bg_brush = QBrush(QColor(0, 128, 0))
+    bg_normal_brush = QBrush(Qt.white)
 
     def __init__(self, *args, **kwargs):
         """
         Descript. :
         """
-        QtGui.QTreeWidgetItem.__init__(self, args[0], args[2])
+        QTreeWidgetItem.__init__(self, args[0], args[2])
         self.deletable = kwargs.pop('deletable', False)
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
@@ -69,12 +76,12 @@ class QueueItem(QtGui.QTreeWidgetItem):
         """ 
         if self._checkable:
             if state:
-                check_state = QtCore.Qt.Checked
+                check_state = Qt.Checked
             else:
-                check_state = QtCore.Qt.Unchecked
+                check_state = Qt.Unchecked
             self.setCheckState(0, check_state)
         else:
-            self.setCheckState(0, QtCore.Qt.Unchecked)
+            self.setCheckState(0, Qt.Unchecked)
 
     def setCheckState(self, column, check_state):
         """
@@ -94,8 +101,8 @@ class QueueItem(QtGui.QTreeWidgetItem):
             self.parent().setCheckState(column, check_state)
 
         if not self._checkable:
-            check_state = QtCore.Qt.Unchecked  
-        QtGui.QTreeWidgetItem.setCheckState(self, column, check_state)
+            check_state = Qt.Unchecked  
+        QTreeWidgetItem.setCheckState(self, column, check_state)
         if self._queue_entry:
             self._queue_entry.set_enabled(check_state > 0)
         if self._data_model:
@@ -152,7 +159,7 @@ class QueueItem(QtGui.QTreeWidgetItem):
     def set_background_color(self, color_index):
         self.previous_bg_brush = self.background(0)
         color = Qt4_widget_colors.QUEUE_ENTRY_COLORS[color_index]
-        self.bg_brush = QtGui.QBrush(color)
+        self.bg_brush = QBrush(color)
         self.setBackground(0, self.bg_brush)
         self.setBackground(1, self.bg_brush)
 
@@ -214,18 +221,18 @@ class SampleQueueItem(QueueItem):
         dc_tree_widget = self.listView().parent()
 
         if dc_tree_widget._loaded_sample_item:
-            dc_tree_widget._loaded_sample_item.setIcon(0, QtGui.QPixmap())
+            dc_tree_widget._loaded_sample_item.setIcon(0, QPixmap())
             
         dc_tree_widget._loaded_sample_item = self
-        self.setIcon(0, QtGui.QIcon(dc_tree_widget.pin_pixmap))
+        self.setIcon(0, QIcon(dc_tree_widget.pin_pixmap))
 
     def set_mounted_style(self, state, clear_background = False):
         self.mounted_style = state
 
         if state:
-            self.setIcon(0, QtGui.QIcon(PIN_PIXMAP))
-            self.setBackground(0, QtGui.QBrush(Qt4_widget_colors.PLUM)) 
-            self.setBackground(1, QtGui.QBrush(Qt4_widget_colors.PLUM))
+            self.setIcon(0, QIcon(PIN_PIXMAP))
+            self.setBackground(0, QBrush(Qt4_widget_colors.PLUM)) 
+            self.setBackground(1, QBrush(Qt4_widget_colors.PLUM))
             self.setSelected(True)
             bold_fond = self.font(1)
             bold_fond.setBold(True)
@@ -233,7 +240,7 @@ class SampleQueueItem(QueueItem):
             if self.parent():
                 self.parent().setExpanded(True)
         else:
-            self.setIcon(0, QtGui.QIcon())
+            self.setIcon(0, QIcon())
 
             if clear_background:
                self.set_background_color(0)  

@@ -21,8 +21,12 @@
 Qt4_CRLBrick
 """
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+try:
+   from PyQt5 import QtCore
+   from PyQt5.QtWidgets import *
+except:
+   from PyQt4 import QtCore
+   from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -61,16 +65,16 @@ class Qt4_CRLBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox('CRL', self) 
-        self.mode_combo = QtGui.QComboBox(self.main_gbox)
-        self.set_according_to_energy_button = QtGui.QPushButton("Set", self.main_gbox)
+        self.main_gbox = QGroupBox('CRL', self) 
+        self.mode_combo = QComboBox(self.main_gbox)
+        self.set_according_to_energy_button = QPushButton("Set", self.main_gbox)
         #self.align_beam_button = QtGui.QPushButton("Align", self.main_gbox)
-        self.crl_value_table = QtGui.QTableWidget(self.main_gbox)
-        self.move_up_button = QtGui.QPushButton("", self.main_gbox)
-        self.move_down_button = QtGui.QPushButton("", self.main_gbox)
+        self.crl_value_table = QTableWidget(self.main_gbox)
+        self.move_up_button = QPushButton("", self.main_gbox)
+        self.move_down_button = QPushButton("", self.main_gbox)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_gridlayout = QtGui.QGridLayout(self.main_gbox)
+        _main_gbox_gridlayout = QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(self.mode_combo, 0, 0)
         _main_gbox_gridlayout.addWidget(\
              self.set_according_to_energy_button, 0, 1, 1, 2)
@@ -79,7 +83,7 @@ class Qt4_CRLBrick(BlissWidget):
         _main_gbox_gridlayout.addWidget(self.move_up_button, 1, 1)
         _main_gbox_gridlayout.addWidget(self.move_down_button, 1, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -128,7 +132,7 @@ class Qt4_CRLBrick(BlissWidget):
         elif property_name == 'lenseCount':
             self.crl_value_table.setColumnCount(new_value)
             for col_index in range(new_value):
-                temp_item = QtGui.QTableWidgetItem("")
+                temp_item = QTableWidgetItem("")
                 temp_item.setFlags(QtCore.Qt.ItemIsEnabled)
                 temp_item.setBackground(Qt4_widget_colors.LIGHT_GRAY)
                 self.crl_value_table.setItem(0, col_index, temp_item)

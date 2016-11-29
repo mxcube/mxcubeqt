@@ -19,8 +19,14 @@
 
 import decimal
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtGui import *
+else:
+    from PyQt4.QtCore import Qt, QString
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from HardwareRepository.dispatcher import dispatcher
@@ -48,12 +54,12 @@ class DataModelInputBinder(object):
             origin_value = new_value
             if type_fn == float and validator:
                 pattern = "%." + str(validator.decimals()) + 'f'
-                new_value = QtCore.QString(pattern % float(new_value))
+                new_value = QString(pattern % float(new_value))
             if self.__validated(field_name,
                                 validator,
                                 self.bindings[field_name][0], 
                                 new_value):
-                if isinstance(widget, QtGui.QLineEdit):
+                if isinstance(widget, QLineEdit):
                     if type_fn is float and validator:
                         widget.setText('{:g}'.format(round(float(origin_value), \
                                        validator.decimals())))
@@ -83,20 +89,20 @@ class DataModelInputBinder(object):
     def __validated(self, field_name, validator, widget, new_value):
         if validator:
             if validator.validate(new_value, widget.cursorPosition())[0] \
-                    == QtGui.QValidator.Acceptable:
+                    == QValidator.Acceptable:
                 if self.bindings[field_name][3]:
                     Qt4_widget_colors.set_widget_color(widget,
                                            Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                           QtGui.QPalette.Base)
+                                           QPalette.Base)
                 else:
                     Qt4_widget_colors.set_widget_color(widget, 
-                                                       QtCore.Qt.white,
-                                                       QtGui.QPalette.Base) 
+                                                       Qt.white,
+                                                       QPalette.Base) 
                 return True
             else:
                 Qt4_widget_colors.set_widget_color(widget, 
                                                    Qt4_widget_colors.LIGHT_RED,
-                                                   QtGui.QPalette.Base)
+                                                   QPalette.Base)
                 return False
         else:
             return True
@@ -124,7 +130,7 @@ class DataModelInputBinder(object):
         try:
             widget.blockSignals(True)
 
-            if isinstance(widget, QtGui.QLineEdit):
+            if isinstance(widget, QLineEdit):
                 if type_fn is float and validator:
                     value = float(getattr(self.__model, field_name))
                     widget.setText('{:g}'.format(round(float(value), \
@@ -132,12 +138,12 @@ class DataModelInputBinder(object):
                 else:
                     widget.setText(str(getattr(self.__model, field_name)))
              
-            elif isinstance(widget, QtGui.QLabel):        
+            elif isinstance(widget, QLabel):        
                 widget.setText(str(getattr(self.__model, field_name)))
-            elif isinstance(widget, QtGui.QComboBox):
+            elif isinstance(widget, QComboBox):
                 widget.setCurrentIndex(int(getattr(self.__model, field_name)))
-            elif isinstance(widget, QtGui.QCheckBox) or \
-                    isinstance(widget, QtGui.QRadioButton):
+            elif isinstance(widget, QCheckBox) or \
+                    isinstance(widget, QRadioButton):
                 widget.setChecked(bool(getattr(self.__model, field_name)))       
         finally:
             widget.blockSignals(False)
@@ -146,19 +152,15 @@ class DataModelInputBinder(object):
     def bind_value_update(self, field_name, widget, type_fn, validator = None):
         self.bindings[field_name] = [widget, validator, type_fn, False]
 
-        if isinstance(widget, QtGui.QLineEdit):        
-            QtCore.QObject.connect(widget, 
-                            QtCore.SIGNAL("textChanged(const QString &)"), 
-                            lambda new_value: \
-                                self.__ledit_update_value(field_name,
+        if isinstance(widget, QLineEdit):        
+            widget.textChanged.connect(\
+              lambda new_value: self.__ledit_update_value(field_name,
                                                           widget,
                                                           new_value,
                                                           type_fn, 
                                                           validator))
-            QtCore.QObject.connect(widget,
-                            QtCore.SIGNAL("textEdited(const QString &)"),
-                            lambda new_value: \
-                                self.__ledit_text_edited(field_name,
+            widget.textEdited.connect(\
+              lambda new_value: self.__ledit_text_edited(field_name,
                                                          widget,
                                                          new_value,
                                                          type_fn,
@@ -170,30 +172,26 @@ class DataModelInputBinder(object):
                 widget.setText(str(getattr(self.__model, field_name)))
 
 
-        elif isinstance(widget, QtGui.QLabel):        
+        elif isinstance(widget, QLabel):        
             widget.setText(str(getattr(self.__model, field_name)))
 
-        elif isinstance(widget, QtGui.QComboBox):
-            QtCore.QObject.connect(widget, 
-                            QtCore.SIGNAL("activated(int)"), 
-                            lambda new_value: \
+        elif isinstance(widget, QComboBox):
+            widget.activated.connect(lambda new_value: \
                                 self.__combobox_update_value(field_name,
                                                              new_value))
 
             widget.setCurrentIndex(int(getattr(self.__model, field_name)))
 
-        elif isinstance(widget, QtGui.QCheckBox) or \
-                isinstance(widget, QtGui.QRadioButton):
-            QtCore.QObject.connect(widget, 
-                            QtCore.SIGNAL("toggled(bool)"), 
-                            lambda new_value: \
+        elif isinstance(widget, QCheckBox) or \
+                isinstance(widget, QRadioButton):
+            widget.toggled.connect(lambda new_value: \
                                 self.__checkbox_update_value(field_name,
                                                              new_value))
 
             widget.setChecked(bool(getattr(self.__model, field_name)))
 
         if validator:
-            if isinstance(validator, QtGui.QDoubleValidator):
+            if isinstance(validator, QDoubleValidator):
                 tooltip = "%s limits %.2f : %.2f" % (field_name.replace("_", " ").capitalize(),
                                                      validator.bottom(),
                                                      validator.top())
@@ -212,16 +210,16 @@ class DataModelInputBinder(object):
             validator = item[1][1]
             
             if validator:
-                if isinstance(widget, QtGui.QLineEdit):
+                if isinstance(widget, QLineEdit):
                     if not self.__validated(key,
                                             validator,
                                             widget, 
                                             widget.text()):
                         result.append(key)
-                elif isinstance(widget, QtGui.QComboBox):
+                elif isinstance(widget, QComboBox):
                     pass
-                elif isinstance(widget, QtGui.QCheckBox) or \
-                        isinstance(widget, QtGui.QRadioButton):
+                elif isinstance(widget, QCheckBox) or \
+                        isinstance(widget, QRadioButton):
                     pass
 
         return result

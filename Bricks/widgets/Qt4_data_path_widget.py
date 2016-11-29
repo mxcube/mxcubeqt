@@ -21,9 +21,16 @@ import os
 import string
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt, pyqtSignal
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+else:
+    from PyQt4.QtCore import Qt, pyqtSignal
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -31,13 +38,13 @@ from widgets.Qt4_widget_utils import DataModelInputBinder
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class DataPathWidget(QtGui.QWidget):
+class DataPathWidget(QWidget):
 
-    pathTemplateChangedSignal = QtCore.pyqtSignal()
+    pathTemplateChangedSignal = pyqtSignal()
 
     def __init__(self, parent = None, name = '', fl = 0, data_model = None, 
                  layout = None):
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
 
@@ -67,7 +74,7 @@ class DataPathWidget(QtGui.QWidget):
                  "ui_files/Qt4_data_path_widget_horizontal_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.data_path_layout)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -88,13 +95,13 @@ class DataPathWidget(QtGui.QWidget):
         
         self._data_model_pm.bind_value_update('run_number', 
              self.data_path_layout.run_number_ledit,
-             int, QtGui.QIntValidator(0, 1000, self))
+             int, QIntValidator(0, 1000, self))
 
     def _browse_clicked(self):
         """
         Descript. :
         """
-        file_dialog = QtGui.QFileDialog(self)
+        file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("%s*" % self._base_image_dir)
 
         selected_dir = str(file_dialog.getExistingDirectory(\
@@ -242,11 +249,11 @@ class DataPathWidget(QtGui.QWidget):
         """
         if conflict:
             Qt4_widget_colors.set_widget_color(self.data_path_layout.prefix_ledit,
-                Qt4_widget_colors.LIGHT_RED, QtGui.QPalette.Base)
+                Qt4_widget_colors.LIGHT_RED, QPalette.Base)
             Qt4_widget_colors.set_widget_color(self.data_path_layout.run_number_ledit,
-                Qt4_widget_colors.LIGHT_RED, QtGui.QPalette.Base)
+                Qt4_widget_colors.LIGHT_RED, QPalette.Base)
             Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
-                Qt4_widget_colors.LIGHT_RED, QtGui.QPalette.Base)
+                Qt4_widget_colors.LIGHT_RED, QPalette.Base)
 
             logging.getLogger("GUI").\
                 error('The current path settings will overwrite data ' + \
@@ -258,11 +265,11 @@ class DataPathWidget(QtGui.QWidget):
                 logging.getLogger("GUI").info('Path valid')
 
             Qt4_widget_colors.set_widget_color(self.data_path_layout.prefix_ledit,
-                Qt4_widget_colors.WHITE, QtGui.QPalette.Base)
+                Qt4_widget_colors.WHITE, QPalette.Base)
             Qt4_widget_colors.set_widget_color(self.data_path_layout.run_number_ledit,
-                Qt4_widget_colors.WHITE, QtGui.QPalette.Base)
+                Qt4_widget_colors.WHITE, QPalette.Base)
             Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
-                Qt4_widget_colors.WHITE, QtGui.QPalette.Base)
+                Qt4_widget_colors.WHITE, QPalette.Base)
         self.path_conflict_state = conflict
             
 

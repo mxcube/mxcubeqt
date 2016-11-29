@@ -164,7 +164,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
         """
         if self.disc_label:
             p = '/' + dataDir.split('/')[1]
-            dataDir = p
+            dataDir = str(p)
             if os.path.exists(dataDir):
                 st = os.statvfs(dataDir)
                 total = st.f_blocks * st.f_frsize

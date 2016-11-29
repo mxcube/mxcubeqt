@@ -19,9 +19,16 @@
 
 import os
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt, pyqtSignal
+    from PyQt5.QtGui import QColor
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+else:
+    from PyQt4.QtCore import Qt, pyqtSignal
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 from BlissFramework.Utils import Qt4_widget_colors
 try:
@@ -32,15 +39,15 @@ except:
 
 EDGE_LIST = ["L1", "L2", "L3"]
 
-class PeriodicTableWidget(QtGui.QWidget):
+class PeriodicTableWidget(QWidget):
     """
     Descript. :
     """ 
-    elementEdgeSelectedSignal = QtCore.pyqtSignal(str, str)
+    elementEdgeSelectedSignal = pyqtSignal(str, str)
 
     def __init__(self, parent=None, name=None, fl=0):
 
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
         self.selected_element = None
@@ -55,21 +62,21 @@ class PeriodicTableWidget(QtGui.QWidget):
             self.periodic_table = CustomPeriodicTable(self)
             self.periodic_table.setFixedSize(470, 230)
 
-        self.edge_widget = QtGui.QWidget(self)
-        edge_label = QtGui.QLabel("Edge:", self.edge_widget)
-        self.edge_combo = QtGui.QComboBox(self.edge_widget)
+        self.edge_widget = QWidget(self)
+        edge_label = QLabel("Edge:", self.edge_widget)
+        self.edge_combo = QComboBox(self.edge_widget)
 
         # Layout --------------------------------------------------------------
-        _edge_hlayout = QtGui.QHBoxLayout(self.edge_widget)
+        _edge_hlayout = QHBoxLayout(self.edge_widget)
         _edge_hlayout.addStretch(0)
         _edge_hlayout.addWidget(edge_label)
         _edge_hlayout.addWidget(self.edge_combo)  
         _edge_hlayout.setSpacing(2)
         _edge_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         if _pymca_exists: 
-            _main_vlayout.addWidget(self.periodic_table, QtCore.Qt.AlignHCenter)
+            _main_vlayout.addWidget(self.periodic_table, Qt.AlignHCenter)
       
         _main_vlayout.addWidget(self.edge_widget)
         _main_vlayout.addStretch(0)
@@ -115,18 +122,17 @@ class PeriodicTableWidget(QtGui.QWidget):
  
 if _pymca_exists:  
     class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
-        edgeSelectedSignal = QtCore.pyqtSignal(str, str)
+        elementClicked = pyqtSignal(str)
+        edgeSelectedSignal = pyqtSignal(str, str)
 
         def __init__(self, *args):
             QPeriodicTable.QPeriodicTable.__init__(self, *args)
 
             self.elements_dict={}
-            QtCore.QObject.connect(self, 
-                                   QtCore.SIGNAL('elementClicked'),
-                                   self.tableElementChanged)
+            self.elementClicked.connect(self.tableElementChanged)
             for b in self.eltButton:
-                self.eltButton[b].colors[0]= QtGui.QColor(QtCore.Qt.green)
-                self.eltButton[b].colors[1]= QtGui.QColor(QtCore.Qt.darkGreen)
+                self.eltButton[b].colors[0]= QColor(Qt.green)
+                self.eltButton[b].colors[1]= QColor(Qt.darkGreen)
                 self.eltButton[b].setEnabled(False)
             for el in QPeriodicTable.Elements:
                 symbol=el[0]
@@ -155,7 +161,7 @@ if _pymca_exists:
                 txt = "%s - %s (%s,%s)" % (symbol, energy, index, name)
                 self.eltLabel.setText(txt)
                 self.edgeSelectedSignal.emit(symbol ,energy)
-                self.emit(QtCore.SIGNAL("widgetSynchronize"), symbol, energy)
+                self.widgetSynchronize.emit(symbol, energy)
 
         def setElements(self,elements):
             self.energies_dict = {}

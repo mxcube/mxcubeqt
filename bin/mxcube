@@ -8,18 +8,17 @@ sys.path.insert(0, MXCUBE_ROOT)
 os.environ["CUSTOM_BRICKS_PATH"]=os.path.join(MXCUBE_ROOT, "Bricks")
 os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareObjects")
 
+import BlissFramework
+BlissFramework.set_gui_version(sys.argv[-1].upper())
 
-if sys.argv[-1].upper() == "-QT4":
+if sys.argv[-1].upper() in ("QT4", "QT5"):
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt4.gui")
     sys.argv.pop(-1)
     import BlissFramework
     from BlissFramework import Qt4_startGUI
-    BlissFramework.set_gui_version("qt4")
     Qt4_startGUI.run(MXCUBE_GUI_FILE)
 else:
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt3.gui")
-    import BlissFramework 
     from BlissFramework import startGUI
-    BlissFramework.set_gui_version("qt3")
     startGUI.run(MXCUBE_GUI_FILE)
 

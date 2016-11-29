@@ -22,8 +22,14 @@ import os
 import time
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import QEvent, pyqtSignal
+    from PyQt5.QtGui import QPalette
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import QEvent, pyqtSignal
+    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -33,13 +39,13 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 __category__ = 'General'
 
 
-PROPOSAL_GUI_EVENT = QtCore.QEvent.User
-class ProposalGUIEvent(QtCore.QEvent):
+PROPOSAL_GUI_EVENT = QEvent.User
+class ProposalGUIEvent(QEvent):
     """
     Descript. :
     """
     def __init__(self, method, arguments):
-        QtCore.QEvent.__init__(self, PROPOSAL_GUI_EVENT)
+        QEvent.__init__(self, PROPOSAL_GUI_EVENT)
         self.method = method
         self.arguments = arguments
 
@@ -47,6 +53,15 @@ class Qt4_ProposalBrick2(BlissWidget):
     """
     Descript. :
     """
+
+    sessionSelected = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 
+                                 'PyQt_PyObject', 'PyQt_PyObject',
+                                 'PyQt_PyObject', 'PyQt_PyObject',
+                                 'PyQt_PyObject')
+    setWindowTitle = pyqtSignal(str)
+    loggedIn = pyqtSignal(bool)
+    userGroupSaved = pyqtSignal(str)
+
     NOBODY_STR = "<nobr><b>Login is required for collecting data!</b>"
 
     def __init__(self, *args):
@@ -102,44 +117,44 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.defineSlot('impersonateProposal', ())
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox("ISPyB proposal", self)
+        self.main_gbox = QGroupBox("ISPyB proposal", self)
 
-        self.login_as_proposal_widget = QtGui.QWidget(self.main_gbox)
-        code_label = QtGui.QLabel("  Code: ", self.login_as_proposal_widget)
-        self.proposal_type_combox = QtGui.QComboBox(self.login_as_proposal_widget)
+        self.login_as_proposal_widget = QWidget(self.main_gbox)
+        code_label = QLabel("  Code: ", self.login_as_proposal_widget)
+        self.proposal_type_combox = QComboBox(self.login_as_proposal_widget)
         self.proposal_type_combox.setEditable(True)
         self.proposal_type_combox.setFixedWidth(60)
-        dash_label = QtGui.QLabel(" - ", self.login_as_proposal_widget)
-        self.proposal_number_ledit = QtGui.QLineEdit(self.login_as_proposal_widget)
+        dash_label = QLabel(" - ", self.login_as_proposal_widget)
+        self.proposal_number_ledit = QLineEdit(self.login_as_proposal_widget)
         self.proposal_number_ledit.setFixedWidth(60)
-        password_label = QtGui.QLabel("   Password: ", self.login_as_proposal_widget)
-        self.proposal_password_ledit = QtGui.QLineEdit(self.login_as_proposal_widget)
-        self.proposal_password_ledit.setEchoMode(QtGui.QLineEdit.Password)
+        password_label = QLabel("   Password: ", self.login_as_proposal_widget)
+        self.proposal_password_ledit = QLineEdit(self.login_as_proposal_widget)
+        self.proposal_password_ledit.setEchoMode(QLineEdit.Password)
         #self.proposal_password_ledit.setFixedWidth(40)
-        self.login_button = QtGui.QPushButton("Login", self.login_as_proposal_widget)
+        self.login_button = QPushButton("Login", self.login_as_proposal_widget)
         self.login_button.setFixedWidth(70)
-        self.logout_button = QtGui.QPushButton("Logout", self.main_gbox)
+        self.logout_button = QPushButton("Logout", self.main_gbox)
         self.logout_button.hide()
         self.logout_button.setFixedWidth(70)
         self.login_as_proposal_widget.hide()
         
 
-        self.login_as_user_widget = QtGui.QWidget(self.main_gbox)
-        self.proposal_combo = QtGui.QComboBox(self.login_as_user_widget)
+        self.login_as_user_widget = QWidget(self.main_gbox)
+        self.proposal_combo = QComboBox(self.login_as_user_widget)
         self.proposal_combo.setFixedWidth(140)
 
-        self.user_group_widget = QtGui.QWidget(self.main_gbox)
+        self.user_group_widget = QWidget(self.main_gbox)
         #self.title_label = QtGui.QLabel(self.user_group_widget)
         #self.title_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.user_group_label = QtGui.QLabel("  Group: ", self.user_group_widget)
-        self.user_group_ledit = QtGui.QLineEdit(self.user_group_widget)
+        self.user_group_label = QLabel("  Group: ", self.user_group_widget)
+        self.user_group_ledit = QLineEdit(self.user_group_widget)
         #self.user_group_ledit.setFixedWidth(40)
-        self.user_group_save_button = QtGui.QToolButton(self.user_group_widget)
+        self.user_group_save_button = QToolButton(self.user_group_widget)
         self.user_group_save_button.setText("Set")
         self.saved_group = True 
 
         # Layout --------------------------------------------------------------
-        _user_group_widget_hlayout = QtGui.QHBoxLayout(self.user_group_widget)
+        _user_group_widget_hlayout = QHBoxLayout(self.user_group_widget)
         _user_group_widget_hlayout.setSpacing(2)
         #_user_group_widget_hlayout.addWidget(self.title_label)
         _user_group_widget_hlayout.addWidget(self.user_group_label) 
@@ -148,7 +163,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         _user_group_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         self.user_group_widget.hide()
 
-        _login_as_proposal_widget_layout = QtGui.QHBoxLayout(self.login_as_proposal_widget)
+        _login_as_proposal_widget_layout = QHBoxLayout(self.login_as_proposal_widget)
         _login_as_proposal_widget_layout.addWidget(code_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_type_combox)
         _login_as_proposal_widget_layout.addWidget(dash_label)
@@ -159,12 +174,12 @@ class Qt4_ProposalBrick2(BlissWidget):
         _login_as_proposal_widget_layout.setSpacing(2)
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _login_as_user_widget_layout = QtGui.QHBoxLayout(self.login_as_user_widget)
+        _login_as_user_widget_layout = QHBoxLayout(self.login_as_user_widget)
         _login_as_user_widget_layout.addWidget(self.proposal_combo)
         _login_as_user_widget_layout.setSpacing(2)
         _login_as_user_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_gboxlayout = QtGui.QHBoxLayout(self.main_gbox)
+        _main_gboxlayout = QHBoxLayout(self.main_gbox)
         _main_gboxlayout.addWidget(self.login_as_proposal_widget)
         _main_gboxlayout.addWidget(self.logout_button)
         _main_gboxlayout.addWidget(self.login_as_user_widget)
@@ -173,7 +188,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         _main_gboxlayout.setSpacing(2)
         _main_gboxlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -195,10 +210,10 @@ class Qt4_ProposalBrick2(BlissWidget):
                                            QtGui.QPalette.Window)"""
         Qt4_widget_colors.set_widget_color(self.proposal_number_ledit,
                                            Qt4_widget_colors.LIGHT_RED,
-                                           QtGui.QPalette.Base)
+                                           QPalette.Base)
         Qt4_widget_colors.set_widget_color(self.proposal_password_ledit,
                                            Qt4_widget_colors.LIGHT_RED,
-                                           QtGui.QPalette.Base)
+                                           QPalette.Base)
  
     def save_group(self):
         """
@@ -213,16 +228,16 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.saved_group = True
             Qt4_widget_colors.set_widget_color(self.user_group_ledit,
                                                Qt4_widget_colors.LIGHT_GREEN,
-                                               QtGui.QPalette.Base)  
+                                               QPalette.Base)  
             msg = 'User group set to: %s' % str(self.user_group_ledit.text())
             logging.getLogger("GUI").info(msg)
-            self.emit(QtCore.SIGNAL("userGroupSaved"), self.user_group_ledit.text())
+            self.userGroupSaved.emit(self.user_group_ledit.text())
         else:
             msg = 'User group not valid, please enter a valid user group'
             logging.getLogger("GUI").info(msg)
             Qt4_widget_colors.set_widget_color(self.user_group_ledit,
                                                Qt4_widget_colors.LIGHT_RED,
-                                               QtGui.QPalette.Base)
+                                               QPalette.Base)
             
     def user_group_changed(self, value):
         """
@@ -233,7 +248,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             logging.getLogger("GUI").warning(msg)
             Qt4_widget_colors.set_widget_color(self.user_group_ledit,
                                                Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                               QtGui.QPalette.Base)
+                                               QPalette.Base)
         self.saved_group = False
         
     def customEvent(self, event):
@@ -287,9 +302,9 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        if QtGui.QMessageBox.question(self, "Confirm logout", 
-            "Press OK to logout.", QtGui.QMessageBox.Ok,
-            QtGui.QMessageBox.Cancel) == QtGui.QMessageBox.Ok:
+        if QMessageBox.question(self, "Confirm logout", 
+            "Press OK to logout.", QMessageBox.Ok,
+            QMessageBox.Cancel) == QMessageBox.Ok:
             self.log_out()
 
     # Logout the user; reset the brick; changes from logout mode to login mode
@@ -319,9 +334,9 @@ class Qt4_ProposalBrick2(BlissWidget):
         #QToolTip.add(self.proposalLabel,"")
        
         # Emit signals clearing the proposal and session
-        self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
-        self.emit(QtCore.SIGNAL("sessionSelected"), None)
-        self.emit(QtCore.SIGNAL("loggedIn"), False)
+        self.setWindowTitle.emit(self["titlePrefix"])
+        self.sessionSelected.emit(None, None, None, None, None, None, None)
+        self.loggedIne.mit(False)
 
     def resetProposal(self):
         """
@@ -427,8 +442,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         win_title = "%s (%s-%s)" % (self["titlePrefix"], \
             self.lims_hwobj.translate(proposal["code"], 'gui'), \
             proposal["number"])
-        self.emit(QtCore.SIGNAL("setWindowTitle"), win_title)
-        self.emit(QtCore.SIGNAL("sessionSelected"),
+        self.setWindowTitle.emit(win_title)
+        self.sessionSelected.emit(
                   session_id, 
                   self.lims_hwobj.translate(proposal["code"],'gui'),
                   str(proposal["number"]),
@@ -436,7 +451,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                   session["startDate"],
                   proposal["code"],
                   is_inhouse)
-        self.emit(QtCore.SIGNAL("loggedIn"), True)
+        self.loggedIn.emit(True)
 
     def setCodes(self, codes):
         """
@@ -465,18 +480,17 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.session_hwobj.proposal_id = ""
             self.session_hwobj.proposal_number = "" 
     
-            self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
-            self.emit(QtCore.SIGNAL("loggedIn"), False)
-            self.emit(QtCore.SIGNAL("sessionSelected"), None)
-            self.emit(QtCore.SIGNAL("loggedIn"), True)
-            self.emit(QtCore.SIGNAL("sessionSelected"), 
-                 self.session_hwobj.session_id,
+            self.setWindowTitle.emit(self["titlePrefix"])
+            #self.loggedIn.emit(False)
+            self.sessionSelected.emit(None, None, None, None, None, None, None)
+            self.loggedIn.emit(True)
+            self.sessionSelected.emit(self.session_hwobj.session_id,
                  str(os.environ["USER"]), 0, '', '',
                  self.session_hwobj.session_id, False)
         else: 
-            self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
-            self.emit(QtCore.SIGNAL("sessionSelected"), None)
-            self.emit(QtCore.SIGNAL("loggedIn"), False)
+            self.setWindowTitle.emit(self["titlePrefix"])
+            self.sessionSelected.emit(None, None, None, None, None, None, None)
+            self.loggedIn.emit(False)
 
             if self.login_as_user:
                if os.getenv("SUDO_USER"):
@@ -486,7 +500,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                self._do_login_as_user(user_name)
 
         start_server_event = ProposalGUIEvent(self.startServers,())
-        QtGui.QApplication.postEvent(self, start_server_event)
+        QApplication.postEvent(self, start_server_event)
 
     def startServers(self):
         """
@@ -501,14 +515,14 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         if message is not None:
             if stat is False:
-                icon = QtGui.QMessageBox.Critical
+                icon = QMessageBox.Critical
             elif stat is None:
-                icon = QtGui.QMessageBox.Warning
+                icon = QMessageBox.Warning
             elif stat is True:
-                icon = QtGui.QMessageBox.Information
-            msg_dialog = QtGui.QMessageBox("Register user", message, \
-                icon, QtGui.QMessageBox.Ok, QtGui.QMessageBox.NoButton,\
-                QtGui.QMessageBox.NoButton, self)
+                icon = QMessageBox.Information
+            msg_dialog = QMessageBox("Register user", message, \
+                icon, QMessageBox.Ok, QMessageBox.NoButton,\
+                QMessageBox.NoButton, self)
             s = self.font().pointSize()
             f = msg_dialog.font()
             f.setPointSize(s)
@@ -531,13 +545,13 @@ class Qt4_ProposalBrick2(BlissWidget):
         """
         Descript. :
         """
-        msg_dialog = QtGui.QMessageBox("Register user", "Couldn't contact " + \
+        msg_dialog = QMessageBox("Register user", "Couldn't contact " + \
             "the ISPyB database server: you've been logged as the local user.\n" + \
             "Your experiments' information will not be stored in ISPyB!",\
-            QtGui.QMessageBox.Warning, 
-            QtGui.QMessageBox.Ok, 
-            QtGui.QMessageBox.NoButton,
-            QtGui.QMessageBox.NoButton,self)
+            QMessageBox.Warning, 
+            QMessageBox.Ok, 
+            QMessageBox.NoButton,
+            QMessageBox.NoButton,self)
         s = self.font().pointSize()
         f = msg_dialog.font()
         f.setPointSize(s)
@@ -654,11 +668,11 @@ class Qt4_ProposalBrick2(BlissWidget):
         elif property_name == 'icons':
             icons_list = new_value.split()
             try:
-                self.login_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[0])))
+                self.login_button.setIcon(Qt4_Icons.load_icon(icons_list[0]))
             except IndexError:
                 pass
             try:
-                self.logout_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[1])))
+                self.logout_button.setIcon(Qt4_Icons.load_icon(icons_list[1]))
             except IndexError:
                 pass
         elif property_name == 'session':
