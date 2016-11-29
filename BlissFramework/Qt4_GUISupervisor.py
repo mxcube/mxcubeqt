@@ -279,12 +279,16 @@ class GUISupervisor(QWidget):
                             else:
                                 try:
                                     slot = getattr(receiver, connection["slot"])
+                                    #etattr(sender, connection["signal"]).connect(slot)
                                 except AttributeError:
                                     logging.getLogger().error(\
                                        "No slot '%s' " % connection["slot"] + \
                                        "in receiver %s" % _receiver)
                                 else:
-                                    sender.connect(sender, connection["signal"], slot)
+                                    getattr(sender, connection["signal"]).connect(slot)
+                                    #sender.connect(sender,
+                                    #    QtCore.SIGNAL(connection["signal"]),
+                                    #    slot)
                     make_connections(item["children"])
 
             make_connections(config.windows_list)

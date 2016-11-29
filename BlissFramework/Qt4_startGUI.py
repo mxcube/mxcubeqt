@@ -30,9 +30,7 @@ import platform
 from optparse import OptionParser
 
 import BlissFramework
-print 111, BlissFramework.get_gui_version()
 if BlissFramework.get_gui_version() == "QT5":
-    
     from PyQt5 import QtCore
     from PyQt5.QtWidgets import QApplication
 else:

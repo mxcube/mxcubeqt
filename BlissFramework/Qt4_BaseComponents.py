@@ -26,11 +26,11 @@ import operator
 import weakref
 
 try:
-   from PyQt5 import QtCore
-   from PyQt5.QtGui import QPainter, QPen
+   from PyQt5.QtCore import *
+   from PyQt5.QtGui import QPainter, QPen, QCursor
    from PyQt5.QtWidgets import *
 except:
-   from PyQt4 import QtCore
+   from PyQt4.QtCore import *
    from PyQt4.QtGui import *
 
 from HardwareRepository import HardwareRepository
@@ -51,12 +51,12 @@ except ImportError:
 _emitterCache = weakref.WeakKeyDictionary()
 
 
-class _QObject(QtCore.QObject):
+class _QObject(QObject):
     def __init__(self, *args, **kwargs):
         """
         Descript. :
         """
-        QtCore.QObject.__init__(self, *args)
+        QObject.__init__(self, *args)
 
         try:
             self.__ho = weakref.ref(kwargs.get("ho"))
@@ -73,7 +73,7 @@ def emitter(ob):
     return _emitterCache[ob]
 
 
-class InstanceEventFilter(QtCore.QObject):
+class InstanceEventFilter(QObject):
     def eventFilter(self, widget, event):
         """
         Descript. :
@@ -85,7 +85,7 @@ class InstanceEventFilter(QtCore.QObject):
                     #if obj.shouldFilterEvent():
                     return True
                 elif isinstance(event, QMouseEvent):
-                    if event.button() == QtCore.Qt.RightButton:
+                    if event.button() == Qt.RightButton:
                         return True
                     elif obj.shouldFilterEvent():
                         return True
@@ -93,12 +93,12 @@ class InstanceEventFilter(QtCore.QObject):
                 or isinstance(event, QFocusEvent):
                     if obj.shouldFilterEvent():
                         return True
-                return QtCore.QObject.eventFilter(self, widget, event)
+                return QObject.eventFilter(self, widget, event)
             try:
                 obj = obj.parent()
             except:
                 obj = None
-        return QtCore.QObject.eventFilter(self, widget, event)
+        return QObject.eventFilter(self, widget, event)
 
 class WeakMethodBound:
     def __init__(self, f):
@@ -373,7 +373,7 @@ class BlissWidget(QFrame, Connectable.Connectable):
         Descript. :
         """
         brick_name = self.objectName()
-        self.connect(widget, QtCore.SIGNAL('widgetSynchronize'), lambda \
+        widget.widgetSynchronize.connect(lambda \
              state: BlissWidget.widgetGenericChanged(brick_name, widget_name, \
              master_sync, state))
 
@@ -398,9 +398,9 @@ class BlissWidget(QFrame, Connectable.Connectable):
         self._widget_events = []
 
         if self.shouldFilterEvent():
-            self.setCursor(QCursor(QtCore.Qt.ForbiddenCursor))
+            self.setCursor(QCursor(Qt.ForbiddenCursor))
         else:
-            self.setCursor(QCursor(QtCore.Qt.ArrowCursor))
+            self.setCursor(QCursor(Qt.ArrowCursor))
 
     @staticmethod
     def isInstanceModeMaster():
@@ -830,7 +830,7 @@ class BlissWidget(QFrame, Connectable.Connectable):
         signal_slot_filter = SignalSlotFilter(signal, slot, should_cache)
         self._signal_slot_filters[uid] = signal_slot_filter
 
-        QtCore.QObject.connect(sender, signal, signal_slot_filter)
+        QObject.connect(sender, signal, signal_slot_filter)
 
     def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
         """
@@ -848,7 +848,7 @@ class BlissWidget(QFrame, Connectable.Connectable):
         else:
             pysignal = True
 
-        if not isinstance(sender, QtCore.QObject):
+        if not isinstance(sender, QObject):
             if isinstance(sender, HardwareObject):
                 sender.connect(signal, slot)
                 return
@@ -874,8 +874,9 @@ class BlissWidget(QFrame, Connectable.Connectable):
             #                       slot)
 
         # workaround for PyQt lapse
-        if hasattr(sender, "connectNotify"):
-            sender.connectNotify(QtCore.SIGNAL(signal))
+        print "TODO workaround for PyQt lapse" 
+        #if hasattr(sender, "connectNotify"):
+        #    sender.connectNotify(QtCore.pyqtSignal(signal))
 
     def disconnect(self, sender, signal, slot):
         """
@@ -922,6 +923,24 @@ class BlissWidget(QFrame, Connectable.Connectable):
                                       QtCore.SIGNAL(signal) or \
                                       QtCore.SIGNAL(signal),
                                       signalSlotFilter)
+
+    """
+    def get_signals(self):
+        signals = []
+        for name in dir(self):
+            if isinstance(getattr(self, name),  pyqtSignal):
+                signals.append(name)
+        return signals
+
+    def get_slots(self):
+        slots = []
+        cls = self if isinstance(self, type) else type(self)
+        slot = type(pyqtSignal())
+        for name in dir(self):
+            if isinstance(getattr(cls, name), slot):
+                slots.append(name)
+        return slots
+    """
 
     def reparent(self, widget_to):
         """
@@ -1176,7 +1195,7 @@ class NullBrick(BlissWidget):
         """
         Descript. :
         """
-        return QtCore.QSize(100, 100)
+        return QSize(100, 100)
 
     def run(self):
         """
@@ -1196,7 +1215,7 @@ class NullBrick(BlissWidget):
         """
         if not self.isRunning():
             painter = QPainter(self)
-            painter.setPen(QPen(QtCore.Qt.black, 1))
+            painter.setPen(QPen(Qt.black, 1))
             painter.drawLine(0, 0, self.width(), self.height())
             painter.drawLine(0, self.height(), self.width(), 0)
 
@@ -1217,18 +1236,18 @@ def ComboBoxActivated(self, index, lines):
                 else:
                     self.insertItem(line)
                     self.setCurrentItem(i)
-                    self.emit(QtCore.SIGNAL('activated(const QString &)'), line)
-                    self.emit(QtCore.SIGNAL('activated(int)'), i)
+                    self.activated[QString].emit(line)
+                    self.activated[int].emit(i)
                 i += 1
     self.setCurrentItem(index)
-    self.emit(QtCore.SIGNAL('activated(const QString &)'), self.currentText())
-    self.emit(QtCore.SIGNAL('activated(int)'), index)
+    self.activated[QString].emit(self.currentText())
+    self.activated[int].emit(index)
 
 def SpinBoxEditorTextChanged(self, text):
     """
     Descript. :
     """
-    self.emit(QtCore.SIGNAL('editorTextChanged'), str(text))
+    self.editorTextChanged.emit(str(text))
 
 def SpinBoxSetEditorText(self, text):
     """

@@ -20,8 +20,14 @@
 import math
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import *
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import*
+    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -87,62 +93,62 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.defineSlot('toggle_enabled',())
 
         # Graphic elements-----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox(self)
-        self.motor_label = QtGui.QLabel(self.main_gbox)
+        self.main_gbox = QGroupBox(self)
+        self.motor_label = QLabel(self.main_gbox)
 
         #Main controls
-        self.control_box = QtGui.QWidget(self.main_gbox)
-        self.move_left_button = QtGui.QPushButton(self.control_box)
+        self.control_box = QWidget(self.main_gbox)
+        self.move_left_button = QPushButton(self.control_box)
         self.move_left_button.setIcon(Qt4_Icons.load_icon('Left2'))
         self.move_left_button.setToolTip("Moves the motor down (while pressed)")
         self.move_left_button.setFixedWidth(25)
-        self.move_right_button = QtGui.QPushButton(self.control_box)
+        self.move_right_button = QPushButton(self.control_box)
         self.move_right_button.setIcon(Qt4_Icons.load_icon('Right2'))
         self.move_right_button.setToolTip("Moves the motor up (while pressed)")  
         self.move_right_button.setFixedWidth(25)
         
-        self.position_spinbox = QtGui.QDoubleSpinBox(self.control_box)
+        self.position_spinbox = QDoubleSpinBox(self.control_box)
         self.position_spinbox.setMinimum(-10000)
         self.position_spinbox.setMaximum(10000)
-        self.position_spinbox.setMinimumSize(QtCore.QSize(75, 25))
-        self.position_spinbox.setMaximumSize(QtCore.QSize(75, 25))
+        self.position_spinbox.setMinimumSize(QSize(75, 25))
+        self.position_spinbox.setMaximumSize(QSize(75, 25))
         self.position_spinbox.setToolTip("Moves the motor to a specific " + \
               "position or step by step; right-click for motor history")
 
         #Extra controls
-        self.extra_button_box = QtGui.QWidget(self.main_gbox)
-        self.stop_button = QtGui.QPushButton(self.extra_button_box)
+        self.extra_button_box = QWidget(self.main_gbox)
+        self.stop_button = QPushButton(self.extra_button_box)
         self.stop_button.setIcon(Qt4_Icons.load_icon('Stop2'))
         self.stop_button.setEnabled(False)
         self.stop_button.setToolTip("Stops the motor")
         self.stop_button.setFixedWidth(25)
-        self.step_button = QtGui.QPushButton(self.extra_button_box)
+        self.step_button = QPushButton(self.extra_button_box)
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
-        self.step_combo = QtGui.QComboBox(self.extra_button_box)
+        self.step_combo = QComboBox(self.extra_button_box)
         self.step_combo.setEditable(True)
-        self.step_combo.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_combo))
+        self.step_combo.setValidator(QDoubleValidator(0, 360, 5, self.step_combo))
         self.step_combo.setDuplicatesEnabled(False)
 
-        self.position_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self.main_gbox)
+        self.position_slider = QSlider(Qt.Horizontal, self.main_gbox)
     
         # Layout --------------------------------------------------------------
-        self.control_box_layout = QtGui.QHBoxLayout(self.control_box)
+        self.control_box_layout = QHBoxLayout(self.control_box)
         self.control_box_layout.addWidget(self.position_spinbox)
         self.control_box_layout.addWidget(self.move_left_button)
         self.control_box_layout.addWidget(self.move_right_button)
         self.control_box_layout.setSpacing(2)
         self.control_box_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.extra_button_box_layout = QtGui.QHBoxLayout(self.extra_button_box)
+        self.extra_button_box_layout = QHBoxLayout(self.extra_button_box)
         self.extra_button_box_layout.addWidget(self.stop_button)
         self.extra_button_box_layout.addWidget(self.step_button)
         self.extra_button_box_layout.addWidget(self.step_combo)
         self.extra_button_box_layout.setSpacing(2)
         self.extra_button_box_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.main_gbox_layout = QtGui.QHBoxLayout(self.main_gbox)
+        self.main_gbox_layout = QHBoxLayout(self.main_gbox)
         self.main_gbox_layout.addWidget(self.motor_label)
         self.main_gbox_layout.addWidget(self.control_box)
         self.main_gbox_layout.addWidget(self.extra_button_box)
@@ -150,22 +156,22 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.main_gbox_layout.setSpacing(2)
         self.main_gbox_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.main_layout = QtGui.QHBoxLayout(self)
+        self.main_layout = QHBoxLayout(self)
         self.main_layout.addWidget(self.main_gbox)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicy (horizontal, vertical) -----------------------------------
-        self.move_left_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                            QtGui.QSizePolicy.Minimum)
-        self.move_right_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                             QtGui.QSizePolicy.Minimum)
-        self.stop_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                       QtGui.QSizePolicy.Minimum)
-        self.step_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                       QtGui.QSizePolicy.Minimum)
-        self.extra_button_box.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                            QtGui.QSizePolicy.Fixed)
+        self.move_left_button.setSizePolicy(QSizePolicy.Fixed, 
+                                            QSizePolicy.Minimum)
+        self.move_right_button.setSizePolicy(QSizePolicy.Fixed, 
+                                             QSizePolicy.Minimum)
+        self.stop_button.setSizePolicy(QSizePolicy.Fixed, 
+                                       QSizePolicy.Minimum)
+        self.step_button.setSizePolicy(QSizePolicy.Fixed, 
+                                       QSizePolicy.Minimum)
+        self.extra_button_box.setSizePolicy(QSizePolicy.Fixed,
+                                            QSizePolicy.Fixed)
 
         # Object events ------------------------------------------------------
         spinbox_event = SpinBoxEvent(self.position_spinbox) 
@@ -176,7 +182,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
         self.step_combo.activated.connect(self.go_to_step)
         self.step_combo.activated.connect(self.step_changed)
-        self.step_combo.textChanged.connect(self.step_edited)
+        self.step_combo.editTextChanged.connect(self.step_edited)
 
         self.stop_button.clicked.connect(self.stop_motor)
         self.step_button.clicked.connect(self.open_step_editor)
@@ -213,7 +219,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         Qt4_widget_colors.set_widget_color(self.step_combo,
                                            Qt4_widget_colors.LINE_EDIT_CHANGED, 
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
 
     def step_changed(self, step):
         """
@@ -222,7 +228,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         Qt4_widget_colors.set_widget_color(self.step_combo.lineEdit(),
-             QtCore.Qt.white, QtGui.QPalette.Base)
+             Qt.white, QPalette.Base)
 
     def toggle_enabled(self):
         """
@@ -432,12 +438,12 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        menu = QtGui.QMenu(self)
+        menu = QMenu(self)
         menu.addAction("Previous positions")
         #menu.insertSeparator()
         for i in range(len(self.pos_history)):
             menu.addAction(self.pos_history[i], i)
-        menu.popup(QtGui.QCursor.pos())
+        menu.popup(QCursor.pos())
         menu.activated.connect(self.go_to_history_pos)
 
     def go_to_history_pos(self, index):
@@ -503,7 +509,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         color = Qt4_MotorSpinBoxBrick.STATE_COLORS[state]
         Qt4_widget_colors.set_widget_color(self.position_spinbox.lineEdit(), 
                                            color,
-                                           QtGui.QPalette.Base) 
+                                           QPalette.Base) 
 
     def state_changed(self, state):
         """
@@ -572,8 +578,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
     def position_value_edited(self, value):
         Qt4_widget_colors.set_widget_color(self.position_spinbox.lineEdit(),
-                                           QtGui.QColor(255,165,0),
-                                           QtGui.QPalette.Base)
+                                           QColor(255,165,0),
+                                           QPalette.Base)
 
     def set_tool_tip(self, name=None, state=None, limits=None):
         """
@@ -779,7 +785,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-class StepEditorDialog(QtGui. QDialog):
+class StepEditorDialog(QDialog):
     """
     Descript. :
     """
@@ -788,35 +794,35 @@ class StepEditorDialog(QtGui. QDialog):
         """
         Descript. :
         """
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         # Graphic elements-----------------------------------------------------
         #self.main_gbox = QtGui.QGroupBox('Motor step', self)
         #box2 = QtGui.QWidget(self)
-        self.grid = QtGui.QWidget(self)
-        label1 = QtGui.QLabel("Current:", self)
-        self.current_step = QtGui.QLineEdit(self)
+        self.grid = QWidget(self)
+        label1 = QLabel("Current:", self)
+        self.current_step = QLineEdit(self)
         self.current_step.setEnabled(False)
-        label2 = QtGui.QLabel("Set to:", self)
-        self.new_step = QtGui.QLineEdit(self)
-        self.new_step.setAlignment(QtCore.Qt.AlignRight)
-        self.new_step.setValidator(QtGui.QDoubleValidator(self))
+        label2 = QLabel("Set to:", self)
+        self.new_step = QLineEdit(self)
+        self.new_step.setAlignment(Qt.AlignRight)
+        self.new_step.setValidator(QDoubleValidator(self))
 
-        self.button_box = QtGui.QWidget(self)
-        self.apply_button = QtGui.QPushButton("Apply", self.button_box)
-        self.close_button = QtGui.QPushButton("Dismiss", self.button_box)
+        self.button_box = QWidget(self)
+        self.apply_button = QPushButton("Apply", self.button_box)
+        self.close_button = QPushButton("Dismiss", self.button_box)
 
         # Layout --------------------------------------------------------------
-        self.button_box_layout = QtGui.QHBoxLayout(self.button_box)
+        self.button_box_layout = QHBoxLayout(self.button_box)
         self.button_box_layout.addWidget(self.apply_button)
         self.button_box_layout.addWidget(self.close_button)
 
-        self.grid_layout = QtGui.QGridLayout(self.grid)
+        self.grid_layout = QGridLayout(self.grid)
         self.grid_layout.addWidget(label1, 0, 0)
         self.grid_layout.addWidget(self.current_step, 0, 1)
         self.grid_layout.addWidget(label2, 1, 0)
         self.grid_layout.addWidget(self.new_step, 1, 1)
 
-        self.main_layout = QtGui.QVBoxLayout(self)
+        self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self.grid)
         self.main_layout.addWidget(self.button_box)
         self.main_layout.setSpacing(0)
@@ -828,10 +834,10 @@ class StepEditorDialog(QtGui. QDialog):
         self.close_button.clicked.connect(self.accept)
 
         # SizePolicies --------------------------------------------------------
-        self.close_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                        QtGui.QSizePolicy.Fixed)
-        self.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                           QtGui.QSizePolicy.Minimum)
+        self.close_button.setSizePolicy(QSizePolicy.Fixed,
+                                        QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Minimum,
+                           QSizePolicy.Minimum)
  
         # Other ---------------------------------------------------------------
         self.setWindowTitle("Motor step editor")
@@ -863,18 +869,18 @@ class StepEditorDialog(QtGui. QDialog):
         self.current_step.setText(str(val))
         self.close()
 
-class SpinBoxEvent(QtCore.QObject):
-    returnPressedSignal = QtCore.pyqtSignal()
-    contextMenuSignal = QtCore.pyqtSignal()
+class SpinBoxEvent(QObject):
+    returnPressedSignal = pyqtSignal()
+    contextMenuSignal = pyqtSignal()
 
     def eventFilter(self,  obj,  event):
-        if event.type() == QtCore.QEvent.KeyPress:
-            if event.key() in [QtCore.Qt.Key_Enter, 
-                               QtCore.Qt.Key_Return]:
+        if event.type() == QEvent.KeyPress:
+            if event.key() in [Qt.Key_Enter, 
+                               Qt.Key_Return]:
                 self.returnPressedSignal.emit()
             
-        elif event.type() == QtCore.QEvent.MouseButtonRelease:
+        elif event.type() == QEvent.MouseButtonRelease:
             self.returnPressedSignal.emit()
-        elif event.type() == QtCore.QEvent.ContextMenu:
+        elif event.type() == QEvent.ContextMenu:
             self.contextMenuSignal.emit()
         return False

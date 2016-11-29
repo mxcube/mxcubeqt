@@ -17,8 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore 
+
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QCursor
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 import Qt4_GraphicsManager
 
@@ -61,14 +68,14 @@ class Qt4_CameraBrick(BlissWidget):
         self.addProperty('cameraControls', 'boolean', False)
 
         # Graphic elements-----------------------------------------------------
-        self.info_widget = QtGui.QWidget(self)
-        self.display_beam_size_cbox = QtGui.QCheckBox("Display beam size", self)
+        self.info_widget = QWidget(self)
+        self.display_beam_size_cbox = QCheckBox("Display beam size", self)
         self.display_beam_size_cbox.setHidden(True)
-        self.coord_label = QtGui.QLabel(":", self)
-        self.info_label = QtGui.QLabel(self)
+        self.coord_label = QLabel(":", self)
+        self.info_label = QLabel(self)
         self.camera_control_dialog = CameraControlDialog(self)
 
-        self.popup_menu = QtGui.QMenu(self)
+        self.popup_menu = QMenu(self)
         create_menu = self.popup_menu.addMenu("Create")
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("VCRPlay2"),
@@ -155,10 +162,10 @@ class Qt4_CameraBrick(BlissWidget):
              self.open_camera_control_dialog)
         self.camera_control_action.setEnabled(False)
 
-        self.popup_menu.popup(QtGui.QCursor.pos())
+        self.popup_menu.popup(QCursor.pos())
       
         # Layout --------------------------------------------------------------
-        _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
+        _info_widget_hlayout = QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.display_beam_size_cbox)
         _info_widget_hlayout.addWidget(self.coord_label)
         _info_widget_hlayout.addStretch(0)
@@ -167,7 +174,7 @@ class Qt4_CameraBrick(BlissWidget):
         _info_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         self.info_widget.setLayout(_info_widget_hlayout)
 
-        self.main_layout = QtGui.QVBoxLayout(self) 
+        self.main_layout = QVBoxLayout(self) 
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -176,8 +183,8 @@ class Qt4_CameraBrick(BlissWidget):
              self.display_beam_size_toggled)
 
         # SizePolicies --------------------------------------------------------
-        self.info_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                       QtGui.QSizePolicy.Fixed)
+        self.info_widget.setSizePolicy(QSizePolicy.Expanding,
+                                       QSizePolicy.Fixed)
 
         # Scene elements ------------------------------------------------------
         self.setMouseTracking(True)
@@ -292,7 +299,7 @@ class Qt4_CameraBrick(BlissWidget):
                 self.graphics_manager_hwobj.set_image_scale(self.image_scale_list[index], action.isChecked())
                 
     def contextMenuEvent(self, event):
-        self.popup_menu.popup(QtGui.QCursor.pos())
+        self.popup_menu.popup(QCursor.pos())
 
     def measure_distance_clicked(self):
         self.graphics_manager_hwobj.start_measure_distance(wait_click=True)
@@ -359,59 +366,59 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj.display_radiation_damage(\
              self.display_radiation_damage_action.isChecked())
 
-class CameraControlDialog(QtGui.QDialog):
+class CameraControlDialog(QDialog):
 
     def __init__(self, parent = None, name = None, flags = 0):
-        QtGui.QDialog.__init__(self, parent,
-              QtCore.Qt.WindowFlags(flags | QtCore.Qt.WindowStaysOnTopHint))
+        QDialog.__init__(self, parent,
+              Qt.WindowFlags(flags | Qt.WindowStaysOnTopHint))
 
         # Internal variables --------------------------------------------------
         self.camera_hwobj = None
 
 
         # Graphic elements ----------------------------------------------------
-        self.contrast_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
-        self.contrast_doublespinbox = QtGui.QDoubleSpinBox(self)
-        self.contrast_checkbox = QtGui.QCheckBox("auto", self)
-        self.brightness_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
-        self.brightness_doublespinbox = QtGui.QDoubleSpinBox(self)
-        self.brightness_checkbox = QtGui.QCheckBox("auto", self)
-        self.gain_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
-        self.gain_doublespinbox = QtGui.QDoubleSpinBox(self)
-        self.gain_checkbox = QtGui.QCheckBox("auto", self)
-        self.gamma_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
-        self.gamma_doublespinbox = QtGui.QDoubleSpinBox(self)
-        self.gamma_checkbox = QtGui.QCheckBox("auto", self)
-        self.exposure_time_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
-        self.exposure_time_doublespinbox = QtGui.QDoubleSpinBox(self) 
-        self.exposure_time_checkbox = QtGui.QCheckBox("auto", self)
-        __close_button = QtGui.QPushButton('Close', self)
+        self.contrast_slider = QSlider(Qt.Horizontal, self)
+        self.contrast_doublespinbox = QDoubleSpinBox(self)
+        self.contrast_checkbox = QCheckBox("auto", self)
+        self.brightness_slider = QSlider(Qt.Horizontal, self)
+        self.brightness_doublespinbox = QDoubleSpinBox(self)
+        self.brightness_checkbox = QCheckBox("auto", self)
+        self.gain_slider = QSlider(Qt.Horizontal, self)
+        self.gain_doublespinbox = QDoubleSpinBox(self)
+        self.gain_checkbox = QCheckBox("auto", self)
+        self.gamma_slider = QSlider(Qt.Horizontal, self)
+        self.gamma_doublespinbox = QDoubleSpinBox(self)
+        self.gamma_checkbox = QCheckBox("auto", self)
+        self.exposure_time_slider = QSlider(Qt.Horizontal, self)
+        self.exposure_time_doublespinbox = QDoubleSpinBox(self) 
+        self.exposure_time_checkbox = QCheckBox("auto", self)
+        __close_button = QPushButton('Close', self)
         # Layout --------------------------------------------------------------
-        __main_gridlayout = QtGui.QGridLayout(self)
-        __main_gridlayout.addWidget(QtGui.QLabel('Contrast:', self), 0, 0)
+        __main_gridlayout = QGridLayout(self)
+        __main_gridlayout.addWidget(QLabel('Contrast:', self), 0, 0)
         __main_gridlayout.addWidget(self.contrast_slider, 0, 1)
         __main_gridlayout.addWidget(self.contrast_doublespinbox, 0, 2)
         __main_gridlayout.addWidget(self.contrast_checkbox, 0, 3)
-        __main_gridlayout.addWidget(QtGui.QLabel('Brightness:', self), 1, 0)
+        __main_gridlayout.addWidget(QLabel('Brightness:', self), 1, 0)
         __main_gridlayout.addWidget(self.brightness_slider, 1, 1)
         __main_gridlayout.addWidget(self.brightness_doublespinbox, 1, 2)
         __main_gridlayout.addWidget(self.brightness_checkbox, 1, 3)
-        __main_gridlayout.addWidget(QtGui.QLabel('Gain:', self), 2, 0)
+        __main_gridlayout.addWidget(QLabel('Gain:', self), 2, 0)
         __main_gridlayout.addWidget(self.gain_slider, 2, 1)
         __main_gridlayout.addWidget(self.gain_doublespinbox, 2, 2)
         __main_gridlayout.addWidget(self.gain_checkbox, 2, 3)
-        __main_gridlayout.addWidget(QtGui.QLabel('Gamma:', self), 3, 0) 
+        __main_gridlayout.addWidget(QLabel('Gamma:', self), 3, 0) 
         __main_gridlayout.addWidget(self.gamma_slider, 3, 1)
         __main_gridlayout.addWidget(self.gamma_doublespinbox, 3, 2)
         __main_gridlayout.addWidget(self.gamma_checkbox, 3, 3)
-        __main_gridlayout.addWidget(QtGui.QLabel('Exposure time (ms):', self), 4, 0)
+        __main_gridlayout.addWidget(QLabel('Exposure time (ms):', self), 4, 0)
         __main_gridlayout.addWidget(self.exposure_time_slider, 4, 1)
         __main_gridlayout.addWidget(self.exposure_time_doublespinbox, 4, 2)      
         __main_gridlayout.addWidget(self.exposure_time_checkbox, 4, 3)      
         __main_gridlayout.addWidget(__close_button, 6, 2)
         __main_gridlayout.setSpacing(2)
         __main_gridlayout.setContentsMargins(5, 5, 5, 5)
-        __main_gridlayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        __main_gridlayout.setSizeConstraint(QLayout.SetFixedSize)
 
         # Qt signal/slot connections ------------------------------------------
         self.contrast_slider.valueChanged.connect(self.set_contrast)
@@ -438,8 +445,8 @@ class CameraControlDialog(QtGui.QDialog):
         self.gain_slider.setFixedWidth(200)
         self.gamma_slider.setFixedWidth(200)
         self.exposure_time_slider.setFixedWidth(200)
-        __close_button.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                     QtGui.QSizePolicy.Fixed)
+        __close_button.setSizePolicy(QSizePolicy.Fixed, 
+                                     QSizePolicy.Fixed)
 
         # Other --------------------------------------------------------------- 
         self.setModal(True)

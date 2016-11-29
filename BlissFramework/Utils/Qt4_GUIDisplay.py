@@ -36,6 +36,7 @@ import collections
 import BlissFramework
 if BlissFramework.get_gui_version() == "QT5":
     from PyQt5 import QtCore
+    from PyQt5.QtGui import QColor, QPalette
     from PyQt5.QtWidgets import *
     StringList = list
 else:
@@ -188,9 +189,10 @@ class CustomMenuBar(QMenuBar):
 
         if state:
             # switch to expert mode
-            QtCore.QObject.emit(self.parent,
-                                QtCore.SIGNAL("enableExpertMode"),
-                                True)
+            #QtCore.QObject.emit(self.parent,
+            #                    QtCore.SIGNAL("enableExpertMode"),
+            #                    True)
+            self.parent.enableExpertModeSignal.emit(True)
             # go through all bricks and execute the method
             for widget in QApplication.allWidgets():
                 if isinstance(widget, BlissWidget):
@@ -203,10 +205,7 @@ class CustomMenuBar(QMenuBar):
             self.set_color("orange")
         else:
             # switch to user mode
-            QtCore.QObject.emit(self.parent,
-                                QtCore.SIGNAL("enableExpertMode"),
-                                False)
-
+            self.parent.enableExpertModeSignal.emit(False)
             # go through all bricks and execute the method
             for widget in QApplication.allWidgets():
                 if isinstance(widget, BlissWidget):
@@ -359,6 +358,7 @@ class WindowDisplayWidget(QScrollArea):
 
     brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
     tabChangedSignal = QtCore.pyqtSignal(str, int)
+    enableExpertModeSignal = QtCore.pyqtSignal(bool)
 
     class Spacer(QFrame):
         """Spacer widget"""
@@ -524,6 +524,10 @@ class WindowDisplayWidget(QScrollArea):
     class CustomTabWidget(QTabWidget):
         """Tab widget"""
 
+        notebookPageChangedSignal = QtCore.pyqtSignal(str)
+        tabChangedSignal = QtCore.pyqtSignal(int, 'PyQt_PyObject')
+        
+
         def __init__(self, *args, **kwargs):
             """init"""
 
@@ -536,6 +540,8 @@ class WindowDisplayWidget(QScrollArea):
             self.setSizePolicy(QSizePolicy.Expanding,
                                QSizePolicy.Expanding)
             self.currentChanged.connect(self._page_changed)
+
+            print dir(self)
 
         def _page_changed(self, index):
             """Page changed event"""
@@ -563,10 +569,8 @@ class WindowDisplayWidget(QScrollArea):
                 orig_label = " ".join(label_list[0:-1])
             else:
                 orig_label = " ".join(label_list)
-            self.emit(QtCore.SIGNAL("notebookPageChanged"), orig_label)
-            QApplication.emit(self,
-                              QtCore.SIGNAL('tab_changed'),
-                              index, page)
+            self.notebookPageChangedSignal.emit(orig_label)
+            self.tabChangedSignal.emit(index, page)
 
             tab_name = self.objectName()
             BlissWidget.update_tab_widget(tab_name, index)
@@ -615,10 +619,12 @@ class WindowDisplayWidget(QScrollArea):
                             self.insertTab(page["index"],
                                            page["widget"],
                                            page["label"])
-                        self.showPage(page["widget"])
+                        slot_name = "showPage_%s" % page["label"].replace(' ', '_')
+                        getattr(self, slot_name)()
                         page["hidden"] = False
                     else:
-                        self.showPage(page["widget"])
+                        slot_name = "showPage_%s" % page["label"].replace(' ', '_')
+                        getattr(self, slot_name)()
             try:
                 # LNLS
                 # python2.7
@@ -896,8 +902,7 @@ class WindowDisplayWidget(QScrollArea):
 
         ret = QWidget.show(self)
         self.isShownSignal.emit()
-        print "TODO self.emit(QtCore.SIGNAL(isShown), ())"
-        #3self.emit(QtCore.SIGNAL("isShown"), ())
+        #self.emit(QtCore.SIGNAL("isShown"), ())
         return ret
 
     def hide(self, *args):
@@ -905,13 +910,11 @@ class WindowDisplayWidget(QScrollArea):
 
         ret = QWidget.hide(self)
         self.isHiddenSignal.emit()
-        print "TODO self.emit(QtCore.SIGNAL(isHidden)"
         #self.emit(QtCore.SIGNAL("isHidden"), ())
         return ret
 
     def set_caption(self, caption):
         """Set caption"""
-
         ret = QWidget.setWindowTitle(self, caption)
         self.base_caption = caption
         return ret

@@ -1,3 +1,11 @@
+import BlissFramework
+
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5 import QtCore
+else:
+    from PyQt4 import QtCore
+
 class Connectable:
     def __init__(self):
         self.__signal = {}
@@ -5,7 +13,6 @@ class Connectable:
 
 
     def defineSignal(self, signalName, signalArgs):
-        setattr(self, signalName, signalArgs)
         try:
             args = tuple(signalArgs)
         except:
@@ -13,7 +20,6 @@ class Connectable:
             raise ValueError
         
         self.__signal[str(signalName)] = args
-
 
     def defineSlot(self, slotName, slotArgs):
         try:

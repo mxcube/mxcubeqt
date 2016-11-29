@@ -20,10 +20,10 @@
 """Connection editor"""
 
 try:
-   from PyQt5 import QtCore
+   from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
    from PyQt5.QtWidgets import *
 except:
-   from PyQt4 import QtCore
+   from PyQt4.QtCore import Qt, pyqtSignal, pyqtSlot
    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
@@ -77,7 +77,7 @@ class Qt4_ConnectionEditor(QDialog):
         # Layout --------------------------------------------------------------
         emitter_panel_layout = QGridLayout(emitter_panel)
         emitter_panel_layout.addWidget(QLabel('<h3>Emitters</h3>', self),
-                                       0, 1, QtCore.Qt.AlignHCenter)
+                                       0, 1, Qt.AlignHCenter)
         emitter_panel_layout.addWidget(QLabel('Windows', self), 1, 0)
         emitter_panel_layout.addWidget(QLabel('Objects', self), 1, 1)
         emitter_panel_layout.addWidget(QLabel('Signals', self), 1, 2)
@@ -88,7 +88,7 @@ class Qt4_ConnectionEditor(QDialog):
         receiver_panel_layout = QGridLayout(receiver_panel)
         receiver_panel_layout.addWidget(\
              QLabel('<h3>Receivers</h3>', self), 0, 1,
-             QtCore.Qt.AlignHCenter)
+             Qt.AlignHCenter)
         receiver_panel_layout.addWidget(QLabel('Windows', self), 1, 0)
         receiver_panel_layout.addWidget(QLabel('Objects', self), 1, 1)
         receiver_panel_layout.addWidget(QLabel('Slots', self), 1, 2)
@@ -105,8 +105,8 @@ class Qt4_ConnectionEditor(QDialog):
         button_panel_layout = QHBoxLayout(button_panel)
         button_panel_layout.addWidget(self.remove_connection_button)
         button_panel_layout.addStretch(0)
-        button_panel_layout.addWidget(self.ok_button, QtCore.Qt.AlignRight)
-        button_panel_layout.addWidget(self.cancel_button, QtCore.Qt.AlignRight)
+        button_panel_layout.addWidget(self.ok_button, Qt.AlignRight)
+        button_panel_layout.addWidget(self.cancel_button, Qt.AlignRight)
 
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(top_panel)
@@ -353,7 +353,7 @@ class Qt4_ConnectionEditor(QDialog):
         for signal_name in signals:
             self.emitter_signals_listwidget.addItem(signal_name)
         self.emitter_signals_listwidget.setFont(\
-            self.emitter_signals_listwidget.font())
+            self.emitter_signals_listwidget.font()) 
 
     def receiver_window_changed(self, item):
         """Event when receiver window changed"""
@@ -493,7 +493,6 @@ class Qt4_ConnectionEditor(QDialog):
              self.connections_treewidget.currentIndex().row())
         self.remove_connection_button.setEnabled(False)
         self.has_changed = True
-        print self.has_changed
 
     def ok_button_clicked(self):
         """Accept"""

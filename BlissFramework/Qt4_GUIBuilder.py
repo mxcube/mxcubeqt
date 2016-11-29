@@ -26,15 +26,15 @@ import weakref
 import logging
 import subprocess
 
-try:
-   from PyQt5 import QtCore
-   from PyQt5.QtGui import QKeySequence, QCursor
-   from PyQt5.QtWidgets import *
-except:
-   from PyQt4 import QtCore
-   from PyQt4.QtGui import *
-
 import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5 import QtCore
+    from PyQt5.QtGui import QKeySequence, QCursor
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4 import QtCore
+    from PyQt4.QtGui import *
+
 from BlissFramework import Qt4_Configuration
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_PropertyEditor
@@ -415,7 +415,7 @@ class GUIEditorWindow(QWidget):
 
     editPropertiesSignal = QtCore.pyqtSignal(object)
     newItemSignal = QtCore.pyqtSignal(object, 'PyQt_PyObject')
-    drawPreviewSignal = QtCore.pyqtSignal()
+    drawPreviewSignal = QtCore.pyqtSignal('PyQt_PyObject', int, list, 'PyQt_PyObject')
     updatePreviewSignal = QtCore.pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject')
     addWidgetSignal = QtCore.pyqtSignal('PyQt_PyObject', 'PyQt_PyObject')
     removeWidgetSignal = QtCore.pyqtSignal()
@@ -1343,7 +1343,6 @@ class GUIBuilder(QMainWindow):
     def open_clicked(self):
         """Open gui file"""
 
-        print "open clicked open clicked open clicked    "
         filename = str(QFileDialog.getOpenFileName(self,
             "Open file", os.environ["HOME"],
             "GUI file (*.gui)", "Choose a GUI file to open"))
@@ -1378,18 +1377,15 @@ class GUIBuilder(QMainWindow):
     def save_clicked(self):
         """Saves gui file"""
 
-        print 111
         QApplication.setOverrideCursor(\
             QCursor(QtCore.Qt.WaitCursor))
 
-        print 222
         if self.filename is not None:
             if os.path.exists(self.filename):
                 should_create_startup_script = False
             else:
                 should_create_startup_script = True\
 
-            print 1, self.filename
             if self.configuration.save(self.filename):
                 self.setWindowTitle("GUI Builder - %s" % self.filename)
                 QApplication.restoreOverrideCursor()
