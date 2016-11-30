@@ -21,9 +21,11 @@ import logging
 
 import BlissFramework
 if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import QString
     from PyQt5.QtWidgets import *
     from PyQt5.QtGui import QPalette, QColor, QDoubleValidator
 else:
+    from PyQt4.QtCore import QString
     from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
@@ -317,8 +319,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             tool_tip = "Detector distance limits %0.1f : %0.1f mm" \
                        %(self.detector_distance_limits[0],
                          self.detector_distance_limits[1])
-        elif self.units_combobox.currentText() == chr(197) and \
-           self.resolution_limits:
+        elif self.resolution_limits:
             tool_tip = "Resolution limits %0.1f : %0.1f %s"\
                        %(self.resolution_limits[0], 
                          self.resolution_limits[1],
@@ -377,7 +378,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             curr_resolution = self.resolution_hwobj.getPosition()
             self.resolution_value_changed(curr_resolution)
             self.resolution_state_changed(self.resolution_hwobj.getState())
-            if self.units_combobox.currentText() == chr(197):
+            if self.units_combobox.currentText() != "mm":
                 self.group_box.setTitle('Resolution')
                 self.new_value_validator.setRange(self.resolution_limits[0],
                                                   self.resolution_limits[1],
@@ -451,7 +452,7 @@ class Qt4_ResolutionBrick(BlissWidget):
     def resolution_value_changed(self, value):
         if value:
             resolution_str = self['angFormatString'] % float(value)
-            self.resolution_ledit.setText("%s %s" % (resolution_str, chr(197)))
+            self.resolution_ledit.setText("%s %s" % (resolution_str, u"\u212B"))
 
     def detector_distance_changed(self, value):
         if value:

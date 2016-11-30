@@ -267,10 +267,7 @@ def run(gui_config_file=None):
 
     QApplication.setDesktopSettingsAware(False)
 
-    print ("TODO Qt4_start")
-    #QtCore.QObject.connect(main_application,
-    #                       QtCore.SIGNAL("lastWindowClosed()"),
-    #                       main_application.quit)
+    main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
     # post event for GUI creation

@@ -72,18 +72,18 @@ import smtplib
 
 import BlissFramework
 if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5 import QtCore
+    from PyQt5.QtCore import Qt, pyqtSignal
     from PyQt5.QtWidgets import *
     from PyQt5.QtGui import QBrush
     StringList = list
 else:
-    from PyQt4 import QtCore
+    from PyQt4.QtCore import Qt, QStringList, pyqtSignal
     from PyQt4.QtGui import *
 
     if sys.version_info > (3, 0):
         StringList = list
     else:
-        StringList = QtCore.QStringList
+        StringList = QStringList
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -115,7 +115,7 @@ class CustomTreeWidget(QTreeWidget):
     def add_log_line(self, record):
         msg = record.getMessage().replace('\n', ' ').strip()
         try: 
-            info_str_list = QtCore.QStringList()
+            info_str_list = QStringList()
         except:
             info_str_list = []
 
@@ -155,7 +155,7 @@ class CustomTreeWidget(QTreeWidget):
 
     def save_log(self):
         self.copy_log()
-        filename = QtCore.QString(QFileDialog.getSaveFileName(\
+        filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save under", "/tmp"))
         if len(filename) > 0:
             log_file = open(filename, "w")
@@ -211,8 +211,11 @@ class Submitfeedback(QWidget):
         # Other ---------------------------------------------------------------
         self.message_textedit.setToolTip("Write here your comments or feedback")
         self.submit_button.setText('Submit')
-        print "TODO setUsesTextLabel"
-        #self.submit_button.setUsesTextLabel(True)
+        if hasattr(self.submit_button, "setUsesTextLabel"):  
+            self.submit_button.setUsesTextLabel(True)
+        elif hasattr(self.submit_button, "setToolButtonStyle"):
+            self.submit_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
         self.submit_button.setIcon(Qt4_Icons.load_icon('Envelope'))
         self.submit_button.setToolTip("Click here to send your feedback " + \
                                       "to the authors of this software")
@@ -270,6 +273,8 @@ class Qt4_LogViewBrick(BlissWidget):
                 "feedback":"Submits a feedback email about this software",
                 "details":"Detailed messages, including warnings and errors",
                 "debug":"Debug messages; please disregard them"}
+
+    resetUnreadMessagesSignal = pyqtSignal()
 
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
@@ -364,7 +369,7 @@ class Qt4_LogViewBrick(BlissWidget):
     def tabSelected(self, tab_name):
         if self["appearance"] == "list":
             if tab_name == self['myTabLabel']:
-                self.emit(QtCore.SIGNAL("resetUnreadMessages"), (True, ))
+                self.resetUnreadMessagesSignal.emit(True)
 
     def appendLogRecord(self, record):
         rec_level = record.getLevel()
@@ -388,7 +393,7 @@ class Qt4_LogViewBrick(BlissWidget):
                     tab_label = "%s (%d)" % (tab.tab_label, tab.unread_messages)
                     self.tab_widget.setTabText(self.tab_widget.indexOf(tab), tab_label)
         elif self["appearance"] == "list":
-            self.emit(QtCore.SIGNAL("incUnreadMessages"), (1, True, ))
+            self.incUnreadMessagesSignal.emit(1, True)
 
 
     def resetUnreadMessages(self, tab_index):

@@ -76,7 +76,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_ledit = QLineEdit(self.new_value_widget)
         #self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QComboBox(self.new_value_widget)
-        self.units_combobox.addItems(["keV", chr(197)]) 
+        self.units_combobox.addItems(["keV", u"\u212B"]) 
         self.stop_button = QPushButton(self.new_value_widget)        
         self.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
@@ -197,7 +197,7 @@ class Qt4_EnergyBrick(BlissWidget):
         energy_value_str = self['kevFormatString'] % energy_value
         wavelength_value_str = self['angFormatString'] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
-        self.wavelength_ledit.setText("%s %s" %(wavelength_value_str, chr(197)))
+        self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def current_value_changed(self):
         """
@@ -262,7 +262,7 @@ class Qt4_EnergyBrick(BlissWidget):
             self.group_box.setTitle("Wavelength")
             self.new_value_ledit.setToolTip(\
                  "Wavelength limits %.4f : %.4f %s" % \
-                 (value_limits[0], value_limits[1], chr(197)))
+                 (value_limits[0], value_limits[1], u"\u212B"))
         self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
    
     def stop_clicked(self):

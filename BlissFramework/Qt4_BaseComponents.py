@@ -193,6 +193,8 @@ class BlissWidget(QFrame, Connectable.Connectable):
 
     _applicationEventFilter = InstanceEventFilter(None)
 
+    widgetSynchronizeSignal = pyqtSignal([])
+
     @staticmethod
     def setRunMode(mode):
         """

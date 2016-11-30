@@ -541,8 +541,6 @@ class WindowDisplayWidget(QScrollArea):
                                QSizePolicy.Expanding)
             self.currentChanged.connect(self._page_changed)
 
-            print dir(self)
-
         def _page_changed(self, index):
             """Page changed event"""
 
@@ -622,9 +620,11 @@ class WindowDisplayWidget(QScrollArea):
                         slot_name = "showPage_%s" % page["label"].replace(' ', '_')
                         getattr(self, slot_name)()
                         page["hidden"] = False
+                        self.setCurrentWidget(page["widget"])
                     else:
                         slot_name = "showPage_%s" % page["label"].replace(' ', '_')
                         getattr(self, slot_name)()
+                        self.setCurrentWidget(page["widget"])
             try:
                 # LNLS
                 # python2.7
@@ -956,8 +956,13 @@ class WindowDisplayWidget(QScrollArea):
                     new_item.setTitle(item_cfg["properties"]["label"])
 
                 new_item.layout().setSpacing(item_cfg["properties"]["spacing"])
-                print "TODO setMargin(item_"
-                #new_item.layout().setMargin(item_cfg["properties"]["margin"])
+                if hasattr(new_item.layout(), "setContentsMargins"):
+                    new_item.layout().setContentsMargins(item_cfg["properties"]["margin"],
+                                                         item_cfg["properties"]["margin"],
+                                                         item_cfg["properties"]["margin"],
+                                                         item_cfg["properties"]["margin"])
+                elif hasattr(new_item.layout(), "setMargins"):
+                    new_item.layout().setMargin(item_cfg["properties"]["margin"])
                 frame_style = QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"] != "default":
                     frame_style = getattr(QFrame,
@@ -996,7 +1001,6 @@ class WindowDisplayWidget(QScrollArea):
                     slot_name = "hidePage_%s" % str(tab.tabText(tab.currentIndex()))
                     slot_name = slot_name.replace(" ", "_")
                     getattr(tab, slot_name)()
-                    #QtGui.QApplication.emit(QtCore.SIGNAL('tab_closed'), tab, slotName)
 
                 def current_page_changed(index):
                     item_cfg.notebookPageChanged(new_item.tabText(index))
