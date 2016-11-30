@@ -79,6 +79,11 @@ class TwoAxisPlotWidget(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding,
                            QSizePolicy.Expanding)
 
+        self.clearcurves = self.clear 
+
+    def setTitle(self, title):
+        self._two_axis_figure_canvas.set_title(title)
+
     def clear(self):
         """
         Descript. :
@@ -136,6 +141,27 @@ class TwoAxisPlotWidget(QWidget):
 
     def showGrid(self):
         pass
+
+    def newcurve(self, label, x_array, y_array):
+        self._two_axis_figure_canvas.add_curve(y_array, x_array, label=label)
+
+    def setx1axislimits(self, x_min, x_max):
+        self._two_axis_figure_canvas.axes.set_xlim((x_min, x_max))
+
+    def xlabel(self, label):
+        self._two_axis_figure_canvas.axes.axes.set_xlabel(label)
+
+    def ylabel(self, label):
+        self._two_axis_figure_canvas.axes.axes.set_ylabel(label)
+
+    def setx1timescale(self, state):
+        pass
+
+    def replot(self):
+        self._two_axis_figure_canvas.axes.relim()
+        self._two_axis_figure_canvas.axes.autoscale_view()
+        self._two_axis_figure_canvas.fig.canvas.draw()
+        self._two_axis_figure_canvas.fig.canvas.flush_events()
 
 class MplCanvas(FigureCanvas):
     """

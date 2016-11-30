@@ -44,24 +44,19 @@ the fit configuration file well as
 """
 import os
 import logging
-
+import numpy as np
 
 import BlissFramework
 if BlissFramework.get_gui_version() == "QT5":
     from PyQt5.QtWidgets import QVBoxLayout
+
+    from PyMca5.PyMca import McaAdvancedFit
+    from PyMca5.PyMca import ConfigDict
 else:
     from PyQt4.QtGui import QVBoxLayout
 
-#import numpy.oldnumeric as Numeric
-import numpy as np
-try:
-   from PyMca import McaAdvancedFit
-   from PyMca import ConfigDict
-   _pymca_exists = True
-except:
-   _pymca_exists = False
-   print ("PyMca not available")
-
+    from PyMca import McaAdvancedFit
+    from PyMca import ConfigDict
 
 from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -73,12 +68,8 @@ class McaSpectrumWidget(BlissWidget):
 
         self.defineSlot('set_data',())
     
-        if _pymca_exists:   
-            self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
-            self.mcafit_widget.dismissButton.hide()
-        else:
-            self.mcafit_widget = TwoAxisPlotWidget(self)
-            
+        self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
+        self.mcafit_widget.dismissButton.hide()
        
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.mcafit_widget)  

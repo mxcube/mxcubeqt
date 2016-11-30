@@ -18,19 +18,21 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import BlissFramework
+PYMCA_EXISTS = False
+
 if BlissFramework.get_gui_version() == "QT5":
     from PyQt5.QtCore import Qt
     from PyQt5.QtWidgets import *
+    from Qt4_matplot_widget import TwoAxisPlotWidget as Graph
 else:
     from PyQt4.QtCore import Qt, QObject, SIGNAL
     from PyQt4.QtGui import *
 
-PYMCA_EXISTS = False
-try:
-    from PyMca.QtBlissGraph import QtBlissGraph as Graph
-    PYMCA_EXISTS = True
-except:
-    from Qt4_matplot_widget import TwoAxisPlotWidget as Graph    
+    try:
+        from PyMca.QtBlissGraph import QtBlissGraph as Graph
+        PYMCA_EXISTS = True
+    except:
+        from Qt4_matplot_widget import TwoAxisPlotWidget as Graph    
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -50,7 +52,7 @@ class PymcaPlotWidget(QWidget):
         self.axis_y_array = []
 
         self.realtime_plot = realtime_plot
-         
+   
         self.pymca_graph = Graph(self)
         self.pymca_graph.showGrid()
         self.info_label = QLabel("", self)  
@@ -65,7 +67,9 @@ class PymcaPlotWidget(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding,
                            QSizePolicy.Expanding)
 
-        if PYMCA_EXISTS:
+        if BlissFramework.get_gui_version() == "QT5":
+             pass
+        else:
              QObject.connect(self.pymca_graph,
                              SIGNAL("QtBlissGraphSignal"),
                              self.handle_graph_signal)

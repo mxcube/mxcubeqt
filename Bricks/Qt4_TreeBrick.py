@@ -813,7 +813,7 @@ class Qt4_TreeBrick(BlissWidget):
         """
         Descript. :
         """
-        self.populate_energy_scan_widgee.emit(item)
+        self.populate_energy_scan_widget.emit(item)
 
     def show_xrf_spectrum_tab(self, item):
         """
