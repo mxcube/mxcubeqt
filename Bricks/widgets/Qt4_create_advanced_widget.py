@@ -274,14 +274,15 @@ class CreateAdvancedWidget(CreateTaskBase):
      
             exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
+            print exp_type
             if exp_type == "MeshScan":
-                dc.run_processing_parallel = "MeshScan"
                 tasks.append(dc)
-            elif exp_type == "XrayCentring":
+            elif exp_type == "XrayCentering":
                 xray_centering = queue_model_objects.XrayCentering(\
                    dc, sample.crystals[0])
-                dc.run_processing_parallel = "XrayCentering"
                 tasks.append(xray_centering)
+
+            dc.run_processing_parallel = exp_type
             self._path_template.run_number += 1
 
             return tasks

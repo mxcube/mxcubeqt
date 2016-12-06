@@ -46,6 +46,7 @@ class PlateNavigatorWidget(QtGui.QWidget):
         _main_hlayout = QtGui.QHBoxLayout(self)
         _main_hlayout.addWidget(self.plate_navigator_table)
         _main_hlayout.addWidget(self.plate_navigator_cell)
+        _main_hlayout.addStretch()
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -92,8 +93,8 @@ class PlateNavigatorWidget(QtGui.QWidget):
             col = new_location[1]
             pos_x = new_location[2]
             pos_y = new_location[3]
-            pos_x *= self.plate_navigator_cell.width()
-            pos_y *= self.plate_navigator_cell.height()
+            #pos_x *= self.plate_navigator_cell.width()
+            #pos_y *= self.plate_navigator_cell.height()
             self.navigation_item.set_navigation_pos(pos_x, pos_y)
             self.plate_navigator_cell.update()
             if self.__current_location:
@@ -103,6 +104,7 @@ class PlateNavigatorWidget(QtGui.QWidget):
                                                    empty_item)
             new_item = QtGui.QTableWidgetItem(Qt4_Icons.load_icon("sample_axis"), "")
             self.plate_navigator_table.setItem(row, col - 1, new_item)
+
             self.__current_location = new_location
 
     def init_plate_view(self, plate_manipulator_hwobj):
@@ -139,9 +141,11 @@ class PlateNavigatorWidget(QtGui.QWidget):
         table_width = 25 * (self.num_cols + 1)
         self.plate_navigator_table.setFixedWidth(table_width)
         self.plate_navigator_table.setFixedHeight(table_height)
-        self.plate_navigator_cell.setFixedHeight(table_height)
-        #self.plate_navigator_cell.setFixedWidth(50)
+        #self.plate_navigator_cell.setFixedHeight(table_height)
+        #self.plate_navigator_cell.setFixedWidth(55)
         self.setFixedHeight(table_height + 2)
+
+        # TODO replace 150 with actual size
         self.navigation_item.set_size(50, table_height)
         self.navigation_item.set_num_drops_per_cell(plate_info['num_drops'])
         self.refresh_plate_location()
@@ -203,10 +207,13 @@ class NavigationItem(QtGui.QGraphicsItem):
         painter.setPen(pen)
         if self.__num_drops:
             for drop_index in range(self.__num_drops):
+                pos_x = self.scene().width() / 2
                 pos_y = float(drop_index + 1) / (self.__num_drops + 1) * \
                      self.scene().height()
-                painter.drawLine(58, pos_y - 2, 62, pos_y + 2)
-                painter.drawLine(62, pos_y - 2, 58, pos_y + 2)
+                painter.drawLine(pos_x - 2, pos_y - 2,
+                                 pos_x + 2, pos_y + 2)
+                painter.drawLine(pos_x - 2, pos_y + 2,
+                                 pos_x + 2, pos_y - 2)
         pen.setColor(QtCore.Qt.blue)
         painter.setPen(pen)
         if self.__navigation_posx and self.__navigation_posy:
@@ -219,8 +226,8 @@ class NavigationItem(QtGui.QGraphicsItem):
         """
         Descript. :
         """
-        self.__navigation_posx = pos_x
-        self.__navigation_posy = pos_y
+        self.__navigation_posx = pos_x * self.scene().width()
+        self.__navigation_posy = pos_y * self.scene().height()
         self.scene().update()
 
     def set_num_drops_per_cell(self, num_drops):

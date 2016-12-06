@@ -549,8 +549,9 @@ class DataCollectTree(QtGui.QWidget):
         self.selection_changed_cb(items)        
 
         checked_items = self.get_checked_items()
-        self.collect_button.setEnabled(len(checked_items) > 1 and \
-                                       self.enable_collect_condition)
+        self.collect_button.setEnabled((len(checked_items) > 1 and \
+                                       self.enable_collect_condition) or \
+                                       self.collecting)
 
     def add_empty_task_node(self):
         """
@@ -867,6 +868,8 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         self.beamline_setup_hwobj.shape_history_hwobj.de_select_all()
+
+        collection_par_list = []
         for item in checked_items:
             # update the run-number text incase of re-collect
             #item.setText(0, item.get_model().get_name())
@@ -874,6 +877,19 @@ class DataCollectTree(QtGui.QWidget):
             #Clear status
             item.setText(1, "")
             item.reset_style()
+            if isinstance(item.get_model(), queue_model_objects.DataCollection):
+                collection_par_list.append(item.get_model().as_dict())
+        invalid_parameters = self.beamline_setup_hwobj.\
+            check_collection_parameters(collection_par_list)
+        if len(invalid_parameters) > 0:
+            msg = "Collection parameter "
+            for item in invalid_parameters:
+                msg = msg + "%s, " % item
+            msg = msg[:-2]
+            msg += " is out of range. Correct the parameter(s) " + \
+                   "and run queue again"
+            logging.getLogger("GUI").error(msg)
+            return
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)
@@ -927,9 +943,7 @@ class DataCollectTree(QtGui.QWidget):
 
     def queue_entry_execution_finished(self, queue_entry, status):
         view_item = queue_entry.get_view()
-        if isinstance(view_item, Qt4_queue_item.TaskQueueItem) and not \
-           isinstance(view_item, Qt4_queue_item.SampleCentringQueueItem) and not \
-           isinstance(view_item, Qt4_queue_item.DataCollectionGroupQueueItem):
+        if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
             item_model = queue_entry.get_data_model()
             item_details = ""
             sample_model = item_model.get_parent().get_parent()
