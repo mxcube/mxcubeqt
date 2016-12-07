@@ -661,3 +661,6 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.energy_ledit.setEnabled(state)
         self.acq_widget_layout.mad_cbox.setEnabled(state)
         self.acq_widget_layout.energies_combo.setEnabled(state)
+
+    def check_parameter_conflict(self):
+        return self._acquisition_mib.validate_all()

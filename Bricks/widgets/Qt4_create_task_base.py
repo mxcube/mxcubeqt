@@ -526,6 +526,18 @@ class CreateTaskBase(QtGui.QWidget):
                       'adding to queue')
             result = False
 
+        if self._acq_widget is not None:
+            parameter_conflict =  self._acq_widget.check_parameter_conflict()
+            if len(parameter_conflict) > 0:
+                msg = "Entered value of " 
+                for item in parameter_conflict:
+                    msg = msg + "%s, " % item
+                msg = msg[:-2]
+                msg += " is out of range. Correct the input value(s) before " + \
+                       "adding item to the queue"
+                logging.getLogger("GUI").error(msg)
+                result = False
+
         return result
             
     # Called by the owning widget (task_toolbox_widget) to create

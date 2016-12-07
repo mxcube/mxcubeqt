@@ -64,7 +64,6 @@ class DataModelInputBinder(object):
                         raise
                 else:
                     dispatcher.send("model_update", self.__model, field_name, self)
-        #self.bindings[field_name][3] = False
 
     def __ledit_text_edited(self, field_name, widget, new_value, type_fn, validator):
         self.bindings[field_name][3] = True
@@ -82,8 +81,8 @@ class DataModelInputBinder(object):
 
     def __validated(self, field_name, validator, widget, new_value):
         if validator:
-            if validator.validate(new_value, widget.cursorPosition())[0] \
-                    == QtGui.QValidator.Acceptable:
+            if validator.validate(new_value, widget.cursorPosition())[0] == \
+               QtGui.QValidator.Acceptable:
                 if self.bindings[field_name][3]:
                     Qt4_widget_colors.set_widget_color(widget,
                                            Qt4_widget_colors.LINE_EDIT_CHANGED,
@@ -217,13 +216,12 @@ class DataModelInputBinder(object):
                                             validator,
                                             widget, 
                                             widget.text()):
-                        result.append(key)
+                        result.append(key.title().replace('_', ' '))
                 elif isinstance(widget, QtGui.QComboBox):
                     pass
                 elif isinstance(widget, QtGui.QCheckBox) or \
                         isinstance(widget, QtGui.QRadioButton):
                     pass
-
         return result
 
 

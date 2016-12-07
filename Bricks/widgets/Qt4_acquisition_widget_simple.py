@@ -396,4 +396,4 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         """
         Descript. :
         """
-        return len(self._acquisition_mib.validate_all()) > 0
+        return self._acquisition_mib.validate_all()

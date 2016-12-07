@@ -81,6 +81,7 @@ class Qt4_TreeBrick(BlissWidget):
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_widgets", ())
+        self.defineSignal("diffractometer_ready", ())
 
         # Hiding and showing the tabs
         self.defineSignal("hide_sample_tab", ())
@@ -431,13 +432,12 @@ class Qt4_TreeBrick(BlissWidget):
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
-       
-        if queue_entry.get_type_str() not in ["Sample", "Basket", ""]: 
+      
+        if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
             BlissWidget.set_status_info("action", "%s : %s" % \
                 (queue_entry.get_type_str(), status))
 
     def queue_paused_handler(self, status):
-        self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_paused_handler(status)
         BlissWidget.set_status_info("status", "Queue paused")
 
@@ -455,7 +455,7 @@ class Qt4_TreeBrick(BlissWidget):
         BlissWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
-        self.emit(QtCore.SIGNAL("enable_widgets"), status) 
+        self.emit(QtCore.SIGNAL("diffractometer_ready"), status) 
         if status:
             BlissWidget.set_status_info("diffractometer", "Ready")
         else:
