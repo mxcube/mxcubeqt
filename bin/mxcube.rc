@@ -1,8 +1,0 @@
-#!/bin/bash
-export http_proxy=http://172.19.43.1:8080
-export MXCUBE_ROOT=/927bis/ccd/gitRepos/mxcube_from_scratch/mxcube #/home/experiences/proxima2a/com-proxima2a/mxcube_v2
-export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT:$MXCUBE_ROOT/HardwareObjects:$MXCUBE_ROOT/HardwareObjects/SOLEIL:$MXCUBE_ROOT/HardwareObjects/sample_changer
-export PYTHONPATH=/home/experiences/proxima2a/com-proxima2a/python_modules/lib/python2.6/site-packages:/home/experiences/proxima2a/com-proxima2a/MxCuBE/libs/lib/python2.6/site-packages:/home/experiences/proxima2a/com-proxima2a/bin:$PYTHONPATH
-export PYTHONPATH=$PYTHONPATH:/opt
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/Lima/lib
-export XML_FILES_PATH=$MXCUBE_ROOT/HardwareObjects.xml/PX2
