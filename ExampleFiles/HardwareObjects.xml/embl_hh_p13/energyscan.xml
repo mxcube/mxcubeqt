@@ -9,6 +9,8 @@
   <channel type="tine" name="energyScanStatus" tinename="/P13/fluorescence-scan/fls-scan" attach="event">status</channel>	
   <command type="tine" name="energyScanAbort" tinename="/P13/fluorescence-scan/fls-scan">abort</command>
   <theoritical_edge_threshold>5</theoritical_edge_threshold>
+  <numPoints>60</numPoints>
+
   <elements>
     <element>
       <symbol>K</symbol>
@@ -198,6 +200,10 @@
     <element>
       <symbol>Se</symbol>
       <energy>K</energy>
+    </element>
+     <element>
+      <symbol>Tb</symbol>
+      <energy>L</energy>
     </element>
   </elements>
   <mad>

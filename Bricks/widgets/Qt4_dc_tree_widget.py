@@ -90,6 +90,7 @@ class DataCollectTree(QtGui.QWidget):
         #self.clear_centred_positions_cb = None
         self.run_cb = None
         self.item_menu = None
+        self.item_history_dict = {}
 
         # Signals ------------------------------------------------------------
 
@@ -104,6 +105,7 @@ class DataCollectTree(QtGui.QWidget):
         self.play_icon = Qt4_Icons.load_icon("VCRPlay.png")
         self.stop_icon = Qt4_Icons.load_icon("Stop.png")
         self.ispyb_icon = Qt4_Icons.load_icon("SampleChanger2.png")
+        self.star_icon = Qt4_Icons.load_icon("star")
         self.caution_icon = Qt4_Icons.load_icon("Caution2.png")
         
         self.button_widget = QtGui.QWidget(self)                
@@ -139,17 +141,12 @@ class DataCollectTree(QtGui.QWidget):
         self.continue_button.setToolTip("Pause after current data collection")
 
         self.tree_splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
-        current_widget = QtGui.QWidget(self.tree_splitter)
-        current_label = QtGui.QLabel("<b>Current</b>", current_widget)
-        current_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.sample_tree_widget = QtGui.QTreeWidget(self)
-
-        history_widget = QtGui.QWidget(self.tree_splitter)
-        history_widget.hide()
-        history_label = QtGui.QLabel("<b>History</b>", history_widget)
-        history_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.history_tree_widget = QtGui.QTreeWidget(history_widget)
-        
+        self.sample_tree_widget = QtGui.QTreeWidget(self.tree_splitter)
+        self.history_table_widget = QtGui.QTableWidget(self.tree_splitter)
+        self.history_enable_cbox = QtGui.QCheckBox(\
+             "Display history view", self)
+        self.history_enable_cbox.setChecked(True)
+ 
         self.plate_navigator_cbox = QtGui.QCheckBox("Plate navigator", self)
         self.plate_navigator_widget = PlateNavigatorWidget(self)
         self.plate_navigator_widget.hide()
@@ -166,21 +163,10 @@ class DataCollectTree(QtGui.QWidget):
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
 
-        current_widget_layout = QtGui.QVBoxLayout(current_widget)
-        current_widget_layout.addWidget(current_label)
-        #current_widget_layout.addWidget(self.sample_tree_widget)
-        current_widget_layout.setContentsMargins(2, 2, 2, 2)
-        current_widget_layout.setSpacing(1)
-
-        history_widget_layout = QtGui.QVBoxLayout(history_widget)
-        history_widget_layout.addWidget(history_label)
-        history_widget_layout.addWidget(self.history_tree_widget)
-        history_widget_layout.setContentsMargins(2, 2, 2, 2)
-        history_widget_layout.setSpacing(1)
-        
         main_layout = QtGui.QVBoxLayout(self)
-        main_layout.addWidget(self.sample_tree_widget)
-        #main_layout.addWidget(self.tree_splitter)
+        #main_layout.addWidget(self.sample_tree_widget)
+        main_layout.addWidget(self.tree_splitter)
+        main_layout.addWidget(self.history_enable_cbox)
         main_layout.addWidget(self.plate_navigator_cbox)
         main_layout.addWidget(self.plate_navigator_widget)
         main_layout.addWidget(self.button_widget)
@@ -207,13 +193,16 @@ class DataCollectTree(QtGui.QWidget):
         self.confirm_dialog.continueClickedSignal.connect(self.collect_items)
         self.continue_button.clicked.connect(self.continue_button_click)
 
-        self.history_tree_widget.itemDoubleClicked.connect(self.item_double_click)
+        self.history_table_widget.cellDoubleClicked.\
+             connect(self.history_table_double_click)
+        self.history_enable_cbox.stateChanged.\
+             connect(self.history_table_widget.setVisible)
 
         self.plate_navigator_cbox.stateChanged.\
              connect(self.use_plate_navigator)
 
         # Other ---------------------------------------------------------------    
-        self.sample_tree_widget.setColumnCount(3)
+        self.sample_tree_widget.setColumnCount(2)
         #self.sample_tree_widget.setColumnWidth(0, 150)
         self.sample_tree_widget.setColumnWidth(1, 130)
         self.sample_tree_widget.header().setDefaultSectionSize(280)
@@ -224,14 +213,29 @@ class DataCollectTree(QtGui.QWidget):
         self.setAttribute(QtCore.Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
 
-        self.history_tree_widget.setColumnCount(3)
-        self.history_tree_widget.setColumnWidth(0, 80)
-        self.history_tree_widget.setColumnWidth(1, 50)
-        self.history_tree_widget.header().setDefaultSectionSize(80)
-        self.history_tree_widget.header().hide()
-        self.history_tree_widget.setRootIsDecorated(False)
-        #self.sample_tree_widget.setSelectionMode(\
-        #     QtGui.QAbstractItemView.MultiSelection)
+        font = self.history_table_widget.font()
+        font.setPointSize(8)
+        self.history_table_widget.setFont(font)
+        self.history_table_widget.setEditTriggers(\
+             QtGui.QAbstractItemView.NoEditTriggers)
+        self.history_table_widget.setColumnCount(5)
+        self.history_table_widget.setHorizontalHeaderItem(\
+             0, QtGui.QTableWidgetItem("Sample"))
+        self.history_table_widget.setHorizontalHeaderItem(\
+             1, QtGui.QTableWidgetItem("Time"))
+        self.history_table_widget.setHorizontalHeaderItem(\
+             2, QtGui.QTableWidgetItem("Type"))
+        self.history_table_widget.setHorizontalHeaderItem(\
+             3, QtGui.QTableWidgetItem("Status"))
+        self.history_table_widget.setHorizontalHeaderItem(\
+             4, QtGui.QTableWidgetItem("Details"))
+        self.history_table_widget.setAlternatingRowColors(True)
+        self.history_table_widget.setSelectionBehavior(\
+             QtGui.QAbstractItemView.SelectRows)
+        #self.history_table_widget.horizontalHeader().setSortIndicatorShown(True)
+        self.history_table_widget.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+        self.history_table_widget.horizontalHeader().setMaximumHeight(18)
+      
 
     def init_plate_navigator(self, plate_navigator_hwobj):
         self.plate_navigator_widget.init_plate_view(plate_navigator_hwobj)
@@ -267,6 +271,13 @@ class DataCollectTree(QtGui.QWidget):
             add_remove = True
             add_details = False
             self.item_menu.addAction("Rename", self.rename_treewidget_item)
+            if item.has_star():
+                self.item_menu.addAction("Remove star", self.remove_star_treewidget_item)
+            else:
+                self.item_menu.addAction(self.star_icon,
+                                         "Add star",
+                                         self.add_star_treewidget_item)
+           
             if isinstance(item, Qt4_queue_item.TaskQueueItem):
                 if not isinstance(item.get_model(),
                                   queue_model_objects.SampleCentring):
@@ -322,6 +333,9 @@ class DataCollectTree(QtGui.QWidget):
         """
         self.show_details()
 
+    def history_table_double_click(self, row, col):
+        self.show_details([self.item_history_dict[row]])
+
     def item_click(self):
         """
         Descript. :
@@ -370,11 +384,12 @@ class DataCollectTree(QtGui.QWidget):
             
             self.collect_items(items)
 
-    def show_details(self):
+    def show_details(self, items=None):
         """
         Descript. :
         """
-        items = self.get_selected_items()
+        if items is None:
+            items = self.get_selected_items()
         if len(items) == 1:
             item = items[0]
             if isinstance(item, Qt4_queue_item.SampleQueueItem):
@@ -411,6 +426,20 @@ class DataCollectTree(QtGui.QWidget):
             items[0].setFlags(QtCore.Qt.ItemIsSelectable |
                               QtCore.Qt.ItemIsEnabled)
             items[0].get_model().set_name(items[0].text(0))
+
+    def add_star_treewidget_item(self):
+        items = self.get_selected_items()
+        for item in items:
+            item.set_star(True)
+            if item.has_star():
+                item.setIcon(0, self.star_icon) 
+
+    def remove_star_treewidget_item(self):
+        items = self.get_selected_items()
+        for item in items:
+            item.set_star(False)        
+            if not item.has_star():
+                item.setIcon(0, QtGui.QIcon())
 
     def mount_sample(self):
         """
@@ -520,8 +549,9 @@ class DataCollectTree(QtGui.QWidget):
         self.selection_changed_cb(items)        
 
         checked_items = self.get_checked_items()
-        self.collect_button.setEnabled(len(checked_items) > 1 and \
-                                       self.enable_collect_condition)
+        self.collect_button.setEnabled((len(checked_items) > 1 and \
+                                       self.enable_collect_condition) or \
+                                       self.collecting)
 
     def add_empty_task_node(self):
         """
@@ -838,6 +868,8 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         self.beamline_setup_hwobj.shape_history_hwobj.de_select_all()
+
+        collection_par_list = []
         for item in checked_items:
             # update the run-number text incase of re-collect
             #item.setText(0, item.get_model().get_name())
@@ -845,6 +877,19 @@ class DataCollectTree(QtGui.QWidget):
             #Clear status
             item.setText(1, "")
             item.reset_style()
+            if isinstance(item.get_model(), queue_model_objects.DataCollection):
+                collection_par_list.append(item.get_model().as_dict())
+        invalid_parameters = self.beamline_setup_hwobj.\
+            check_collection_parameters(collection_par_list)
+        if len(invalid_parameters) > 0:
+            msg = "Collection parameter "
+            for item in invalid_parameters:
+                msg = msg + "%s, " % item
+            msg = msg[:-2]
+            msg += " is out of range. Correct the parameter(s) " + \
+                   "and run queue again"
+            logging.getLogger("GUI").error(msg)
+            return
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)
@@ -898,47 +943,44 @@ class DataCollectTree(QtGui.QWidget):
 
     def queue_entry_execution_finished(self, queue_entry, status):
         view_item = queue_entry.get_view()
-        item_model = queue_entry.get_data_model()
+        if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
+            item_model = queue_entry.get_data_model()
+            item_details = ""
+            sample_model = item_model.get_parent().get_parent()
 
-        item_type = None
-        item_icon = None
-        item_details = ""
+            if isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
+                sample_model = item_model.get_parent().get_parent()
+                item_details = "%.1f%s, %.3f sec, %d images" % (\
+                   item_model.as_dict()["osc_range"],
+                   u"\u00b0",
+                   item_model.as_dict()["exp_time"],
+                   item_model.as_dict()["num_images"])
 
-        if isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
-            collect_par = item_model.as_dict()
-            item_details = "%d images" % collect_par["num_images"]
-            if item_model.is_helical():
-                item_type = "Helical"
-                item_icon = "Line"
-            elif item_model.is_mesh():
-                item_type = "Mesh"
-                item_icon = "Grid"
+            self.history_table_widget.insertRow(0)
+            
+            self.history_table_widget.setItem(\
+                 0, 0, QtGui.QTableWidgetItem(sample_model.get_display_name()))
+            self.history_table_widget.setItem(\
+                 0, 1, QtGui.QTableWidgetItem(datetime.now().strftime("%H:%M:%S")))
+            self.history_table_widget.setItem(\
+                 0, 2, QtGui.QTableWidgetItem(queue_entry.get_type_str()))
+            status_item = QtGui.QTableWidgetItem(status)
+            self.history_table_widget.setItem(0, 3, status_item)
+            if status == "Successful":
+                status_item.setBackground(QtGui.QBrush(Qt4_widget_colors.LIGHT_GREEN))
             else:
-                item_type = "OSC"
-                item_icon = "Point"
-        elif isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
-            item_type = "Energy scan"
-            item_icon = "EnergyScan2"
-        elif isinstance(view_item, Qt4_queue_item.XRFSpectrumQueueItem):
-            item_type = "XRF spectrum"
-            item_icon = "LineGraph"
+                status_item.setBackground(QtGui.QBrush(Qt4_widget_colors.LIGHT_RED)) 
 
-        if item_type:
-            info_str_list = QtCore.QStringList()
-            info_str_list.append(datetime.now().strftime("%H:%M:%S"))
-            info_str_list.append(item_type)
-            info_str_list.append(status)
-            info_str_list.append(item_details)
-
-            temp_treewidget_item = QtGui.QTreeWidgetItem(info_str_list)
-            if status != "Successful": 
-                for row in range(4):
-                    temp_treewidget_item.setBackgroundColor(row, Qt4_widget_colors.LIGHT_RED)
-            if item_icon:
-                temp_treewidget_item.setIcon(0, Qt4_Icons.load_icon(item_icon))
-            self.history_tree_widget.insertTopLevelItem(0, temp_treewidget_item)
-
-        self.delete_empty_finished_items()
+            self.history_table_widget.setItem(\
+                 0, 4, QtGui.QTableWidgetItem(item_details))
+            self.history_table_widget.resizeRowsToContents()
+            self.history_table_widget.resizeColumnsToContents()
+            #self.history_table_widget.setSortingEnabled(True)
+            self.history_table_widget.setRowHeight(0, 17)
+            self.history_table_widget.setVerticalHeaderItem(\
+                 0, QtGui.QTableWidgetItem(str(self.history_table_widget.rowCount())))
+            self.item_history_dict[self.history_table_widget.rowCount() - 1] = view_item
+            #self.delete_empty_finished_items()
 
     def queue_execution_completed(self, status):
         """
@@ -973,8 +1015,9 @@ class DataCollectTree(QtGui.QWidget):
         it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
         while item: 
-            if item.checkState(0) > 0:
-               checked_items.append(item)   
+            if item.checkState(0) > 0 and not \
+               item.isHidden():
+                checked_items.append(item)
             it += 1
             item = it.value()
         return checked_items
@@ -1234,6 +1277,10 @@ class DataCollectTree(QtGui.QWidget):
                 if do_it:
                     item.setOn(False)        
                 """
+             
+            if item.has_star():
+                item.setIcon(0, Qt4_Icons.load_icon("star"))
+
             it += 1
             item = it.value()
 
@@ -1257,7 +1304,10 @@ class DataCollectTree(QtGui.QWidget):
                          conflict = True
                          item.setIcon(0, self.caution_icon)
                      else:
-                         item.setIcon(0, QtGui.QIcon())
+                         if item.has_star():
+                             item.setIcon(0, self.star_icon)
+                         else:
+                             item.setIcon(0, QtGui.QIcon())
                          
             it += 1
             item = it.value()
@@ -1282,7 +1332,8 @@ class DataCollectTree(QtGui.QWidget):
                       if not item.child(index).isHidden():
                           hide = False
                           break
-                  item.setHidden(hide)
+                  if hide:
+                      item.set_hidden(hide)
 
               self.item_iterator += 1
               item = self.item_iterator.value()

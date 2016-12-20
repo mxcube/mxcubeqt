@@ -102,8 +102,8 @@ class CreateHelicalWidget(CreateTaskBase):
         # Other ---------------------------------------------------------------
         for col in range(self._lines_widget.lines_treewidget.columnCount()):
             self._lines_widget.lines_treewidget.resizeColumnToContents(col)
-        self._processing_widget.processing_widget.\
-             run_processing_parallel_cbox.setChecked(False)
+        #self._processing_widget.processing_widget.\
+        #     run_processing_parallel_cbox.setChecked(False)
 
     def init_models(self):
         CreateTaskBase.init_models(self)

@@ -3,7 +3,7 @@
     <program>
       <executable>/to_be_defined/edna_queued_autoprocessing.sh</executable>
       <event>after</event>
-    </program>
+    </program> 
     <program>
       <executable>/to_be_defined/edna_thumbnails.sh</executable>
       <event>image</event>

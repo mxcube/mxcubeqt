@@ -71,6 +71,7 @@ class Qt4_ProgressBarBrick(BlissWidget):
         self.progress_bar.reset()
         self.progress_type_label.setText("")
         self.setEnabled(False)
+        BlissWidget.set_status_info("status", "")
 
     def step_progress(self, step):
         self.progress_bar.setValue(step)
@@ -84,6 +85,7 @@ class Qt4_ProgressBarBrick(BlissWidget):
         self.progress_type_label.setText(progress_type)
         self.number_of_steps = number_of_steps
         self.progress_bar.setMaximum(self.number_of_steps)
+        BlissWidget.set_status_info("status", progress_type)
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == "mnemonicList":

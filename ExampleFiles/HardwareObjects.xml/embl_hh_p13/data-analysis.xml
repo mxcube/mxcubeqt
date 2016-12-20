@@ -4,5 +4,4 @@
   <object href="/beam-info" role="beam"/>
   <edna_command>/to_be_defined/edna_characterisation.sh</edna_command>
   <edna_default_file>edna-defaults.xml</edna_default_file>
-  <dozor_command>/to_be_defined/edna_dozor.sh</dozor_command>
 </object>

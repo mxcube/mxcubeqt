@@ -1,4 +1,4 @@
-#
+
 #  Project: MXCuBE
 #  https://github.com/mxcube.
 #
@@ -68,7 +68,6 @@ class Qt4_TreeBrick(BlissWidget):
         self.filtered_lims_samples = None
 
         # Properties ---------------------------------------------------------- 
-        self.addProperty("holderLengthMotor", "string", "")
         self.addProperty("queue", "string", "/queue")
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
@@ -78,9 +77,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("scOneName", "string", "Sample changer")
         self.addProperty("scTwoName", "string", "Plate")
         self.addProperty("usePlateNavigator", "boolean", False)
+        self.addProperty("useHistoryView", "boolean", True)
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_widgets", ())
+        self.defineSignal("diffractometer_ready", ())
 
         # Hiding and showing the tabs
         self.defineSignal("hide_sample_tab", ())
@@ -276,6 +277,9 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(self.sample_changer_hwobj,
                              SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
+                self.connect(self.sample_changer_hwobj,
+                             SampleChanger.STATUS_CHANGED_EVENT,
+                             self.sample_changer_status_changed)
             if self.plate_manipulator_hwobj is not None:
                 self.connect(self.plate_manipulator_hwobj,
                              SampleChanger.STATE_CHANGED_EVENT,
@@ -326,6 +330,9 @@ class Qt4_TreeBrick(BlissWidget):
               self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
         #elif property_name == 'usePlateNavigator':
         #      self.dc_tree_widget.show_plate_navigator_cbox.setVisible(new_value)
+        elif property_name == 'useHistoryView':
+              self.dc_tree_widget.history_table_widget.setVisible(new_value)
+              self.dc_tree_widget.history_enable_cbox.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -421,24 +428,38 @@ class Qt4_TreeBrick(BlissWidget):
     def queue_entry_execution_started(self, queue_entry):
         self.emit(QtCore.SIGNAL("enable_widgets"), False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
+        BlissWidget.set_status_info("status", "Queue started")
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
+      
+        if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
+            BlissWidget.set_status_info("action", "%s : %s" % \
+                (queue_entry.get_type_str(), status))
 
     def queue_paused_handler(self, status):
-        self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_paused_handler(status)
+        BlissWidget.set_status_info("status", "Queue paused")
 
     def queue_execution_finished(self, status):
         self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_execution_completed(status)
+        if status == "Failed": 
+            BlissWidget.set_status_info("status", "Queue execution failed")
+        else:
+            BlissWidget.set_status_info("status", "")
 
     def queue_stop_handler(self, status):
         self.emit(QtCore.SIGNAL("enable_widgets"), True)
         self.dc_tree_widget.queue_stop_handler(status)
+        BlissWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
-        self.emit(QtCore.SIGNAL("enable_widgets"), status) 
+        self.emit(QtCore.SIGNAL("diffractometer_ready"), status) 
+        if status:
+            BlissWidget.set_status_info("diffractometer", "Ready")
+        else:
+            BlissWidget.set_status_info("diffractometer", "Not ready")
 
     def samples_from_lims(self, samples):
         """
@@ -645,6 +666,9 @@ class Qt4_TreeBrick(BlissWidget):
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
         Qt4_widget_colors.set_widget_color(self.sample_changer_widget.details_button,
                                            QtGui.QColor(s_color))
+
+    def sample_changer_status_changed(self, state):
+        BlissWidget.set_status_info("sc", state)
 
     def plate_info_changed(self):
         self.set_sample_pin_icon()
@@ -960,55 +984,56 @@ class Qt4_TreeBrick(BlissWidget):
     def filter_combo_changed(self, filter_index):
         """Filters sample treewidget based on the selected filter criteria:
            0 : No filter
-           1 : Sample name
-           2 : Protein name
-           3 : Basket index
-           4 : Executed
-           5 : Not executed
-           6 : OSC
-           7 : Helical
-           8 : Characterisation
-           9 : Energy Scan
-           10: XRF spectrum            
+           1 : Star 
+           2 : Sample name
+           3 : Protein name
+           4 : Basket index
+           5 : Executed
+           6 : Not executed
+           7 : OSC
+           8 : Helical
+           9 : Characterisation
+           10: Energy Scan
+           11: XRF spectrum            
         """
         self.sample_changer_widget.filter_ledit.setEnabled(\
-             filter_index in (1, 2, 3))
+             filter_index in (2, 3, 4))
         self.clear_filter()
-        if filter_index == 0:
-            self.clear_filter() 
-        else:
+        if filter_index > 0:
             item_iterator = QtGui.QTreeWidgetItemIterator(\
                   self.dc_tree_widget.sample_tree_widget)
             item = item_iterator.value()
             while item:
                   hide = False
                   item_model = item.get_model() 
-                  if filter_index == 4:
-                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                          hide = not item_model.is_executed()
+                  if filter_index == 1:
+                      hide = not item.has_star()
                   elif filter_index == 5:
                       if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
-                          hide = item_model.is_executed()
+                          hide = not item_model.is_executed()
                   elif filter_index == 6:
+                      if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                          hide = item_model.is_executed()
+                  elif filter_index == 7:
                       if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                           hide = item_model.is_helical()
                       else:
                           hide = True
-                  elif filter_index == 7:
+                  elif filter_index == 8:
                       if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                           hide = not item_model.is_helical()
                       else:
                           hide = True
-                  elif filter_index == 8:
-                      hide = not isinstance(item, Qt4_queue_item.CharacterisationQueueItem)
                   elif filter_index == 9:
-                      hide = not isinstance(item, Qt4_queue_item.EnergyScanQueueItem)
+                      hide = not isinstance(item, Qt4_queue_item.CharacterisationQueueItem)
                   elif filter_index == 10:
+                      hide = not isinstance(item, Qt4_queue_item.EnergyScanQueueItem)
+                  elif filter_index == 11:
                       hide = not isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem)
                   #elif filter_index == 11:
                   #    hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
-
-                  if isinstance(item, Qt4_queue_item.TaskQueueItem):
+                  if isinstance(item, Qt4_queue_item.TaskQueueItem) and not \
+                     isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                       item.set_hidden(hide)
                   item_iterator += 1
                   item = item_iterator.value()
@@ -1051,7 +1076,7 @@ class Qt4_TreeBrick(BlissWidget):
              self.dc_tree_widget.sample_tree_widget)
         item = item_iterator.value()
         while item:
-              item.setHidden(False)
+              item.set_hidden(False)
               item_iterator += 1
               item = item_iterator.value() 
 

@@ -102,6 +102,11 @@ class Qt4_PlateBrick(BlissWidget):
         """
         if propertyName == 'mnemonic':
             self.plate_manipulator_hwobj = self.getHardwareObject(newValue)
+            if self.plate_manipulator_hwobj is not None:
+                self.plate_navigator_widget.init_plate_view(self.plate_manipulator_hwobj)
+                self.connect(self.plate_manipulator_hwobj,
+                             SampleChanger.INFO_CHANGED_EVENT,
+                             self.plate_navigator_widget.refresh_plate_location)
         else:
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 

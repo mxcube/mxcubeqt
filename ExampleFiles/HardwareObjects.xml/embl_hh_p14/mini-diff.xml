@@ -37,7 +37,7 @@
        Direction     : fast bottom -> top
                        slow right -> left 
   --> 
-  <grid_direction>{"fast": (0,1), "slow": (1,0)}</grid_direction>
+  <grid_direction>{"fast": (0,1), "slow": (1,0), "omega_ref" : 163.675}</grid_direction>
   <reversing_rotation>True</reversing_rotation>
 
   <phase_list>("Transfer", "Centring", "DataCollection", "BeamLocation")</phase_list>

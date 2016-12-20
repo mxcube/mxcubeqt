@@ -6,6 +6,9 @@
   <channel type="exporter" name="CurrentPhase">CurrentPhase</channel>
   <channel type="exporter" name="FastShutterIsOpen">FastShutterIsOpen</channel>
   <channel type="exporter" name="State">State</channel>
+  <channel type="exporter" name="ScintillatorPosition">ScintillatorPosition</channel>
+  <channel type="exporter" name="CapillaryPosition">CapillaryPosition</channel>
+
   <command type="exporter" name="startSetPhase">startSetPhase</command>
   <command type="exporter" name="startAutoFocus">startAutoFocus</command>
   <command type="exporter" name="saveCentringPositions">saveCentringPositions</command>
@@ -27,11 +30,11 @@
   <object href="/minikappa-correction" role="minikappa_correction"/>
 
   <use_sample_changer>True</use_sample_changer>
-  <zoom_centre>{"x": 755,"y": 469}</zoom_centre>
+  <zoom_centre>{"x": 668,"y": 612}</zoom_centre>
 
   <!-- Alignment Z -->
-  <!-- old value 0.2092 -->
-  <omega_reference>{"motor_name": "phiz", "position": -0.101, "camera_axis":"y","direction": -1}</omega_reference>
+  <!-- old value -0.101 -->
+  <omega_reference>{"motor_name": "phiz", "position": -0.143, "camera_axis":"y","direction": -1}</omega_reference>
   <grid_direction>{"fast": (1, 0), "slow": (0, -1), "omega_ref" : 0.0}</grid_direction>
   <reversing_rotation>True</reversing_rotation>
 </object>

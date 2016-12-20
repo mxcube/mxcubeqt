@@ -154,8 +154,10 @@ class CreateTaskBase(QtGui.QWidget):
         if len(self._current_selected_items) > 0:
             item = self._current_selected_items[0]
             model = item.get_model()
-            model.run_processing_after = run_processing_after
-            model.run_processing_parallel = run_processing_parallel
+            if isinstance(model, queue_model_objects.DataCollection):
+                model.run_processing_after = run_processing_after
+                model.run_processing_parallel = run_processing_parallel and \
+                  model.acquisitions[0].acquisition_parameters.num_images > 19
 
     def acq_parameters_changed(self):
         self._data_path_widget.update_file_name()
@@ -523,6 +525,18 @@ class CreateTaskBase(QtGui.QWidget):
                       'from another task. Correct the problem before ' + \
                       'adding to queue')
             result = False
+
+        if self._acq_widget is not None:
+            parameter_conflict =  self._acq_widget.check_parameter_conflict()
+            if len(parameter_conflict) > 0:
+                msg = "Entered value of " 
+                for item in parameter_conflict:
+                    msg = msg + "%s, " % item
+                msg = msg[:-2]
+                msg += " is out of range. Correct the input value(s) before " + \
+                       "adding item to the queue"
+                logging.getLogger("GUI").error(msg)
+                result = False
 
         return result
             

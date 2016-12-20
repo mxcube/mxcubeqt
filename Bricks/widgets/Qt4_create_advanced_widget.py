@@ -274,14 +274,15 @@ class CreateAdvancedWidget(CreateTaskBase):
      
             exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
+            print exp_type
             if exp_type == "MeshScan":
-                dc.run_processing_parallel = "MeshScan"
                 tasks.append(dc)
-            elif exp_type == "XrayCentring":
+            elif exp_type == "XrayCentering":
                 xray_centering = queue_model_objects.XrayCentering(\
                    dc, sample.crystals[0])
-                dc.run_processing_parallel = "XrayCentering"
                 tasks.append(xray_centering)
+
+            dc.run_processing_parallel = exp_type
             self._path_template.run_number += 1
 
             return tasks
@@ -364,6 +365,8 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._advanced_methods_widget.ver_spacing_ledit.setText(\
                      "%.2f" % (float(grid_properties["yOffset"]) * 1000))
 
+                treewidget_item.setText(3, str(grid_properties["num_lines"]))
+                treewidget_item.setText(4, str(grid_properties["num_images_per_line"]))
              
                 if osc_dynamic_limits:
                     osc_range_limits = \
@@ -437,10 +440,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         spacing = self.get_spacing()
         for grid_object, treewidget_item in self._grid_map.iteritems():
             if treewidget_item.isSelected():
-                grid_object.set_spacing(spacing)
-                #self._graphics_manager_hwobj.\
-                #     update_grid_motor_positions(grid_object)
+                grid_object.set_spacing(spacing, adjust_size=\
+                     self._advanced_methods_widget.adjust_size_cbox.isChecked())
                 break
+        #self.grid_treewidget_item_selection_changed()
 
     def move_to_grid(self):
         """Moves diffractometer to the center of the grid
