@@ -108,7 +108,8 @@ class GUITreeWidget(QtGui.QTreeWidget):
     def dragEnterEvent(self, event):
         """Drag start event"""
 
-        self.drag_source_item = self.itemAt(event.pos())
+        if self.drag_source_item is None:
+            self.drag_source_item = self.selectedItems()[0]
         event.accept()
 
     def dropEvent(self, event):
@@ -119,6 +120,7 @@ class GUITreeWidget(QtGui.QTreeWidget):
             self.emit(QtCore.SIGNAL("dragdrop"),
                       self.drag_source_item,
                       self.drag_target_item)
+            self.drag_source_item = None
         event.accept()
 
 

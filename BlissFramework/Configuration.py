@@ -483,17 +483,8 @@ class Configuration:
                          newItem.setProperties(child["properties"])
                          
                      child["properties"] = newItem.properties
-                 
-                     try:
-                       newItemSignals = newItem["signals"]
-                       newItemSlots = newItem["slots"]
-                     except:
-                       newItem.__dict__ = child
-                     else:
-                       newItem.__dict__ = child
-                       newItem.slots = newItemSlots
-                       newItem.signals = newItemSignals                     
-  
+
+                     newItem.__dict__ = child
                      children[i] = newItem
                      
                      loadChildren(child["children"])

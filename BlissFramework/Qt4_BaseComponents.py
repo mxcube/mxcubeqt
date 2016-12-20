@@ -184,6 +184,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
     _eventsCache = {}
     _menuBackgroundColor = None
     _menuBar = None
+    _statusBar = None
 
     _applicationEventFilter = InstanceEventFilter(None)
 
@@ -285,6 +286,12 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         BlissWidget.update_menu_bar_color(BlissWidget._instanceMode == \
                     BlissWidget.INSTANCE_MODE_MASTER)
+
+    @staticmethod
+    def set_status_info(info_type, info_message):
+        if BlissWidget._statusBar:
+            BlissWidget._statusBar.parent().update_status_info(\
+                 info_type, info_message)
 
     def shouldFilterEvent(self):
         """

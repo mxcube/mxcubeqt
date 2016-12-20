@@ -62,6 +62,8 @@ class Qt4_CameraBrick(BlissWidget):
 
         # Graphic elements-----------------------------------------------------
         self.info_widget = QtGui.QWidget(self)
+        self.display_beam_size_cbox = QtGui.QCheckBox("Display beam size", self)
+        self.display_beam_size_cbox.setHidden(True)
         self.coord_label = QtGui.QLabel(":", self)
         self.info_label = QtGui.QLabel(self)
         self.camera_control_dialog = CameraControlDialog(self)
@@ -131,6 +133,9 @@ class Qt4_CameraBrick(BlissWidget):
         self.display_grid_action = self.popup_menu.addAction(\
              "Display grid", self.display_grid_toggled)
         self.display_grid_action.setCheckable(True)
+        self.display_beam_size_action = self.popup_menu.addAction(\
+             "Display beam size", self.display_beam_size_toggled)
+        self.display_beam_size_action.setCheckable(True)
 
         #self.display_histogram_action = self.popup_menu.addAction(\
         #     "Display histogram", self.display_histogram_toggled)
@@ -154,6 +159,7 @@ class Qt4_CameraBrick(BlissWidget):
       
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
+        _info_widget_hlayout.addWidget(self.display_beam_size_cbox)
         _info_widget_hlayout.addWidget(self.coord_label)
         _info_widget_hlayout.addStretch(0)
         _info_widget_hlayout.addWidget(self.info_label)
@@ -166,6 +172,8 @@ class Qt4_CameraBrick(BlissWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Qt signal/slot connections -----------------------------------------
+        self.display_beam_size_cbox.stateChanged.connect(\
+             self.display_beam_size_toggled)
 
         # SizePolicies --------------------------------------------------------
         self.info_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
@@ -230,6 +238,10 @@ class Qt4_CameraBrick(BlissWidget):
              self.image_scale_menu.setEnabled(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def display_beam_size_toggled(self):
+        self.graphics_manager_hwobj.display_beam_size(\
+            self.display_beam_size_action.isChecked())
 
     def set_control_mode(self, have_control):
         if have_control:
@@ -356,6 +368,7 @@ class CameraControlDialog(QtGui.QDialog):
         # Internal variables --------------------------------------------------
         self.camera_hwobj = None
 
+
         # Graphic elements ----------------------------------------------------
         self.contrast_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.contrast_doublespinbox = QtGui.QDoubleSpinBox(self)
@@ -373,7 +386,6 @@ class CameraControlDialog(QtGui.QDialog):
         self.exposure_time_doublespinbox = QtGui.QDoubleSpinBox(self) 
         self.exposure_time_checkbox = QtGui.QCheckBox("auto", self)
         __close_button = QtGui.QPushButton('Close', self)
-
         # Layout --------------------------------------------------------------
         __main_gridlayout = QtGui.QGridLayout(self)
         __main_gridlayout.addWidget(QtGui.QLabel('Contrast:', self), 0, 0)

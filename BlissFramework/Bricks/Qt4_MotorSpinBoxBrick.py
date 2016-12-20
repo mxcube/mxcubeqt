@@ -28,6 +28,8 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.2."
 __category__ = 'Motor'
 
 
@@ -65,6 +67,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.addProperty('label', 'string', '')
         self.addProperty('showLabel', 'boolean', True)
         self.addProperty('showMoveButtons', 'boolean', True)
+        self.addProperty('showSlider', 'boolean', False)
         self.addProperty('showStop', 'boolean', True)
         self.addProperty('showStep', 'boolean', True)
         self.addProperty('showStepList', 'boolean', False)
@@ -76,6 +79,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.addProperty('helpIncrease', 'string', '')
         self.addProperty('hideInUser', 'boolean', False)
         self.addProperty('defaultSteps', 'string', '180 90 45 30 10')
+        self.addProperty('enableSliderTracking', 'boolean', False)
 
         # Signals ------------------------------------------------------------
 
@@ -121,11 +125,13 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.step_combo.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_combo))
         self.step_combo.setDuplicatesEnabled(False)
 
+        self.position_slider = QtGui.QSlider(QtCore.Qt.Horizontal, self.main_gbox)
+    
         # Layout --------------------------------------------------------------
         self.control_box_layout = QtGui.QHBoxLayout(self.control_box)
+        self.control_box_layout.addWidget(self.position_spinbox)
         self.control_box_layout.addWidget(self.move_left_button)
         self.control_box_layout.addWidget(self.move_right_button)
-        self.control_box_layout.addWidget(self.position_spinbox)
         self.control_box_layout.setSpacing(2)
         self.control_box_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -140,6 +146,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.main_gbox_layout.addWidget(self.motor_label)
         self.main_gbox_layout.addWidget(self.control_box)
         self.main_gbox_layout.addWidget(self.extra_button_box)
+        self.main_gbox_layout.addWidget(self.position_slider)
         self.main_gbox_layout.setSpacing(2)
         self.main_gbox_layout.setContentsMargins(2, 2, 2, 2)
 
@@ -178,6 +185,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.move_left_button.released.connect(self.stop_moving)
         self.move_right_button.pressed.connect(self.move_up)
         self.move_right_button.released.connect(self.stop_moving)
+
+        self.position_slider.valueChanged.connect(\
+             self.position_slider_value_changed)
 
         # Other ---------------------------------------------------------------
         self.instance_synchronize("position_spinbox", "step_combo")
@@ -350,8 +360,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             except:
                 pass
 
+        print step 
         if self.motor_hwobj.isReady():
             self.set_position_spinbox_color(self.motor_hwobj.READY)
+            print self.motor_hwobj
             self.motor_hwobj.moveRelative(step)
 
     def really_move_down(self):
@@ -406,7 +418,13 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.position_spinbox.setMinimum(limits[0])
         self.position_spinbox.setMaximum(limits[1])
         self.position_spinbox.blockSignals(False)
-        self.setToolTip(limits = limits)
+
+        self.position_slider.blockSignals(True)
+        self.position_slider.setMinimum(limits[0])
+        self.position_slider.setMaximum(limits[1])
+        self.position_slider.blockSignals(False)
+
+        self.set_tool_tip(limits=limits)
 
     def open_history_menu(self):
         """
@@ -471,6 +489,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         try:
            self.position_spinbox.setValue(float(new_position))
+           self.position_slider.setValue(float(new_position))
         except:
            print(('ERROR!!! Setting position...' + str(new_position)))
            pass
@@ -530,7 +549,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.stop_button.setEnabled(False)
             self.move_left_button.setEnabled(True)
             self.move_right_button.setEnabled(True)
-        self.setToolTip(state = state)
+        self.set_tool_tip(state=state)
 
     def motor_position_changed_relativ(self):
         """
@@ -556,7 +575,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                                            QtGui.QColor(255,165,0),
                                            QtGui.QPalette.Base)
 
-    def setToolTip(self, name = None, state = None, limits = None):
+    def set_tool_tip(self, name=None, state=None, limits=None):
         """
         Descript. :
         Args.     :
@@ -594,7 +613,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 l_bot = self['formatString'] % float(limits[0])
                 l_top = self['formatString'] % float(limits[1])
                 limits_str = " Limits:%s,%s" % (l_bot, l_top)
-            tip = "State:" + state_str + limits_str
+            tip = "State: " + state_str + limits_str
 
         self.motor_label.setToolTip(tip)
         if not self['showBox']:
@@ -677,6 +696,12 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         #self['label'] = self['label']
         #self['defaultStep']=self['defaultStep']
 
+    def position_slider_value_changed(self, value):
+        """Sets motor postion based on the slider value"""
+
+        if self.motor_hwobj is not None:
+            self.motor_hwobj.move(value) 
+
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
@@ -735,7 +760,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             if new_value == "":
                 self.move_left_button.setToolTip("Moves the motor down (while pressed)")
             else:
-                self.move_left_button.setToolTip(new_value)
+                self.move_left_button.set_tool_tip(new_value)
         elif property_name == 'helpIncrease':
             if new_value == "" :
                 self.move_right_button.setToolTip("Moves the motor up (while pressed)")
@@ -747,6 +772,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 for default_step in default_step_list:
                     self.set_line_step(float(default_step))
                 self.step_changed(None)
+        elif property_name == 'showSlider':
+            self.position_slider.setVisible(new_value)
+        elif property_name == 'enableSliderTracking':
+            self.position_slider.setTracking(new_value)  
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 

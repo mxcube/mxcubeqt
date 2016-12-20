@@ -24,6 +24,7 @@ import os
 # python2.7
 #import new
 # python3.4
+import time
 import types
 import logging
 import weakref
@@ -33,6 +34,7 @@ import collections
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
+from functools import partial
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -80,6 +82,11 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.view_toolbar_action = self.view_menu.addAction(\
              "Graphics toolbar", self.view_toolbar_clicked)
         self.view_toolbar_action.setCheckable(True)
+        self.view_menu.addSeparator()
+        
+        self.view_windows_menu = self.view_menu.addMenu("Windows")
+        self.view_windows_menu.setEnabled(False)
+
         self.view_maximize_action = self.view_menu.addAction(\
              "Show maximized window", self.view_max_clicked)
         self.view_normal_action = self.view_menu.addAction(\
@@ -209,22 +216,21 @@ class CustomMenuBar(QtGui.QMenuBar):
         for hwr_obj in hwr.hardwareObjects:
 
             connections = hwr.hardwareObjects[hwr_obj].connect_dict
+            for sender in connections:
+                hwr.hardwareObjects[hwr_obj].disconnect(\
+                    sender, connections[sender]["signal"], connections[sender]["slot"])
 
-            #for sender in connections:
-            #    print connections[sender]["signal"], connections[sender]["slot"]
-            #    hwr.hardwareObjects[hwr_obj].disconnect(\
-            #        sender, connections[sender]["signal"], connections[sender]["slot"])
+            #reload(hwr.hardwareObjects[hwr_obj].__class__)
 
-            reload(hwr.hardwareObjects[hwr_obj].__class__)
+        from HardwareRepository import BaseHardwareObjects
+        import Qt4_VideoMockup
+        reimport.reimport(BaseHardwareObjects)
+        reimport.reimport(Qt4_VideoMockup)
 
-        #from  HardwareRepository import BaseHardwareObjects
-        #reimport.reimport(BaseHardwareObjects)
-
-        #for hwr_obj in hwr.hardwareObjects:
-        ##    for sender in connections:
-        #        print connections[sender]["signal"], connections[sender]["slot"]
-        #        hwr.hardwareObjects[hwr_obj].connect(\
-        #            sender, connections[sender]["signal"], connections[sender]["slot"])
+        for hwr_obj in hwr.hardwareObjects:
+            for sender in connections:
+                hwr.hardwareObjects[hwr_obj].connect(\
+                    sender, connections[sender]["signal"], connections[sender]["slot"])
 
     def whats_this_clicked(self):
         """Whats this"""
@@ -303,6 +309,23 @@ class CustomMenuBar(QtGui.QMenuBar):
         """Show minimized window"""
 
         QtGui.QApplication.activeWindow().showMinimized()
+
+    def append_windows_links(self, windows_list):
+        """If there are more than one window then appends names
+           of available windows to the menu Windows
+        """
+        if len(windows_list) > 1:
+            self.view_windows_menu.setEnabled(True)
+            self.preview_windows = {}
+            for window in windows_list:
+                self.preview_windows[window.base_caption] = window
+                temp_menu = self.view_windows_menu.addAction(window.base_caption, 
+                           partial(self.view_window, window.base_caption))
+            
+    def view_window(self, window_caption):
+        """Displays selected window"""
+        self.preview_windows[window_caption].show()
+        self.preview_windows[window_caption].activateWindow()
 
 
 class CustomToolBar(QtGui.QToolBar):
@@ -771,22 +794,26 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.central_widget.show()
 
-        self.toolbar = CustomToolBar(self)
-        self.toolbar.hide()
-        self.menubar = CustomMenuBar(self)
-        self.menubar.hide()
-        self.statusbar = QtGui.QStatusBar(self)
-        self.statusbar.hide()
+        self._toolbar = CustomToolBar(self)
+        self._toolbar.hide()
+        self._menubar = CustomMenuBar(self)
+        self._menubar.hide()
+        self._statusbar = QtGui.QStatusBar(self)
+        self._statusbar.hide()
+
+        #_statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
+        #_statusbar_hlayout.setSpacing(2)
+        #_statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtGui.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.menubar)
-        _main_vlayout.addWidget(self.toolbar)
+        _main_vlayout.addWidget(self._menubar)
+        _main_vlayout.addWidget(self._toolbar)
         _main_vlayout.addWidget(self.central_widget)
-        _main_vlayout.addWidget(self.statusbar)
+        _main_vlayout.addWidget(self._statusbar)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
+        self._menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
         self.setWindowFlags(self.windowFlags() |
                             QtCore.Qt.WindowMaximizeButtonHint)
@@ -796,22 +823,57 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         """Toggle toolbar visibility"""
 
         if state:
-            self.toolbar.show()
+            self._toolbar.show()
         else:
-            self.toolbar.hide()
+            self._toolbar.hide()
 
     def set_menu_bar(self, menu_data, exp_pwd, execution_mode):
         """Sets menu bar"""
 
-        self.menubar.configure(menu_data, exp_pwd, execution_mode)
-        self.menubar.show()
-        BlissWidget._menuBar = self.menubar
-        BlissWidget._toolBar = self.toolbar
+        self._menubar.configure(menu_data, exp_pwd, execution_mode)
+        self._menubar.show()
+        BlissWidget._menuBar = self._menubar
+        BlissWidget._toolBar = self._toolbar
 
     def set_status_bar(self):
         """Sets statusbar"""
+ 
+        self._statusbar_user_label = QtGui.QLabel("-")
+        self._statusbar_state_label = QtGui.QLabel(" <b>State: </b>")
+        self._statusbar_diffractometer_label = QtGui.QLabel(" <b>Diffractometer: </b>")
+        self._statusbar_sc_label = QtGui.QLabel(" <b>Sample changer: </b>")
+        self._statusbar_action_label = QtGui.QLabel(" <b>Last collect: </b>")
+        
+        self._statusbar.addWidget(self._statusbar_user_label)
+        self._statusbar.addWidget(self._statusbar_state_label)
+        self._statusbar.addWidget(self._statusbar_diffractometer_label)
+        self._statusbar.addWidget(self._statusbar_sc_label)
+        self._statusbar.addWidget(self._statusbar_action_label)
+         
+        self._statusbar.show()
+        BlissWidget._statusBar = self._statusbar
 
-        self.statusbar.show()
+    def update_status_info(self, info_type, info_message):
+        """Updates status info"""
+
+        if info_message == "":
+            info_message = "Ready"
+
+        if info_type == "user":
+            self._statusbar_user_label.setText(info_message)
+        elif info_type == "status":
+            self._statusbar_state_label.setText(\
+                " <b>State: </b> %s" % info_message)
+        elif info_type == "diffractometer":
+            self._statusbar_diffractometer_label.setText(\
+                " <b>Diffractometer: </b>%s" % info_message)
+        elif info_type == "sc":
+            self._statusbar_sc_label.setText(\
+                " <b>Sample changer: </b> %s" % info_message)
+        elif info_type == "action":
+            self._statusbar_action_label.setText(\
+                " <b>Last collect: </b> %s (%s)" % \
+                (info_message, time.strftime("%Y-%m-%d %H:%M:%S")))
 
     def show(self, *args):
         """Show"""
@@ -846,7 +908,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if len(args) > 0:
             if args[0]:
                 return
-        self.menubar.set_exp_mode(False)
+        self._menubar.set_exp_mode(False)
 
     def add_item(self, item_cfg, parent):
         """Adds item to the gui"""
@@ -1183,12 +1245,15 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         return QtGui.QSizePolicy(_get_size_policy_flag(hsizepolicy),
                                  _get_size_policy_flag(vsizepolicy))
 
+    def append_windows_links(self, window_list):
+        self._menubar.append_windows_links(window_list)
 
 def display(configuration, no_border=False):
     """Display window"""
 
     windows = []
     for window in configuration.windows_list:
+        BlissWidget.set_status_info("status", window["name"])
         display = WindowDisplayWidget(None, window["name"],
             execution_mode=True, no_border=no_border)
         windows.append(display)
@@ -1200,6 +1265,10 @@ def display(configuration, no_border=False):
             display._show = False
         display.hide()
         restoreSizes(configuration, window, display)
+
+    for window in windows:
+        window.append_windows_links(windows)
+
     return windows
 
 def restoreSizes(configuration, window, display, configuration_suffix="", move_window_flag=True):
