@@ -125,6 +125,8 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.photon_shut_ho = None
         self.fe_ho = None
 
+        print("setting %s property to %s", property_name, new_value)
+
         if property_name == 'fast_shutter':
             if self.fast_shut_ho is not None:
                 self.disconnect(self.fast_shut_ho, QtCore.SIGNAL('stateChanged'), self.fast_state_changed)
@@ -193,3 +195,7 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
 
     def _update_led(self, led, value):
         led.setState(value)
+
+def test_brick(brick):
+    """ Run test by running from command line test_mxcube <name of this file> """
+    brick.setProperty("frontend", "/photonshut")

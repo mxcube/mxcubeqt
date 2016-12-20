@@ -103,6 +103,9 @@ class Qt4_ALBA_MachineInfoBrick(BlissWidget):
         self.setToolTip("Main information about machine current, " + \
                         "machine status and top-up remaining time.")
 
+    def setProperty(self, property_name, value):
+        self.propertyChanged(property_name, None, value)
+
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
@@ -154,3 +157,6 @@ class Qt4_ALBA_MachineInfoBrick(BlissWidget):
         else:
             Qt4_widget_colors.set_widget_color(self.current_value_label, STATES['error'])
         Qt4_widget_colors.set_widget_color(self.state_text_value_label, STATES['ready'])
+
+def test_brick(brick):
+    brick.propertyChanged("mnemonic", None, "/mach-info")
