@@ -11,7 +11,7 @@ from PyQt4 import uic
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
-__category__ = 'Sample Changer'
+__category__ = 'Sample changer'
 
 class Qt4_CatsMaintBrick(BlissWidget):
     def __init__(self, *args):
