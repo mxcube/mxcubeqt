@@ -304,13 +304,13 @@ class MXCuBE_Test_Environment(object):
             print("Cannot test bricks without Qt")
             sys.exit(0)
 
+        if not self.hwr_server:
+            self._connect_hwserver()
+
         mod = imp.load_source('_brick', filename)
         basename = os.path.basename(filename)
         name, ext = os.path.splitext(basename)
         brick_class = mod.__dict__[name]
-
-        if not self.hwr_server:
-            self._connect_hwserver()
 
         brick = brick_class() 
         return brick, mod
