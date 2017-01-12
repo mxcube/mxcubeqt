@@ -28,7 +28,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
-from QLed import QLed
+from widgets.QLed import QLed
 
 __category__ = 'ALBA'
 
