@@ -832,7 +832,10 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.user_selected_sample = (None, None)
 
         self.contents_widget = QtGui.QWidget(self)
-        self.status = StatusView(self.contents_widget)
+
+        # allow to have a custom status widget
+        # build status widget in class method
+        self.status = self.build_status_view(self.contents_widget) 
         self.switch_to_sample_transfer_button = QtGui.QPushButton(\
              "Switch to Sample Transfer mode", self.contents_widget)
         self.test_sample_changer_button = QtGui.QPushButton(\
@@ -986,6 +989,10 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
+
+    def build_status_view(self, container):
+        return StatusView(container)
+
     def build_operations_widget(self):
         pass
 
@@ -1072,6 +1079,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobjStateChanged(state)
 
     def sc_status_changed(self, status):
+        logging.getLogger("HWR").debug("Status3 changed") 
         self.status.setStatusMsg(status)
 
     def sc_state_changed(self, state, previous_state=None):

@@ -358,6 +358,9 @@ if __name__ == '__main__':
     else:
         mnemonic = None
 
+    if mnemonic.endswith(".xml"):
+        mnemonic = mnemonic[:-4]
+
     test_env = MXCuBE_Test_Environment()
 
     test_env.set_institute(os.environ.get("MXCUBE_SITE",None))
