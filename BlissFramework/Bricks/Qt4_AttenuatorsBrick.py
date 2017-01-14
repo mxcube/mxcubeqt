@@ -21,6 +21,7 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 from BlissFramework.Utils import Qt4_widget_colors
+from BlissFramework.Utils.Qt4_widget_colors import color_to_hexa
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -31,6 +32,13 @@ class Qt4_AttenuatorsBrick(BlissWidget):
     """
     Descript. : 
     """
+
+    states = {
+       "ON":  color_to_hexa( Qt4_widget_colors.LIGHT_GREEN),
+       "MOVING": color_to_hexa( Qt4_widget_colors.LIGHT_YELLOW),
+       "FAULT":  color_to_hexa( Qt4_widget_colors.LIGHT_RED),
+       "UNKNOWN": color_to_hexa( Qt4_widget_colors.DARK_GRAY),
+    }
 
     def __init__(self, *args):
         """
@@ -192,6 +200,13 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
+        if transmission_state in self.states: 
+            color = self.states[transmission_state]
+        else: 
+            color = self.states["UNKNOWN"]
+
+        self.transmission_ledit.setStyleSheet("background-color: %s;" % color)
+
         return
 
     def transmission_value_changed(self, new_value):
