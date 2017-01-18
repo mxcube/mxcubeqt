@@ -176,7 +176,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
         self.step_combo.activated.connect(self.go_to_step)
         self.step_combo.activated.connect(self.step_changed)
-        self.step_combo.textChanged.connect(self.step_edited)
+        self.step_combo.editTextChanged.connect(self.step_edited)
 
         self.stop_button.clicked.connect(self.stop_motor)
         self.step_button.clicked.connect(self.open_step_editor)

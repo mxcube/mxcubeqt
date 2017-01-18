@@ -175,14 +175,14 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.allow_timeout_control_chbox.setChecked(False)
 
         self.take_control_button = QtGui.QToolButton(_main_gbox)
-        self.take_control_button.setUsesTextLabel(True)
+        self.take_control_button.setToolButtonStyle(True)
         self.take_control_button.setText("Take control")
         self.take_control_button.setEnabled(True)
         self.take_control_button.setIcon(Qt4_Icons.load_icon("FingerRight"))
         self.take_control_button.hide()
 
         self.ask_control_button = QtGui.QToolButton(_main_gbox)
-        self.ask_control_button.setUsesTextLabel(True)
+        self.ask_control_button.setToolButtonStyle(True)
         self.ask_control_button.setText("Ask for control")
         self.ask_control_button.setEnabled(False)
         self.ask_control_button.setIcon(Qt4_Icons.load_icon("FingerUp"))
