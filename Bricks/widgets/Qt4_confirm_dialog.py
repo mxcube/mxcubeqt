@@ -91,7 +91,7 @@ class ConfirmDialog(QtGui.QDialog):
         Descript. :
         """
         self.conf_dialog_layout.force_dark_cbx.setEnabled(False)
-        self.conf_dialog_layout.force_dark_cbx.setOn(False)
+        self.conf_dialog_layout.force_dark_cbx.setChecked(False)
 
     def enable_dark_current_cbx(self):
         """

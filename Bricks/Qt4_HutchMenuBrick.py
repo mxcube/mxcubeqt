@@ -380,7 +380,7 @@ class MonoStateButton(QtGui.QToolButton):
 
     def __init__(self, parent, caption=None, icon=None, fixed_size=(80, 45)):
         QtGui.QToolButton.__init__(self, parent)
-        self.setUsesTextLabel(True)
+        self.setToolButtonStyle(True)
         if fixed_size: 
             self.setFixedSize(fixed_size[0], fixed_size[1])
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
@@ -408,7 +408,7 @@ class DuoStateButton(QtGui.QToolButton):
         self.run_icon = None
         self.stop_icon = None
         self.standard_color = self.palette().color(QtGui.QPalette.Window)
-        self.setUsesTextLabel(True)
+        self.setToolButtonStyle(True)
         self.setText(caption)
         self.setFixedSize(80, 45)
         self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
