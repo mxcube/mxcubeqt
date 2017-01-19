@@ -30,11 +30,11 @@ from random import randint
 import numpy as np
 
 #Basic core colors
-WHITE = QtCore.Qt.white
-GRAY =  QtCore.Qt.gray
-LIGHT_GRAY = QtCore.Qt.lightGray
-DARK_GRAY = QtCore.Qt.darkGray
-GREEN = QtCore.Qt.green
+WHITE = QtGui.QColor( QtCore.Qt.white )
+GRAY =  QtGui.QColor( QtCore.Qt.gray )
+LIGHT_GRAY = QtGui.QColor( QtCore.Qt.lightGray )
+DARK_GRAY = QtGui.QColor( QtCore.Qt.darkGray )
+GREEN = QtGui.QColor( QtCore.Qt.green )
 
 LIGHT_GREEN = QtGui.QColor(204,255,204)
 LIGHT_RED = QtGui.QColor(255,204,204)
@@ -56,7 +56,7 @@ QUEUE_ENTRY_COLORS = [WHITE, LIGHT_GREEN, LIGHT_YELLOW, LIGHT_RED]
 TREE_ITEM_SAMPLE = QtGui.QColor(240, 240, 240)
 TREE_ITEM_COLLECTION = QtGui.QColor(255, 230, 210)
 
-TASK_GROUP = ["#B0DBFF", "#E57935", "#B1FF52"]
+TASK_GROUP = [QtGui.QColor("#B0DBFF"), QtGui.QColor("#E57935"), QtGui.QColor("#B1FF52")]
 
 
 def set_widget_color(widget, color, color_role=None):
@@ -81,3 +81,7 @@ def get_random_hex(alpha=255):
 
 def get_random_numpy_color(alpha=255):
     return np.random.rand(3,1)
+
+def color_to_hexa(color):
+    return "#%x%x%x" % (color.red(), color.green(), color.blue())
+

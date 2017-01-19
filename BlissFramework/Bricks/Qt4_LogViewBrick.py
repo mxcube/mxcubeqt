@@ -211,11 +211,13 @@ class Submitfeedback(QWidget):
         # Other ---------------------------------------------------------------
         self.message_textedit.setToolTip("Write here your comments or feedback")
         self.submit_button.setText('Submit')
-        if hasattr(self.submit_button, "setUsesTextLabel"):  
-            self.submit_button.setUsesTextLabel(True)
-        elif hasattr(self.submit_button, "setToolButtonStyle"):
-            self.submit_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
+        #if hasattr(self.submit_button, "setUsesTextLabel"):  
+        #    self.submit_button.setUsesTextLabel(True)
+        #elif hasattr(self.submit_button, "setToolButtonStyle"):
+        #    self.submit_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        self.submit_button.setToolButtonStyle(True)
         self.submit_button.setIcon(Qt4_Icons.load_icon('Envelope'))
         self.submit_button.setToolTip("Click here to send your feedback " + \
                                       "to the authors of this software")
