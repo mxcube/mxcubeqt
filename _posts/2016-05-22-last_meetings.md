@@ -5,7 +5,55 @@ color: white
 fa-icon: users 
 ---
 
-# 9th. MXCuBE meeting @ EMBL (Hamburg), 27<sup>st</sup>-29<sup>nd</sup> of June, 2016
+# 10th. MXCuBE meeting @ ESRF (Grenoble, France), 16<sup>th</sup>-18<sup>th</sup> of January, 2017
+
+## Full list of presentations
+
+### Status reports
+
+- ![doc/meetings_2017_ESRF/ESRF_Status_20170116.pdf](ESRF)
+- ![doc/meetings_2017_ESRF/MXCuBE-Grenoble_20170116-ALBA_status_report.pdf](ALBA)
+- ![doc/meetings_2017_ESRF/mxcube_workshop_bessy2_status_2017-01-16.odp](HZB)
+- ![doc/meetings_2017_ESRF/BIOMAX_Status Report_JN.pdf](MAX IV)
+- ![doc/meetings_2017_ESRF/00-SOLEIL-MXCUBE-2017.pdf](Soleil)
+- ![doc/meetings_2017_ESRF/missing](EMBL-HH)
+- ![doc/meetings_2017_ESRF/FIP.pdf](BM30 (FIP))
+
+### Hardware integration
+
+- ![doc/meetings_2017_ESRF/Newest_Developments_at_P11.ppt](Newest developments at P11 (Petra III))
+- ![doc/meetings_2017_ESRF/Didier-Gergely.pptx](FlexHCD sample changer)
+- ![doc/meetings_2017_ESRF/Plate Manipulator.pptx](Crystallisation plates integration within MXCuBE)
+- ![doc/meetings_2017_ESRF/Eiger_integration.pdf](Eiger integration at BioMax)
+- ![doc/meetings_2017_ESRF/NanoDiff-P11.pdf](NanoDiff@P11 - Usage and Setup From Actuators to Controls)
+- ![doc/meetings_2017_ESRF/missing](Implementation of interactive mesh scans & serial crystallography)
+
+### User Interfaces
+
+- ![doc/meetings_2017_ESRF/doc/meetings_2017_ESRF/wifip.pdf](WIFIP, web application for FIP)
+- ![doc/meetings_2017_ESRF/missing](MXCuBE 3: status, ongoing developments and milestones )
+- ![doc/meetings_2017_ESRF/remote_access.pdf](Remote Access in MXCuBE 3)
+
+### Scientific applications
+
+- ![doc/meetings_2017_ESRF/doc/Autoproc_mxcube_meeting.pptx](Automatic data processing)
+- ![doc/meetings_2017_ESRF/doc/vonStetten_MXCuBE_2017.pdf](SSX experiments with MXCuBE)
+- ![doc/meetings_2017_ESRF/doc/autocomplexdc_olof.pdf](Automating complex data collection using workflows)
+- ![doc/meetings_2017_ESRF/doc/missing](Global Phasing workflow calculation within MXCuBE)
+
+### Developers meeting
+
+- ![doc/meetings_2017_ESRF/doc/missing](Aligning Samples in Refractive Media)
+- ![doc/meetings_2017_ESRF/doc/ImprovingAbstractions.pptx](Improving abstractions)
+- ![http://slides.com/matiasg/git_mxcube](Branches and git workflow)
+- ![http://slides.com/matiasg/blctrlsw_fault_mxcube3](Beamline control software fault-tolerance for MXCuBE 3)
+- ![doc/meetings_2017_ESRF/doc/missing](Docker)
+- ![doc/meetings_2017_ESRF/doc/missing](Testing Single Page Applications)
+
+
+
+
+# 9th. MXCuBE meeting @ EMBL (Hamburg, Germany), 27<sup>th</sup>-29<sup>th</sup> of June, 2016
 
 ![embl group photo](img/2016-embl-meeting-group.jpg)
 
