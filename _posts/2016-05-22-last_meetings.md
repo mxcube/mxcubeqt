@@ -30,21 +30,21 @@ fa-icon: users
 
 ### User Interfaces
 
-- [WIFIP, web application for FIP](doc/meetings_2017_ESRF/doc/meetings_2017_ESRF/wifip.pdf)
+- [WIFIP, web application for FIP](doc/meetings_2017_ESRF/meetings_2017_ESRF/wifip.pdf)
 - [(MXCuBE 3: status, ongoing developments and milestones](doc/meetings_2017_ESRF/missing)
 - [Remote Access in MXCuBE 3](doc/meetings_2017_ESRF/remote_access.pdf)
 
 ### Scientific applications
 
-- [Automatic data processing](doc/meetings_2017_ESRF/doc/Autoproc_mxcube_meeting.pptx)
-- [SSX experiments with MXCuBE](doc/meetings_2017_ESRF/doc/vonStetten_MXCuBE_2017.pdf)
-- [Automating complex data collection using workflows](doc/meetings_2017_ESRF/doc/autocomplexdc_olof.pdf)
+- [Automatic data processing](doc/meetings_2017_ESRF/Autoproc_mxcube_meeting.pptx)
+- [SSX experiments with MXCuBE](doc/meetings_2017_ESRFvonStetten_MXCuBE_2017.pdf)
+- [Automating complex data collection using workflows](doc/meetings_2017_ESRF/autocomplexdc_olof.pdf)
 - [Global Phasing workflow calculation within MXCuBE](doc/meetings_2017_ESRF/doc/missing)
 
 ### Developers meeting
 
-- [Aligning Samples in Refractive Media](doc/meetings_2017_ESRF/doc/missing)
-- [Improving Abstractions](doc/meetings_2017_ESRF/doc/ImprovingAbstractions.pptx)
+- [Aligning Samples in Refractive Media](doc/meetings_2017_ESRF/missing)
+- [Improving Abstractions](doc/meetings_2017_ESRF/ImprovingAbstractions.pptx)
 - [Branches and git workflow](http://slides.com/matiasg/git_mxcube)
 - [Beamline control software fault-tolerance for MXCuBE 3](http://slides.com/matiasg/blctrlsw_fault_mxcube3)
 - [Docker]()
