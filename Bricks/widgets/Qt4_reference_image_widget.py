@@ -17,17 +17,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_acquisition_widget import AcquisitionWidget
 from widgets.Qt4_data_path_widget import DataPathWidget
 
 
-class ReferenceImageWidget(QtGui.QWidget):
-    def __init__(self,parent = None,name = None,fl = 0):
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+class ReferenceImageWidget(QWidget):
+    def __init__(self, parent=None, name=None, fl=0):
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
 
         if not name:
             self.setObjectName("ReferenceImageWidget")
@@ -37,9 +42,9 @@ class ReferenceImageWidget(QtGui.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox("Reference images", self)
-        self.tool_box = QtGui.QToolBox(self.group_box)
-        self.page_widget = QtGui.QWidget(self.tool_box)
+        self.group_box = QGroupBox("Reference images", self)
+        self.tool_box = QToolBox(self.group_box)
+        self.page_widget = QWidget(self.tool_box)
         self.path_widget = DataPathWidget(self.page_widget)
         self.acq_widget = AcquisitionWidget(self.page_widget, 'horizontal')
         self.acq_widget.acq_widget_layout.inverse_beam_cbx.hide()
@@ -50,19 +55,19 @@ class ReferenceImageWidget(QtGui.QWidget):
         self.tool_box.addItem(self.page_widget, "Acquisition parameters")
 
         # Layout --------------------------------------------------------------
-        _page_widget_layout = QtGui.QVBoxLayout(self.page_widget)
+        _page_widget_layout = QVBoxLayout(self.page_widget)
         _page_widget_layout.addWidget(self.path_widget)
         _page_widget_layout.addWidget(self.acq_widget)
         _page_widget_layout.addStretch(0)
         _page_widget_layout.setSpacing(0)
         _page_widget_layout.setContentsMargins(0, 0, 0, 0)  
         
-        _group_box_vlayout = QtGui.QVBoxLayout(self.group_box)
+        _group_box_vlayout = QVBoxLayout(self.group_box)
         _group_box_vlayout.addWidget(self.tool_box)
         _group_box_vlayout.setSpacing(0)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)

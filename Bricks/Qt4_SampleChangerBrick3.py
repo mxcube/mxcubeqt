@@ -17,8 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt, pyqtSignal
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import * 
+else:
+    from PyQt4.QtCore import Qt,  pyqtSignal
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -32,16 +38,16 @@ import logging
 __category__ = "Sample changer"
 
 
-class VialView(QtGui.QWidget):
+class VialView(QWidget):
 
     (VIAL_UNKNOWN, VIAL_NONE, VIAL_NOBARCODE, VIAL_BARCODE, VIAL_AXIS,
      VIAL_ALREADY_LOADED, VIAL_NOBARCODE_LOADED) = (0, 1, 2, 3, 4, 5, 6)
 
-    doubleClickSignal = QtCore.pyqtSignal(int)
-    singleClickSignal = QtCore.pyqtSignal(int)
+    doubleClickSignal = pyqtSignal(int)
+    singleClickSignal = pyqtSignal(int)
 
     def __init__(self, vial_index, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
         self.vial_index = vial_index
         self.setFixedSize(20, 16)
         self.pixmaps = [Qt4_Icons.load_pixmap("sample_unknown"),
@@ -68,8 +74,8 @@ class VialView(QtGui.QWidget):
     def paintEvent(self, event):
         """Paints the widget"""
         if self.vial_state is not None:
-            painter = QtGui.QPainter(self)
-            painter.setBrush(QtCore.Qt.NoBrush)
+            painter = QPainter(self)
+            painter.setBrush(Qt.NoBrush)
             pixmap = self.pixmaps[self.vial_state]
             if pixmap is not None:
                 painter.drawPixmap(2, 0, pixmap)
@@ -99,13 +105,13 @@ class VialView(QtGui.QWidget):
         """Mouse double clicked event"""
         self.doubleClickSignal.emit(self.vial_index)
 
-class VialNumberView(QtGui.QLabel):
+class VialNumberView(QLabel):
 
-    doubleClickSignal = QtCore.pyqtSignal(int)
-    singleClickSignal = QtCore.pyqtSignal(int)
+    doubleClickSignal = pyqtSignal(int)
+    singleClickSignal = pyqtSignal(int)
 
     def __init__(self, vial_index, parent):
-        QtGui.QWidget.__init__(self, str(vial_index), parent)
+        QWidget.__init__(self, str(vial_index), parent)
         self.vial_index = vial_index
 
     def mouseReleaseEvent(self, event):
@@ -127,12 +133,12 @@ class VialNumberView(QtGui.QLabel):
         self.setToolTip(code)
 
 
-class SampleBox(QtGui.QWidget):
+class SampleBox(QWidget):
     def __init__(self, *args):
+        QWidget.__init__(self, *args)
         self.selected = False
-        QtGui.QWidget.__init__(self, *args)
         self.setMouseTracking(True)
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -146,33 +152,28 @@ class SampleBox(QtGui.QWidget):
                 Qt4_widget_colors.BUTTON_ORIGINAL)
 
     def mouseMoveEvent(self, event):
-        QtGui.QWidget.mouseMoveEvent(self, event)
-        if not self.selected:
-            Qt4_widget_colors.set_widget_color(self, \
-                Qt4_widget_colors.LINE_EDIT_CHANGED)
+        QWidget.mouseMoveEvent(self, event)
+        Qt4_widget_colors.set_widget_color(self, \
+            Qt4_widget_colors.LINE_EDIT_CHANGED)
 
     def enterEvent(self, event):
-        QtGui.QWidget.enterEvent(self, event)
-        if not self.selected:
-            Qt4_widget_colors.set_widget_color(self, \
-                Qt4_widget_colors.LINE_EDIT_CHANGED)
+        QWidget.enterEvent(self, event)
+        Qt4_widget_colors.set_widget_color(self, \
+            Qt4_widget_colors.LINE_EDIT_CHANGED)
 
     def leaveEvent(self, event):
-        QtGui.QWidget.leaveEvent(self, event)
-        if not self.selected:
-            Qt4_widget_colors.set_widget_color(self, \
-                Qt4_widget_colors.BUTTON_ORIGINAL)
+        QWidget.leaveEvent(self, event)
+        Qt4_widget_colors.set_widget_color(self, \
+            Qt4_widget_colors.BUTTON_ORIGINAL)
 
-class SamplesView(QtGui.QWidget):
-
+class SamplesView(QWidget):
     SAMPLE_COUNT = 10
-    CURRENT_VIAL_COLOR = QtCore.Qt.gray
-
-    loadSampleSignal = QtCore.pyqtSignal(int, int)
-    selectSampleSignal = QtCore.pyqtSignal(int, int)
+    CURRENT_VIAL_COLOR = Qt.gray
+    loadSampleSignal = pyqtSignal(int, int)
+    selectSampleSignal = pyqtSignal(int, int)
 
     def __init__(self, parent, basket_index):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.basket_index = basket_index
         self.vials = []
@@ -182,7 +183,7 @@ class SamplesView(QtGui.QWidget):
         self.current_location = None
         self.standard_color = None
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -190,7 +191,7 @@ class SamplesView(QtGui.QWidget):
             sample_box = SampleBox(self)
             label = VialNumberView(index + 1, sample_box)
             label.set_vial([VialView.VIAL_UNKNOWN])
-            label.setAlignment(QtCore.Qt.AlignHCenter)
+            label.setAlignment(Qt.AlignHCenter)
             self.numbers.append(label)
 
             vial_view = VialView(index + 1, sample_box)
@@ -208,8 +209,8 @@ class SamplesView(QtGui.QWidget):
             label.doubleClickSignal.connect(self.load_sample)
             vial_view.doubleClickSignal.connect(self.load_sample)
 
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.Fixed)
 
     def load_sample(self, vial_index):
         """Loads sample"""
@@ -258,36 +259,36 @@ class SamplesView(QtGui.QWidget):
             self.numbers[location[1] - 1].setPaletteBackgroundColor(SamplesView.CURRENT_VIAL_COLOR)
         self.current_location = location
 
-class BasketView(QtGui.QWidget):
+class BasketView(QWidget):
 
-    loadSampleSignal = QtCore.pyqtSignal(int, int)
-    selectSampleSignal = QtCore.pyqtSignal(int, int)
-    basketPresenceSignal = QtCore.pyqtSignal(int, bool)
+    loadSampleSignal = pyqtSignal(int, int)
+    selectSampleSignal = pyqtSignal(int, int)
+    basketPresenceSignal = pyqtSignal(int, bool)
 
     def __init__(self, parent, basket_index):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.basket_index = basket_index
 
         #self.contents_widget = QVGroupBox("Basket %s" % basket_index,self)
-        self.contents_widget = QtGui.QGroupBox("Basket %s" % basket_index, self)
+        self.contents_widget = QGroupBox("Basket %s" % basket_index, self)
         self.contents_widget.setCheckable(True)
         self.samples_view = SamplesView(self.contents_widget, basket_index)
 
-        _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
+        _contents_widget_vlayout = QVBoxLayout(self.contents_widget)
         _contents_widget_vlayout.addWidget(self.samples_view)
         _contents_widget_vlayout.setSpacing(1)
         _contents_widget_vlayout.setContentsMargins(1, 1, 1, 1)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.contents_widget)
         _main_vlayout.setSpacing(1)
         _main_vlayout.setContentsMargins(1, 1, 1, 1)
 
-        self.contents_widget.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                           QtGui.QSizePolicy.Minimum)
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        self.contents_widget.setSizePolicy(QSizePolicy.Minimum,
+                                           QSizePolicy.Minimum)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.Fixed)
 
         self.samples_view.loadSampleSignal.connect(self.load_this_sample)
         self.samples_view.selectSampleSignal.connect(self.user_select_this_sample)
@@ -343,23 +344,23 @@ class BasketView(QtGui.QWidget):
         self.basketPresenceSignal.emit(self.basket_index, on)
 
 
-class CurrentView(QtGui.QWidget):
+class CurrentView(QWidget):
     def __init__(self, title, parent):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         #self.standard_color=None
-        self.standard_color = QtCore.Qt.white
+        self.standard_color = Qt.white
         self.currentSelection = 1
         self.title = title
 
-        self.contents_widget = QtGui.QGroupBox(title, self)
-        self.contents_widget_hlayout = QtGui.QHBoxLayout(self.contents_widget)
+        self.contents_widget = QGroupBox(title, self)
+        self.contents_widget_hlayout = QHBoxLayout(self.contents_widget)
         self.contents_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         self.contents_widget_hlayout.setSpacing(0)
-        self.contents_widget.setAlignment(QtCore.Qt.AlignHCenter)
+        self.contents_widget.setAlignment(Qt.AlignHCenter)
         self.commands_widget_list = []
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.addWidget(self.contents_widget)
@@ -381,7 +382,7 @@ class CurrentView(QtGui.QWidget):
         if self.standard_color is not None:
             Qt4_widget_colors.set_widget_color(self.selected_spinbox.lineEdit(),
                                                self.standard_color)
-        self.emit(QtCore.SIGNAL("selectedChanged"), val)
+        self.selectedChangedSignal.emit(val)
 
     def setMatrixCode(self, code):
         if code is None or code == "":
@@ -406,12 +407,12 @@ class CurrentBasketView(CurrentView):
     def __init__(self, parent):
         CurrentView.__init__(self, "Current basket", parent)
 
-        self.position_label = QtGui.QLabel("Position:", self.contents_widget)
-        self.selected_spinbox = QtGui.QSpinBox(self.contents_widget)
+        self.position_label = QLabel("Position:", self.contents_widget)
+        self.selected_spinbox = QSpinBox(self.contents_widget)
         #self.selected_spinbox.setWrapping(True)
         #self.selected_spinbox.editor().setAlignment(QWidget.AlignRight)
 
-        self.scan_basket_button = QtGui.QToolButton(self.contents_widget)
+        self.scan_basket_button = QToolButton(self.contents_widget)
         self.scan_basket_button.setText("Scan")
 
         self.commands_widget_list.append(self.scan_basket_button)
@@ -430,9 +431,11 @@ class CurrentBasketView(CurrentView):
         self.scan_basket_button.setIcon(Qt4_Icons.load_icon(scan_one_icon))
 
     def scanBasket(self):
-        self.emit(QtCore.SIGNAL("scanBasket"))
+        self.scanBasketSignal.emitt()
 
 class CurrentSampleView(CurrentView):
+
+    sampleChangerStateSignal = pyqtSignal(str)
 
     def __init__(self, parent):
         CurrentView.__init__(self, "Current sample", parent)
@@ -442,35 +445,34 @@ class CurrentSampleView(CurrentView):
         self.load_icon = None
         self.unload_icon = None
 
-        _current_sample_view_widget = QtGui.QWidget(self.contents_widget)
+        _current_sample_view_widget = QWidget(self.contents_widget)
+        self.state_label = QLabel("unknown", _current_sample_view_widget)
+        self.state_label.setAlignment(Qt.AlignHCenter)
 
-        self.state_label = QtGui.QLabel("unknown", _current_sample_view_widget)
-        self.state_label.setAlignment(QtCore.Qt.AlignHCenter)
-
-        self.commands_widget = QtGui.QWidget(_current_sample_view_widget)
-        self.position_label = QtGui.QLabel("Position:", self.commands_widget)
-        self.selected_spinbox = QtGui.QSpinBox(self.commands_widget)
+        self.commands_widget = QWidget(_current_sample_view_widget)
+        self.position_label = QLabel("Position:", self.commands_widget)
+        self.selected_spinbox = QSpinBox(self.commands_widget)
         self.selected_spinbox.setRange(1, 10)
         self.selected_spinbox.setSingleStep(1)
         self.selected_spinbox.setWrapping(True)
-        self.selected_spinbox.lineEdit().setAlignment(QtCore.Qt.AlignRight)
+        self.selected_spinbox.lineEdit().setAlignment(Qt.AlignRight)
 
-        self.holder_length_label = QtGui.QLabel("Holder length:", self.commands_widget)
-        self.holder_length_spinbox = QtGui.QSpinBox(self.commands_widget)
+        self.holder_length_label = QLabel("Holder length:", self.commands_widget)
+        self.holder_length_spinbox = QSpinBox(self.commands_widget)
         self.holder_length_spinbox.setRange(19, 26)
         self.holder_length_spinbox.setSingleStep(1)
-        self.holder_length_spinbox.lineEdit().setAlignment(QtCore.Qt.AlignRight)
-        self.holder_length_spinboxUnit = QtGui.QLabel("mm", self.commands_widget)
+        self.holder_length_spinbox.lineEdit().setAlignment(Qt.AlignRight)
+        self.holder_length_spinboxUnit = QLabel("mm", self.commands_widget)
         self.holder_length_spinbox.setEnabled(False)
         self.holder_length_spinboxUnit.setEnabled(False)
         self.holder_length_label.setEnabled(False)
 
-        self.load_button = QtGui.QToolButton(self.commands_widget)
+        self.load_button = QToolButton(self.commands_widget)
         self.load_button.setText("Mount sample")
         #self.load_button.setTextPosition(QToolButton.BesideIcon)
         self.load_button.hide()
 
-        _commands_widget_gridlayout = QtGui.QGridLayout(self.commands_widget)
+        _commands_widget_gridlayout = QGridLayout(self.commands_widget)
         _commands_widget_gridlayout.addWidget(self.position_label, 0, 0)
         _commands_widget_gridlayout.addWidget(self.selected_spinbox, 0, 1)
         _commands_widget_gridlayout.addWidget(self.holder_length_label, 1, 0)
@@ -479,7 +481,7 @@ class CurrentSampleView(CurrentView):
         #_commands_widget_gridlayout.addWidget(self.load_button, 2, 0, 2, 2)
         #self.commands_widget.setLayout(_commands_widget_gridlayout)
 
-        _current_sample_view_widget_vlayout = QtGui.QVBoxLayout(_current_sample_view_widget)
+        _current_sample_view_widget_vlayout = QVBoxLayout(_current_sample_view_widget)
         _current_sample_view_widget_vlayout.addWidget(self.state_label)
         _current_sample_view_widget_vlayout.addWidget(self.commands_widget)
         _current_sample_view_widget_vlayout.setSpacing(0)
@@ -559,7 +561,7 @@ class CurrentSampleView(CurrentView):
         if msg is None:
             msg = ""
         self.state_label.setText(msg)
-        self.emit(QtCore.SIGNAL("sampleChangerState"), (msg,))
+        self.sampleChangerStateSignal.emit(msg)
 
     def setStateColor(self, state):
         color = SC_SAMPLE_COLOR.get(state)
@@ -592,9 +594,12 @@ class CurrentSampleView(CurrentView):
             self.load_button.setText(\
                 "%s %d:%02d" % (txt, location[0], location[1]))
 
-class StatusView(QtGui.QWidget):
+class StatusView(QWidget):
+
+    statusMsgChangedSignal = pyqtSignal(str, QColor)
+
     def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
 
@@ -609,41 +614,41 @@ class StatusView(QtGui.QWidget):
         # Slots --------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.contents_widget = QtGui.QGroupBox("Unknown", self)
-        self.box1 = QtGui.QWidget(self.contents_widget)
+        self.contents_widget = QGroupBox("Unknown", self)
+        self.box1 = QWidget(self.contents_widget)
 
-        self.status_label = QtGui.QLabel("", self.box1)
-        self.status_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.status_label = QLabel("", self.box1)
+        self.status_label.setAlignment(Qt.AlignCenter)
 
         #flags=self.status_label.alignment()|QtCore.Qt.WordBreak
         #self.status_label.setAlignment(flags)
 
-        self.reset_button = QtGui.QToolButton(self.box1)
+        self.reset_button = QToolButton(self.box1)
         self.reset_button.setText("Reset")
-        self.reset_button.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                        QtGui.QSizePolicy.Fixed)
+        self.reset_button.setSizePolicy(QSizePolicy.Fixed,
+                                        QSizePolicy.Fixed)
         self.reset_button.setEnabled(False)
 
-        self.sc_can_load_radiobutton = QtGui.QRadioButton(\
+        self.sc_can_load_radiobutton = QRadioButton(\
              "Sample changer can load/unload", self.contents_widget)
-        self.minidiff_can_move_radiobutton = QtGui.QRadioButton(\
+        self.minidiff_can_move_radiobutton = QRadioButton(\
              "Minidiff motors can move", self.contents_widget)
 
         # Layout --------------------------------------------------------------
-        _box1_hlayout = QtGui.QHBoxLayout(self.box1)
+        _box1_hlayout = QHBoxLayout(self.box1)
         _box1_hlayout.addWidget(self.status_label)
         _box1_hlayout.addWidget(self.reset_button)
         _box1_hlayout.setSpacing(2)
         _box1_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
+        _contents_widget_vlayout = QVBoxLayout(self.contents_widget)
         _contents_widget_vlayout.addWidget(self.box1)
         _contents_widget_vlayout.addWidget(self.sc_can_load_radiobutton)
         _contents_widget_vlayout.addWidget(self.minidiff_can_move_radiobutton)
         _contents_widget_vlayout.setSpacing(2)
         _contents_widget_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.contents_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -662,7 +667,7 @@ class StatusView(QtGui.QWidget):
         self.status_label.setToolTip(status)
         status = status.strip()
         self.status_label.setText(status)
-        self.emit(QtCore.SIGNAL("statusMsgChanged"), (status, Qt4_widget_colors.LINE_EDIT_ORIGINAL))
+        self.statusMsgChangedSignal.emit(status, Qt4_widget_colors.LINE_EDIT_ORIGINAL)
 
     def setState(self, state):
         color = SC_STATE_COLOR.get(state, None)
@@ -713,7 +718,7 @@ class StatusView(QtGui.QWidget):
         self.minidiff_can_move_radiobutton.setChecked(can_move)
 
     def resetSampleChanger(self):
-        self.emit(QtCore.SIGNAL("resetSampleChanger"), ())
+        self.resetSampleChangerSignal.emit()
 
     def sampleChangerMoveToLoadingPos(self):
         if not self.sc_can_load_radiobutton.isChecked():
@@ -723,7 +728,7 @@ class StatusView(QtGui.QWidget):
         self.minidiff_can_move_radiobutton.setEnabled(False)
         self.sc_can_load_radiobutton.setChecked(False)
         self.minidiff_can_move_radiobutton.setChecked(False)
-        self.emit(QtCore.SIGNAL("sampleChangerToLoadingPosition"), ())
+        self.sampleChangerToLoadingPositionSignal.emit()
 
     def minidiffGetControl(self):
         if not self.minidiff_can_move_radiobutton.isChecked():
@@ -733,9 +738,9 @@ class StatusView(QtGui.QWidget):
         self.minidiff_can_move_radiobutton.setEnabled(False)
         self.sc_can_load_radiobutton.setChecked(False)
         self.minidiff_can_move_radiobutton.setChecked(False)
-        self.emit(QtCore.SIGNAL("minidiffGetControl"), ())
+        self.minidiffGetControlSignal.emit()
 
-class SCCheckBox(QtGui.QCheckBox):
+class SCCheckBox(QCheckBox):
 
     def setMyState(self, state):
         try:
@@ -744,32 +749,32 @@ class SCCheckBox(QtGui.QCheckBox):
             enabled = False
         self.setEnabled(enabled)
 
-class ScanBasketsView(QtGui.QWidget):
+class ScanBasketsView(QWidget):
 
     def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.scan_all_icon = None
         self.standard_color = None
         self.commands_widget_list = []
 
-        self.scan_all_baskets_button = QtGui.QToolButton(self)
+        self.scan_all_baskets_button = QToolButton(self)
         self.scan_all_baskets_button.setText("Scan selected baskets")
         #self.scan_all_baskets_button.setUsesTextLabel(True)
         #self.scan_all_baskets_button.setTextPosition(QToolButton.BesideIcon)
 
-        self.buttonSelect = QtGui.QToolButton(self)
+        self.buttonSelect = QToolButton(self)
         self.buttonSelect.setText("Select")
         #self.buttonSelect.setUsesTextLabel(True)
         #self.buttonSelect.setTextPosition(QToolButton.BesideIcon)
         self.buttonSelect.setEnabled(False)
-        self.buttonSelect.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                        QtGui.QSizePolicy.Fixed)
+        self.buttonSelect.setSizePolicy(QSizePolicy.Fixed,
+                                        QSizePolicy.Fixed)
 
         self.commands_widget_list.append(self.scan_all_baskets_button)
         self.commands_widget_list.append(self.buttonSelect)
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(self.scan_all_baskets_button)
         _main_hlayout.addWidget(self.buttonSelect)
         _main_hlayout.setSpacing(0)
@@ -784,10 +789,10 @@ class ScanBasketsView(QtGui.QWidget):
         self.buttonSelect.setIcon(Qt4_Icons.load(scan_select))
 
     def scanAllBaskets(self):
-        self.emit(QtCore.SIGNAL("scanAllBaskets"))
+        self.scanAllBasketsSignal.emit()
 
     def select_baskets_samples(self):
-        self.emit(QtCore.SIGNAL("select_baskets_samples"))
+        self.selectBasketsSamplesSignal.emit()
 
     def setState(self, state):
         enabled = SC_STATE_GENERAL.get(state, False)
@@ -801,6 +806,9 @@ class ScanBasketsView(QtGui.QWidget):
             self.buttonSelect.hide()
 
 class Qt4_SampleChangerBrick3(BlissWidget):
+
+    sampleGotLoadedSignal = pyqtSignal()
+
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
@@ -831,21 +839,18 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.single_click_selection = False
         self.user_selected_sample = (None, None)
 
-        self.contents_widget = QtGui.QWidget(self)
-
-        # allow to have a custom status widget
-        # build status widget in class method
-        self.status = self.build_status_view(self.contents_widget) 
-        self.switch_to_sample_transfer_button = QtGui.QPushButton(\
+        self.contents_widget = QWidget(self)
+        self.status = StatusView(self.contents_widget)
+        self.switch_to_sample_transfer_button = QPushButton(\
              "Switch to Sample Transfer mode", self.contents_widget)
-        self.test_sample_changer_button = QtGui.QPushButton(\
+        self.test_sample_changer_button = QPushButton(\
              "Test sample changer", self.contents_widget)
         self.current_basket_view = CurrentBasketView(self.contents_widget)
         self.current_sample_view = CurrentSampleView(self.contents_widget)
 
-        self.sc_contents_gbox = QtGui.QGroupBox("Contents", self)
-        self.sc_contents_gbox.setAlignment(QtCore.Qt.AlignHCenter)
-        self.reset_baskets_samples_button = QtGui.QPushButton(\
+        self.sc_contents_gbox = QGroupBox("Contents", self)
+        self.sc_contents_gbox.setAlignment(Qt.AlignHCenter)
+        self.reset_baskets_samples_button = QPushButton(\
              "Reset sample changer contents", self.sc_contents_gbox)
 
         self.double_click_loads_cbox = SCCheckBox(\
@@ -857,10 +862,10 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         #   overwrite 'build_operations_widget()' method in derived class 
         #   to put content.  Otherwise empty and hidden by default
         #   See Qt4_SampleChangerSimple.py (derived from this class)
-        self.operations_widget = QtGui.QWidget(self)  
+        self.operations_widget = QWidget(self)  
         self.build_operations_widget()                
 
-        self.baskets_grid_layout = QtGui.QGridLayout()
+        self.baskets_grid_layout = QGridLayout()
         self.baskets_grid_layout.setSpacing(0)
         self.baskets_grid_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -871,7 +876,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
 
         #self.basketsSamplesSelectionDialog = BasketsSamplesSelection(self)
 
-        self.sc_contents_gbox_vlayout = QtGui.QVBoxLayout(self.sc_contents_gbox)
+        self.sc_contents_gbox_vlayout = QVBoxLayout(self.sc_contents_gbox)
         self.sc_contents_gbox_vlayout.addWidget(self.reset_baskets_samples_button)
         self.sc_contents_gbox_vlayout.addWidget(self.double_click_loads_cbox)
         self.sc_contents_gbox_vlayout.addWidget(self.scan_baskets_view)
@@ -881,7 +886,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sc_contents_gbox_vlayout.setSpacing(0)
         self.sc_contents_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _contents_widget_vlayout = QtGui.QVBoxLayout(self.contents_widget)
+        _contents_widget_vlayout = QVBoxLayout(self.contents_widget)
         _contents_widget_vlayout.addWidget(self.status)
         _contents_widget_vlayout.addWidget(self.switch_to_sample_transfer_button)
         _contents_widget_vlayout.addWidget(self.test_sample_changer_button)
@@ -893,7 +898,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         _contents_widget_vlayout.setContentsMargins(0, 0, 0, 0)
         self.contents_widget.setLayout(_contents_widget_vlayout)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.contents_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -997,7 +1002,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         pass
 
     def status_msg_changed(self, msg, color):
-        self.emit(QtCore.SIGNAL("statusMsgChanged"), (msg, color))
+        self.statusMsgChangedSignal.emit(msg, color)
 
     def selectionChanged(self):
         sample = self.sample_changer_hwobj.getSelectedSample()
@@ -1042,7 +1047,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.current_sample_view.setLoaded(loaded)
 
         if loaded:
-            self.emit(QtCore.SIGNAL("sampleGotLoaded"), ())
+            self.sampleGotLoadedSignal.emit()
 
     def setCollecting(self, enabled_state):
         self.setEnabled(enabled_state)
@@ -1152,7 +1157,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def clear_matrices(self):
         for basket in self.baskets:
             basket.clear_matrices()
-        self.emit(QtCore.SIGNAL("scanBasketUpdate"), (None, ))
+        self.scanBasketUpdateSignal.emit()
 
     def sampleChangerContentsChanged(self, baskets):
         self.clear_matrices()
@@ -1218,7 +1223,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def select_baskets_samples(self):
         retval = self.basketsSamplesSelectionDialog.exec_loop()
 
-        if retval == QtGui.QDialog.Accepted:
+        if retval == QDialog.Accepted:
             self.sample_changer_hwobj.resetBasketsInformation()
 
             for basket, samples in self.basketsSamplesSelectionDialog.result.iteritems():

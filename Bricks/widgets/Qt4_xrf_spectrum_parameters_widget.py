@@ -17,8 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -28,9 +32,9 @@ from widgets.Qt4_mca_spectrum_widget import McaSpectrumWidget
 from widgets.Qt4_snapshot_widget import SnapshotWidget
 
 
-class XRFSpectrumParametersWidget(QtGui.QWidget):
+class XRFSpectrumParametersWidget(QWidget):
     def __init__(self, parent = None, name = "xrf_spectrum_parameters_widget"):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -43,22 +47,22 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        _top_widget = QtGui.QWidget(self)
-        _parameters_widget = QtGui.QWidget(_top_widget)
+        _top_widget = QWidget(self)
+        _parameters_widget = QWidget(_top_widget)
         self.data_path_widget = DataPathWidget(_parameters_widget)
-        self.other_parameters_gbox = QtGui.QGroupBox("Other parameters", _parameters_widget) 
-        self.count_time_label = QtGui.QLabel("Count time:", 
-                                             self.other_parameters_gbox)
-        self.count_time_ledit = QtGui.QLineEdit(self.other_parameters_gbox)
+        self.other_parameters_gbox = QGroupBox("Other parameters", _parameters_widget) 
+        self.count_time_label = QLabel("Count time:", 
+                                       self.other_parameters_gbox)
+        self.count_time_ledit = QLineEdit(self.other_parameters_gbox)
         self.count_time_ledit.setFixedWidth(50)
-        self.adjust_transmission_cbox = QtGui.QCheckBox("Adjust transmission", \
+        self.adjust_transmission_cbox = QCheckBox("Adjust transmission", \
              self.other_parameters_gbox)
         self.adjust_transmission_cbox.hide()
         self.mca_spectrum_widget = McaSpectrumWidget(self)
         self.snapshot_widget = SnapshotWidget(self)
  
         # Layout -------------------------------------------------------------
-        _other_parameters_gbox_hlayout = QtGui.QHBoxLayout(self.other_parameters_gbox)
+        _other_parameters_gbox_hlayout = QHBoxLayout(self.other_parameters_gbox)
         _other_parameters_gbox_hlayout.addWidget(self.count_time_label)  
         _other_parameters_gbox_hlayout.addWidget(self.count_time_ledit)
         _other_parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
@@ -66,31 +70,31 @@ class XRFSpectrumParametersWidget(QtGui.QWidget):
         _other_parameters_gbox_hlayout.setSpacing(2)
         _other_parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _parameters_widget_layout = QtGui.QVBoxLayout(_parameters_widget)
+        _parameters_widget_layout = QVBoxLayout(_parameters_widget)
         _parameters_widget_layout.addWidget(self.data_path_widget)
         _parameters_widget_layout.addWidget(self.other_parameters_gbox)
         _parameters_widget_layout.addStretch(0)
         _parameters_widget_layout.setSpacing(2)
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _top_widget_layout = QtGui.QHBoxLayout(_top_widget)
+        _top_widget_layout = QHBoxLayout(_top_widget)
         _top_widget_layout.addWidget(_parameters_widget)
         _top_widget_layout.addWidget(self.snapshot_widget)
         _top_widget_layout.setSpacing(2)
         _top_widget_layout.addStretch(0)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
         
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.mca_spectrum_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
        
         # SizePolicies -------------------------------------------------------
-        self.mca_spectrum_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                               QtGui.QSizePolicy.Expanding)
-        _top_widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                  QtGui.QSizePolicy.Fixed)
+        self.mca_spectrum_widget.setSizePolicy(QSizePolicy.Expanding,
+                                               QSizePolicy.Expanding)
+        _top_widget.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------ 
         self.data_path_widget.data_path_layout.prefix_ledit.textChanged.\

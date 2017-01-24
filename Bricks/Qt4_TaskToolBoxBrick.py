@@ -21,8 +21,13 @@ import os
 import logging
 import traceback
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import pyqtSignal, pyqtSlot
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import pyqtSignal, pyqtSlot
+    from PyQt4.QtGui import *
 
 import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
@@ -38,6 +43,9 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
     """
     Descript. : 
     """
+
+    request_tree_brick = pyqtSignal()
+
     def __init__(self, *args):
         """
         Descript. : Initiates BlissWidget Brick
@@ -60,28 +68,29 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("useOscStartCbox", "boolean", False)
        
-        # Signals ------------------------------------------------------------  
-        self.defineSignal("getTreeBrick",())
+        # Signals -------------------------------------------------------------
+        self.defineSignal("request_tree_brick", ())
 
         # Slots ---------------------------------------------------------------
         self.defineSlot("logged_in", ())
         self.defineSlot("set_session", ())
         self.defineSlot("selection_changed",())
         self.defineSlot("user_group_saved", ())
+        self.defineSlot("set_tree_brick", ())
 
         # Graphic elements ----------------------------------------------------
         self.task_tool_box_widget = TaskToolBoxWidget(self)
 
         # Layout --------------------------------------------------------------
-        self.main_layout = QtGui.QVBoxLayout(self)
+        self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self.task_tool_box_widget)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
         self.setEnabled(self.ispyb_logged_in)
@@ -98,12 +107,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         if self.session_hwobj.session_id:
             self.setEnabled(True)
 
-
-
-        tree_brick = {}
-        self.emit(QtCore.SIGNAL("getTreeBrick"), tree_brick)
-        self.tree_brick = tree_brick.get('tree_brick', None)
-        self.task_tool_box_widget.set_tree_brick(self.tree_brick)
+        self.request_tree_brick.emit() 
 
     def user_group_saved(self, new_user_group):
         """
@@ -116,7 +120,13 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         path = self.session_hwobj.get_base_image_directory() + "/" + str(new_user_group)
         msg = 'Image path is: %s' % path
         logging.getLogger('GUI').info(msg)
-        
+
+    @pyqtSlot(BlissWidget)
+    def set_tree_brick(self, brick):
+        self.tree_brick = brick
+        self.task_tool_box_widget.set_tree_brick(brick)
+    
+    @pyqtSlot(int, str, str, int, str, str, bool)
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):
@@ -133,6 +143,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.logged_in(True)
 
 
+    @pyqtSlot(bool)
     def logged_in(self, logged_in):
         """
         Descript. : Handels the signal logged_in from the brick the handles 

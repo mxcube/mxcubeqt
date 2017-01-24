@@ -28,9 +28,14 @@ import jsonpickle
 from datetime import datetime
 from collections import namedtuple
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtCore import Qt, QEvent
+else:
+    from PyQt4.QtGui import *
+    from PyQt4.QtCore import Qt, QEvent
 
 import Qt4_queue_item
 import queue_entry
@@ -51,7 +56,7 @@ SCFilterOptions = namedtuple('SCFilterOptions',
 SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
 
 
-class DataCollectTree(QtGui.QWidget):
+class DataCollectTree(QWidget):
     """
     Descript. :
     """ 
@@ -62,7 +67,7 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
  
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.setObjectName(name)
 
@@ -108,51 +113,50 @@ class DataCollectTree(QtGui.QWidget):
         self.star_icon = Qt4_Icons.load_icon("star")
         self.caution_icon = Qt4_Icons.load_icon("Caution2.png")
         
-        self.button_widget = QtGui.QWidget(self)                
-        self.up_button = QtGui.QPushButton(self.button_widget)
+        self.button_widget = QWidget(self)                
+        self.up_button = QPushButton(self.button_widget)
         self.up_button.setIcon(Qt4_Icons.load_icon("Up2.png"))
         self.up_button.setFixedHeight(25)
-        self.down_button = QtGui.QPushButton(self.button_widget)
+        self.down_button = QPushButton(self.button_widget)
         self.down_button.setIcon(Qt4_Icons.load_icon("Down2.png"))
         self.down_button.setFixedHeight(25)
 
-        self.copy_button = QtGui.QPushButton(self.button_widget)
+        self.copy_button = QPushButton(self.button_widget)
         self.copy_button.setIcon(Qt4_Icons.load_icon("copy.png"))
         self.copy_button.setDisabled(True)
         self.copy_button.setToolTip("Copy highlighted queue entries")
 
-        self.delete_button = QtGui.QPushButton(self.button_widget)
+        self.delete_button = QPushButton(self.button_widget)
         self.delete_button.setIcon(Qt4_Icons.load_icon("bin_small.png"))
         self.delete_button.setDisabled(True)
         self.delete_button.setToolTip("Delete highlighted queue entries")
 
-        self.collect_button = QtGui.QPushButton(self.button_widget)
+        self.collect_button = QPushButton(self.button_widget)
         self.collect_button.setText("Collect Queue")
         self.collect_button.setFixedWidth(125)
         self.collect_button.setIcon(self.play_icon)
         self.collect_button.setDisabled(True)
         Qt4_widget_colors.set_widget_color(self.collect_button, 
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
 
-        self.continue_button = QtGui.QPushButton(self.button_widget)
+        self.continue_button = QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
         self.continue_button.setDisabled(True)
         self.continue_button.setToolTip("Pause after current data collection")
 
-        self.tree_splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
-        self.sample_tree_widget = QtGui.QTreeWidget(self.tree_splitter)
-        self.history_table_widget = QtGui.QTableWidget(self.tree_splitter)
-        self.history_enable_cbox = QtGui.QCheckBox(\
-             "Display history view", self)
+        self.tree_splitter = QSplitter(Qt.Vertical, self)
+        self.sample_tree_widget = QTreeWidget(self.tree_splitter)
+        self.history_table_widget = QTableWidget(self.tree_splitter)
+        self.history_enable_cbox = QCheckBox("Display history view", self)
         self.history_enable_cbox.setChecked(True)
  
-        self.plate_navigator_cbox = QtGui.QCheckBox("Plate navigator", self)
+        self.plate_navigator_cbox = QCheckBox("Plate navigator", self)
         self.plate_navigator_widget = PlateNavigatorWidget(self)
         self.plate_navigator_widget.hide()
 
         # Layout --------------------------------------------------------------
-        button_widget_grid_layout = QtGui.QGridLayout(self.button_widget) 
+        button_widget_grid_layout = QGridLayout(self.button_widget) 
         button_widget_grid_layout.addWidget(self.up_button, 0, 0)
         button_widget_grid_layout.addWidget(self.down_button, 0, 1)
         button_widget_grid_layout.addWidget(self.collect_button, 1, 0, 1, 2)
@@ -163,7 +167,7 @@ class DataCollectTree(QtGui.QWidget):
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         #main_layout.addWidget(self.sample_tree_widget)
         main_layout.addWidget(self.tree_splitter)
         main_layout.addWidget(self.history_enable_cbox)
@@ -174,8 +178,6 @@ class DataCollectTree(QtGui.QWidget):
         main_layout.setSpacing(1) 
 
         # SizePolicies --------------------------------------------------------
-        #self.sample_tree_widget.setSizePolicy(QtGui.QSizePolicy(
-        #     QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
 
         # Qt signal/slot connections ------------------------------------------
         self.up_button.clicked.connect(self.up_click)
@@ -209,31 +211,37 @@ class DataCollectTree(QtGui.QWidget):
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
-        self.sample_tree_widget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        self.setAttribute(QtCore.Qt.WA_WState_Polished)      
+        self.sample_tree_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setAttribute(Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
 
         font = self.history_table_widget.font()
         font.setPointSize(8)
         self.history_table_widget.setFont(font)
         self.history_table_widget.setEditTriggers(\
-             QtGui.QAbstractItemView.NoEditTriggers)
+             QAbstractItemView.NoEditTriggers)
         self.history_table_widget.setColumnCount(5)
         self.history_table_widget.setHorizontalHeaderItem(\
-             0, QtGui.QTableWidgetItem("Sample"))
+             0, QTableWidgetItem("Sample"))
         self.history_table_widget.setHorizontalHeaderItem(\
-             1, QtGui.QTableWidgetItem("Time"))
+             1, QTableWidgetItem("Time"))
         self.history_table_widget.setHorizontalHeaderItem(\
-             2, QtGui.QTableWidgetItem("Type"))
+             2, QTableWidgetItem("Type"))
         self.history_table_widget.setHorizontalHeaderItem(\
-             3, QtGui.QTableWidgetItem("Status"))
+             3, QTableWidgetItem("Status"))
         self.history_table_widget.setHorizontalHeaderItem(\
-             4, QtGui.QTableWidgetItem("Details"))
+             4, QTableWidgetItem("Details"))
         self.history_table_widget.setAlternatingRowColors(True)
         self.history_table_widget.setSelectionBehavior(\
-             QtGui.QAbstractItemView.SelectRows)
+             QAbstractItemView.SelectRows)
         #self.history_table_widget.horizontalHeader().setSortIndicatorShown(True)
-        self.history_table_widget.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+
+        if BlissFramework.get_gui_version() == "QT5":
+            self.history_table_widget.verticalHeader().\
+               setSectionResizeMode(QHeaderView.Fixed)
+        else:    
+           self.history_table_widget.verticalHeader().\
+               setResizeMode(QHeaderView.Fixed)
         self.history_table_widget.horizontalHeader().setMaximumHeight(18)
       
 
@@ -244,7 +252,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        if event.type() == QtCore.QEvent.MouseButtonDblClick:
+        if event.type() == QEvent.MouseButtonDblClick:
             self.show_details()
             return True
         else:
@@ -264,7 +272,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        self.item_menu = QtGui.QMenu(self.sample_tree_widget)
+        self.item_menu = QMenu(self.sample_tree_widget)
         item = self.sample_tree_widget.currentItem()
 
         if item:
@@ -325,7 +333,7 @@ class DataCollectTree(QtGui.QWidget):
                 self.item_menu.addAction("Remove", self.delete_click) 
             if add_details:
                 self.item_menu.addAction("Details", self.show_details)
-            self.item_menu.popup(QtGui.QCursor.pos())
+            self.item_menu.popup(QCursor.pos())
         
     def item_double_click(self):
         """
@@ -419,12 +427,12 @@ class DataCollectTree(QtGui.QWidget):
         """
         items = self.get_selected_items()
         if len(items) == 1:
-            items[0].setFlags(QtCore.Qt.ItemIsSelectable |
-                              QtCore.Qt.ItemIsEnabled |
-                              QtCore.Qt.ItemIsEditable)
+            items[0].setFlags(Qt.ItemIsSelectable |
+                              Qt.ItemIsEnabled |
+                              Qt.ItemIsEditable)
             self.sample_tree_widget.editItem(items[0])
-            items[0].setFlags(QtCore.Qt.ItemIsSelectable |
-                              QtCore.Qt.ItemIsEnabled)
+            items[0].setFlags(Qt.ItemIsSelectable |
+                              Qt.ItemIsEnabled)
             items[0].get_model().set_name(items[0].text(0))
 
     def add_star_treewidget_item(self):
@@ -439,7 +447,7 @@ class DataCollectTree(QtGui.QWidget):
         for item in items:
             item.set_star(False)        
             if not item.has_star():
-                item.setIcon(0, QtGui.QIcon())
+                item.setIcon(0, QIcon())
 
     def mount_sample(self):
         """
@@ -568,7 +576,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
     
         while item:
@@ -625,11 +633,11 @@ class DataCollectTree(QtGui.QWidget):
         return self.sample_tree_widget.selectedItems()
 
     def de_select_items(self):
-        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
-            item.setCheckState(0, QtCore.Qt.Unchecked)
+            item.setCheckState(0, Qt.Unchecked)
             it += 1
             item = it.value()
 
@@ -685,7 +693,7 @@ class DataCollectTree(QtGui.QWidget):
         return False
 
     def get_mounted_sample_item(self):
-        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
@@ -729,7 +737,7 @@ class DataCollectTree(QtGui.QWidget):
                    loaded_sample_loc = loaded_sample.getCoords() 
                 except:
                    pass
-            it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+            it = QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()
         
             while item:
@@ -787,13 +795,13 @@ class DataCollectTree(QtGui.QWidget):
             self.continue_button.setText('Continue')
             Qt4_widget_colors.set_widget_color(self.continue_button, 
                                                Qt4_widget_colors.LIGHT_YELLOW, 
-                                               QtGui.QPalette.Button)
+                                               QPalette.Button)
         else:
             self.continue_button.setText('Pause')
             Qt4_widget_colors.set_widget_color(
                               self.continue_button, 
                               Qt4_widget_colors.BUTTON_ORIGINAL, 
-                              QtGui.QPalette.Button)
+                              QPalette.Button)
 
     def collect_stop_toggle(self):
         """
@@ -826,7 +834,7 @@ class DataCollectTree(QtGui.QWidget):
                 message = "No data collections selected, please select one" + \
                           " or more data collections"
 
-                QtGui.QMessageBox.information(self,"Data collection",
+                QMessageBox.information(self,"Data collection",
                                               message, "OK")
         else:
             self.stop_collection()
@@ -899,12 +907,12 @@ class DataCollectTree(QtGui.QWidget):
         Qt4_widget_colors.set_widget_color(
                           self.collect_button, 
                           Qt4_widget_colors.LIGHT_RED,
-                          QtGui.QPalette.Button)
+                          QPalette.Button)
         self.collect_button.setIcon(self.stop_icon)
         self.continue_button.setEnabled(True)
         self.run_cb()
 
-        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.BusyCursor))
+        QApplication.setOverrideCursor(QCursor(Qt.BusyCursor))
         try:
             self.queue_hwobj.execute()
         except (Exception, e):
@@ -914,7 +922,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
         self.queue_hwobj.stop()
         self.queue_stop_handler()
 
@@ -922,7 +930,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
         self.user_stopped = True
         self.queue_execution_completed(None)
 
@@ -959,26 +967,26 @@ class DataCollectTree(QtGui.QWidget):
             self.history_table_widget.insertRow(0)
             
             self.history_table_widget.setItem(\
-                 0, 0, QtGui.QTableWidgetItem(sample_model.get_display_name()))
+                 0, 0, QTableWidgetItem(sample_model.get_display_name()))
             self.history_table_widget.setItem(\
-                 0, 1, QtGui.QTableWidgetItem(datetime.now().strftime("%H:%M:%S")))
+                 0, 1, QTableWidgetItem(datetime.now().strftime("%H:%M:%S")))
             self.history_table_widget.setItem(\
-                 0, 2, QtGui.QTableWidgetItem(queue_entry.get_type_str()))
-            status_item = QtGui.QTableWidgetItem(status)
+                 0, 2, QTableWidgetItem(queue_entry.get_type_str()))
+            status_item = QTableWidgetItem(status)
             self.history_table_widget.setItem(0, 3, status_item)
             if status == "Successful":
-                status_item.setBackground(QtGui.QBrush(Qt4_widget_colors.LIGHT_GREEN))
+                status_item.setBackground(QBrush(Qt4_widget_colors.LIGHT_GREEN))
             else:
-                status_item.setBackground(QtGui.QBrush(Qt4_widget_colors.LIGHT_RED)) 
+                status_item.setBackground(QBrush(Qt4_widget_colors.LIGHT_RED)) 
 
             self.history_table_widget.setItem(\
-                 0, 4, QtGui.QTableWidgetItem(item_details))
+                 0, 4, QTableWidgetItem(item_details))
             self.history_table_widget.resizeRowsToContents()
             self.history_table_widget.resizeColumnsToContents()
             #self.history_table_widget.setSortingEnabled(True)
             self.history_table_widget.setRowHeight(0, 17)
             self.history_table_widget.setVerticalHeaderItem(\
-                 0, QtGui.QTableWidgetItem(str(self.history_table_widget.rowCount())))
+                 0, QTableWidgetItem(str(self.history_table_widget.rowCount())))
             self.item_history_dict[self.history_table_widget.rowCount() - 1] = view_item
             #self.delete_empty_finished_items()
 
@@ -987,7 +995,7 @@ class DataCollectTree(QtGui.QWidget):
         Restores normal cursors, changes collect button
         Deselects all items and selects mounted sample
         """
-        QtGui.QApplication.restoreOverrideCursor() 
+        QApplication.restoreOverrideCursor() 
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(self.play_icon)
@@ -995,7 +1003,7 @@ class DataCollectTree(QtGui.QWidget):
         Qt4_widget_colors.set_widget_color(
                           self.collect_button,
                           Qt4_widget_colors.LIGHT_GREEN,
-                          QtGui.QPalette.Button)
+                          QPalette.Button)
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
         #self.parent().enable_hutch_menu(True)
@@ -1012,7 +1020,7 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         checked_items = []
-        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
         while item: 
             if item.checkState(0) > 0 and not \
@@ -1080,7 +1088,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         selected_items = self.get_selected_items()
         if len(selected_items) == 0:        
-            it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+            it = QTreeWidgetItemIterator(self.sample_tree_widget)
             #item = it.current()
             item = it.value()
             if item.get_model().free_pin_mode:
@@ -1245,7 +1253,7 @@ class DataCollectTree(QtGui.QWidget):
         """
         Descript. :
         """
-        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
@@ -1289,11 +1297,11 @@ class DataCollectTree(QtGui.QWidget):
         Descript. :
         """
         conflict = False
-        it = QtGui.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
-            if item.checkState(0) == QtCore.Qt.Checked:
+            if item.checkState(0) == Qt.Checked:
                 pt = item.get_model().get_path_template()
                 
                 if pt:
@@ -1307,7 +1315,7 @@ class DataCollectTree(QtGui.QWidget):
                          if item.has_star():
                              item.setIcon(0, self.star_icon)
                          else:
-                             item.setIcon(0, QtGui.QIcon())
+                             item.setIcon(0, QIcon())
                          
             it += 1
             item = it.value()
@@ -1320,7 +1328,7 @@ class DataCollectTree(QtGui.QWidget):
             self.last_added_item.setSelected(True) 
 
     def hide_empty_baskets(self):
-        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
+        self.item_iterator = QTreeWidgetItemIterator(\
              self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
@@ -1339,7 +1347,7 @@ class DataCollectTree(QtGui.QWidget):
               item = self.item_iterator.value()
 
     def delete_empty_finished_items(self):
-        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
+        self.item_iterator = QTreeWidgetItemIterator(\
              self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
@@ -1403,7 +1411,7 @@ class DataCollectTree(QtGui.QWidget):
     def save_item(self):
         """Saves a single item in a file"""
 
-        filename = str(QtGui.QFileDialog.getSaveFileName(\
+        filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
@@ -1431,7 +1439,7 @@ class DataCollectTree(QtGui.QWidget):
     def insert_item(self, apply_once=False):
         """Inserts item from a file"""
 
-        filename = str(QtGui.QFileDialog.getOpenFileName(self,
+        filename = str(QFileDialog.getOpenFileName(self,
             "Open file", os.environ["HOME"],
             "Item file (*.dat)", "Choose a itemfile to open"))
         if len(filename) > 0:
@@ -1478,7 +1486,7 @@ class DataCollectTree(QtGui.QWidget):
     def save_queue(self):
         """Saves queue in the file"""
 
-        filename = str(QtGui.QFileDialog.getSaveFileName(\
+        filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
@@ -1488,7 +1496,7 @@ class DataCollectTree(QtGui.QWidget):
     def load_queue(self):
         """Loads queue from file"""
 
-        filename = str(QtGui.QFileDialog.getOpenFileName(self,
+        filename = str(QFileDialog.getOpenFileName(self,
             "Open file", os.environ["HOME"],
             "Item file (*.dat)", "Choose queue file to open"))
         if len(filename) > 0:
@@ -1516,7 +1524,7 @@ class DataCollectTree(QtGui.QWidget):
         pass 
 
     def shape_changed(self, shape, shape_type):
-        self.item_iterator = QtGui.QTreeWidgetItemIterator(\
+        self.item_iterator = QTreeWidgetItemIterator(\
              self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:

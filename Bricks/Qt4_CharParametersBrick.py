@@ -17,9 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtWebKit import QWebView
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
@@ -55,9 +57,9 @@ class Qt4_CharParametersBrick(BlissWidget):
         self.defineSlot("populate_char_parameter_widget", {})
 
         # Graphic elements ---------------------------------------------------- 
-        self.stacked_widget = QtGui.QStackedWidget(self)
+        self.stacked_widget = QStackedWidget(self)
         self.parameters_widget = CharParametersWidget(self)
-        self.toggle_page_button = QtGui.QPushButton('View Results', self)
+        self.toggle_page_button = QPushButton('View Results', self)
         self.toggle_page_button.setFixedWidth(100)
 
         self.results_view = WebViewWidget(self)
@@ -65,14 +67,14 @@ class Qt4_CharParametersBrick(BlissWidget):
         self.stacked_widget.addWidget(self.results_view)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.stacked_widget)
         #_main_vlayout.addStretch(0)
         _main_vlayout.addWidget(self.toggle_page_button)
 
         # SizePolicies -------------------------------------------------------
-        self.results_view.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                        QtGui.QSizePolicy.Expanding)
+        self.results_view.setSizePolicy(QSizePolicy.Expanding,
+                                        QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         self.toggle_page_button.clicked.connect(self.toggle_page)

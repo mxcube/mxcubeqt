@@ -19,8 +19,13 @@
 
 import copy
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import QVBoxLayout
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QVBoxLayout
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -44,7 +49,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         """
 
         CreateTaskBase.__init__(self, parent, name, 
-            QtCore.Qt.WindowFlags(fl), "Standart")
+            Qt.WindowFlags(fl), "Standart")
 
         if not name:
             self.setObjectName("create_discrete_widget")
@@ -67,7 +72,7 @@ class CreateDiscreteWidget(CreateTaskBase):
              data_model=self._processing_parameters)
        
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)

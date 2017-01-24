@@ -20,16 +20,22 @@
 import os
 import sys
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class RadiationDamageModelWidgetLayout(QtGui.QWidget):
+class RadiationDamageModelWidgetLayout(QWidget):
     def __init__(self, parent = None, name = None, fl = 0):
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
 
         if not name:
             self.setObjectName("RadiationDamageModelWidgetLayout")
@@ -44,7 +50,7 @@ class RadiationDamageModelWidgetLayout(QtGui.QWidget):
              "ui_files/Qt4_radiation_damage_model_widget_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.rad_damage_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -54,7 +60,7 @@ class RadiationDamageModelWidgetLayout(QtGui.QWidget):
 
         # Other ---------------------------------------------------------------
         self.languageChange()
-        self.setAttribute(QtCore.Qt.WA_WState_Polished) 
+        self.setAttribute(Qt.WA_WState_Polished) 
         Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.GROUP_BOX_GRAY)
 
     def languageChange(self):
@@ -68,8 +74,8 @@ class RadiationDamageModelWidgetLayout(QtGui.QWidget):
              setText(self.__tr("Sensetivity:"))
 
     def __tr(self, s, c = None):
-        return QtGui.QApplication.translate("RadiationDamageModelWidgetLayout", s, c)
+        return QApplication.translate("RadiationDamageModelWidgetLayout", s, c)
 
     def __trUtf8(self, s, c = None):
-        return QtGui.QApplication.translate("RadiationDamageModelWidgetLayout",\
-                     s, c, QtGui.QApplication.UnicodeUTF8)
+        return QApplication.translate("RadiationDamageModelWidgetLayout",\
+                     s, c, QApplication.UnicodeUTF8)

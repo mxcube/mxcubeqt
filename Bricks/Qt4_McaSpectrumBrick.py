@@ -19,9 +19,9 @@
 
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+#from PyQt4 import QtGui
+#from PyQt4 import QtCore
+#from PyQt4 import uic
 
 from PyMca import McaAdvancedFit
 from PyMca import ConfigDict

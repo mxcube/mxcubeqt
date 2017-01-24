@@ -17,22 +17,38 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import pyqtSignal, Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QCursor
+else:
+    from PyQt4.QtCore import pyqtSignal, Qt
+    from PyQt4.QtGui import *
 
 import numpy as np
 from matplotlib.figure import Figure
 
-#from matplotlib.backends import qt4_compat
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
-try:
-   from matplotlib.backends.backend_qt4agg \
-   import NavigationToolbar2QTAgg as NavigationToolbar
-except:
-   from matplotlib.backends.backend_qt4agg \
-   import NavigationToolbar2QT as NavigationToolbar
+if BlissFramework.get_gui_version() == "QT5":
+    from matplotlib.backends.backend_qt5agg \
+    import FigureCanvasQTAgg as FigureCanvas
+    try:
+        from matplotlib.backends.backend_qt5agg \
+        import NavigationToolbar2QTAgg as NavigationToolbar
+    except:
+        from matplotlib.backends.backend_qt5agg \
+        import NavigationToolbar2QT as NavigationToolbar 
+else:
+    from matplotlib.backends.backend_qt4agg \
+    import FigureCanvasQTAgg as FigureCanvas
+    try:
+        from matplotlib.backends.backend_qt4agg \
+        import NavigationToolbar2QTAgg as NavigationToolbar
+    except:
+        from matplotlib.backends.backend_qt4agg \
+        import NavigationToolbar2QT as NavigationToolbar
 
 import matplotlib.pyplot as plt
 
@@ -40,7 +56,7 @@ import matplotlib.pyplot as plt
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class TwoAxisPlotWidget(QtGui.QWidget):
+class TwoAxisPlotWidget(QWidget):
     """
     Descript. :
     """
@@ -49,19 +65,24 @@ class TwoAxisPlotWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self._realtime_plot = realtime_plot
         self._two_axis_figure_canvas = MplCanvas(self)
         self._two_axis_figure_canvas.set_real_time(realtime_plot)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._two_axis_figure_canvas)  
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
+
+        self.clearcurves = self.clear 
+
+    def setTitle(self, title):
+        self._two_axis_figure_canvas.set_title(title)
 
     def clear(self):
         """
@@ -118,6 +139,30 @@ class TwoAxisPlotWidget(QtGui.QWidget):
     def set_max_plot_point(self, max_points):
         self._two_axis_figure_canvas.set_max_plot_points(max_points)
 
+    def showGrid(self):
+        pass
+
+    def newcurve(self, label, x_array, y_array):
+        self._two_axis_figure_canvas.add_curve(y_array, x_array, label=label)
+
+    def setx1axislimits(self, x_min, x_max):
+        self._two_axis_figure_canvas.axes.set_xlim((x_min, x_max))
+
+    def xlabel(self, label):
+        self._two_axis_figure_canvas.axes.axes.set_xlabel(label)
+
+    def ylabel(self, label):
+        self._two_axis_figure_canvas.axes.axes.set_ylabel(label)
+
+    def setx1timescale(self, state):
+        pass
+
+    def replot(self):
+        self._two_axis_figure_canvas.axes.relim()
+        self._two_axis_figure_canvas.axes.autoscale_view()
+        self._two_axis_figure_canvas.fig.canvas.draw()
+        self._two_axis_figure_canvas.fig.canvas.flush_events()
+
 class MplCanvas(FigureCanvas):
     """
     Descript. : Class to draw plots on canvas
@@ -137,8 +182,8 @@ class MplCanvas(FigureCanvas):
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
         self.curves = []
@@ -214,7 +259,7 @@ class MplCanvas(FigureCanvas):
         return self.mouse_position
 
 
-class PolarScaterWidget(QtGui.QWidget):
+class PolarScaterWidget(QWidget):
     """
     Descript. :
     """
@@ -223,17 +268,17 @@ class PolarScaterWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self._polar_scater = PolarScater(self)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._polar_scater)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
 
     def draw_multiwedge_scater(self, sw_list):
         self._polar_scater.draw_scater(sw_list)
@@ -254,8 +299,8 @@ class PolarScater(FigureCanvas):
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
 
@@ -287,18 +332,18 @@ class PolarScater(FigureCanvas):
         self.axes.set_yticks(np.arange(1, col_count + 2))
         self.fig.canvas.draw_idle()
 
-class TwoDimenisonalPlotWidget(QtGui.QWidget):
+class TwoDimenisonalPlotWidget(QWidget):
     """
     Descript. :
     """
-    mouseClickedSignal = QtCore.pyqtSignal(float, float)
-    mouseDoubleClickedSignal = QtCore.pyqtSignal(float, float)
+    mouseClickedSignal = pyqtSignal(float, float)
+    mouseDoubleClickedSignal = pyqtSignal(float, float)
 
     def __init__(self, parent=None):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.im = None
         self.mpl_canvas = MplCanvas(self)
@@ -307,14 +352,14 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.selection_span = None
         self.mouse_clicked = None
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.mpl_canvas)
         _main_vlayout.addWidget(self.ntb)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
 
         self.mpl_canvas.axes.grid(True)
         self.mpl_canvas.fig.canvas.mpl_connect(\
@@ -342,20 +387,20 @@ class TwoDimenisonalPlotWidget(QtGui.QWidget):
         self.mouse_clicked = False
 
     def motion_notify_event(self, mouse_event):
-        QtGui.QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
         if self.selection_xrange and mouse_event.xdata:
             do_update = False
             (x_start, x_end) = self.mpl_canvas.axes.get_xlim()
             delta = abs((x_end - x_start) / 50.0)
             if abs(self.selection_xrange[0] - mouse_event.xdata) < delta:
-                QtGui.QApplication.setOverrideCursor(\
-                    QtGui.QCursor(QtCore.Qt.SizeHorCursor))
+                QApplication.setOverrideCursor(\
+                    QCursor(Qt.SizeHorCursor))
                 if self.mouse_clicked: 
                     self.selection_xrange[0] = mouse_event.xdata
                     do_update = True
             elif abs(self.selection_xrange[1] - mouse_event.xdata) < delta:
-                QtGui.QApplication.setOverrideCursor(\
-                    QtGui.QCursor(QtCore.Qt.SizeHorCursor))
+                QApplication.setOverrideCursor(\
+                    QCursor(Qt.SizeHorCursor))
                 if self.mouse_clicked:
                     self.selection_xrange[1] = mouse_event.xdata 
                     do_update = True

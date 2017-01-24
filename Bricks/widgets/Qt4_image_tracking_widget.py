@@ -23,13 +23,19 @@
 
 import os
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPixmap
+    from PyQt5 import uic
+else:
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
-class ImageTrackingWidget(QtGui.QWidget):
+
+class ImageTrackingWidget(QWidget):
     def __init__(self, parent = None, name = "image_tracking_widget"):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.setObjectName(name)
 
@@ -50,7 +56,7 @@ class ImageTrackingWidget(QtGui.QWidget):
                  "ui_files/Qt4_image_tracking_widget_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.image_tracking_widget_layout)
         _main_vlayout.setSpacing(0)
         _main_vlayout.addStretch(10) 
@@ -127,7 +133,7 @@ class ImageTrackingWidget(QtGui.QWidget):
                      acq.acquisition_parameters.num_images - 1)
 
             self.image_tracking_widget_layout.first_image_label.\
-                 setPixmap(QtGui.QPixmap(paths[0]))
+                 setPixmap(QPixmap(paths[0]))
             if len(paths) > 1:
                 self.image_tracking_widget_layout.last_image_label.\
-                     setPixmap(QtGui.QPixmap(paths[1]))
+                     setPixmap(QPixmap(paths[1]))

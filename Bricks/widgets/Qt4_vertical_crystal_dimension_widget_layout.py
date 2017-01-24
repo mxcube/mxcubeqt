@@ -19,20 +19,24 @@
 
 import sys
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
 
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
-class VerticalCrystalDimensionWidgetLayout(QtGui.QWidget):
+class VerticalCrystalDimensionWidgetLayout(QWidget):
+
     def __init__(self,parent = None,name = None,fl = 0):
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
 
         if not name:
             self.setObjectName("VerticalCrystalDimensionWidgetLayout")
 
         return
-
-        self.setSizePolicy(QtGui.QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.MinimumExpanding,0,0,self.sizePolicy().hasHeightForWidth()))
 
         VerticalCrystalDimensionWidgetLayoutLayout = QtGui.QVBoxLayout(self,0,6,"VerticalCrystalDimensionWidgetLayoutLayout")
 

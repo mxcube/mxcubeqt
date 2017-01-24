@@ -19,20 +19,28 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt, pyqtSignal
+    from PyQt5.QtGui import QDoubleValidator
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+else:
+    from PyQt4.QtCore import Qt, pyqtSignal
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 from widgets.Qt4_widget_utils import DataModelInputBinder
 
 
-class AcquisitionWidgetSimple(QtGui.QWidget):
+class AcquisitionWidgetSimple(QWidget):
     """
     Descript. :
     """
-    acqParametersChangedSignal = QtCore.pyqtSignal()
-    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, bool)
+    acqParametersChangedSignal = pyqtSignal()
+    madEnergySelectedSignal = pyqtSignal(str, float, bool)
 
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None, 
                  path_template = None, layout = None):
@@ -40,7 +48,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
         Descript. :
         """ 
 
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
 
@@ -70,7 +78,7 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
             __file__), "ui_files/Qt4_acquisition_widget_vertical_simple_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.acq_widget_layout)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -86,21 +94,21 @@ class AcquisitionWidgetSimple(QtGui.QWidget):
              self.detector_roi_mode_changed)
 
         # Other ---------------------------------------------------------------
-        self.osc_start_validator = QtGui.QDoubleValidator(\
+        self.osc_start_validator = QDoubleValidator(\
              -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit)
-        self.osc_range_validator = QtGui.QDoubleValidator(\
+        self.osc_range_validator = QDoubleValidator(\
              -10000, 10000, 4, self.acq_widget_layout.osc_range_ledit)
-        self.kappa_validator = QtGui.QDoubleValidator(\
+        self.kappa_validator = QDoubleValidator(\
              0, 360, 4, self.acq_widget_layout.kappa_ledit)
-        self.kappa_phi_validator = QtGui.QDoubleValidator(\
+        self.kappa_phi_validator = QDoubleValidator(\
              0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
-        self.energy_validator = QtGui.QDoubleValidator(\
+        self.energy_validator = QDoubleValidator(\
              0, 25, 5, self.acq_widget_layout.energy_ledit)
-        self.resolution_validator = QtGui.QDoubleValidator(\
+        self.resolution_validator = QDoubleValidator(\
              0, 15, 3, self.acq_widget_layout.resolution_ledit)
-        self.transmission_validator = QtGui.QDoubleValidator(\
+        self.transmission_validator = QDoubleValidator(\
              0, 100, 3, self.acq_widget_layout.transmission_ledit)
-        self.exp_time_validator = QtGui.QDoubleValidator(\
+        self.exp_time_validator = QDoubleValidator(\
              0, 10000, 5, self.acq_widget_layout.exp_time_ledit)
         self.acq_widget_layout.num_images_cbox.setCurrentIndex(1)
 

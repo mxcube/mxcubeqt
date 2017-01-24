@@ -19,22 +19,28 @@
 
 import os
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt, pyqtSignal
+    from PyQt5.QtWidgets import QWidget, QVBoxLayout
+    from PyQt5 import uic
+else:
+    from PyQt4.QtCore import Qt, pyqtSignal
+    from PyQt4.QtGui import QWidget, QVBoxLayout
+    from PyQt4 import uic
 
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 from widgets.Qt4_widget_utils import DataModelInputBinder
 
 
-class ProcessingWidget(QtGui.QWidget):
+class ProcessingWidget(QWidget):
 
-    enableProcessingSignal = QtCore.pyqtSignal(bool, bool)
+    enableProcessingSignal = pyqtSignal(bool, bool)
 
     def __init__(self, parent=None, name=None, fl=0, data_model=None):
 
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
 
@@ -49,7 +55,7 @@ class ProcessingWidget(QtGui.QWidget):
                            os.path.join(os.path.dirname(__file__),
                            "ui_files/Qt4_processing_widget_vertical_layout.ui"))
       
-        self.main_layout = QtGui.QVBoxLayout(self)
+        self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self.processing_widget)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)

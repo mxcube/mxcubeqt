@@ -20,9 +20,14 @@
 import os
 import copy
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import QVBoxLayout
+    from PyQt5.QtGui import QDoubleValidator
+    from PyQt5 import uic
+else:
+    from PyQt4.QtGui import QDoubleValidator, QVBoxLayout
+    from PyQt4 import uic
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -72,7 +77,7 @@ class CreateCharWidget(CreateTaskBase):
              'ui_files/Qt4_characterise_simple_widget_vertical_layout.ui')) 
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self) 
+        _main_vlayout = QVBoxLayout(self) 
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
@@ -116,22 +121,22 @@ class CreateCharWidget(CreateTaskBase):
         self._char_params_mib.\
             bind_value_update('max_crystal_vdim',
                               self._vertical_dimension_widget.max_vdim_ledit, float,
-                              QtGui.QDoubleValidator(0.0, 1000, 2, self))
+                              QDoubleValidator(0.0, 1000, 2, self))
 
         self._char_params_mib.\
             bind_value_update('min_crystal_vdim',
                               self._vertical_dimension_widget.min_vdim_ledit, float,
-                              QtGui.QDoubleValidator(0.0, 1000, 2, self))
+                              QDoubleValidator(0.0, 1000, 2, self))
 
         self._char_params_mib.\
             bind_value_update('min_crystal_vphi',
                               self._vertical_dimension_widget.min_vphi_ledit, float,
-                              QtGui.QDoubleValidator(0.0, 1000, 2, self))
+                              QDoubleValidator(0.0, 1000, 2, self))
 
         self._char_params_mib.\
             bind_value_update('max_crystal_vphi',
                               self._vertical_dimension_widget.max_vphi_ledit, float,
-                              QtGui.QDoubleValidator(0.0, 1000, 2, self))
+                              QDoubleValidator(0.0, 1000, 2, self))
         
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 

@@ -19,28 +19,34 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtCore import Qt, pyqtSignal
+    from PyQt5 import uic
+else:
+    from PyQt4.QtGui import *
+    from PyQt4.QtCore import Qt, pyqtSignal
+    from PyQt4 import uic
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class ConfirmDialog(QtGui.QDialog):
+class ConfirmDialog(QDialog):
     """
     Descript. :
     """
-    continueClickedSignal = QtCore.pyqtSignal(list, list)
+    continueClickedSignal = pyqtSignal(list, list)
 
     def __init__(self, parent=None, name=None, flags=0):
         """
         Descript. :
         """
 
-        QtGui.QDialog.__init__(self, parent, 
-              QtCore.Qt.WindowFlags(flags | QtCore.Qt.WindowStaysOnTopHint))
+        QDialog.__init__(self, parent, Qt.WindowFlags(flags | Qt.WindowStaysOnTopHint))
 
         if name is not None:
             self.setObjectName(name) 
@@ -55,7 +61,7 @@ class ConfirmDialog(QtGui.QDialog):
              "ui_files/Qt4_confirmation_dialog_layout.ui"))
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.conf_dialog_layout)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(0) 
@@ -98,7 +104,7 @@ class ConfirmDialog(QtGui.QDialog):
         Descript. :
         """
         self.conf_dialog_layout.force_dark_cbx.setEnabled(True)
-        self.conf_dialog_layout.force_dark_cbx.setOn(True)
+        self.conf_dialog_layout.force_dark_cbx.setChecked(True)
         
     def set_items(self, checked_items):
         """
@@ -136,22 +142,22 @@ class ConfirmDialog(QtGui.QDialog):
                     info_str_list.append("Already mounted")
                 else:
                     info_str_list.append("Sample mounting") 
-                sample_treewidget_item = QtGui.QTreeWidgetItem(\
+                sample_treewidget_item = QTreeWidgetItem(\
                    self.conf_dialog_layout.summary_treewidget,
                    info_str_list)
                 for col in range(9):
                     sample_treewidget_item.setBackground(col, \
-                      QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
+                      QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
                 sample_treewidget_item.setExpanded(True)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem): 
                 info_str_list.append(item_type_name) 
-                collection_group_treewidget_item = QtGui.QTreeWidgetItem(\
+                collection_group_treewidget_item = QTreeWidgetItem(\
                    sample_treewidget_item,
                    info_str_list)
                 collection_group_treewidget_item.setExpanded(True)
             elif isinstance(item, Qt4_queue_item.SampleCentringQueueItem):
                 info_str_list.append(item_type_name)
-                QtGui.QTreeWidgetItem(collection_group_treewidget_item,
+                QTreeWidgetItem(collection_group_treewidget_item,
                                       info_str_list) 
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 acq_parameters = item_model.acquisitions[0].\
@@ -186,11 +192,11 @@ class ConfirmDialog(QtGui.QDialog):
                 info_str_list.append(str(acq_parameters.num_images * \
                                          acq_parameters.exp_time))
 
-                collection_treewidget_item = QtGui.QTreeWidgetItem(\
+                collection_treewidget_item = QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
                 for col in range(9):
                     collection_treewidget_item.setBackground(col, \
-                      QtGui.QBrush(Qt4_widget_colors.TREE_ITEM_COLLECTION))  
+                      QBrush(Qt4_widget_colors.TREE_ITEM_COLLECTION))  
              
                 collection_items.append(item)
                 file_paths = path_template.get_files_to_be_written()
@@ -211,11 +217,11 @@ class ConfirmDialog(QtGui.QDialog):
                         file_str_list.append(dir_name)
                         file_str_list.append(file_name)
 
-                        file_treewidgee_item = QtGui.QTreeWidgetItem(\
+                        file_treewidgee_item = QTreeWidgetItem(\
                              self.conf_dialog_layout.file_treewidget,
                              file_str_list)
-                        file_treewidgee_item.setTextColor(1, QtCore.Qt.red)
-                        file_treewidgee_item.setTextColor(2, QtCore.Qt.red)
+                        file_treewidgee_item.setTextColor(1, Qt.red)
+                        file_treewidgee_item.setTextColor(2, Qt.red)
                         file_exists = True
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)

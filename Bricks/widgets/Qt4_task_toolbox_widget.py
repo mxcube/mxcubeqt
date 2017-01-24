@@ -19,8 +19,13 @@
 
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -35,9 +40,9 @@ from widgets.Qt4_create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
 
 
-class TaskToolBoxWidget(QtGui.QWidget):
+class TaskToolBoxWidget(QWidget):
     def __init__(self, parent = None, name = "task_toolbox"):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.setObjectName = name
 
         # Hardware objects ----------------------------------------------------
@@ -49,15 +54,15 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.is_running = None
 
         # Graphic elements ----------------------------------------------------
-        self.method_label = QtGui.QLabel("Collection method", self)
-        self.method_label.setAlignment(QtCore.Qt.AlignCenter) 
+        self.method_label = QLabel("Collection method", self)
+        self.method_label.setAlignment(Qt.AlignCenter) 
         #Qt4_widget_colors.set_widget_color(self.method_label,
         #                                   Qt4_widget_colors.SKY_BLUE)
         #font = self.method_group_box.font()
         #font.setPointSize(10)
         #self.method_group_box.setFont(font)
     
-        self.tool_box = QtGui.QToolBox(self)
+        self.tool_box = QToolBox(self)
         self.tool_box.setObjectName("tool_box")
         self.tool_box.setFixedWidth(475)
         #self.tool_box.setFont(font)
@@ -76,13 +81,13 @@ class TaskToolBoxWidget(QtGui.QWidget):
         self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         self.tool_box.addItem(self.advanced_page, "Advanced")
 
-        self.button_box = QtGui.QWidget(self)
-        self.create_task_button = QtGui.QPushButton("  Add to queue", self.button_box)
+        self.button_box = QWidget(self)
+        self.create_task_button = QPushButton("  Add to queue", self.button_box)
         self.create_task_button.setIcon(Qt4_Icons.load_icon("add_row.png"))
         msg = "Add the collection method to the selected sample"
         self.create_task_button.setToolTip(msg)
 
-        self.collect_now_button = QtGui.QPushButton("Collect Now", self.button_box)
+        self.collect_now_button = QPushButton("Collect Now", self.button_box)
         self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
         self.collect_now_button.hide()
         
@@ -92,14 +97,14 @@ class TaskToolBoxWidget(QtGui.QWidget):
         #_method_group_box_vlayout.setSpacing(2)
         #_method_group_box_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _button_box_hlayout = QtGui.QHBoxLayout(self.button_box)
+        _button_box_hlayout = QHBoxLayout(self.button_box)
         _button_box_hlayout.addWidget(self.collect_now_button)
         _button_box_hlayout.addStretch(0)
         _button_box_hlayout.addWidget(self.create_task_button)
         _button_box_hlayout.setSpacing(0)
         _button_box_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.method_label)
         _main_vlayout.addWidget(self.tool_box)
         #_main_vlayout.addStretch(0)  
@@ -108,8 +113,8 @@ class TaskToolBoxWidget(QtGui.QWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
 
 
         # Qt signal/slot connections ------------------------------------------

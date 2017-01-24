@@ -21,9 +21,15 @@ import os
 import logging
 from copy import deepcopy
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5 import uic
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
+    from PyQt4 import uic
 
 import Qt4_queue_item
 import Qt4_GraphicsManager
@@ -41,7 +47,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def __init__(self, parent=None,name=None, fl=0):
         CreateTaskBase.__init__(self, parent, name, 
-            QtCore.Qt.WindowFlags(fl), 'Advanced')
+            Qt.WindowFlags(fl), 'Advanced')
 
         if not name:
             self.setObjectName("create_advanced_widget")
@@ -65,7 +71,7 @@ class CreateAdvancedWidget(CreateTaskBase):
              data_model = self._path_template, layout = 'vertical')
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self) 
+        _main_vlayout = QVBoxLayout(self) 
         _main_vlayout.addWidget(self._advanced_methods_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
@@ -307,7 +313,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             info_str_list.append("%d" % grid_properties["num_lines"])
             info_str_list.append("%d" % grid_properties["num_images_per_line"])
 
-            grid_treewidget_item = QtGui.QTreeWidgetItem(\
+            grid_treewidget_item = QTreeWidgetItem(\
                 self._advanced_methods_widget.grid_treewidget,
                 info_str_list)
             grid_treewidget_item.setSelected(True)
@@ -473,7 +479,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def overlay_change_color(self):
         """Changes the default color (blue) of overlay
         """
-        color = QtGui.QColorDialog.getColor()
+        color = QColorDialog.getColor()
         if color.isValid():
             for grid_object, treewidget_item in self._grid_map.iteritems():
                 if treewidget_item.isSelected():

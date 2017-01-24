@@ -17,7 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_xrf_spectrum_parameters_widget import XRFSpectrumParametersWidget
@@ -39,7 +44,7 @@ class Qt4_XRFSpectrumParametersBrick(BlissWidget):
         
         self.xrf_spectrum_widget = XRFSpectrumParametersWidget(self)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.xrf_spectrum_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)

@@ -21,9 +21,11 @@
 #  https://www.python.org/dev/peps/pep-0008/
 
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtGui import *
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -55,12 +57,12 @@ class Qt4_ProgressBarBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.progress_type_label = QtGui.QLabel('', self)
-        self.progress_bar = QtGui.QProgressBar(self)
+        self.progress_type_label = QLabel('', self)
+        self.progress_bar = QProgressBar(self)
         #$self.progress_bar.setCenterIndicator(True)
         self.progress_bar.setMinimum(0)
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.progress_type_label)
         main_layout.addWidget(self.progress_bar)
         main_layout.setContentsMargins(2, 2, 2, 2)

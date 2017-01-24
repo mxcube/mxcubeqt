@@ -17,8 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPalette
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -51,17 +55,17 @@ class Qt4_MDPhaseBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox("Phase", self) 
-        self.phase_combobox = QtGui.QComboBox(self.group_box)
+        self.group_box = QGroupBox("Phase", self) 
+        self.phase_combobox = QComboBox(self.group_box)
 
         # Layout --------------------------------------------------------------
-        _group_box_vlayout = QtGui.QVBoxLayout(self.group_box)
+        _group_box_vlayout = QVBoxLayout(self.group_box)
         _group_box_vlayout.addWidget(self.phase_combobox)
         _group_box_vlayout.addStretch()
         _group_box_vlayout.setSpacing(0)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -74,7 +78,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         Qt4_widget_colors.set_widget_color(self.phase_combobox,
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
  
     def propertyChanged(self, property_name, old_value, new_value):
         """

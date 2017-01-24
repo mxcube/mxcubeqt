@@ -17,15 +17,27 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+PYMCA_EXISTS = False
 
-from PyMca.QtBlissGraph import QtBlissGraph
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+    from Qt4_matplot_widget import TwoAxisPlotWidget as Graph
+else:
+    from PyQt4.QtCore import Qt, QObject, SIGNAL
+    from PyQt4.QtGui import *
+
+    try:
+        from PyMca.QtBlissGraph import QtBlissGraph as Graph
+        PYMCA_EXISTS = True
+    except:
+        from Qt4_matplot_widget import TwoAxisPlotWidget as Graph    
 
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class PymcaPlotWidget(QtGui.QWidget):
+class PymcaPlotWidget(QWidget):
     """
     Descript. :
     """
@@ -34,30 +46,33 @@ class PymcaPlotWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.axis_x_array = []
         self.axis_y_array = []
 
         self.realtime_plot = realtime_plot
-         
-        self.pymca_graph = QtBlissGraph(self)
+   
+        self.pymca_graph = Graph(self)
         self.pymca_graph.showGrid()
-        self.info_label = QtGui.QLabel("", self)  
-        self.info_label.setAlignment(QtCore.Qt.AlignRight)
+        self.info_label = QLabel("", self)  
+        self.info_label.setAlignment(Qt.AlignRight)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.pymca_graph)  
         _main_vlayout.addWidget(self.info_label)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
 
-        QtCore.QObject.connect(self.pymca_graph,
-                               QtCore.SIGNAL("QtBlissGraphSignal"),
-                               self.handle_graph_signal)
+        if BlissFramework.get_gui_version() == "QT5":
+             pass
+        else:
+             QObject.connect(self.pymca_graph,
+                             SIGNAL("QtBlissGraphSignal"),
+                             self.handle_graph_signal)
 
         Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.WHITE)         
 

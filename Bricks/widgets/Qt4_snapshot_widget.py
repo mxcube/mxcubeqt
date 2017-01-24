@@ -19,33 +19,38 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPixmap
+else:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class SnapshotWidget(QtGui.QWidget):
+class SnapshotWidget(QWidget):
     """
     """
 
     def __init__(self, parent, realtime_plot = False):
         """
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
        
-        _main_gbox = QtGui.QGroupBox('Snapshot', self) 
-        self.snapshot_label = QtGui.QLabel(_main_gbox)
+        _main_gbox = QGroupBox('Snapshot', self) 
+        self.snapshot_label = QLabel(_main_gbox)
 
         # Layout --------------------------------------------------------------
-        _parameters_gbox_hlayout = QtGui.QHBoxLayout(_main_gbox)
+        _parameters_gbox_hlayout = QHBoxLayout(_main_gbox)
         _parameters_gbox_hlayout.addWidget(self.snapshot_label)
         _parameters_gbox_hlayout.addStretch(0)
         _parameters_gbox_hlayout.setSpacing(2)
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -55,6 +60,6 @@ class SnapshotWidget(QtGui.QWidget):
         ration = image.height() / float(image.width())
         image = image.scaled(width, 
                              width * ration, 
-                             QtCore.Qt.KeepAspectRatio,
-                             QtCore.Qt.SmoothTransformation)
-        self.snapshot_label.setPixmap(QtGui.QPixmap(image))
+                             Qt.KeepAspectRatio,
+                             Qt.SmoothTransformation)
+        self.snapshot_label.setPixmap(QPixmap(image))
