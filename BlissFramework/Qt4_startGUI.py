@@ -26,13 +26,17 @@ import tempfile
 import sys
 import os
 import logging
+import platform
 from optparse import OptionParser
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-
 import BlissFramework
-BlissFramework.set_gui_version("qt4")
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5 import QtCore
+    from PyQt5.QtWidgets import QApplication
+else:
+    from PyQt4 import QtCore
+    from PyQt4.QtGui import QApplication
+
 from BlissFramework import Qt4_GUISupervisor
 from BlissFramework.Utils import Qt4_ErrorHandler
 from BlissFramework.Utils import Qt4_GUILogHandler
@@ -44,6 +48,10 @@ from HardwareRepository import HardwareRepository
 _logger = logging.getLogger()
 _GUIhdlr = Qt4_GUILogHandler.GUILogHandler()
 _logger.addHandler(_GUIhdlr)
+
+
+__credits__ = ["MXCuBE colaboration"]
+__version__ = 2.3
 
 
 def do_gevent():
@@ -154,7 +162,7 @@ def run(gui_config_file=None):
     hwobj_directory = [_directory for _directory in \
           hwobj_directory if _directory]
 
-    main_application = QtGui.QApplication([])
+    main_application = QApplication([])
     if app_style:
         main_application.setStyle(app_style)
     lockfile = None
@@ -249,19 +257,19 @@ def run(gui_config_file=None):
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
     print ("=================================================================================")
-    logging.getLogger().info("Starting MXCuBE")
+    logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
+    logging.getLogger().info("System info: Python %s - Qt %s - PyQt %s on %s" % \
+       (platform.python_version(), QtCore.QT_VERSION_STR, 
+        QtCore.PYQT_VERSION_STR, platform.system()))
     logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
     print ("---------------------------------------------------------------------------------")
 
-    QtGui.QApplication.setDesktopSettingsAware(False)
-    QtCore.QObject.connect(main_application,
-                           QtCore.SIGNAL("lastWindowClosed()"),
-                           main_application.quit)
- 
+    QApplication.setDesktopSettingsAware(False)
+
+    main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
-
     # post event for GUI creation
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))
@@ -270,7 +278,7 @@ def run(gui_config_file=None):
     Qt4_ErrorHandler.enableStdErrRedirection()
 
     gevent_timer = QtCore.QTimer()
-    gevent_timer.connect(gevent_timer, QtCore.SIGNAL("timeout()"), do_gevent)
+    gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 
     main_application.setOrganizationName("MXCuBE")

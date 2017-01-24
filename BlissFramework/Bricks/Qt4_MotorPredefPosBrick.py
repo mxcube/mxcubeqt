@@ -17,8 +17,12 @@
 #   You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPalette
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -58,14 +62,14 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.defineSlot('setEnabled',())
 
         # Graphic elements ----------------------------------------------------
-        _group_box = QtGui.QGroupBox(self)
-        self.label = QtGui.QLabel("motor:", _group_box)
-        self.positions_combo = QtGui.QComboBox(_group_box)
-        self.previous_position_button = QtGui.QPushButton(_group_box)
-        self.next_position_button = QtGui.QPushButton(_group_box)
+        _group_box = QGroupBox(self)
+        self.label = QLabel("motor:", _group_box)
+        self.positions_combo = QComboBox(_group_box)
+        self.previous_position_button = QPushButton(_group_box)
+        self.next_position_button = QPushButton(_group_box)
 
         # Layout -------------------------------------------------------------- 
-        _group_box_hlayout = QtGui.QHBoxLayout(_group_box)
+        _group_box_hlayout = QHBoxLayout(_group_box)
         _group_box_hlayout.addWidget(self.label)
         _group_box_hlayout.addWidget(self.positions_combo) 
         _group_box_hlayout.addWidget(self.previous_position_button)
@@ -73,7 +77,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         _group_box_hlayout.setSpacing(2)
         _group_box_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        main_layout = QtGui.QHBoxLayout(self)
+        main_layout = QHBoxLayout(self)
         main_layout.addWidget(_group_box)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -81,8 +85,8 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         # Size Policy ---------------------------------------------------------
         #box1.setSizePolicy(QtGui.QSizePolicy.Fixed, 
         #                   QtGui.QSizePolicy.Fixed)
-        self.label.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                                 QtGui.QSizePolicy.Fixed)
+        self.label.setSizePolicy(QSizePolicy.Fixed,
+                                 QSizePolicy.Fixed)
         #self.setSizePolicy(QtGui.QSizePolicy.Minimum,
         #                   QtGui.QSizePolicy.Fixed)
         # Qt signal/slot connections ------------------------------------------
@@ -119,7 +123,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.positions_combo.setEnabled(s)
         Qt4_widget_colors.set_widget_color(self.positions_combo, 
                                            Qt4_MotorPredefPosBrick.STATE_COLORS[state],
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
         self.setToolTip(state=state)
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -158,7 +162,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                     self.label.setText("<i>" + lbl + ":</i>")
                 Qt4_widget_colors.set_widget_color(self.positions_combo,
                                                    Qt4_MotorPredefPosBrick.STATE_COLORS[0],
-                                                   QtGui.QPalette.Button)
+                                                   QPalette.Button)
                 self.motor_state_changed(self.motor_hwobj.getState())
         elif property_name == 'showMoveButtons':
             if new_value:

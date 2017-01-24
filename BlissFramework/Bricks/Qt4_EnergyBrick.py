@@ -17,14 +17,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore 
+try:
+   from PyQt5 import QtCore
+   from PyQt5.QtGui import QPalette, QValidator, QDoubleValidator
+   from PyQt5.QtWidgets import *
+except:
+   from PyQt4 import QtCore
+   from PyQt4.QtGui import *
+
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+
 __category__ = "General"
+__version__ = 2.3
 
 class Qt4_EnergyBrick(BlissWidget):
     """
@@ -54,35 +62,35 @@ class Qt4_EnergyBrick(BlissWidget):
         self.wavelength_limits = None
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox("Energy", self)
-        energy_label = QtGui.QLabel("Current:", self.group_box)
+        self.group_box = QGroupBox("Energy", self)
+        energy_label = QLabel("Current:", self.group_box)
         energy_label.setFixedWidth(75)
-        wavelength_label = QtGui.QLabel("Wavelength: ", self.group_box)
-        self.energy_ledit = QtGui.QLineEdit(self.group_box)
+        wavelength_label = QLabel("Wavelength: ", self.group_box)
+        self.energy_ledit = QLineEdit(self.group_box)
         self.energy_ledit.setReadOnly(True)
-        self.wavelength_ledit = QtGui.QLineEdit(self.group_box)
+        self.wavelength_ledit = QLineEdit(self.group_box)
         self.wavelength_ledit.setReadOnly(True)
 
-        self.new_value_widget = QtGui.QWidget(self)
-        self.set_to_label = QtGui.QLabel("Set to: ", self)
-        self.new_value_ledit = QtGui.QLineEdit(self.new_value_widget)
+        self.new_value_widget = QWidget(self)
+        self.set_to_label = QLabel("Set to: ", self)
+        self.new_value_ledit = QLineEdit(self.new_value_widget)
         #self.new_value_ledit.setMaximumWidth(60)
-        self.units_combobox = QtGui.QComboBox(self.new_value_widget)
-        self.units_combobox.addItems(["keV", chr(197)]) 
-        self.stop_button = QtGui.QPushButton(self.new_value_widget)        
+        self.units_combobox = QComboBox(self.new_value_widget)
+        self.units_combobox.addItems(["keV", u"\u212B"]) 
+        self.stop_button = QPushButton(self.new_value_widget)        
         self.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedWidth(25)
  
         # Layout --------------------------------------------------------------
-        _new_value_widget_hlayout = QtGui.QHBoxLayout(self.new_value_widget)
+        _new_value_widget_hlayout = QHBoxLayout(self.new_value_widget)
         _new_value_widget_hlayout.addWidget(self.new_value_ledit)
         _new_value_widget_hlayout.addWidget(self.units_combobox)
         _new_value_widget_hlayout.addWidget(self.stop_button)
         _new_value_widget_hlayout.setSpacing(0)
         _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
+        _group_box_gridlayout = QGridLayout(self.group_box)
         _group_box_gridlayout.addWidget(energy_label, 0, 0)
         _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1) 
         _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
@@ -92,7 +100,7 @@ class Qt4_EnergyBrick(BlissWidget):
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1) 
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 2, 2)
         _main_vlayout.addWidget(self.group_box)
@@ -108,7 +116,7 @@ class Qt4_EnergyBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         #self.group_box.setCheckable(True)
         #self.group_box.setChecked(True)
-        self.new_value_validator = QtGui.QDoubleValidator(\
+        self.new_value_validator = QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
 
         self.instance_synchronize("energy_ledit", "new_value_ledit")
@@ -166,7 +174,7 @@ class Qt4_EnergyBrick(BlissWidget):
              Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                QtGui.QPalette.Base)
+                QPalette.Base)
              #Qt4_widget_colors.set_widget_color(\
              #   self.units_combobox,
              #   Qt4_widget_colors.LIGHT_GREEN,
@@ -189,7 +197,7 @@ class Qt4_EnergyBrick(BlissWidget):
         energy_value_str = self['kevFormatString'] % energy_value
         wavelength_value_str = self['angFormatString'] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
-        self.wavelength_ledit.setText("%s %s" %(wavelength_value_str, chr(197)))
+        self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def current_value_changed(self):
         """
@@ -200,7 +208,7 @@ class Qt4_EnergyBrick(BlissWidget):
         input_field_text = self.new_value_ledit.text()
 
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtGui.QValidator.Acceptable:
+           QValidator.Acceptable:
             if self.units_combobox.currentIndex() == 0:
                 self.energy_hwobj.move_energy(float(input_field_text))
             else:
@@ -209,7 +217,7 @@ class Qt4_EnergyBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(\
                  self.new_value_ledit,
                  Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
 
     def input_field_changed(self, input_field_text):
         """
@@ -218,16 +226,16 @@ class Qt4_EnergyBrick(BlissWidget):
         Return.   : 
         """
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtGui.QValidator.Acceptable:
+           QValidator.Acceptable:
             Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_CHANGED,
-                QtGui.QPalette.Base)
+                QPalette.Base)
         else:
            Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_ERROR,
-                QtGui.QPalette.Base)
+                QPalette.Base)
 
     def units_changed(self, unit):
         """
@@ -254,7 +262,7 @@ class Qt4_EnergyBrick(BlissWidget):
             self.group_box.setTitle("Wavelength")
             self.new_value_ledit.setToolTip(\
                  "Wavelength limits %.4f : %.4f %s" % \
-                 (value_limits[0], value_limits[1], chr(197)))
+                 (value_limits[0], value_limits[1], u"\u212B"))
         self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
    
     def stop_clicked(self):

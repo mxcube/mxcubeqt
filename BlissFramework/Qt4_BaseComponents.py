@@ -25,8 +25,13 @@ import time
 import operator
 import weakref
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+try:
+   from PyQt5.QtCore import *
+   from PyQt5.QtGui import QPainter, QPen, QCursor
+   from PyQt5.QtWidgets import *
+except:
+   from PyQt4.QtCore import *
+   from PyQt4.QtGui import *
 
 from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
@@ -46,12 +51,12 @@ except ImportError:
 _emitterCache = weakref.WeakKeyDictionary()
 
 
-class _QObject(QtCore.QObject):
+class _QObject(QObject):
     def __init__(self, *args, **kwargs):
         """
         Descript. :
         """
-        QtCore.QObject.__init__(self, *args)
+        QObject.__init__(self, *args)
 
         try:
             self.__ho = weakref.ref(kwargs.get("ho"))
@@ -68,7 +73,7 @@ def emitter(ob):
     return _emitterCache[ob]
 
 
-class InstanceEventFilter(QtCore.QObject):
+class InstanceEventFilter(QObject):
     def eventFilter(self, widget, event):
         """
         Descript. :
@@ -76,24 +81,24 @@ class InstanceEventFilter(QtCore.QObject):
         obj = widget
         while obj is not None:
             if isinstance(obj, BlissWidget):
-                if isinstance(event, QtGui.QContextMenuEvent):
+                if isinstance(event, QContextMenuEvent):
                     #if obj.shouldFilterEvent():
                     return True
-                elif isinstance(event, QtGui.QMouseEvent):
-                    if event.button() == QtCore.Qt.RightButton:
+                elif isinstance(event, QMouseEvent):
+                    if event.button() == Qt.RightButton:
                         return True
                     elif obj.shouldFilterEvent():
                         return True
-                elif isinstance(event, QtGui.QKeyEvent) \
-                or isinstance(event, QtGui.QFocusEvent):
+                elif isinstance(event, QKeyEvent) \
+                or isinstance(event, QFocusEvent):
                     if obj.shouldFilterEvent():
                         return True
-                return QtCore.QObject.eventFilter(self, widget, event)
+                return QObject.eventFilter(self, widget, event)
             try:
                 obj = obj.parent()
             except:
                 obj = None
-        return QtCore.QObject.eventFilter(self, widget, event)
+        return QObject.eventFilter(self, widget, event)
 
 class WeakMethodBound:
     def __init__(self, f):
@@ -163,7 +168,7 @@ class SignalSlotFilter:
             s(*args)
 
 
-class BlissWidget(QtGui.QFrame, Connectable.Connectable):
+class BlissWidget(QFrame, Connectable.Connectable):
     (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
      INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
     (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
@@ -188,6 +193,8 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
     _applicationEventFilter = InstanceEventFilter(None)
 
+    widgetSynchronizeSignal = pyqtSignal([])
+
     @staticmethod
     def setRunMode(mode):
         """
@@ -195,7 +202,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         if mode:
             BlissWidget._runMode = True
-            for widget in QtGui.QApplication.allWidgets():
+            for widget in QApplication.allWidgets():
                 if isinstance(widget, BlissWidget):
                     widget.__run()
                     try:
@@ -206,7 +213,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         else:
             BlissWidget._runMode = False
-            for widget in QtGui.QApplication.allWidgets():
+            for widget in QApplication.allWidgets():
                 if isinstance(widget, BlissWidget):
                     widget.__stop()
                     try:
@@ -260,7 +267,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         BlissWidget._instanceMode = mode
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 #try:
                 if True:
@@ -274,13 +281,13 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
                 #    pass
         if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
             if BlissWidget._filterInstalled:
-                QtGui.QApplication.instance().removeEventFilter(\
+                QApplication.instance().removeEventFilter(\
                      BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = False
                 BlissWidget.synchronizeWithCache() # why?
         else:
             if not BlissWidget._filterInstalled:
-                QtGui.QApplication.instance().installEventFilter(\
+                QApplication.instance().installEventFilter(\
                      BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = True
 
@@ -368,7 +375,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         brick_name = self.objectName()
-        self.connect(widget, QtCore.SIGNAL('widgetSynchronize'), lambda \
+        widget.widgetSynchronize.connect(lambda \
              state: BlissWidget.widgetGenericChanged(brick_name, widget_name, \
              master_sync, state))
 
@@ -377,15 +384,15 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         for widget, widget_name, master_sync in self._widget_events:
-            if isinstance(widget, QtGui.QGroupBox):
+            if isinstance(widget, QGroupBox):
                 self.connect_group_box(widget, widget_name, master_sync)
-            elif isinstance(widget, QtGui.QComboBox):
+            elif isinstance(widget, QComboBox):
                 self.connect_combobox(widget, widget_name, master_sync)
-            elif isinstance(widget, QtGui.QLineEdit):
+            elif isinstance(widget, QLineEdit):
                 self.connect_line_edit(widget, widget_name, master_sync)
-            elif isinstance(widget, QtGui.QSpinBox):
+            elif isinstance(widget, QSpinBox):
                 self.connect_spinbox(widget, widget_name, master_sync)
-            elif isinstance(widget, QtGui.QDoubleSpinBox):
+            elif isinstance(widget, QDoubleSpinBox):
                 self.connect_double_spinbox(widget, widget_name, master_sync)
             else:
                 ### verify if widget has the widgetSynchronize method!!!
@@ -393,9 +400,9 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         self._widget_events = []
 
         if self.shouldFilterEvent():
-            self.setCursor(QtGui.QCursor(QtCore.Qt.ForbiddenCursor))
+            self.setCursor(QCursor(Qt.ForbiddenCursor))
         else:
-            self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+            self.setCursor(QCursor(Qt.ArrowCursor))
 
     @staticmethod
     def isInstanceModeMaster():
@@ -469,7 +476,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if role == BlissWidget._instanceRole:
             return
         BlissWidget._instanceRole = role
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 #try:
                 widget.instanceRoleChanged(role)
@@ -484,7 +491,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if location == BlissWidget._instanceLocation:
             return
         BlissWidget._instanceLocation = location
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 #try:
                 widget.instanceLocationChanged(location)
@@ -500,7 +507,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
             return
         BlissWidget._instanceUserId = user_id
 
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 #try:
                 widget.instanceUserIdChanged(user_id)
@@ -520,7 +527,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         if mirror == BlissWidget.INSTANCE_MIRROR_ALLOW:
             BlissWidget.synchronizeWithCache()
 
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 widget.instanceMirrorChanged(mirror)
 
@@ -577,20 +584,20 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         """
         Descript. :
         """
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 msg = "%s (%s)\n%s" % (widget.objectName(),
                                        widget.__class__.__name__,
                                        widget.getHardwareObjectsInfo())
                 widget.setWhatsThis(msg)
-        QtGui.QWhatsThis.enterWhatsThisMode()
+        QWhatsThis.enterWhatsThisMode()
 
     @staticmethod
     def update_widget(brick_name, widget_name, method_name,
                       method_args, master_sync):
         """Updates widget
         """
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if hasattr(widget, "configuration"):
                 top_level_widget = widget
                 break
@@ -608,7 +615,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_MASTER:
-            for widget in QtGui.QApplication.allWidgets():
+            for widget in QApplication.allWidgets():
                 if hasattr(widget, "configuration"):
                     widget.tabChangedSignal.emit(tab_name, tab_index)
 
@@ -740,7 +747,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         Descript. :
         """
         Connectable.Connectable.__init__(self)
-        QtGui.QFrame.__init__(self, parent)
+        QFrame.__init__(self, parent)
         self.setObjectName(widget_name)
         self.property_bag = PropertyBag.PropertyBag()
 
@@ -809,7 +816,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
 
         #self.setAcceptDrops(True)
         self.__enabledState = self.isEnabled()
-        QtGui.QWidget.setEnabled(self, True)
+        QWidget.setEnabled(self, True)
 
     def __repr__(self):
         """
@@ -825,7 +832,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         signal_slot_filter = SignalSlotFilter(signal, slot, should_cache)
         self._signal_slot_filters[uid] = signal_slot_filter
 
-        QtCore.QObject.connect(sender, signal, signal_slot_filter)
+        QObject.connect(sender, signal, signal_slot_filter)
 
     def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
         """
@@ -843,7 +850,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         else:
             pysignal = True
 
-        if not isinstance(sender, QtCore.QObject):
+        if not isinstance(sender, QObject):
             if isinstance(sender, HardwareObject):
                 sender.connect(signal, slot)
                 return
@@ -859,15 +866,19 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
                                          QtCore.SIGNAL(signal),
                                          slot, shouldCache)
         else:
-            QtCore.QObject.connect(_sender,
-                                   pysignal and \
-                                   QtCore.SIGNAL(signal) or \
-                                   QtCore.SIGNAL(signal),
-                                   slot)
+            #Porting to Qt5
+            getattr(_sender, signal).connect(slot)
+
+            #QtCore.QObject.connect(_sender,
+            #                       pysignal and \
+            #                       QtCore.SIGNAL(signal) or \
+            #                       QtCore.SIGNAL(signal),
+            #                       slot)
 
         # workaround for PyQt lapse
-        if hasattr(sender, "connectNotify"):
-            sender.connectNotify(QtCore.SIGNAL(signal))
+        print "TODO workaround for PyQt lapse" 
+        #if hasattr(sender, "connectNotify"):
+        #    sender.connectNotify(QtCore.pyqtSignal(signal))
 
     def disconnect(self, sender, signal, slot):
         """
@@ -914,6 +925,24 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
                                       QtCore.SIGNAL(signal) or \
                                       QtCore.SIGNAL(signal),
                                       signalSlotFilter)
+
+    """
+    def get_signals(self):
+        signals = []
+        for name in dir(self):
+            if isinstance(getattr(self, name),  pyqtSignal):
+                signals.append(name)
+        return signals
+
+    def get_slots(self):
+        slots = []
+        cls = self if isinstance(self, type) else type(self)
+        slot = type(pyqtSignal())
+        for name in dir(self):
+            if isinstance(getattr(cls, name), slot):
+                slots.append(name)
+        return slots
+    """
 
     def reparent(self, widget_to):
         """
@@ -971,7 +1000,7 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
             for child in children:
                 self.removeChild(child)
 
-            layout = QtGui.QGridLayout(self, 1, 1)
+            layout = QGridLayout(self, 1, 1)
             widget.reparent(self)
             widget.show()
             layout.addWidget(widget, 0, 0)
@@ -1098,9 +1127,9 @@ class BlissWidget(QtGui.QFrame, Connectable.Connectable):
         elif property_name == 'frame':
             try:
                 if new_value:
-                    self.setFrameStyle(QtGui.QFrame.StyledPanel)
+                    self.setFrameStyle(QFrame.StyledPanel)
                 else:
-                    self.setFrameStyle(QtGui.QFrame.NoFrame)
+                    self.setFrameStyle(QFrame.NoFrame)
             except:
                 pass
             self.update()
@@ -1168,7 +1197,7 @@ class NullBrick(BlissWidget):
         """
         Descript. :
         """
-        return QtCore.QSize(100, 100)
+        return QSize(100, 100)
 
     def run(self):
         """
@@ -1187,8 +1216,8 @@ class NullBrick(BlissWidget):
         Descript. :
         """
         if not self.isRunning():
-            painter = QtGui.QPainter(self)
-            painter.setPen(QtGui.QPen(QtCore.Qt.black, 1))
+            painter = QPainter(self)
+            painter.setPen(QPen(Qt.black, 1))
             painter.drawLine(0, 0, self.width(), self.height())
             painter.drawLine(0, self.height(), self.width(), 0)
 
@@ -1209,18 +1238,18 @@ def ComboBoxActivated(self, index, lines):
                 else:
                     self.insertItem(line)
                     self.setCurrentItem(i)
-                    self.emit(QtCore.SIGNAL('activated(const QString &)'), line)
-                    self.emit(QtCore.SIGNAL('activated(int)'), i)
+                    self.activated[QString].emit(line)
+                    self.activated[int].emit(i)
                 i += 1
     self.setCurrentItem(index)
-    self.emit(QtCore.SIGNAL('activated(const QString &)'), self.currentText())
-    self.emit(QtCore.SIGNAL('activated(int)'), index)
+    self.activated[QString].emit(self.currentText())
+    self.activated[int].emit(index)
 
 def SpinBoxEditorTextChanged(self, text):
     """
     Descript. :
     """
-    self.emit(QtCore.SIGNAL('editorTextChanged'), str(text))
+    self.editorTextChanged.emit(str(text))
 
 def SpinBoxSetEditorText(self, text):
     """

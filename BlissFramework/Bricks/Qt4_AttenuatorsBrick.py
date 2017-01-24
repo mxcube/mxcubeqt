@@ -17,8 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPalette, QDoubleValidator, QValidator
+else:
+    from PyQt4.QtGui import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Utils.Qt4_widget_colors import color_to_hexa
@@ -60,16 +64,16 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox("Transmission", self)
-        current_label = QtGui.QLabel("Current:", self.group_box)
+        self.group_box = QGroupBox("Transmission", self)
+        current_label = QLabel("Current:", self.group_box)
         current_label.setFixedWidth(75)
-        self.transmission_ledit = QtGui.QLineEdit(self.group_box)
+        self.transmission_ledit = QLineEdit(self.group_box)
         self.transmission_ledit.setReadOnly(True)
-        set_to_label = QtGui.QLabel("Set to:", self.group_box)
-        self.new_value_ledit = QtGui.QLineEdit(self.group_box)
+        set_to_label = QLabel("Set to:", self.group_box)
+        self.new_value_ledit = QLineEdit(self.group_box)
 
         # Layout --------------------------------------------------------------
-        _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
+        _group_box_gridlayout = QGridLayout(self.group_box)
         _group_box_gridlayout.addWidget(current_label, 0, 0)
         _group_box_gridlayout.addWidget(self.transmission_ledit, 0, 1)
         _group_box_gridlayout.addWidget(set_to_label, 1, 0)
@@ -77,7 +81,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 2, 2)
         _main_vlayout.addWidget(self.group_box)
@@ -91,8 +95,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                        Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                       QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(\
+                                       QPalette.Base)
+        self.new_value_validator = QDoubleValidator(\
              0, 100, 2, self.new_value_ledit)
         self.new_value_ledit.setToolTip("Transmission limits 0 : 100 %")
 
@@ -149,16 +153,16 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Return.   : 
         """
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtGui.QValidator.Acceptable:
+           QValidator.Acceptable:
             Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_CHANGED,
-                QtGui.QPalette.Base)
+                QPalette.Base)
         else:
            Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_ERROR,
-                QtGui.QPalette.Base)
+                QPalette.Base)
 
     def current_value_changed(self):
         """
@@ -169,14 +173,14 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         input_field_text = self.new_value_ledit.text()
 
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtGui.QValidator.Acceptable:
+           QValidator.Acceptable:
             self.attenuators_hwobj.setTransmission(\
                  float(input_field_text))
             self.new_value_ledit.setText("") 
             Qt4_widget_colors.set_widget_color(\
                  self.new_value_ledit,
                  Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
 
     def connected(self):
         """

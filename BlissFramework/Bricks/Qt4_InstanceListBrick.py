@@ -25,8 +25,14 @@ import logging
 import InstanceServer
 #import email.Utils
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import *
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import *
+else:
+    from PyQt4.QtCore import *
+    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -39,71 +45,71 @@ import collections
 __category__ = "General"
 
 
-WANTS_CONTROL_EVENT = QtCore.QEvent.User
-class WantsControlEvent(QtCore.QEvent):
+WANTS_CONTROL_EVENT = QEvent.User
+class WantsControlEvent(QEvent):
     """Descript. :
     """
 
     def __init__(self, client_id):
         """Descr
         """
-        QtCore.QEvent.__init__(self, WANTS_CONTROL_EVENT)
+        QEvent.__init__(self, WANTS_CONTROL_EVENT)
         self.client_id = client_id
 
-START_SERVER_EVENT = QtCore.QEvent.User + 1
-class StartServerEvent(QtCore.QEvent):
+START_SERVER_EVENT = QEvent.User + 1
+class StartServerEvent(QEvent):
     """Descript. :
     """
  
     def __init__(self):
-        QtCore.QEvent.__init__(self, START_SERVER_EVENT)
+        QEvent.__init__(self, START_SERVER_EVENT)
         """Descr. 
         """
 
-APP_BRICK_EVENT = QtCore.QEvent.User + 2
-class AppBrickEvent(QtCore.QEvent):
+APP_BRICK_EVENT = QEvent.User + 2
+class AppBrickEvent(QEvent):
     """Descr.
     """
 
     def __init__(self, brick_name, widget_name, method_name, method_args, master_sync):
         """Descr.
         """
-        QtCore.QEvent.__init__(self, APP_BRICK_EVENT)
+        QEvent.__init__(self, APP_BRICK_EVENT)
         self.brick_name = brick_name
         self.widget_name = widget_name
         self.method_name = method_name
         self.method_args = method_args
         self.master_sync = master_sync
 
-APP_TAB_EVENT = QtCore.QEvent.User + 3
-class AppTabEvent(QtCore.QEvent):
+APP_TAB_EVENT = QEvent.User + 3
+class AppTabEvent(QEvent):
     """Descr."""
  
     def __init__(self, tab_name, tab_index):
         """Descr."""
-        QtCore.QEvent.__init__(self, APP_TAB_EVENT)
+        QEvent.__init__(self, APP_TAB_EVENT)
         self.tab_name = tab_name
         self.tab_index = tab_index
 
-MSG_DIALOG_EVENT = QtCore.QEvent.User + 4
-class MsgDialogEvent(QtCore.QEvent):
+MSG_DIALOG_EVENT = QEvent.User + 4
+class MsgDialogEvent(QEvent):
     """Descript. :"""
 
     def __init__(self, icon_type, msg, font_size, callback=None):
         """Descr."""
-        QtCore.QEvent.__init__(self, MSG_DIALOG_EVENT)
+        QEvent.__init__(self, MSG_DIALOG_EVENT)
         self.icon_type = icon_type
         self.msg = msg
         self.font_size = font_size
         self.callback = callback
 
-USER_INFO_DIALOG_EVENT = QtCore.QEvent.User + 5
-class UserInfoDialogEvent(QtCore.QEvent):
+USER_INFO_DIALOG_EVENT = QEvent.User + 5
+class UserInfoDialogEvent(QEvent):
     """Descript. :    """
 
     def __init__(self, msg, fromaddrs, toaddrs, subject, is_local, font_size):
         """Descript."""
-        QtCore.QEvent.__init__(self, USER_INFO_DIALOG_EVENT)
+        QEvent.__init__(self, USER_INFO_DIALOG_EVENT)
         self.msg = msg
         self.fromaddrs = fromaddrs
         self.toaddrs = toaddrs
@@ -162,18 +168,20 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.client_icon = Qt4_Icons.load_icon("User2")
 
         # Graphic elements ----------------------------------------------------
-        _main_gbox = QtGui.QGroupBox("Current users", self)
+        _main_gbox = QGroupBox("Current users", self)
 
-        self.users_listwidget = QtGui.QListWidget(_main_gbox)
+        self.users_listwidget = QListWidget(_main_gbox)
         self.users_listwidget.setFixedHeight(50)
 
-        self.give_control_chbox = QtGui.QCheckBox(\
+        self.give_control_chbox = QCheckBox(\
              "Selecting gives control", _main_gbox)
         self.give_control_chbox.setChecked(False)
-        self.allow_timeout_control_chbox = QtGui.QCheckBox(\
+        self.allow_timeout_control_chbox = QCheckBox(\
              "Allow timeout control", _main_gbox)
         self.allow_timeout_control_chbox.setChecked(False)
 
+        #self.take_control_button = QToolButton(_main_gbox)
+        #self.take_control_button.setUsesTextLabel(True)
         self.take_control_button = QtGui.QToolButton(_main_gbox)
         self.take_control_button.setToolButtonStyle(True)
         self.take_control_button.setText("Take control")
@@ -181,31 +189,33 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.take_control_button.setIcon(Qt4_Icons.load_icon("FingerRight"))
         self.take_control_button.hide()
 
-        self.ask_control_button = QtGui.QToolButton(_main_gbox)
+        self.ask_control_button = QToolButton(_main_gbox)
+        #self.ask_control_button.setUsesTextLabel(True)
+        #self.ask_control_button = QtGui.QToolButton(_main_gbox)
         self.ask_control_button.setToolButtonStyle(True)
         self.ask_control_button.setText("Ask for control")
         self.ask_control_button.setEnabled(False)
         self.ask_control_button.setIcon(Qt4_Icons.load_icon("FingerUp"))
 
-        _my_name_widget = QtGui.QWidget(_main_gbox)
-        _my_name_label = QtGui.QLabel("My name:", _my_name_widget)
+        _my_name_widget = QWidget(_main_gbox)
+        _my_name_label = QLabel("My name:", _my_name_widget)
         self.nickname_ledit = NickEditInput(_my_name_widget)
 
-        reg_exp = QtCore.QRegExp(".+")
-        nick_validator = QtGui.QRegExpValidator(reg_exp, self.nickname_ledit)
+        reg_exp = QRegExp(".+")
+        nick_validator = QRegExpValidator(reg_exp, self.nickname_ledit)
         self.nickname_ledit.setValidator(nick_validator)
 
         self.external_user_info_dialog = ExternalUserInfoDialog()
 
         # Layout --------------------------------------------------------------
-        _my_name_widget_layout = QtGui.QHBoxLayout(_my_name_widget)
+        _my_name_widget_layout = QHBoxLayout(_my_name_widget)
         _my_name_widget_layout.addWidget(_my_name_label)
         _my_name_widget_layout.addWidget(self.nickname_ledit)
         #_my_name_widget_layout.addStretch(0)
         _my_name_widget_layout.setSpacing(2)
         _my_name_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_gbox_vlayout = QtGui.QVBoxLayout(_main_gbox)
+        _main_gbox_vlayout = QVBoxLayout(_main_gbox)
         _main_gbox_vlayout.addWidget(self.users_listwidget)
         _main_gbox_vlayout.addWidget(self.give_control_chbox)
         _main_gbox_vlayout.addWidget(self.allow_timeout_control_chbox)
@@ -215,14 +225,14 @@ class Qt4_InstanceListBrick(BlissWidget):
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
  
         # SizePolicies --------------------------------------------------------
-        self.ask_control_button.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                              QtGui.QSizePolicy.Fixed)
+        self.ask_control_button.setSizePolicy(QSizePolicy.Expanding,
+                                              QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.users_listwidget.itemPressed.connect(self.user_selected)
@@ -231,7 +241,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.nickname_ledit.returnPressed.connect(self.change_my_name)
 
         # Other ---------------------------------------------------------------
-        self.timeout_timer = QtCore.QTimer(self)
+        self.timeout_timer = QTimer(self)
         self.timeout_timer.timeout.connect(self.timeout_approaching)
 
 
@@ -427,7 +437,7 @@ class Qt4_InstanceListBrick(BlissWidget):
             local = BlissWidget.INSTANCE_LOCATION_EXTERNAL
         BlissWidget.setInstanceLocation(local)
 
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if hasattr(widget, "configuration"):
                 active_window = widget
                 break 
@@ -447,32 +457,32 @@ class Qt4_InstanceListBrick(BlissWidget):
         elif not connected:
             if not quiet:
                 msg_event = MsgDialogEvent(\
-                    QtGui.QMessageBox.Warning,\
+                    QMessageBox.Warning,\
                     "Couldn't connect to the server application!",\
                     self.font().pointSize())
-                QtGui.QApplication.postEvent(self, msg_event)
+                QApplication.postEvent(self, msg_event)
  
-            QtCore.QTimer.singleShot(Qt4_InstanceListBrick.RECONNECT_TIME,
+            QTimer.singleShot(Qt4_InstanceListBrick.RECONNECT_TIME,
                                      self.reconnect_to_server)
         else:
             BlissWidget.set_instance_role(BlissWidget.INSTANCE_ROLE_CLIENT)
             BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_SLAVE)
 
             server_print = self.instance_server_hwobj.idPrettyPrint(server_id)
-            item = QtGui.QListWidgetItem(self.server_icon,
+            item = QListWidgetItem(self.server_icon,
                                          server_print,
                                          self.users_listwidget)
             item.setSelected(False)
             self.nickname_ledit.setText(my_nickname)
             self.connections[server_id[0]] = (item, server_id[1])
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            item.setFlags(Qt.ItemIsEnabled)
             self.have_control(False, gui_only=True)
             self.init_name(my_nickname)
 
-            msg_event = MsgDialogEvent(QtGui.QMessageBox.Information,
+            msg_event = MsgDialogEvent(QMessageBox.Information,
                 "Successfully connected to the server application.",
                 self.font().pointSize())
-            QtGui.QApplication.postEvent(self, msg_event)
+            QApplication.postEvent(self, msg_event)
 
     def server_initialized(self, started, server_id=None):
         """
@@ -484,14 +494,14 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.init_name(server_id[0])
             self.have_control(True, gui_only=True)
         else:
-            msg_dialog = QtGui.QMessageBox("mxCuBE",\
+            msg_dialog = QMessageBox("mxCuBE",\
                 "Couldn't start the multiple instances server!",\
-                QtGui.QMessageBox.Critical,
+                QMessageBox.Critical,
                 QMessageBox.Ok,
                 QMessageBox.NoButton,\
-                QtGui.QMessageBox.NoButton,
+                QMessageBox.NoButton,
                 self)
-            msg_dialog.setButtonText(QtGui.QMessageBox.Ok, "Quit")
+            msg_dialog.setButtonText(QMessageBox.Ok, "Quit")
             #s=self.font().pointSize()
             #f=msg_dialog.font()
             #f.setPointSize(s)
@@ -512,18 +522,17 @@ class Qt4_InstanceListBrick(BlissWidget):
              BlissWidget.INSTANCE_MODE_SLAVE)
 
         msg_event = MsgDialogEvent(\
-            QtGui.QMessageBox.Warning,\
+            QMessageBox.Warning,\
             "The server application closed the connection!",\
             self.font().pointSize())
-        QtGui.QApplication.postEvent(self, msg_event)
-        QtCore.QTimer.singleShot(Qt4_InstanceListBrick.RECONNECT_TIME,
+        QApplication.postEvent(self, msg_event)
+        QTimer.singleShot(Qt4_InstanceListBrick.RECONNECT_TIME,
                                  self.reconnect_to_server)
 
     def widget_update(self, timestamp, method, method_args, master_sync=True):
         """
         Descript. :
         """
-        print timestamp, method, method_args, master_sync
         if self.instance_server_hwobj.isServer():
             BlissWidget.addEventToCache(timestamp, method, *method_args)
             if not master_sync or BlissWidget.shouldRunEvent():
@@ -544,7 +553,6 @@ class Qt4_InstanceListBrick(BlissWidget):
                     except AttributeError:
                         pass
         else:
-            print method, method.__self__
             method.__self__.blockSignals(True)
             method(*method_args)
 
@@ -600,7 +608,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         """
         if self.instance_server_hwobj is not None:
             tab_event = AppTabEvent(tab_name, tab_index)
-            QtGui.QApplication.postEvent(self, tab_event)
+            QApplication.postEvent(self, tab_event)
 
     def application_brick_changed(self, brick_name, widget_name, \
             method_name, method_args, master_sync):
@@ -613,14 +621,16 @@ class Qt4_InstanceListBrick(BlissWidget):
                                         method_name,
                                         method_args,
                                         master_sync)
-            QtGui.QApplication.postEvent(self, brick_event)
+            QApplication.postEvent(self, brick_event)
 
     def init_name(self, new_name):
         """
         Descript. :
         """
+        self.nickname_ledit.blockSignals(True)
         self.nickname_ledit.setText(new_name)
         self.nickname_ledit.acceptInput()
+        self.nickname_ledit.blockSignals(False)
 
     def change_my_name(self):
         """
@@ -644,19 +654,19 @@ class Qt4_InstanceListBrick(BlissWidget):
         user_id = current_user[0]
         user_prop = current_user[1]
         control_user_print = self.instance_server_hwobj.idPrettyPrint(current_user)
-        take_control_dialog = QtGui.QMessageBox(
+        take_control_dialog = QMessageBox(
             "mxCuBE",\
             "You're about to take control of the application, " + \
             "taking over %s!" % control_user_print,\
-            QtGui.QMessageBox.Question, QMessageBox.Ok, QMessageBox.Cancel, \
-            QtGui.QMessageBox.NoButton, self)
-        take_control_dialog.setButtonText(QtGui.QMessageBox.Ok, "Take control")
+            QMessageBox.Question, QMessageBox.Ok, QMessageBox.Cancel, \
+            QMessageBox.NoButton, self)
+        take_control_dialog.setButtonText(QMessageBox.Ok, "Take control")
         #s=self.font().pointSize()
         #f=take_control_dialog.font()
         #f.setPointSize(s)
         #take_control_dialog.setFont(f)
         #take_control_dialog.updateGeometry()
-        if take_control_dialog.exec_() == QtGui.QMessageBox.Ok:
+        if take_control_dialog.exec_() == QMessageBox.Ok:
             self.instance_server_hwobj.takeControl()
 
     def run(self):
@@ -664,7 +674,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         Descript. :
         """
         if self['initializeServer']:
-            QtGui.QApplication.postEvent(self, StartServerEvent())
+            QApplication.postEvent(self, StartServerEvent())
 
     def instance_user_id_changed(self, user_id):
         """
@@ -689,10 +699,10 @@ class Qt4_InstanceListBrick(BlissWidget):
         Descript. :
         """
         client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-        item = QtGui.QListWidgetItem(self.client_icon,
-                                     client_print,
-                                     self.users_listwidget)
-        item.setFlags(QtCore.Qt.ItemIsEnabled)
+        item = QListWidgetItem(self.client_icon,
+                               client_print,
+                               self.users_listwidget)
+        item.setFlags(Qt.ItemIsEnabled)
         self.connections[client_id[0]] = (item, client_id[1])
 
     def client_closed(self, client_id):
@@ -756,7 +766,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         Descript. :
         """
         camera_brick = None
-        for widget in QtGui.QApplication.allWidgets():
+        for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
                 if "CameraBrick" in str(widget.__class__):
                     widget.set_control_mode(have_control)
@@ -776,15 +786,15 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.ask_control_button.setEnabled(False)
 
             self.users_listwidget.setSelectionMode(\
-                 QtGui.QAbstractItemView.SingleSelection)
+                 QAbstractItemView.SingleSelection)
             #self.users_listwidget.setSelectionModel()
             self.users_listwidget.clearSelection()
             for item_index in range(self.users_listwidget.count()):
                 self.users_listwidget.item(item_index).\
-                     setFlags(QtCore.Qt.ItemIsEnabled)
+                     setFlags(Qt.ItemIsEnabled)
                 #tem.setFlags(QtCore.Qt.NoItemFlags)
             self.users_listwidget.setSelectionMode(\
-                QtGui.QAbstractItemView.NoSelection)
+                QAbstractItemView.NoSelection)
         else:
             if self.xmlrpc_server:
                 self.xmlrpc_server.close()
@@ -837,7 +847,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                 logging.getLogger('user_level_log').warning(\
                     "You have gained control of the application.")
             else:
-                msg_event = MsgDialogEvent(QtGui.QMessageBox.Warning, \
+                msg_event = MsgDialogEvent(QMessageBox.Warning, \
                     "I've lost control of the application!",\
                     self.font().pointSize())
                 logging.getLogger('user_level_log').warning(\
@@ -856,14 +866,14 @@ class Qt4_InstanceListBrick(BlissWidget):
             #item = self.users_listwidget.item(0)
             for item_index in range(self.users_listwidget.count()):
                 self.users_listwidget.item(item_index).setFlags(\
-                     QtCore.Qt.ItemIsEnabled)
+                     Qt.ItemIsEnabled)
             self.users_listwidget.setSelectionMode(\
-                 QtGui.QAbstractItemView.SingleSelection)
-            control_item.setFlags(QtCore.Qt.ItemIsEnabled | \
-                                  QtCore.Qt.ItemIsSelectable)
+                 QAbstractItemView.SingleSelection)
+            control_item.setFlags(Qt.ItemIsEnabled | \
+                                  Qt.ItemIsSelectable)
             control_item.setSelected(True)
             self.users_listwidget.setSelectionMode(\
-                 QtGui.QAbstractItemView.NoSelection)
+                 QAbstractItemView.NoSelection)
             self.in_control = list(has_control_id)
             self.update_mirroring()
 
@@ -937,10 +947,10 @@ class Qt4_InstanceListBrick(BlissWidget):
                       self.timeout_left))
             self.timeout_left -= 1
             if self.timeout_left == 0:
-                self.give_control_msgbox.done(QtGui.QMessageBox.Yes)
+                self.give_control_msgbox.done(QMessageBox.Yes)
             else:
                 self.give_control_msgbox.setButtonText(\
-                     QtGui.QMessageBox.Yes,
+                     QMessageBox.Yes,
                      "Allow (%d secs)" % self.timeout_left)
 
     def event(self, event):
@@ -957,16 +967,16 @@ class Qt4_InstanceListBrick(BlissWidget):
                     client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
                     self.give_control_msgbox.nickname = client_print
                     self.give_control_msgbox.setButtonText(\
-                         QtGui.QMessageBox.Yes,
+                         QMessageBox.Yes,
                          "Allow (%d secs)" % self.timeout_left)
                     self.give_control_msgbox.setButtonText(\
-                         QtGui.QMessageBox.No,
+                         QMessageBox.No,
                          "Deny")
                     self.timeout_timer.start(1000)
                     res = self.give_control_msgbox.exec_()
                     self.timeout_timer.stop()
 
-                    if res == QtGui.QMessageBox.Yes:
+                    if res == QMessageBox.Yes:
                         self.instance_server_hwobj.giveControl(client_id)
                     else:
                         self.instance_server_hwobj.sendChatMessage(\
@@ -992,9 +1002,9 @@ class Qt4_InstanceListBrick(BlissWidget):
                     event.tab_index)
 
             elif event.type() == MSG_DIALOG_EVENT:
-                msg_dialog = QtGui.QMessageBox("mxCuBE",\
-                    event.msg, event.icon_type, QtGui.QMessageBox.Ok,\
-                    QtGui.QMessageBox.NoButton, QtGui.QMessageBox.NoButton,
+                msg_dialog = QMessageBox("mxCuBE",\
+                    event.msg, event.icon_type, QMessageBox.Ok,\
+                    QMessageBox.NoButton, QMessageBox.NoButton,
                     self)
                 msg_dialog.exec_()
                 if isinstance(event.callback, collections.Callable):
@@ -1002,10 +1012,10 @@ class Qt4_InstanceListBrick(BlissWidget):
 
             elif event.type() == USER_INFO_DIALOG_EVENT:
                 if event.is_local or event.toaddrs == "":
-                    msg_dialog = QtGui.QMessageBox("mxCuBE",\
-                        event.msg, QtGui.QMessageBox.Information,
-                        QtGui.QMessageBox.Ok, QtGui.QMessageBox.NoButton,
-                        QtGui.QMessageBox.NoButton, None)
+                    msg_dialog = QMessageBox("mxCuBE",\
+                        event.msg, QMessageBox.Information,
+                        QMessageBox.Ok, QMessageBox.NoButton,
+                        QMessageBox.NoButton, None)
                 else:
                     self.external_user_info_dialog.setMessage(event.msg)
                     msg_dialog = self.external_user_info_dialog
@@ -1046,7 +1056,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                         smtp.quit()
                     else:
                         smtp.quit()
-        return QtGui.QWidget.event(self, event)
+        return QWidget.event(self, event)
 
     def wants_control(self, client_id):
         """
@@ -1057,19 +1067,19 @@ class Qt4_InstanceListBrick(BlissWidget):
         and self.allow_timeout_control_chbox.isChecked():
             self.timeout_left = self['giveControlTimeout']
             client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-            self.give_control_msgbox = QtGui.QMessageBox(
+            self.give_control_msgbox = QMessageBox(
                 "Pass control", \
                 "The user %s wants to have control " % client_print + \
                 "of the application!", \
-                QtGui.QMessageBox.Question,
-                QtGui.QMessageBox.Yes,
-                QtGui.QMessageBox.No,\
-                QtGui.QMessageBox.NoButton,
+                QMessageBox.Question,
+                QMessageBox.Yes,
+                QMessageBox.No,\
+                QMessageBox.NoButton,
                 self)
             custom_event = WantsControlEvent(client_id)
-            QtGui.QApplication.postEvent(self, custom_event)
+            QApplication.postEvent(self, custom_event)
 
-class LineEditInput(QtGui.QLineEdit):
+class LineEditInput(QLineEdit):
     """
     Descript: Single-line input field. Changes color depending on the validity
               of the input: red for invalid (or whatever DataCollectBrick2.
@@ -1085,35 +1095,37 @@ class LineEditInput(QtGui.QLineEdit):
     Notes      : Returns 1/3 of the width in the sizeHint from QtGui.QLineEdit
     """
 
-    PARAMETER_STATE = {"INVALID" : QtCore.Qt.red, \
-                       "OK" : QtCore.Qt.white, \
-                       "WARNING" : QtCore.Qt.yellow}
+    PARAMETER_STATE = {"INVALID" : Qt.red, \
+                       "OK" : Qt.white, \
+                       "WARNING" : Qt.yellow}
+
+    inputValidSignal = pyqtSignal(bool)
 
     def __init__(self, parent):
         """
         Descript. :
         """
-        QtGui.QLineEdit.__init__(self, parent)
+        QLineEdit.__init__(self, parent)
         self.textChanged.connect(self.text_changed)
         self.returnPressed.connect(self.return_pressed)
         self.colorDefault = None
-        self.origPalette = QtGui.QPalette(self.palette())
-        self.palette2 = QtGui.QPalette(self.origPalette)
+        self.origPalette = QPalette(self.palette())
+        self.palette2 = QPalette(self.origPalette)
         self.palette2.setColor(\
-             QtGui.QPalette.Active,
-             QtGui.QPalette.Base, 
-             self.origPalette.brush(QtGui.QPalette.Disabled,
-                                    QtGui.QPalette.Background).color())
+             QPalette.Active,
+             QPalette.Base,
+             self.origPalette.brush(QPalette.Disabled,
+                                    QPalette.Background).color())
         self.palette2.setColor(\
-             QtGui.QPalette.Inactive,
-             QtGui.QPalette.Base,
-             self.origPalette.brush(QtGui.QPalette.Disabled,
-                                    QtGui.QPalette.Background).color())
+             QPalette.Inactive,
+             QPalette.Base,
+             self.origPalette.brush(QPalette.Disabled,
+                                    QPalette.Background).color())
         self.palette2.setColor(\
-             QtGui.QPalette.Disabled,
-             QtGui.QPalette.Base,
-             self.origPalette.brush(QtGui.QPalette.Disabled,
-                                    QtGui.QPalette.Background).color())
+             QPalette.Disabled,
+             QPalette.Base,
+             self.origPalette.brush(QPalette.Disabled,
+                                    QPalette.Background).color())
 
     def return_pressed(self):
         """
@@ -1121,15 +1133,15 @@ class LineEditInput(QtGui.QLineEdit):
         """
         if self.validator() is not None:
             if self.hasAcceptableInput():
-                self.emit(QtCore.SIGNAL("returnPressed"))
+                self.returnPressed.emit()
         else:
-            self.emit(QtCore.SIGNAL("returnPressed"))
+            self.returnPressed.emit()
 
     def text(self):
         """
         Descript. :
         """
-        return str(QtGui.QLineEdit.text(self))
+        return str(QLineEdit.text(self))
 
     def text_changed(self, txt):
         """
@@ -1173,15 +1185,15 @@ class LineEditInput(QtGui.QLineEdit):
                 else:
                     color = LineEditInput.PARAMETER_STATE["OK"]
             self.setPaletteBackgroundColor(color)
-        self.emit(QtCore.SIGNAL("textChanged"), txt)
+        self.textChanged.emit(txt)
         if valid is not None:
-            self.emit(QtCore.SIGNAL("inputValid"), self, valid)
+            self.inputValidSignal.emit(valid)
 
     def sizeHint(self):
         """
         Descript. :
         """
-        size_hint = QtGui.QLineEdit.sizeHint(self)
+        size_hint = QLineEdit.sizeHint(self)
         size_hint.setWidth(size_hint.width() / 3)
         return size_hint
 
@@ -1193,7 +1205,7 @@ class LineEditInput(QtGui.QLineEdit):
             self.setPalette(self.palette2)
         else:
             self.setPalette(self.origPalette)
-        QtGui.QLineEdit.setReadOnly(self, readonly)
+        QLineEdit.setReadOnly(self, readonly)
 
     def origBackgroundColor(self):
         """
@@ -1225,16 +1237,16 @@ class NickEditInput(LineEditInput):
                 Qt4_widget_colors.set_widget_color(\
                    self,
                    LineEditInput.PARAMETER_STATE["WARNING"],
-                   QtGui.QPalette.Base)
+                   QPalette.Base)
             else:
                 valid = False
                 Qt4_widget_colors.set_widget_color(\
                    self,
                    LineEditInput.PARAMETER_STATE["INVALID"],
-                   QtGui.QPalette.Base)
-        self.emit(QtCore.SIGNAL("textChanged"), txt)
+                   QPalette.Base)
+        self.textChanged.emit(txt)
         if valid is not None:
-            self.emit(QtCore.SIGNAL("inputValid"), self, valid)
+            self.inputValidSignal.emit(valid)
 
     def acceptInput(self):
         """
@@ -1243,16 +1255,16 @@ class NickEditInput(LineEditInput):
         Qt4_widget_colors.set_widget_color(\
             self,
             LineEditInput.PARAMETER_STATE["OK"],
-            QtGui.QPalette.Base)
+            QPalette.Base)
 
-class ExternalUserInfoDialog(QtGui.QDialog):
+class ExternalUserInfoDialog(QDialog):
     """
     """
 
     def __init__(self):
         """
         """
-        QtGui.QDialog.__init__(self, None)
+        QDialog.__init__(self, None)
         self.setWindowTitle('mxCuBE')
 
         # Hardware objects ----------------------------------------------------
@@ -1266,32 +1278,32 @@ class ExternalUserInfoDialog(QtGui.QDialog):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.message_box = QtGui.QGroupBox("Your info", self) #v
-        self.message1 = QtGui.QLabel(self.message_box)
-        self.message2 = QtGui.QLabel("<nobr>Please enter the following " + \
-                                     "information, <u>required</u> for " + \
-                                     "the experimental hall operator:",
-                                     self.message_box)
-        my_name_widget = QtGui.QWidget(self.message_box)
-        name_label = QtGui.QLabel("Your name:", my_name_widget)
-        self.name_input = QtGui.QLineEdit(my_name_widget)
-        institute_label = QtGui.QLabel("Your institute:", my_name_widget)
-        self.institute_input = QtGui.QLineEdit(my_name_widget)
-        phone_label = QtGui.QLabel("Your telephone:", my_name_widget)
-        self.phone_input = QtGui.QLineEdit(my_name_widget)
-        email_label = QtGui.QLabel("Your email:", my_name_widget)
-        self.email_input = QtGui.QLineEdit(my_name_widget)
+        self.message_box = QGroupBox("Your info", self) #v
+        self.message1 = QLabel(self.message_box)
+        self.message2 = QLabel("<nobr>Please enter the following " + \
+                               "information, <u>required</u> for " + \
+                               "the experimental hall operator:",
+                               self.message_box)
+        my_name_widget = QWidget(self.message_box)
+        name_label = QLabel("Your name:", my_name_widget)
+        self.name_input = QLineEdit(my_name_widget)
+        institute_label = QLabel("Your institute:", my_name_widget)
+        self.institute_input = QLineEdit(my_name_widget)
+        phone_label = QLabel("Your telephone:", my_name_widget)
+        self.phone_input = QLineEdit(my_name_widget)
+        email_label = QLabel("Your email:", my_name_widget)
+        self.email_input = QLineEdit(my_name_widget)
 
         # Layout --------------------------------------------------------------
 
         # SizePolicies --------------------------------------------------------
-        self.message_box.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                      QtGui.QSizePolicy.Fixed)
+        self.message_box.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                       QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        _my_name_widget_vlayout = QtGui.QVBoxLayout(my_name_widget)
+        _my_name_widget_vlayout = QVBoxLayout(my_name_widget)
         _my_name_widget_vlayout.addWidget(name_label)
         _my_name_widget_vlayout.addWidget(self.name_input)
         _my_name_widget_vlayout.addWidget(institute_label)
@@ -1301,12 +1313,12 @@ class ExternalUserInfoDialog(QtGui.QDialog):
         _my_name_widget_vlayout.addWidget(email_label)
         _my_name_widget_vlayout.addWidget(self.email_input)
 
-        _message_gbox_vlayout = QtGui.QVBoxLayout(self.message_box)
+        _message_gbox_vlayout = QVBoxLayout(self.message_box)
         _message_gbox_vlayout.addWidget(self.message1)
         _message_gbox_vlayout.addWidget(self.message2)
         _message_gbox_vlayout.addWidget(my_name_widget)
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.message_box)
         main_layout.setSpacing(0)
         #main_layout.addWidget(self.buttons_box)
@@ -1319,7 +1331,7 @@ class ExternalUserInfoDialog(QtGui.QDialog):
 
     def show(self):
         self.validate_parameters()
-        return QtGui.QDialog.exec_(self)
+        return QDialog.exec_(self)
 
     def validate_parameters(self):
         if len(str(self.name_input.text())) \

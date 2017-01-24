@@ -19,7 +19,10 @@
 
 from os import path
 
-from PyQt4 import QtGui
+try:
+   from PyQt5 import QtGui
+except:
+   from PyQt4 import QtGui
 
 
 ICONS_DIR = path.join(path.dirname(__file__), 'Icons')

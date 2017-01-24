@@ -19,8 +19,14 @@
 
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import QString
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPalette, QColor, QDoubleValidator
+else:
+    from PyQt4.QtCore import QString
+    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -39,8 +45,8 @@ class Qt4_ResolutionBrick(BlissWidget):
                     Qt4_widget_colors.LIGHT_GREEN,
                     Qt4_widget_colors.LIGHT_YELLOW,
                     Qt4_widget_colors.LIGHT_YELLOW,
-                    QtCore.Qt.darkYellow,
-                    QtGui.QColor(255,165,0),
+                    Qt4_widget_colors.LIGHT_YELLOW,
+                    QColor(255,165,0),
                     Qt4_widget_colors.LIGHT_RED)   
 
     def __init__(self, *args):
@@ -69,33 +75,33 @@ class Qt4_ResolutionBrick(BlissWidget):
         self.addProperty('mmFormatString','formatString','###.##')
         self.addProperty('angFormatString','formatString','##.###')        
 
-        self.group_box = QtGui.QGroupBox("Resolution", self)
-        current_label = QtGui.QLabel("Current:", self.group_box)
+        self.group_box = QGroupBox("Resolution", self)
+        current_label = QLabel("Current:", self.group_box)
         current_label.setFixedWidth(75)
 
-        self.resolution_ledit = QtGui.QLineEdit(self.group_box)
+        self.resolution_ledit = QLineEdit(self.group_box)
         self.resolution_ledit.setReadOnly(True)
-        self.detector_distance_ledit = QtGui.QLineEdit(self.group_box)
+        self.detector_distance_ledit = QLineEdit(self.group_box)
         self.detector_distance_ledit.setReadOnly(True) 
 
-        _new_value_widget = QtGui.QWidget(self)
-        set_to_label = QtGui.QLabel("Set to:",self.group_box)
-        self.new_value_ledit = QtGui.QLineEdit(self.group_box)
-        self.units_combobox = QtGui.QComboBox(_new_value_widget)
-        self.stop_button = QtGui.QPushButton(_new_value_widget)
+        _new_value_widget = QWidget(self)
+        set_to_label = QLabel("Set to:",self.group_box)
+        self.new_value_ledit = QLineEdit(self.group_box)
+        self.units_combobox = QComboBox(_new_value_widget)
+        self.stop_button = QPushButton(_new_value_widget)
         self.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedWidth(25)
 
         # Layout --------------------------------------------------------------
-        _new_value_widget_hlayout = QtGui.QHBoxLayout(_new_value_widget)
+        _new_value_widget_hlayout = QHBoxLayout(_new_value_widget)
         _new_value_widget_hlayout.addWidget(self.new_value_ledit)
         _new_value_widget_hlayout.addWidget(self.units_combobox)
         _new_value_widget_hlayout.addWidget(self.stop_button)
         _new_value_widget_hlayout.setSpacing(0)
         _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
+        _group_box_gridlayout = QGridLayout(self.group_box)
         _group_box_gridlayout.addWidget(current_label, 0, 0, 2, 1)
         _group_box_gridlayout.addWidget(self.resolution_ledit, 0, 1)
         _group_box_gridlayout.addWidget(self.detector_distance_ledit, 1, 1)
@@ -104,7 +110,7 @@ class Qt4_ResolutionBrick(BlissWidget):
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 2, 2)
         _main_vlayout.addWidget(self.group_box)
@@ -120,8 +126,8 @@ class Qt4_ResolutionBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                            Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                           QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(\
+                                           QPalette.Base)
+        self.new_value_validator = QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
 
         self.units_combobox.addItem(chr(197))
@@ -247,16 +253,16 @@ class Qt4_ResolutionBrick(BlissWidget):
         Return    : None
         """
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtGui.QValidator.Acceptable:
+           QValidator.Acceptable:
             Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_CHANGED,
-                QtGui.QPalette.Base)
+                QPalette.Base)
         else:
            Qt4_widget_colors.set_widget_color(\
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_ERROR,
-                QtGui.QPalette.Base)
+                QPalette.Base)
 
     def current_value_changed(self):
         """
@@ -267,7 +273,7 @@ class Qt4_ResolutionBrick(BlissWidget):
         input_field_text = self.new_value_ledit.text()
 
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtGui.QValidator.Acceptable:
+           QValidator.Acceptable:
             unit = self.units_combobox.currentText()
             value = float()
             self.new_value_ledit.setText("")
@@ -278,7 +284,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(\
                  self.new_value_ledit,
                  Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
 
     def connected(self):
         """
@@ -313,8 +319,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             tool_tip = "Detector distance limits %0.1f : %0.1f mm" \
                        %(self.detector_distance_limits[0],
                          self.detector_distance_limits[1])
-        elif self.units_combobox.currentText() == chr(197) and \
-           self.resolution_limits:
+        elif self.resolution_limits:
             tool_tip = "Resolution limits %0.1f : %0.1f %s"\
                        %(self.resolution_limits[0], 
                          self.resolution_limits[1],
@@ -373,7 +378,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             curr_resolution = self.resolution_hwobj.getPosition()
             self.resolution_value_changed(curr_resolution)
             self.resolution_state_changed(self.resolution_hwobj.getState())
-            if self.units_combobox.currentText() == chr(197):
+            if self.units_combobox.currentText() != "mm":
                 self.group_box.setTitle('Resolution')
                 self.new_value_validator.setRange(self.resolution_limits[0],
                                                   self.resolution_limits[1],
@@ -447,7 +452,7 @@ class Qt4_ResolutionBrick(BlissWidget):
     def resolution_value_changed(self, value):
         if value:
             resolution_str = self['angFormatString'] % float(value)
-            self.resolution_ledit.setText("%s %s" % (resolution_str, chr(197)))
+            self.resolution_ledit.setText("%s %s" % (resolution_str, u"\u212B"))
 
     def detector_distance_changed(self, value):
         if value:
@@ -462,7 +467,7 @@ class Qt4_ResolutionBrick(BlissWidget):
                 color = Qt4_widget_colors.LIGHT_RED
 
             unit = self.units_combobox.currentText()
-            if unit == chr(197):
+            if unit is chr(197):
                 if state == self.detector_distance_hwobj.READY:
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")

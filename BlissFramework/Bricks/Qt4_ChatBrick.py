@@ -21,8 +21,13 @@ import os
 import time
 import InstanceServer
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import pyqtSignal
+    from PyQt5.QtWidgets import *
+else:
+    from PyQt4.QtCore import pyqtSignal
+    from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -68,23 +73,23 @@ class Qt4_ChatBrick(BlissWidget):
         self.role = BlissWidget.INSTANCE_ROLE_UNKNOWN
 
         # Graphic elements ----------------------------------------------------
-        self.conversation_textedit = QtGui.QTextEdit(self)
+        self.conversation_textedit = QTextEdit(self)
         self.conversation_textedit.setReadOnly(True)
-        _controls_widget = QtGui.QWidget(self)
-        _say_label = QtGui.QLabel("Say:", _controls_widget)
-        self.message_ledit = QtGui.QLineEdit(_controls_widget)
-        self.send_button = QtGui.QPushButton("Send", _controls_widget)
+        _controls_widget = QWidget(self)
+        _say_label = QLabel("Say:", _controls_widget)
+        self.message_ledit = QLineEdit(_controls_widget)
+        self.send_button = QPushButton("Send", _controls_widget)
         self.send_button.setEnabled(False)
 
         # Layout --------------------------------------------------------------
-        _controls_widget_hlayout = QtGui.QHBoxLayout(_controls_widget)
+        _controls_widget_hlayout = QHBoxLayout(_controls_widget)
         _controls_widget_hlayout.addWidget(_say_label)
         _controls_widget_hlayout.addWidget(self.message_ledit)
         _controls_widget_hlayout.addWidget(self.send_button)
         _controls_widget_hlayout.setSpacing(2)
         _controls_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.conversation_textedit)
         _main_vlayout.addWidget(_controls_widget)
         _main_vlayout.setSpacing(2)

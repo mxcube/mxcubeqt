@@ -17,8 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5 import QtCore
+else:
+    from PyQt4 import QtCore
 
 from BlissFramework.Utils import PropertyBag
 
@@ -199,7 +202,7 @@ class TabCfg(ContainerCfg):
         ContainerCfg.__init__(self, *args)
 
         self.properties.addProperty("fontSize", "integer", 0)
-        self.signals.update({"notebookPageChanged": "pageName"})
+        self.signals.update({"notebookPageChangedSignal": "pageName"})
 
     def setProperties(self, properties):
         """

@@ -25,8 +25,14 @@ import pickle
 import logging
 import collections
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+try:
+   from PyQt5 import QtCore
+   from PyQt5.QtGui import QPen
+   from PyQt5.QtWidgets import *
+   
+except:
+   from PyQt4 import QtCore
+   from PyQt4.QtGui import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework import Qt4_Configuration
@@ -36,17 +42,16 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 from HardwareRepository import HardwareRepository
 
-
 LOAD_GUI_EVENT = QtCore.QEvent.MaxUser
 
 
-class BlissSplashScreen(QtGui.QSplashScreen):
+class BlissSplashScreen(QSplashScreen):
     """Splash screen when mxcube is loading"""
 
     def __init__(self, pixmap):
         """init"""
 
-        QtGui.QSplashScreen.__init__(self, pixmap)
+        QSplashScreen.__init__(self, pixmap)
 
         self.gui_name = None
         self.repaint()
@@ -68,7 +73,7 @@ class BlissSplashScreen(QtGui.QSplashScreen):
         bot_y = 340 + painter.fontMetrics().height()
         pxsize = 14
         painter.font().setPixelSize(pxsize)
-        painter.setPen(QtGui.QPen(QtCore.Qt.black))
+        painter.setPen(QPen(QtCore.Qt.black))
         painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
                          QtCore.QPoint(right_x, bot_y)),
                          QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop,
@@ -83,7 +88,7 @@ class BlissSplashScreen(QtGui.QSplashScreen):
                          "Please wait...")
 
 
-class GUISupervisor(QtGui.QWidget):
+class GUISupervisor(QWidget):
     """GUI supervisor"""
 
     brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
@@ -92,7 +97,7 @@ class GUISupervisor(QtGui.QWidget):
     def __init__(self, design_mode=False, show_maximized=False, no_border=False):
         """init"""
 
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
 
         self.framework = None
         self.gui_config_file = None
@@ -130,9 +135,9 @@ class GUISupervisor(QtGui.QWidget):
                 except:
                     logging.getLogger().exception("Cannot open file %s",
                                                   gui_config_file)
-                    QtGui.QMessageBox.warning(self, "Error",
+                    QMessageBox.warning(self, "Error",
                            "Could not open file %s !" % gui_config_file,
-                           QtGui.QMessageBox.Ok)
+                           QMessageBox.Ok)
                 else:
                     # find mnemonics to speed up loading
                     # (using the 'require' feature from Hardware Repository)
@@ -187,8 +192,8 @@ class GUISupervisor(QtGui.QWidget):
                         config = Qt4_Configuration.Configuration(raw_config)
                     except:
                         logging.getLogger().exception(failed_msg)
-                        QtGui.QMessageBox.warning(self, "Error", failed_msg,
-                                                  QtGui.QMessageBox.Ok)
+                        QMessageBox.warning(self, "Error", failed_msg,
+                                            QMessageBox.Ok)
                     else:
                         self.configuration = config
 
@@ -198,7 +203,7 @@ class GUISupervisor(QtGui.QWidget):
                     if self.launch_in_design_mode:
                         self.framework = Qt4_GUIBuilder.GUIBuilder()
 
-                        QtGui.QApplication.setActiveWindow(self.framework)
+                        QApplication.setActiveWindow(self.framework)
 
                         self.framework.filename = gui_config_file
                         self.framework.configuration = config
@@ -224,7 +229,7 @@ class GUISupervisor(QtGui.QWidget):
 
         self.framework = Qt4_GUIBuilder.GUIBuilder()
 
-        QtGui.QApplication.setActiveWindow(self.framework)
+        QApplication.setActiveWindow(self.framework)
         self.framework.show()
         self.framework.new_clicked(self.gui_config_file)
 
@@ -240,17 +245,17 @@ class GUISupervisor(QtGui.QWidget):
         if len(self.windows) > 0:
             main_window = self.windows[0]
             main_window.configuration = config
-            QtGui.QApplication.setActiveWindow(main_window)
+            QApplication.setActiveWindow(main_window)
             if self.no_border:
                 main_window.move(0, 0)
-                width = QtGui.QApplication.desktop().width()
-                height = QtGui.QApplication.desktop().height()
+                width = QApplication.desktop().width()
+                height = QApplication.desktop().height()
                 main_window.resize(QtCore.QSize(width, height))
 
             # make connections
             widgets_dict = dict([(isinstance(w.objectName, \
                 collections.Callable) and str(w.objectName()) or None, w) \
-                for w in QtGui.QApplication.allWidgets()])
+                for w in QApplication.allWidgets()])
 
             def make_connections(items_list):
                 """Creates connections"""
@@ -274,14 +279,16 @@ class GUISupervisor(QtGui.QWidget):
                             else:
                                 try:
                                     slot = getattr(receiver, connection["slot"])
+                                    #etattr(sender, connection["signal"]).connect(slot)
                                 except AttributeError:
                                     logging.getLogger().error(\
                                        "No slot '%s' " % connection["slot"] + \
                                        "in receiver %s" % _receiver)
                                 else:
-                                    sender.connect(sender,
-                                        QtCore.SIGNAL(connection["signal"]),
-                                        slot)
+                                    getattr(sender, connection["signal"]).connect(slot)
+                                    #sender.connect(sender,
+                                    #    QtCore.SIGNAL(connection["signal"]),
+                                    #    slot)
                     make_connections(item["children"])
 
             make_connections(config.windows_list)
@@ -310,8 +317,8 @@ class GUISupervisor(QtGui.QWidget):
 
         self.hardware_repository.close()
 
-        QtGui.QApplication.sendPostedEvents()
-        QtGui.QApplication.processEvents()
+        QApplication.sendPostedEvents()
+        QApplication.processEvents()
 
         self.save_size()
 
@@ -367,11 +374,11 @@ class GUISupervisor(QtGui.QWidget):
                    "Repository server.\nMake sure the Hardware " + \
                    "Repository Server is running on host:\n%s." % \
                    str(self.hardware_repository.serverAddress).split(':')[0]
-                if QtGui.QMessageBox.warning(None,
+                if QMessageBox.warning(None,
                        "Cannot connect to Hardware Repository", message,
-                       QtGui.QMessageBox.Retry, QtGui.QMessageBox.Cancel,
-                       QtGui.QMessageBox.NoButton) == \
-                   QtGui.QMessageBox.Cancel:
+                       QMessageBox.Retry, QMessageBox.Cancel,
+                       QMessageBox.NoButton) == \
+                   QMessageBox.Cancel:
                     logging.getLogger().warning("Gave up trying to " + \
                        "connect to Hardware Repository server.")
                     break
@@ -389,7 +396,7 @@ class GUISupervisor(QtGui.QWidget):
             del self.splash_screen
         except:
             logging.getLogger().exception("exception while loading GUI file")
-            QtGui.QApplication.exit()
+            QApplication.exit()
 
     def customEvent(self, event):
         """Custom event"""

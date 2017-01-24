@@ -21,8 +21,15 @@
 import re
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import BlissFramework
+if BlissFramework.get_gui_version() == "QT5":
+    from PyQt5.QtCore import pyqtSignal, QObject, Qt
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtGui import QPalette
+else:
+    from PyQt4.QtCore import pyqtSignal, QObject, Qt
+    from PyQt4.QtGui import *
+
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -70,30 +77,30 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.defineSlot('allowControl', ())
       
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox("none", self)
-        self.main_gbox.setAlignment(QtCore.Qt.AlignCenter)
-        self.state_ledit = QtGui.QLineEdit('unknown', self.main_gbox)
+        self.main_gbox = QGroupBox("none", self)
+        self.main_gbox.setAlignment(Qt.AlignCenter)
+        self.state_ledit = QLineEdit('unknown', self.main_gbox)
 
-        self.buttons_widget = QtGui.QWidget(self.main_gbox)
-        self.set_in_button = QtGui.QPushButton("Set in", self.buttons_widget)
+        self.buttons_widget = QWidget(self.main_gbox)
+        self.set_in_button = QPushButton("Set in", self.buttons_widget)
         self.set_in_button.setCheckable(True)
-        self.set_out_button = QtGui.QPushButton("Set out",self.buttons_widget)
+        self.set_out_button = QPushButton("Set out",self.buttons_widget)
         self.set_out_button.setCheckable(True)
 
         # Layout -------------------------------------------------------------- 
-        _buttons_widget_hlayout = QtGui.QHBoxLayout(self.buttons_widget)
+        _buttons_widget_hlayout = QHBoxLayout(self.buttons_widget)
         _buttons_widget_hlayout.addWidget(self.set_in_button)
         _buttons_widget_hlayout.addWidget(self.set_out_button)
         _buttons_widget_hlayout.setSpacing(0)
         _buttons_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_gbox)
+        _main_gbox_vlayout = QVBoxLayout(self.main_gbox)
         _main_gbox_vlayout.addWidget(self.state_ledit)
         _main_gbox_vlayout.addWidget(self.buttons_widget)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -105,7 +112,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.set_out_button.toggled.connect(self.set_out)
 
         # Other ---------------------------------------------------------------
-        self.state_ledit.setAlignment(QtCore.Qt.AlignCenter)
+        self.state_ledit.setAlignment(Qt.AlignCenter)
         self.state_ledit.setToolTip("Shows the current control state")
         self.state_ledit.setFrame(False)
         bold_font = self.state_ledit.font()
@@ -159,7 +166,7 @@ class Qt4_DuoStateBrick(BlissWidget):
 
         Qt4_widget_colors.set_widget_color(self.state_ledit,
                                            color,
-                                           QtGui.QPalette.Base)
+                                           QPalette.Base)
         #self.state_ledit.setPaletteBackgroundColor(QColor(color))
         if len(state_ledit) > 0:
             self.state_ledit.setText('%s' % state_label)
@@ -190,18 +197,20 @@ class Qt4_DuoStateBrick(BlissWidget):
             self.set_out_button.setChecked(out_state)
             self.set_out_button.blockSignals(False)
 
+        """
         if state=='in':
-            self.emit(QtCore.SIGNAL("duoStateBrickMoving"), False)
-            self.emit(QtCore.SIGNAL("duoStateBrickIn"), True)
+            self.duoStateBrickMovingSignal.emit(False)
+            self.duoStateBrickInSignal.emit(True)
         elif state=='out':
-            self.emit(QtCore.SIGNAL("duoStateBrickMoving"), False)
-            self.emit(QtCore.SIGNAL("duoStateBrickOut"), True)
+            self.duoStateBrickMovingSignal.emit(False)
+            self.duoStateBrickOutSignal.emit(True)
         elif state=='moving':
-            self.emit(QtCore.SIGNAL("duoStateBrickMoving"), True)
+            self.duoStateBrickMovingSignal.emit(True)
         elif state=='error' or state=='unknown' or state=='disabled':
-            self.emit(QtCore.SIGNAL("duoStateBrickMoving"), False)
-            self.emit(QtCore.SIGNAL("duoStateBrickIn"), False)
-            self.emit(QtCore.SIGNAL("duoStateBrickOut"), False)
+            self.duoStateBrickMovingSignal.emit(False)
+            self.duoStateBrickInSignal.emit(False)
+            self.duoStateBrickOutSignal.emit(False)
+        """
 
     def allowControl(self,enable):
         if self['forceNoControl']:
@@ -315,7 +324,7 @@ class Qt4_DuoStateBrick(BlissWidget):
 ### Wrapper around different hardware objects, to make them have the
 ### same behavior to the brick
 ###
-class WrapperHO(QtCore.QObject):
+class WrapperHO(QObject):
     deviceMap = {"Device": "Procedure",
                  "TangoShutter" : "Shutter",
                  "ShutterEpics" : "Shutter",
@@ -345,10 +354,10 @@ class WrapperHO(QtCore.QObject):
 
     STATES = ('unknown','disabled','error','out','moving','in','automatic')
 
-    duoStateChangedSignal = QtCore.pyqtSignal(str, str)
+    duoStateChangedSignal = pyqtSignal(str, str)
 
     def __init__(self, hardware_obj):
-        QtCore.QObject.__init__(self)
+        QObject.__init__(self)
 
         #self.setIn = new.instancemethod(lambda self: None, self)
         self.setIn = lambda self: None
