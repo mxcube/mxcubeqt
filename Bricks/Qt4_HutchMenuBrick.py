@@ -383,7 +383,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.graphics_manager_hwobj.start_auto_centring()
 
 class MonoStateButton(QToolButton):
-
     def __init__(self, parent, caption=None, icon=None, fixed_size=(75, 40)):
         QToolButton.__init__(self, parent)
 
@@ -418,6 +417,8 @@ class DuoStateButton(QToolButton):
         self.run_icon = None
         self.stop_icon = None
         self.standard_color = self.palette().color(QPalette.Window)
+        self.standard_color = self.palette().color(QPalette.Window)
+        #self.setToolButtonStyle(True)
         self.setText(caption)
         self.setFixedSize(75, 40)
         self.setSizePolicy(QSizePolicy.Fixed,

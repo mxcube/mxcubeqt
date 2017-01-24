@@ -71,7 +71,6 @@ class DataModelInputBinder(object):
                         raise
                 else:
                     dispatcher.send("model_update", self.__model, field_name, self)
-        #self.bindings[field_name][3] = False
 
     def __ledit_text_edited(self, field_name, widget, new_value, type_fn, validator):
         self.bindings[field_name][3] = True
@@ -222,7 +221,6 @@ class DataModelInputBinder(object):
                 elif isinstance(widget, QCheckBox) or \
                         isinstance(widget, QRadioButton):
                     pass
-
         return result
 
 
