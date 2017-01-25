@@ -13,6 +13,13 @@ import types
 #
 import logging
 
+global SPLASH_SCREEN
+def set_splash_screen(screen):
+    SPLASH_SCREEN = screen
+
+def get_splash_screen():
+    return SPLASH_SCREEN
+
 _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
 _formatter = logging.Formatter('%(asctime)s |%(levelname)-7s| %(message)s')

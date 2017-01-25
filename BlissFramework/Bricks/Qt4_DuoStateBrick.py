@@ -171,7 +171,18 @@ class Qt4_DuoStateBrick(BlissWidget):
         if len(state_ledit) > 0:
             self.state_ledit.setText('%s' % state_label)
         else:
-            self.state_ledit.setText('%s' % state)
+            label_str = state
+            if state == "in":
+                 prop_label = self['in'].strip()
+                 if len(prop_label.strip()):
+                     label_str = prop_label
+            if state == "out":
+                 prop_label = self['out'].strip()
+                 if prop_label:
+                     label_str = prop_label
+                   
+            self.state_label.setText('<b>%s</b>' % label_str)
+
         try:
             in_enable=self.STATES[state][1]
             out_enable=self.STATES[state][2]
@@ -326,6 +337,8 @@ class Qt4_DuoStateBrick(BlissWidget):
 ###
 class WrapperHO(QObject):
     deviceMap = {"Device": "Procedure",
+                 "SOLEILGuillotine" : "Shutter",
+                 "SoleilSafetyShutter" : "Shutter",
                  "TangoShutter" : "Shutter",
                  "ShutterEpics" : "Shutter",
                  "MD2v4_FastShutter": "Shutter",

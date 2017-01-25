@@ -40,6 +40,8 @@ from BlissFramework import Qt4_GUIBuilder
 from BlissFramework.Utils import Qt4_GUIDisplay
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+from BlissFramework import set_splash_screen
+
 from HardwareRepository import HardwareRepository
 
 LOAD_GUI_EVENT = QtCore.QEvent.MaxUser
@@ -64,28 +66,41 @@ class BlissSplashScreen(QSplashScreen):
             self.gui_name = ' '
         self.repaint()
 
+    def set_message(self, message):
+        self.message = message
+        self.repaint()
+
     def drawContents(self, painter):
         """draws splash screen"""
 
         top_x = 10
-        top_y = 340
+        top_y = 334
         right_x = 390
-        bot_y = 340 + painter.fontMetrics().height()
-        pxsize = 14
+        bot_y = 334 + painter.fontMetrics().height()
+        pxsize = 12
+
         painter.font().setPixelSize(pxsize)
-        painter.setPen(QPen(QtCore.Qt.black))
+        painter.setPen(QtGui.QPen(QtCore.Qt.black))
         painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
                          QtCore.QPoint(right_x, bot_y)),
                          QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop,
                          "Loading MXCuBE")
         painter.font().setPixelSize(pxsize * 2.5)
         painter.font().setPixelSize(pxsize)
+
         top_y = bot_y
-        bot_y += 3 + painter.fontMetrics().height()
+        bot_y += 2 + painter.fontMetrics().height()
         painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
                          QtCore.QPoint(right_x, bot_y)),
                          QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom,
                          "Please wait...")
+
+        top_y = bot_y
+        bot_y += 2 + painter.fontMetrics().height()
+        painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
+                         QtCore.QPoint(right_x, bot_y)),
+                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom,
+                         self.message)
 
 
 class GUISupervisor(QWidget):
@@ -109,7 +124,10 @@ class GUISupervisor(QWidget):
         self.no_border = no_border
         self.windows = []
         self.splash_screen = BlissSplashScreen(Qt4_Icons.load_pixmap('splash'))
+
+        set_splash_screen(self.splash_screen)
         self.splash_screen.show()
+
         self.timestamp = 0
 
     def load_gui(self, gui_config_file):
@@ -184,11 +202,13 @@ class GUISupervisor(QWidget):
                     except:
                         logging.getLogger().exception(failed_msg)
 
+                    self.splash_screen.set_message("Gathering H/O info...")
                     mnemonics = __get_mnemonics(raw_config)
                     self.hardware_repository.require(mnemonics)
                     gui_file.close()
 
                     try:
+                        self.splash_screen.set_message("Building GUI configuration...")
                         config = Qt4_Configuration.Configuration(raw_config)
                     except:
                         logging.getLogger().exception(failed_msg)
@@ -240,6 +260,9 @@ class GUISupervisor(QWidget):
 
         self.windows = Qt4_GUIDisplay.display(config,
                                               no_border=self.no_border)
+
+        self.splash_screen.set_message("Executing configuration...")
+
         main_window = None
 
         if len(self.windows) > 0:
@@ -291,9 +314,11 @@ class GUISupervisor(QWidget):
                                     #    slot)
                     make_connections(item["children"])
 
+            self.splash_screen.set_message("Connecting bricks...")
             make_connections(config.windows_list)
 
             # set run mode for every brick
+            self.splash_screen.set_message("Setting run mode...")
             BlissWidget.setRunMode(True)
 
             if self.show_maximized:
@@ -392,6 +417,7 @@ class GUISupervisor(QWidget):
             main_widget = None
             main_widget = self.load_gui(gui_config_file)
             if main_widget:
+                set_splash_screen(None)
                 self.splash_screen.finish(main_widget)
             del self.splash_screen
         except:

@@ -256,14 +256,15 @@ def run(gui_config_file=None):
     # log startup details
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
-    print ("=================================================================================")
+    logging.getLogger().info("\n\n\n\n")
+    logging.getLogger().info("=================================================================================")
     logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
+    logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
+    logging.getLogger().info("Hardware repository: %s" % hwr_server)
     logging.getLogger().info("System info: Python %s - Qt %s - PyQt %s on %s" % \
        (platform.python_version(), QtCore.QT_VERSION_STR, 
         QtCore.PYQT_VERSION_STR, platform.system()))
-    logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
-    logging.getLogger().info("Hardware repository: %s" % hwr_server)
-    print ("---------------------------------------------------------------------------------")
+    logging.getLogger().info("---------------------------------------------------------------------------------")
 
     QApplication.setDesktopSettingsAware(False)
 
