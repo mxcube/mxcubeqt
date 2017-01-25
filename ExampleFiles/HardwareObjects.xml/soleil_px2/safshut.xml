@@ -1,4 +1,5 @@
 <object class="SoleilSafetyShutter">
+  <username>SoleilSafetyShutter</username>
   <object href="/obx" role="shutter"></object>
   <object href="/TangoExpPss" role="pss"></object>
 </object>

@@ -221,7 +221,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.file_index, "png")
         filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save under",
-            current_file_name, "Image files (%s)" % " ".join(formats)))
+            current_file_name, "Image files (%s)" % " ".join(formats))
 
         if len(filename):
             image_type = os.path.splitext(filename)[1].strip('.').upper()

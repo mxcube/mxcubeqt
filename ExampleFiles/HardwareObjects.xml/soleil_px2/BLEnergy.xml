@@ -9,6 +9,9 @@
     
     <channel type="tango" tangoname="i11-ma-c03/op/mono1-mt_rx" name="mono_mt_rx_state">State</channel>
     <command type="tango" tangoname="i11-ma-c03/op/mono1-mt_rx" name="mono_mt_rx_on">On</command>
+    
+    <channel type="tango" tangoname="i11-ma-c03/op/mono1-mt_rx_fine" name="mono_mt_rx_fine_state">State</channel>
+    <command type="tango" tangoname="i11-ma-c03/op/mono1-mt_rx_fine" name="mono_mt_rx_fine_on">On</command>
 
     <interval>1000</interval>
     <backlash>False</backlash>
