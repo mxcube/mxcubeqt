@@ -211,13 +211,7 @@ import imp
 import logging
 import gevent
 
-try:
-    from PyQt4 import QtCore, QtGui
-    qt_imported = True
-except:
-    print("Cannot import Qt4.  Testing Hardware Objects is still possible")
-    qt_imported = False
-
+from QtImport import *
 from HardwareRepository import HardwareRepository
 
 class MXCuBE_Test_Environment(object):
