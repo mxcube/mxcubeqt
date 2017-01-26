@@ -266,9 +266,23 @@ class CatsMaintBrick(BaseComponents.BlissWidget):
                 self.device.backTraj()
         except:
             qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
-
+    
+    def recover(self):
+        import os
+        return os.system('gnome-terminal --title "recover cats"  --geometry 80x24+1980+0 --execute /bin/bash -c "dry_tremp_toolcal_calibrate.py; bash" &')
+    
     def _safeTraj(self):
         logging.getLogger("user_level_log").info("CATS: Safely move robot arm to home position.")
+        try:
+            if self.device is not None:
+                #self.device._doSafe()
+                #self.device.safeTraj()
+                self.recover()
+        except:
+            qt.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            
+    def _safeTraj_old(self):
+        logging.getLogger("user_level_log").info("CATS: Safely move robot arm to safe position.")
         try:
             if self.device is not None:
                 #self.device._doSafe()

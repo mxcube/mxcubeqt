@@ -1,12 +1,9 @@
+
 from BlissFramework.Bricks import Qt4_MotorSpinBoxBrick
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-
+from QtImport import *
 from BlissFramework import Qt4_Icons
-#from BlissFramework.Utils import Qt4_widget_colors
-#from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 '''
 Controls both the light on/off (wago) and intensity (motor)
@@ -22,18 +19,18 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.addProperty('wagoicons', 'string', '')
         self.addProperty('out_delta', 'string', '')
         
-        self.light_button_box = QtGui.QWidget(self.main_gbox)
+        self.light_button_box = QWidget(self.main_gbox)
         
-        self.lightOffButton=QtGui.QPushButton(self.light_button_box)
+        self.lightOffButton=QPushButton(self.light_button_box)
         self.lightOffButton.setIcon(Qt4_Icons.load_icon('far_left'))
         self.lightOffButton.setToolTip("Switches off the light and sets the intensity to zero")
         
-        self.lightOnButton=QtGui.QPushButton(self.light_button_box)
+        self.lightOnButton=QPushButton(self.light_button_box)
         self.lightOnButton.setIcon(Qt4_Icons.load_icon('far_right'))
         self.lightOnButton.setToolTip("Switches on the light and sets the intensity back to the previous setting")
         
 
-        self.light_button_box_layout = QtGui.QHBoxLayout(self.light_button_box)
+        self.light_button_box_layout = QHBoxLayout(self.light_button_box)
         self.light_button_box_layout.addWidget(self.lightOffButton)
         self.light_button_box_layout.addWidget(self.lightOnButton)
         self.light_button_box_layout.setSpacing(2)
@@ -41,16 +38,15 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         
         self.main_gbox_layout.addWidget(self.light_button_box)
                 
-        self.lightOffButton.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                            QtGui.QSizePolicy.Minimum)
-        self.lightOnButton.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-                                            QtGui.QSizePolicy.Minimum)
+        self.lightOffButton.setSizePolicy(QSizePolicy.Fixed, 
+                                            QSizePolicy.Minimum)
+        self.lightOnButton.setSizePolicy(QSizePolicy.Fixed, 
+                                            QSizePolicy.Minimum)
 
         self.defineSlot('wagoLightStateChanged',())
         self.lightOffButton.clicked.connect(self.lightButtonOffClicked)
         self.lightOnButton.clicked.connect(self.lightButtonOnClicked)
         
-        logging.info("init Qt4_LightControlBrick")
     
     ### Light off pressed: switch off lamp and set out the wago
     def lightButtonOffClicked(self):
@@ -91,12 +87,13 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
             self.lightOffButton.setDown(False)
 
     def propertyChanged(self,property,oldValue,newValue):
-        #print "LightControlBrick2.propertyChanged",property,newValue
 
         if property=='wagolight':
             if self.wagoLight is not None:
                 self.disconnect(self.wagoLight,'wagoStateChanged',self.wagoLightStateChanged)
+
             self.wagoLight=self.getHardwareObject(newValue)
+
             if self.wagoLight is not None:
                 self.connect(self.wagoLight,'wagoStateChanged',self.wagoLightStateChanged)
                 self.wagoLightStateChanged(self.wagoLight.getWagoState())

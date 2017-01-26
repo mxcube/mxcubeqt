@@ -1,12 +1,9 @@
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import Qt
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
-
 
 import logging
 import time
@@ -29,6 +26,10 @@ __category__ = 'SOLEIL'
 class Qt4_SoleilLoginBrick(BlissWidget):
 
     NOBODY_STR="<nobr><b>Login is required for collecting data!</b>"
+
+    setWindowTitle = pyqtSignal(str)
+    loggedIn = pyqtSignal(bool)
+    sessionSelected = pyqtSignal([],[object,object,object,object,object,object,object])
 
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
@@ -70,35 +71,35 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.defineSlot('impersonateProposal',())
 
         # Initialize GUI elements
-        self.contents_box = QtGui.QGroupBox("User",self)
-        self.contents_layout = QtGui.QHBoxLayout(self.contents_box)
+        self.contents_box = QGroupBox("User",self)
+        self.contents_layout = QHBoxLayout(self.contents_box)
         self.contents_layout.setContentsMargins(4,4,4,4)
 
-        self.login_box = QtGui.QWidget()
-        self.login_layout = QtGui.QHBoxLayout()
+        self.login_box = QWidget()
+        self.login_layout = QHBoxLayout()
         self.login_layout.setContentsMargins(1,1,1,1)
         self.login_box.setLayout(self.login_layout)
 
-        self.user_label = QtGui.QLabel("Username: ")
+        self.user_label = QLabel("Username: ")
 
-        self.user_name_ety = QtGui.QLineEdit()
+        self.user_name_ety = QLineEdit()
         self.user_name_ety.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.MinimumExpanding)
         self.user_name_ety.setFixedWidth(75)
         self.user_name_ety.setFixedHeight(25)
         Qt4_widget_colors.set_widget_color(self.user_name_ety, Qt4_widget_colors.LIGHT_RED)
 
-        self.dash_label = QtGui.QLabel(" - ")
+        self.dash_label = QLabel(" - ")
 
-        self.pass_label = QtGui.QLabel("   Password: ")
+        self.pass_label = QLabel("   Password: ")
 
-        self.prop_password = QtGui.QLineEdit()
+        self.prop_password = QLineEdit()
         self.prop_password.setEchoMode(Qt.QLineEdit.Password)
         self.prop_password.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.MinimumExpanding)
         self.prop_password.setFixedWidth(75)
         self.prop_password.setFixedHeight(25)
         Qt4_widget_colors.set_widget_color(self.prop_password, Qt4_widget_colors.LIGHT_RED)
 
-        self.login_button = QtGui.QToolButton()
+        self.login_button = QToolButton()
         self.login_button.setText("Login")
         self.login_button.setUsesTextLabel(True)
         self.login_button.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
@@ -114,7 +115,7 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.login_button.clicked.connect(self.login)
         self.prop_password.returnPressed.connect(self.login)
 
-        self.logout_button=QtGui.QToolButton()
+        self.logout_button=QToolButton()
         self.logout_button.setText("Logout")
         font = self.logout_button.font()
         font.setPointSize(10)
@@ -125,19 +126,19 @@ class Qt4_SoleilLoginBrick(BlissWidget):
 
         self.logout_button.clicked.connect(self.openLogoutDialog)
 
-        self.user_group_box = QtGui.QWidget()
-        self.user_group_layout = QtGui.QHBoxLayout()
+        self.user_group_box = QWidget()
+        self.user_group_layout = QHBoxLayout()
         self.user_group_layout.setContentsMargins(1,1,1,1)
         self.user_group_box.setLayout(self.user_group_layout)
 
-        self.group_label=QtGui.QLabel()
+        self.group_label=QLabel()
         self.group_label.setAlignment(Qt.Qt.AlignCenter)
         self.group_label.hide()
 
-        self.user_group_label = QtGui.QLabel("  Group: ")
-        self.user_group_ledit = QtGui.QLineEdit()
+        self.user_group_label = QLabel("  Group: ")
+        self.user_group_ledit = QLineEdit()
         self.user_group_ledit.setFixedWidth(100)
-        self.user_group_save_button = QtGui.QToolButton()
+        self.user_group_save_button = QToolButton()
         self.user_group_save_button.setText("Set")
 
         self.user_group_layout.addWidget(self.group_label)
@@ -162,7 +163,7 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.saved_group = True
 
         # Initialize layout
-        QtGui.QHBoxLayout(self)
+        QHBoxLayout(self)
         self.layout().addWidget(self.contents_box)
         self.setSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.Fixed)
         self.contents_box.setSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.Fixed)
@@ -175,7 +176,7 @@ class Qt4_SoleilLoginBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(self.user_group_ledit, Qt4_widget_colors.LIGHT_GREEN)
             msg = 'User group set to: %s' % str(self.user_group_ledit.text())
             logging.getLogger("user_level_log").info(msg)
-            self.emit(QtCore.SIGNAL("user_group_saved"), self.user_group_ledit.text())
+            self.user_group_saved.emit(self.user_group_ledit.text())
         else:
             msg = 'User group not valid, please enter a valid user group'
             logging.getLogger("user_level_log").info(msg)
@@ -261,9 +262,9 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.session_hwobj.set_user_info( '','','' )
        
         # Emit signals clearing the proposal and session
-        self.emit(QtCore.SIGNAL("setWindowTitle"),self["titlePrefix"])
-        self.emit(QtCore.SIGNAL("sessionSelected"),None)
-        self.emit(QtCore.SIGNAL("loggedIn"), False)
+        self.setWindowTitle.emit(self["titlePrefix"])
+        self.sessionSelected.emit(None)
+        self.loggedIn.emit(False)
 
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self,proposal,person,laboratory,session,localcontact):
@@ -348,15 +349,15 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         win_title="%s (%s-%s)" % (self["titlePrefix"],\
             self.dbConnection.translate(proposal["code"],'gui'),\
             proposal["number"])
-        self.emit(QtCore.SIGNAL("setWindowTitle"),win_title)
-        self.emit(QtCore.SIGNAL("sessionSelected"),\
-            session_id,self.dbConnection.translate(proposal["code"],'gui'),\
+        self.setWindowTitle.emit(win_title)
+        self.sessionSelected.emit(session_id,
+            self.dbConnection.translate(proposal["code"],'gui'),\
             str(proposal["number"]),\
             proposal["proposalId"],\
             session["startDate"],\
             proposal["code"],\
             is_inhouse)
-        self.emit(QtCore.SIGNAL("loggedIn"), True)
+        self.loggedIn.emit(True)
 
     #def setCodes(self,codes):
         #codes_list=codes.split()
@@ -381,21 +382,21 @@ class Qt4_SoleilLoginBrick(BlissWidget):
           self.session_hwobj.proposal_id = ""
           self.session_hwobj.proposal_number = "" 
 
-          self.emit(QtCore.SIGNAL("setWindowTitle"), self["titlePrefix"])
-          self.emit(QtCore.SIGNAL("loggedIn"), False)
-          self.emit(QtCore.SIGNAL("sessionSelected"),None)
-          self.emit(QtCore.SIGNAL("loggedIn"), True)
-          self.emit(QtCore.SIGNAL("sessionSelected"), self.session_hwobj.session_id,
-                                                  str(os.environ["USER"]),
-                                                  0,
-                                                  '',
-                                                  '',
-                                                  self.session_hwobj.session_id, 
-                                                  False)
+          self.setWindowTitle.emit(self["titlePrefix"])
+          self.loggedIn.emit(False)
+          self.sessionSelected.emit(None)
+          self.loggedIn.emit(True)
+          self.sessionSelected.emit(self.session_hwobj.session_id,
+                                    str(os.environ["USER"]),
+                                    0,
+                                    '',
+                                    '',
+                                    self.session_hwobj.session_id, 
+                                    False)
         else: 
-          self.emit(QtCore.SIGNAL("setWindowTitle"),self["titlePrefix"])
-          self.emit(QtCore.SIGNAL("sessionSelected"),None)
-          self.emit(QtCore.SIGNAL("loggedIn"), False)
+          self.setWindowTitle.emit(self["titlePrefix"])
+          self.loggedIn.emit(False)
+          self.sessionSelected.emit(None)
 
     #    start_server_event=ProposalGUIEvent(self.startServers,())
     #    qApp.postEvent(self,start_server_event)
@@ -547,11 +548,11 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         elif propertyName == 'icons':
             icons_list=newValue.split()
             try:
-                self.login_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[0])))
+                self.login_button.setIcon(QIcon(Qt4_Icons.load(icons_list[0])))
             except IndexError:
                 pass
             try:
-                self.logout_button.setIcon(QtGui.QIcon(Qt4_Icons.load(icons_list[1])))
+                self.logout_button.setIcon(QIcon(Qt4_Icons.load(icons_list[1])))
             except IndexError:
                 pass
         elif propertyName == 'session':

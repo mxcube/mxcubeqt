@@ -19,22 +19,12 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 __category__ = 'SOLEIL'
-
-
 
 class Qt4_SoleilMachCurrentBrick(BlissWidget):
     """
@@ -48,7 +38,7 @@ class Qt4_SoleilMachCurrentBrick(BlissWidget):
     
     UND_STATES = {
         'SLOW': Qt4_widget_colors.GREEN,
-        'FAST': QtGui.QColor("#ff8c00"),  # orange
+        'FAST': QColor("#ff8c00"),  # orange
         'SCANNING': Qt4_widget_colors.RED,
         'ERROR': Qt4_widget_colors.RED,
         'UNKNOWN': Qt4_widget_colors.DARK_GRAY,
@@ -91,37 +81,13 @@ class Qt4_SoleilMachCurrentBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
         self.defineSlot('setColDir', ())
         pathfile = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
-        self.mac_widget = uic.loadUi(os.path.join(pathfile,
-                               "widgets/ui_files/Qt4_soleil_machine_current.ui"))
-        """
-        self.containerBox=QtGui.QGroupBox("Soleil machine current",self)
-
-        self.current=QtGui.QLabel(self.containerBox)
-        self.current.setAlignment(QtGui.QLabel.AlignCenter)
-        self.current.setStyleSheet(_fromUtf8("background-color: rgb(255, 0, 0);\n"
-            "color: rgb(255, 255, 255);"))
-        #font=self.current.font()
-        #font.setStyleHint(QtGui.QFont.OldEnglish)
-        #self.current.setFont(font)
-        self.mode=QtGui.QLabel(self.containerBox)
-        self.mode.setAlignment(QtCore.Qt.AlignCenter)
-        self.mode.setStyleSheet(_fromUtf8("background-color: rgb(85, 255, 255);"))
-
-        self.refillCountdown=QtGui.QLabel(self.containerBox)
-        self.refillCountdown.setAlignment(QtCore.Qt.AlignCenter)
-        #self.refillCountdown.setFont(bold_font)
-        #self.refillCountdown.setSegmentStyle(QLCDNumber.Flat)
-
-        #self.containerBox.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.minimum, QtGui.QSizePolicy.Fixed))
-        
-        QtGui.QVBoxLayout(self)
-        self.layout().addWidget(self.containerBox)
-        """
+        self.mac_widget = loadUi(os.path.join(os.path.dirname(__file__),
+                               "widgets/ui_files/Qt4_soleil_machcurrent_widget.ui"))
         self.mac_widget.current.setToolTip("Current machine current")
         self.mac_widget.mode.setToolTip("Fill mode")
         self.mac_widget.refillCountdown.setToolTip("Life time")
         
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.mac_widget)
         
 

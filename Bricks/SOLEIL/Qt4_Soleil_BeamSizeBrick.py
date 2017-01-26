@@ -46,8 +46,7 @@ Sizes are estimated by related HO
 -----------------------------------------------------------------------
 """
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -81,31 +80,31 @@ class Qt4_Soleil_BeamSizeBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox('Beam size', self)
-        hor_label = QtGui.QLabel("Horizontal:", self.main_gbox)
-        self.hor_size_ledit = QtGui.QLineEdit(self.main_gbox)
+        self.main_gbox = QGroupBox('Beam size', self)
+        hor_label = QLabel("Horizontal:", self.main_gbox)
+        self.hor_size_ledit = QLineEdit(self.main_gbox)
         self.hor_size_ledit.setMaximumWidth(70)
         self.hor_size_ledit.setEnabled(False)
-        self.hor_size_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.hor_size_ledit.setAlignment(Qt.AlignRight)
 
-        ver_label = QtGui.QLabel("Vertical:", self.main_gbox)
-        self.ver_size_ledit = QtGui.QLineEdit(self.main_gbox)
+        ver_label = QLabel("Vertical:", self.main_gbox)
+        self.ver_size_ledit = QLineEdit(self.main_gbox)
         self.ver_size_ledit.setMaximumWidth(70)
         self.ver_size_ledit.setEnabled(False)
-        self.ver_size_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.ver_size_ledit.setAlignment(Qt.AlignRight)
         
-        self.main_g2box = QtGui.QGroupBox('Beam Position', self)
-        hor_labelp = QtGui.QLabel("Horizontal:", self.main_g2box)
-        self.hor_pos_ledit = QtGui.QLineEdit(self.main_g2box)
+        self.main_g2box = QGroupBox('Beam Position', self)
+        hor_labelp = QLabel("Horizontal:", self.main_g2box)
+        self.hor_pos_ledit = QLineEdit(self.main_g2box)
         self.hor_pos_ledit.setMaximumWidth(70)
         self.hor_pos_ledit.setEnabled(False)
-        self.hor_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.hor_pos_ledit.setAlignment(Qt.AlignRight)
 
-        ver_labelv = QtGui.QLabel("Vertical:", self.main_g2box)
-        self.ver_pos_ledit = QtGui.QLineEdit(self.main_g2box)
+        ver_labelv = QLabel("Vertical:", self.main_g2box)
+        self.ver_pos_ledit = QLineEdit(self.main_g2box)
         self.ver_pos_ledit.setMaximumWidth(70)
         self.ver_pos_ledit.setEnabled(False)
-        self.ver_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.ver_pos_ledit.setAlignment(Qt.AlignRight)
 
         bold_font = self.hor_size_ledit.font()
         bold_font.setBold(True)
@@ -115,7 +114,7 @@ class Qt4_Soleil_BeamSizeBrick(BlissWidget):
         self.ver_pos_ledit.setFont(bold_font)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_gridlayout = QtGui.QGridLayout(self.main_gbox)
+        _main_gbox_gridlayout = QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(hor_label, 0, 0)
         _main_gbox_gridlayout.addWidget(self.hor_size_ledit, 0, 1)
         _main_gbox_gridlayout.addWidget(ver_label, 1, 0)
@@ -123,7 +122,7 @@ class Qt4_Soleil_BeamSizeBrick(BlissWidget):
         _main_gbox_gridlayout.setSpacing(2)
         _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
         
-        _main2_gbox_gridlayout = QtGui.QGridLayout(self.main_g2box)
+        _main2_gbox_gridlayout = QGridLayout(self.main_g2box)
         _main2_gbox_gridlayout.addWidget(hor_labelp, 0, 0)
         _main2_gbox_gridlayout.addWidget(self.hor_pos_ledit, 0, 1)
         _main2_gbox_gridlayout.addWidget(ver_labelv, 1, 0)
@@ -131,7 +130,7 @@ class Qt4_Soleil_BeamSizeBrick(BlissWidget):
         _main2_gbox_gridlayout.setSpacing(2)
         _main2_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QGridLayout(self)
+        _main_vlayout = QGridLayout(self)
         _main_vlayout.addWidget(self.main_gbox, 0, 0)
         _main_vlayout.addWidget(self.main_g2box, 0, 1)
         _main_vlayout.setSpacing(0)
@@ -150,16 +149,16 @@ class Qt4_Soleil_BeamSizeBrick(BlissWidget):
         """
         if property == 'mnemonic':
             if self.beam_info_hwobj is not None:
-                self.disconnect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), 
-                    self.beamSizeChanged)
-                self.disconnect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), 
-                    self.beam_position_changed)
+                self.disconnect(self.beam_info_hwobj, 'beamInfoChanged', 
+                                   self.beamSizeChanged)
+                self.disconnect(self.beam_info_hwobj, 'beamPosChanged', 
+                                   self.beam_position_changed)
             self.beam_info_hwobj = self.getHardwareObject(newValue)
             if self.beam_info_hwobj is not None:
-                self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamInfoChanged'), 
-                    self.beamSizeChanged)
-                self.connect(self.beam_info_hwobj, QtCore.SIGNAL('beamPosChanged'), 
-                    self.beam_position_changed)
+                self.connect(self.beam_info_hwobj, 'beamInfoChanged', 
+                                   self.beamSizeChanged)
+                self.connect(self.beam_info_hwobj, 'beamPosChanged', 
+                                   self.beam_position_changed)
         else:
             BlissWidget.propertyChanged(self, property, oldValue, newValue)
     
