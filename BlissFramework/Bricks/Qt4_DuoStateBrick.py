@@ -181,7 +181,7 @@ class Qt4_DuoStateBrick(BlissWidget):
                  if prop_label:
                      label_str = prop_label
                    
-            self.state_label.setText('<b>%s</b>' % label_str)
+            self.state_ledit.setText('%s' % label_str)
 
         try:
             in_enable=self.STATES[state][1]

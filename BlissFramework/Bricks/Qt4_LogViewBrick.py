@@ -70,20 +70,7 @@ import logging
 from datetime import datetime
 import smtplib
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QBrush
-    StringList = list
-else:
-    from PyQt4.QtCore import Qt, QStringList, pyqtSignal
-    from PyQt4.QtGui import *
-
-    if sys.version_info > (3, 0):
-        StringList = list
-    else:
-        StringList = QStringList
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -114,10 +101,7 @@ class CustomTreeWidget(QTreeWidget):
  
     def add_log_line(self, record):
         msg = record.getMessage().replace('\n', ' ').strip()
-        try: 
-            info_str_list = QStringList()
-        except:
-            info_str_list = []
+        info_str_list = []
 
         info_str_list.append(record.getLevelName())
         info_str_list.append(record.getDate())
@@ -276,7 +260,8 @@ class Qt4_LogViewBrick(BlissWidget):
                 "details":"Detailed messages, including warnings and errors",
                 "debug":"Debug messages; please disregard them"}
 
-    resetUnreadMessagesSignal = pyqtSignal()
+    incUnreadMessagesSignal = pyqtSignal(int,bool)
+    resetUnreadMessagesSignal = pyqtSignal(bool)
 
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
@@ -297,8 +282,8 @@ class Qt4_LogViewBrick(BlissWidget):
         self.addProperty('myTabLabel', 'string', '')
 
         # Signals -------------------------------------------------------------
-        self.defineSignal('incUnreadMessages', ())
-        self.defineSignal('resetUnreadMessages', ())
+        self.defineSignal('incUnreadMessagesSignal', ())
+        self.defineSignal('resetUnreadMessagesSignal', ())
 
         # Slots ---------------------------------------------------------------
         self.defineSlot('clearLog', ())

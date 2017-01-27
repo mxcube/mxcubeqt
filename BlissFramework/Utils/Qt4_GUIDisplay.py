@@ -34,19 +34,21 @@ import webbrowser
 import collections
 
 import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5 import QtCore
-    from PyQt5.QtGui import QColor, QPalette
-    from PyQt5.QtWidgets import *
-    StringList = list
-else:
-    from PyQt4 import QtCore
-    from PyQt4.QtGui import *
 
-    if sys.version_info > (3, 0):
-        StringList = list
-    else:
-        StringList = QtCore.QStringList
+from QtImport import *
+#if BlissFramework.get_gui_version() == "QT5":
+#    from PyQt5 import QtCore
+#    from PyQt5.QtGui import QColor, QPalette
+#    from PyQt5.QtWidgets import *
+#    StringList = list
+#else:
+#    from PyQt4 import QtCore
+#    from PyQt4.QtGui import *
+#
+#    if sys.version_info > (3, 0):
+#        StringList = list
+#    else:
+#        StringList = QStringList
 
 from functools import partial
 
@@ -64,7 +66,7 @@ __version__ = '2.2'
 class CustomMenuBar(QMenuBar):
     """MenuBar"""
 
-    viewToolBarSignal = QtCore.pyqtSignal(bool)
+    viewToolBarSignal = pyqtSignal(bool)
 
     def __init__(self, parent):
         """Parent *must* be the window
@@ -189,8 +191,8 @@ class CustomMenuBar(QMenuBar):
 
         if state:
             # switch to expert mode
-            #QtCore.QObject.emit(self.parent,
-            #                    QtCore.SIGNAL("enableExpertMode"),
+            #QObject.emit(self.parent,
+            #                    SIGNAL("enableExpertMode"),
             #                    True)
             self.parent.enableExpertModeSignal.emit(True)
             # go through all bricks and execute the method
@@ -258,8 +260,8 @@ class CustomMenuBar(QMenuBar):
              """<b>MXCuBE v %s </b>
                 <p>Macromolecular Xtallography Customized Beamline Environment<p>
                 Python %s - Qt %s - PyQt %s on %s"""%(__version__,
-              platform.python_version(), QtCore.QT_VERSION_STR,
-              QtCore.PYQT_VERSION_STR, platform.system()))
+              platform.python_version(), QT_VERSION_STR,
+              PYQT_VERSION_STR, platform.system()))
 
     def quit_clicked(self):
         """Exit mxcube"""
@@ -356,9 +358,9 @@ class CustomToolBar(QToolBar):
 class WindowDisplayWidget(QScrollArea):
     """Main widget"""
 
-    brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
-    tabChangedSignal = QtCore.pyqtSignal(str, int)
-    enableExpertModeSignal = QtCore.pyqtSignal(bool)
+    brickChangedSignal = pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = pyqtSignal(str, int)
+    enableExpertModeSignal = pyqtSignal(bool)
 
     class Spacer(QFrame):
         """Spacer widget"""
@@ -416,7 +418,7 @@ class WindowDisplayWidget(QScrollArea):
             if self.execution_mode:
                 return
             painter = QPainter(self)
-            painter.setPen(QPen(QtCore.Qt.black, 3))
+            painter.setPen(QPen(Qt.black, 3))
 
             if self.orientation == 'horizontal':
                 height = self.height() / 2
@@ -453,12 +455,12 @@ class WindowDisplayWidget(QScrollArea):
     def horizontalSplitter(*args, **kwargs):
         """Horizontal splitter"""
 
-        return QSplitter(QtCore.Qt.Horizontal, *args)
+        return QSplitter(Qt.Horizontal, *args)
 
     def verticalSplitter(*args, **kwargs):
         """Vertical splitter"""
 
-        return QSplitter(QtCore.Qt.Vertical, *args)
+        return QSplitter(Qt.Vertical, *args)
 
     def verticalBox(*args, **kwargs):
         """Vertical box"""
@@ -524,8 +526,8 @@ class WindowDisplayWidget(QScrollArea):
     class CustomTabWidget(QTabWidget):
         """Tab widget"""
 
-        notebookPageChangedSignal = QtCore.pyqtSignal(str)
-        tabChangedSignal = QtCore.pyqtSignal(int, 'PyQt_PyObject')
+        notebookPageChangedSignal = pyqtSignal(str)
+        tabChangedSignal = pyqtSignal(int, 'PyQt_PyObject')
         
 
         def __init__(self, *args, **kwargs):
@@ -792,9 +794,9 @@ class WindowDisplayWidget(QScrollArea):
              "hsplitter": horizontalSplitter,
              "vsplitter": verticalSplitter}
 
-    isShownSignal = QtCore.pyqtSignal()
-    isHiddenSignal = QtCore.pyqtSignal()
-    itemClickedSignal = QtCore.pyqtSignal(str)
+    isShownSignal = pyqtSignal()
+    isHiddenSignal = pyqtSignal()
+    itemClickedSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """__init__ of WindowDisplayWidget"""
@@ -838,7 +840,7 @@ class WindowDisplayWidget(QScrollArea):
         self._menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
         self.setWindowFlags(self.windowFlags() |
-                            QtCore.Qt.WindowMaximizeButtonHint)
+                            Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(Qt4_Icons.load_icon("desktop_icon"))
 
     def view_toolbar_toggled(self, state):
@@ -902,7 +904,7 @@ class WindowDisplayWidget(QScrollArea):
 
         ret = QWidget.show(self)
         self.isShownSignal.emit()
-        #self.emit(QtCore.SIGNAL("isShown"), ())
+        #self.emit(SIGNAL("isShown"), ())
         return ret
 
     def hide(self, *args):
@@ -910,7 +912,7 @@ class WindowDisplayWidget(QScrollArea):
 
         ret = QWidget.hide(self)
         self.isHiddenSignal.emit()
-        #self.emit(QtCore.SIGNAL("isHidden"), ())
+        #self.emit(SIGNAL("isHidden"), ())
         return ret
 
     def set_caption(self, caption):
@@ -1071,7 +1073,7 @@ class WindowDisplayWidget(QScrollArea):
                     self.preview_items.append(new_item)
                     if alignment_flags is not None:
                         layout.addWidget(new_item, stretch,
-                             QtCore.Qt.Alignment(alignment_flags))
+                             Qt.Alignment(alignment_flags))
                     else:
                         layout.addWidget(new_item, stretch)
             self.make_item(child, new_item)
@@ -1216,8 +1218,8 @@ class WindowDisplayWidget(QScrollArea):
         """Even filter"""
 
         if widget is not None and event is not None:
-            if event.type() == QtCore.QEvent.MouseButtonRelease and \
-               event.button() == QtCore.Qt.LeftButton:
+            if event.type() == QEvent.MouseButtonRelease and \
+               event.button() == Qt.LeftButton:
                 self.itemClickedSignal.emit(widget.objectName())
                 return True
 
@@ -1235,28 +1237,28 @@ class WindowDisplayWidget(QScrollArea):
         if "none" in alignment_directives:
             return alignment_flags
         if "hcenter" in alignment_directives:
-            return QtCore.Qt.AlignHCenter
+            return Qt.AlignHCenter
         if "vcenter" in alignment_directives:
-            return QtCore.Qt.AlignVCenter
+            return Qt.AlignVCenter
         if "top" in alignment_directives:
-            alignment_flags = QtCore.Qt.AlignTop
+            alignment_flags = Qt.AlignTop
         if "bottom" in alignment_directives:
-            alignment_flags = QtCore.Qt.AlignBottom
+            alignment_flags = Qt.AlignBottom
         if "center" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtCore.Qt.AlignCenter
+                alignment_flags = Qt.AlignCenter
             else:
-                alignment_flags = alignment_flags | QtCore.Qt.AlignHCenter
+                alignment_flags = alignment_flags | Qt.AlignHCenter
         if "left" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+                alignment_flags = Qt.AlignLeft | Qt.AlignVCenter
             else:
-                alignment_flags = alignment_flags | QtCore.Qt.AlignLeft
+                alignment_flags = alignment_flags | Qt.AlignLeft
         if "right" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
+                alignment_flags = Qt.AlignRight | Qt.AlignVCenter
             else:
-                alignment_flags = alignment_flags | QtCore.Qt.AlignRight
+                alignment_flags = alignment_flags | Qt.AlignRight
         return alignment_flags
 
     def getSizePolicy(self, hsizepolicy, vsizepolicy):
@@ -1320,6 +1322,6 @@ def restoreSizes(configuration, window, display, configuration_suffix="", move_w
         if move_window_flag:
             display.move(window["properties"]["x%s" % configuration_suffix],
                          window["properties"]["y%s" % configuration_suffix])
-        display.resize(QtCore.QSize(\
+        display.resize(QSize(\
              window["properties"]["w%s" % configuration_suffix],
              window["properties"]["h%s" % configuration_suffix]))

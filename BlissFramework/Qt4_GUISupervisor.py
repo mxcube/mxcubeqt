@@ -25,14 +25,7 @@ import pickle
 import logging
 import collections
 
-try:
-   from PyQt5 import QtCore
-   from PyQt5.QtGui import QPen
-   from PyQt5.QtWidgets import *
-   
-except:
-   from PyQt4 import QtCore
-   from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework import Qt4_Configuration
@@ -44,7 +37,7 @@ from BlissFramework import set_splash_screen
 
 from HardwareRepository import HardwareRepository
 
-LOAD_GUI_EVENT = QtCore.QEvent.MaxUser
+LOAD_GUI_EVENT = QEvent.MaxUser
 
 
 class BlissSplashScreen(QSplashScreen):
@@ -55,6 +48,7 @@ class BlissSplashScreen(QSplashScreen):
 
         QSplashScreen.__init__(self, pixmap)
 
+        self._message = ""
         self.gui_name = None
         self.repaint()
 
@@ -67,7 +61,7 @@ class BlissSplashScreen(QSplashScreen):
         self.repaint()
 
     def set_message(self, message):
-        self.message = message
+        self._message = message
         self.repaint()
 
     def drawContents(self, painter):
@@ -80,34 +74,34 @@ class BlissSplashScreen(QSplashScreen):
         pxsize = 12
 
         painter.font().setPixelSize(pxsize)
-        painter.setPen(QtGui.QPen(QtCore.Qt.black))
-        painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
-                         QtCore.QPoint(right_x, bot_y)),
-                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop,
+        painter.setPen(QPen(Qt.black))
+        painter.drawText(QRect(QPoint(top_x, top_y),
+                         QPoint(right_x, bot_y)),
+                         Qt.AlignLeft | Qt.AlignTop,
                          "Loading MXCuBE")
         painter.font().setPixelSize(pxsize * 2.5)
         painter.font().setPixelSize(pxsize)
 
         top_y = bot_y
         bot_y += 2 + painter.fontMetrics().height()
-        painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
-                         QtCore.QPoint(right_x, bot_y)),
-                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom,
+        painter.drawText(QRect(QPoint(top_x, top_y),
+                         QPoint(right_x, bot_y)),
+                         Qt.AlignLeft | Qt.AlignBottom,
                          "Please wait...")
 
         top_y = bot_y
         bot_y += 2 + painter.fontMetrics().height()
-        painter.drawText(QtCore.QRect(QtCore.QPoint(top_x, top_y),
-                         QtCore.QPoint(right_x, bot_y)),
-                         QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom,
-                         self.message)
+        painter.drawText(QRect(QPoint(top_x, top_y),
+                         QPoint(right_x, bot_y)),
+                         Qt.AlignLeft | Qt.AlignBottom,
+                         self._message)
 
 
 class GUISupervisor(QWidget):
     """GUI supervisor"""
 
-    brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
-    tabChangedSignal = QtCore.pyqtSignal(str, int)
+    brickChangedSignal = pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = pyqtSignal(str, int)
 
     def __init__(self, design_mode=False, show_maximized=False, no_border=False):
         """init"""
@@ -273,7 +267,7 @@ class GUISupervisor(QWidget):
                 main_window.move(0, 0)
                 width = QApplication.desktop().width()
                 height = QApplication.desktop().height()
-                main_window.resize(QtCore.QSize(width, height))
+                main_window.resize(QSize(width, height))
 
             # make connections
             widgets_dict = dict([(isinstance(w.objectName, \
