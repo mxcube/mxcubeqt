@@ -146,7 +146,7 @@ class CustomMenuBar(QMenuBar):
                      widget.objectName(), 
                      widget)
         self.bricks_properties_editor.bricks_listwidget.\
-             sortItems(QtCore.Qt.AscendingOrder)
+             sortItems(Qt.AscendingOrder)
 
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
@@ -1320,9 +1320,10 @@ class BricksPropertiesEditor(QWidget):
         self.bricks_listwidget.itemClicked.connect(\
              self.bricks_listwidget_item_clicked)
 
-        QtCore.QObject.connect(self.properties_table,
-                               QtCore.SIGNAL("propertyChanged"),
-                               self.property_changed)
+        self.properties_table.propertyChangedSignal.connect(self.property_changed)
+        #QtCore.QObject.connect(self.properties_table,
+                               #QtCore.SIGNAL("propertyChanged"),
+                               #self.property_changed)
 
         self.setWindowTitle("Bricks properties")
 
