@@ -175,7 +175,7 @@ A more complex test example where a Brick is placed in a GUI layout
 together with a "Close" button.
 
    from MXCuBE_Test_Environment import MXCuBE_Test_Environment
-   from PyQt4 import QtGui
+   from QtImport import *
    import sys
 
    test_env = MXCuBE_Test_Environment()
@@ -184,9 +184,9 @@ together with a "Close" button.
 
    test_env.start_app()
    
-   win = QtGui.QMainWindow()
-   wid = QtGui.QWidget()
-   layout = QtGui.QVBoxLayout()
+   win = QMainWindow()
+   wid = QWidget()
+   layout = QVBoxLayout()
    
    brick, mod = test_env.get_brick_mod("Bricks/ALBA/Qt4_ALBA_MachineInfoBrick.py")
    brick.propertyChanged("mnemonic",None,"mach-info")
@@ -194,7 +194,7 @@ together with a "Close" button.
    wid.setLayout(layout)
    layout.addWidget(brick)
 
-   quit_but = QtGui.QPushButton("Close")
+   quit_but = QPushButton("Close")
    quit_but.clicked.connect(sys.exit)
    layout.addWidget(quit_but)
 
@@ -211,7 +211,7 @@ import imp
 import logging
 import gevent
 
-from QtImport import *
+from BlissFramework.QtImport import *
 from HardwareRepository import HardwareRepository
 
 class MXCuBE_Test_Environment(object):
@@ -274,17 +274,17 @@ class MXCuBE_Test_Environment(object):
         HardwareRepository.addHardwareObjectsDirs([hwo_path, inst_hwo_path, sc_hwo_path])
 
     def _do_gevent(self):
-        if QtCore.QEventLoop():
+        if QEventLoop():
             gevent.wait(timeout=0.01)
 
     def start_app(self):
         if not self.app:
-            self.app = QtGui.QApplication([])
-            self.gevent_timer = QtCore.QTimer()
-            self.gevent_timer.connect(self.gevent_timer, QtCore.SIGNAL("timeout()"), self._do_gevent)
+            self.app = QApplication([])
+            self.gevent_timer = QTimer()
+            self.gevent_timer.connect(self.gevent_timer, SIGNAL("timeout()"), self._do_gevent)
 
     def run_brick(self,brick):
-        self.win = QtGui.QMainWindow()
+        self.win = QMainWindow()
         self.win.setCentralWidget(brick)
         self.win.show()
         self.exec_app()
@@ -352,11 +352,12 @@ if __name__ == '__main__':
     else:
         mnemonic = None
 
-    if mnemonic.endswith(".xml"):
+    if mnemonic and mnemonic.endswith(".xml"):
         mnemonic = mnemonic[:-4]
 
     test_env = MXCuBE_Test_Environment()
 
+    print(os.environ.get("MXCUBE_SITE"))
     test_env.set_institute(os.environ.get("MXCUBE_SITE",None))
     test_env.set_xml_path(os.environ.get("MXCUBE_XML_PATH", None), relative=True)
 

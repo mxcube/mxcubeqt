@@ -199,8 +199,7 @@ class Qt4_CryoSpyBrick(BlissWidget):
                 self.updateState()
 
         elif property == 'warningTemp':
-            if not self.cryodev.test_mode:
-                self.warning_temp = newValue
+            self.warning_temp = newValue
         else:
             BlissWidget.propertyChanged(self,property,oldValue,newValue)
 
