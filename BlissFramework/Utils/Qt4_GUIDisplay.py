@@ -53,7 +53,9 @@ from QtImport import *
 from functools import partial
 
 from BlissFramework import Qt4_Icons
+from BlissFramework import Qt4_Configuration
 from BlissFramework.Utils import Qt4_widget_colors
+from BlissFramework.Utils import Qt4_PropertyEditor
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
@@ -92,6 +94,8 @@ class CustomMenuBar(QMenuBar):
         self.reload_hwr_action = self.file_menu.addAction(\
              "Reload hardware objects", self.reload_hwr_clicked)
         #self.reload_hwr_action.setEnabled(False)
+        self.brick_properties_action = self.file_menu.addAction(\
+             "Edit brick properties", self.edit_brick_properties)
         self.file_menu.addAction("Quit", self.quit_clicked)
 
         self.view_menu = self.addMenu("View")
@@ -121,6 +125,9 @@ class CustomMenuBar(QMenuBar):
         self.help_menu.addSeparator()
         self.help_menu.addAction("About", self.about_clicked)
 
+        self.bricks_properties_editor = BricksPropertiesEditor()
+        self.bricks_properties_editor.close()
+
         # Layout --------------------------------------------------------------
         self.setSizePolicy(QSizePolicy.MinimumExpanding,
                            QSizePolicy.Fixed)
@@ -133,12 +140,20 @@ class CustomMenuBar(QMenuBar):
                            self.view_menu,
                            self.help_menu]
         #self.setwindowIcon(Qt4_Icons.load_icon("desktop_icon"))
+        for widget in QApplication.allWidgets():
+            if isinstance(widget, BlissWidget):
+                self.bricks_properties_editor.add_brick(\
+                     widget.objectName(), 
+                     widget)
+        self.bricks_properties_editor.bricks_listwidget.\
+             sortItems(QtCore.Qt.AscendingOrder)
 
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
 
         self.clear()
         self.menu_items.insert(position, new_menu_item)
+
         for menu_item in self.menu_items:
             self.addMenu(menu_item)
 
@@ -188,6 +203,7 @@ class CustomMenuBar(QMenuBar):
             return
 
         self.info_for_developers_action.setEnabled(state)
+        self.brick_properties_action.setEnabled(state)
 
         if state:
             # switch to expert mode
@@ -245,6 +261,9 @@ class CustomMenuBar(QMenuBar):
             for sender in connections:
                 hwr.hardwareObjects[hwr_obj].connect(\
                     sender, connections[sender]["signal"], connections[sender]["slot"])
+
+    def edit_brick_properties(self):
+        self.bricks_properties_editor.show()
 
     def whats_this_clicked(self):
         """Whats this"""
@@ -1278,12 +1297,55 @@ class WindowDisplayWidget(QScrollArea):
     def append_windows_links(self, window_list):
         self._menubar.append_windows_links(window_list)
 
+class BricksPropertiesEditor(QWidget):
+    """Main Gui preview"""
+
+    def __init__(self, *args, **kwargs):
+        """init"""
+
+        QWidget.__init__(self, *args)
+
+        self.bricks_dict = {}
+        self.selected_brick = None
+
+        self.bricks_listwidget = QListWidget()
+        self.properties_table = Qt4_PropertyEditor.Qt4_ConfigurationTable(self)
+
+        _main_vlayout = QHBoxLayout(self)
+        _main_vlayout.addWidget(self.bricks_listwidget)
+        _main_vlayout.addWidget(self.properties_table)
+        _main_vlayout.setSpacing(2)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+
+        self.bricks_listwidget.itemClicked.connect(\
+             self.bricks_listwidget_item_clicked)
+
+        QtCore.QObject.connect(self.properties_table,
+                               QtCore.SIGNAL("propertyChanged"),
+                               self.property_changed)
+
+        self.setWindowTitle("Bricks properties")
+
+
+    def add_brick(self, name, brick):
+        self.bricks_dict[name] = brick
+        self.bricks_listwidget.addItem(name) 
+
+    def bricks_listwidget_item_clicked(self, listwidget_item):
+        brick_name = listwidget_item.text()
+        self.selected_brick = self.bricks_dict[brick_name]
+        self.properties_table.set_property_bag(\
+             self.bricks_dict[brick_name].property_bag)
+ 
+    def property_changed(self, property_name, old_value, new_value):
+        self.selected_brick._propertyChanged(property_name, old_value, new_value)
+        self.selected_brick.propertyChanged(property_name, old_value, new_value)
+
 def display(configuration, no_border=False):
     """Display window"""
 
     windows = []
     for window in configuration.windows_list:
-        BlissWidget.set_status_info("status", window["name"])
         display = WindowDisplayWidget(None, window["name"],
             execution_mode=True, no_border=no_border)
         windows.append(display)

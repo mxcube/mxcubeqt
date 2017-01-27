@@ -143,6 +143,10 @@ class Qt4_CameraBrick(BlissWidget):
         self.display_beam_size_action = self.popup_menu.addAction(\
              "Display beam size", self.display_beam_size_toggled)
         self.display_beam_size_action.setCheckable(True)
+        self.magnification_action = self.popup_menu.addAction(\
+             Qt4_Icons.load_icon("Magnify2"),
+             "Magnification tool", self.magnification_mode_toggled)
+        self.magnification_action.setCheckable(True)
 
         #self.display_histogram_action = self.popup_menu.addAction(\
         #     "Display histogram", self.display_histogram_toggled)
@@ -242,13 +246,17 @@ class Qt4_CameraBrick(BlissWidget):
         elif property_name == 'beamDefiner':
              self.define_beam_action.setEnabled(new_value) 
         elif property_name == 'cameraControls':
-             self.image_scale_menu.setEnabled(new_value) 
+             self.camera_control_action.setEnabled(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def display_beam_size_toggled(self):
         self.graphics_manager_hwobj.display_beam_size(\
             self.display_beam_size_action.isChecked())
+
+    def magnification_mode_toggled(self):
+        self.graphics_manager_hwobj.set_magnification_mode(\
+            self.magnification_action.isChecked())
 
     def set_control_mode(self, have_control):
         if have_control:

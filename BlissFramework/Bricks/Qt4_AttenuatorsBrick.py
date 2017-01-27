@@ -57,6 +57,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
         # Properties ---------------------------------------------------------- 
         self.addProperty('mnemonic', 'string', '')
+        self.addProperty('mockup_mnemonic', 'string', '')
         self.addProperty('formatString', 'formatString', '###.##')
 
         # Signals ------------------------------------------------------------

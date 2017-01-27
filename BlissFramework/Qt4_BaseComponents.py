@@ -788,6 +788,8 @@ class BlissWidget(QFrame, Connectable.Connectable):
         self.defineSlot('enable_widget', ())
         self.defineSlot('disable_widget', ())
 
+        #self.run_mode = QtGui.QPushButton("Run mode", self)
+
     def __run(self):
         """
         Descript. :
@@ -795,7 +797,8 @@ class BlissWidget(QFrame, Connectable.Connectable):
         self.setAcceptDrops(False)
         self.blockSignals(False) 
         self.setEnabled(self.__enabledState)
- 
+        #self.run_mode_pushbutton = QPushButton("Simulation", self)
+
         try:
             self.run()
         except:

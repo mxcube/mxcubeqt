@@ -168,6 +168,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.client_icon = Qt4_Icons.load_icon("User2")
 
         # Graphic elements ----------------------------------------------------
+        _main_widget = QWidget(self)
         _main_gbox = QGroupBox("Current users", self)
 
         self.users_listwidget = QListWidget(_main_gbox)
@@ -182,8 +183,9 @@ class Qt4_InstanceListBrick(BlissWidget):
 
         #self.take_control_button = QToolButton(_main_gbox)
         #self.take_control_button.setUsesTextLabel(True)
-        self.take_control_button = QtGui.QToolButton(_main_gbox)
+        self.take_control_button = QToolButton(_main_gbox)
         self.take_control_button.setToolButtonStyle(True)
+        self.take_control_button.setUsesTextLabel(True)
         self.take_control_button.setText("Take control")
         self.take_control_button.setEnabled(True)
         self.take_control_button.setIcon(Qt4_Icons.load_icon("FingerRight"))
@@ -193,6 +195,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         #self.ask_control_button.setUsesTextLabel(True)
         #self.ask_control_button = QtGui.QToolButton(_main_gbox)
         self.ask_control_button.setToolButtonStyle(True)
+        #self.ask_control_button.setUsesTextLabel(True)
         self.ask_control_button.setText("Ask for control")
         self.ask_control_button.setEnabled(False)
         self.ask_control_button.setIcon(Qt4_Icons.load_icon("FingerUp"))
@@ -213,28 +216,34 @@ class Qt4_InstanceListBrick(BlissWidget):
         _my_name_widget_layout.addWidget(self.nickname_ledit)
         #_my_name_widget_layout.addStretch(0)
         _my_name_widget_layout.setSpacing(2)
-        _my_name_widget_layout.setContentsMargins(0, 0, 0, 0)
+        _my_name_widget_layout.setContentsMargins(2, 2, 2, 2)
+
+        _main_widget_vlayout = QVBoxLayout(_main_widget)
+        _main_widget_vlayout.addWidget(self.users_listwidget)
+        _main_widget_vlayout.addWidget(self.give_control_chbox)
+        _main_widget_vlayout.addWidget(self.allow_timeout_control_chbox)
+        _main_widget_vlayout.addWidget(self.take_control_button)
+        _main_widget_vlayout.addWidget(self.ask_control_button)
+        _main_widget_vlayout.addWidget(_my_name_widget)
+        _main_widget_vlayout.setSpacing(2)
+        _main_widget_vlayout.setContentsMargins(2, 2, 2, 2)
 
         _main_gbox_vlayout = QVBoxLayout(_main_gbox)
-        _main_gbox_vlayout.addWidget(self.users_listwidget)
-        _main_gbox_vlayout.addWidget(self.give_control_chbox)
-        _main_gbox_vlayout.addWidget(self.allow_timeout_control_chbox)
-        _main_gbox_vlayout.addWidget(self.take_control_button)
-        _main_gbox_vlayout.addWidget(self.ask_control_button)
-        _main_gbox_vlayout.addWidget(_my_name_widget)
+        _main_gbox_vlayout.addWidget(_main_widget)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
         _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
  
         # SizePolicies --------------------------------------------------------
         self.ask_control_button.setSizePolicy(QSizePolicy.Expanding,
                                               QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
+        _main_gbox.toggled.connect(_main_widget.setVisible)
         self.users_listwidget.itemPressed.connect(self.user_selected)
         self.take_control_button.clicked.connect(self.take_control_clicked)
         self.ask_control_button.clicked.connect(self.ask_for_control_clicked)
@@ -243,7 +252,7 @@ class Qt4_InstanceListBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.timeout_timer = QTimer(self)
         self.timeout_timer.timeout.connect(self.timeout_approaching)
-
+        _main_gbox.setChecked(False)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -470,8 +479,8 @@ class Qt4_InstanceListBrick(BlissWidget):
 
             server_print = self.instance_server_hwobj.idPrettyPrint(server_id)
             item = QListWidgetItem(self.server_icon,
-                                         server_print,
-                                         self.users_listwidget)
+                                   server_print,
+                                   self.users_listwidget)
             item.setSelected(False)
             self.nickname_ledit.setText(my_nickname)
             self.connections[server_id[0]] = (item, server_id[1])
