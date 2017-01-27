@@ -1,5 +1,5 @@
 <object class="QueueController" role="QueueController">
-  <object href="/sc-mockup"     role="sample_changer"/>    
+  <object href="/cats"     role="sample_changer"/>    
   <!-- <object href="/diffractometer-mockup" role="diffractometer"/> -->
   <object href="/energyscan"    role="energy_scan"/>
   <object href="/mxlocal"       role="beamline_configuration"/>

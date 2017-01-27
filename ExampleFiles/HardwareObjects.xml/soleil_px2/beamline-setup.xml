@@ -7,6 +7,7 @@
   <object href="/soleil-minidiff"      role="diffractometer"/>
   <object href="/cats"          role="sample_changer"/>    
   <object href="/resolution"    role="resolution"/>
+  <object href="/detectordistance"     role="detector"/>
   <object href="/horizontal"    role="horizontal"/>
   <object href="/vertical"      role="vertical"/>
   <object href="/horizontal_motors" role="horizontal_motors"/>

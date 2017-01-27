@@ -99,18 +99,20 @@ class DataPathWidget(QWidget):
 
     def _browse_clicked(self):
         """
-        Descript. :
+        Descript. : from branch 2.2
         """
         file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("%s*" % self._base_image_dir)
 
-        selected_dir = str(file_dialog.getExistingDirectory(\
-            self, "Select a directory", self._base_image_dir))
-        selecte_dir = os.path.dirname(selected_dir)
+        selected_dir = str(file_dialog.getExistingDirectory(self, \
+                                             "Select a directory", \
+                                             self._base_image_dir, \
+                                             QtGui.QFileDialog.ShowDirsOnly))
+        selected_dir = os.path.dirname(selected_dir)
 
         if selected_dir is not None and len(selected_dir) > 0:
             self.set_directory(selected_dir)
-
+            
     def _prefix_ledit_change(self, new_value):
         """
         Descript. :

@@ -172,10 +172,11 @@ class SamplesView(QWidget):
     loadSampleSignal = pyqtSignal(int, int)
     selectSampleSignal = pyqtSignal(int, int)
 
-    def __init__(self, parent, basket_index):
+    def __init__(self, parent, basket_index, nb_samples=10):
         QWidget.__init__(self, parent)
 
         self.basket_index = basket_index
+        self.nb_samples = nb_samples
         self.vials = []
         self.numbers = []
         self.sample_boxes = []
@@ -187,7 +188,7 @@ class SamplesView(QWidget):
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        for index in range(SamplesView.SAMPLE_COUNT):
+        for index in range(self.nb_samples):
             sample_box = SampleBox(self)
             label = VialNumberView(index + 1, sample_box)
             label.set_vial([VialView.VIAL_UNKNOWN])
@@ -265,7 +266,7 @@ class BasketView(QWidget):
     selectSampleSignal = pyqtSignal(int, int)
     basketPresenceSignal = pyqtSignal(int, bool)
 
-    def __init__(self, parent, basket_index):
+    def __init__(self, parent, basket_index, samples):
         QWidget.__init__(self, parent)
 
         self.basket_index = basket_index
@@ -273,7 +274,7 @@ class BasketView(QWidget):
         #self.contents_widget = QVGroupBox("Basket %s" % basket_index,self)
         self.contents_widget = QGroupBox("Basket %s" % basket_index, self)
         self.contents_widget.setCheckable(True)
-        self.samples_view = SamplesView(self.contents_widget, basket_index)
+        self.samples_view = SamplesView(self.contents_widget, basket_index, samples)
 
         _contents_widget_vlayout = QVBoxLayout(self.contents_widget)
         _contents_widget_vlayout.addWidget(self.samples_view)
@@ -814,6 +815,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
 
         self.addProperty("mnemonic", "string", "")
         self.addProperty("basketCount", "string", "5")
+        self.addProperty("samplesPerBasket", "integer", 10)
         self.addProperty("defaultHolderLength", "integer", 22)
         self.addProperty("icons", "string", "")
         self.addProperty("showSelectButton", "boolean", False)
@@ -833,8 +835,11 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.in_expert_mode = None
         self.basket_count = None
         self.basket_per_column_default = 9
+        self.samples_per_basket = None
         self.baskets = []
         self.last_basket_checked = ()
+
+        self.info_changed = False
 
         self.single_click_selection = False
         self.user_selected_sample = (None, None)
@@ -939,16 +944,14 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             if len(parts) > 1:
                 self.basket_per_column = int(parts[1])
 
-            for basket_index in range(self.basket_count):
-                temp_basket = BasketView(self.sc_contents_gbox, basket_index)
-                temp_basket.loadSampleSignal.connect(self.load_this_sample)
-                temp_basket.selectSampleSignal.connect(self.user_select_this_sample)
-                temp_basket.setChecked(False)
-                temp_basket.setEnabled(False)
-                self.baskets.append(temp_basket)
-                basket_row = basket_index % self.basket_per_column
-                basket_column = int(basket_index / self.basket_per_column)
-                self.baskets_grid_layout.addWidget(temp_basket, basket_row, basket_column)
+            if self.samples_per_basket is not None:
+                self.build_baskets_view()
+
+        elif property_name == 'samplesPerBasket':
+             self.samples_per_basket = new_value
+             if self.basket_count is not None:
+                self.build_baskets_view()
+
         elif property_name == 'mnemonic':
             self.sample_changer_hwobj = self.getHardwareObject(new_value)
             if self.sample_changer_hwobj is not None:
@@ -964,23 +967,14 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                 self.connect(self.sample_changer_hwobj,
                              SampleChanger.SELECTION_CHANGED_EVENT,
                              self.selectionChanged)
-                #self.connect(self.sample_changer_hwobj, QtCore.SIGNAL("sampleChangerCanLoad"), self.sampleChangerCanLoad)
-                #self.connect(self.sample_changer_hwobj, QtCore.SIGNAL("minidiffCanMove"), self.minidiff_can_move_radiobutton)
-                #self.connect(self.sample_changer_hwobj, QtCore.SIGNAL("sampleChangerInUse"), self.sampleChangerInUse)
                 self.connect(self.sample_changer_hwobj,
                              SampleChanger.LOADED_SAMPLE_CHANGED_EVENT,
                              self.loadedSampleChanged)
-                #self.current_sample_view.hideHolderLength(self.sample_changer_hwobj.isMicrodiff())
-                #self.status.hideOperationalControl(self.sample_changer_hwobj.isMicrodiff())
                 self.sc_status_changed(self.sample_changer_hwobj.getStatus())
                 self.sc_state_changed(self.sample_changer_hwobj.getState())
                 self.infoChanged()
                 self.selectionChanged()
-                #self.sample_changer_hwobjInUse(self.sampleChanger.sampleChangerInUse())
-                #self.sample_changer_hwobjCanLoad(self.sampleChanger.sampleChangerCanLoad())
-                #self.minidiff_can_move_radiobutton(self.sample_changer_hwobj.minidiffCanMove())
                 self.loadedSampleChanged(self.sample_changer_hwobj.getLoadedSample())
-                #self.basketTransferModeChanged(self.sample_changer_hwobj.getBasketTransferMode())
         elif property_name == 'showSelectButton':
             self.scan_baskets_view.showSelectButton(new_value)
             for basket in self.baskets:
@@ -994,6 +988,20 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
+    def build_baskets_view(self):
+        for basket_index in range(self.basket_count):
+            temp_basket = BasketView(self.sc_contents_gbox, basket_index, self.samples_per_basket)
+            temp_basket.loadSampleSignal.connect(self.load_this_sample)
+            temp_basket.selectSampleSignal.connect(self.user_select_this_sample)
+            temp_basket.setChecked(False)
+            temp_basket.setEnabled(False)
+            self.baskets.append(temp_basket)
+            basket_row = basket_index % self.basket_per_column
+            basket_column = int(basket_index / self.basket_per_column)
+            self.baskets_grid_layout.addWidget(temp_basket, basket_row, basket_column)
+
+        if self.info_changed:
+            self.do_infoChanged()
 
     def build_status_view(self, container):
         return StatusView(container)
@@ -1185,11 +1193,16 @@ class Qt4_SampleChangerBrick3(BlissWidget):
              recursive=True, wait=False)
 
     def infoChanged(self):
+        self.info_changed = True
+        if self.samples_per_basket is not None and self.basket_count is not None:
+            self.do_infoChanged() 
+
+    def do_infoChanged(self):
         baskets_at_sc = self.sample_changer_hwobj.getComponents()
         presences = []
         for basket in baskets_at_sc:
-            presences.append([[VialView.VIAL_UNKNOWN]] * 10 if \
-               basket.isPresent() else [[VialView.VIAL_NONE]] * 10)
+            presences.append([[VialView.VIAL_UNKNOWN]] * self.samples_per_basket if \
+               basket.isPresent() else [[VialView.VIAL_NONE]] * self.samples_per_basket)
 
         for sample in self.sample_changer_hwobj.getSampleList():
             matrix = sample.getID() or ""
@@ -1202,8 +1215,14 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                         presences[basket_index][vial_index] = \
                             [VialView.VIAL_ALREADY_LOADED, matrix]
                     else:
-                        presences[basket_index][vial_index] = \
-                            [VialView.VIAL_BARCODE, matrix]
+                        try:
+                            presences[basket_index][vial_index] = \
+                                [VialView.VIAL_BARCODE, matrix]
+                        except IndexError:
+                            logging.info("index out of range")
+                            logging.info(   str(presences) )
+                            logging.info(   str(basket_index) )
+                            logging.info(   str(vial_index) )
                 else:
                     if sample.hasBeenLoaded():
                         presences[basket_index][vial_index] = \
@@ -1227,7 +1246,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             self.sample_changer_hwobj.resetBasketsInformation()
 
             for basket, samples in self.basketsSamplesSelectionDialog.result.iteritems():
-                for index in range(10):
+                for index in range(self.samples_per_basket):
                     basket_input = [basket, index + 1, 0, 0, 0]
                 for sample in samples:
                     basket_input[1] = sample

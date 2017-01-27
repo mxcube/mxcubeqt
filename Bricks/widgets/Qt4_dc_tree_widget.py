@@ -275,6 +275,12 @@ class DataCollectTree(QWidget):
         self.item_menu = QMenu(self.sample_tree_widget)
         item = self.sample_tree_widget.currentItem()
 
+        try:
+            sample_changer = self.beamline_setup_hwobj.sample_changer_hwobj
+            sc_can_wash = sample_changer.can_wash()
+        except:
+            sc_can_wash = False
+
         if item:
             add_remove = True
             add_details = False
@@ -316,6 +322,8 @@ class DataCollectTree(QWidget):
                     else:
                         if self.is_mounted_sample_item(item):
                             self.item_menu.addAction("Un-Mount", self.unmount_sample)
+                            if sc_can_wash:
+                                self.item_menu.addAction("Wash", self.wash_sample)
                         else:
                             self.item_menu.addAction("Mount", self.mount_sample)
                 self.item_menu.addSeparator()
@@ -456,19 +464,19 @@ class DataCollectTree(QWidget):
         self.enable_collect(False)
         gevent.spawn(self.mount_sample_task)
 
-    def mount_sample_task(self):
+    def mount_sample_task(self,wash=False):
         """
         Descript. :
         """
         items = self.get_selected_items()
-        
+        logging.info(">>>>>>>>>>>>>>>>>>>>>>>>. mount_sample_task wash is %s" % str(wash))
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
                    queue_entry.mount_sample(self.beamline_setup_hwobj,
                         items[0], items[0].get_model(), self.centring_done,
-                        self.sample_centring_result)
+                        self.sample_centring_result,wash=wash)
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
@@ -490,7 +498,16 @@ class DataCollectTree(QWidget):
             msg = "Loop centring failed or was cancelled, " +\
                   "please continue manually."
             logging.getLogger("GUI").warning(msg)
+    
+    def wash_sample(self):
+        """
+        Descript. : wash sample if is loaded
+        """
+        gevent.spawn(self.wash_sample_task)
 
+    def wash_sample_task(self):
+        self.mount_sample_task(wash=True)
+        
     def unmount_sample(self):
         """
         Descript. :
@@ -523,8 +540,7 @@ class DataCollectTree(QWidget):
                    sample_changer = self.beamline_setup_hwobj.plate_manipulator_hwobj
                 except AttributeError:
                    sample_changer = None
-
-            if sample_changer:
+            if sample_changer is not None:
                 if hasattr(sample_changer, '__TYPE__')\
                    and sample_changer.__TYPE__ in ('CATS', 'Marvin'):
                     sample_changer.unload(wait=True)

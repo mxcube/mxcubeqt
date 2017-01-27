@@ -5,6 +5,7 @@
    <object href="/fastshutter" role="fast_shutter" />
    <object href="/mxlocal" role="beamline_configuration" />
    <object href="/soleil-minidiff" role="diffractometer" />
+   <!--object href="/sc-mockup" role="sample_changer"/-->
    <object href="/cats" role="sample_changer" />
    <object href="/BLEnergy" role="energy" />
    <object href="/Ps_attenuator" role="transmission" />

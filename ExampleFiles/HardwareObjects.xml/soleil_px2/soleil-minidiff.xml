@@ -5,7 +5,8 @@
     <phiy_direction>-1</phiy_direction>
     <phaseList>("Transfer", "Centring", "DataCollection", "BeamLocation")</phaseList>
 
-    <device role="camera" hwrid="/gc655c"></device>
+    <!--device role="camera" hwrid="/gc655c"></device-->
+    <device role="camera" hwrid="/Qt4_video-mockup"></device>
     <!--device role="camera" hwrid="/limacam"></device-->
     <!--device role="camera" hwrid="/limavideo"></device-->
     <!--device role="samplechanger" hwrid="/cats"></device-->   

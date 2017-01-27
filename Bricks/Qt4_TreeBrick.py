@@ -454,6 +454,9 @@ class Qt4_TreeBrick(BlissWidget):
             BlissWidget.set_status_info("action", "%s : %s" % \
                 (queue_entry.get_type_str(), status))
 
+    def queue_entry_execution_finished(self, queue_entry, status):
+        self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
+
     def queue_paused_handler(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_paused_handler(status)
