@@ -23,13 +23,14 @@ __category__ = 'SOLEIL'
 ### Brick to show the current proposal & session (and login/out the user)
 ###
 
-class Qt4_SoleilLoginBrick(BlissWidget):
+class Qt4_Soleil_LoginBrick(BlissWidget):
 
     NOBODY_STR="<nobr><b>Login is required for collecting data!</b>"
 
     setWindowTitle = pyqtSignal(str)
     loggedIn = pyqtSignal(bool)
     sessionSelected = pyqtSignal([],[object,object,object,object,object,object,object])
+    user_group_saved = pyqtSignal(str)
 
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
@@ -83,7 +84,7 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.user_label = QLabel("Username: ")
 
         self.user_name_ety = QLineEdit()
-        self.user_name_ety.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.MinimumExpanding)
+        self.user_name_ety.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.user_name_ety.setFixedWidth(75)
         self.user_name_ety.setFixedHeight(25)
         Qt4_widget_colors.set_widget_color(self.user_name_ety, Qt4_widget_colors.LIGHT_RED)
@@ -93,8 +94,8 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.pass_label = QLabel("   Password: ")
 
         self.prop_password = QLineEdit()
-        self.prop_password.setEchoMode(Qt.QLineEdit.Password)
-        self.prop_password.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.MinimumExpanding)
+        self.prop_password.setEchoMode(QLineEdit.Password)
+        self.prop_password.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.prop_password.setFixedWidth(75)
         self.prop_password.setFixedHeight(25)
         Qt4_widget_colors.set_widget_color(self.prop_password, Qt4_widget_colors.LIGHT_RED)
@@ -102,8 +103,8 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.login_button = QToolButton()
         self.login_button.setText("Login")
         self.login_button.setUsesTextLabel(True)
-        self.login_button.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
-        self.login_button.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Fixed)
+        self.login_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.login_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.login_layout.addWidget(self.user_label)
         self.login_layout.addWidget(self.user_name_ety)
@@ -121,8 +122,8 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         font.setPointSize(10)
         self.logout_button.setFont(font)
         self.logout_button.setUsesTextLabel(True)
-        self.logout_button.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
-        self.logout_button.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Fixed)
+        self.logout_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.logout_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.logout_button.clicked.connect(self.openLogoutDialog)
 
@@ -132,7 +133,7 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.user_group_box.setLayout(self.user_group_layout)
 
         self.group_label=QLabel()
-        self.group_label.setAlignment(Qt.Qt.AlignCenter)
+        self.group_label.setAlignment(Qt.AlignCenter)
         self.group_label.hide()
 
         self.user_group_label = QLabel("  Group: ")
@@ -165,8 +166,8 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         # Initialize layout
         QHBoxLayout(self)
         self.layout().addWidget(self.contents_box)
-        self.setSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.Fixed)
-        self.contents_box.setSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        self.contents_box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
     def save_group(self):
         user_group = str(self.user_group_ledit.text())
@@ -230,15 +231,15 @@ class Qt4_SoleilLoginBrick(BlissWidget):
 
     # Opens the logout dialog (modal); if the answer is OK then logout the user
     def openLogoutDialog(self):
-        logout_dialog=Qt.QMessageBox("Confirm logout","Press OK to logout.",\
-            Qt.QMessageBox.Question,Qt.QMessageBox.Ok,Qt.QMessageBox.Cancel,\
-            Qt.QMessageBox.NoButton,self)
+        logout_dialog=QMessageBox("Confirm logout","Press OK to logout.",\
+            QMessageBox.Question,QMessageBox.Ok,QMessageBox.Cancel,\
+            QMessageBox.NoButton,self)
         s=self.font().pointSize()
         f = logout_dialog.font()
         f.setPointSize(s)
         logout_dialog.setFont(f)
         logout_dialog.updateGeometry()
-        if logout_dialog.exec_()==Qt.QMessageBox.Ok:
+        if logout_dialog.exec_()==QMessageBox.Ok:
             self.logout()
 
     # Logout the user; reset the brick; changes from logout mode to login mode
@@ -408,14 +409,14 @@ class Qt4_SoleilLoginBrick(BlissWidget):
     def refuseLogin(self,stat,message=None):
         if message is not None:
             if stat is False:
-                icon=Qt.QMessageBox.Critical
+                icon=QMessageBox.Critical
             elif stat is None:
-                icon=Qt.QMessageBox.Warning
+                icon=QMessageBox.Warning
             elif stat is True:
-                icon=Qt.QMessageBox.Information
-            msg_dialog=Qt.QMessageBox("Register user",message,\
-                icon,Qt.QMessageBox.Ok,Qt.QMessageBox.NoButton,\
-                Qt.QMessageBox.NoButton,self)
+                icon=QMessageBox.Information
+            msg_dialog=QMessageBox("Register user",message,\
+                icon,QMessageBox.Ok,QMessageBox.NoButton,\
+                QMessageBox.NoButton,self)
             s=self.font().pointSize()
             f = msg_dialog.font()
             f.setPointSize(s)
@@ -430,10 +431,10 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.setEnabled(True)
 
     def ispybDown(self):
-        msg_dialog=Qt.QMessageBox("Register user",\
+        msg_dialog=QMessageBox("Register user",\
             "Couldn't contact the ISPyB database server: you've been logged as the local user.\nYour experiments' information will not be stored in ISPyB!",\
-            Qt.QMessageBox.Warning,Qt.QMessageBox.Ok,Qt.QMessageBox.NoButton,\
-            Qt.QMessageBox.NoButton,self)
+            QMessageBox.Warning,QMessageBox.Ok,QMessageBox.NoButton,\
+            QMessageBox.NoButton,self)
         s=self.font().pointSize()
         f=msg_dialog.font()
         f.setPointSize(s)
@@ -454,17 +455,17 @@ class Qt4_SoleilLoginBrick(BlissWidget):
         self.acceptLogin(prop_dict,pers_dict,lab_dict,ses_dict,cont_dict)
 
     def askForNewSession(self):
-        create_session_dialog=Qt.QMessageBox("Create session",\
+        create_session_dialog=QMessageBox("Create session",\
             "Unable to find an appropriate session.\nPress OK to create one for today.",\
-            Qt.QMessageBox.Question,Qt.QMessageBox.Ok,Qt.QMessageBox.Cancel,\
-            Qt.QMessageBox.NoButton,self)
+            QMessageBox.Question,QMessageBox.Ok,QMessageBox.Cancel,\
+            QMessageBox.NoButton,self)
         s=self.font().pointSize()
         f = create_session_dialog.font()
         f.setPointSize(s)
         create_session_dialog.setFont(f)
         create_session_dialog.updateGeometry()
         answer=create_session_dialog.exec_()
-        return answer==Qt.QMessageBox.Ok
+        return answer==QMessageBox.Ok
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):

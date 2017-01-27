@@ -30,7 +30,7 @@ __category__ = 'SOLEIL'
 __author__ = 'Laurent GADEA'
 __version__ = '1.0'
 
-class Qt4_SoleilCatsMaintBrick(BlissWidget):
+class Qt4_Soleil_CatsMaintBrick(BlissWidget):
     """
     Descript. :
     """
@@ -44,7 +44,7 @@ class Qt4_SoleilCatsMaintBrick(BlissWidget):
         
         pathfile = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "."))
         self.widget = loadUi(os.path.join(os.path.dirname(__file__), \
-                                 "Qt4_soleil_catsmaint_widget.ui"))
+                                 "widgets/ui_files/Qt4_soleil_catsmaint_widget.ui"))
         
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.widget)
@@ -159,7 +159,8 @@ class Qt4_SoleilCatsMaintBrick(BlissWidget):
     def _updateLid1State(self, value):
         logging.info('CatsMaintBrick: _updateLid1State %s' % value)
         self._lid1State = value
-        if self._hwobj is not None and not self._pathRunning:
+
+        if self._hwobj is not None and not self._pathRunning and self._poweredOn is not None:
             self.widget.btLid1Open.setEnabled(not value and self._poweredOn)
             self.widget.btLid1Close.setEnabled(value and self._poweredOn)
         else:

@@ -112,7 +112,7 @@ class Qt4_TangoPssBrick(BlissWidget):
                 self.disconnect(self._hwobj, '__', self.state_changed)
             self._hwobj = self.getHardwareObject(new_value)
             if self._hwobj is not None:
-                self.connect(self._hwobj, ('__', self.state_changed)
+                self.connect(self._hwobj, '__', self.state_changed)
                 self.state_changed(self._hwobj.getWagoState())
                 
         elif property_name=='expertModeControlOnly':

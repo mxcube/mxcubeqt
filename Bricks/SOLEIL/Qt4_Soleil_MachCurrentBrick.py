@@ -26,7 +26,7 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 __category__ = 'SOLEIL'
 
-class Qt4_SoleilMachCurrentBrick(BlissWidget):
+class Qt4_Soleil_MachCurrentBrick(BlissWidget):
     """
     Descript. :
     """
