@@ -35,6 +35,7 @@ GRAY =  QtGui.QColor( QtCore.Qt.gray )
 LIGHT_GRAY = QtGui.QColor( QtCore.Qt.lightGray )
 DARK_GRAY = QtGui.QColor( QtCore.Qt.darkGray )
 GREEN = QtGui.QColor( QtCore.Qt.green )
+RED = QtGui.QColor( QtCore.Qt.red )
 
 LIGHT_GREEN = QtGui.QColor(204,255,204)
 LIGHT_RED = QtGui.QColor(255,204,204)

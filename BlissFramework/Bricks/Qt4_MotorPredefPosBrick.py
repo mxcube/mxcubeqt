@@ -191,7 +191,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         if positions is None:
             positions=[]
         for p in positions:
-            pos_list=p.split()
+            pos_list=str(p).split()
             pos_name=pos_list[1]
             self.positions_combo.addItem(str(pos_name))
         self.positions=positions

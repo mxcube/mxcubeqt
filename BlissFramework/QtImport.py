@@ -115,6 +115,7 @@ if (qt_variant == 'PyQt5') or (qt_variant is None and not qt_imported):
         from PyQt5.QtGui import *
         from PyQt5.QtWidgets import *
         from PyQt5.QtPrintSupport import *
+        from PyQt5.uic import *
 
         getQApp = QCoreApplication.instance
 
@@ -133,6 +134,7 @@ if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
     try:
         from PySide.QtCore import *
         from PySide.QtGui import *
+        from PySide.QtUiTools import *
         from PySide import __version_info__
 
         pyqtSignal = Signal
@@ -140,6 +142,14 @@ if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
         qt_variant = "PySide"
         getQApp = QCoreApplication.instance
         qt_version_no = __version_info__[:3]
+        def loadUi(filename, parent=None):
+            loader = QUiLoader()
+            uifile = QFile(uifilename)
+            uifile.open(QFile.ReadOnly)
+            ui = loader.load(uifile, parent)
+            uifile.close()
+            return ui
+
     except:
         pass
 
@@ -168,6 +178,7 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
 
         from PyQt4.QtCore import *
         from PyQt4.QtGui import *
+        from PyQt4.uic import *
         
         def getQApp():
             return qApp

@@ -43,6 +43,9 @@ class Qt4_ChatBrick(BlissWidget):
     PRIORITY_COLORS = ('darkblue', 'black', 'red')
     MY_COLOR = 'darkgrey'
 
+    incoming_unread_messages = pyqtSignal(int,bool)
+    reset_unread_messages = pyqtSignal(bool)
+
     def __init__(self, *args):
         """
         Descript. :
@@ -57,8 +60,8 @@ class Qt4_ChatBrick(BlissWidget):
         self.addProperty('myTabLabel', 'string', '')
 
         # Signals ------------------------------------------------------------
-        self.defineSignal('incUnreadMessages',())
-        self.defineSignal('resetUnreadMessages',())
+        self.defineSignal('incoming_unread_messages',())
+        self.defineSignal('reset_unread_message',())
 
         # Slots ---------------------------------------------------------------
         self.defineSlot('tabSelected',())
@@ -209,7 +212,8 @@ class Qt4_ChatBrick(BlissWidget):
           chat_history_file.write("\n")
           chat_history_file.close()
 
-        self.emit(QtCore.SIGNAL("incUnreadMessages"),1, True)
+        #self.emit(QtCore.SIGNAL("incUnreadMessages"),1, True)
+        self.incoming_unread_messages.emit(1,True)
 
     def new_client(self,client_id):
         """
@@ -400,4 +404,5 @@ class Qt4_ChatBrick(BlissWidget):
         Return    : 
         """
         if tab_name==self['myTabLabel']:
-            self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
+            #self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
+            self.reset_unread_messages.emit(True)

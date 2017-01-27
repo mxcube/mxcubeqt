@@ -418,8 +418,8 @@ class GUIEditorWindow(QWidget):
     drawPreviewSignal = QtCore.pyqtSignal('PyQt_PyObject', int, list, 'PyQt_PyObject')
     updatePreviewSignal = QtCore.pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject')
     addWidgetSignal = QtCore.pyqtSignal('PyQt_PyObject', 'PyQt_PyObject')
-    removeWidgetSignal = QtCore.pyqtSignal()
-    moveWidgeSignal = QtCore.pyqtSignal()
+    removeWidgetSignal = QtCore.pyqtSignal(object,object)
+    moveWidgetSignal = QtCore.pyqtSignal()
     showProperyEditorWindowSignal = QtCore.pyqtSignal()
     hidePropertyEditorWindowSignal = QtCore.pyqtSignal()
     showPreviewSignal = QtCore.pyqtSignal()
@@ -1283,7 +1283,7 @@ class GUIBuilder(QMainWindow):
              self.gui_preview_window.add_item_widget)
         self.gui_editor_window.removeWidgetSignal.connect(\
              self.gui_preview_window.remove_item_widget)
-        self.gui_editor_window.moveWidgeSignal.connect(\
+        self.gui_editor_window.moveWidgetSignal.connect(\
              self.gui_preview_window.move_item_widget)
         self.gui_preview_window.previewItemClickedSignal.connect(\
              self.gui_editor_window.preview_item_clicked)

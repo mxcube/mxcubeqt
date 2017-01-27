@@ -288,8 +288,9 @@ class Qt4_ConfigurationTable(QTableWidget):
                         self.setText(row, 1, str(prop.getUserValue()))
 
                 if not old_value == prop.getUserValue():
-                    self.emit(QtCore.SIGNAL('propertyChanged'), 
-                              (prop_name, old_value, prop.getUserValue(), ))
+                    self.propertyChangedSignal.emit(prop_name, old_value, prop.getUserValue())
+                    #self.emit(QtCore.SIGNAL('propertyChanged'), 
+                              #(prop_name, old_value, prop.getUserValue(), ))
 
         return QTable.endEdit(self, row, col, accept, replace)
 
