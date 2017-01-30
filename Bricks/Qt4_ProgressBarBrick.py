@@ -20,15 +20,13 @@
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
 
+from QtImport import *
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
 
 

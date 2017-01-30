@@ -20,17 +20,9 @@
 import os
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QColor
-    from PyQt5 import uic
-else:
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
-
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_matplot_widget import PolarScaterWidget
@@ -62,8 +54,8 @@ class DCGroupWidget(QWidget):
         self.polar_scater_widget = PolarScaterWidget()
         self.subwedge_table = QTableWidget(_subwedge_widget)
         _snapshot_widget = QWidget(self)
-        self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                          'ui_files/Qt4_snapshot_widget_layout.ui'))
+        self.position_widget = loadUi(os.path.join(os.path.dirname(__file__),
+                                      'ui_files/Qt4_snapshot_widget_layout.ui'))
         
         # Layout --------------------------------------------------------------
         _subwedge_widget_vlayout = QVBoxLayout(_subwedge_widget)

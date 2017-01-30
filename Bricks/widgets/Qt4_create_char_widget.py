@@ -20,14 +20,7 @@
 import os
 import copy
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import QVBoxLayout
-    from PyQt5.QtGui import QDoubleValidator
-    from PyQt5 import uic
-else:
-    from PyQt4.QtGui import QDoubleValidator, QVBoxLayout
-    from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -70,10 +63,10 @@ class CreateCharWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self, 
              data_model = self._path_template, layout = 'vertical')
 
-        self._vertical_dimension_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self._vertical_dimension_widget = loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_vertical_crystal_dimension_widget_layout.ui'))
 
-        self._char_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self._char_widget = loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_characterise_simple_widget_vertical_layout.ui')) 
 
         # Layout --------------------------------------------------------------

@@ -21,15 +21,7 @@ import os
 import logging
 from collections import namedtuple
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import pyqtSignal, pyqtSlot
-    from PyQt5.QtWidgets import * 
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import pyqtSignal, pyqtSlot
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
 from BlissFramework import Qt4_Icons
@@ -41,7 +33,9 @@ from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from widgets.Qt4_dc_tree_widget import DataCollectTree
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
 
 #ViewType = namedtuple('ViewType', ['ISPYB', 'MANUAL', 'SC'])
@@ -151,7 +145,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSlot("set_requested_tree_brick", ())
 
         # Graphic elements ----------------------------------------------------
-        self.sample_changer_widget = uic.loadUi(os.path.join(\
+        self.sample_changer_widget = loadUi(os.path.join(\
              os.path.dirname(__file__),
              "widgets/ui_files/Qt4_sample_changer_widget_layout.ui"))
 

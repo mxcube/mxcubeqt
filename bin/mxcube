@@ -11,14 +11,13 @@ os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareOb
 import BlissFramework
 BlissFramework.set_gui_version(sys.argv[-1].upper())
 
-if sys.argv[-1].upper() in ("QT4", "QT5"):
-    MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt4.gui")
-    sys.argv.pop(-1)
-    import BlissFramework
-    from BlissFramework import Qt4_startGUI
-    Qt4_startGUI.run(MXCUBE_GUI_FILE)
-else:
-    MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt3.gui")
-    from BlissFramework import startGUI
-    startGUI.run(MXCUBE_GUI_FILE)
+# Qt4/5, PySide
+MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt4.gui")
+import BlissFramework
+from BlissFramework import Qt4_startGUI
+Qt4_startGUI.run(MXCUBE_GUI_FILE)
 
+# Qt3 
+# MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt3.gui")
+# from BlissFramework import startGUI
+# startGUI.run(MXCUBE_GUI_FILE)

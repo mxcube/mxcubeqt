@@ -17,11 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -32,9 +28,6 @@ from widgets.Qt4_pymca_plot_widget import PymcaPlotWidget
 from widgets.Qt4_snapshot_widget import SnapshotWidget
 
 from BlissFramework.Utils import Qt4_widget_colors
-
-
-__category__ = 'Tasks'
 
 
 class EnergyScanParametersWidget(QWidget):

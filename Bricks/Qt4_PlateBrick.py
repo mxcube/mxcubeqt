@@ -20,16 +20,7 @@
 import os
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QPixmap
-    from PyQt5 import uic
-    QStringList = list
-else:
-    from PyQt4.QtCore import QStringList
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -39,6 +30,8 @@ from widgets.Qt4_plate_navigator_widget import PlateNavigatorWidget
 from Qt4_sample_changer_helper import SampleChanger
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "Sample changer"
 
 
@@ -74,7 +67,7 @@ class Qt4_PlateBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.plate_navigator_widget = PlateNavigatorWidget(self)
-        self.crims_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.crims_widget = loadUi(os.path.join(os.path.dirname(__file__),
              'widgets/ui_files/Qt4_plate_crims_widget_layout.ui'))
 
         # Layout --------------------------------------------------------------

@@ -17,21 +17,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import pyqtSignal, Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QCursor
-else:
-    from PyQt4.QtCore import pyqtSignal, Qt
-    from PyQt4.QtGui import *
+from QtImport import *
 
 import numpy as np
 from matplotlib.figure import Figure
-
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-if BlissFramework.get_gui_version() == "QT5":
+if qt_variant == 'PyQt5':
     from matplotlib.backends.backend_qt5agg \
     import FigureCanvasQTAgg as FigureCanvas
     try:
@@ -51,7 +43,6 @@ else:
         import NavigationToolbar2QT as NavigationToolbar
 
 import matplotlib.pyplot as plt
-
 
 from BlissFramework.Utils import Qt4_widget_colors
 

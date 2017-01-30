@@ -19,15 +19,7 @@
 
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -44,7 +36,7 @@ class OptimisationParametersWidgetLayout(QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.opt_param_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.opt_param_widget = loadUi(os.path.join(os.path.dirname(__file__),
              "ui_files/Qt4_optimization_parameters_widget_layout.ui"))
 
         # Layout --------------------------------------------------------------

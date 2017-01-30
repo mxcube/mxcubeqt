@@ -17,14 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import * 
-else:
-    from PyQt4.QtCore import Qt,  pyqtSignal
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -32,9 +25,11 @@ from BlissFramework import Qt4_Icons
 from sample_changer import SC3
 from Qt4_sample_changer_helper import *
 
-import logging
+#import logging
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "Sample changer"
 
 
@@ -1084,7 +1079,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobjStateChanged(state)
 
     def sc_status_changed(self, status):
-        logging.getLogger("HWR").debug("Status3 changed") 
+        #logging.getLogger("HWR").debug("Status3 changed") 
         self.status.setStatusMsg(status)
 
     def sc_state_changed(self, state, previous_state=None):

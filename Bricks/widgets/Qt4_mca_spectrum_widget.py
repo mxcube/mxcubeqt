@@ -46,15 +46,11 @@ import os
 import logging
 import numpy as np
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import QVBoxLayout
-
+from QtImport import *
+if qt_variant == "PyQt5":
     from PyMca5.PyMca import McaAdvancedFit
     from PyMca5.PyMca import ConfigDict
 else:
-    from PyQt4.QtGui import QVBoxLayout
-
     from PyMca import McaAdvancedFit
     from PyMca import ConfigDict
 

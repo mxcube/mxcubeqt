@@ -17,24 +17,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Qt4_BeamlineTestBrick
+   
+   Widget allows to run tests defined in the hardware object.
+   As a result a html page and pdf are generated.
+"""
+
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-    QStringList = list
-else:
-    from PyQt4.QtCore import Qt, QStringList
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_webview_widget import WebViewWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "Test"
 
 
@@ -58,7 +57,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.beamline_test_widget = uic.loadUi(os.path.join(\
+        self.beamline_test_widget = loadUi(os.path.join(\
              os.path.dirname(__file__), 
             'widgets/ui_files/Qt4_beamline_test_widget_layout.ui'))
 

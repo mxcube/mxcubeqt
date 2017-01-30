@@ -19,15 +19,7 @@
 
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtWidgets import QWidget, QVBoxLayout
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import Qt, pyqtSignal
-    from PyQt4.QtGui import QWidget, QVBoxLayout
-    from PyQt4 import uic
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
@@ -51,7 +43,7 @@ class ProcessingWidget(QWidget):
 
         self._model_mib = DataModelInputBinder(self._model)
 
-        self.processing_widget = self.acq_widget_layout = uic.loadUi(
+        self.processing_widget = self.acq_widget_layout = loadUi(
                            os.path.join(os.path.dirname(__file__),
                            "ui_files/Qt4_processing_widget_vertical_layout.ui"))
       

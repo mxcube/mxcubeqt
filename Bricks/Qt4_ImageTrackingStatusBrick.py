@@ -17,16 +17,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-
-import logging
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
+
 
 class Qt4_ImageTrackingStatusBrick(BlissWidget):
 

@@ -20,19 +20,14 @@
 import time
 import gevent
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtCore import Qt
-else:
-    from PyQt4.QtGui import *
-    from PyQt4.QtCore import Qt
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 
 
 class LogBarWidget(QWidget):
-    def __init__(self, parent = None, name = "log_bar_widget", fl = 0):
+
+    def __init__(self, parent=None, name="log_bar_widget", fl=0):
         QWidget.__init__(self, parent, Qt.WindowFlags(fl))
 
         if name is not None:

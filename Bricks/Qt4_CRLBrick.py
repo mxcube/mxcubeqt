@@ -21,19 +21,15 @@
 Qt4_CRLBrick
 """
 
-try:
-   from PyQt5 import QtCore
-   from PyQt5.QtWidgets import *
-except:
-   from PyQt4 import QtCore
-   from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
-
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Beam definition"
 
 
 class Qt4_CRLBrick(BlissWidget):
@@ -133,7 +129,7 @@ class Qt4_CRLBrick(BlissWidget):
             self.crl_value_table.setColumnCount(new_value)
             for col_index in range(new_value):
                 temp_item = QTableWidgetItem("")
-                temp_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                temp_item.setFlags(Qt.ItemIsEnabled)
                 temp_item.setBackground(Qt4_widget_colors.LIGHT_GRAY)
                 self.crl_value_table.setItem(0, col_index, temp_item)
                 self.crl_value_table.setColumnWidth(col_index, 20)

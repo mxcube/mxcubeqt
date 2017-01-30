@@ -19,10 +19,10 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import uic
+from QtImport import *
 
-class ISPyBSampleInfoWidget(QtGui.QWidget):
+
+class ISPyBSampleInfoWidget(QWidget):
     """
     Descript. :
     """
@@ -31,13 +31,13 @@ class ISPyBSampleInfoWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
-        self.ispyb_sample_widget = uic.loadUi(
+        self.ispyb_sample_widget = loadUi(
               os.path.join(os.path.dirname(__file__),
              "ui_files/Qt4_ispyb_widget_layout.ui"))
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.ispyb_sample_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)

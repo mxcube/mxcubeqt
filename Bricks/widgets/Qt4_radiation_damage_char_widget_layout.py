@@ -17,13 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import *
+
+from QtImport import *
 
 
 class RadiationDamageWidgetLayout(QWidget):

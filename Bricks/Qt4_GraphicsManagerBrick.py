@@ -21,23 +21,16 @@
 """
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-    QStringList = list
-else:
-    from PyQt4.QtCore import Qt, QStringList
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Graphics'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Graphics"
 
 
 class Qt4_GraphicsManagerBrick(BlissWidget):
@@ -70,7 +63,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QGroupBox("Graphics items", self)
-        self.manager_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.manager_widget = loadUi(os.path.join(os.path.dirname(__file__),
             'widgets/ui_files/Qt4_graphics_manager_layout.ui'))
 
         # Layout --------------------------------------------------------------
@@ -172,7 +165,8 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
              shapes_treewidget, info_str_list)
         self.toggle_buttons_enabled()
 
-        info_str_list = QStringList()
+        #info_str_list = QStringList()
+        info_str_list = []
 
         info_str_list.append(str(shape.index))
         if shape_type == "Point":

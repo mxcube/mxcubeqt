@@ -20,15 +20,7 @@
 import os
 import sys
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -46,7 +38,7 @@ class RadiationDamageModelWidgetLayout(QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.rad_damage_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.rad_damage_widget = loadUi(os.path.join(os.path.dirname(__file__),
              "ui_files/Qt4_radiation_damage_model_widget_layout.ui"))
 
         # Layout --------------------------------------------------------------

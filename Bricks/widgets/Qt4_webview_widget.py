@@ -17,20 +17,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-QWEBVIEW_AVAILABLE = False
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import QUrl
-    from PyQt5.QtWidgets import *
-    #from PyQt5 import QWebView
-else:
-    from PyQt4.QtCore import QUrl
-    from PyQt4.QtGui import *
-    try:
+from QtImport import *
+
+try:
+    if qt_variant == 'PyQt5':
+        from PyQt5.QtWebKit import QWebView
+    else:
         from PyQt4.QtWebKit import QWebView
-        QWEBVIEW_AVAILABLE = True
-    except:
-        pass
+    QWEBVIEW_AVAILABLE = True
+except:
+    QWEBVIEW_AVAILABLE = False
 
 from BlissFramework import Qt4_Icons
 

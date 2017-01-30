@@ -21,15 +21,7 @@ import os
 import logging
 from copy import deepcopy
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
 import Qt4_GraphicsManager
@@ -60,7 +52,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._grid_map = {}
 
         # Graphic elements ----------------------------------------------------
-        self._advanced_methods_widget = uic.loadUi(os.path.join(\
+        self._advanced_methods_widget = loadUi(os.path.join(\
             os.path.dirname(__file__), "ui_files/Qt4_advanced_methods_layout.ui"))
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",

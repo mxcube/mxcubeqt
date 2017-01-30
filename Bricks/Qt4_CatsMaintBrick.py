@@ -1,3 +1,22 @@
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube.
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
 import string
 import logging
 import time
@@ -5,15 +24,18 @@ import traceback
 import sys
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
 from Qt4_sample_changer_helper import *
 
-__category__ = 'Sample changer'
+
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Sample changer"
+
 
 class Qt4_CatsMaintBrick(BlissWidget):
 

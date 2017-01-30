@@ -21,14 +21,7 @@ import os
 import logging
 import traceback
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QPalette, QImageWriter
-else:
-    from PyQt4.QtCore import Qt, pyqtSignal
-    from PyQt4.QtGui import *
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 import Qt4_GraphicsManager as graphics_manager
@@ -38,7 +31,9 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
 
 class Qt4_HutchMenuBrick(BlissWidget):

@@ -19,11 +19,7 @@
 
 import html_template
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from widgets.Qt4_dc_parameters_widget import DCParametersWidget
 from widgets.Qt4_image_tracking_widget import ImageTrackingWidget
@@ -32,7 +28,9 @@ from widgets.Qt4_snapshot_widget import SnapshotWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Task'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_DCParametersBrick(BlissWidget):

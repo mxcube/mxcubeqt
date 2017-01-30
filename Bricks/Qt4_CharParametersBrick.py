@@ -17,18 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
 from widgets.Qt4_webview_widget import WebViewWidget
 
-
-__category__ = 'Task'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_CharParametersBrick(BlissWidget):

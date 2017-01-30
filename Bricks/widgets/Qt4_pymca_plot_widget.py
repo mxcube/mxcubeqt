@@ -17,17 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
+from QtImport import *
 PYMCA_EXISTS = False
 
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
+if qt_variant == 'PyQt5':
     from Qt4_matplot_widget import TwoAxisPlotWidget as Graph
 else:
-    from PyQt4.QtCore import Qt, QObject, SIGNAL
-    from PyQt4.QtGui import *
-
     try:
         from PyMca.QtBlissGraph import QtBlissGraph as Graph
         PYMCA_EXISTS = True
@@ -67,7 +62,7 @@ class PymcaPlotWidget(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding,
                            QSizePolicy.Expanding)
 
-        if BlissFramework.get_gui_version() == "QT5":
+        if qt_variant == 'PyQt5':
              pass
         else:
              QObject.connect(self.pymca_graph,
