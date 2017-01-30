@@ -29,14 +29,9 @@ import logging
 import platform
 from optparse import OptionParser
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5 import QtCore
-    from PyQt5.QtWidgets import QApplication
-else:
-    from PyQt4 import QtCore
-    from PyQt4.QtGui import QApplication
+from QtImport import *
 
+import BlissFramework
 from BlissFramework import Qt4_GUISupervisor
 from BlissFramework.Utils import Qt4_ErrorHandler
 from BlissFramework.Utils import Qt4_GUILogHandler
@@ -58,7 +53,7 @@ def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)
     """
 
-    if QtCore.QEventLoop():
+    if QEventLoop():
         try:
             gevent.wait(timeout=0.01)
         except AssertionError:
@@ -67,13 +62,13 @@ def do_gevent():
         # all that I tried with gevent here fails! => seg fault
         pass
 
-class MyCustomEvent(QtCore.QEvent):
+class MyCustomEvent(QEvent):
     """Custom event"""
 
     def __init__(self, event_type, data):
         """init"""
 
-        QtCore.QEvent.__init__(self, event_type)
+        QEvent.__init__(self, event_type)
         self.data = data
 
 def run(gui_config_file=None):
@@ -256,14 +251,14 @@ def run(gui_config_file=None):
     # log startup details
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
-    logging.getLogger().info("\n\n\n\n")
+    #logging.getLogger().info("\n\n\n\n")
     logging.getLogger().info("=================================================================================")
     logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
     logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
     logging.getLogger().info("System info: Python %s - Qt %s - PyQt %s on %s" % \
-       (platform.python_version(), QtCore.QT_VERSION_STR, 
-        QtCore.PYQT_VERSION_STR, platform.system()))
+       (platform.python_version(), QT_VERSION_STR, 
+        PYQT_VERSION_STR, platform.system()))
     logging.getLogger().info("---------------------------------------------------------------------------------")
 
     QApplication.setDesktopSettingsAware(False)
@@ -278,7 +273,7 @@ def run(gui_config_file=None):
     # redirect errors to logger
     Qt4_ErrorHandler.enableStdErrRedirection()
 
-    gevent_timer = QtCore.QTimer()
+    gevent_timer = QTimer()
     gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 

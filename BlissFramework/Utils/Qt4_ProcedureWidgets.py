@@ -17,42 +17,43 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 import logging
 
 from HardwareRepository import HardwareRepository
 from BlissFramework import Qt4_Icons
 
-class ProcedureBoxLayout(QtGui.QBoxLayout):
+class ProcedureBoxLayout(QBoxLayout):
     def addItem(self, item):
-        item.setAlignment(QtGui.Qt.AlignLeft)
-        QtGui.QBoxLayout.addItem(self, item)
+        item.setAlignment(Qt.AlignLeft)
+        QBoxLayout.addItem(self, item)
 
           
-class HorizontalSpacer(QtGui.QWidget):
+class HorizontalSpacer(QWidget):
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Fixed)
 
 
-class VerticalSpacer(QtGui.QWidget):
+class VerticalSpacer(QWidget):
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
         
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Fixed,
+                           QSizePolicy.Expanding)
         
 
-class ProcedurePanel(QtGui.QWidget):
+class ProcedurePanel(QWidget):
     """Container for Procedure widgets"""
     def __init__(self, parent, orientation = QtCore.Qt.Vertical):
         """Constructor
 
         parent -- the parent QObject
         procedure -- the Procedure this panel belongs to (default: None)"""
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.currentWidget = None
         self.lastCommandID = None
@@ -65,9 +66,9 @@ class ProcedurePanel(QtGui.QWidget):
             self.setProcedure(parent.getProcedure())
     
         if orientation == QtCore.Qt.Vertical:
-            ProcedureBoxLayout(self, QtGui.QBoxLayout.Down, 10, 5)
+            ProcedureBoxLayout(self, QBoxLayout.Down, 10, 5)
         else:
-            ProcedureBoxLayout(self, QtGui.QBoxLayout.LeftToRight, 10, 5)
+            ProcedureBoxLayout(self, QBoxLayout.LeftToRight, 10, 5)
             
         self.layout().setAutoAdd(True)
 
@@ -126,14 +127,14 @@ class ProcedurePanel(QtGui.QWidget):
                 self.currentWidget.validationPassed(reply)
 
                     
-class ProcedureEntryField(QtGui.QGroupBox):
+class ProcedureEntryField(QGroupBox):
     """Base class for entry widgets in Procedure panels"""
     def __init__(self, parent, caption = ''):
         """Constructor
 
         parent -- the parent ProcedurePanel
         caption -- caption (default: no caption)"""
-        QtGui.QGroupBox.__init__(self, parent)
+        QGroupBox.__init__(self, parent)
                             
         self.isValidating = False
         self.command = ''
@@ -542,9 +543,9 @@ class TextEntryField(ProcedureEntryField):
         return self.cmdOK.isEnabled() == False and self.cmdCancel.setEnabled() == False
     
 
-class Label(QtGui.QGroupBox):
+class Label(QGroupBox):
     def __init__(self, parent, caption, value = '-'):
-        QtGui.QGroupBox.__init__(self, parent)
+        QGroupBox.__init__(self, parent)
 
         self.setSpacing(5)
         self.setMargin(0)
@@ -566,11 +567,11 @@ class Label(QtGui.QGroupBox):
         return self.value
 
 
-class MotorPositionReminder(QtGui.QTableWidgetItem):
+class MotorPositionReminder(QTableWidgetItem):
     NOPOSITION = 13*'-'
 
     def __init__(self, parent):
-        QtGui.QTableWidgetItem.__init__(self, parent, QtGui.QTableWidgetItem.Always, '')
+        QTableWidgetItem.__init__(self, parent, QTableWidgetItem.Always, '')
 
         self.motor = None
         self.controlDialog = None
@@ -637,9 +638,9 @@ class MotorPositionReminder(QtGui.QTableWidgetItem):
         self.controlDialog = None
       
 
-class ScanConfigurationTable(QtGui.QTableWidget):
+class ScanConfigurationTable(QTableWidget):
     def __init__(self, parent):
-        QtGui.QTableWidget.__init__(self, parent)
+        QTableWidget.__init__(self, parent)
 
         self.motorsList = QStringList()
         self.motors = {}
@@ -833,9 +834,9 @@ class ScanConfigurationTable(QtGui.QTableWidget):
         return QTable.endEdit(self, row, col, accept, replace)
 
 
-class Table(QtGui.QTableWidget):
+class Table(QTableWidget):
     def __init__(self, parent):
-        QtGui.QTableWidget.__init__(self, parent)
+        QTableWidget.__init__(self, parent)
 
         self.customColumns = {}
 

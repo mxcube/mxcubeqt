@@ -32,26 +32,10 @@ import weakref
 import platform
 import webbrowser
 import collections
-
-import BlissFramework
-
 from QtImport import *
-#if BlissFramework.get_gui_version() == "QT5":
-#    from PyQt5 import QtCore
-#    from PyQt5.QtGui import QColor, QPalette
-#    from PyQt5.QtWidgets import *
-#    StringList = list
-#else:
-#    from PyQt4 import QtCore
-#    from PyQt4.QtGui import *
-#
-#    if sys.version_info > (3, 0):
-#        StringList = list
-#    else:
-#        StringList = QStringList
-
 from functools import partial
 
+import BlissFramework
 from BlissFramework import Qt4_Icons
 from BlissFramework import Qt4_Configuration
 from BlissFramework.Utils import Qt4_widget_colors

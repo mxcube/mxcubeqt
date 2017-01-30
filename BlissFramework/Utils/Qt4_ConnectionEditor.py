@@ -19,12 +19,7 @@
 
 """Connection editor"""
 
-try:
-   from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-   from PyQt5.QtWidgets import *
-except:
-   from PyQt4.QtCore import Qt, pyqtSignal, pyqtSlot
-   from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 

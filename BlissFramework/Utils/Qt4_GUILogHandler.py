@@ -22,14 +22,7 @@ import time
 import weakref
 import gevent
 
-try:
-   from PyQt5.QtCore import QEvent
-   from PyQt5.QtWidgets import QApplication
-   StringList = list
-except:
-   from PyQt4.QtCore import QEvent
-   from PyQt4.QtGui import QApplication
-
+from QtImport import *
 
 _logHandler = None
 _timer = None
