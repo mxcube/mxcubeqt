@@ -19,8 +19,7 @@
 
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors

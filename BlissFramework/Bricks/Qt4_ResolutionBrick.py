@@ -19,22 +19,16 @@
 
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import QString
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QPalette, QColor, QDoubleValidator
-else:
-    from PyQt4.QtCore import QString
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
-
 
 class Qt4_ResolutionBrick(BlissWidget):
     """
