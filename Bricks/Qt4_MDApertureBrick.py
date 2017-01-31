@@ -45,18 +45,18 @@ Apertures are allowed according the bam focusing mode.
 -----------------------------------------------------------------------
 """
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QPalette
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Beam definition"
+
+
+#TODO rename to ApertureBrick
 
 
 class Qt4_MDApertureBrick(BlissWidget):

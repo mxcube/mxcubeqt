@@ -19,13 +19,7 @@
 
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-else:
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -35,7 +29,9 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-__category__ = 'Task'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_SampleDetailsBrick(BlissWidget):
@@ -61,10 +57,10 @@ class Qt4_SampleDetailsBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         _info_widget = QWidget(self)
-        self.crystal_widget = uic.loadUi(\
+        self.crystal_widget = loadUi(\
              os.path.join(os.path.dirname(__file__),
              "widgets/ui_files/Qt4_crystal_widget_layout.ui"))
-        self.sample_info_widget = uic.loadUi(
+        self.sample_info_widget = loadUi(
               os.path.join(os.path.dirname(__file__),
              "widgets/ui_files/Qt4_sample_info_widget_layout.ui"))
         #self.ispyb_sample_info_widget = ISPyBSampleInfoWidget(self)

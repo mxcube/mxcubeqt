@@ -17,18 +17,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import QMenu
-else:
-    from PyQt4.QtGui import QMenu
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Graphics'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Graphics"
 
 
 class Qt4_GraphicsToolsBrick(BlissWidget):

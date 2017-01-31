@@ -20,11 +20,7 @@
 import os
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_acquisition_widget import AcquisitionWidget

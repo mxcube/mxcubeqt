@@ -17,16 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QDoubleValidator, QPixmap
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import os
 import queue_model_objects_v1 as queue_model_objects
@@ -76,7 +67,7 @@ class CharParametersWidget(QWidget):
         self.reference_img_widget = ReferenceImageWidget(rone_widget)
         self.acq_widget = self.reference_img_widget.acq_widget
         self.path_widget = self.reference_img_widget.path_widget
-        self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.position_widget = loadUi(os.path.join(os.path.dirname(__file__),
                                           'ui_files/Qt4_snapshot_widget_layout.ui'))
         self.position_widget.setMinimumSize(450, 340)
 
@@ -88,9 +79,9 @@ class CharParametersWidget(QWidget):
         self.opt_parameters_widget = OptimisationParametersWidgetLayout(self)
         
         rtree_widget = QWidget(main_widget)
-        self.rad_dmg_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.rad_dmg_widget = loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_radiation_damage_model_widget_layout.ui'))
-        self.vertical_dimension_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.vertical_dimension_widget = loadUi(os.path.join(os.path.dirname(__file__),
              'ui_files/Qt4_vertical_crystal_dimension_widget_layout.ui'))
 
         # Layout --------------------------------------------------------------

@@ -20,11 +20,7 @@
 import copy
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import QVBoxLayout
-else:
-    from PyQt4.QtGui import QVBoxLayout
+from QtImport import *
 
 import Qt4_queue_item
 from Qt4_GraphicsLib import GraphicsItemPoint

@@ -21,15 +21,7 @@ import os
 import copy
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-    QStringList = list
-else:
-    from PyQt4.QtCore import QStringList
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -56,7 +48,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
-        self._lines_widget = uic.loadUi(os.path.join(\
+        self._lines_widget = loadUi(os.path.join(\
             os.path.dirname(__file__), "ui_files/Qt4_helical_line_widget_layout.ui"))
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
@@ -136,7 +128,8 @@ class CreateHelicalWidget(CreateTaskBase):
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
             self._lines_widget.lines_treewidget.clearSelection()
-            info_str_list = QStringList()
+            #info_str_list = QStringList()
+            info_str_list = []
             info_str_list.append(shape.get_display_name())
             info_str_list.append("%d" % shape.get_points_index()[0])
             info_str_list.append("%d" % shape.get_points_index()[1])

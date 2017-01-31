@@ -28,14 +28,7 @@ import jsonpickle
 from datetime import datetime
 from collections import namedtuple
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtGui import *
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtCore import Qt, QEvent
-else:
-    from PyQt4.QtGui import *
-    from PyQt4.QtCore import Qt, QEvent
+from QtImport import *
 
 import Qt4_queue_item
 import queue_entry
@@ -236,7 +229,7 @@ class DataCollectTree(QWidget):
              QAbstractItemView.SelectRows)
         #self.history_table_widget.horizontalHeader().setSortIndicatorShown(True)
 
-        if BlissFramework.get_gui_version() == "QT5":
+        if qt_variant == 'PyQt5':
             self.history_table_widget.verticalHeader().\
                setSectionResizeMode(QHeaderView.Fixed)
         else:    

@@ -20,13 +20,7 @@
 import os
 import numpy
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, QPoint
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtCore import Qt, QPoint
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from copy import copy
 from BlissFramework.Utils import Qt4_widget_colors

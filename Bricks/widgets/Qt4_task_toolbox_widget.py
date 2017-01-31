@@ -19,13 +19,7 @@
 
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import *
+from QtImport import *
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects

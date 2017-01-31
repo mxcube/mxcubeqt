@@ -19,17 +19,10 @@
 
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtGui import QColor
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
+from QtImport import *
+if qt_variant == "PyQt5":
     from PyMca5.PyMca import QPeriodicTable
 else:
-    from PyQt4.QtCore import Qt, QObject, pyqtSignal, SIGNAL
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
     from PyMca import QPeriodicTable
 
 from BlissFramework.Utils import Qt4_widget_colors
@@ -123,12 +116,12 @@ class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
         QPeriodicTable.QPeriodicTable.__init__(self, *args)
 
         self.elements_dict={}
-        if BlissFramework.get_gui_version() == "QT5":
-            self.elementClicked.connect(self.tableElementChanged)
-        else:
-            QObject.connect(self,
-                            SIGNAL('elementClicked'),
-                            self.tableElementChanged)
+        #if qt_variant == 'PyQt5':
+        self.elementClicked.connect(self.table_element_changed)
+        #else:
+        #    QObject.connect(self,
+        #                    SIGNAL('elementClicked'),
+        #                    self.tableElementChanged)
         for b in self.eltButton:
             self.eltButton[b].colors[0]= QColor(Qt.green)
             self.eltButton[b].colors[1]= QColor(Qt.darkGreen)
@@ -147,7 +140,8 @@ class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
         if b.isEnabled():
             b.setCurrent(False)
 
-    def tableElementChanged(self, symbol, energy = None):
+    def table_element_changed(self, symbol, energy=None):
+        print symbol, energy
         if energy is None:
             energy = self.energies_dict[symbol]
         self.setSelection((symbol,))

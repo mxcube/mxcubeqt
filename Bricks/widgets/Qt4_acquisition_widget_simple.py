@@ -19,17 +19,7 @@
 
 import os
 
-
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, pyqtSignal
-    from PyQt5.QtGui import QDoubleValidator
-    from PyQt5.QtWidgets import *
-    from PyQt5 import uic
-else:
-    from PyQt4.QtCore import Qt, pyqtSignal
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 from widgets.Qt4_widget_utils import DataModelInputBinder
@@ -74,7 +64,7 @@ class AcquisitionWidgetSimple(QWidget):
             self._path_template = path_template
 
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
-        self.acq_widget_layout = uic.loadUi(os.path.join(os.path.dirname(\
+        self.acq_widget_layout = loadUi(os.path.join(os.path.dirname(\
             __file__), "ui_files/Qt4_acquisition_widget_vertical_simple_layout.ui"))
 
         # Layout --------------------------------------------------------------

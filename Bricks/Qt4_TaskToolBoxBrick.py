@@ -21,13 +21,7 @@ import os
 import logging
 import traceback
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import pyqtSignal, pyqtSlot
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtCore import pyqtSignal, pyqtSlot
-    from PyQt4.QtGui import *
+from QtImport import *
 
 import Qt4_GraphicsManager as graphics_manager
 import queue_model_objects_v1 as queue_model_objects
@@ -36,7 +30,9 @@ from widgets.Qt4_task_toolbox_widget import TaskToolBoxWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
 
 class Qt4_TaskToolBoxBrick(BlissWidget):

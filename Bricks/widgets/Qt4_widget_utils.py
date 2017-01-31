@@ -19,18 +19,11 @@
 
 import decimal
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtGui import *
-    QString = str
-else:
-    from PyQt4.QtCore import Qt, QString
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from HardwareRepository.dispatcher import dispatcher
+
 
 class DataModelInputBinder(object):
     def __init__(self,  obj):

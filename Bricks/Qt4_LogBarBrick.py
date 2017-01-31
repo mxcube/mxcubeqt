@@ -19,19 +19,16 @@
 
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtGui import *
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_log_bar_widget import LogBarWidget
 from BlissFramework.Utils import Qt4_GUILogHandler
 
 
-__category__ = 'Log'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Log"
 
 
 class Qt4_LogBarBrick(BlissWidget):

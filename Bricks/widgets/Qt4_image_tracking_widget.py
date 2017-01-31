@@ -20,17 +20,9 @@
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
 
-
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import QPixmap
-    from PyQt5 import uic
-else:
-    from PyQt4.QtGui import *
-    from PyQt4 import uic
+from QtImport import *
 
 
 class ImageTrackingWidget(QWidget):
@@ -51,7 +43,7 @@ class ImageTrackingWidget(QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.image_tracking_widget_layout = uic.loadUi(os.path.join(\
+        self.image_tracking_widget_layout = loadUi(os.path.join(\
                  os.path.dirname(__file__),
                  "ui_files/Qt4_image_tracking_widget_layout.ui"))
 

@@ -19,13 +19,14 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
 
 

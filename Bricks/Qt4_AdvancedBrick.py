@@ -19,17 +19,15 @@
 
 import os
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_advanced_parameters_widget import AdvancedParametersWidget
 from widgets.Qt4_advanced_results_widget import AdvancedResultsWidget
 from widgets.Qt4_snapshot_widget import SnapshotWidget
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = 'Task'
 
 

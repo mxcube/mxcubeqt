@@ -17,15 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Beam definition"
 
 
 class Qt4_BeamFocusingBrick(BlissWidget):
@@ -52,18 +52,18 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _main_groupbox = QtGui.QGroupBox("Beam focusing", self)
-        self.beam_focusing_combo = QtGui.QComboBox(_main_groupbox)
+        _main_groupbox = QGroupBox("Beam focusing", self)
+        self.beam_focusing_combo = QComboBox(_main_groupbox)
         self.beam_focusing_combo.setMinimumWidth(100)
 
         # Layout --------------------------------------------------------------
-        _main_groupbox_vlayout = QtGui.QVBoxLayout(_main_groupbox)
+        _main_groupbox_vlayout = QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.beam_focusing_combo)
         _main_groupbox_vlayout.addStretch()
         _main_groupbox_vlayout.setSpacing(2)
         _main_groupbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_main_groupbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setSpacing(0)
@@ -122,7 +122,6 @@ class Qt4_BeamFocusingBrick(BlissWidget):
             self.beam_focusing_hwobj.set_focus_mode(focus_mode_name)
 
     def focus_mode_changed(self, new_focus_mode, beam_size):
-        
         self.active_focus_mode = new_focus_mode
         self.beam_focusing_combo.blockSignals(True)
         if self.active_focus_mode is None:

@@ -22,20 +22,12 @@ import abc
 import copy
 import logging
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import QWidget
-else:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import QWidget
+from QtImport import *
 
 import Qt4_queue_item
 import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
-
-#from BlissFramework.Utils import widget_colors
 
 
 class CreateTaskBase(QWidget):

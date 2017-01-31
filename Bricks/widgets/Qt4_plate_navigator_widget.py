@@ -17,15 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5.QtCore import Qt, QRectF
-    from PyQt5.QtGui import *
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4.QtCore import Qt, QRectF
-    from PyQt4.QtGui import *
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from Qt4_sample_changer_helper import SampleChanger
