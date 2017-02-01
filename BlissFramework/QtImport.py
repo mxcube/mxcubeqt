@@ -165,6 +165,7 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
     #   !! this means the classes below will not exist !!
     # but code is guaranteed to be compatible
     try:
+        """
         import sip
         api2_classes = [
             'QData','QDateTime','QString','QTextStream',
@@ -175,6 +176,7 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
                 sip.setapi(cl,2)
             except:
                 pass
+        """
 
         from PyQt4.QtCore import *
         from PyQt4.QtGui import *

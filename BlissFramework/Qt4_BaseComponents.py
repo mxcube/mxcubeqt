@@ -25,19 +25,13 @@ import time
 import operator
 import weakref
 
-try:
-   from PyQt5.QtCore import *
-   from PyQt5.QtGui import QPainter, QPen, QCursor
-   from PyQt5.QtWidgets import *
-except:
-   from PyQt4.QtCore import *
-   from PyQt4.QtGui import *
+from QtImport import *
 
+import BlissFramework
 from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
-import BlissFramework
 
 try:
     from louie import dispatcher

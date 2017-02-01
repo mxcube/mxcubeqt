@@ -23,20 +23,7 @@ import types
 import weakref
 import logging
 
-
-try:
-   from PyQt5 import QtCore
-   from PyQt5.QtGui import QPalette
-   from PyQt5.QtWidgets import *
-   StringList = list
-except:
-   from PyQt4 import QtCore
-   from PyQt4.QtGui import *
-
-   if sys.version_info > (3, 0):
-       StringList = list
-   else:
-       StringList = QtCore.QStringList
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import PropertyBag
@@ -48,7 +35,7 @@ class Qt4_ConfigurationTable(QTableWidget):
     Descript. :
     """
 
-    propertyChangedSignal = QtCore.pyqtSignal(str, 'PyQt_PyObject', 'PyQt_PyObject')
+    propertyChangedSignal = pyqtSignal(str, 'PyQt_PyObject', 'PyQt_PyObject')
 
     def __init__(self, parent):
         """
@@ -123,13 +110,13 @@ class Qt4_ConfigurationTable(QTableWidget):
 
                 self.setRowCount(i + 1)
                 temp_table_item = QTableWidgetItem(prop_name)
-                temp_table_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                temp_table_item.setFlags(Qt.ItemIsEnabled)
                 self.blockSignals(True) 
                 self.setItem(i, 0, temp_table_item)
                 self.setWidgetFromProperty(i, prop)
 
                 temp_table_item = QTableWidgetItem(prop.comment)
-                temp_table_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                temp_table_item.setFlags(Qt.ItemIsEnabled)
                 self.setItem(i, 3, temp_table_item)
                 
                 self.blockSignals(False)
@@ -155,14 +142,15 @@ class Qt4_ConfigurationTable(QTableWidget):
         Descript. :
         """
         if prop.getType() == 'boolean':
-            new_property_item = QTableWidgetItem(QtCore.QString(""))
+            new_property_item = QTableWidgetItem("")
             self.setItem(row, 1, new_property_item)
             if prop.getUserValue():
-                self.item(row, 1).setCheckState(QtCore.Qt.Checked)
+                self.item(row, 1).setCheckState(Qt.Checked)
             else:
-                self.item(row, 1).setCheckState(QtCore.Qt.Unchecked)
+                self.item(row, 1).setCheckState(Qt.Unchecked)
         elif prop.getType() == 'combo':
-            choicesList = StringList()
+            #choicesList = StringList()
+            choicesList = []
             choices = prop.getChoices()
             for choice in choices:
                 choicesList.append(choice)
@@ -469,7 +457,7 @@ class ColorTableItem(QWidget):
                 try:
                     self.qtcolor = QColor(color)
                 except:
-                    self.qtcolor = QtColor(QtCore.Qt.green)
+                    self.qtcolor = QtColor(Qt.green)
                     self.color = self.qtcolor.rgb()
                 else:
                     self.color = self.qtcolor.rgb()

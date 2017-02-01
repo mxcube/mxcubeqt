@@ -26,15 +26,9 @@ import weakref
 import logging
 import subprocess
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5 import QtCore
-    from PyQt5.QtGui import QKeySequence, QCursor
-    from PyQt5.QtWidgets import *
-else:
-    from PyQt4 import QtCore
-    from PyQt4.QtGui import *
+from QtImport import *
 
+import BlissFramework
 from BlissFramework import Qt4_Configuration
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_PropertyEditor
@@ -47,9 +41,6 @@ try:
     from HardwareRepository import HardwareRepository
 except ImportError:
     logging.getLogger().warning("no Hardware Repository client module could be found")
-
-if not hasattr(QtCore, 'QString'):
-    QtCore.QString = str
 
 
 class HorizontalSpacer(QWidget):
@@ -79,7 +70,7 @@ class CustomListWidget(QListWidget):
         """__init__ method"""
 
         QListWidget.__init__(self, *args)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
 
     def addToolTip(self, item, text):
@@ -91,7 +82,7 @@ class CustomListWidget(QListWidget):
 class GUITreeWidget(QTreeWidget):
     """Gui config tree"""
 
-    dragDropSignal = QtCore.pyqtSignal()
+    dragDropSignal = pyqtSignal()
 
     def __init__(self, *args):
         """__init__ method"""
@@ -133,7 +124,7 @@ class GUITreeWidget(QTreeWidget):
 class ToolboxWidget(QWidget):
     """Toolbox windget"""
 
-    addBrickSignal = QtCore.pyqtSignal(str)
+    addBrickSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """Init"""
@@ -311,7 +302,7 @@ class ToolboxWidget(QWidget):
 
             for brick_name, directory_name, description in bricks_list:
                 brick_list_widget_item = QListWidgetItem(\
-                     QtCore.QString(self.get_brick_text_label(brick_name)),
+                     QString(self.get_brick_text_label(brick_name)),
                      bricks_listwidget)
                 bricks_listwidget.addToolTip(brick_list_widget_item,
                                              description)
@@ -413,16 +404,16 @@ class ToolButton(QToolButton):
 class GUIEditorWindow(QWidget):
     """Gui editor window"""
 
-    editPropertiesSignal = QtCore.pyqtSignal(object)
-    newItemSignal = QtCore.pyqtSignal(object, 'PyQt_PyObject')
-    drawPreviewSignal = QtCore.pyqtSignal('PyQt_PyObject', int, list, 'PyQt_PyObject')
-    updatePreviewSignal = QtCore.pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject')
-    addWidgetSignal = QtCore.pyqtSignal('PyQt_PyObject', 'PyQt_PyObject')
-    removeWidgetSignal = QtCore.pyqtSignal(object,object)
-    moveWidgetSignal = QtCore.pyqtSignal()
-    showProperyEditorWindowSignal = QtCore.pyqtSignal()
-    hidePropertyEditorWindowSignal = QtCore.pyqtSignal()
-    showPreviewSignal = QtCore.pyqtSignal()
+    editPropertiesSignal = pyqtSignal(object)
+    newItemSignal = pyqtSignal(object, 'PyQt_PyObject')
+    drawPreviewSignal = pyqtSignal('PyQt_PyObject', int, list, 'PyQt_PyObject')
+    updatePreviewSignal = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject')
+    addWidgetSignal = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject')
+    removeWidgetSignal = pyqtSignal(object,object)
+    moveWidgetSignal = pyqtSignal()
+    showProperyEditorWindowSignal = pyqtSignal()
+    hidePropertyEditorWindowSignal = pyqtSignal()
+    showPreviewSignal = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         """init"""
@@ -476,7 +467,7 @@ class GUIEditorWindow(QWidget):
 
         self.tree_widget = GUITreeWidget(self)
         self.root_element = QTreeWidgetItem(self.tree_widget)
-        self.root_element.setText(0, QtCore.QString("GUI tree"))
+        self.root_element.setText(0, "GUI tree")
         self.root_element.setExpanded(True)
 
         self.connection_editor_window = Qt4_ConnectionEditor.\
@@ -623,8 +614,8 @@ class GUIEditorWindow(QWidget):
         """Appends an item to the tree"""
 
         new_treewidget_item = QTreeWidgetItem(parent_item)
-        new_treewidget_item.setText(0, QtCore.QString(str(column1_text)))
-        new_treewidget_item.setText(1, QtCore.QString(str(column2_text)))
+        new_treewidget_item.setText(0, QString(str(column1_text)))
+        new_treewidget_item.setText(1, QString(str(column2_text)))
         new_treewidget_item.setExpanded(True)
         self.tree_widget.setDragEnabled(True)
         self.tree_widget.setAcceptDrops(True)
@@ -696,8 +687,8 @@ class GUIEditorWindow(QWidget):
     def prepare_window_preview(self, item_name, item_cfg=None, selected_item=""):
         """Prepares window"""
 
-        item_list = self.tree_widget.findItems(QtCore.QString(item_name),
-                                               QtCore.Qt.MatchRecursive,
+        item_list = self.tree_widget.findItems(QString(item_name),
+                                               Qt.MatchRecursive,
                                                0)
         item = item_list[0]
         item_type = str(item.text(1))
@@ -796,7 +787,7 @@ class GUIEditorWindow(QWidget):
 
         try:
             QApplication.setOverrideCursor(\
-                QCursor(QtCore.Qt.WaitCursor))
+                QCursor(Qt.WaitCursor))
 
             if item_type == "window":
                 new_item = self.configuration.add_window()
@@ -948,8 +939,8 @@ class GUIEditorWindow(QWidget):
            Refreshes property table
         """
 
-        item = self.tree_widget.findItems(QtCore.QString(item_name),
-                                          QtCore.Qt.MatchRecursive, 0)
+        item = self.tree_widget.findItems(QString(item_name),
+                                          Qt.MatchRecursive, 0)
         if item is not None:
             self.tree_widget.setCurrentItem(item[0])
             self.tree_widget.scrollToItem(item[0],
@@ -962,13 +953,13 @@ class GUIEditorWindow(QWidget):
             item_name = str(item.text(0))
             item_cfg = self.configuration.find_item(item_name)
             if item_cfg:
-                item.setFlags(QtCore.Qt.ItemIsSelectable |
-                              QtCore.Qt.ItemIsEnabled |
-                              QtCore.Qt.ItemIsEditable)
+                item.setFlags(Qt.ItemIsSelectable |
+                              Qt.ItemIsEnabled |
+                              Qt.ItemIsEditable)
                 self.item_rename_started = True
                 self.tree_widget.editItem(item)
-                item.setFlags(QtCore.Qt.ItemIsSelectable |
-                              QtCore.Qt.ItemIsEnabled)
+                item.setFlags(Qt.ItemIsSelectable |
+                              Qt.ItemIsEnabled)
 
     def item_selected(self):
         """Item selected"""
@@ -1070,8 +1061,8 @@ class GUIEditorWindow(QWidget):
 
                 if new_parent is not None:
                     new_parent_item_list = self.tree_widget.findItems(\
-                         QtCore.QString(new_parent),
-                         QtCore.Qt.MatchRecursive, 0)
+                         QString(new_parent),
+                         Qt.MatchRecursive, 0)
                     new_parent_item = new_parent_item_list[0]
 
                     item_index = old_parent_item.indexOfChild(item)
@@ -1086,8 +1077,8 @@ class GUIEditorWindow(QWidget):
 
                 if new_parent is not None:
                     new_parent_item_list = self.tree_widget.findItems(\
-                         QtCore.QString(new_parent),
-                         QtCore.Qt.MatchRecursive, 0)
+                         QString(new_parent),
+                         Qt.MatchRecursive, 0)
                     new_parent_item = new_parent_item_list[0]
 
                     item_index = old_parent_item.indexOfChild(item)
@@ -1119,7 +1110,7 @@ class GUIEditorWindow(QWidget):
 class GUIPreviewWindow(QWidget):
     """Main Gui preview"""
 
-    previewItemClickedSignal = QtCore.pyqtSignal()
+    previewItemClickedSignal = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         """init"""
@@ -1215,7 +1206,7 @@ class GUIBuilder(QMainWindow):
         self.log_window.setWindowTitle("Log window")
         sw = QApplication.desktop().screen().width()
         sh = QApplication.desktop().screen().height()
-        self.log_window.resize(QtCore.QSize(sw * 0.8, sh * 0.2))
+        self.log_window.resize(QSize(sw * 0.8, sh * 0.2))
         self.property_editor_window = Qt4_PropertyEditorWindow(None)
         self.gui_preview_window = GUIPreviewWindow(None)
         self.configuration = self.gui_editor_window.configuration
@@ -1378,7 +1369,7 @@ class GUIBuilder(QMainWindow):
         """Saves gui file"""
 
         QApplication.setOverrideCursor(\
-            QCursor(QtCore.Qt.WaitCursor))
+            QCursor(Qt.WaitCursor))
 
         if self.filename is not None:
             if os.path.exists(self.filename):

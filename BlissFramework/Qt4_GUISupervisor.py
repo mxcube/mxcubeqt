@@ -393,9 +393,9 @@ class GUISupervisor(QWidget):
                    "Repository server.\nMake sure the Hardware " + \
                    "Repository Server is running on host:\n%s." % \
                    str(self.hardware_repository.serverAddress).split(':')[0]
-                if QMessageBox.warning(None,
+                if QMessageBox.warning(self,
                        "Cannot connect to Hardware Repository", message,
-                       QMessageBox.Retry, QMessageBox.Cancel,
+                       QMessageBox.Retry | QMessageBox.Cancel | \
                        QMessageBox.NoButton) == \
                    QMessageBox.Cancel:
                     logging.getLogger().warning("Gave up trying to " + \

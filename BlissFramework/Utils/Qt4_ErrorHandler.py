@@ -17,12 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging, sys, traceback
-
-try:
-    from PyQt5.QtWidgets import QApplication
-except:
-    from PyQt4.QtGui import QApplication
+import sys
+import logging
+import traceback
+from QtImport import *
 
 _handler = None
 

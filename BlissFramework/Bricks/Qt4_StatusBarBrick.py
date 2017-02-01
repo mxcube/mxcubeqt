@@ -19,15 +19,16 @@
 
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_spin_box_buttons import SpinBoxButtons
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
 
 class Qt4_StatusBarBrick(BlissWidget):

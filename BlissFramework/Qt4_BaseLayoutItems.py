@@ -17,11 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5 import QtCore
-else:
-    from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework.Utils import PropertyBag
 
@@ -167,10 +163,10 @@ class WindowCfg(ContainerCfg):
         self.properties.addProperty("caption", "string", "")
         self.properties.addProperty("show", "boolean", True)
         for suffix in ['',
-                       '_%d' % QtCore.Qt.Key_F9,
-                       '_%d' % QtCore.Qt.Key_F10,
-                       '_%d' % QtCore.Qt.Key_F11,
-                       '_%d' % QtCore.Qt.Key_F12]:
+                       '_%d' % Qt.Key_F9,
+                       '_%d' % Qt.Key_F10,
+                       '_%d' % Qt.Key_F11,
+                       '_%d' % Qt.Key_F12]:
             self.properties.addProperty("x%s" % suffix, "integer", 0)
             self.properties.addProperty("y%s" % suffix, "integer", 0)
             self.properties.addProperty("w%s" % suffix, "integer", 0)
@@ -309,10 +305,10 @@ class SplitterCfg(ContainerCfg):
 
         self.properties.addProperty("sizes", "string", "[]",
                                     hidden=True)
-        for key in [QtCore.Qt.Key_F9,
-                    QtCore.Qt.Key_F10,
-                    QtCore.Qt.Key_F11,
-                    QtCore.Qt.Key_F12]:
+        for key in [Qt.Key_F9,
+                    Qt.Key_F10,
+                    Qt.Key_F11,
+                    Qt.Key_F12]:
             self.properties.addProperty("sizes_%d" % key,
                                         "string",
                                         "[]",

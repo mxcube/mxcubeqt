@@ -1,10 +1,4 @@
-import BlissFramework
-
-import BlissFramework
-if BlissFramework.get_gui_version() == "QT5":
-    from PyQt5 import QtCore
-else:
-    from PyQt4 import QtCore
+from QtImport import *
 
 class Connectable:
     def __init__(self):
