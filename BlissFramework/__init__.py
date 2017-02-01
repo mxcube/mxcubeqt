@@ -13,7 +13,7 @@ import types
 #
 import logging
 
-global SPLASH_SCREEN
+SPLASH_SCREEN = None
 def set_splash_screen(screen):
     SPLASH_SCREEN = screen
 

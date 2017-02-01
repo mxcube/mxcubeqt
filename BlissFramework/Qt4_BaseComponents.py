@@ -32,6 +32,7 @@ from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
+from BlissFramework import get_splash_screen
 
 try:
     from louie import dispatcher
@@ -1061,6 +1062,10 @@ class BlissWidget(QFrame, Connectable.Connectable):
         """
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)
+
+        screen=get_splash_screen()
+        if screen is not None:
+            screen.set_message("Loading hardware object: %s" % hardwareObjectName)
 
         return HardwareRepository.HardwareRepository().\
                getHardwareObject(hardware_object_name)
