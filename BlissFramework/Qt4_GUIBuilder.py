@@ -82,7 +82,7 @@ class CustomListWidget(QListWidget):
 class GUITreeWidget(QTreeWidget):
     """Gui config tree"""
 
-    dragDropSignal = pyqtSignal()
+    dragDropSignal = pyqtSignal(object, object)
 
     def __init__(self, *args):
         """__init__ method"""
@@ -115,7 +115,7 @@ class GUITreeWidget(QTreeWidget):
 
         self.drag_target_item = self.itemAt(event.pos())
         if self.drag_source_item and self.drag_target_item:
-            self.dragDropSignal.connect(self.drag_source_item,
+            self.dragDropSignal.emit(self.drag_source_item,
                                         self.drag_target_item)
             self.drag_source_item = None
         event.accept()
@@ -302,7 +302,7 @@ class ToolboxWidget(QWidget):
 
             for brick_name, directory_name, description in bricks_list:
                 brick_list_widget_item = QListWidgetItem(\
-                     QString(self.get_brick_text_label(brick_name)),
+                     self.get_brick_text_label(brick_name),
                      bricks_listwidget)
                 bricks_listwidget.addToolTip(brick_list_widget_item,
                                              description)
@@ -395,7 +395,7 @@ class ToolButton(QToolButton):
 
         if tooltip is not None:
             self.setToolTip(tooltip)
-            #QtGui.QToolTip.add(self, tooltip)
+            #QToolTip.add(self, tooltip)
 
         self.setSizePolicy(QSizePolicy.Fixed,
                            QSizePolicy.Fixed)
@@ -405,12 +405,12 @@ class GUIEditorWindow(QWidget):
     """Gui editor window"""
 
     editPropertiesSignal = pyqtSignal(object)
-    newItemSignal = pyqtSignal(object, 'PyQt_PyObject')
-    drawPreviewSignal = pyqtSignal('PyQt_PyObject', int, list, 'PyQt_PyObject')
-    updatePreviewSignal = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject')
-    addWidgetSignal = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject')
+    newItemSignal = pyqtSignal(object, object)
+    drawPreviewSignal = pyqtSignal(object, int, list, object)
+    updatePreviewSignal = pyqtSignal(object, object, object, object)
+    addWidgetSignal = pyqtSignal(object, object)
     removeWidgetSignal = pyqtSignal(object,object)
-    moveWidgetSignal = pyqtSignal()
+    moveWidgetSignal = pyqtSignal(object, object)
     showProperyEditorWindowSignal = pyqtSignal()
     hidePropertyEditorWindowSignal = pyqtSignal()
     showPreviewSignal = pyqtSignal()
@@ -614,8 +614,8 @@ class GUIEditorWindow(QWidget):
         """Appends an item to the tree"""
 
         new_treewidget_item = QTreeWidgetItem(parent_item)
-        new_treewidget_item.setText(0, QString(str(column1_text)))
-        new_treewidget_item.setText(1, QString(str(column2_text)))
+        new_treewidget_item.setText(0, str(column1_text))
+        new_treewidget_item.setText(1, str(column2_text))
         new_treewidget_item.setExpanded(True)
         self.tree_widget.setDragEnabled(True)
         self.tree_widget.setAcceptDrops(True)
@@ -687,7 +687,7 @@ class GUIEditorWindow(QWidget):
     def prepare_window_preview(self, item_name, item_cfg=None, selected_item=""):
         """Prepares window"""
 
-        item_list = self.tree_widget.findItems(QString(item_name),
+        item_list = self.tree_widget.findItems(str(item_name),
                                                Qt.MatchRecursive,
                                                0)
         item = item_list[0]
@@ -939,7 +939,7 @@ class GUIEditorWindow(QWidget):
            Refreshes property table
         """
 
-        item = self.tree_widget.findItems(QString(item_name),
+        item = self.tree_widget.findItems(str(item_name),
                                           Qt.MatchRecursive, 0)
         if item is not None:
             self.tree_widget.setCurrentItem(item[0])
@@ -1061,7 +1061,7 @@ class GUIEditorWindow(QWidget):
 
                 if new_parent is not None:
                     new_parent_item_list = self.tree_widget.findItems(\
-                         QString(new_parent),
+                         str(new_parent),
                          Qt.MatchRecursive, 0)
                     new_parent_item = new_parent_item_list[0]
 
@@ -1077,7 +1077,7 @@ class GUIEditorWindow(QWidget):
 
                 if new_parent is not None:
                     new_parent_item_list = self.tree_widget.findItems(\
-                         QString(new_parent),
+                         str(new_parent),
                          Qt.MatchRecursive, 0)
                     new_parent_item = new_parent_item_list[0]
 

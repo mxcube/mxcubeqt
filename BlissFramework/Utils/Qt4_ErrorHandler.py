@@ -79,8 +79,7 @@ class __Handler:
         Descript. :
         """
         if type == KeyboardInterrupt:
-          #qt.qApp.quit()
-          QApplication.quit()
+          getQApp().quit()
           return
         try: 
             exception = traceback.format_exception(type, value, tb)

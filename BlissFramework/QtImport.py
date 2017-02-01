@@ -105,6 +105,8 @@ elif '--pyside' in sys.argv:
     qt_variant = 'PySide'
 elif '--pyqt4' in sys.argv:
     qt_variant = 'PyQt4'
+elif '--pyqt3' in sys.argv:
+    qt_variant = 'PyQt3'
 
 #
 # PyQt5 
@@ -116,40 +118,17 @@ if (qt_variant == 'PyQt5') or (qt_variant is None and not qt_imported):
         from PyQt5.QtWidgets import *
         from PyQt5.QtPrintSupport import *
         from PyQt5.uic import *
+        try:
+            from PyQt5.QtSvg import *
+        except:
+            print("QtSvg is not imported. It maybe needs to be installed")
 
         getQApp = QCoreApplication.instance
 
         qt_imported = True
         qt_variant = "PyQt5"
         qt_version_no = list(map(int,QT_VERSION_STR.split(".")))
-    except:
-        pass
-#
-# PySide
-#
-if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
-    #
-    # Maybe you want to try PySide
-    #
-    try:
-        from PySide.QtCore import *
-        from PySide.QtGui import *
-        from PySide.QtUiTools import *
-        from PySide import __version_info__
-
-        pyqtSignal = Signal
-        qt_imported = True
-        qt_variant = "PySide"
-        getQApp = QCoreApplication.instance
-        qt_version_no = __version_info__[:3]
-        def loadUi(filename, parent=None):
-            loader = QUiLoader()
-            uifile = QFile(uifilename)
-            uifile.open(QFile.ReadOnly)
-            ui = loader.load(uifile, parent)
-            uifile.close()
-            return ui
-
+        pyqt_version_no = list(map(int,PYQT_VERSION_STR.split(".")))[:3]
     except:
         pass
 
@@ -158,7 +137,7 @@ if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
 #
 if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
     #
-    # Finally try PyQt4 
+    # Maybe it is PyQt4 that you want
     #
 
     # force api 2 (so that the api is common for all pyqt versions)
@@ -181,6 +160,7 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
         from PyQt4.QtCore import *
         from PyQt4.QtGui import *
         from PyQt4.uic import *
+        from PyQt4.QtSvg import *
         
         def getQApp():
             return qApp
@@ -188,6 +168,41 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
         qt_imported = True
         qt_variant = "PyQt4"
         qt_version_no = list(map(int,QT_VERSION_STR.split(".")))
+        pyqt_version_no = list(map(int,PYQT_VERSION_STR.split(".")))[:3]
+    except:
+        pass
+
+#
+# PySide
+#
+if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
+    #
+    # Finally try PySide (not fully tested)
+    #
+    try:
+        from PySide import __version_info__ 
+        pyqt_version_no = __version_info__[:3]
+        from PySide.QtCore import __version_info__
+        qt_version_no = __version_info__[:3]
+
+        from PySide.QtCore import *
+        from PySide.QtGui import *
+        from PySide.QtUiTools import *
+        from PySide.QtSvg import *
+
+        pyqtSignal = Signal
+        pyqtSlot = Slot
+        qt_imported = True
+        qt_variant = "PySide"
+        getQApp = QCoreApplication.instance
+        def loadUi(filename, parent=None):
+            loader = QUiLoader()
+            uifile = QFile(uifilename)
+            uifile.open(QFile.ReadOnly)
+            ui = loader.load(uifile, parent)
+            uifile.close()
+            return ui
+
     except:
         pass
 
@@ -216,12 +231,13 @@ if mpl_imported:
         matplotlib.use("Qt4Agg")
 
 if qt_imported:
-    print("Using PyQt:  %s, version: %s" % (qt_variant, "%d.%d.%d" % tuple(qt_version_no)))
+    print("Using PyQt:  %s" % (qt_variant))
+    print("   qt version: %s / pyqt version: %s" % ("%d.%d.%d" % tuple(qt_version_no), "%d.%d.%d" % tuple(pyqt_version_no)))
 else:
     print("Cannot import PyQt")
 
 if mpl_imported:
-    print("Matplotlib:  %s, version: %s" % (qt_variant, "%d.%d.%d" % tuple(mpl_version_no)))
+    print("Matplotlib version: %s" % "%d.%d.%d" % tuple(mpl_version_no))
 else:
     print("Cannot import matplotlib")
 

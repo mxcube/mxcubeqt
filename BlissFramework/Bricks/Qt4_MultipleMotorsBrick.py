@@ -64,19 +64,19 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_group_box = QtGui.QGroupBox(self)
-        self.enable_motors_buttons = QtGui.QPushButton('Enable', self.main_group_box)
-        self.disable_motors_buttons = QtGui.QPushButton('Disable', self.main_group_box)
+        self.main_group_box = QGroupBox(self)
+        self.enable_motors_buttons = QPushButton('Enable', self.main_group_box)
+        self.disable_motors_buttons = QPushButton('Disable', self.main_group_box)
 
         # Layout -------------------------------------------------------------- 
         if self['alignment'] == 'horizontal':
-            self.main_groupbox_hlayout = QtGui.QHBoxLayout(self.main_group_box)
+            self.main_groupbox_hlayout = QHBoxLayout(self.main_group_box)
         else:
-            self.main_groupbox_hlayout = QtGui.QVBoxLayout(self.main_group_box)
+            self.main_groupbox_hlayout = QVBoxLayout(self.main_group_box)
         self.main_groupbox_hlayout.setSpacing(2)
         self.main_groupbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        self.main_hlayout = QtGui.QHBoxLayout(self)
+        self.main_hlayout = QHBoxLayout(self)
         self.main_hlayout.addWidget(self.main_group_box)
         self.main_hlayout.setSpacing(2)
         self.main_hlayout.setContentsMargins(2, 2, 2, 2)
@@ -133,7 +133,7 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         elif property_name == 'predefinedPositions':
             self.predefined_positions_list = new_value.split()
             for predefined_position in self.predefined_positions_list:
-                temp_position_button = QtGui.QPushButton(predefined_position, self.main_group_box)
+                temp_position_button = QPushButton(predefined_position, self.main_group_box)
                 self.main_groupbox_hlayout.addWidget(temp_position_button)
                 temp_position_button.clicked.connect(lambda: \
                      self.predefined_position_clicked(predefined_position))

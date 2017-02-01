@@ -45,10 +45,10 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.addProperty('icons', 'string', '')
         self.addProperty('out_delta', 'string', '')
 
-        self.light_off_button=QtGui.QPushButton("",self.extra_button_box)
+        self.light_off_button=QPushButton("",self.extra_button_box)
         self.light_off_button.setIcon(Qt4_Icons.load_icon('BulbDelete'))
 
-        self.light_on_button=QtGui.QPushButton("",self.extra_button_box)
+        self.light_on_button=QPushButton("",self.extra_button_box)
         self.light_on_button.setIcon(Qt4_Icons.load_icon('BulbCheck'))
 
         self.light_on_button.clicked.connect(self.lightButtonOffClicked)
@@ -64,8 +64,8 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.light_off_button.setToolTip("Switches off the light and sets the intensity to zero")
         self.light_on_button.setToolTip("Switches on the light and sets the intensity back to the previous setting")        
 
-        self.light_off_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
-        self.light_on_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        self.light_off_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.light_on_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
 
 
     ### Light off pressed: switch off lamp and set out the wago

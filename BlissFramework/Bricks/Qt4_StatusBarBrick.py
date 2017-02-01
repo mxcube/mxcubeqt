@@ -32,10 +32,10 @@ __category__ = "General"
 
 
 class Qt4_StatusBarBrick(BlissWidget):
-    STATES = { "Unknown": QtGui.QWidget.gray,\
+    STATES = { "Unknown": QWidget.gray,\
         "Disconnected": Qt4_widget_colors.LIGHT_RED,\
-        "Connected": QtGui.QColor(255,165,0),\
-        "Busy": QtGui.QWidget.yellow,\
+        "Connected": QColor(255,165,0),\
+        "Busy": QWidget.yellow,\
         "Ready": Qt4_widget_colors.LIGHT_GREEN }
 
     def __init__(self, *args):

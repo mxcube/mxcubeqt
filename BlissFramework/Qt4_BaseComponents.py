@@ -162,7 +162,7 @@ class SignalSlotFilter:
             s(*args)
 
 
-class BlissWidget(QFrame, Connectable.Connectable):
+class BlissWidget(Connectable.Connectable, QFrame):
     (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
      INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
     (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
@@ -782,7 +782,7 @@ class BlissWidget(QFrame, Connectable.Connectable):
         self.defineSlot('enable_widget', ())
         self.defineSlot('disable_widget', ())
 
-        #self.run_mode = QtGui.QPushButton("Run mode", self)
+        #self.run_mode = QPushButton("Run mode", self)
 
     def __run(self):
         """
@@ -859,8 +859,8 @@ class BlissWidget(QFrame, Connectable.Connectable):
         if instanceFilter:
             self.connectSignalSlotFilter(_sender,
                                          pysignal and \
-                                         QtCore.SIGNAL(signal) or \
-                                         QtCore.SIGNAL(signal),
+                                         SIGNAL(signal) or \
+                                         SIGNAL(signal),
                                          slot, shouldCache)
         else:
             #Porting to Qt5
@@ -1235,11 +1235,11 @@ def ComboBoxActivated(self, index, lines):
                 else:
                     self.insertItem(line)
                     self.setCurrentItem(i)
-                    self.activated[QString].emit(line)
+                    self.activated[str].emit(line)
                     self.activated[int].emit(i)
                 i += 1
     self.setCurrentItem(index)
-    self.activated[QString].emit(self.currentText())
+    self.activated[str].emit(self.currentText())
     self.activated[int].emit(index)
 
 def SpinBoxEditorTextChanged(self, text):

@@ -23,7 +23,6 @@ from QtImport import *
 
 from BlissFramework import Qt4_Icons
 
-
 class Qt4_ConnectionEditor(QDialog):
     """Connection editor"""
 
