@@ -35,7 +35,7 @@ class Qt4_ConfigurationTable(QTableWidget):
     Descript. :
     """
 
-    propertyChangedSignal = pyqtSignal(str, 'PyQt_PyObject', 'PyQt_PyObject')
+    propertyChangedSignal = pyqtSignal(str, object, object)
 
     def __init__(self, parent):
         """
@@ -149,7 +149,6 @@ class Qt4_ConfigurationTable(QTableWidget):
             else:
                 self.item(row, 1).setCheckState(Qt.Unchecked)
         elif prop.getType() == 'combo':
-            #choicesList = StringList()
             choicesList = []
             choices = prop.getChoices()
             for choice in choices:
@@ -397,7 +396,7 @@ class FileTableItem(QWidget):
         """
         Descript. :
         """
-        new_filename = FileDialog.getOpenFileName(
+        new_filename = QFileDialog.getOpenFileName(
                              self, os.path.dirname(self.filename) or os.getcwd(), 
                              self.file_filter, '', 'Select a file')
         

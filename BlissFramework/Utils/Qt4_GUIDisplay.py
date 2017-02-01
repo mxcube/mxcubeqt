@@ -530,7 +530,7 @@ class WindowDisplayWidget(QScrollArea):
         """Tab widget"""
 
         notebookPageChangedSignal = pyqtSignal(str)
-        tabChangedSignal = pyqtSignal(int, 'PyQt_PyObject')
+        tabChangedSignal = pyqtSignal(int, object)
         
 
         def __init__(self, *args, **kwargs):

@@ -178,7 +178,7 @@ class WindowCfg(ContainerCfg):
 
         self.signals.update({"isShown": (),
                              "isHidden": (),
-                             "enableExpertMode": (),
+                             "enableExpertModeSignal": (),
                              "quit":()})
         self.slots.update({"show": (),
                            "hide": (),

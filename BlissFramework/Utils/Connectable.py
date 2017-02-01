@@ -1,6 +1,6 @@
-from QtImport import *
 
-class Connectable:
+class Connectable(object):
+
     def __init__(self):
         self.__signal = {}
         self.__slot = {}

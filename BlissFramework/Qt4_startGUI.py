@@ -114,6 +114,10 @@ def run(gui_config_file=None):
                            "cde, plastique, windowsxp, or macintosh)",
                       dest='appStyle', default=None)
 
+    parser.add_option('', '--pyqt4', action='store_true', default=None)
+    parser.add_option('', '--pyqt5', action='store_true', default=None)
+    parser.add_option('', '--pyside', action='store_true', default=None)
+
     (opts, args) = parser.parse_args()
 
     if len(args) >= 1:
@@ -256,9 +260,13 @@ def run(gui_config_file=None):
     logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
     logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
-    logging.getLogger().info("System info: Python %s - Qt %s - PyQt %s on %s" % \
-       (platform.python_version(), QT_VERSION_STR, 
-        PYQT_VERSION_STR, platform.system()))
+    logging.getLogger().info("System info: Python %s on %s" %(platform.python_version(), platform.system()))
+    logging.getLogger().info("    - Qt %s - %s %s" % \
+                 ("%d.%d.%d" % tuple(qt_version_no), qt_variant, "%d.%d.%d" % tuple(pyqt_version_no)) )
+    if mpl_imported:
+        logging.getLogger().info("    - Matplotlib %s - " % "%d.%d.%d" % tuple(mpl_version_no))
+    else:
+        logging.getLogger().info("    - Matplotlib not available")
     logging.getLogger().info("---------------------------------------------------------------------------------")
 
     QApplication.setDesktopSettingsAware(False)

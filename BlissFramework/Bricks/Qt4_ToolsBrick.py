@@ -62,7 +62,7 @@ class Qt4_ToolsBrick(BlissWidget):
         # Other ---------------------------------------------------------------
 
     def run(self):
-        self.tools_menu = QtGui.QMenu("Tools", self)
+        self.tools_menu = QMenu("Tools", self)
         self.tools_menu.addSeparator()
         BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
         self.init_tools()
