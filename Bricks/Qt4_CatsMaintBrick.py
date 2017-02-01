@@ -47,10 +47,10 @@ class Qt4_CatsMaintBrick(BlissWidget):
 
         self.expert_mode = False
       
-        self.widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.widget = loadUi(os.path.join(os.path.dirname(__file__),
              'widgets/ui_files/Qt4_catsmaint_widget.ui'))
 
-        QtGui.QHBoxLayout(self)
+        QHBoxLayout(self)
         self.layout().addWidget(self.widget)
         
         self.widget.btPowerOn.clicked.connect(self.power_on)        
@@ -103,8 +103,6 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.update_buttons()
 
     def propertyChanged(self, property, oldValue, newValue):
-
-        logging.getLogger("user_level_log").info("Property Changed: " + str(property) + " = " + str(newValue))
 
         if property == 'mnemonic':
             if self.device is not None:
@@ -300,229 +298,216 @@ class Qt4_CatsMaintBrick(BlissWidget):
             self.update_tool_state(self.tool_state)
 
     def regulation_set_on(self):
-        logging.getLogger("user_level_log").info("CATS: Regulation On")
         try:
             if self.device is not None:
                 self.device._doEnableRegulation()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def regulation_set_off(self):
-        logging.getLogger("user_level_log").info("CATS: Regulation Off")
         try:
             if self.device is not None:
                 self.device._doDisableRegulation()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def power_on(self):
-        logging.getLogger("user_level_log").info("CATS: Power On")
         try:
             if self.device is not None:
                 self.device._doPowerState(True)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def power_off(self):
-        logging.getLogger("user_level_log").info("CATS: Power Off")
         try:
             if self.device is not None:
                 self.device._doPowerState(False)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def lid1_open(self):
-        logging.getLogger("user_level_log").info("CATS: Open Lid 1")
         try:
             if self.device is not None:
                 self.device._doLid1State(True)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def lid1_close(self):
-        logging.getLogger("user_level_log").info("CATS: Close  Lid 1")
         try:
             if self.device is not None:
                 self.device._doLid1State(False)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def lid2_open(self):
-        logging.getLogger("user_level_log").info("CATS: Open Lid 2")
         try:
             if self.device is not None:
                 self.device._doLid2State(True)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def lid2_close(self):
-        logging.getLogger("user_level_log").info("CATS: Close  Lid 2")
         try:
             if self.device is not None:
                 self.device._doLid2State(False)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def lid3_open(self):
-        logging.getLogger("user_level_log").info("CATS: Open Lid 3")
         try:
             if self.device is not None:
                 self.device._doLid3State(True)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def lid3_close(self):
-        logging.getLogger("user_level_log").info("CATS: Close  Lid 3")
         try:
             if self.device is not None:
                 self.device._doLid3State(False)
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def tool_open(self):
         try:
             if self.device is not None:
                 self.device._doToolOpen()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def tool_close(self):
         try:
             if self.device is not None:
                 self.device._doToolClose()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def tool_calibrate(self):
         try:
             if self.device is not None:
                 self.device._doCalibration()   # adds a parameter 2 (for tool) in device
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def magnet_on(self):
         try:
             if self.device is not None:
                 self.device._doMagnetOn()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def magnet_off(self):
         try:
             if self.device is not None:
                 self.device._doMagnetOff()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def home(self):
         try:
             if self.device is not None:
                 self.device._doHome()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def resetError(self):
-        logging.getLogger("user_level_log").info("CATS: Reset")
         try:
             if self.device is not None:
                 self.device._doReset()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def home(self):
         try:
             if self.device is not None:
                 self.device._doHome()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def dry(self):
         try:
             if self.device is not None:
                 self.device._doDryGripper()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def soak(self):
         try:
             if self.device is not None:
                 self.device._doSoak()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def back_traj(self):
-        logging.getLogger("user_level_log").info("CATS: Transfer sample back to dewar.")
         try:
             if self.device is not None:
                 #self.device._doBack()
                 self.device.backTraj()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def safe_traj(self):
-        logging.getLogger("user_level_log").info("CATS: Safely move robot arm to home position.")
         try:
             if self.device is not None:
                 #self.device._doSafe()
                 self.device.safeTraj()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def abort(self):
         try:
             if self.device is not None:
                 self.device._doAbort()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def panic(self):
         try:
             if self.device is not None:
                 self.device._doPanic()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def restart(self):
         try:
             if self.device is not None:
                 self.device._doRestart()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def reset_motion(self):
         try:
             if self.device is not None:
                 self.device._doResetMotion()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def reset_put_get(self):
         try:
             if self.device is not None:
                 self.device._doResetPutGet()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def clear(self):
         try:
             if self.device is not None:
                 self.device._doClear()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def clear_memory(self):
         try:
             if self.device is not None:
                 self.device._doResetMemory()
         except:
-            QtGui.QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def command_prompt(self, index):
         self.command_dialog = CatsCommandDialog(self)
         self.command_dialog.set_cats_device(self.device)
         self.command_dialog.show()
 
-class CatsCommandDialog(QtGui.QDialog):
+class CatsCommandDialog(QDialog):
 
     cmds = ["put(mount)", "get(un-mount)", "getput",
             "get_brcd", "getput_brcd", "barcode", 
@@ -544,17 +529,17 @@ class CatsCommandDialog(QtGui.QDialog):
     def __init__(self, *args):
 
 
-        QtGui.QDialog.__init__(self,*args)
-        layout = QtGui.QHBoxLayout()
+        QDialog.__init__(self,*args)
+        layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
 
         self.setLayout(layout)
-        self.widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.widget = loadUi(os.path.join(os.path.dirname(__file__),
              'widgets/ui_files/Qt4_catscommand_dialog.ui'))
 
         layout.addWidget(self.widget)
 
-        self.btSend = self.widget.buttonBox.addButton("Send", QtGui.QDialogButtonBox.ApplyRole)
+        self.btSend = self.widget.buttonBox.addButton("Send", QDialogButtonBox.ApplyRole)
         self.btSend.clicked.connect(self.send_command)
 
         self.widget.cbCommand.clear()
@@ -564,7 +549,7 @@ class CatsCommandDialog(QtGui.QDialog):
 
     def show(self):
         self.widget.cbCommand.setCurrentIndex(2)
-        QtGui.QDialog.show(self)
+        QDialog.show(self)
 
     def set_cats_device(self,device):
         self.device = device 

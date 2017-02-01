@@ -77,7 +77,7 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.beam_focusing_combo,
                                            Qt4_widget_colors.LIGHT_GREEN,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -111,9 +111,9 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         txt = self.beam_focusing_hwobj.get_focus_mode_message(focus_mode_name)
 
         if len(txt) > 0:
-            confDialog = QtGui.QMessageBox.warning(None, "Focus mode", txt,
-                  QtGui.QMessageBox.Ok, QtGui.QMessageBox.Cancel)
-            if confDialog == QtGui.QMessageBox.Ok:
+            confDialog = QMessageBox.warning(None, "Focus mode", txt,
+                  QMessageBox.Ok, QMessageBox.Cancel)
+            if confDialog == QMessageBox.Ok:
                 self.beam_focusing_hwobj.set_focus_mode(focus_mode_name)
             else:
                 self.beam_focusing_combo.setCurrentIndex(\

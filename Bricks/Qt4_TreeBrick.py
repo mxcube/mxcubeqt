@@ -59,19 +59,19 @@ class Qt4_TreeBrick(BlissWidget):
     hide_xrf_spectrum_tab = pyqtSignal(bool)
     hide_workflow_tab = pyqtSignal(bool)
     hide_advanced_tab = pyqtSignal(bool)
-    populate_dc_parameter_widget = pyqtSignal('PyQt_PyObject')
-    populate_dc_group_widget = pyqtSignal('PyQt_PyObject')
-    populate_char_parameter_widget = pyqtSignal('PyQt_PyObject')
-    populate_sample_details = pyqtSignal('PyQt_PyObject')
-    populate_energy_scan_widget = pyqtSignal('PyQt_PyObject')
-    populate_xrf_spectrum_widget = pyqtSignal('PyQt_PyObject')
-    populate_workflow_tab = pyqtSignal('PyQt_PyObject')
-    populate_advanced_widget = pyqtSignal('PyQt_PyObject')
+    populate_dc_parameter_widget = pyqtSignal(object)
+    populate_dc_group_widget = pyqtSignal(object)
+    populate_char_parameter_widget = pyqtSignal(object)
+    populate_sample_details = pyqtSignal(object)
+    populate_energy_scan_widget = pyqtSignal(object)
+    populate_xrf_spectrum_widget = pyqtSignal(object)
+    populate_workflow_tab = pyqtSignal(object)
+    populate_advanced_widget = pyqtSignal(object)
  
-    selection_changed = pyqtSignal('PyQt_PyObject')
+    selection_changed = pyqtSignal(object)
     set_directory = pyqtSignal(str)
     set_prefix = pyqtSignal(str)
-    set_sample = pyqtSignal('PyQt_PyObject')
+    set_sample = pyqtSignal(object)
     get_tree_brick = pyqtSignal(BlissWidget)
 
     def __init__(self, *args):
@@ -214,7 +214,8 @@ class Qt4_TreeBrick(BlissWidget):
              "Redo last action", self.queue_redo_clicked)
         self.queue_redo_action.setEnabled(False)
 
-        BlissWidget._menuBar.insert_menu(self.tools_menu, 1) 
+        if BlissWidget._menuBar is not None:
+            BlissWidget._menuBar.insert_menu(self.tools_menu, 1) 
 
         self.hide_dc_parameters_tab.emit(True)
         self.hide_dcg_tab.emit(True)
@@ -515,6 +516,7 @@ class Qt4_TreeBrick(BlissWidget):
         sample_changer = None
 
         self.sample_changer_widget.sample_combo.clear()
+        logging.getLogger("GUI").debug("LIMS samples: %s" % self.lims_samples)
         for sample in self.lims_samples:
             if sample.containerSampleChangerLocation:
                 self.filtered_lims_samples.append(sample)

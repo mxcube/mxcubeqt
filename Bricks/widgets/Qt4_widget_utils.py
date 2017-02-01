@@ -48,7 +48,13 @@ class DataModelInputBinder(object):
             origin_value = new_value
             if type_fn == float and validator:
                 pattern = "%." + str(validator.decimals()) + 'f'
-                new_value = QString(pattern % float(new_value))
+                new_value = pattern % float(new_value)
+ 
+            # fix validation if PyQt4 and sipapi 1 is used
+            if type(new_value) is str:
+                 if "QString" in globals(): 
+                     new_value = QString(new_value)
+
             if self.__validated(field_name,
                                 validator,
                                 self.bindings[field_name][0], 
