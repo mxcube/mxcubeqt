@@ -138,7 +138,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.magnification_action = self.popup_menu.addAction(\
              Qt4_Icons.load_icon("Magnify2"),
              "Magnification tool", self.magnification_mode_toggled)
-        self.magnification_action.setCheckable(True)
+        #self.magnification_action.setCheckable(True)
 
         #self.display_histogram_action = self.popup_menu.addAction(\
         #     "Display histogram", self.display_histogram_toggled)
@@ -247,8 +247,7 @@ class Qt4_CameraBrick(BlissWidget):
             self.display_beam_size_action.isChecked())
 
     def magnification_mode_toggled(self):
-        self.graphics_manager_hwobj.set_magnification_mode(\
-            self.magnification_action.isChecked())
+        self.graphics_manager_hwobj.set_magnification_mode(True)
 
     def set_control_mode(self, have_control):
         if have_control:
