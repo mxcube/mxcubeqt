@@ -94,7 +94,7 @@ class VialView(QWidget):
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
         self.singleClickSignal.emit(self.vial_index)
-        QtGui.QWidget.mouseReleaseEvent(self,event)
+        QWidget.mouseReleaseEvent(self,event)
 
     def mouseDoubleClickEvent(self, event):
         """Mouse double clicked event"""
@@ -112,7 +112,7 @@ class VialNumberView(QLabel):
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
         self.singleClickSignal.emit(self.vial_index)
-        QtGui.QLabel.mouseReleaseEvent(self,event)
+        QLabel.mouseReleaseEvent(self,event)
 
     def mouseDoubleClickEvent(self, event):
         """Mouse double click event"""
@@ -835,7 +835,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.user_selected_sample = (None, None)
 
         self.contents_widget = QWidget(self)
-        self.status = StatusView(self.contents_widget)
+        self.status = self.build_status_view(self.contents_widget)
         self.switch_to_sample_transfer_button = QPushButton(\
              "Switch to Sample Transfer mode", self.contents_widget)
         self.test_sample_changer_button = QPushButton(\

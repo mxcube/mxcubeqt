@@ -137,16 +137,20 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
         #self.camera_control_action.setEnabled(False)
 
         if self.target_menu == "menuBar":
-            BlissWidget._menuBar.insert_menu(self.tools_menu, 3)
+            if BlissWidget._menuBar is not None:
+                BlissWidget._menuBar.insert_menu(self.tools_menu, 3)
         elif self.target_menu == "toolBar":
-            for action in self.tools_menu.actions():
-                BlissWidget._toolBar.addAction(action)
+            if BlissWidget._toolBar is not None:
+                for action in self.tools_menu.actions():
+                    BlissWidget._toolBar.addAction(action)
         else:
-         
-            BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
-            toolbar_actions = []
-            for action in self.tools_menu.actions():
-                BlissWidget._toolBar.addAction(action)
+            if BlissWidget._menuBar is not None:
+                BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
+ 
+            if BlissWidget._toolBar is not None:
+                toolbar_actions = []
+                for action in self.tools_menu.actions():
+                    BlissWidget._toolBar.addAction(action)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """

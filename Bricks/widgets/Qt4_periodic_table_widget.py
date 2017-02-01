@@ -20,6 +20,7 @@
 import os
 
 from QtImport import *
+
 if qt_variant == "PyQt5":
     from PyMca5.PyMca import QPeriodicTable
 else:
@@ -109,7 +110,7 @@ class PeriodicTableWidget(QWidget):
         self.periodic_table.setElements(elements)
  
 class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
-    elementClicked = pyqtSignal(str)
+    elementClicked = pyqtSignal(object)
     edgeSelectedSignal = pyqtSignal(str, str)
 
     def __init__(self, *args):
@@ -141,7 +142,9 @@ class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
             b.setCurrent(False)
 
     def table_element_changed(self, symbol, energy=None):
-        print symbol, energy
+        if type(symbol) is tuple and len(symbol) > 0:
+            symbol = symbol[0]
+
         if energy is None:
             energy = self.energies_dict[symbol]
         self.setSelection((symbol,))
