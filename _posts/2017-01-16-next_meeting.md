@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ ESRF (Grenoble, France), January, 2017
+# Next MXCuBE meeting @ SOLEIL (Paris, France), June 13 - 15, 2017
