@@ -248,6 +248,9 @@ class DataCollectTree(qt.QWidget):
         item.get_model().set_name(text)
 
     def mount_sample(self):
+        if self.beamline_setup_hwobj.sample_changer_hwobj.getState() != 1:
+            logging.getLogger("user_level_log").error("Cannot mount sample, sample changer is not ready")
+            return
         self.enable_collect(False)
         gevent.spawn(self.mount_sample_task)
 
@@ -303,19 +306,26 @@ class DataCollectTree(qt.QWidget):
             if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 self.plate_manipulator_hwobj._doUnload()
             else:
+                def resetLoadedSample(g=None):
+                    if g:
+                        if not g.successful():
+                            return
+                    items[0].setOn(False)
+                    items[0].set_mounted_style(False)
                 if hasattr(self.beamline_setup_hwobj.sample_changer_hwobj, '__TYPE__')\
                    and (self.beamline_setup_hwobj.sample_changer_hwobj.__TYPE__ == 'CATS'):
                     self.beamline_setup_hwobj.sample_changer_hwobj.unload(wait=True)
+                    resetLoadedSample()
                 else:
                     if 'SC3' in self.beamline_setup_hwobj.sample_changer_hwobj.__class__.__name__:
-                      self.beamline_setup_hwobj.sample_changer_hwobj.\
+                      t = self.beamline_setup_hwobj.sample_changer_hwobj.\
                           unload(22, sample_location = location, wait = False)
                     else:
-                      self.beamline_setup_hwobj.sample_changer_hwobj.\
+                      t = self.beamline_setup_hwobj.sample_changer_hwobj.\
                           unload_sample(22, sample_location = location, wait = False)
+                      
+                    t.link(resetLoadedSample)
 
-            items[0].setOn(False)
-            items[0].set_mounted_style(False)
 
     def sample_list_view_selection(self):
         items = self.get_selected_items()
