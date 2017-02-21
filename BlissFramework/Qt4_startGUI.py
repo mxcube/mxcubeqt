@@ -260,11 +260,12 @@ def run(gui_config_file=None):
     logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
     logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
-    logging.getLogger().info("System info: Python %s on %s" %(platform.python_version(), platform.system()))
+    logging.getLogger().info("System info:")
+    logging.getLogger().info("    - Python %s on %s" %(platform.python_version(), platform.system()))
     logging.getLogger().info("    - Qt %s - %s %s" % \
-                 ("%d.%d.%d" % tuple(qt_version_no), qt_variant, "%d.%d.%d" % tuple(pyqt_version_no)) )
+                  ("%d.%d.%d" % tuple(qt_version_no), qt_variant, "%d.%d.%d" % tuple(pyqt_version_no)) )
     if mpl_imported:
-        logging.getLogger().info("    - Matplotlib %s - " % "%d.%d.%d" % tuple(mpl_version_no))
+        logging.getLogger().info("    - Matplotlib %s" % "%d.%d.%d" % tuple(mpl_version_no))
     else:
         logging.getLogger().info("    - Matplotlib not available")
     logging.getLogger().info("---------------------------------------------------------------------------------")

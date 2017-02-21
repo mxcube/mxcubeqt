@@ -54,12 +54,31 @@ class _CfgItem:
            Add new properties (if any) and remove odd ones (if any)
         """
         for item_property in properties:
-            prop_name = item_property.getName()
-            if prop_name in self.properties.properties:
-                self.properties.getProperty(prop_name).setValue(\
-                     item_property.getUserValue())
-            elif item_property.hidden:
-                self.properties[item_property.getName()] = item_property
+            if hasattr(item_property, "getName"):
+                prop_name = item_property.getName()
+                if prop_name in self.properties.properties:
+                    self.properties.getProperty(prop_name).setValue(\
+                         item_property.getUserValue())
+                elif item_property.hidden:
+                    self.properties[prop_name] = item_property
+            else:
+                if item_property["type"] == "combo":
+                    arg1 = item_property["choices"]
+                else:
+                    arg1 = item_property["value"]
+                arg2 = item_property["defaultValue"]
+                self.properties.addProperty(propertyName=item_property["name"],
+                                            propertyType=item_property["type"],
+                                            arg1=arg1,
+                                            arg2=arg2,
+                                            comment=item_property["comment"],
+                                            hidden=item_property["hidden"])
+ 
+
+                #if prop_name in self.properties.properties:
+                #    self.properties.getProperty(prop_name).setValue(item_property["value"])
+                #if item_property["hidden"]:
+                #    self.properties[prop_name] = item_property
 
     def __getitem__(self, item):
         """
@@ -87,7 +106,6 @@ class _CfgItem:
         Descript. :
         """
         self.name = new_name
-
 
 class ContainerCfg(_CfgItem):
     """
@@ -200,17 +218,25 @@ class TabCfg(ContainerCfg):
         self.properties.addProperty("fontSize", "integer", 0)
         self.signals.update({"notebookPageChangedSignal": "pageName"})
 
+    """
     def setProperties(self, properties):
-        """
-        Descript. :
-        """
         for prop in properties:
-            prop_name = prop.getName()
-            if prop_name in self.properties.properties:
-                self.properties.getProperty(prop_name).\
-                     setValue(prop.getUserValue())
-            elif prop.hidden or prop_name.startswith("closable_"):
-                self.properties[prop_name] = prop
+            if hasattr(prop, "getName"): 
+                prop_name = prop.getName()
+                if prop_name in self.properties.properties:
+                    self.properties.getProperty(prop_name).\
+                         setValue(prop.getUserValue())
+                elif prop.hidden or prop_name.startswith("closable_"):
+                    self.properties[prop_name] = prop
+
+            else:
+                prop_name = prop["name"]
+                if prop_name in self.properties.properties:
+                    self.properties.getProperty(prop_name).\
+                         setValue(prop["value"])
+                elif prop["hidden"] or prop_name.startswith("closable_"):
+                    self.properties[prop_name] = prop
+    """
 
     def __repr__(self):
         """
@@ -256,9 +282,13 @@ class TabCfg(ContainerCfg):
         """
         closable_props = {}
         for prop in self.properties:
-            if prop.name.startswith("closable_"):
-                closable_props[prop.name] = prop.getValue()
- 
+            if hasattr(prop, "name"):
+                if prop.name.startswith("closable_"):
+                    closable_props[prop.name] = prop.getValue()
+            else:
+                if prop["name"].startswith("closable_"):
+                    closable_props[prop["name"]] = prop["value"]
+
         for prop_name in closable_props.keys():
             self.properties.delProperty(prop_name)
 
@@ -369,6 +399,9 @@ class BrickCfg(_CfgItem):
         Descript. :
         """
         _CfgItem.__init__(self, name, brick_type)
+
+        self.name = name
+        self.type = brick_type
 
         self.brick = brick
 

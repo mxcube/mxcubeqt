@@ -21,6 +21,8 @@
 
 import os
 import stat
+import json
+import yaml
 import pickle
 import logging
 import collections
@@ -129,6 +131,8 @@ class GUISupervisor(QWidget):
 
         self.configuration = Qt4_Configuration.Configuration()
         self.gui_config_file = gui_config_file
+        load_from_dict = gui_config_file.endswith(".json") or \
+                         gui_config_file.endswith(".yml")
 
         if self.gui_config_file:
             if hasattr(self, "splash_screen"):
@@ -162,7 +166,10 @@ class GUISupervisor(QWidget):
                         for item in items_list:
                             if "brick" in item:
                                 try:
-                                    props = pickle.loads(item["properties"])
+                                    if load_from_dict:
+                                        props = item["properties"]
+                                    else:
+                                        props = pickle.loads(item["properties"])
                                     #props = pickle.loads(item["properties"].encode('utf8'))
                                 except:
                                     logging.getLogger().exception(\
@@ -172,7 +179,10 @@ class GUISupervisor(QWidget):
                                     item["properties"] = props
                                     try:
                                         for prop in props:
-                                            prop_value = prop.getValue()
+                                            if load_from_dict:
+                                                prop_value = prop["value"]
+                                            else:
+                                                prop_value = prop.getValue()
                                             if type(prop_value) == type('') and \
                                                prop_value.startswith("/"):
                                                 mne_list.append(prop_value)
@@ -192,7 +202,12 @@ class GUISupervisor(QWidget):
                     failed_msg += "Starting in designer mode with clean GUI."
 
                     try:
-                        raw_config = eval(gui_file.read())
+                        if gui_config_file.endswith(".json"):
+                            raw_config = json.load(gui_file) 
+                        elif gui_config_file.endswith(".yml"):
+                            raw_config = yaml.load(gui_file)
+                        else:
+                            raw_config = eval(gui_file.read())
                     except:
                         logging.getLogger().exception(failed_msg)
 
@@ -203,7 +218,7 @@ class GUISupervisor(QWidget):
 
                     try:
                         self.splash_screen.set_message("Building GUI configuration...")
-                        config = Qt4_Configuration.Configuration(raw_config)
+                        config = Qt4_Configuration.Configuration(raw_config, load_from_dict)
                     except:
                         logging.getLogger().exception(failed_msg)
                         QMessageBox.warning(self, "Error", failed_msg,

@@ -101,6 +101,19 @@ class Qt4_CameraBrick(BlissWidget):
              Qt4_Icons.load_icon("measure_area"),
              "Area", self.measure_area_clicked)
 
+        beam_mark_menu = self.popup_menu.addMenu("Beam mark")
+        self.move_beam_mark_manual_action = beam_mark_menu.addAction(\
+             "Set position manually", self.move_beam_mark_manual)
+        self.move_beam_mark_manual_action.setEnabled(False)
+        self.move_beam_mark_auto_action = beam_mark_menu.addAction(\
+             "Set position automaticaly", self.move_beam_mark_auto)
+        self.move_beam_mark_auto_action.setEnabled(False)
+        self.display_beam_size_action = beam_mark_menu.addAction(\
+             "Display size", self.display_beam_size_toggled)
+        self.display_beam_size_action.setCheckable(True)
+        self.define_beam_action = beam_mark_menu.addAction(\
+             "Define size with slits", self.define_beam_size)
+        self.define_beam_action.setEnabled(False)
         self.popup_menu.addSeparator()
 
         temp_action = self.popup_menu.addAction(\
@@ -112,32 +125,18 @@ class Qt4_CameraBrick(BlissWidget):
              self.deselect_all_items_clicked)
         temp_action.setShortcut("Ctrl+D")
         temp_action = self.popup_menu.addAction(\
+             Qt4_Icons.load_icon("Delete"),
              "Clear all items",
              self.clear_all_items_clicked)
         temp_action.setShortcut("Ctrl+X")
-        
         self.popup_menu.addSeparator()
 
-        self.move_beam_mark_manual_action = self.popup_menu.addAction(\
-             "Set beam mark manually", self.move_beam_mark_manual)
-        self.move_beam_mark_manual_action.setEnabled(False)
-        self.move_beam_mark_auto_action = self.popup_menu.addAction(\
-             "Set beam mark automaticaly", self.move_beam_mark_auto)
-        self.move_beam_mark_auto_action.setEnabled(False)
-        self.define_beam_action = self.popup_menu.addAction(\
-             "Define beam size", self.define_beam_size)
-        self.define_beam_action.setEnabled(False)
-
-        self.popup_menu.addSeparator()
         self.display_grid_action = self.popup_menu.addAction(\
              "Display grid", self.display_grid_toggled)
         self.display_grid_action.setCheckable(True)
-        self.display_beam_size_action = self.popup_menu.addAction(\
-             "Display beam size", self.display_beam_size_toggled)
-        self.display_beam_size_action.setCheckable(True)
         self.magnification_action = self.popup_menu.addAction(\
              Qt4_Icons.load_icon("Magnify2"),
-             "Magnification tool", self.magnification_mode_toggled)
+             "Magnification tool", self.start_magnification_tool)
         #self.magnification_action.setCheckable(True)
 
         #self.display_histogram_action = self.popup_menu.addAction(\
@@ -148,11 +147,12 @@ class Qt4_CameraBrick(BlissWidget):
         #self.display_histogram_action.setEnabled(False)
         #self.define_histogram_action.setEnabled(False)
 
-        self.image_scale_menu = self.popup_menu.addMenu("Image scale")
+        self.image_scale_menu = self.popup_menu.addMenu(\
+             Qt4_Icons.load_icon("DocumentMag2"),
+             "Image scale")
         self.image_scale_menu.setEnabled(False) 
-        #self.zoom_window_menu = self.popup_menu.addAction(\
-        #     "Zoom window",
-        #     self.zoom_window_clicked)
+        self.image_scale_menu.triggered.connect(\
+             self.image_scale_triggered)
         self.camera_control_action = self.popup_menu.addAction(\
              "Camera control",
              self.open_camera_control_dialog)
@@ -218,7 +218,7 @@ class Qt4_CameraBrick(BlissWidget):
                 self.main_layout.addWidget(self.graphics_view) 
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
-                self.init_image_zoom_list()
+                self.init_image_scale_list()
                 self.camera_control_dialog.set_camera_hwobj(\
                      self.graphics_manager_hwobj.camera_hwobj)
         elif property_name == 'fixedSize':
@@ -246,7 +246,7 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj.display_beam_size(\
             self.display_beam_size_action.isChecked())
 
-    def magnification_mode_toggled(self):
+    def start_magnification_tool(self):
         self.graphics_manager_hwobj.set_magnification_mode(True)
 
     def set_control_mode(self, have_control):
@@ -276,11 +276,10 @@ class Qt4_CameraBrick(BlissWidget):
         for index, action in enumerate(self.image_scale_menu.actions()):
             action.setChecked(scale_value == self.image_scale_list[index])
 
-    def init_image_zoom_list(self):
+    def init_image_scale_list(self):
         self.image_scale_list = self.graphics_manager_hwobj.get_image_scale_list()
         if len(self.image_scale_list) > 0:
             self.image_scale_menu.setEnabled(True)
-            self.image_scale_menu.triggered.connect(self.image_scale_triggered)
             for scale in self.image_scale_list:
                 #probably there is a way to use a single method for all actions
                 # by passing index. lambda function at first try did not work  
@@ -295,7 +294,8 @@ class Qt4_CameraBrick(BlissWidget):
     def image_scale_triggered(self, selected_action):
         for index, action in enumerate(self.image_scale_menu.actions()):
             if selected_action == action:
-                self.graphics_manager_hwobj.set_image_scale(self.image_scale_list[index], action.isChecked())
+                self.graphics_manager_hwobj.set_image_scale(\
+                     self.image_scale_list[index], action.isChecked())
                 
     def contextMenuEvent(self, event):
         self.popup_menu.popup(QCursor.pos())
