@@ -802,6 +802,11 @@ class BlissWidget(Connectable.Connectable, QFrame):
         self.defineSlot('enable_widget', ())
         self.defineSlot('disable_widget', ())
 
+        #If PySide used then connect method was not overriden
+        #This solution of redirecting methods works...
+
+        self.connect = self.connect_hwobj
+        self.diconnect = self.disconnect_hwobj
         #self.run_mode = QPushButton("Run mode", self)
 
     def __run(self):
@@ -851,7 +856,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
 
         QObject.connect(sender, signal, signal_slot_filter)
 
-    def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
+    def connect_hwobj(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
         """
         Descript. :
         """
@@ -897,7 +902,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         #if hasattr(sender, "connectNotify"):
         #    sender.connectNotify(QtCore.pyqtSignal(signal))
 
-    def disconnect(self, sender, signal, slot):
+    def disconnect_hwobj(self, sender, signal, slot):
         """
         Descript. :
         """

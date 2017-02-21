@@ -866,17 +866,16 @@ class GUIEditorWindow(QWidget):
         if current_item:
             item_cfg = self.configuration.find_item(str(current_item.text(0)))
 
-            #try:
-            if True:
+            try:
                 if self.configuration.is_container(item_cfg):
                     self._add_item(current_item, item_type, item_subtype)
                 else:
                     parent_item = current_item.parent()
                     self._add_item(parent_item, item_type, item_subtype)
-            #except:
-            #    QMessageBox.warning(self, "Cannot add %s" % item_type,
-            #                              "Please select a suitable parent container",
-            #                              QMessageBox.Ok)
+            except:
+                QMessageBox.warning(self, "Cannot add %s" % item_type,
+                                          "Please select a suitable parent container",
+                                          QMessageBox.Ok)
 
     def add_hbox_clicked(self):
         """Adds horizontal box"""
