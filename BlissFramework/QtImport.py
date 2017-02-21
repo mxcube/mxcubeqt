@@ -230,6 +230,7 @@ if mpl_imported:
         mpl_compat = True
         matplotlib.use("Qt4Agg")
 
+"""
 if qt_imported:
     print("Using PyQt:  %s" % (qt_variant))
     print("   qt version: %s / pyqt version: %s" % ("%d.%d.%d" % tuple(qt_version_no), "%d.%d.%d" % tuple(pyqt_version_no)))
@@ -246,4 +247,4 @@ if qt_imported and mpl_imported:
         print("  Matplotlib is COMPATIBLE with PyQt")
     else:
         print("  !!! Matplotlib is NOT COMPATIBLE with PyQt !!!")
-
+"""

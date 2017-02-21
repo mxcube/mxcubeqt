@@ -279,7 +279,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
                 QApplication.instance().removeEventFilter(\
                      BlissWidget._applicationEventFilter)
                 BlissWidget._filterInstalled = False
-                BlissWidget.synchronizeWithCache() # why?
+                BlissWidget.synchronize_with_cache() # why?
         else:
             if not BlissWidget._filterInstalled:
                 QApplication.instance().installEventFilter(\
@@ -290,10 +290,29 @@ class BlissWidget(Connectable.Connectable, QFrame):
                     BlissWidget.INSTANCE_MODE_MASTER)
 
     @staticmethod
-    def set_status_info(info_type, info_message):
+    def set_status_info(info_type, info_message, info_status=None):
+        """Updates status bar"""
         if BlissWidget._statusBar:
             BlissWidget._statusBar.parent().update_status_info(\
-                 info_type, info_message)
+                 info_type, info_message, info_status)
+
+    @staticmethod
+    def init_progress_bar(progress_type, number_of_steps):
+        """Updates status bar"""
+        if BlissWidget._statusBar:
+            BlissWidget._statusBar.parent().init_progress_bar(progress_type, number_of_steps)
+
+    @staticmethod
+    def set_progress_bar_step(step):
+        """Updates status bar"""
+        if BlissWidget._statusBar:
+            BlissWidget._statusBar.parent().set_progress_bar_step(step)
+
+    @staticmethod
+    def stop_progress_bar():
+        """Updates status bar"""
+        if BlissWidget._statusBar:
+            BlissWidget._statusBar.parent().stop_progress_bar()
 
     def shouldFilterEvent(self):
         """
@@ -520,7 +539,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         BlissWidget._instanceMirror = mirror
 
         if mirror == BlissWidget.INSTANCE_MIRROR_ALLOW:
-            BlissWidget.synchronizeWithCache()
+            BlissWidget.synchronize_with_cache()
 
         for widget in QApplication.allWidgets():
             if isinstance(widget, BlissWidget):
@@ -722,7 +741,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         BlissWidget._eventsCache[m] = (timestamp, methos_to_add, args)
 
     @staticmethod
-    def synchronizeWithCache():
+    def synchronize_with_cache():
         """
         Descript. :
         """
@@ -783,6 +802,11 @@ class BlissWidget(Connectable.Connectable, QFrame):
         self.defineSlot('enable_widget', ())
         self.defineSlot('disable_widget', ())
 
+        #If PySide used then connect method was not overriden
+        #This solution of redirecting methods works...
+
+        self.connect = self.connect_hwobj
+        self.diconnect = self.disconnect_hwobj
         #self.run_mode = QPushButton("Run mode", self)
 
     def __run(self):
@@ -832,7 +856,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
 
         QObject.connect(sender, signal, signal_slot_filter)
 
-    def connect(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
+    def connect_hwobj(self, sender, signal, slot, instanceFilter=False, shouldCache=True):
         """
         Descript. :
         """
@@ -878,7 +902,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         #if hasattr(sender, "connectNotify"):
         #    sender.connectNotify(QtCore.pyqtSignal(signal))
 
-    def disconnect(self, sender, signal, slot):
+    def disconnect_hwobj(self, sender, signal, slot):
         """
         Descript. :
         """
@@ -1010,12 +1034,19 @@ class BlissWidget(Connectable.Connectable, QFrame):
         Descript. :
         """
         if id(persistent_property_bag) != id(self.property_bag):
-            for property in persistent_property_bag:
-                if property.getName() in self.property_bag.properties:
-                    self.property_bag.getProperty(property.getName()).\
-                         setValue(property.getUserValue())
-                elif property.hidden:
-                    self.property_bag[property.getName()] = property
+            for prop in persistent_property_bag:
+                if hasattr(prop, "getName"):
+                    if prop.getName() in self.property_bag.properties:
+                        self.property_bag.getProperty(prop.getName()).\
+                             setValue(prop.getUserValue())
+                    elif prop.hidden:
+                        self.property_bag[prop.getName()] = prop
+                else:
+                    if prop["name"] in self.property_bag.properties:
+                        self.property_bag.getProperty(prop["name"]).\
+                             setValue(prop["value"])
+                    elif prop.hidden:
+                        self.property_bag[prop["name"]] = prop
 
         self.readProperties()
 
@@ -1178,6 +1209,21 @@ class BlissWidget(Connectable.Connectable, QFrame):
             self.setDisabled(True)
         else:
             self.setEnabled(True)
+
+    def get_window_display_widget(self):
+        for widget in QApplication.allWidgets():
+            if hasattr(widget, "configuration"):
+                return widget
+
+    def add_state(self, state_arg):
+        logging.getLogger().debug("Adding FSM state: % s" % str(state_arg))
+        top_level_widget = self.get_window_display_widget()
+        return top_level_widget.add_state(state_arg)
+
+    def add_transition(self, source, dest, trigger_widget, trigger_signal):
+        logging.getLogger().debug("Adding FSM transition: ")
+        top_level_widget = self.get_window_display_widget()
+        return top_level_widget.add_transition(source, dest, trigger_widget, trigger_signal)
 
 class NullBrick(BlissWidget):
 

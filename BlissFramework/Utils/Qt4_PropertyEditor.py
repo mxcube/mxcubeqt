@@ -61,11 +61,12 @@ class Qt4_ConfigurationTable(QTableWidget):
                                         'Value', 
                                         '',
                                         'Comment'])
-        
-        self.setSizePolicy(QSizePolicy.Expanding,
-                           QSizePolicy.Expanding)
+         
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.Fixed)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.cellChanged.connect(self.OnCellChanged)
+        self.cellChanged.connect(self.on_cell_changed)
         
     def clear(self):
         """
@@ -113,7 +114,7 @@ class Qt4_ConfigurationTable(QTableWidget):
                 temp_table_item.setFlags(Qt.ItemIsEnabled)
                 self.blockSignals(True) 
                 self.setItem(i, 0, temp_table_item)
-                self.setWidgetFromProperty(i, prop)
+                self.set_widget_from_property(i, prop)
 
                 temp_table_item = QTableWidgetItem(prop.comment)
                 temp_table_item.setFlags(Qt.ItemIsEnabled)
@@ -133,13 +134,18 @@ class Qt4_ConfigurationTable(QTableWidget):
             self.setEnabled(i > 0)    
         self.resizeColumnsToContents()
         self.setFixedHeight((self.rowCount() + 1)  * \
-                            (self.rowHeight(0) + 2) + 20)
+                            (self.rowHeight(0) + 2))
         #self.adjustSize()
         self.parent().adjustSize()
-        
-    def setWidgetFromProperty(self, row, prop):
-        """
-        Descript. :
+        #self.parent().resize(self.parent().sizeHint())
+
+    def set_widget_from_property(self, row, prop):
+        """Adds new property to the propery table
+
+        :param row: selected row
+        :type row: int
+        :param prop: property
+        :type prop: dict 
         """
         if prop.getType() == 'boolean':
             new_property_item = QTableWidgetItem("")
@@ -168,10 +174,12 @@ class Qt4_ConfigurationTable(QTableWidget):
             else:
                 temp_table_item = QTableWidgetItem(str(prop.getUserValue()))  
             self.setItem(row, 1, temp_table_item)
+        self.resizeColumnsToContents()
+        #self.parent().adjustSize()
 
-    def OnCellChanged(self, row, col):
-        """
-        Descript. :
+    def on_cell_changed(self, row, col):
+        """Assignes new value to the property, clicked on the the
+           property table
         """
         col += 1
         prop_name = str(self.item(row, 0).text())
@@ -233,7 +241,7 @@ class Qt4_ConfigurationTable(QTableWidget):
         if not default_value == None:
             prop.setValue(default_value)
         
-        self.setWidgetFromProperty(self.currentRow(), prop)
+        self.set_widget_from_property(self.currentRow(), prop)
 
     def beginEdit(self, row, col, replace):
         """

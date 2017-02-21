@@ -17,7 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""GUIDisplay"""
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__license__ = "GPLv3+"
+__status__ = "Production"
+
 
 import os
 # LNLS
@@ -46,11 +50,8 @@ from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, C
 from HardwareRepository import HardwareRepository
 
 
-__version__ = '2.2'
-
-
 class CustomMenuBar(QMenuBar):
-    """MenuBar"""
+    """MenuBar displayed on the top of the window"""
 
     viewToolBarSignal = pyqtSignal(bool)
 
@@ -77,7 +78,7 @@ class CustomMenuBar(QMenuBar):
         self.expert_mode_action.setCheckable(True)
         self.reload_hwr_action = self.file_menu.addAction(\
              "Reload hardware objects", self.reload_hwr_clicked)
-        #self.reload_hwr_action.setEnabled(False)
+        self.reload_hwr_action.setEnabled(False)
         self.brick_properties_action = self.file_menu.addAction(\
              "Edit brick properties", self.edit_brick_properties)
         self.file_menu.addAction("Quit", self.quit_clicked)
@@ -237,9 +238,9 @@ class CustomMenuBar(QMenuBar):
             #reload(hwr.hardwareObjects[hwr_obj].__class__)
 
         from HardwareRepository import BaseHardwareObjects
-        import Qt4_VideoMockup
+        #import Qt4_VideoMockup
         reimport.reimport(BaseHardwareObjects)
-        reimport.reimport(Qt4_VideoMockup)
+        #reimport.reimport(Qt4_VideoMockup)
 
         for hwr_obj in hwr.hardwareObjects:
             for sender in connections:
@@ -247,6 +248,7 @@ class CustomMenuBar(QMenuBar):
                     sender, connections[sender]["signal"], connections[sender]["slot"])
 
     def edit_brick_properties(self):
+        """Opens dialog that allows to edit propeties of gui bricks"""
         self.bricks_properties_editor.show()
 
     def whats_this_clicked(self):
@@ -845,7 +847,7 @@ class WindowDisplayWidget(QScrollArea):
         self.setWindowFlags(self.windowFlags() |
                             Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(Qt4_Icons.load_icon("desktop_icon"))
-
+ 
     def view_toolbar_toggled(self, state):
         """Toggle toolbar visibility"""
 
@@ -866,41 +868,72 @@ class WindowDisplayWidget(QScrollArea):
         """Sets statusbar"""
  
         self._statusbar_user_label = QLabel("-")
-        self._statusbar_state_label = QLabel(" <b>State: </b>")
-        self._statusbar_diffractometer_label = QLabel(" <b>Diffractometer: </b>")
-        self._statusbar_sc_label = QLabel(" <b>Sample changer: </b>")
-        self._statusbar_action_label = QLabel(" <b>Last collect: </b>")
-        
+        self._statusbar_state_label = QLabel(" <b>State: -</b>")
+        self._statusbar_diffractometer_label = QLabel(" <b>Diffractometer: -</b>")
+        self._statusbar_sc_label = QLabel(" <b>Sample changer: -</b>")
+        self._progress_bar = QProgressBar()
+        self._progress_bar.setEnabled(False)
+        self._statusbar_last_collect_label = QLabel(" <b>Last collect: -</b>")
+
         self._statusbar.addWidget(self._statusbar_user_label)
         self._statusbar.addWidget(self._statusbar_state_label)
         self._statusbar.addWidget(self._statusbar_diffractometer_label)
         self._statusbar.addWidget(self._statusbar_sc_label)
-        self._statusbar.addWidget(self._statusbar_action_label)
-         
+        self._statusbar.addWidget(self._progress_bar)
+        self._statusbar.addWidget(self._statusbar_last_collect_label)
+
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
 
-    def update_status_info(self, info_type, info_message):
+    def update_status_info(self, info_type, info_message, info_state=None):
         """Updates status info"""
 
         if info_message == "":
             info_message = "Ready"
 
         if info_type == "user":
-            self._statusbar_user_label.setText(info_message)
+            selected_label = self._statusbar_user_label
+            msg = info_message 
         elif info_type == "status":
-            self._statusbar_state_label.setText(\
-                " <b>State: </b> %s" % info_message)
+            selected_label = self._statusbar_state_label
+            msg = " <b>State: </b> %s" % info_message
         elif info_type == "diffractometer":
-            self._statusbar_diffractometer_label.setText(\
-                " <b>Diffractometer: </b>%s" % info_message)
+            selected_label = self._statusbar_diffractometer_label
+            msg = " <b>Diffractometer: </b>%s" % info_message
         elif info_type == "sc":
-            self._statusbar_sc_label.setText(\
-                " <b>Sample changer: </b> %s" % info_message)
-        elif info_type == "action":
-            self._statusbar_action_label.setText(\
-                " <b>Last collect: </b> %s (%s)" % \
-                (info_message, time.strftime("%Y-%m-%d %H:%M:%S")))
+            selected_label = self._statusbar_sc_label
+            msg = " <b>Sample changer: </b> %s" % info_message
+        elif info_type == "collect":
+            selected_label = self._statusbar_last_collect_label
+            msg = " <b>Last collect: </b> %s (%s)" % \
+                (info_message, time.strftime("%Y-%m-%d %H:%M:%S"))
+
+        selected_label.setText(msg)
+
+        if info_state == "ready":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_GREEN)
+        elif info_state == "running":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_YELLOW)
+        elif info_state == "action_req":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_ORANGE)
+        elif info_state == "error":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_RED)
+
+    def init_progress_bar(self, progress_type, number_of_steps):
+        self._progress_bar.setEnabled(True)
+        self._progress_bar.reset()
+        self._progress_bar.setMaximum(number_of_steps)
+
+    def set_progress_bar_step(self, step):
+        self._progress_bar.setValue(step)
+
+    def stop_progress_bar(self):
+        self._progress_bar.reset()
+        self._progress_bar.setEnabled(False)
 
     def show(self, *args):
         """Show"""
@@ -1298,23 +1331,31 @@ class BricksPropertiesEditor(QWidget):
         _main_vlayout = QHBoxLayout(self)
         _main_vlayout.addWidget(self.bricks_listwidget)
         _main_vlayout.addWidget(self.properties_table)
-        _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        #_main_vlayout.setSpacing(2)
+        #_main_vlayout.setContentsMargins(2, 2, 6, 6)
 
         self.bricks_listwidget.itemClicked.connect(\
              self.bricks_listwidget_item_clicked)
 
-        self.properties_table.propertyChangedSignal.connect(self.property_changed)
+        self.properties_table.propertyChangedSignal.\
+             connect(self.property_changed)
         #QtCore.QObject.connect(self.properties_table,
                                #QtCore.SIGNAL("propertyChanged"),
                                #self.property_changed)
+
+        self.bricks_listwidget.setSizePolicy(QSizePolicy.Fixed,
+                                             QSizePolicy.MinimumExpanding) 
+        #self.properties_table.setSizePolicy(QSizePolicy.Expanding,
+        #                                    QSizePolicy.MinimumExpanding)
+        #self.properties_table.horizontalHeader().setStretchLastSection(True)
 
         self.setWindowTitle("Bricks properties")
 
 
     def add_brick(self, name, brick):
-        self.bricks_dict[name] = brick
-        self.bricks_listwidget.addItem(name) 
+        if name != "":
+            self.bricks_dict[name] = brick
+            self.bricks_listwidget.addItem(name) 
 
     def bricks_listwidget_item_clicked(self, listwidget_item):
         brick_name = listwidget_item.text()

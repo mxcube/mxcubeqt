@@ -258,7 +258,6 @@ class ToolboxWidget(QWidget):
                         if brick_module_file:
                             brick_module_file.close()
                         continue
-
                     module_contents = brick_module_file.read()
 
                     check_if_it_Brick = re.compile(\
@@ -853,7 +852,7 @@ class GUIEditorWindow(QWidget):
     def add_brick(self, brick_type):
         """Adds bricks to the gui"""
 
-        self.add_item("brick", brick_type)
+        self.add_item("brick", str(brick_type))
 
     def add_container(self, container_type, container_subtype=None):
         """Adds container"""
@@ -1414,16 +1413,23 @@ class GUIBuilder(QMainWindow):
         """Saves gui file"""
 
         filename = self.filename
-        self.filename = str(QFileDialog.getSaveFileName(self, os.environ["HOME"],
-             "GUI file (*.gui)", "Save file", "Choose a filename to save under"))
+        name_filters = ['JSON (*.json)',
+                        'YAML (*.yml)',
+                        'PICKLE (*.gui)']
+        dialog = QFileDialog()
+        dialog.setFilter(dialog.filter() | QDir.Hidden)
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setNameFilters(name_filters)
 
-        if len(self.filename) == 0:
-            self.filename = filename
-            return
-        elif not self.filename.endswith(os.path.extsep + "gui"):
-            self.filename += os.path.extsep + 'gui'
+        if dialog.exec_() == QDialog.Accepted:
+            self.filename = str(dialog.selectedFiles()[0])
+            if not (self.filename.endswith(".json") or \
+                    self.filename.endswith(".yml") or \
+                    self.filename.endswith(".gui")):
 
-        return self.save_clicked()
+                self.filename += str(dialog.selectedNameFilter()).split('*')[1][:-1]
+
+            return self.save_clicked()
 
     def quit_clicked(self):
         """Quit"""
