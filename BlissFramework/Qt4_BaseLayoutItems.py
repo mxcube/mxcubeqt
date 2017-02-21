@@ -59,7 +59,7 @@ class _CfgItem:
                 if prop_name in self.properties.properties:
                     self.properties.getProperty(prop_name).setValue(\
                          item_property.getUserValue())
-                elif item_property.hidden:
+                elif item_property.hidden or prop_name.startswith("closable_"):
                     self.properties[prop_name] = item_property
             else:
                 if item_property["type"] == "combo":
@@ -73,12 +73,6 @@ class _CfgItem:
                                             arg2=arg2,
                                             comment=item_property["comment"],
                                             hidden=item_property["hidden"])
- 
-
-                #if prop_name in self.properties.properties:
-                #    self.properties.getProperty(prop_name).setValue(item_property["value"])
-                #if item_property["hidden"]:
-                #    self.properties[prop_name] = item_property
 
     def __getitem__(self, item):
         """
