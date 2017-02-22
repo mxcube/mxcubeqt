@@ -33,25 +33,36 @@ To get MXCuBE code execute:
 2. Python dependencies
 **********************
 
+MXCuBE supports Qt4, Qt5 and PySide. Start script automaticaly detects and imports available version of Qt.
+
+* `Qt4 <http://doc.qt.io/qt-4.8/>`_
+* `Qt5 <http://doc.qt.io/qt-5/>`_
+* `PySide <https://wiki.qt.io/PySide>`_
+
+Other dependencies:
+
 * `Python (>2.6) <https://www.python.org/>`_
-* `Qt4 <http://doc.qt.io/qt-4.8/)>`_
-* `PyQt <https://riverbankcomputing.com/software/pyqt/intro>`_ 
 * `louie (pydispatcher) <https://pypi.python.org/pypi/Louie/1.1>`_
 * `gevent >= 1.0RC2 <https://github.com/downloads/surfly/gevent/gevent-1.0rc2.tar.gz>`_
+* `suds <https://pypi.python.org/pypi/suds>`_
+* `jsonpickle <https://pypi.python.org/pypi/jsonpickle/0.7.0>`_
+* `yaml <https://pypi.python.org/pypi/PyYAML/3.12>`_
+* `scipy stack <http://www.scipy.org/install.html>`_
 * `PyChooch <http://github.com/mxcube/pychooch>`_
 * `PyMca <http://sourceforge.net/projects/pymca/>`_
-* `jsonpickle <https://pypi.python.org/pypi/jsonpickle/0.7.0>`_
-* `scipy stack <http://www.scipy.org/install.html>`_
-
-Before installing dependencies it is recomended to run mxcube (see :) to see
-which dependencies are missing.
 
 2.1. Debian/Ubuntu
 ==================
 
 .. code-block:: bash
 
-   sudo apt-get install python-qt4 python-gevent python-louie python-jsonpickle python-numpy python-scipy python-matplotlib python-suds pymca 
+   sudo apt-get install python-qt4 python-gevent python-louie python-jsonpickle python-yaml python-numpy python-scipy python-matplotlib python-suds pymca
+
+If Qt5 used:
+
+.. code-block:: bash
+   
+   sudo apt-get install PyMca5 
 
 2.2. Fedora/Centos
 ==================
@@ -69,8 +80,14 @@ Some hints if problems during ``sudo pip install matplotlib``:
    sudo yum install libpng-devel
    # gcc error 
    sudo yum install gcc-c++
+
+2.3. Installing dependencies with pip
+=====================================
+
+.. code-block:: bash
+   sudo pip install PyQt
   
-2.3. PyMca
+2.4. PyMca
 ==========
 
 If pymca is not available via package management tool then:
@@ -98,13 +115,9 @@ More info:
 Use **mxcube** script file located in **bin** directory with 
 command line arguments to launch MXCuBE. 
 
-.. note::
-
-   Last command line argument has to indicate qt version (**-qt3** or **-qt4**). 
-
 .. code-block:: bash
 
-   Usage: mxcube <GUI definition file> [options] [-qt3 or -qt4]
+   Usage: mxcube <GUI definition file> [options]
 
    Options:
 	  -h, --help            show this help message and exit
@@ -128,15 +141,13 @@ For example to run MXCuBE with default parameters edit script:
 
 .. code-block:: bash
    
-   PATH_TO_MXCUBE/bin/mxcube --hardwareRepository=PATH_TO_MXCUBE/ExampleFiles/HardwareObjects.xml -qt4
+   PATH_TO_MXCUBE/bin/mxcube --hardwareRepository=PATH_TO_MXCUBE/ExampleFiles/HardwareObjects.xml
 
-In this case MXCuBE will start in **Qt4** mode with GUI definition file 
-**Qt4_example_mxcube.gui**. It is possible to adjust script by defining gui 
-configuration file, additional directories for bricks and hardware objects. For example:
+It is possible to adjust script by defining gui configuration file, additional directories for bricks and hardware objects. For example:
 
 .. code-block:: bash
    
-   PATH_TO_MXCUBE/bin/mxcube PATH_TO_GUI_FILE --hardwareRepository=PATH_TO_XML_FILES  --hardwareObjectsDirs=PATHs_TO_ADDITIONAL_HARDWARE_OBJECTS --bricksDirs=PATHS_TO_ADDITIONAL_BRICKS -qt4 
+   PATH_TO_MXCUBE/bin/mxcube PATH_TO_GUI_FILE --hardwareRepository=PATH_TO_XML_FILES  --hardwareObjectsDirs=PATHs_TO_ADDITIONAL_HARDWARE_OBJECTS --bricksDirs=PATHS_TO_ADDITIONAL_BRICKS
 
 Example xml files are available `here <https://github.com/mxcube/mxcube/tree/master/ExampleFiles/HardwareObjects.xml>`_
 
@@ -145,11 +156,11 @@ Example xml files are available `here <https://github.com/mxcube/mxcube/tree/mas
 
 GUI builder is used to define GUI layout. It is possible to add, edit or remove bricks, 
 change brick parameters, edit signals and slots between bricks. 
-To launch gui builder add **-d** before **-qt4** argument. For example:
+To launch gui builder add **-d**. For example:
 
 .. code-block:: bash
 
-   PATH_TO_MXCUBE/bin/mxcube --hardwareRepository=PATH_TO_MXCUBE/ExampleFiles/HardwareObjects.xml -d -qt4
+   PATH_TO_MXCUBE/bin/mxcube --hardwareRepository=PATH_TO_MXCUBE/ExampleFiles/HardwareObjects.xml -d
 
 *****************
 Other information
@@ -158,4 +169,3 @@ Other information
 * :doc:`how_to_create_hwobj`
 * :doc:`how_to_create_qt_brick`
 * :doc:`how_to_define_qt_gui`
-

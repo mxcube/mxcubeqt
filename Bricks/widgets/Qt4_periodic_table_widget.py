@@ -110,19 +110,19 @@ class PeriodicTableWidget(QWidget):
         self.periodic_table.setElements(elements)
  
 class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
-    elementClicked = pyqtSignal(object)
+    elementClicked = pyqtSignal(str)
     edgeSelectedSignal = pyqtSignal(str, str)
 
     def __init__(self, *args):
         QPeriodicTable.QPeriodicTable.__init__(self, *args)
 
         self.elements_dict={}
-        #if qt_variant == 'PyQt5':
-        self.elementClicked.connect(self.table_element_changed)
-        #else:
-        #    QObject.connect(self,
-        #                    SIGNAL('elementClicked'),
-        #                    self.tableElementChanged)
+        if qt_variant == 'PyQt5':
+            self.elementClicked.connect(self.table_element_clicked)
+        else:
+            QObject.connect(self,
+                            SIGNAL('elementClicked'),
+                            self.table_element_clicked)
         for b in self.eltButton:
             self.eltButton[b].colors[0]= QColor(Qt.green)
             self.eltButton[b].colors[1]= QColor(Qt.darkGreen)
@@ -141,7 +141,7 @@ class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
         if b.isEnabled():
             b.setCurrent(False)
 
-    def table_element_changed(self, symbol, energy=None):
+    def table_element_clicked(self, symbol, energy=None):
         if type(symbol) is tuple and len(symbol) > 0:
             symbol = symbol[0]
 

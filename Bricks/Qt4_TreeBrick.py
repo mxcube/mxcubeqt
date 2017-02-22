@@ -440,27 +440,27 @@ class Qt4_TreeBrick(BlissWidget):
     def queue_entry_execution_started(self, queue_entry):
         self.enable_widgets.emit(False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
-        BlissWidget.set_status_info("status", "Queue started")
+        BlissWidget.set_status_info("status", "Queue started", "running")
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
       
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
-            BlissWidget.set_status_info("action", "%s : %s" % \
+            BlissWidget.set_status_info("collect", "%s : %s" % \
                 (queue_entry.get_type_str(), status))
 
     def queue_paused_handler(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_paused_handler(status)
-        BlissWidget.set_status_info("status", "Queue paused")
+        BlissWidget.set_status_info("status", "Queue paused", "action_req")
 
     def queue_execution_finished(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_execution_completed(status)
-        if status == "Failed": 
-            BlissWidget.set_status_info("status", "Queue execution failed")
+        if status == "Failed":
+            BlissWidget.set_status_info("status", "Queue execution failed", "error")
         else:
-            BlissWidget.set_status_info("status", "")
+            BlissWidget.set_status_info("status", "", "ready")
 
     def queue_stop_handler(self, status):
         self.enable_widgets.emit(True)
@@ -471,9 +471,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.enable_widgets.emit(status) 
         #self.emit(QtCore.SIGNAL("diffractometer_ready"), status) 
         if status:
-            BlissWidget.set_status_info("diffractometer", "Ready")
+            BlissWidget.set_status_info("diffractometer", "Ready", "ready")
         else:
-            BlissWidget.set_status_info("diffractometer", "Not ready")
+            BlissWidget.set_status_info("diffractometer", "Not ready", "running")
 
     def samples_from_lims(self, samples):
         """
