@@ -17,8 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
+
+import os
 from QtImport import *
 
 from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
@@ -28,23 +32,17 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
-__category__ = "General"
-
-
 STATES = {'unknown': Qt4_widget_colors.GRAY,
           'ready': Qt4_widget_colors.LIGHT_BLUE,
           'error': Qt4_widget_colors.LIGHT_RED}
 
+
 class Qt4_MachineInfoBrick(BlissWidget):
-    """
-    Descript. :
-    """
+    """Brick to display information about synchrotron and beamline"""
+
     def __init__(self, *args):
-        """
-        Descript. :
-        """
+        """Main init"""
+
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
@@ -92,11 +90,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
         self.setToolTip("Main information about the beamline")
 
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
+        """Method called when user changes a property in the gui builder"""
+
         if property_name == 'hwobj_mach_info':
             if self.mach_info_hwobj is not None:
                 self.disconnect(self.mach_info_hwobj,
@@ -114,11 +109,11 @@ class Qt4_MachineInfoBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def set_value(self, values_list):
+        """Slot connected to the valuesChanged signal
+           At first time initializes gui by adding necessary labels.
+           If the gui is initialized then update labels with values
         """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
+
         if self.graphics_initialized is None:
             for item in values_list:
                 temp_widget = CustomInfoWidget(self)
@@ -135,11 +130,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
             self.value_label_list[index].update_info(value)
 
     def sizeof_fmt(self, num):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
+        """Returns disk space formated in string"""
+
         for x in ['bytes', 'KB', 'MB', 'GB']:
             if num < 1024.0:
                 return "%3.1f%s" % (num, x)
@@ -147,11 +139,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
         return "%3.1f%s" % (num, 'TB')
    
     def sizeof_num(self, num):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
+        """Returns disk space formated in exp value"""
+
         for x in ['m', unichr(181), 'n']:
             if num > 0.001:
                 num *= 1000.0 
@@ -160,11 +149,10 @@ class Qt4_MachineInfoBrick(BlissWidget):
         return "%3.1f%s" % (num, ' n')
 
     def setColDir(self, dataDir):
+        """Slot to update disk space label.
+           Typicaly connected to the signal comming from TreeBrick
         """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
+
         if self.disc_label:
             p = '/' + dataDir.split('/')[1]
             dataDir = str(p)
@@ -190,11 +178,9 @@ class Qt4_MachineInfoBrick(BlissWidget):
 
 
 class CustomInfoWidget(QWidget):
+    """Custom information widget"""
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
         QWidget.__init__(self, *args)
 
         self.value_plot = None
