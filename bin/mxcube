@@ -9,7 +9,7 @@ os.environ["CUSTOM_BRICKS_PATH"]=os.path.join(MXCUBE_ROOT, "Bricks")
 os.environ["CUSTOM_HARDWARE_OBJECTS_PATH"]=os.path.join(MXCUBE_ROOT, "HardwareObjects")
 
 # Qt4/5, PySide
-MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "example_mxcube_qt4.gui")
+MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "/ExampleFiles/example_mxcube_qt4.yml")
 from BlissFramework import Qt4_startGUI
 Qt4_startGUI.run(MXCUBE_GUI_FILE)
 

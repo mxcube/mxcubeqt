@@ -71,11 +71,11 @@ class ConfirmDialog(QDialog):
         self.setWindowTitle('Confirm collection')
 
     def set_plate_mode(self, plate_mode):
-        """
-        Descript. :
-        """
+        """Sets plate mode"""
         if plate_mode:
             snapshot_count = [0, 1]
+            self.conf_dialog_layout.take_video_cbx.setEnabled(False)
+            self.conf_dialog_layout.take_video_cbx.setChecked(False)
         else:
             snapshot_count = [0, 1, 2, 4]
         self.conf_dialog_layout.take_snapshots_combo.clear()
@@ -84,23 +84,15 @@ class ConfirmDialog(QDialog):
         self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(1)
  
     def disable_dark_current_cbx(self):
-        """
-        Descript. :
-        """
         self.conf_dialog_layout.force_dark_cbx.setEnabled(False)
         self.conf_dialog_layout.force_dark_cbx.setChecked(False)
 
     def enable_dark_current_cbx(self):
-        """
-        Descript. :
-        """
         self.conf_dialog_layout.force_dark_cbx.setEnabled(True)
         self.conf_dialog_layout.force_dark_cbx.setChecked(True)
         
     def set_items(self, checked_items):
-        """
-        Descript. :
-        """
+        """Populates information about items to be collected"""
         self.sample_items = []
         self.checked_items = checked_items
 
@@ -258,6 +250,8 @@ class ConfirmDialog(QDialog):
             if acq_parameters: 
                 acq_parameters.take_snapshots = int(self.conf_dialog_layout.\
                     take_snapshots_combo.currentText())
+                acq_parameters.take_video = self.conf_dialog_layout.\
+                    take_video_cbx.isChecked()
                 acq_parameters.take_dark_current = self.conf_dialog_layout.\
                     force_dark_cbx.isChecked()
                 acq_parameters.skip_existing_images = self.conf_dialog_layout.\
