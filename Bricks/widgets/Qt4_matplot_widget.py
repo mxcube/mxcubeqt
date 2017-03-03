@@ -154,6 +154,9 @@ class TwoAxisPlotWidget(QWidget):
         self._two_axis_figure_canvas.fig.canvas.draw()
         self._two_axis_figure_canvas.fig.canvas.flush_events()
 
+    def setdata(self, x, y):
+        self.newcurve("XRF spectrum", x, y)
+
 class MplCanvas(FigureCanvas):
     """
     Descript. : Class to draw plots on canvas
