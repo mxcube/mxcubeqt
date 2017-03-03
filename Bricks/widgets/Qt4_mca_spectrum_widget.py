@@ -47,14 +47,19 @@ import logging
 import numpy as np
 
 from QtImport import *
-if qt_variant == "PyQt5":
-    from PyMca5.PyMca import McaAdvancedFit
-    from PyMca5.PyMca import ConfigDict
-else:
-    from PyMca import McaAdvancedFit
-    from PyMca import ConfigDict
 
-from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
+try:
+    if qt_variant == "PyQt5":
+        from PyMca5.PyMca import McaAdvancedFit
+        from PyMca5.PyMca import ConfigDict
+    else:
+        from PyMca import McaAdvancedFit
+        from PyMca import ConfigDict
+    pymca_imported = True
+except:
+    pymca_imported = False
+    from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
+
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -63,9 +68,12 @@ class McaSpectrumWidget(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         self.defineSlot('set_data',())
-    
-        self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
-        self.mcafit_widget.dismissButton.hide()
+
+        if pymca_imported:    
+            self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
+            self.mcafit_widget.dismissButton.hide()
+        else:
+            self.mcafit_widget = TwoAxisPlotWidget(self)
        
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.mcafit_widget)  
@@ -91,9 +99,10 @@ class McaSpectrumWidget(BlissWidget):
             kw['xmax'] = xmax
             kw['calibration'] = calib"""
             self.mcafit_widget.setdata(x, y)
-            #elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
-            self.mcafit_widget._energyAxis = False
-            self.mcafit_widget.toggleEnergyAxis()
+            if pymca_imported:
+                #elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
+                self.mcafit_widget._energyAxis = False
+                self.mcafit_widget.toggleEnergyAxis()
             #result = self._fit()
             #pyarch file name and directory
             pf = config["legend"].split(".")
@@ -102,15 +111,16 @@ class McaSpectrumWidget(BlissWidget):
             outdir = config['htmldir']
             sourcename = config['legend']
 
-            result = self._fit()
-            if configured:
-                report = McaAdvancedFit.QtMcaAdvancedFitReport.\
-                     QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,
-                     fitresult=result, sourcename=sourcename, 
-                     plotdict={'logy':False}, table=2)
+            if pymca_imported:
+                result = self._fit()
+                if configured:
+                    report = McaAdvancedFit.QtMcaAdvancedFitReport.\
+                         QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,
+                         fitresult=result, sourcename=sourcename, 
+                         plotdict={'logy':False}, table=2)
 
-                text = report.getText()
-                report.writeReport(text=text)
+                    text = report.getText()
+                    report.writeReport(text=text)
   
         except:
             logging.getLogger().exception("McaSpectrumWidget: problem fitting %s %s %s" % \
