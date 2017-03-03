@@ -19,13 +19,14 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
 
 
@@ -47,18 +48,18 @@ class Qt4_ExporterClientBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.info_widget = QtGui.QWidget(self)
-        self.info_address_ledit = QtGui.QLineEdit(self.info_widget)
-        self.info_refresh_button = QtGui.QPushButton("Refresh", self.info_widget)
-        self.method_table = QtGui.QTableWidget(self)
-        self.property_table = QtGui.QTableWidget(self)
+        self.info_widget = QWidget(self)
+        self.info_address_ledit = QLineEdit(self.info_widget)
+        self.info_refresh_button = QPushButton("Refresh", self.info_widget)
+        self.method_table = QTableWidget(self)
+        self.property_table = QTableWidget(self)
 
         # Layout --------------------------------------------------------------
-        _info_widget_hlayout = QtGui.QHBoxLayout(self.info_widget)
+        _info_widget_hlayout = QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.info_address_ledit)
         _info_widget_hlayout.addWidget(self.info_refresh_button) 
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.info_widget)
         _main_vlayout.addWidget(self.method_table)
         _main_vlayout.addWidget(self.property_table)
@@ -94,9 +95,9 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
         for index, method in enumerate(method_list):
             string_list = method.split(" ")
-            temp_item = QtGui.QTableWidgetItem(string_list[0])
+            temp_item = QTableWidgetItem(string_list[0])
             self.method_table.setItem(index, 0, temp_item)
-            temp_item = QtGui.QTableWidgetItem(string_list[1])
+            temp_item = QTableWidgetItem(string_list[1])
             self.method_table.setItem(index, 1, temp_item)
 
         property_list = self.exporter_client_hwobj.get_property_list()
@@ -104,13 +105,13 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
         for index, prop in enumerate(property_list):
             string_list = prop.split(" ")
-            temp_item = QtGui.QTableWidgetItem(string_list[0])
+            temp_item = QTableWidgetItem(string_list[0])
             self.property_table.setItem(index, 0, temp_item)
-            temp_item = QtGui.QTableWidgetItem(string_list[1])
+            temp_item = QTableWidgetItem(string_list[1])
             self.property_table.setItem(index, 1, temp_item)
-            temp_item = QtGui.QTableWidgetItem(string_list[2])
+            temp_item = QTableWidgetItem(string_list[2])
             self.property_table.setItem(index, 2, temp_item)
-            temp_item = QtGui.QTableWidgetItem()
+            temp_item = QTableWidgetItem()
             self.property_table.setItem(index, 3, temp_item)
         self.refresh_property_values()
 

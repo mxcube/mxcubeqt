@@ -17,16 +17,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
 
-__category__ = 'General'
+
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
+
 
 class Qt4_DetectorStatusBrick(BlissWidget):
  
@@ -62,20 +63,20 @@ class Qt4_DetectorStatusBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _main_groupbox = QtGui.QGroupBox("Detector status", self) 
-        self.status_label = QtGui.QLabel("<b>unknown status</b>", _main_groupbox)
-        self.temperature_label = QtGui.QLabel("Temperature:", _main_groupbox)
-        self.humidity_label = QtGui.QLabel("Humidity:     ", _main_groupbox)
+        _main_groupbox = QGroupBox("Detector status", self) 
+        self.status_label = QLabel("<b>unknown status</b>", _main_groupbox)
+        self.temperature_label = QLabel("Temperature:", _main_groupbox)
+        self.humidity_label = QLabel("Humidity:     ", _main_groupbox)
 
         # Layout -------------------------------------------------------------- 
-        _main_groupbox_vlayout = QtGui.QVBoxLayout(_main_groupbox)
+        _main_groupbox_vlayout = QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.status_label)
         _main_groupbox_vlayout.addWidget(self.temperature_label)
         _main_groupbox_vlayout.addWidget(self.humidity_label)
         _main_groupbox_vlayout.setSpacing(2)
         _main_groupbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(_main_groupbox)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -93,21 +94,33 @@ class Qt4_DetectorStatusBrick(BlissWidget):
             Qt4_DetectorStatusBrick.STATES['unknown']) 
 
         self.status_label.setMinimumHeight(20)
-        self.status_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.status_label.setAlignment(Qt.AlignCenter)
         self.temperature_label.setMinimumHeight(20)
         self.humidity_label.setMinimumHeight(20)
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.detector_hwobj is not None:
-                self.disconnect(self.detector_hwobj, 'temperatureChanged', self.temperature_changed)
-                self.disconnect(self.detector_hwobj, 'humidityChanged', self.humidity_changed)
-                self.disconnect(self.detector_hwobj, 'statusChanged', self.status_changed)
+                self.disconnect(self.detector_hwobj,
+                                'temperatureChanged',
+                                self.temperature_changed)
+                self.disconnect(self.detector_hwobj,
+                                'humidityChanged',
+                                self.humidity_changed)
+                self.disconnect(self.detector_hwobj,
+                                'statusChanged',
+                                self.status_changed)
 	    self.detector_hwobj = self.getHardwareObject(new_value)
             if self.detector_hwobj is not None:
-                self.connect(self.detector_hwobj, 'temperatureChanged', self.temperature_changed)
-                self.connect(self.detector_hwobj, 'humidityChanged', self.humidity_changed)
-                self.connect(self.detector_hwobj, 'statusChanged', self.status_changed)
+                self.connect(self.detector_hwobj,
+                             'temperatureChanged',
+                             self.temperature_changed)
+                self.connect(self.detector_hwobj,
+                             'humidityChanged',
+                             self.humidity_changed)
+                self.connect(self.detector_hwobj,
+                             'statusChanged',
+                             self.status_changed)
                 self.detector_hwobj.update_values()             
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)

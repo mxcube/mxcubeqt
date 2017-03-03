@@ -20,9 +20,7 @@
 import os
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+from QtImport import *
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_acquisition_widget import AcquisitionWidget
@@ -33,10 +31,10 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
 
 
-class DCParametersWidget(QtGui.QWidget):
+class DCParametersWidget(QWidget):
     def __init__(self, parent = None, name = "parameter_widget"):
 
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         if name is not None:
             self.setObjectName(name) 
 
@@ -55,14 +53,14 @@ class DCParametersWidget(QtGui.QWidget):
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        _dc_parameters_widget = QtGui.QWidget(self)
+        _dc_parameters_widget = QWidget(self)
         self._data_path_widget = DataPathWidget(_dc_parameters_widget)
         self._acq_widget = AcquisitionWidget(_dc_parameters_widget, 
                                             layout = 'horizontal')
         self._processing_widget = ProcessingWidget(_dc_parameters_widget)
         
         # Layout --------------------------------------------------------------
-        _dc_parameters_widget_layout = QtGui.QVBoxLayout(_dc_parameters_widget)
+        _dc_parameters_widget_layout = QVBoxLayout(_dc_parameters_widget)
         _dc_parameters_widget_layout.addWidget(self._data_path_widget)
         _dc_parameters_widget_layout.addWidget(self._acq_widget)
         _dc_parameters_widget_layout.addWidget(self._processing_widget)
@@ -70,7 +68,7 @@ class DCParametersWidget(QtGui.QWidget):
         _dc_parameters_widget_layout.setSpacing(2)
         _dc_parameters_widget_layout.addStretch(10)
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.setSpacing(2)

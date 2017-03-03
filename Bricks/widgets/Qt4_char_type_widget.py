@@ -17,8 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_routine_dc_char_widget_layout import RoutineDCWidgetLayout
@@ -27,16 +26,16 @@ from widgets.Qt4_radiation_damage_char_widget_layout import \
      RadiationDamageWidgetLayout
 
 
-class CharTypeWidget(QtGui.QWidget):
+class CharTypeWidget(QWidget):
     """
     Descript. :
     """
 
-    def __init__(self, parent = None, name = None, fl = 0):
+    def __init__(self, parent=None, name=None, fl=0):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         self.setObjectName("char_type_widget")
 
         # Hardware objects ----------------------------------------------------
@@ -44,14 +43,14 @@ class CharTypeWidget(QtGui.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.charact_type_gbox = QtGui.QGroupBox(self)
+        self.charact_type_gbox = QGroupBox(self)
 
         # Fix the widths of the widgets to make the layout look nicer,
         # and beacuse the qt layout engine is so tremendosly good.
         self.charact_type_gbox.setFixedWidth(621)
         self.charact_type_gbox.setFixedHeight(220)
 
-        self.charact_type_tbox = QtGui.QToolBox(self.charact_type_gbox)
+        self.charact_type_tbox = QToolBox(self.charact_type_gbox)
         self.routine_dc_page = RoutineDCWidgetLayout(self.charact_type_tbox)
         self.sad_page = SADWidgetLayout(self.charact_type_tbox)
         self.rad_damage_page = RadiationDamageWidgetLayout(self.charact_type_tbox)
@@ -61,13 +60,13 @@ class CharTypeWidget(QtGui.QWidget):
         self.charact_type_tbox.addItem(self.rad_damage_page, "Radiation damage")
 
         # Layout --------------------------------------------------------------
-        _charact_type_gbox_vlayout = QtGui.QVBoxLayout(self.charact_type_gbox)
+        _charact_type_gbox_vlayout = QVBoxLayout(self.charact_type_gbox)
         _charact_type_gbox_vlayout.addWidget(self.charact_type_tbox)
         _charact_type_gbox_vlayout.addStretch(0)
         _charact_type_gbox_vlayout.setSpacing(0)
         _charact_type_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.charact_type_gbox)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)

@@ -20,22 +20,19 @@
 import os
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
-
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_matplot_widget import PolarScaterWidget
 
 
 
-class DCGroupWidget(QtGui.QWidget):
+class DCGroupWidget(QWidget):
     def __init__(self, parent = None, name = "dc_group_widget"):
 
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         if name is not None:
             self.setObjectName(name) 
 
@@ -53,22 +50,22 @@ class DCGroupWidget(QtGui.QWidget):
         self.add_dc_cb = None
         self._tree_view_item = None
 
-        _subwedge_widget = QtGui.QGroupBox("Summary", self) 
+        _subwedge_widget = QGroupBox("Summary", self) 
         self.polar_scater_widget = PolarScaterWidget()
-        self.subwedge_table = QtGui.QTableWidget(_subwedge_widget)
-        _snapshot_widget = QtGui.QWidget(self)
-        self.position_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                          'ui_files/Qt4_snapshot_widget_layout.ui'))
+        self.subwedge_table = QTableWidget(_subwedge_widget)
+        _snapshot_widget = QWidget(self)
+        self.position_widget = loadUi(os.path.join(os.path.dirname(__file__),
+                                      'ui_files/Qt4_snapshot_widget_layout.ui'))
         
         # Layout --------------------------------------------------------------
-        _subwedge_widget_vlayout = QtGui.QVBoxLayout(_subwedge_widget)
+        _subwedge_widget_vlayout = QVBoxLayout(_subwedge_widget)
         _subwedge_widget_vlayout.addWidget(self.polar_scater_widget)
         _subwedge_widget_vlayout.addWidget(self.subwedge_table)
         _subwedge_widget_vlayout.setContentsMargins(0, 4, 0, 0)
         _subwedge_widget_vlayout.setSpacing(6)
         _subwedge_widget_vlayout.addStretch(0)
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(_subwedge_widget)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.setSpacing(2)
@@ -84,7 +81,7 @@ class DCGroupWidget(QtGui.QWidget):
         font.setPointSize(8)
         self.subwedge_table.setFont(font)
         self.subwedge_table.setEditTriggers(\
-             QtGui.QAbstractItemView.NoEditTriggers)
+             QAbstractItemView.NoEditTriggers)
         self.subwedge_table.setColumnCount(7)
         self.subwedge_table.horizontalHeader().setStretchLastSection(False)
 
@@ -93,7 +90,7 @@ class DCGroupWidget(QtGui.QWidget):
                               "Energy", "Transmission", "Resolution"]
         for index, header in enumerate(horizontal_headers):
             self.subwedge_table.setHorizontalHeaderItem(index, 
-                 QtGui.QTableWidgetItem(header))
+                 QTableWidgetItem(header))
         #self.subwedge_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
         #                                  QtGui.QSizePolicy.Fixed)
 
@@ -136,8 +133,10 @@ class DCGroupWidget(QtGui.QWidget):
             #color = Qt4_widget_colors.get_random_color()
             #sw.append(color)
             for col in range(7):
-                self.subwedge_table.setItem(row, col, QtGui.QTableWidgetItem(param_list[col]))
-                color = QtGui.QColor(sw[-1])
+                self.subwedge_table.setItem(row, col, QTableWidgetItem(param_list[col]))
+                color = QColor(int(sw[-1][0] * 255),
+                               int(sw[-1][0] * 255),
+                               int(sw[-1][0] * 255))
                 color.setAlpha(100)
                 self.subwedge_table.item(row, col).setBackground(color)
                 #     QtGui.QColor(Qt4_widget_colors.TASK_GROUP[sw[0]]))

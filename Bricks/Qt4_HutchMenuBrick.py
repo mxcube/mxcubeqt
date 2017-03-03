@@ -21,8 +21,7 @@ import os
 import logging
 import traceback
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 import Qt4_GraphicsManager as graphics_manager
@@ -32,7 +31,9 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
 
 class Qt4_HutchMenuBrick(BlissWidget):
@@ -76,7 +77,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.centre_button.set_icons("VCRPlay2", "Delete")
         self.accept_button = MonoStateButton(self, "Save", "ThumbUp")
         self.standard_color = self.accept_button.palette().\
-             color(QtGui.QPalette.Window)
+             color(QPalette.Window)
         self.reject_button = MonoStateButton(self, "Reject", "ThumbDown")
         self.reject_button.hide()
         self.create_line_button = MonoStateButton(self, "Line", "Line")
@@ -84,14 +85,15 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.auto_focus_button = MonoStateButton(self, "Focus", "Eyeball")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
-        self.visual_align_button = MonoStateButton(self, "Kappa align", "Align")
+        self.visual_align_button = MonoStateButton(self, "Visual align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
         self.clear_all_button = MonoStateButton(self, "Clear all", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
+        self.auto_center_button.setText("Auto")
         self.realign_button = MonoStateButton(self, "Realign beam", "QuickRealign")
 
         # Layout -------------------------------------------------------------- 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.centre_button)
         _main_vlayout.addWidget(self.accept_button)
         _main_vlayout.addWidget(self.reject_button)
@@ -208,16 +210,15 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         formats = ["*.%s" % unicode(format).lower() for format in \
-                   QtGui.QImageWriter.supportedImageFormats()]
+                   QImageWriter.supportedImageFormats()]
 
         current_file_name = "%s/%s_%d.%s" % (self.directory, self.prefix,
             self.file_index, "png")
-        filename = QtCore.QString(QtGui.QFileDialog.getSaveFileName(\
+        filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save under",
             current_file_name, "Image files (%s)" % " ".join(formats)))
 
-        if not filename.isEmpty():
-            filename = str(filename)
+        if len(filename):
             image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
                 self.graphics_manager_hwobj.save_scene_snapshot(filename)
@@ -304,9 +305,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         self.setEnabled(True)
-        self.emit(QtCore.SIGNAL("enableMinidiff"), (False,))
-        if self.inside_data_collection:
-            self.emit(QtCore.SIGNAL("centringStarted"), ())
+        #self.GNAL("enableMinidiff"), (False,))
+        #if self.inside_data_collection:
+        #    self.emit(QtCore.SIGNAL("centringStarted"), ())
         self.centre_button.command_started()
         self.accept_button.setEnabled(False)
         self.reject_button.setEnabled(True)
@@ -328,7 +329,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
                                                Qt4_widget_colors.LIGHT_RED)
 
         self.setEnabled(True)
-        self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
+        #self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
     def centring_failed(self, method, centring_status):
         """
@@ -341,7 +342,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         if self.inside_data_collection:
             Qt4_widget_colors.set_widget_color(self.accept_button, self.button_standart_color)
             self.reject_button.setEnabled(True)
-            Qt4_widget_colors.set_widget_color(self.reject_button, QtCore.Qt.red)
+            Qt4_widget_colors.set_widget_color(self.reject_button, Qt.red)
         else:
             self.reject_button.setEnabled(False)
         #self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
@@ -376,26 +377,27 @@ class Qt4_HutchMenuBrick(BlissWidget):
     def auto_center_clicked(self):
         self.graphics_manager_hwobj.start_auto_centring()
 
-class MonoStateButton(QtGui.QToolButton):
+class MonoStateButton(QToolButton):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(75, 40)):
+        QToolButton.__init__(self, parent)
 
-    def __init__(self, parent, caption=None, icon=None, fixed_size=(80, 45)):
-        QtGui.QToolButton.__init__(self, parent)
-        self.setToolButtonStyle(True)
-        if fixed_size: 
-            self.setFixedSize(fixed_size[0], fixed_size[1])
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.setFixedSize(fixed_size[0], fixed_size[1])
+        #self.setSizePolicy(QSizePolicy.Fixed,
+        #                   QSizePolicy.Fixed)
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         if caption:
             self.setText(caption)
+            self.setWindowIconText(caption)
         if icon:
             self.setIcon(Qt4_Icons.load_icon(icon))
             
-class DuoStateButton(QtGui.QToolButton):
+class DuoStateButton(QToolButton):
     """
     Descript. : 
     Args.     : 
     Return    : 
     """
-    commandExecuteSignal = QtCore.pyqtSignal(bool)
+    commandExecuteSignal = pyqtSignal(bool)
 
     def __init__(self, parent, caption):
         """
@@ -403,15 +405,19 @@ class DuoStateButton(QtGui.QToolButton):
         Args.     : 
         Return    : 
         """
-        QtGui.QToolButton.__init__(self, parent)
+        QToolButton.__init__(self, parent)
+
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.executing = False
         self.run_icon = None
         self.stop_icon = None
-        self.standard_color = self.palette().color(QtGui.QPalette.Window)
-        self.setToolButtonStyle(True)
+        self.standard_color = self.palette().color(QPalette.Window)
+        self.standard_color = self.palette().color(QPalette.Window)
+        #self.setToolButtonStyle(True)
         self.setText(caption)
-        self.setFixedSize(80, 45)
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.setFixedSize(75, 40)
+        self.setSizePolicy(QSizePolicy.Fixed,
+                           QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 
     def set_icons(self, icon_run, icon_stop):
@@ -444,7 +450,7 @@ class DuoStateButton(QtGui.QToolButton):
         Return    : 
         """
         Qt4_widget_colors.set_widget_color(self, Qt4_widget_colors.LIGHT_YELLOW,
-            QtGui.QPalette.Button) 
+            QPalette.Button) 
         if self.stop_icon is not None:
             self.setIcon(self.stop_icon)
         self.executing = True
@@ -466,7 +472,7 @@ class DuoStateButton(QtGui.QToolButton):
         """
         self.executing = False
         Qt4_widget_colors.set_widget_color(self, self.standard_color,
-            QtGui.QPalette.Button)
+            QPalette.Button)
         if self.run_icon is not None:
             self.setIcon(self.run_icon)
         self.setEnabled(True)

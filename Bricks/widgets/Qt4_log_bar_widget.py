@@ -20,27 +20,24 @@
 import time
 import gevent
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class LogBarWidget(QtGui.QWidget):
-    def __init__(self, parent = None, name = "log_bar_widget", fl = 0):
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+class LogBarWidget(QWidget):
+
+    def __init__(self, parent=None, name="log_bar_widget", fl=0):
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
 
-        self.text_edit = QtGui.QTextEdit(self)
-        #self.text_edit.setMinimumSize(QtCore.QSize(0, 100))
-        #self.text_edit.setMaximumSize(QtCore.QSize(32767, 100))
+        self.text_edit = QTextEdit(self)
         self.text_edit.setAcceptRichText(True)
-        #self.text_edit.setTextFormat(QtGui.QTextEdit.RichText)
         self.text_edit.setReadOnly(True)
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(self.text_edit)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)

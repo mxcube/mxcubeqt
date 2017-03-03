@@ -19,7 +19,7 @@
 
 import html_template
 
-from PyQt4 import QtGui
+from QtImport import *
 
 from widgets.Qt4_dc_parameters_widget import DCParametersWidget
 from widgets.Qt4_image_tracking_widget import ImageTrackingWidget
@@ -28,7 +28,9 @@ from widgets.Qt4_snapshot_widget import SnapshotWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'Task'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_DCParametersBrick(BlissWidget):
@@ -59,9 +61,9 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.defineSlot("populate_dc_parameter_widget",({}))
        
         # Graphic elements ---------------------------------------------------- 
-        self.tool_box = QtGui.QToolBox(self)
+        self.tool_box = QToolBox(self)
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
-        self.results_static_view = QtGui.QTextBrowser(self.tool_box)
+        self.results_static_view = QTextBrowser(self.tool_box)
         self.image_tracking_widget = ImageTrackingWidget(self.tool_box) 
         self.advance_results_widget = AdvancedResultsWidget(self.tool_box)
         self.snapshot_widget = SnapshotWidget(self)
@@ -72,7 +74,7 @@ class Qt4_DCParametersBrick(BlissWidget):
         self.tool_box.addItem(self.advance_results_widget, "Results - Parallel processing")
 
         # Layout -------------------------------------------------------------- 
-        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout = QHBoxLayout(self)
         _main_vlayout.addWidget(self.tool_box)
         _main_vlayout.addWidget(self.snapshot_widget)
 

@@ -20,9 +20,7 @@
 import os
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -32,6 +30,8 @@ from widgets.Qt4_plate_navigator_widget import PlateNavigatorWidget
 from Qt4_sample_changer_helper import SampleChanger
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "Sample changer"
 
 
@@ -67,11 +67,11 @@ class Qt4_PlateBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.plate_navigator_widget = PlateNavigatorWidget(self)
-        self.crims_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.crims_widget = loadUi(os.path.join(os.path.dirname(__file__),
              'widgets/ui_files/Qt4_plate_crims_widget_layout.ui'))
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.plate_navigator_widget)
         _main_vlayout.addWidget(self.crims_widget)
         _main_vlayout.setSpacing(0)
@@ -88,11 +88,11 @@ class Qt4_PlateBrick(BlissWidget):
         self.crims_widget.xtal_treewidget.currentItemChanged.connect(\
              self.xtal_treewidget_current_item_changed)
         # Other ---------------------------------------------------------------
-        self.xtal_image_graphicsscene = QtGui.QGraphicsScene(self)
+        self.xtal_image_graphicsscene = QGraphicsScene(self)
         self.crims_widget.xtal_image_graphicsview.setScene(\
              self.xtal_image_graphicsscene)
-        self.xtal_image_pixmap = QtGui.QPixmap()  
-        self.xtal_image_graphics_pixmap = QtGui.QGraphicsPixmapItem()
+        self.xtal_image_pixmap = QPixmap()  
+        self.xtal_image_graphics_pixmap = QGraphicsPixmapItem()
         self.xtal_image_graphicsscene.addItem(\
              self.xtal_image_graphics_pixmap)
 
@@ -170,11 +170,11 @@ class Qt4_PlateBrick(BlissWidget):
         Descript. :
         """
         self.plate_widget.xtal_treewidget.clear()
-        info_str_list = QtCore.QStringList()
+        info_str_list = QStringList()
         info_str_list.append(self.plate_content.plate.barcode)
         info_str_list.append(self.plate_content.plate.plate_type)
-        root_item = QtGui.QTreeWidgetItem(self.plate_widget.xtal_treewidget,
-                                          info_str_list)
+        root_item = QTreeWidgetItem(self.plate_widget.xtal_treewidget,
+                                    info_str_list)
         root_item.setExpanded(True)
         for xtal in self.plate_content.plate.xtal_list:
             xtal_address = "%s:%d" % (xtal.row, xtal.column + 1)
@@ -184,7 +184,7 @@ class Qt4_PlateBrick(BlissWidget):
             if not cell_treewidget_item:
                 cell_treewidget_item = root_item
 
-            info_str_list = QtCore.QStringList()
+            info_str_list = QStringList()
             info_str_list.append(xtal.sample)
             info_str_list.append(xtal.label)
             info_str_list.append(xtal.login)
@@ -192,7 +192,7 @@ class Qt4_PlateBrick(BlissWidget):
             info_str_list.append(str(xtal.column))
             if xtal.comments:
                 info_str_list.append(str(xtal.comments))
-            xtal_treewidget_item = QtGui.QTreeWidgetItem(\
+            xtal_treewidget_item = QTreeWidgetItem(\
                  cell_treewidget_item, info_str_list)
             #self.plate_widget.xtal_treewidget.ensureItemVisible(xtal_treewidget_item) 
             self.xtal_map[xtal_treewidget_item] = xtal

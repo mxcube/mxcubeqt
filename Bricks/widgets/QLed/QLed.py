@@ -1,13 +1,12 @@
 
-from PyQt4 import QtGui
-from PyQt4 import QtSvg
+from QtImport import *
 
 from qled_resources import *
 
-class QLed(QtGui.QWidget):
+class QLed(QWidget):
     def __init__(self,*args):
 
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
         self.value = False
 
         self.username = None
@@ -20,7 +19,7 @@ class QLed(QtGui.QWidget):
 
         self.shapes = ["circle", "square" , "triang", "round"]
         self.colors = ["red", "green", "yellow", "grey", "orange", "purple", "blue"]
-        self.renderer = QtSvg.QSvgRenderer()
+        self.renderer = QSvgRenderer()
         self.setOff()
 
     def setUserName(self, name):
@@ -36,8 +35,8 @@ class QLed(QtGui.QWidget):
         self._update()
 
     def paintEvent(self,ev):
-        painter = QtGui.QPainter(self)  
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        painter = QPainter(self)  
+        painter.setRenderHint(QPainter.Antialiasing, True)
 
         self.filename = ":/resources/%s_%s.svg" % (self.shape, self.color) 
         
@@ -99,8 +98,8 @@ class QLed(QtGui.QWidget):
         self.repaint()
 
 if __name__ == '__main__':
-    app = QtGui.QApplication([])
-    win = QtGui.QMainWindow()
+    app = QApplication([])
+    win = QMainWindow()
     wid = QLed()
     wid.setOn()
     win.setCentralWidget(wid) 

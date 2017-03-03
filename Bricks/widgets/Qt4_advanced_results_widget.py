@@ -17,19 +17,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 from widgets.Qt4_heat_map_widget import HeatMapWidget
 
 
-class AdvancedResultsWidget(QtGui.QWidget):
+class AdvancedResultsWidget(QWidget):
     def __init__(self, parent = None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.setObjectName('advanced_results_widget')  
 
         # Hardware objects ----------------------------------------------------
@@ -43,7 +41,7 @@ class AdvancedResultsWidget(QtGui.QWidget):
         self.heat_map_widget = HeatMapWidget(self)
 
         # Layout --------------------------------------------------------------
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(self.heat_map_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)

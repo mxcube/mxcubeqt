@@ -17,13 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_dc_group_widget import DCGroupWidget
 
-__category__ = 'Task'
+
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_DCGBrick(BlissWidget):
@@ -36,7 +38,7 @@ class Qt4_DCGBrick(BlissWidget):
 
         self.dc_group_widget = DCGroupWidget(self)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.dc_group_widget)
 
         # Qt-Slots

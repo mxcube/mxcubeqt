@@ -17,14 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
 
 
@@ -54,24 +55,24 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         self.__expertMode = False
         
         # Graphic elements ----------------------------------------------------
-        self.main_groupbox = QtGui.QGroupBox("Door interlock", self)
-        self.main_groupbox.setAlignment(QtCore.Qt.AlignCenter)
-        self.state_label = QtGui.QLabel('<b>unknown</b>', self.main_groupbox)
+        self.main_groupbox = QGroupBox("Door interlock", self)
+        self.main_groupbox.setAlignment(Qt.AlignCenter)
+        self.state_label = QLabel('<b>unknown</b>', self.main_groupbox)
         Qt4_widget_colors.set_widget_color(self.state_label,
                                            self.STATES['unknown']) 
-        self.state_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.unlock_door_button = QtGui.QPushButton(\
+        self.state_label.setAlignment(Qt.AlignCenter)
+        self.unlock_door_button = QPushButton(\
              Qt4_Icons.load_icon("EnterHutch"),
              "Unlock", self.main_groupbox)
 
         # Layout -------------------------------------------------------------- 
-        _main_gbox_vlayout = QtGui.QVBoxLayout(self.main_groupbox)
+        _main_gbox_vlayout = QVBoxLayout(self.main_groupbox)
         _main_gbox_vlayout.addWidget(self.state_label)
         _main_gbox_vlayout.addWidget(self.unlock_door_button)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_groupbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)

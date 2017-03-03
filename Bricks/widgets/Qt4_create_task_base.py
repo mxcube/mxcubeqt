@@ -22,18 +22,15 @@ import abc
 import copy
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 
 import Qt4_queue_item
 import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 import queue_model_enumerables_v1 as queue_model_enumerables
 
-#from BlissFramework.Utils import widget_colors
 
-
-class CreateTaskBase(QtGui.QWidget):
+class CreateTaskBase(QWidget):
     """
     Base class for widgets that are used to create tasks.
     Contains methods for handling the PathTemplate,
@@ -48,7 +45,7 @@ class CreateTaskBase(QtGui.QWidget):
     the objects PathTemplate and AcquisitionParameters.
     """
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
-         QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+         QWidget.__init__(self, parent, Qt.WindowFlags(fl))
          self.setObjectName(name)
          
          self._tree_brick = None

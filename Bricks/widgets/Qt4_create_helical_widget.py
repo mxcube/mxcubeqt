@@ -21,9 +21,7 @@ import os
 import copy
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
@@ -50,7 +48,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
-        self._lines_widget = uic.loadUi(os.path.join(\
+        self._lines_widget = loadUi(os.path.join(\
             os.path.dirname(__file__), "ui_files/Qt4_helical_line_widget_layout.ui"))
 
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
@@ -64,7 +62,7 @@ class CreateHelicalWidget(CreateTaskBase):
              data_model=self._processing_parameters)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
@@ -130,12 +128,13 @@ class CreateHelicalWidget(CreateTaskBase):
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
             self._lines_widget.lines_treewidget.clearSelection()
-            info_str_list = QtCore.QStringList()
+            #info_str_list = QStringList()
+            info_str_list = []
             info_str_list.append(shape.get_display_name())
             info_str_list.append("%d" % shape.get_points_index()[0])
             info_str_list.append("%d" % shape.get_points_index()[1])
             
-            lines_treewidget_item = QtGui.QTreeWidgetItem(\
+            lines_treewidget_item = QTreeWidgetItem(\
                 self._lines_widget.lines_treewidget,
                 info_str_list)
             lines_treewidget_item.setSelected(True)

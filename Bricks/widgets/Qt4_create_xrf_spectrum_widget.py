@@ -13,9 +13,7 @@ import sys
 import copy
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+from QtImport import *
 
 import Qt4_queue_item
 from Qt4_GraphicsLib import GraphicsItemPoint
@@ -31,7 +29,7 @@ __category__ = 'Qt4_TaskToolbox_Tabs'
 class CreateXRFSpectrumWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
         CreateTaskBase.__init__(self, parent, name, 
-            QtCore.Qt.WindowFlags(fl), 'XRF spectrum')
+            Qt.WindowFlags(fl), 'XRF spectrum')
  
         if name is not None:
             self.setObjectName(name)
@@ -47,17 +45,17 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self, 
              data_model = self._path_template, layout = 'vertical')
 
-        _parameters_gbox = QtGui.QGroupBox('Parameters', self)
-        _count_time_label = QtGui.QLabel("Count time (sec.):", _parameters_gbox)
-        self.count_time_ledit = QtGui.QLineEdit("1", _parameters_gbox)
+        _parameters_gbox = QGroupBox('Parameters', self)
+        _count_time_label = QLabel("Count time (sec.):", _parameters_gbox)
+        self.count_time_ledit = QLineEdit("1", _parameters_gbox)
         #self.count_time_ledit.setMaximumWidth(75)
-        self.adjust_transmission_cbox = QtGui.QCheckBox(\
+        self.adjust_transmission_cbox = QCheckBox(\
              "Adjust transmission", _parameters_gbox)
         self.adjust_transmission_cbox.setChecked(True)
         
 
         # Layout --------------------------------------------------------------
-        _parameters_gbox_hlayout = QtGui.QHBoxLayout(_parameters_gbox)
+        _parameters_gbox_hlayout = QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
         _parameters_gbox_hlayout.addWidget(self.count_time_ledit) 
         _parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
@@ -65,7 +63,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _parameters_gbox_hlayout.setSpacing(2)
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(_parameters_gbox)
         _main_vlayout.setSpacing(2)

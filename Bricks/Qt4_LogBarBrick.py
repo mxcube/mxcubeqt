@@ -19,14 +19,16 @@
 
 import logging
 
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_log_bar_widget import LogBarWidget
 from BlissFramework.Utils import Qt4_GUILogHandler
 
 
-__category__ = 'Log'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Log"
 
 
 class Qt4_LogBarBrick(BlissWidget):
@@ -62,14 +64,14 @@ class Qt4_LogBarBrick(BlissWidget):
         self._status_bar_widget = LogBarWidget(self)
 
         # Layout --------------------------------------------------------------
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(self._status_bar_widget)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
-                           QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, 
+                           QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
 
@@ -109,8 +111,8 @@ class Qt4_LogBarBrick(BlissWidget):
             text_document = self._status_bar_widget.text_edit.document()
             if self.max_log_lines > -1 and \
                text_document.blockCount() > self.max_log_lines:
-                cursor = QtGui.QTextCursor(text_document.firstBlock())
-                cursor.select(QtGui.QTextCursor.BlockUnderCursor)
+                cursor = QTextCursor(text_document.firstBlock())
+                cursor.select(QTextCursor.BlockUnderCursor)
                 cursor.removeSelectedText()
                 cursor.deleteChar()
 

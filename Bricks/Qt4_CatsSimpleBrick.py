@@ -32,27 +32,28 @@ puck. This HT puck has special handling by the Cats sample changer.
 """
 
 import logging
-from PyQt4 import QtCore, QtGui
+
+from QtImport import *
 
 from Qt4_SampleChangerBrick3 import Qt4_SampleChangerBrick3, BasketView, VialView
 from Qt4_sample_changer_helper import *
 
 __category__ = "Sample changer"
 
-class CatsStatusView(QtGui.QGroupBox):
+class CatsStatusView(QGroupBox):
 
     def __init__(self, parent):
-        QtGui.QGroupBox.__init__(self, "Sample Changer State", parent)
+        QGroupBox.__init__(self, "Sample Changer State", parent)
 
         # Graphic elements ----------------------------------------------------
-        #self.contents_widget = QtGui.QGroupBox("Sample Changer State", self)
+        #self.contents_widget = QGroupBox("Sample Changer State", self)
 
-        self.status_label = QtGui.QLabel("")
-        self.status_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.status_label = QLabel("")
+        self.status_label.setAlignment(Qt.AlignCenter)
 
         # Layout --------------------------------------------------------------
 
-        _layout = QtGui.QHBoxLayout(self)
+        _layout = QHBoxLayout(self)
         _layout.addWidget(self.status_label)
         _layout.setSpacing(2)
         _layout.setContentsMargins(6,6,6,10)
@@ -105,8 +106,6 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
         self.double_click_loads_cbox.hide()
 
     def propertyChanged(self, property_name, oldValue, newValue):
-        logging.getLogger("GUI").info("Property Changed: " + str(property_name) + " = " + str(newValue))
-
         if property_name == 'mnemonic':
             if self.sample_changer_hwobj is not None:
                 self.disconnect(self.device, 'runningStateChanged', \
@@ -147,12 +146,12 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
         return CatsStatusView(container)
 
     def build_operations_widget(self):
-        self.buttons_layout = QtGui.QHBoxLayout()
-        self.operation_buttons_layout = QtGui.QVBoxLayout()
+        self.buttons_layout = QHBoxLayout()
+        self.operation_buttons_layout = QVBoxLayout()
 
-        self.load_button = QtGui.QPushButton("Load", self)
-        self.unload_button = QtGui.QPushButton("Unload", self)
-        self.abort_button = QtGui.QPushButton("Abort", self)
+        self.load_button = QPushButton("Load", self)
+        self.unload_button = QPushButton("Unload", self)
+        self.abort_button = QPushButton("Abort", self)
 
         self.load_button.clicked.connect(self.load_selected_sample)
         self.unload_button.clicked.connect(self.unload_selected_sample)
@@ -192,7 +191,6 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
              self.baskets[-1].setMatrices(vials)
 
     def sc_state_changed(self, state, previous_state=None):
-        logging.getLogger("GUI").info("CATS. sc state changed %s " % (state))
         Qt4_SampleChangerBrick3.sc_state_changed(self, state, previous_state)
 
         self.state = state
@@ -207,20 +205,19 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
         self._updateButtons()
 
     def _updateButtons(self):
-        logging.getLogger("GUI").info("Update buttons %s / %s  / %s " % (self.state, self._poweredOn, self._pathRunning))
-        
         running = self._pathRunning and True or False
-        ready = not running
+        if self.state in [SampleChangerState.Ready, SampleChangerState.StandBy]:
+            ready = not running
+        else:
+            ready = False
         poweredOn = self._poweredOn and True or False # handles init state None as False
 
         if not poweredOn:
-            logging.getLogger("GUI").info("powered off")
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(False)
             abort_color = Qt4_widget_colors.LIGHT_GRAY
         elif ready:
-            logging.getLogger("GUI").info("ready and not running task. Activate buttons")
             self.load_button.setEnabled(True)
             if self.sample_changer_hwobj.hasLoadedSample():
                 self.unload_button.setEnabled(True)
@@ -229,7 +226,6 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
             self.abort_button.setEnabled(False)
             abort_color = Qt4_widget_colors.LIGHT_GRAY
         else:
-            logging.getLogger("GUI").info("running task. Activate abort button")
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(True)
@@ -242,15 +238,15 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
         basket, vial = self.user_selected_sample
         logging.getLogger("GUI").info("Loading sample basket: %s / %s" % (basket, vial))
 
-        if self.sample_changer_hwobj.read_diff_phase() != "TRANSFER":
-             _res = QtGui.QMessageBox.warning(self, "Loading aborted", 
+        if self.sample_changer_hwobj.read_diff_phase().upper() != "TRANSFER":
+             _res = QMessageBox.warning(self, "Loading aborted", 
                  "Diffractometer is not in TRANSFER phase.  Loading sample aborted", 
-                 QtGui.QMessageBox.Ok)
+                 QMessageBox.Ok)
              return
 
         if basket is not None and vial is not None:
             if basket != 100:
-                sample_loc=(basket,vial)
+                sample_loc="%d:%02d" % (basket+1,vial)
                 self.sample_changer_hwobj.load(sample_loc,wait=False)
             else:
                 self.sample_changer_hwobj.load_ht(vial,wait=False)

@@ -50,17 +50,16 @@ Depending of the beam focusing mode user can enter gap sizes by using spinboxes.
 -----------------------------------------------------------------------
 """
 
-import logging
-
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Beam definition"
 
 
 class Qt4_SlitsBrick(BlissWidget):
@@ -85,51 +84,51 @@ class Qt4_SlitsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtGui.QGroupBox('Slits', self) #h
-        hor_label = QtGui.QLabel("Horizontal:", self.main_gbox)
-        self.current_hor_pos_ledit = QtGui.QLineEdit(self.main_gbox)
-        self.current_hor_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
+        self.main_gbox = QGroupBox('Slits', self) #h
+        hor_label = QLabel("Horizontal:", self.main_gbox)
+        self.current_hor_pos_ledit = QLineEdit(self.main_gbox)
+        self.current_hor_pos_ledit.setAlignment(Qt.AlignRight)
         boldFont = self.current_hor_pos_ledit.font()
         boldFont.setBold(True)
         self.current_hor_pos_ledit.setFont(boldFont)
         self.current_hor_pos_ledit.setMaximumWidth(70)
         self.current_hor_pos_ledit.setEnabled(False)
-        self.hor_pos_dspinbox = QtGui.QSpinBox(self.main_gbox)
+        self.hor_pos_dspinbox = QSpinBox(self.main_gbox)
         self.hor_pos_dspinbox.setMaximumWidth(70)
         self.hor_pos_dspinbox.setEnabled(False)
-        self.set_hor_gap_button = QtGui.QPushButton(\
+        self.set_hor_gap_button = QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
         self.set_hor_gap_button.setEnabled(False)
         self.set_hor_gap_button.setFixedWidth(27)
-        self.stop_hor_button = QtGui.QPushButton(\
+        self.stop_hor_button = QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
         self.stop_hor_button.setEnabled(False)
         self.stop_hor_button.setFixedWidth(27)
 
 	#Vertical gap
-        ver_label = QtGui.QLabel("Vertical:", self.main_gbox)
-        self.current_ver_pos_ledit = QtGui.QLineEdit(self.main_gbox)
-        self.current_ver_pos_ledit.setAlignment(QtCore.Qt.AlignRight)
+        ver_label = QLabel("Vertical:", self.main_gbox)
+        self.current_ver_pos_ledit = QLineEdit(self.main_gbox)
+        self.current_ver_pos_ledit.setAlignment(Qt.AlignRight)
         self.current_ver_pos_ledit.setFont(boldFont)
         self.current_ver_pos_ledit.setMaximumWidth(70)
         self.current_ver_pos_ledit.setEnabled(False)
-        self.ver_pos_dspinbox = QtGui.QSpinBox(self.main_gbox)
+        self.ver_pos_dspinbox = QSpinBox(self.main_gbox)
         self.ver_pos_dspinbox.setMaximumWidth(70)
         self.ver_pos_dspinbox.setEnabled(False)
-        self.set_ver_gap_button = QtGui.QPushButton(\
+        self.set_ver_gap_button = QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
         self.set_ver_gap_button.setEnabled(False)
         self.set_ver_gap_button.setFixedWidth(27)
-        self.stop_ver_button = QtGui.QPushButton(\
+        self.stop_ver_button = QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
         self.stop_ver_button.setEnabled(False)
         self.stop_ver_button.setFixedWidth(27)
 
-        self.test_button = QtGui.QPushButton("Test", self.main_gbox)
+        self.test_button = QPushButton("Test", self.main_gbox)
         self.test_button.hide()
 
         # Layout --------------------------------------------------------------
-        _main_gbox_gridlayout = QtGui.QGridLayout(self.main_gbox)
+        _main_gbox_gridlayout = QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(hor_label, 0, 0)
         _main_gbox_gridlayout.addWidget(self.current_hor_pos_ledit, 0, 1)
         _main_gbox_gridlayout.addWidget(self.hor_pos_dspinbox, 0, 2)
@@ -145,7 +144,7 @@ class Qt4_SlitsBrick(BlissWidget):
 
         _main_gbox_gridlayout.addWidget(self.test_button, 0, 5)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -215,10 +214,10 @@ class Qt4_SlitsBrick(BlissWidget):
 
         Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox,
                                            Qt4_SlitsBrick.CONNECTED_COLOR,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
         Qt4_widget_colors.set_widget_color(self.ver_pos_dspinbox,
                                            Qt4_SlitsBrick.CONNECTED_COLOR,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
 
     def stop_hor_clicked(self):
         self.slitbox_hwobj.stop_gap_move('Hor')
@@ -228,13 +227,13 @@ class Qt4_SlitsBrick(BlissWidget):
 
     def hor_gap_edited(self, text):
         Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox.lineEdit(),
-                                              Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                              QtGui.QPalette.Base)
+                                           Qt4_widget_colors.LINE_EDIT_CHANGED,
+                                           QPalette.Base)
 
     def ver_gap_edited(self, text):
         Qt4_widget_colors.set_widget_color(self.ver_pos_dspinbox.lineEdit(),
-                                              Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                              QtGui.QPalette.Base)
+                                           Qt4_widget_colors.LINE_EDIT_CHANGED,
+                                           QPalette.Base)
 
     def change_hor_gap(self):
         val = self.hor_pos_dspinbox.value() / 1000.0
@@ -271,10 +270,10 @@ class Qt4_SlitsBrick(BlissWidget):
 
         Qt4_widget_colors.set_widget_color(self.hor_pos_dspinbox.lineEdit(),
                                            Qt4_SlitsBrick.CONNECTED_COLOR,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
         Qt4_widget_colors.set_widget_color(self.ver_pos_dspinbox.lineEdit(),
                                            Qt4_SlitsBrick.CONNECTED_COLOR,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
 
     def gap_status_changed(self, gapHorStatus, gapVerStatus):
         if gapHorStatus == 'Move':  #Moving
@@ -282,26 +281,26 @@ class Qt4_SlitsBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(\
                  self.hor_pos_dspinbox.lineEdit(),
                  Qt4_widget_colors.LIGHT_YELLOW,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
         else:
             self.stop_hor_button.setEnabled(False)
             Qt4_widget_colors.set_widget_color(\
                  self.hor_pos_dspinbox.lineEdit(),
                  Qt4_widget_colors.LIGHT_GREEN,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
 
         if gapVerStatus == 'Move':  #Moving
             self.stop_ver_button.setEnabled(True)
             Qt4_widget_colors.set_widget_color(\
                  self.ver_pos_dspinbox.lineEdit(),
                  Qt4_widget_colors.LIGHT_YELLOW,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
         else:
            self.stop_ver_button.setEnabled(False)
            Qt4_widget_colors.set_widget_color(\
                  self.ver_pos_dspinbox.lineEdit(),
                  Qt4_widget_colors.LIGHT_GREEN,
-                 QtGui.QPalette.Base)
+                 QPalette.Base)
 
     def focus_mode_changed(self, horFocMode, verFocMode):
         self.hor_pos_dspinbox.setEnabled(horFocMode)

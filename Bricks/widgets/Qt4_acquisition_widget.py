@@ -19,9 +19,7 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 
@@ -32,20 +30,20 @@ from BlissFramework.Utils import Qt4_widget_colors
 MAD_ENERGY_COMBO_NAMES = {'ip': 0, 'pk': 1, 'rm1': 2, 'rm2': 3}
 
 
-class AcquisitionWidget(QtGui.QWidget):
+class AcquisitionWidget(QWidget):
     """
     Descript. :
     """
   
-    acqParametersChangedSignal = QtCore.pyqtSignal()
-    madEnergySelectedSignal = QtCore.pyqtSignal(str, float, bool)
+    acqParametersChangedSignal = pyqtSignal()
+    madEnergySelectedSignal = pyqtSignal(str, float, bool)
 
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
                  path_template = None, layout = 'horizontal'):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent, QtCore.Qt.WindowFlags(fl))
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         
         if name is not None:
             self.setObjectName(name)
@@ -78,15 +76,15 @@ class AcquisitionWidget(QtGui.QWidget):
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         if layout == "horizontal":
-            self.acq_widget_layout = uic.loadUi(os.path.join(\
+            self.acq_widget_layout = loadUi(os.path.join(\
                  os.path.dirname(__file__),
                  "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
         else:
-            self.acq_widget_layout = uic.loadUi(os.path.join(\
+            self.acq_widget_layout = loadUi(os.path.join(\
                  os.path.dirname(__file__),
                  "ui_files/Qt4_acquisition_widget_vertical_layout.ui"))
         # Layout --------------------------------------------------------------
-        __main_vlayout = QtGui.QVBoxLayout(self)
+        __main_vlayout = QVBoxLayout(self)
         __main_vlayout.addWidget(self.acq_widget_layout)
         __main_vlayout.setSpacing(0)
         __main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -121,7 +119,7 @@ class AcquisitionWidget(QtGui.QWidget):
              self.resolution_ledit_changed)
         
         overlap_ledit = self.acq_widget_layout.findChild(\
-            QtGui.QLineEdit, "overlap_ledit")
+            QLineEdit, "overlap_ledit")
         if overlap_ledit is not None:
             overlap_ledit.textChanged.connect(self.overlap_changed)
 
@@ -131,30 +129,30 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.energies_combo.setDisabled(True)
         self.acq_widget_layout.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
-        self.osc_start_validator = QtGui.QDoubleValidator(\
+        self.osc_start_validator = QDoubleValidator(\
              -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit)
-        self.osc_range_validator = QtGui.QDoubleValidator(\
+        self.osc_range_validator = QDoubleValidator(\
              -10000, 10000, 4, self.acq_widget_layout.osc_range_ledit)
-        self.kappa_validator = QtGui.QDoubleValidator(\
+        self.kappa_validator = QDoubleValidator(\
              0, 360, 4, self.acq_widget_layout.kappa_ledit)
-        self.kappa_phi_validator = QtGui.QDoubleValidator(\
+        self.kappa_phi_validator = QDoubleValidator(\
              0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
-        self.energy_validator = QtGui.QDoubleValidator(\
+        self.energy_validator = QDoubleValidator(\
              4, 25, 4, self.acq_widget_layout.energy_ledit)
-        self.resolution_validator = QtGui.QDoubleValidator(\
+        self.resolution_validator = QDoubleValidator(\
              0, 15, 3, self.acq_widget_layout.resolution_ledit)
-        self.transmission_validator = QtGui.QDoubleValidator(\
+        self.transmission_validator = QDoubleValidator(\
              0, 100, 3, self.acq_widget_layout.transmission_ledit)
-        self.exp_time_validator = QtGui.QDoubleValidator(\
+        self.exp_time_validator = QDoubleValidator(\
              0.0001, 10000, 4, self.acq_widget_layout.exp_time_ledit)
-        self.first_img_validator = QtGui.QIntValidator(\
+        self.first_img_validator = QIntValidator(\
              0, 99999, self.acq_widget_layout.first_image_ledit)
-        self.num_img_validator = QtGui.QIntValidator(\
+        self.num_img_validator = QIntValidator(\
              1, 99999, self.acq_widget_layout.num_images_ledit) 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-        if self.acq_widget_layout.findChild(QtGui.QPushButton, "set_max_osc_range_button"):
+        if self.acq_widget_layout.findChild(QPushButton, "set_max_osc_range_button"):
             self.acq_widget_layout.set_max_osc_range_button.hide()
 
     def fix_osc_start(self, state):
@@ -307,19 +305,19 @@ class AcquisitionWidget(QtGui.QWidget):
                                                 int, 
                                                 self.num_img_validator)
 
-        num_passes = self.acq_widget_layout.findChild(QtGui.QLineEdit, "num_passes_ledit")
+        num_passes = self.acq_widget_layout.findChild(QLineEdit, "num_passes_ledit")
 
         if num_passes:
             self._acquisition_mib.\
                 bind_value_update('num_passes', num_passes, int,
-                                  QtGui.QIntValidator(1, 1000, self))
+                                  QIntValidator(1, 1000, self))
 
-        overlap_ledit = self.acq_widget_layout.findChild(QtGui.QLineEdit, "overlap_ledit")
+        overlap_ledit = self.acq_widget_layout.findChild(QLineEdit, "overlap_ledit")
 
         if overlap_ledit:
             self._acquisition_mib.\
                 bind_value_update('overlap', overlap_ledit, float,
-                                  QtGui.QDoubleValidator(-1000, 1000, 2, self))
+                                  QDoubleValidator(-1000, 1000, 2, self))
 
         self._acquisition_mib.\
              bind_value_update('energy',
@@ -358,7 +356,7 @@ class AcquisitionWidget(QtGui.QWidget):
         self.acq_widget_layout.shutterless_cbx.setChecked(has_shutter_less)
 
         if self._beamline_setup_hwobj.disable_num_passes():
-            num_passes = self.acq_widget_layout.findChild(QtGui.QLineEdit, "num_passes_ledit")
+            num_passes = self.acq_widget_layout.findChild(QLineEdit, "num_passes_ledit")
             if num_passes:
                 num_passes.setDisabled(True)
 

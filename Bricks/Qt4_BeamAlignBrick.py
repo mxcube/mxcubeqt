@@ -21,15 +21,16 @@
 Qt4_BeamAlignBrick
 """
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-__category__ = 'General'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "General"
 
 
 class Qt4_BeamAlignBrick(BlissWidget):
@@ -56,17 +57,17 @@ class Qt4_BeamAlignBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox('Beam align', self) 
-        self.align_button = QtGui.QPushButton("Align", self.group_box)
+        self.group_box = QGroupBox('Beam align', self) 
+        self.align_button = QPushButton("Align", self.group_box)
 
         # Layout --------------------------------------------------------------
-        _group_box_vlayout = QtGui.QVBoxLayout(self.group_box)
+        _group_box_vlayout = QVBoxLayout(self.group_box)
         _group_box_vlayout.addWidget(self.align_button)
         _group_box_vlayout.addStretch()
         _group_box_vlayout.setSpacing(0)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
         
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)

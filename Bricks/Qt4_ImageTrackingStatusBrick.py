@@ -17,16 +17,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-
-import logging
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
+
 
 class Qt4_ImageTrackingStatusBrick(BlissWidget):
 
@@ -54,19 +54,19 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _main_groupbox = QtGui.QGroupBox("Image tracking", self)
-        self.state_label = QtGui.QLabel('<b> </b>', _main_groupbox)
-        self.image_tracking_cbox = QtGui.QCheckBox(\
+        _main_groupbox = QGroupBox("Image tracking", self)
+        self.state_label = QLabel('<b> </b>', _main_groupbox)
+        self.image_tracking_cbox = QCheckBox(\
              "Enable Adxv image tracking", _main_groupbox)
         
         # Layout --------------------------------------------------------------
-        _main_groupbox_vlayout = QtGui.QVBoxLayout(_main_groupbox)
+        _main_groupbox_vlayout = QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.state_label)
         _main_groupbox_vlayout.addWidget(self.image_tracking_cbox)
         _main_groupbox_vlayout.setSpacing(2)
         _main_groupbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_main_groupbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -78,7 +78,7 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
              self.image_tracking_cbox_changed)
 
         # Other ---------------------------------------------------------------
-        self.state_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.state_label.setAlignment(Qt.AlignCenter)
         self.state_changed("unknown")
         
     def propertyChanged(self, property_name, old_value, new_value):

@@ -17,13 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_energy_scan_parameters_widget import EnergyScanParametersWidget
 
 
-__category__ = 'Task'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_EnergyScanParametersBrick(BlissWidget):
@@ -40,7 +42,7 @@ class Qt4_EnergyScanParametersBrick(BlissWidget):
         # Layout
         self.energy_scan_widget = EnergyScanParametersWidget(self)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.energy_scan_widget)
 
         # Qt-Slots

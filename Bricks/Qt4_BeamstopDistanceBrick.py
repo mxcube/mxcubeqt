@@ -21,13 +21,11 @@
 Qt4_BeamstopDistanceBrick
 """
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from QtImport import *
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "General"
 
 
@@ -54,16 +52,16 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         self.addProperty('formatString', 'formatString', '###.##')
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtGui.QGroupBox("Beamstop distance", self)
-        current_label = QtGui.QLabel("Current:", self.group_box)
+        self.group_box = QGroupBox("Beamstop distance", self)
+        current_label = QLabel("Current:", self.group_box)
         current_label.setFixedWidth(75)
-        self.beamstop_distance_ledit = QtGui.QLineEdit(self.group_box)
+        self.beamstop_distance_ledit = QLineEdit(self.group_box)
         self.beamstop_distance_ledit.setReadOnly(True)
-        set_to_label = QtGui.QLabel("Set to:", self.group_box)
-        self.new_value_ledit = QtGui.QLineEdit(self.group_box)
+        set_to_label = QLabel("Set to:", self.group_box)
+        self.new_value_ledit = QLineEdit(self.group_box)
 
         # Layout --------------------------------------------------------------
-        _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
+        _group_box_gridlayout = QGridLayout(self.group_box)
         _group_box_gridlayout.addWidget(current_label, 0, 0)
         _group_box_gridlayout.addWidget(self.beamstop_distance_ledit, 0, 1)
         _group_box_gridlayout.addWidget(set_to_label, 1, 0)
@@ -71,7 +69,7 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 2, 2)
         _main_vlayout.addWidget(self.group_box)
@@ -85,8 +83,8 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                            Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                           QtGui.QPalette.Base)
-        self.new_value_validator = QtGui.QDoubleValidator(\
+                                           QPalette.Base)
+        self.new_value_validator = QDoubleValidator(\
              0, 100, 2, self.new_value_ledit)
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -146,11 +144,11 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         if input_field_text == "":
             Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                                Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                               QtGui.QPalette.Base)
+                                               QPalette.Base)
         else:
             Qt4_widget_colors.set_widget_color(self.new_value_ledit,
                                                Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                               QtGui.QPalette.Base)
+                                               QPalette.Base)
 
     def beamstop_distance_changed(self, value):
         """

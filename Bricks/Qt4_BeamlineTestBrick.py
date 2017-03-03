@@ -17,17 +17,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Qt4_BeamlineTestBrick
+   
+   Widget allows to run tests defined in the hardware object.
+   As a result a html page and pdf are generated.
+"""
+
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_webview_widget import WebViewWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = "Test"
 
 
@@ -51,7 +57,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.beamline_test_widget = uic.loadUi(os.path.join(\
+        self.beamline_test_widget = loadUi(os.path.join(\
              os.path.dirname(__file__), 
             'widgets/ui_files/Qt4_beamline_test_widget_layout.ui'))
 
@@ -66,19 +72,19 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.available_tests_listwidget = self.beamline_test_widget.\
              available_tests_listwidget
 
-        _web_view_widget = QtGui.QWidget(self)
-        _load_last_test_button = QtGui.QPushButton("View last results", \
+        _web_view_widget = QWidget(self)
+        _load_last_test_button = QPushButton("View last results", \
              _web_view_widget)
         self.test_result_browser = WebViewWidget(_web_view_widget)
 
         # Layout --------------------------------------------------------------
-        _web_view_widget_vlayout = QtGui.QVBoxLayout(_web_view_widget)
+        _web_view_widget_vlayout = QVBoxLayout(_web_view_widget)
         _web_view_widget_vlayout.addWidget(_load_last_test_button)
         _web_view_widget_vlayout.addWidget(self.test_result_browser)
         _web_view_widget_vlayout.setSpacing(2)
         _web_view_widget_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout = QHBoxLayout(self)
         _main_vlayout.addWidget(self.beamline_test_widget)
         _main_vlayout.addWidget(_web_view_widget)
         _main_vlayout.setSpacing(2)
@@ -99,8 +105,8 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         #self.beamline_test_widget.setFixedWidth(600)
         self.test_result_browser.setSizePolicy(\
-             QtGui.QSizePolicy.Expanding,
-             QtGui.QSizePolicy.Expanding)
+             QSizePolicy.Expanding,
+             QSizePolicy.Expanding)
         _load_last_test_button.setFixedWidth(200)
 
         self.test_toolbox.setCurrentWidget(self.test_queue_page)  
@@ -206,7 +212,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
             for device in self.com_device_list:
                 row += 1
                 for info_index, info in enumerate(device):
-                    temp_table_item = QtGui.QTableWidgetItem(info)
+                    temp_table_item = QTableWidgetItem(info)
                     self.com_device_table.setItem(row - 1, info_index, temp_table_item)
             #for col in range(self.com_device_table.columnCount()):
             #     self.com_device_table.adjustColumn(col)
@@ -240,7 +246,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         if focus_modes:
             focus_modes_table.setColumnCount(len(focus_modes))
             focus_modes_combo.clear()
-            hor_labels = QtCore.QStringList(focus_modes)
+            hor_labels = QStringList(focus_modes)
             focus_modes_table.setHorizontalHeaderLabels(hor_labels)
             for col, mode in enumerate(focus_modes):
                 focus_modes_combo.addItem(mode)
@@ -252,7 +258,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
 
         focus_motors_list = self.beamline_test_hwobj.get_focus_motors()
         if focus_motors_list:
-            ver_labels = QtCore.QStringList()
+            ver_labels = QStringList()
             focus_modes_table.setRowCount(len(focus_motors_list))
             for row, motor in enumerate(focus_motors_list):
                 ver_labels.append(motor['motorName'])
@@ -260,10 +266,10 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                     item_text = "%.3f/%.3f" % (motor['focusingModes'][mode], motor['position'])
                     res = (mode in motor['focMode'])
                     if res:
-                        temp_table_item = QtGui.QTableWidgetItem(item_text) 
+                        temp_table_item = QTableWidgetItem(item_text) 
                         temp_table_item.setBackground(Qt4_widget_colors.LIGHT_GREEN)
                     else:
-                        temp_table_item = QtGui.QTableWidgetItem(item_text)
+                        temp_table_item = QTableWidgetItem(item_text)
                         temp_table_item.setBackground(Qt4_widget_colors.LIGHT_RED)
                     focus_modes_table.setItem(row, col, temp_table_item) 
             focus_modes_table.setVerticalHeaderLabels(ver_labels)

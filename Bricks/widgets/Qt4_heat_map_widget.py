@@ -20,17 +20,16 @@
 import os
 import numpy
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from copy import copy
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_matplot_widget import TwoDimenisonalPlotWidget
 
 
-class HeatMapWidget(QtGui.QWidget):
-    def __init__(self, parent = None):
-        QtGui.QWidget.__init__(self, parent)
+class HeatMapWidget(QWidget):
+    def __init__(self, parent=None):
+        QWidget.__init__(self, parent)
         self.setObjectName('heat_map_widget')
 
         # Properties ---------------------------------------------------------- 
@@ -58,59 +57,59 @@ class HeatMapWidget(QtGui.QWidget):
         self.__heat_map_max_size = []
 
         # Graphic elements ----------------------------------------------------
-        self._heat_map_gbox = QtGui.QGroupBox('Heat map', self)
+        self._heat_map_gbox = QGroupBox('Heat map', self)
         self._heat_map_plot = TwoDimenisonalPlotWidget(self)
-        self._heat_map_popup_menu = QtGui.QMenu(self._heat_map_gbox)
-        self._image_info_label = QtGui.QLabel("Image: #, value #", self._heat_map_gbox)
+        self._heat_map_popup_menu = QMenu(self._heat_map_gbox)
+        self._image_info_label = QLabel("Image: #, value #", self._heat_map_gbox)
 
-        self._heat_map_tools_widget = QtGui.QWidget(self._heat_map_gbox)
-        score_type_label = QtGui.QLabel("Score type: ", self._heat_map_tools_widget)
-        self._score_type_cbox = QtGui.QComboBox(self._heat_map_tools_widget)
+        self._heat_map_tools_widget = QWidget(self._heat_map_gbox)
+        score_type_label = QLabel("Score type: ", self._heat_map_tools_widget)
+        self._score_type_cbox = QComboBox(self._heat_map_tools_widget)
 
-        _threshold_label = QtGui.QLabel("Threshold: ", self._heat_map_tools_widget)
-        self._threshold_slider = QtGui.QSlider(QtCore.Qt.Horizontal, 
+        _threshold_label = QLabel("Threshold: ", self._heat_map_tools_widget)
+        self._threshold_slider = QSlider(Qt.Horizontal, 
                self._heat_map_tools_widget)
-        self._relaunch_processing_button = QtGui.QPushButton("Relaunch processing",
-             self._heat_map_tools_widget)
-        self._create_points_button = QtGui.QPushButton("Create centring points", 
+        #self._relaunch_processing_button = QPushButton("Relaunch processing",
+        #     self._heat_map_tools_widget)
+        self._create_points_button = QPushButton("Create centring points", 
              self._heat_map_tools_widget)
 
-        self._summary_gbox = QtGui.QGroupBox("Summary", self)
-        self._summary_textbrowser = QtGui.QTextBrowser(self._summary_gbox)
-        self._best_pos_gbox = QtGui.QGroupBox("Best positions", self)
-        self._best_pos_table = QtGui.QTableWidget(self._best_pos_gbox)
-        self._best_pos_popup_menu = QtGui.QMenu(self._heat_map_gbox)
+        self._summary_gbox = QGroupBox("Summary", self)
+        self._summary_textbrowser = QTextBrowser(self._summary_gbox)
+        self._best_pos_gbox = QGroupBox("Best positions", self)
+        self._best_pos_table = QTableWidget(self._best_pos_gbox)
+        self._best_pos_popup_menu = QMenu(self._heat_map_gbox)
 
         # Layout --------------------------------------------------------------
-        _heat_map_tools_hlayout = QtGui.QHBoxLayout(self._heat_map_tools_widget)
+        _heat_map_tools_hlayout = QHBoxLayout(self._heat_map_tools_widget)
         _heat_map_tools_hlayout.addWidget(score_type_label)
         _heat_map_tools_hlayout.addWidget(self._score_type_cbox)
         _heat_map_tools_hlayout.addWidget(_threshold_label)
         _heat_map_tools_hlayout.addWidget(self._threshold_slider)
         _heat_map_tools_hlayout.addStretch(0)
-        _heat_map_tools_hlayout.addWidget(self._relaunch_processing_button)
+        #_heat_map_tools_hlayout.addWidget(self._relaunch_processing_button)
         _heat_map_tools_hlayout.addWidget(self._create_points_button)
         _heat_map_tools_hlayout.setSpacing(2)
         _heat_map_tools_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _heat_map_gbox_vlayout = QtGui.QVBoxLayout(self._heat_map_gbox)
+        _heat_map_gbox_vlayout = QVBoxLayout(self._heat_map_gbox)
         _heat_map_gbox_vlayout.addWidget(self._heat_map_plot)
         _heat_map_gbox_vlayout.addWidget(self._image_info_label)
         _heat_map_gbox_vlayout.addWidget(self._heat_map_tools_widget)
         _heat_map_gbox_vlayout.setSpacing(2)
         _heat_map_gbox_vlayout.setContentsMargins(2, 4, 2, 2)
         
-        _summary_gbox_vlayout = QtGui.QVBoxLayout(self._summary_gbox)
+        _summary_gbox_vlayout = QVBoxLayout(self._summary_gbox)
         _summary_gbox_vlayout.addWidget(self._summary_textbrowser)
         _summary_gbox_vlayout.setSpacing(2)
         _summary_gbox_vlayout.setContentsMargins(2, 4, 2, 2)
 
-        _best_postition_gbox_vlayout = QtGui.QVBoxLayout(self._best_pos_gbox)
+        _best_postition_gbox_vlayout = QVBoxLayout(self._best_pos_gbox)
         _best_postition_gbox_vlayout.addWidget(self._best_pos_table)
         _best_postition_gbox_vlayout.setSpacing(2)
         _best_postition_gbox_vlayout.setContentsMargins(2, 4, 2, 2)
 
-        _main_hlayout = QtGui.QVBoxLayout(self)
+        _main_hlayout = QVBoxLayout(self)
         _main_hlayout.addWidget(self._heat_map_gbox)
         _main_hlayout.addWidget(self._summary_gbox)
         _main_hlayout.addWidget(self._best_pos_gbox)
@@ -118,16 +117,16 @@ class HeatMapWidget(QtGui.QWidget):
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self._image_info_label.setAlignment(QtCore.Qt.AlignRight)
-        self._image_info_label.setSizePolicy(QtGui.QSizePolicy.Expanding, 
-                                             QtGui.QSizePolicy.Fixed)
+        self._image_info_label.setAlignment(Qt.AlignRight)
+        self._image_info_label.setSizePolicy(QSizePolicy.Expanding, 
+                                             QSizePolicy.Fixed)
 
         # Qt signals and slots ------------------------------------------------
         self._score_type_cbox.activated.connect(self.score_type_changed)
         self._threshold_slider.valueChanged.\
              connect(self.filter_min_slider_changed)
-        self._relaunch_processing_button.clicked.\
-             connect(self.relaunch_processing_clicked)
+        #self._relaunch_processing_button.clicked.\
+        #     connect(self.relaunch_processing_clicked)
         self._create_points_button.clicked.\
              connect(self.create_points_clicked)
         self._heat_map_plot.mouseClickedSignal.\
@@ -163,33 +162,32 @@ class HeatMapWidget(QtGui.QWidget):
         font = self._best_pos_table.font()
         font.setPointSize(8)
         self._best_pos_table.setFont(font)
-        self._best_pos_table.setEditTriggers(\
-             QtGui.QAbstractItemView.NoEditTriggers)
+        self._best_pos_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self._best_pos_table.setColumnCount(9)
         self._best_pos_table.setAlternatingRowColors(True)
         self._best_pos_table.setWordWrap(False)
         self._best_pos_table.horizontalHeader().setSortIndicatorShown(True)
         self._best_pos_table.setHorizontalHeaderItem(0, \
-            QtGui.QTableWidgetItem("No."))
+            QTableWidgetItem("No."))
         for score_type in enumerate(score_types):
             self._best_pos_table.setHorizontalHeaderItem(\
-                 score_type[0] + 1, QtGui.QTableWidgetItem(score_type[1]))
+                 score_type[0] + 1, QTableWidgetItem(score_type[1]))
 
         self._best_pos_table.setHorizontalHeaderItem(5,
-             QtGui.QTableWidgetItem("Path"))
+             QTableWidgetItem("Path"))
         self._best_pos_table.setHorizontalHeaderItem(6,
-             QtGui.QTableWidgetItem("Col"))
+             QTableWidgetItem("Col"))
         self._best_pos_table.setHorizontalHeaderItem(7,
-             QtGui.QTableWidgetItem("Row"))
+             QTableWidgetItem("Row"))
         self._best_pos_table.setHorizontalHeaderItem(8,
-             QtGui.QTableWidgetItem("Motor positions"))
+             QTableWidgetItem("Motor positions"))
 
         self._best_pos_popup_menu.addAction(\
              "Move to position",
               self.move_to_best_position_clicked)
         self._best_pos_table.contextMenuEvent = self.open_best_pos_popup_menu
 
-        screenShape = QtGui.QDesktopWidget().screenGeometry()
+        screenShape = QDesktopWidget().screenGeometry()
         self.__heat_map_max_size = (screenShape.width() / 2 - 200,
                                     screenShape.height() / 2)
 
@@ -230,14 +228,14 @@ class HeatMapWidget(QtGui.QWidget):
         self._heat_map_tools_widget.setHidden(not toggle)
             
     def open_heat_map_popup_menu(self, context_event):
-        point = QtCore.QPoint(context_event.globalX(), 
-                              context_event.globalY())
+        point = QPoint(context_event.globalX(), 
+                       context_event.globalY())
         self._heat_map_popup_menu.popup(point)
 
     def open_best_pos_popup_menu(self, context_event):
         if self._best_pos_table.rowCount() > 0:
-            point = QtCore.QPoint(context_event.globalX(), 
-                                  context_event.globalY())
+            point = QPoint(context_event.globalX(), 
+                           context_event.globalY())
             self._best_pos_popup_menu.popup(point)  
 
     def score_type_changed(self, score_type_index):
@@ -505,24 +503,24 @@ class HeatMapWidget(QtGui.QWidget):
         """
         self._best_pos_table.setRowCount(len(self.__results["best_positions"]))
         for row in range(len(self.__results["best_positions"])):
-            self._best_pos_table.setItem(row, 0, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 0, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("index") + 1)))  
-            self._best_pos_table.setItem(row, 1, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 1, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("score"))))
-            self._best_pos_table.setItem(row, 2, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 2, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("spots_num"))))
-            self._best_pos_table.setItem(row, 3, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 3, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("spots_int_aver"))))
-            self._best_pos_table.setItem(row, 4, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 4, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("spots_resolution"))))
-            self._best_pos_table.setItem(row, 5, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 5, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("filename"))))
-            self._best_pos_table.setItem(row, 6, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 6, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("col"))))
-            self._best_pos_table.setItem(row, 7, QtGui.QTableWidgetItem(\
+            self._best_pos_table.setItem(row, 7, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("row"))))
             if self.__results["best_positions"][row]["cpos"]:
-                self._best_pos_table.setItem(row, 8, QtGui.QTableWidgetItem(\
+                self._best_pos_table.setItem(row, 8, QTableWidgetItem(\
                    self.__results["best_positions"][row]["cpos"].as_str()))
         self._best_pos_table.setSortingEnabled(True)
 

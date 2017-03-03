@@ -44,21 +44,22 @@ the fit configuration file well as
 """
 import os
 import logging
+import numpy as np
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
-import numpy.oldnumeric as Numeric
 try:
-   from PyMca import McaAdvancedFit
-   from PyMca import ConfigDict
-   _pymca_exists = True
+    if qt_variant == "PyQt5":
+        from PyMca5.PyMca import McaAdvancedFit
+        from PyMca5.PyMca import ConfigDict
+    else:
+        from PyMca import McaAdvancedFit
+        from PyMca import ConfigDict
+    pymca_imported = True
 except:
-   _pymca_exists = False
-   print ("PyMca not available")
+    pymca_imported = False
+    from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 
-
-from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
@@ -67,15 +68,14 @@ class McaSpectrumWidget(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         self.defineSlot('set_data',())
-    
-        if _pymca_exists:   
+
+        if pymca_imported:    
             self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
             self.mcafit_widget.dismissButton.hide()
         else:
             self.mcafit_widget = TwoAxisPlotWidget(self)
-            
        
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.mcafit_widget)  
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -86,22 +86,23 @@ class McaSpectrumWidget(BlissWidget):
             if os.path.exists(config.get("file", "")):
                 self._configure(config)
                 configured = True
-            data = Numeric.array(data)
-            x = Numeric.array(data[:,0]).astype(Numeric.Float)
-            y = Numeric.array(data[:,1]).astype(Numeric.Float)
+            data = np.array(data)
+            x = np.array(data[:,0]).astype(np.float)
+            y = np.array(data[:,1]).astype(np.float)
             xmin = float(config["min"])
             xmax = float(config["max"])
             #self.mcafit_widget.refreshWidgets()
-            calib = Numeric.ravel(calib).tolist()
+            calib = np.ravel(calib).tolist()
             """kw = {}
             kw.update(config)
             kw['xmin'] = xmin
             kw['xmax'] = xmax
             kw['calibration'] = calib"""
             self.mcafit_widget.setdata(x, y)
-            #elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
-            self.mcafit_widget._energyAxis = False
-            self.mcafit_widget.toggleEnergyAxis()
+            if pymca_imported:
+                #elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
+                self.mcafit_widget._energyAxis = False
+                self.mcafit_widget.toggleEnergyAxis()
             #result = self._fit()
             #pyarch file name and directory
             pf = config["legend"].split(".")
@@ -110,15 +111,16 @@ class McaSpectrumWidget(BlissWidget):
             outdir = config['htmldir']
             sourcename = config['legend']
 
-            result = self._fit()
-            if configured:
-                report = McaAdvancedFit.QtMcaAdvancedFitReport.\
-                     QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,
-                     fitresult=result, sourcename=sourcename, 
-                     plotdict={'logy':False}, table=2)
+            if pymca_imported:
+                result = self._fit()
+                if configured:
+                    report = McaAdvancedFit.QtMcaAdvancedFitReport.\
+                         QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,
+                         fitresult=result, sourcename=sourcename, 
+                         plotdict={'logy':False}, table=2)
 
-                text = report.getText()
-                report.writeReport(text=text)
+                    text = report.getText()
+                    report.writeReport(text=text)
   
         except:
             logging.getLogger().exception("McaSpectrumWidget: problem fitting %s %s %s" % \
@@ -143,6 +145,6 @@ class McaSpectrumWidget(BlissWidget):
 
     def clear(self):
         #TODO make with clear
-        x = Numeric.array([0]).astype(Numeric.Float)
-        y = Numeric.array([0]).astype(Numeric.Float)
+        x = np.array([0]).astype(np.float)
+        y = np.array([0]).astype(np.float)
         self.mcafit_widget.setdata(x, y)

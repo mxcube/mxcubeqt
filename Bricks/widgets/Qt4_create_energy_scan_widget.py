@@ -20,8 +20,7 @@
 import copy
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 import Qt4_queue_item
 from Qt4_GraphicsLib import GraphicsItemPoint
@@ -60,7 +59,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
              data_model = self._path_template, layout = 'vertical')
 
         # Layout --------------------------------------------------------------
-        self.main_layout = QtGui.QVBoxLayout(self)
+        self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self._periodic_table_widget)
         self.main_layout.addWidget(self._data_path_widget)
         self.main_layout.setContentsMargins(0, 0, 0, 0)

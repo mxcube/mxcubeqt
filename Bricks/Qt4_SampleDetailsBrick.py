@@ -19,19 +19,19 @@
 
 import os
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 
-from widgets.Qt4_ispyb_widget import ISPyBSampleInfoWidget
+#from widgets.Qt4_ispyb_widget import ISPyBSampleInfoWidget
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-__category__ = 'Task'
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__category__ = "Task"
 
 
 class Qt4_SampleDetailsBrick(BlissWidget):
@@ -56,24 +56,24 @@ class Qt4_SampleDetailsBrick(BlissWidget):
         self.defineSlot("populate_sample_details", ({}))
 
         # Graphic elements ----------------------------------------------------
-        _info_widget = QtGui.QWidget(self)
-        self.crystal_widget = uic.loadUi(\
+        _info_widget = QWidget(self)
+        self.crystal_widget = loadUi(\
              os.path.join(os.path.dirname(__file__),
              "widgets/ui_files/Qt4_crystal_widget_layout.ui"))
-        self.sample_info_widget = uic.loadUi(
+        self.sample_info_widget = loadUi(
               os.path.join(os.path.dirname(__file__),
              "widgets/ui_files/Qt4_sample_info_widget_layout.ui"))
         #self.ispyb_sample_info_widget = ISPyBSampleInfoWidget(self)
 
         # Layout --------------------------------------------------------------
-        _info_widget_hlayout = QtGui.QHBoxLayout(_info_widget)
+        _info_widget_hlayout = QHBoxLayout(_info_widget)
         _info_widget_hlayout.addWidget(self.sample_info_widget)
         _info_widget_hlayout.addWidget(self.crystal_widget)
         _info_widget_hlayout.addStretch(0)
         _info_widget_hlayout.setSpacing(0)
         _info_widget_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_hlayout = QtGui.QVBoxLayout(self)
+        _main_hlayout = QVBoxLayout(self)
         _main_hlayout.addWidget(_info_widget)
         #_main_hlayout.addWidget(self.ispyb_sample_info_widget)
         _main_hlayout.addStretch(0)

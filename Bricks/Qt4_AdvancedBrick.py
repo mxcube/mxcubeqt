@@ -19,13 +19,15 @@
 
 import os
 
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_advanced_parameters_widget import AdvancedParametersWidget
 from widgets.Qt4_advanced_results_widget import AdvancedResultsWidget
 from widgets.Qt4_snapshot_widget import SnapshotWidget
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = 'Task'
 
 
@@ -48,7 +50,7 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.defineSlot("populate_advanced_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.tool_box = QtGui.QToolBox(self)
+        self.tool_box = QToolBox(self)
         self.parameters_widget = AdvancedParametersWidget(self) 
         self.results_widget = AdvancedResultsWidget(self)
         self.snapshot_widget = SnapshotWidget(self)
@@ -57,7 +59,7 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.tool_box.addItem(self.results_widget, "Results - Heat map")
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtGui.QHBoxLayout(self)
+        _main_vlayout = QHBoxLayout(self)
         _main_vlayout.addWidget(self.tool_box)
         _main_vlayout.addWidget(self.snapshot_widget)
 

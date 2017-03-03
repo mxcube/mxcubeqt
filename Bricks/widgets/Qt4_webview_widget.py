@@ -17,19 +17,21 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-
-from BlissFramework import Qt4_Icons
+from QtImport import *
 
 try:
-    #PyQt > 4.8. has WebKit 
-    from PyQt4.QtWebKit import QWebView
-    QWEBVIEW_AVAILABLE = True 
+    if qt_variant == 'PyQt5':
+        from PyQt5.QtWebKit import QWebView
+    else:
+        from PyQt4.QtWebKit import QWebView
+    QWEBVIEW_AVAILABLE = True
 except:
     QWEBVIEW_AVAILABLE = False
 
-class WebViewWidget(QtGui.QWidget):
+from BlissFramework import Qt4_Icons
+
+
+class WebViewWidget(QWidget):
     """
     Descript. :
     """
@@ -38,16 +40,16 @@ class WebViewWidget(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.home_url = None
 
-        self.navigation_bar = QtGui.QWidget(self)
-        self.url_ledit = QtGui.QLineEdit(self.navigation_bar)
+        self.navigation_bar = QWidget(self)
+        self.url_ledit = QLineEdit(self.navigation_bar)
         self.url_ledit.setReadOnly(True)
-        self.home_button = QtGui.QPushButton(self.navigation_bar)
-        self.back_button = QtGui.QPushButton(self.navigation_bar)
-        self.forward_button = QtGui.QPushButton(self.navigation_bar)
+        self.home_button = QPushButton(self.navigation_bar)
+        self.back_button = QPushButton(self.navigation_bar)
+        self.forward_button = QPushButton(self.navigation_bar)
 
         self.home_button.setIcon(Qt4_Icons.load_icon("Home2"))
         self.back_button.setIcon(Qt4_Icons.load_icon("Left2"))
@@ -56,8 +58,10 @@ class WebViewWidget(QtGui.QWidget):
         if QWEBVIEW_AVAILABLE:
             self.web_page_viewer = QWebView(self)
             self.web_page_viewer.settings().setObjectCacheCapacities(0,0,0)
+        else:
+            self.web_page_viewer = QTextBrowser(self)
 
-        _navigation_bar_hlayout = QtGui.QHBoxLayout(self.navigation_bar)
+        _navigation_bar_hlayout = QHBoxLayout(self.navigation_bar)
         _navigation_bar_hlayout.addWidget(self.home_button)
         _navigation_bar_hlayout.addWidget(self.back_button) 
         _navigation_bar_hlayout.addWidget(self.forward_button)
@@ -65,14 +69,14 @@ class WebViewWidget(QtGui.QWidget):
         _navigation_bar_hlayout.setSpacing(2)
         _navigation_bar_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.navigation_bar) 
         _main_vlayout.addWidget(self.web_page_viewer)  
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         
-        self.web_page_viewer.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                           QtGui.QSizePolicy.Expanding)
+        self.web_page_viewer.setSizePolicy(QSizePolicy.Expanding,
+                                           QSizePolicy.Expanding)
 
         self.home_button.clicked.connect(self.go_to_home_page)
         self.back_button.clicked.connect(self.go_back)
@@ -97,7 +101,7 @@ class WebViewWidget(QtGui.QWidget):
         """
         """
         self.url_ledit.setText(self.home_url)
-        self.web_page_viewer.load(QtCore.QUrl(self.home_url))
+        self.web_page_viewer.load(QUrl(self.home_url))
         self.web_page_viewer.show()
 
     def go_back(self):

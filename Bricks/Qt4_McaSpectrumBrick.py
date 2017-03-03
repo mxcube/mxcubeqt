@@ -19,9 +19,10 @@
 
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
+#from PyQt4 import QtGui
+#from PyQt4 import QtCore
+#from PyQt4 import uic
 
 from PyMca import McaAdvancedFit
 from PyMca import ConfigDict
@@ -54,7 +55,7 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         #                        "widgets/ui_files/Qt4_scan_plot_widget.ui"))
 
         # Layout --------------------------------------------------------------
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.mcafit)
         #main_layout.addWidget(self.scan_plot_widget)
         main_layout.setSpacing(0)

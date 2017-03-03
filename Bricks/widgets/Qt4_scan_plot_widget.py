@@ -17,16 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+from QtImport import *
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
 from PyMca.QtBlissGraph import QtBlissGraph
 
-class ScanPlotWidget(QtGui.QWidget):
+class ScanPlotWidget(QWidget):
 
     def __init__(self, parent = None, name = "scan_plot_widget"):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -38,15 +36,15 @@ class ScanPlotWidget(QtGui.QWidget):
         self.isConnected = None
         self.isScanning = None
 
-        self.lblTitle = QtGui.QLabel(self)
+        self.lblTitle = QLabel(self)
         #self.graphPanel = qt.QFrame(self)
         #buttonBox = qt.QHBox(self)
-        self.lblPosition = QtGui.QLabel(self)
+        self.lblPosition = QLabel(self)
         self.graph = QtBlissGraph(self)
 
-        QtCore.QObject.connect(self.graph, QtCore.SIGNAL('QtBlissGraphSignal'), self.handleBlissGraphSignal)
-        QtCore.QObject.disconnect(self.graph, QtCore.SIGNAL('plotMousePressed(const QMouseEvent&)'), self.graph.onMousePressed)
-        QtCore.QObject.disconnect(self.graph, QtCore.SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.graph.onMouseReleased)
+        #QtCore.QObject.connect(self.graph, QtCore.SIGNAL('QtBlissGraphSignal'), self.handleBlissGraphSignal)
+        #QtCore.QObject.disconnect(self.graph, QtCore.SIGNAL('plotMousePressed(const QMouseEvent&)'), self.graph.onMousePressed)
+        #QtCore.QObject.disconnect(self.graph, QtCore.SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.graph.onMouseReleased)
 
         self.graph.canvas().setMouseTracking(True)
         self.graph.enableLegend(False)
@@ -66,7 +64,7 @@ class ScanPlotWidget(QtGui.QWidget):
         self.layout().addWidget(buttonBox)
         self.layout().addWidget(self.graphPanel)
         self.setPaletteBackgroundColor(qt.Qt.white)"""
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.lblTitle)
         _main_vlayout.addWidget(self.lblPosition)
         _main_vlayout.addWidget(self.graph)
