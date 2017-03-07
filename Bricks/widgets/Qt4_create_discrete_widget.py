@@ -80,7 +80,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._acq_widget.acqParametersChangedSignal.\
              connect(self.acq_parameters_changed)
         self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.acq_parameters_changed)
+             connect(self.path_template_changed)
 
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)

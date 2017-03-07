@@ -29,7 +29,7 @@ class AcquisitionWidgetSimple(QWidget):
     """
     Descript. :
     """
-    acqParametersChangedSignal = pyqtSignal()
+    acqParametersChangedSignal = pyqtSignal([])
     madEnergySelectedSignal = pyqtSignal(str, float, bool)
 
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None, 

@@ -35,7 +35,7 @@ class AcquisitionWidget(QWidget):
     Descript. :
     """
   
-    acqParametersChangedSignal = pyqtSignal()
+    acqParametersChangedSignal = pyqtSignal(list)
     madEnergySelectedSignal = pyqtSignal(str, float, bool)
 
     def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
@@ -207,6 +207,8 @@ class AcquisitionWidget(QWidget):
         if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
            new_value:
             self.acq_widget_layout.kappa_ledit.setText(str(new_value))
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def update_kappa_phi(self, new_value):
         """
@@ -215,6 +217,8 @@ class AcquisitionWidget(QWidget):
         if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and \
            new_value:
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def use_osc_start(self, state):
         """
@@ -359,6 +363,7 @@ class AcquisitionWidget(QWidget):
             num_passes = self.acq_widget_layout.findChild(QLineEdit, "num_passes_ledit")
             if num_passes:
                 num_passes.setDisabled(True)
+        print 1
 
     def first_image_ledit_change(self, new_value):
         """
@@ -367,13 +372,15 @@ class AcquisitionWidget(QWidget):
         if str(new_value).isdigit():
             #self._path_template.start_num = int(new_value)
             #widget = self.acq_widget_layout.first_image_ledit
-            self.acqParametersChangedSignal.emit()
+            self.acqParametersChangedSignal.emit(\
+                 self.check_parameter_conflict())
 
     def exposure_time_ledit_changed(self, new_values):
         """
         Descript. :
         """
-        self.acqParametersChangedSignal.emit()
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def num_images_ledit_change(self, new_value):
         """
@@ -381,7 +388,8 @@ class AcquisitionWidget(QWidget):
         """
         if str(new_value).isdigit():
             #self._path_template.num_files = int(new_value)
-            self.acqParametersChangedSignal.emit()
+            self.acqParametersChangedSignal.emit(\
+                 self.check_parameter_conflict())
 
     def overlap_changed(self, new_value):
         """
@@ -471,6 +479,8 @@ class AcquisitionWidget(QWidget):
     def energy_ledit_changed(self, energy):
         if "energy" not in self.value_changed_list:
             self.value_changed_list.append("energy") 
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def update_energy(self, energy, wav=None):
         """
@@ -479,34 +489,35 @@ class AcquisitionWidget(QWidget):
         if "energy" not in self.value_changed_list and \
            not self.acq_widget_layout.energy_ledit.hasFocus():
             self.acq_widget_layout.energy_ledit.setText(str(energy))
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def transmission_ledit_changed(self, transmission):
         if "transmission" not in self.value_changed_list:
             self.value_changed_list.append("transmission")
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def update_transmission(self, transmission):
-        """
-        Descript. :
-        """
         if "transmission" not in self.value_changed_list:
             self.acq_widget_layout.transmission_ledit.setText(str(transmission))
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
            
     def resolution_ledit_changed(self, resolution):
         if "resolution" not in self.value_changed_list:
             self.value_changed_list.append("resolution") 
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def update_resolution(self, resolution):
-        """
-        Descript. :
-        """
         if "resolution" not in self.value_changed_list and \
            not self.acq_widget_layout.resolution_ledit.hasFocus():
             self.acq_widget_layout.resolution_ledit.setText(str(resolution))
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
 
     def update_energy_limits(self, limits):
-        """
-        Descript. :
-        """
         if limits:
             self.energy_validator.setBottom(limits[0])
             self.energy_validator.setTop(limits[1])
@@ -517,9 +528,6 @@ class AcquisitionWidget(QWidget):
             self._acquisition_mib.validate_all()
 
     def update_transmission_limits(self, limits):
-        """
-        Descript. :
-        """
         if limits:
             self.transmission_validator.setBottom(limits[0])
             self.transmission_validator.setTop(limits[1])
@@ -530,9 +538,6 @@ class AcquisitionWidget(QWidget):
             self._acquisition_mib.validate_all()
 
     def update_resolution_limits(self, limits):
-        """
-        Descript. :
-        """
         if limits:
             self.resolution_validator.setBottom(limits[0])
             self.resolution_validator.setTop(limits[1])
@@ -543,9 +548,6 @@ class AcquisitionWidget(QWidget):
             self._acquisition_mib.validate_all()
 
     def update_detector_exp_time_limits(self, limits):
-        """
-        Descript. :
-        """
         if limits:
             self.exp_time_validator.setRange(limits[0], limits[1], 4)
             self.acq_widget_layout.exp_time_ledit.setToolTip(
@@ -651,6 +653,9 @@ class AcquisitionWidget(QWidget):
             self.acq_widget_layout.mad_cbox.setChecked(False)
             self.acq_widget_layout.energies_combo.setEnabled(False)
             self.acq_widget_layout.energies_combo.setCurrentIndex(0)
+        self.acqParametersChangedSignal.emit(\
+             self.check_parameter_conflict())
+        print 2
 
     def set_tunable_energy(self, state):
         """

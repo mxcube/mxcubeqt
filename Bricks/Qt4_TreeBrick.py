@@ -87,6 +87,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_hwobj = None
         self.plate_manipulator_hwobj = None
         self.queue_hwobj = None
+        self.state_machine_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.enable_collect_conditions = {}
@@ -206,6 +207,7 @@ class Qt4_TreeBrick(BlissWidget):
              "Auto save", self.queue_autosave_clicked)
         self.queue_autosave_action.setCheckable(True)
         self.queue_autosave_action.setEnabled(False)
+        self.tools_menu.addSeparator()
 
         self.queue_undo_action = self.tools_menu.addAction(\
              "Undo last action", self.queue_undo_clicked)
@@ -213,6 +215,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.queue_redo_action = self.tools_menu.addAction(\
              "Redo last action", self.queue_redo_clicked)
         self.queue_redo_action.setEnabled(False)
+        self.tools_menu.addSeparator()
+
+        self.queue_sync_action = self.tools_menu.addAction(\
+             "Sync with ISPyB", self.queue_sync_clicked)
+        self.queue_sync_action.setEnabled(False)
 
         if BlissWidget._menuBar is not None:
             BlissWidget._menuBar.insert_menu(self.tools_menu, 1) 
@@ -228,6 +235,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+
+        self.state_machine_hwobj = self.getHardwareObject("/state-machine")
 
     # Framework 2 method
     def propertyChanged(self, property_name, old_value, new_value):
@@ -540,6 +549,8 @@ class Qt4_TreeBrick(BlissWidget):
               samples_from_sc_content(sc_basket_content, sc_sample_content)
 
             basket_list = sc_basket_list
+            
+            self.queue_sync_action.setEnabled(True)
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -1154,3 +1165,21 @@ class Qt4_TreeBrick(BlissWidget):
         """If queue autosave is enable then redo last changed"""
 
         self.dc_tree_widget.redo_queue()
+
+    def queue_sync_clicked(self):
+        self.dc_tree_widget.sample_tree_widget.selectAll()
+        self.dc_tree_widget.sync_diffraction_plan()
+
+    def data_path_changed(self, conflict):
+        print "data_path_changed... ", conflict
+        self.dc_tree_widget.item_parameters_changed()
+        if self.state_machine_hwobj is not None:
+            self.state_machine_hwobj.condition_changed("data_path_valid",
+                                                       not conflict)
+
+    def acq_parameters_changed(self, conflict):
+        print "acq_parameters_changed... ", conflict
+        self.dc_tree_widget.item_parameters_changed()
+        if self.state_machine_hwobj is not None:
+            self.state_machine_hwobj.condition_changed("acq_parameters_valid",
+                                                       len(conflict) == 0)

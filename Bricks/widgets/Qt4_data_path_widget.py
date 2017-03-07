@@ -232,6 +232,7 @@ class DataPathWidget(QWidget):
         self._data_model = data_model
         self.set_data_path(data_model.get_image_path())
         self._data_model_pm.set_model(data_model)
+        self.pathTemplateChangedSignal.emit()
 
     def indicate_path_conflict(self, conflict):
         """
