@@ -2980,8 +2980,8 @@
     value: 1}
   - {comment: '', defaultValue: 1, hidden: false, name: statusbar, oldValue: null,
     type: boolean, value: 1}
-  - {comment: '', defaultValue: 1898, hidden: false, name: w, oldValue: 1898, type: integer,
-    value: 1898}
+  - {comment: '', defaultValue: 1855, hidden: false, name: w, oldValue: 1855, type: integer,
+    value: 1855}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777273, oldValue: null,
@@ -2990,8 +2990,8 @@
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777275, oldValue: null,
     type: integer, value: 0}
-  - {comment: '', defaultValue: 509, hidden: false, name: x, oldValue: 509, type: integer,
-    value: 22}
+  - {comment: '', defaultValue: 65, hidden: false, name: x, oldValue: 65, type: integer,
+    value: 65}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777273, oldValue: null,
@@ -3000,7 +3000,7 @@
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777275, oldValue: null,
     type: integer, value: 0}
-  - {comment: '', defaultValue: 130, hidden: false, name: y, oldValue: 130, type: integer,
+  - {comment: '', defaultValue: 52, hidden: false, name: y, oldValue: 52, type: integer,
     value: 52}
   - {comment: '', defaultValue: 0, hidden: false, name: y_16777272, oldValue: null,
     type: integer, value: 0}

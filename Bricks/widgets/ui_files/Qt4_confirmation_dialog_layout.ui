@@ -35,7 +35,16 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
        <number>2</number>
       </property>
       <item>
@@ -257,6 +266,16 @@
        <widget class="QCheckBox" name="skip_existing_images_cbx">
         <property name="text">
          <string>Skip already collected images</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="take_video_cbx">
+        <property name="text">
+         <string>Rotate sample by 360 degrees and record video</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
