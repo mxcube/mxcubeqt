@@ -53,8 +53,8 @@ states:
   coord:
   - 520
   - 280
-- name: confirmation_window
-  desc: Confirmation window
+- name: data_collection_confirmed
+  desc: Data collection confirmed
   coord:
   - 600
   - 200
@@ -68,20 +68,20 @@ states:
   coord:
   - 760
   - 200
-- name: unable_to_start_collect
+- name: data_collection_failed_to_start
   desc: Unable to start data collection
   type:
   - error
   coord:
-  - 760
+  - 680
   - 280
 - name: data_collection_failed 
   desc: Data collection failed
   type:
   - error
   coord:
-  - 840
-  - 280
+  - 760
+  - 360
 - name: beam_alignment 
   desc: Beam alignment
   coord:
@@ -97,7 +97,7 @@ conditions:
 - name: sample_mounting_plate
 - name: manual_centering_done
 - name: auto_centering_done
-- name: centering_skipped
+- name: centering_position_accepted
 - name: acq_parameters_valid
 - name: data_path_valid
 - name: energy_ready
@@ -117,9 +117,10 @@ conditions:
 - name: slits_in_range
 - name: door_interlocked
 - name: safety_shutter_open
-- name: confirmation_window_opened
 - name: confirmation_window_accepted
 - name: data_collection_started
+- name: data_collection_failed_to_started
+- name: data_collection_successful
 - name: beam_alignment_requested
 
 transitions: 
@@ -181,7 +182,7 @@ transitions:
 - source: sample_mounted
   dest: sample_positioned
   conditions_true:
-  - centering_skipped
+  - centering_position_accepted
 
 - source: sample_positioned
   dest: valid_parameters
@@ -241,59 +242,80 @@ transitions:
   - safety_shutter_open
 
 - source: collect_conditions_accepted
-  dest: confirmation_window
+  dest: data_collection_confirmed
   conditions_true:
-  - confirmation_window_opened
+  - confirmation_window_accepted
 
-- source: confirmation_window
+- source: data_collection_confirmed
   dest: preparing_collection
-  conditions_true:
-  - confirmation_window_accepted
-
-- source: confirmation_window
-  dest: collect_conditions_accepted
-  conditions_false:
-  - confirmation_window_accepted
-
 
 - source: preparing_collection
   dest: data_collection_running
   conditions_true:
   - data_collection_started
-    
 
-- source: confirmation_window
-  dest: sample_positioned 
+- source: preparing_collection
+  dest: data_collection_failed_to_start
+  conditions_true:
+  - data_collection_failed_to_started
+
+- source: data_collection_failed_to_start
+  dest: sample_mounted
+
+- source: data_collection_running
+  dest: sample_mounted
+  conditions_true:
+  - data_collection_successful
+
+- source: data_collection_running
+  dest: data_collection_failed
+  conditions_false:
+  - data_collection_successful
+
+- source: data_collection_failed
+  dest: sample_mounted
+
 - source: sample_positioned
   dest: beam_alignment
   conditions_true:
   - beam_alignment_requested
+
 - source: valid_parameters
   dest: beam_alignment
   conditions_true:
   - beam_alignment_requested
+
 - source: invalid_parameters
   dest: beam_alignment
   conditions_true:
   - beam_alignment_requested
+
 - source: sample_mounted
   dest: beam_alignment
   conditions_true:
   - beam_alignment_requested
+
 - source: data_collection_failed
   dest: beam_alignment
   conditions_true:
   - beam_alignment_requested
+
 - source: beam_alignment
   dest: sample_mounted
+
 - source: beam_alignment
   dest: sample_positioned
+
 - source: beam_alignment
   dest: valid_parameters 
+
 - source: beam_alignment
   dest: invalid_parameters 
+
 - source: beam_alignment
   dest: sample_mounted
+
 - source: beam_alignment
   dest: data_collection_failed 
+
 initial_state: start

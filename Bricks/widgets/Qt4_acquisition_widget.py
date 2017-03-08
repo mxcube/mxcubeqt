@@ -363,7 +363,6 @@ class AcquisitionWidget(QWidget):
             num_passes = self.acq_widget_layout.findChild(QLineEdit, "num_passes_ledit")
             if num_passes:
                 num_passes.setDisabled(True)
-        print 1
 
     def first_image_ledit_change(self, new_value):
         """
@@ -655,7 +654,6 @@ class AcquisitionWidget(QWidget):
             self.acq_widget_layout.energies_combo.setCurrentIndex(0)
         self.acqParametersChangedSignal.emit(\
              self.check_parameter_conflict())
-        print 2
 
     def set_tunable_energy(self, state):
         """

@@ -1,4 +1,4 @@
-#
+
 #  Project: MXCuBE
 #  https://github.com/mxcube.
 #
@@ -821,7 +821,7 @@ class DataCollectTree(QWidget):
                     result = True
         return result
 
-    def collect_items(self, items = [], checked_items = []):
+    def collect_items(self, items=[], checked_items=[]):
         """Starts data collection
            - deselects all shapes
            - checks data collection parameters via beamline setup
@@ -862,13 +862,16 @@ class DataCollectTree(QWidget):
                           QPalette.Button)
         self.collect_button.setIcon(self.stop_icon)
         self.continue_button.setEnabled(True)
+        self.parent().set_condition_state("confirmation_window_accepted",
+                                          True)
         self.run_cb()
-
         QApplication.setOverrideCursor(QCursor(Qt.BusyCursor))
         try:
             self.queue_hwobj.execute()
         except (Exception, e):
             raise e
+        self.parent().set_condition_state("confirmation_window_accepted",
+                                          False)
         
     def stop_collection(self):
         """Stops queue"""

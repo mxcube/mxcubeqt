@@ -27,10 +27,9 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
-
 from widgets.Qt4_dc_tree_widget import DataCollectTree
+from queue_model_enumerables_v1 import CENTRING_METHOD
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -106,6 +105,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("scTwoName", "string", "Plate")
         self.addProperty("usePlateNavigator", "boolean", False)
         self.addProperty("useHistoryView", "boolean", True)
+
+        # Properties to initialize hardware objects --------------------------
+        self.addProperty("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_widgets", ())
@@ -236,8 +238,6 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
 
-        self.state_machine_hwobj = self.getHardwareObject("/state-machine")
-
     # Framework 2 method
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -322,6 +322,9 @@ class Qt4_TreeBrick(BlissWidget):
             self.connect(bl_setup.shape_history_hwobj,
                          "diffractometerReady",
                          self.diffractometer_ready_changed)
+            self.connect(bl_setup.diffractometer_hwobj,
+                         "newAutomaticCentringPoint",
+                         self.diffractometer_automatic_centring_done)
             self.connect(bl_setup.diffractometer_hwobj, 
                          "minidiffPhaseChanged",
                          self.diffractometer_phase_changed)
@@ -352,6 +355,8 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(xml_rpc_server_hwobj,
                              'start_queue',
                              self.dc_tree_widget.collect_items)
+        elif property_name == 'hwobj_state_machine':
+              self.state_machine_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'scOneName':
               self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == 'scTwoName':
@@ -483,6 +488,22 @@ class Qt4_TreeBrick(BlissWidget):
             BlissWidget.set_status_info("diffractometer", "Ready", "ready")
         else:
             BlissWidget.set_status_info("diffractometer", "Not ready", "running")
+
+    def diffractometer_automatic_centring_done(self, point):
+        index = 0
+
+        if self.dc_tree_widget.centring_method == \
+            CENTRING_METHOD.LOOP:
+            message_box = QMessageBox(
+                  QMessageBox.Question,
+                  "Optical centring (Try no. %d)" % (index + 1),
+                  "Accept centring results?", 
+                  QMessageBox.No)
+            message_box.addButton("Skip following entry")
+
+            if message_box.question() == QMessageBox.Yes:
+                print "Ok" 
+                #TODO implement this
 
     def samples_from_lims(self, samples):
         """
@@ -1125,15 +1146,21 @@ class Qt4_TreeBrick(BlissWidget):
             if enable_collect:
                 logging.getLogger("GUI").info("Data collection is enabled")    
             else:
+                msg = ""
                 logging.getLogger("GUI").warning("Data collect is disabled")
                 for key, value in self.enable_collect_conditions.iteritems():
                     if value == False:
                         if key == "diffractometer":
-                            logging.getLogger("GUI").info("Diffractometer is in beam location phase")
+                            msg += "\n- Diffractometer is in beam location phase"
                         elif key == "shutter":
-                            logging.getLogger("GUI").info("Safety shutter is closed")
+                            msg += "\n- Safety shutter is closed " + \
+                                   "(Open the safety shutter to enable collections)"
                         elif key == "ppu":
-                            logging.getLogger("GUI").error("PPU is in error state")
+                            msg += "\n- PPU is in error state"
+                logging.getLogger("GUI").warning(msg)
+                self.dc_tree_widget.collect_button.setToolTip(
+                     "Collect button is disabled:\n" + \
+                     msg)
             self.dc_tree_widget.enable_collect_condition = enable_collect
             self.dc_tree_widget.sample_tree_widget_selection()
 
@@ -1171,15 +1198,16 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.sync_diffraction_plan()
 
     def data_path_changed(self, conflict):
-        print "data_path_changed... ", conflict
         self.dc_tree_widget.item_parameters_changed()
-        if self.state_machine_hwobj is not None:
-            self.state_machine_hwobj.condition_changed("data_path_valid",
-                                                       not conflict)
+        self.set_condition_state("data_path_valid",
+                                 not conflict)
 
     def acq_parameters_changed(self, conflict):
-        print "acq_parameters_changed... ", conflict
         self.dc_tree_widget.item_parameters_changed()
+        self.set_condition_state("acq_parameters_valid",
+                                 len(conflict) == 0)
+
+    def set_condition_state(self, condition_name, value):
         if self.state_machine_hwobj is not None:
-            self.state_machine_hwobj.condition_changed("acq_parameters_valid",
-                                                       len(conflict) == 0)
+            self.state_machine_hwobj.condition_changed(condition_name,
+                                                       value)

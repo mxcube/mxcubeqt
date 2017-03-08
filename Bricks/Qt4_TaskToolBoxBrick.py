@@ -223,8 +223,10 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         """
         self.task_tool_box_widget.helical_page.shape_deleted(shape) 
 
+    """
     def acq_parameters_changed(self, conflict):
         print conflict
 
     def data_path_changed(self, conflict):
         print conflict
+    """

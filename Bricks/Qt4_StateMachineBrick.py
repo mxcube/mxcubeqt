@@ -141,9 +141,7 @@ class Qt4_StateMachineBrick(BlissWidget):
         for col in range(self.cond_states_table.columnCount()):
             for row in range(self.cond_states_table.rowCount()):
                 temp_item = QTableWidgetItem()
-                temp_item.setBackground(Qt4_widget_colors.LIGHT_GRAY)
                 self.cond_states_table.setItem(row, col, temp_item)
-
 
     def init_state_graph(self):
         for index, transition in enumerate(self.trans_list):
@@ -162,8 +160,8 @@ class Qt4_StateMachineBrick(BlissWidget):
         """State changed event"""
         temp_item = QTreeWidgetItem()
         temp_item.setText(0, new_state["time"])
-        temp_item.setText(1, new_state["current_state"])
-        temp_item.setText(2, new_state["previous_state"])        
+        temp_item.setText(1, self.get_state_by_name(new_state["current_state"])["desc"])
+        temp_item.setText(2, self.get_state_by_name(new_state["previous_state"])["desc"])
         self.log_treewidget.insertTopLevelItem(0, temp_item)
         for col in range(4):
             self.log_treewidget.resizeColumnToContents(col)
@@ -177,8 +175,13 @@ class Qt4_StateMachineBrick(BlissWidget):
                       setIcon(QIcon())
 
             for row, condition in enumerate(self.cond_list):
-                self.cond_states_table.item(row, col).\
-                     setBackground(Qt4_widget_colors.LIGHT_GRAY)
+                color = Qt4_widget_colors.WHITE
+                #if row % 5:
+                #    color = Qt4_widget_colors.WHITE
+                if not col % 5 or not row % 5:
+                    color = Qt4_widget_colors.LIGHT_2_GRAY
+
+                self.cond_states_table.item(row, col).setBackground(color)
                 self.cond_states_table.item(row, col).setText("")
 
                 for index, translation in enumerate(self.trans_list):
@@ -216,6 +219,11 @@ class Qt4_StateMachineBrick(BlissWidget):
             if state["name"] == transition_dict["dest"]:
                 end_coord = state["coord"]
         return start_coord, end_coord
+
+    def get_state_by_name(self, state_name):
+        for state in self.states_list:
+            if state["name"] == state_name:
+                return state
 
 class GraphStateNode(QGraphicsItem):
 
