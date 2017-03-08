@@ -292,6 +292,10 @@ def run(gui_config_file=None):
     #app.setWindowIcon(QIcon("images/icon.png"))
     main_application.exec_()
 
+    #gevent_timer = QTimer()
+    #gevent_timer.timeout.connect(do_gevent)
+    #gevent_timer.start(0)
+
     supervisor.finalize()
 
     if lockfile is not None:

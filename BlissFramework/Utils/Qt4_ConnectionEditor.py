@@ -154,11 +154,13 @@ class Qt4_ConnectionEditor(QDialog):
 
         children = []
         for child in parent["children"]:
+            n_signals = 0
             try:
                 n_signals = len(child["signals"])
             except KeyError:
                 # item is a brick
-                n_signals = len(child["brick"].getSignals())
+                if hasattr(child, "brick"):
+                    n_signals = len(child["brick"].getSignals())
 
             if n_signals > 0:
                 children.append(child)
@@ -172,11 +174,13 @@ class Qt4_ConnectionEditor(QDialog):
 
         children = []
         for child in parent["children"]:
+            n_slots = 0
             try:
                 n_slots = len(child["slots"])
             except KeyError:
                 # item is a brick
-                n_slots = len(child["brick"].getSlots())
+                if hasattr(child, "brick"):
+                    n_slots = len(child["brick"].getSlots())
 
             if n_slots > 0:
                 children.append(child)

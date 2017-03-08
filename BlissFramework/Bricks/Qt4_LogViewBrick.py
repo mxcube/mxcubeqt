@@ -111,7 +111,7 @@ class CustomTreeWidget(QTreeWidget):
         self.addTopLevelItem(new_item)
         if self.topLevelItemCount() % 10 == 0:
             for col in range(4):
-                new_item.setBackground(col, QBrush(Qt4_widget_colors.LIGH_2_GRAY))
+                new_item.setBackground(col, QBrush(Qt4_widget_colors.LIGHT_2_GRAY))
               
         if self.max_log_lines and self.max_log_lines > 0:
             if self.topLevelItemCount() > self.max_log_lines:
