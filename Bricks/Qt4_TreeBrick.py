@@ -482,7 +482,7 @@ class Qt4_TreeBrick(BlissWidget):
         BlissWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
-        self.enable_widgets.emit(status) 
+        #self.enable_widgets.emit(status) 
         #self.emit(QtCore.SIGNAL("diffractometer_ready"), status) 
         if status:
             BlissWidget.set_status_info("diffractometer", "Ready", "ready")
