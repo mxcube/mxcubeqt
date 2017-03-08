@@ -147,8 +147,6 @@
               type: string, value: '9'}
             - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
               name: frame, oldValue: 0, type: boolean, value: 0}
-            - {comment: '', defaultValue: '', hidden: false, name: hwobj_state_machine,
-              oldValue: '', type: string, value: /state-machine}
             - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
               name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2982,8 +2980,8 @@
     value: 1}
   - {comment: '', defaultValue: 1, hidden: false, name: statusbar, oldValue: null,
     type: boolean, value: 1}
-  - {comment: '', defaultValue: 1920, hidden: false, name: w, oldValue: 1920, type: integer,
-    value: 1920}
+  - {comment: '', defaultValue: 1855, hidden: false, name: w, oldValue: 1855, type: integer,
+    value: 1855}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777273, oldValue: null,
@@ -2992,8 +2990,8 @@
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777275, oldValue: null,
     type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x, oldValue: 0, type: integer,
-    value: 0}
+  - {comment: '', defaultValue: 65, hidden: false, name: x, oldValue: 65, type: integer,
+    value: 65}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777273, oldValue: null,
@@ -3002,8 +3000,8 @@
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777275, oldValue: null,
     type: integer, value: 0}
-  - {comment: '', defaultValue: -4, hidden: false, name: y, oldValue: -4, type: integer,
-    value: -4}
+  - {comment: '', defaultValue: 52, hidden: false, name: y, oldValue: 52, type: integer,
+    value: 52}
   - {comment: '', defaultValue: 0, hidden: false, name: y_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: y_16777273, oldValue: null,
@@ -3155,8 +3153,8 @@
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: w_16777275, oldValue: null,
     type: integer, value: 0}
-  - {comment: '', defaultValue: 2309, hidden: false, name: x, oldValue: 2309, type: integer,
-    value: 2309}
+  - {comment: '', defaultValue: 995, hidden: false, name: x, oldValue: 995, type: integer,
+    value: 995}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777273, oldValue: null,
@@ -3165,159 +3163,8 @@
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: x_16777275, oldValue: null,
     type: integer, value: 0}
-  - {comment: '', defaultValue: 230, hidden: false, name: y, oldValue: 230, type: integer,
-    value: 230}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777275, oldValue: null,
-    type: integer, value: 0}
-  type: window
-- children:
-  - children:
-    - brick: {class: Qt4_StateMachineBrick, name: state_machine_brick}
-      children: []
-      connections: []
-      name: state_machine_brick
-      properties:
-      - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: -1, type: integer, value: -1}
-      - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
-        oldValue: -1, type: integer, value: -1}
-      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
-        type: string, value: '9'}
-      - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
-        name: frame, oldValue: 0, type: boolean, value: 0}
-      - {comment: '', defaultValue: '', hidden: false, name: hwobj_state_machine,
-        oldValue: '', type: string, value: /state-machine}
-      - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
-        name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
-      - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
-        name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
-      type: Qt4_StateMachineBrick
-    connections: []
-    name: vbox2
-    properties:
-    - choices: [none, top center, top left, top right, bottom center, bottom left,
-        bottom right, center, hcenter, vcenter, left, right]
-      comment: ''
-      defaultValue: none
-      hidden: false
-      name: alignment
-      oldValue: null
-      type: combo
-      value: none
-    - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
-      type: color, value: null}
-    - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
-      type: integer, value: -1}
-    - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
-      type: integer, value: -1}
-    - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
-      comment: ''
-      defaultValue: default
-      hidden: false
-      name: frameshape
-      oldValue: null
-      type: combo
-      value: default
-    - choices: [fixed, expanding, default]
-      comment: ''
-      defaultValue: default
-      hidden: false
-      name: hsizepolicy
-      oldValue: null
-      type: combo
-      value: default
-    - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null, type: string,
-      value: ''}
-    - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
-      type: string, value: ''}
-    - {comment: '', defaultValue: 5, hidden: false, name: margin, oldValue: null,
-      type: integer, value: 5}
-    - choices: [plain, raised, sunken, default]
-      comment: ''
-      defaultValue: default
-      hidden: false
-      name: shadowstyle
-      oldValue: null
-      type: combo
-      value: default
-    - {comment: '', defaultValue: 5, hidden: false, name: spacing, oldValue: null,
-      type: integer, value: 5}
-    - choices: [fixed, expanding, default]
-      comment: ''
-      defaultValue: default
-      hidden: false
-      name: vsizepolicy
-      oldValue: null
-      type: combo
-      value: default
-    type: vbox
-  connections: []
-  name: state_machine
-  properties:
-  - choices: [none, top center, top left, top right, bottom center, bottom left, bottom
-        right, center, hcenter, vcenter, left, right]
-    comment: ''
-    defaultValue: none
-    hidden: false
-    name: alignment
-    oldValue: null
-    type: combo
-    value: none
-  - {comment: '', defaultValue: State machine, hidden: false, name: caption, oldValue: null,
-    type: string, value: State machine}
-  - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
-    type: string, value: tonic}
-  - {comment: '', defaultValue: 1148, hidden: false, name: h, oldValue: 1148, type: integer,
-    value: 1148}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
-    value: 0}
-  - comment: ''
-    defaultValue: &id003 {}
-    hidden: true
-    name: menudata
-    oldValue: null
-    type: undefined
-    value: *id003
-  - {comment: '', defaultValue: 1, hidden: false, name: show, oldValue: null, type: boolean,
-    value: 1}
-  - {comment: '', defaultValue: 0, hidden: false, name: statusbar, oldValue: null,
-    type: boolean, value: 0}
-  - {comment: '', defaultValue: 1855, hidden: false, name: w, oldValue: 1855, type: integer,
-    value: 1855}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 1985, hidden: false, name: x, oldValue: 1985, type: integer,
-    value: 1985}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 52, hidden: false, name: y, oldValue: 52, type: integer,
-    value: 52}
+  - {comment: '', defaultValue: 150, hidden: false, name: y, oldValue: 150, type: integer,
+    value: 150}
   - {comment: '', defaultValue: 0, hidden: false, name: y_16777272, oldValue: null,
     type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: y_16777273, oldValue: null,
