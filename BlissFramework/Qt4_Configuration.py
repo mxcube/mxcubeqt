@@ -429,6 +429,7 @@ class Configuration:
             window_cfg_dict = {"type": "window",
                                "name": window_cfg["name"],
                                "properties": [],
+                               "signals": window_cfg.signals,
                                "connections": window_cfg.connections}
             for prop in window_cfg.properties:
                 window_cfg_dict["properties"].append(prop.__getstate__())
