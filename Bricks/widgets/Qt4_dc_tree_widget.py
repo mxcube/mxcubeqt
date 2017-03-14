@@ -1,4 +1,4 @@
-#
+
 #  Project: MXCuBE
 #  https://github.com/mxcube.
 #
@@ -243,6 +243,7 @@ class DataCollectTree(QWidget):
            self.history_table_widget.verticalHeader().\
                setResizeMode(QHeaderView.Fixed)
         self.history_table_widget.horizontalHeader().setMaximumHeight(18)
+        self.tree_splitter.setSizes([200, 20])
       
 
     def init_plate_navigator(self, plate_navigator_hwobj):
@@ -512,10 +513,10 @@ class DataCollectTree(QWidget):
 
             if sample_changer:
                 if hasattr(sample_changer, '__TYPE__')\
-                   and sample_changer.__TYPE__ in ('CATS', 'Marvin'):
+                   and sample_changer.__TYPE__ in ('CATS', 'Marvin', 'Mockup'):
                     sample_changer.unload(wait=True)
                 else:
-                    sample_changer.unload(22, sample_location = location, wait = False)
+                    sample_changer.unload(22, location, wait=False)
 
             items[0].setOn(False)
             items[0].set_mounted_style(False)
@@ -820,7 +821,7 @@ class DataCollectTree(QWidget):
                     result = True
         return result
 
-    def collect_items(self, items = [], checked_items = []):
+    def collect_items(self, items=[], checked_items=[]):
         """Starts data collection
            - deselects all shapes
            - checks data collection parameters via beamline setup
@@ -861,13 +862,16 @@ class DataCollectTree(QWidget):
                           QPalette.Button)
         self.collect_button.setIcon(self.stop_icon)
         self.continue_button.setEnabled(True)
+        self.parent().set_condition_state("confirmation_window_accepted",
+                                          True)
         self.run_cb()
-
         QApplication.setOverrideCursor(QCursor(Qt.BusyCursor))
         try:
             self.queue_hwobj.execute()
         except (Exception, e):
             raise e
+        self.parent().set_condition_state("confirmation_window_accepted",
+                                          False)
         
     def stop_collection(self):
         """Stops queue"""
@@ -1390,9 +1394,12 @@ class DataCollectTree(QWidget):
     def create_task_group(self, sample_item_model, ref_item=None):
         """Creates empty task group"""
         task_group_node = queue_model_objects.TaskGroup()
-        
+       
+
         #This is ugly and could be much nicer
-        if isinstance(self.item_copy[0], queue_model_objects.DataCollection):
+        if self.item_copy is None:
+            group_name = "Diffraction plan"
+        elif isinstance(self.item_copy[0], queue_model_objects.DataCollection):
             if self.item_copy[0].is_helical():
                 group_name = "Helical"
             elif self.item_copy[0].is_mesh():
@@ -1471,4 +1478,49 @@ class DataCollectTree(QWidget):
     def sync_diffraction_plan(self):
         """Adds data collection items defined in ispyb diffraction plan"""
         for item in self.get_selected_items():
-            print item
+            if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                if item.get_model().diffraction_plan is not None:
+                    self.add_sample_diffraction_plan(item.get_model())
+            elif isinstance(item, Qt4_queue_item.BasketQueueItem):
+                for sample in item.get_model().get_sample_list():
+                    if sample.diffraction_plan is not None:
+                        self.add_sample_diffraction_plan(sample)
+    
+    def add_sample_diffraction_plan(self, sample_model):
+        """Adds diffraction plan defined in ispyb
+           At first experimentKind is checked and related data collection
+           queue entry is created.
+        """
+        #logging.getLogger("HWR").debug("Adding diffraction plan : %s", 
+        #                               str(sample_model.diffraction_plan))
+        task_node = self.create_task_group(sample_model)
+        prefix = self.beamline_setup_hwobj.session_hwobj.get_default_prefix(sample_model)
+        snapshot = self.beamline_setup_hwobj.shape_history_hwobj.get_scene_snapshot()
+
+        if sample_model.diffraction_plan.experimentKind in ("OSC", "Default"):
+            acq = queue_model_objects.Acquisition()
+            acq.acquisition_parameters = self.beamline_setup_hwobj.\
+                get_default_acquisition_parameters("default_acquisition_values")
+            if hasattr(sample_model.diffraction_plan, "oscillationRange"):
+                acq.acquisition_parameters.osc_range = \
+                    sample_model.diffraction_plan.oscillationRange
+            if hasattr(sample_model.diffraction_plan, "exposureTime"):
+                acq.acquisition_parameters.exp_time = \
+                    sample_model.diffraction_plan.exposureTime
+            else:
+                acq.acquisition_parameters.exp_time = 0.04
+            acq.acquisition_parameters.centred_position.snapshot_image = snapshot
+            path_template = self.beamline_setup_hwobj.get_default_path_template()
+            path_template.base_prefix = prefix
+            path_template.num_files = 1800
+            path_template.reference_image_prefix = "plan"
+            path_template.run_number = self.queue_model_hwobj.\
+                get_next_run_number(path_template)
+            acq.path_template = path_template
+
+            dc = queue_model_objects.DataCollection([acq],
+                                                    sample_model.crystals[0])
+            dc.set_name("OSC_" + str(sample_model.diffraction_plan.diffractionPlanId))
+            self.queue_model_hwobj.add_child(task_node, dc)
+       
+        self.sample_tree_widget_selection()

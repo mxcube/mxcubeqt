@@ -27,10 +27,9 @@ import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
-
 from widgets.Qt4_dc_tree_widget import DataCollectTree
+from queue_model_enumerables_v1 import CENTRING_METHOD
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -87,10 +86,12 @@ class Qt4_TreeBrick(BlissWidget):
         self.sample_changer_hwobj = None
         self.plate_manipulator_hwobj = None
         self.queue_hwobj = None
+        self.state_machine_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.enable_collect_conditions = {}
         self.current_view = None
+        self.current_queue_entry = None
         self.lims_samples = None
         self.filtered_lims_samples = None
 
@@ -105,6 +106,9 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("scTwoName", "string", "Plate")
         self.addProperty("usePlateNavigator", "boolean", False)
         self.addProperty("useHistoryView", "boolean", True)
+
+        # Properties to initialize hardware objects --------------------------
+        self.addProperty("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
         self.defineSignal("enable_widgets", ())
@@ -206,6 +210,7 @@ class Qt4_TreeBrick(BlissWidget):
              "Auto save", self.queue_autosave_clicked)
         self.queue_autosave_action.setCheckable(True)
         self.queue_autosave_action.setEnabled(False)
+        self.tools_menu.addSeparator()
 
         self.queue_undo_action = self.tools_menu.addAction(\
              "Undo last action", self.queue_undo_clicked)
@@ -213,6 +218,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.queue_redo_action = self.tools_menu.addAction(\
              "Redo last action", self.queue_redo_clicked)
         self.queue_redo_action.setEnabled(False)
+        self.tools_menu.addSeparator()
+
+        self.queue_sync_action = self.tools_menu.addAction(\
+             "Sync with ISPyB", self.queue_sync_clicked)
+        self.queue_sync_action.setEnabled(False)
 
         if BlissWidget._menuBar is not None:
             BlissWidget._menuBar.insert_menu(self.tools_menu, 1) 
@@ -313,6 +323,9 @@ class Qt4_TreeBrick(BlissWidget):
             self.connect(bl_setup.shape_history_hwobj,
                          "diffractometerReady",
                          self.diffractometer_ready_changed)
+            self.connect(bl_setup.diffractometer_hwobj,
+                         "newAutomaticCentringPoint",
+                         self.diffractometer_automatic_centring_done)
             self.connect(bl_setup.diffractometer_hwobj, 
                          "minidiffPhaseChanged",
                          self.diffractometer_phase_changed)
@@ -343,6 +356,8 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(xml_rpc_server_hwobj,
                              'start_queue',
                              self.dc_tree_widget.collect_items)
+        elif property_name == 'hwobj_state_machine':
+              self.state_machine_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'scOneName':
               self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == 'scTwoName':
@@ -438,11 +453,13 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.enable_collect(state)
 
     def queue_entry_execution_started(self, queue_entry):
+        self.current_queue_entry = queue_entry 
         self.enable_widgets.emit(False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
         BlissWidget.set_status_info("status", "Queue started", "running")
 
     def queue_entry_execution_finished(self, queue_entry, status):
+        self.current_queue_entry = None
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
       
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
@@ -468,12 +485,43 @@ class Qt4_TreeBrick(BlissWidget):
         BlissWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
-        self.enable_widgets.emit(status) 
+        #self.enable_widgets.emit(status) 
         #self.emit(QtCore.SIGNAL("diffractometer_ready"), status) 
         if status:
             BlissWidget.set_status_info("diffractometer", "Ready", "ready")
         else:
             BlissWidget.set_status_info("diffractometer", "Not ready", "running")
+
+    def diffractometer_automatic_centring_done(self, point):
+        if self.dc_tree_widget.centring_method == \
+            CENTRING_METHOD.LOOP:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Question)
+            message_box.setWindowTitle("Optical centring with user confirmation.")
+            message_box.setText("Optical centring done. How to proceed?")
+            message_box.addButton("Accept result", QMessageBox.ApplyRole)
+            message_box.addButton("Try again", QMessageBox.RejectRole)
+
+            if self.current_queue_entry:
+                message_box.addButton("Skip following entry",
+                                      QMessageBox.NoRole)
+
+            result = message_box.exec_()
+            if result == QMessageBox.AcceptRole:
+                self.diffractometer_hwobj.automatic_centring_try_count = 0
+            elif result == QMessageBox.RejectRole:
+                logging.getLogger("GUI").info(\
+                    "Optical centring result rejected. " + \
+                    "Trying once again.")
+            else:
+                self.diffractometer_hwobj.automatic_centring_try_count = 0
+                if self.current_queue_entry:
+                    logging.getLogger("GUI").info(\
+                        "Optical centring rejected " + \
+                        "and the following queue entries skipped")
+                    task_group_entry = self.current_queue_entry.get_container()
+                    for child_entry in task_group_entry.get_queue_entry_list():
+                        child_entry.set_enabled(False)
 
     def samples_from_lims(self, samples):
         """
@@ -540,6 +588,8 @@ class Qt4_TreeBrick(BlissWidget):
               samples_from_sc_content(sc_basket_content, sc_sample_content)
 
             basket_list = sc_basket_list
+            
+            self.queue_sync_action.setEnabled(True)
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -1114,15 +1164,21 @@ class Qt4_TreeBrick(BlissWidget):
             if enable_collect:
                 logging.getLogger("GUI").info("Data collection is enabled")    
             else:
+                msg = ""
                 logging.getLogger("GUI").warning("Data collect is disabled")
                 for key, value in self.enable_collect_conditions.iteritems():
                     if value == False:
                         if key == "diffractometer":
-                            logging.getLogger("GUI").info("Diffractometer is in beam location phase")
+                            msg += "\n- Diffractometer is in beam location phase"
                         elif key == "shutter":
-                            logging.getLogger("GUI").info("Safety shutter is closed")
+                            msg += "\n- Safety shutter is closed " + \
+                                   "(Open the safety shutter to enable collections)"
                         elif key == "ppu":
-                            logging.getLogger("GUI").error("PPU is in error state")
+                            msg += "\n- PPU is in error state"
+                logging.getLogger("GUI").warning(msg)
+                self.dc_tree_widget.collect_button.setToolTip(
+                     "Collect button is disabled:\n" + \
+                     msg)
             self.dc_tree_widget.enable_collect_condition = enable_collect
             self.dc_tree_widget.sample_tree_widget_selection()
 
@@ -1154,3 +1210,22 @@ class Qt4_TreeBrick(BlissWidget):
         """If queue autosave is enable then redo last changed"""
 
         self.dc_tree_widget.redo_queue()
+
+    def queue_sync_clicked(self):
+        self.dc_tree_widget.sample_tree_widget.selectAll()
+        self.dc_tree_widget.sync_diffraction_plan()
+
+    def data_path_changed(self, conflict):
+        self.dc_tree_widget.item_parameters_changed()
+        self.set_condition_state("data_path_valid",
+                                 not conflict)
+
+    def acq_parameters_changed(self, conflict):
+        self.dc_tree_widget.item_parameters_changed()
+        self.set_condition_state("acq_parameters_valid",
+                                 len(conflict) == 0)
+
+    def set_condition_state(self, condition_name, value):
+        if self.state_machine_hwobj is not None:
+            self.state_machine_hwobj.condition_changed(condition_name,
+                                                       value)
