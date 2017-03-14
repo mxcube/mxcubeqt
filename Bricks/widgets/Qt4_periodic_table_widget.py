@@ -111,15 +111,15 @@ class PeriodicTableWidget(QWidget):
                                             self.selected_edge)
         
     def set_current_element_edge(self, element, edge):
-        self.periodic_table.tableElementChanged(element, edge)
+        self.periodic_table.table_element_clicked(element, edge)
 
     def get_selected_element_edge(self):
         return self.selected_element, self.selected_edge
 
     def edge_combo_activated(self, item_index):
         self.selected_edge = str(self.edge_combo.currentText())
-        self.periodic_table.tableElementChanged(self.selected_element,
-                                                self.selected_edge)
+        self.periodic_table.table_element_clicked(self.selected_element,
+                                                  self.selected_edge)
     def set_elements(self, elements):
         if pymca_imported:
             self.periodic_table.setElements(elements)
