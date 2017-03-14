@@ -11,6 +11,9 @@
   <object href="/plate-manipulator" role="plate_manipulator"/>
   <object href="/resolution-mockup" role="resolution"/>
   <object href="/energy-mockup" role="energy"/>
+  <object href="/slits-mockup" role="slits"/>
+  <object href="/safshut" role="safety_shutter"/>
+  <object href="/door-interlock-mockup" role="door_interlock"/>
 
   <!-- Software (abstract) concepts -->
   <object href="/Qt4_graphics-manager" role="shape_history"/>
@@ -18,6 +21,7 @@
   <object href="/lims-client-mockup" role="lims_client"/>
   <object href="/data-analysis" role="data_analysis"/>
   <!--<object href="/workflow-mockup" role="workflow"/> -->
+  <object href="/fsm" role="fsm"/>
  
   <!-- Procedures and routines -->
   <object href="/energyscan-mockup" role="energyscan"/>

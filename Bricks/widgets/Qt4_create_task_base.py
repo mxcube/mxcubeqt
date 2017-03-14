@@ -156,14 +156,20 @@ class CreateTaskBase(QWidget):
                 model.run_processing_parallel = run_processing_parallel and \
                   model.acquisitions[0].acquisition_parameters.num_images > 19
 
-    def acq_parameters_changed(self):
-        self._data_path_widget.update_file_name()
+    def acq_parameters_changed(self, conflict):
         if self._tree_brick:
+            self._tree_brick.acq_parameters_changed(conflict)
+ 
+    def path_template_changed(self):
+        print 222, " path_template_changed "
+        self._data_path_widget.update_file_name()
+        if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                             check_for_path_collisions(self._path_template)
-            self._data_path_widget.indicate_path_conflict(path_conflict)                    
-            self._tree_brick.dc_tree_widget.item_parameters_changed()
+            print 333, path_conflict
+            self._data_path_widget.indicate_path_conflict(path_conflict)
+            self._tree_brick.data_path_changed(path_conflict)
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick

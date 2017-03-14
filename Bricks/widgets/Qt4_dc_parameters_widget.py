@@ -108,7 +108,8 @@ class DCParametersWidget(QWidget):
         if self._tree_view_item is None:
             #TODO fix this
             return 
-        dc_tree_widget = self._tree_view_item.listView().parent()
+
+        dc_tree_widget = self._tree_view_item.listView().parent().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
         path_conflict = self.queue_model_hwobj.\

@@ -1,0 +1,321 @@
+states: 
+- name: start
+  desc: Initial state
+  coord: 
+  - 40
+  - 200
+- name: diffractometer_loaded 
+  desc: Diffractometer loaded
+  coord:
+  - 120
+  - 40
+- name: diffractometer_not_loaded 
+  desc: Diffractometer not loaded
+  coord:
+  - 120
+  - 360
+- name: sample_mounting
+  desc: Sample mounting
+  coord:
+  - 120
+  - 280
+- name: sample_mounted 
+  desc: Sample mounted
+  coord:
+  - 120
+  - 200
+- name: sample_positioned
+  desc: Sample positioned
+  coord:
+  - 200
+  - 200
+- name: valid_parameters 
+  desc: Valid input parameters
+  coord:
+  - 360
+  - 200
+- name: invalid_parameters 
+  desc: Invalid input parameters
+  type:
+  - error
+  coord:
+  - 360
+  - 280
+- name: collect_conditions_accepted
+  desc: Collection conditions are accepted
+  coord:
+  - 520
+  - 200
+- name: collect_conditions_rejected
+  desc: Collection conditions are rejected
+  type:
+  - error
+  coord:
+  - 520
+  - 280
+- name: data_collection_confirmed
+  desc: Data collection confirmed
+  coord:
+  - 600
+  - 200
+- name: preparing_collection
+  desc: Preparing data collection
+  coord:
+  - 680
+  - 200
+- name: data_collection_running 
+  desc: Data collection running
+  coord:
+  - 760
+  - 200
+- name: data_collection_failed_to_start
+  desc: Unable to start data collection
+  type:
+  - error
+  coord:
+  - 680
+  - 280
+- name: data_collection_failed 
+  desc: Data collection failed
+  type:
+  - error
+  coord:
+  - 760
+  - 360
+- name: beam_alignment 
+  desc: Beam alignment
+  coord:
+  - 500
+  - 500
+
+conditions: 
+- name: sample_is_loaded
+  desc: Sample mounted on the gonio 
+  hint: Mount sample on the gonio
+- name: sample_mounting_manual
+- name: sample_mounting_sample_changer
+- name: sample_mounting_plate
+- name: manual_centering_done
+- name: auto_centering_done
+- name: centering_position_accepted
+- name: acq_parameters_valid
+- name: data_path_valid
+- name: energy_ready
+- name: energy_in_range
+- name: transmission_ready
+- name: transmission_in_range
+- name: resolution_ready
+- name: resolution_in_range
+- name: diffractometer_ready
+- name: diffractometer_phase_transfer
+- name: diffractometer_phase_centering
+- name: diffractometer_phase_collection
+- name: diffractometer_phase_beam_alignment
+- name: diffractometer_capilary_in
+- name: diffractometer_aperture_in
+- name: slits_ready
+- name: slits_in_range
+- name: door_interlocked
+- name: safety_shutter_open
+- name: confirmation_window_accepted
+- name: data_collection_started
+- name: data_collection_failed_to_started
+- name: data_collection_successful
+- name: beam_alignment_requested
+
+transitions: 
+- source: start 
+  dest: diffractometer_loaded 
+  conditions_true: 
+  - sample_is_loaded
+
+- source: start 
+  dest: diffractometer_not_loaded 
+  conditions_false: 
+  - sample_is_loaded
+
+- source: diffractometer_loaded
+  dest: diffractometer_not_loaded
+  conditions_false:
+  - sample_is_loaded
+
+- source: diffractometer_not_loaded
+  dest: sample_mounting
+  conditions_true:
+  - sample_mounting_sample_changer
+
+- source: diffractometer_not_loaded
+  dest: sample_mounting
+  conditions_true:
+  - sample_mounting_plate
+
+- source: diffractometer_not_loaded
+  dest: sample_mounted
+  conditions_true:
+  - sample_is_loaded
+
+- source: sample_mounting
+  dest: sample_mounted
+  conditions_true:
+  - sample_is_loaded
+
+- source: sample_mounting
+  dest: diffractometer_not_loaded
+  conditions_false:
+  - sample_is_loaded
+
+- source: sample_mounted
+  dest: diffractometer_not_loaded
+  conditions_false:
+  - sample_is_loaded
+
+- source: sample_mounted
+  dest: sample_positioned
+  conditions_true:
+  - manual_centering_done
+
+- source: sample_mounted
+  dest: sample_positioned
+  conditions_true:
+  - auto_centering_done
+
+- source: sample_mounted
+  dest: sample_positioned
+  conditions_true:
+  - centering_position_accepted
+
+- source: sample_positioned
+  dest: valid_parameters
+  conditions_true:
+  - acq_parameters_valid
+  - data_path_valid
+
+- source: sample_positioned
+  dest: invalid_parameters
+  conditions_false:
+  - acq_parameters_valid
+  - data_path_valid
+
+- source: invalid_parameters
+  dest: valid_parameters
+  conditions_true:
+  - acq_parameters_valid
+  - data_path_valid
+
+- source: valid_parameters
+  dest: collect_conditions_accepted
+  conditions_true:
+  - energy_ready
+  - energy_in_range
+  - transmission_ready
+  - transmission_in_range
+  - resolution_ready
+  - resolution_in_range
+  - diffractometer_ready
+  - door_interlocked
+  - safety_shutter_open
+
+- source: valid_parameters
+  dest: collect_conditions_rejected
+  conditions_false:
+  - energy_ready
+  - energy_in_range
+  - transmission_ready
+  - transmission_in_range
+  - resolution_ready
+  - resolution_in_range
+  - diffractometer_ready
+  - door_interlocked
+  - safety_shutter_open
+
+- source: collect_conditions_rejected
+  dest: collect_conditions_accepted
+  conditions_true:
+  - energy_ready
+  - energy_in_range
+  - transmission_ready
+  - transmission_in_range
+  - resolution_ready
+  - resolution_in_range
+  - diffractometer_ready
+  - door_interlocked
+  - safety_shutter_open
+
+- source: collect_conditions_accepted
+  dest: data_collection_confirmed
+  conditions_true:
+  - confirmation_window_accepted
+
+- source: data_collection_confirmed
+  dest: preparing_collection
+
+- source: preparing_collection
+  dest: data_collection_running
+  conditions_true:
+  - data_collection_started
+
+- source: preparing_collection
+  dest: data_collection_failed_to_start
+  conditions_true:
+  - data_collection_failed_to_started
+
+- source: data_collection_failed_to_start
+  dest: sample_mounted
+
+- source: data_collection_running
+  dest: sample_mounted
+  conditions_true:
+  - data_collection_successful
+
+- source: data_collection_running
+  dest: data_collection_failed
+  conditions_false:
+  - data_collection_successful
+
+- source: data_collection_failed
+  dest: sample_mounted
+
+- source: sample_positioned
+  dest: beam_alignment
+  conditions_true:
+  - beam_alignment_requested
+
+- source: valid_parameters
+  dest: beam_alignment
+  conditions_true:
+  - beam_alignment_requested
+
+- source: invalid_parameters
+  dest: beam_alignment
+  conditions_true:
+  - beam_alignment_requested
+
+- source: sample_mounted
+  dest: beam_alignment
+  conditions_true:
+  - beam_alignment_requested
+
+- source: data_collection_failed
+  dest: beam_alignment
+  conditions_true:
+  - beam_alignment_requested
+
+- source: beam_alignment
+  dest: sample_mounted
+
+- source: beam_alignment
+  dest: sample_positioned
+
+- source: beam_alignment
+  dest: valid_parameters 
+
+- source: beam_alignment
+  dest: invalid_parameters 
+
+- source: beam_alignment
+  dest: sample_mounted
+
+- source: beam_alignment
+  dest: data_collection_failed 
+
+initial_state: start

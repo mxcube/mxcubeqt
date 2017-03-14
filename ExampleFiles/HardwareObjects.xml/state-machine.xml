@@ -1,0 +1,4 @@
+<object class="StateMachine">
+  <object href="/beamline-setup" role="beamline_setup"/>
+  <structure_file>/home/karpics/mxcube/mxcubeIvarsKarpics/ExampleFiles/HardwareObjects.xml/state-machine-structure.yml</structure_file>
+</object>

@@ -70,9 +70,13 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
         # Other ---------------------------------------------------------------
         self.method_table.setColumnCount(2)
-        self.method_table.setHorizontalHeaderLabels(["Type", "Method (Parameters)"])
+        self.method_table.setHorizontalHeaderLabels(["Type",
+                                                     "Method (Parameters)"])
         self.property_table.setColumnCount(4)
-        self.property_table.setHorizontalHeaderLabels(["Type", "Property", "Access", "Value"])
+        self.property_table.setHorizontalHeaderLabels(["Type",
+                                                       "Property",
+                                                       "Access",
+                                                       "Value"])
         self.setFixedWidth(600)
 
     def set_expert_mode(self, expert):

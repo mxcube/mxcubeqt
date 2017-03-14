@@ -76,13 +76,14 @@ class CreateAdvancedWidget(CreateTaskBase):
         # Qt signal/slot connections ------------------------------------------
         self._acq_widget.acqParametersChangedSignal.\
              connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.\
+             connect(self.path_template_changed)
+
         self._acq_widget.madEnergySelectedSignal.\
              connect(self.mad_energy_selected)
+
         self._acq_widget.acq_widget_layout.set_max_osc_range_button.clicked.\
              connect(self.set_max_osc_range_clicked)
-
-        self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.acq_parameters_changed)
 
         self._advanced_methods_widget.grid_treewidget.itemSelectionChanged.\
              connect(self.grid_treewidget_item_selection_changed)
@@ -272,7 +273,6 @@ class CreateAdvancedWidget(CreateTaskBase):
      
             exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
-            print exp_type
             if exp_type == "MeshScan":
                 tasks.append(dc)
             elif exp_type == "XrayCentering":
