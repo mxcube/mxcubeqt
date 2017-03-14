@@ -113,7 +113,6 @@ class TaskToolBoxWidget(qt.QWidget):
         login, ie ProposalBrick. The signal is emitted when a user was 
         succesfully logged in.
         """
-        #import pdb;pdb.set_trace()
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).ispyb_logged_in(logged_in)
             
@@ -171,6 +170,13 @@ class TaskToolBoxWidget(qt.QWidget):
         current_page = self.tool_box.currentItem()
         current_page.selection_changed(items)
 
+    def _create_task(self, item, task_model, shapes):
+        if item.mounted_style and shapes:
+            for shape in shapes:
+                self.create_task(task_model, shape)
+        else:
+            self.create_task(task_model)  
+
     def create_task_button_click(self):
         if self.tool_box.currentItem().approve_creation():
             items = self.tree_brick.get_selected_items()
@@ -183,30 +189,17 @@ class TaskToolBoxWidget(qt.QWidget):
                 for item in items:
                     shapes = self.shape_history.selected_shapes
                     task_model = item.get_model()
-
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
                         task_model = self.create_task_group(task_model)
-                        if len(shapes):
-                            for shape in shapes:
-                                self.create_task(task_model, shape)
-                        else:
-                            self.create_task(task_model)
+                        self._create_task(item, task_model, shapes)
                     elif isinstance(task_model, queue_model_objects.Basket):
                         for sample_node in task_model.get_sample_list():
                             child_task_model = self.create_task_group(sample_node)
-                            if len(shapes):
-                                for shape in shapes:
-                                    self.create_task(child_task_model, shape)
-                            else:
-                                self.create_task(child_task_model) 
+                            item = self.tree_brick.dc_tree_widget.get_item_by_model(child_task_model).get_sample_view_item()
+                            self._create_task(item, child_task_model, shapes) 
                     else:
-                        if len(shapes):
-                            for shape in shapes:
-                                self.create_task(task_model, shape)
-                        else:
-                            self.create_task(task_model)
-
+                        self._create_task(item, task_model, shapes)
 
             self.tool_box.currentItem().update_selection()
 
