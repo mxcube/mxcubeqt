@@ -113,6 +113,11 @@ def run(gui_config_file=None):
                       help="Visual style of the application (windows, motif," + \
                            "cde, plastique, windowsxp, or macintosh)",
                       dest='appStyle', default=None)
+    parser.add_option('', '--configFile', action='store', type='string',
+                      help="Configuration file to store application related settings " + \
+                           "(window size and position). If not defined then user home " + \
+                           "directory is used",
+                      dest='configFile', default=None)
 
     parser.add_option('', '--pyqt4', action='store_true', default=None)
     parser.add_option('', '--pyqt5', action='store_true', default=None)
@@ -132,6 +137,11 @@ def run(gui_config_file=None):
     log_template = opts.logTemplate
     hwobj_directory = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directory = opts.bricksDirs.split(os.path.pathsep)
+    if opts.configFile:
+        config_file_dir = opts.configFile
+    else:
+        config_file_dir = os.path.join(os.path.expanduser("~"), ".mxcube")
+
     app_style = opts.appStyle
 
     if opts.hardwareRepositoryServer:
@@ -155,6 +165,13 @@ def run(gui_config_file=None):
            os.environ['CUSTOM_HARDWARE_OBJECTS_PATH'].split(os.path.pathsep)
     except KeyError:
         pass
+
+    try:
+        if not os.path.exists(config_file_dir):
+            os.makedirs(config_file_dir)
+    except:
+        logging.getLogger().exception(\
+          "Unable to create configuration file directory: %s" % config_file_dir)
 
     custom_bricks_directory = [_directory for _directory in \
           custom_bricks_directory if _directory]
@@ -258,8 +275,11 @@ def run(gui_config_file=None):
     #logging.getLogger().info("\n\n\n\n")
     logging.getLogger().info("=================================================================================")
     logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
-    logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
+    logging.getLogger().info("GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
+    logging.getLogger().info("Configuration file directory: %s" % config_file_dir)
+    if len(logFile) > 0:
+        logging.getLogger().info("Log file: %s" % logFile)
     logging.getLogger().info("System info:")
     logging.getLogger().info("    - Python %s on %s" %(platform.python_version(), platform.system()))
     logging.getLogger().info("    - Qt %s - %s %s" % \
@@ -275,6 +295,7 @@ def run(gui_config_file=None):
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
+    supervisor.config_file_dir = config_file_dir
     # post event for GUI creation
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))

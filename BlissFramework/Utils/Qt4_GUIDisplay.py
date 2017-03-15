@@ -1382,7 +1382,8 @@ def display(configuration, no_border=False):
         else:
             display._show = False
         display.hide()
-        restoreSizes(configuration, window, display)
+         
+        #restoreSizes(configuration, window, display)
 
     for window in windows:
         window.append_windows_links(windows)

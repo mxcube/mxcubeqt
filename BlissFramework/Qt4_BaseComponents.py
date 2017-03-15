@@ -1045,7 +1045,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
                     if prop["name"] in self.property_bag.properties:
                         self.property_bag.getProperty(prop["name"]).\
                              setValue(prop["value"])
-                    elif prop.hidden:
+                    elif prop["hidden"]:
                         self.property_bag[prop["name"]] = prop
 
         self.readProperties()
