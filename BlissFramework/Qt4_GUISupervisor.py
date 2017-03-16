@@ -112,8 +112,9 @@ class GUISupervisor(QWidget):
 
         self.framework = None
         self.gui_config_file = None
-        self.config_file_dir = None
+        self.user_file_dir = None
         self.configuration = None
+        self.user_settings = None
 
         self.launch_in_design_mode = design_mode
         self.hardware_repository = HardwareRepository.HardwareRepository()
@@ -226,6 +227,23 @@ class GUISupervisor(QWidget):
                     else:
                         self.configuration = config
 
+                    #try:
+                    if True:
+                       user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                       user_settings_file = open(user_settings_filename)
+                       self.user_settings = eval(user_settings_file.read())
+
+                       print "read: ", self.user_settings
+                    """
+                    except:
+                       self.user_settings = []
+                       logging.getLogger().error(\
+                           "Unable to read user settings file: %s" % \
+                           user_settings_filename)
+                    else:
+                       user_settings_file.close()
+                    """
+
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
 
@@ -250,28 +268,6 @@ class GUISupervisor(QWidget):
 
         return self.new_gui()
 
-    def load_configuration(self):
-
-        try:
-           config_filename = os.path.join(self.config_file_dir, "config.yaml")
-           config_file = open(config_filename)
-           config_dict = yaml.load(config_file)
-        except:
-           config_dict = {}
-           logging.getLogger().error(\
-               "Unable to read configuration file: %s" % config_filename)
-        else:
-           config_file.close()
-
-        if not self.launch_in_design_mode and config_dict:
-            # save windows positions
-            for window in self.windows:
-                window_cfg = self.configuration.windows[str(window.objectName())]
-                window.move(config_dict[window_cfg.name]["posx"],
-                            config_dict[window_cfg.name]["posy"])
-                window.resize(QSize(config_dict[window_cfg.name]["width"],
-                                    config_dict[window_cfg.name]["height"]))
-
     def new_gui(self):
         """Starts new gui"""
 
@@ -286,13 +282,33 @@ class GUISupervisor(QWidget):
 
         return self.framework
 
+    def display(self):
+        self.windows = []
+        for window in self.configuration.windows_list:
+            display = Qt4_GUIDisplay.WindowDisplayWidget(\
+                 None, window["name"],
+                 execution_mode=True, no_border=self.no_border)
+            self.windows.append(display)
+            display.set_caption(window["properties"]["caption"])
+            display.draw_preview(window, id(display))
+            if window["properties"]["show"]:
+                display._show = True
+            else:
+                display._show = False
+            display.hide()
+
+            for item in self.user_settings:
+                if item["name"] == window["name"]:
+                    display.move(item["posx"], item["posy"])
+                    display.resize(item["width"], item["height"])
+
+        for window in self.windows:
+            window.append_windows_links(self.windows)
+
     def execute(self, config):
         """Start in execution mode"""
-
-        self.windows = Qt4_GUIDisplay.display(config,
-                                              no_border=self.no_border)
-
         self.splash_screen.set_message("Executing configuration...")
+        self.display()
 
         main_window = None
 
@@ -381,7 +397,7 @@ class GUISupervisor(QWidget):
     def save_size(self, configuration_suffix=''):
         """Saves window size and coordinates in the gui file"""
 
-        config_dict = {}
+        display_config_list = []
 
         if not self.launch_in_design_mode:
             # save windows positions
@@ -410,10 +426,11 @@ class GUISupervisor(QWidget):
                             continue
                 """
 
-                config_dict[window_cfg.name] = {"posx": window.x(),
-                                                "posy": window.y(),
-                                                "width": window.width(),
-                                                "height": window.height()}
+                display_config_list.append({"name": window_cfg.name,
+                                            "posx": window.x(),
+                                            "posy": window.y(),
+                                            "width": window.width(),
+                                            "height": window.height()})
 
             # save GUI file only if it is not more recent
             # (to prevent overwritting file if it has been modified in the meantime)
@@ -426,10 +443,19 @@ class GUISupervisor(QWidget):
                             "file to keep windows pos. and sizes")
                     self.configuration.save(self.gui_config_file)
             """
-            config_filename = os.path.join(self.config_file_dir, "config.yaml")
-            with open(config_filename, 'w') as outfile:
-                  yaml.dump(config_dict, outfile)
-
+            try:
+                user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                user_settings_file = open(user_settings_filename, "w")
+                user_settings_file.write(repr(display_config_list))
+                print "write: ", display_config_list
+            except:
+                logging.getLogger().exception(\
+                    "Unable to save window position and size in " + \
+                    "configuration file: %s" % user_settings_filename)
+         
+            else:
+                user_settings_file.close()
+ 
     def finish_init(self, gui_config_file):
         """Finalize gui init"""
 
@@ -465,7 +491,6 @@ class GUISupervisor(QWidget):
                 set_splash_screen(None)
                 self.splash_screen.finish(main_widget)
             del self.splash_screen
-            self.load_configuration()
         except:
             logging.getLogger().exception("exception while loading GUI file")
             QApplication.exit()
