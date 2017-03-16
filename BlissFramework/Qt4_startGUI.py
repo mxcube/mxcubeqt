@@ -113,6 +113,11 @@ def run(gui_config_file=None):
                       help="Visual style of the application (windows, motif," + \
                            "cde, plastique, windowsxp, or macintosh)",
                       dest='appStyle', default=None)
+    parser.add_option('', '--userFileDir', action='store', type='string',
+                      help="User settings file stores application related settings " + \
+                           "(window size and position). If not defined then user home " + \
+                           "directory is used",
+                      dest='userFileDir', default=None)
 
     parser.add_option('', '--pyqt4', action='store_true', default=None)
     parser.add_option('', '--pyqt5', action='store_true', default=None)
@@ -132,6 +137,11 @@ def run(gui_config_file=None):
     log_template = opts.logTemplate
     hwobj_directory = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directory = opts.bricksDirs.split(os.path.pathsep)
+    if opts.userFileDir:
+        user_file_dir = opts.userFileDir
+    else:
+        user_file_dir = os.path.join(os.environ["HOME"], ".mxcube")
+
     app_style = opts.appStyle
 
     if opts.hardwareRepositoryServer:
@@ -155,6 +165,13 @@ def run(gui_config_file=None):
            os.environ['CUSTOM_HARDWARE_OBJECTS_PATH'].split(os.path.pathsep)
     except KeyError:
         pass
+
+    try:
+        if not os.path.exists(user_file_dir):
+            os.makedirs(user_file_dir)
+    except:
+        logging.getLogger().exception(\
+          "Unable to create user files directory: %s" % user_file_dir)
 
     custom_bricks_directory = [_directory for _directory in \
           custom_bricks_directory if _directory]
@@ -188,6 +205,7 @@ def run(gui_config_file=None):
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_server)
     HardwareRepository.addHardwareObjectsDirs(hwobj_directory)
+    HardwareRepository.setUserFileDirectory(user_file_dir)
     BlissFramework.addCustomBricksDirs(custom_bricks_directory)
 
     # set log name and log file
@@ -258,8 +276,11 @@ def run(gui_config_file=None):
     #logging.getLogger().info("\n\n\n\n")
     logging.getLogger().info("=================================================================================")
     logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
-    logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
+    logging.getLogger().info("GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
+    logging.getLogger().info("User file directory: %s" % user_file_dir)
+    if len(logFile) > 0:
+        logging.getLogger().info("Log file: %s" % logFile)
     logging.getLogger().info("System info:")
     logging.getLogger().info("    - Python %s on %s" %(platform.python_version(), platform.system()))
     logging.getLogger().info("    - Qt %s - %s %s" % \
@@ -275,6 +296,7 @@ def run(gui_config_file=None):
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
+    supervisor.user_file_dir = user_file_dir
     # post event for GUI creation
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))

@@ -112,7 +112,9 @@ class GUISupervisor(QWidget):
 
         self.framework = None
         self.gui_config_file = None
+        self.user_file_dir = None
         self.configuration = None
+        self.user_settings = None
 
         self.launch_in_design_mode = design_mode
         self.hardware_repository = HardwareRepository.HardwareRepository()
@@ -128,7 +130,6 @@ class GUISupervisor(QWidget):
 
     def load_gui(self, gui_config_file):
         """Loads gui"""
-
         self.configuration = Qt4_Configuration.Configuration()
         self.gui_config_file = gui_config_file
         load_from_dict = gui_config_file.endswith(".json") or \
@@ -226,6 +227,18 @@ class GUISupervisor(QWidget):
                     else:
                         self.configuration = config
 
+                    try:
+                        user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                        user_settings_file = open(user_settings_filename)
+                        self.user_settings = eval(user_settings_file.read())
+                    except:
+                        self.user_settings = []
+                        logging.getLogger().error(\
+                            "Unable to read user settings file: %s" % \
+                            user_settings_filename)
+                    else:
+                        user_settings_file.close()
+
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
 
@@ -264,13 +277,33 @@ class GUISupervisor(QWidget):
 
         return self.framework
 
+    def display(self):
+        self.windows = []
+        for window in self.configuration.windows_list:
+            display = Qt4_GUIDisplay.WindowDisplayWidget(\
+                 None, window["name"],
+                 execution_mode=True, no_border=self.no_border)
+            self.windows.append(display)
+            display.set_caption(window["properties"]["caption"])
+            display.draw_preview(window, id(display))
+            if window["properties"]["show"]:
+                display._show = True
+            else:
+                display._show = False
+            display.hide()
+
+            for item in self.user_settings:
+                if item["name"] == window["name"]:
+                    display.move(item["posx"], item["posy"])
+                    display.resize(item["width"], item["height"])
+
+        for window in self.windows:
+            window.append_windows_links(self.windows)
+
     def execute(self, config):
         """Start in execution mode"""
-
-        self.windows = Qt4_GUIDisplay.display(config,
-                                              no_border=self.no_border)
-
         self.splash_screen.set_message("Executing configuration...")
+        self.display()
 
         main_window = None
 
@@ -358,42 +391,28 @@ class GUISupervisor(QWidget):
 
     def save_size(self, configuration_suffix=''):
         """Saves window size and coordinates in the gui file"""
+        display_config_list = []
 
         if not self.launch_in_design_mode:
-            # save windows positions
             for window in self.windows:
                 window_cfg = self.configuration.windows[str(window.objectName())]
-
-                window_cfg["properties"].getProperty(\
-                    "x%s" % configuration_suffix).setValue(window.x())
-                window_cfg["properties"].getProperty(\
-                    "y%s" % configuration_suffix).setValue(window.y())
-                window_cfg["properties"].getProperty(\
-                    "w%s" % configuration_suffix).setValue(window.width())
-                window_cfg["properties"].getProperty(\
-                    "h%s" % configuration_suffix).setValue(window.height())
-
-                splitters = self.configuration.find_all_children_by_type(\
-                    "splitter", window_cfg)
-                if len(splitters):
-                    for widget in window.queryList("QSplitter"):
-                        try:
-                            splitter = splitters[widget.name()]
-                            splitter["properties"].getProperty("sizes%s" % \
-                               configuration_suffix).setValue(widget.sizes())
-                        except KeyError:
-                            continue
-
-            # save GUI file only if it is not more recent
-            # (to prevent overwritting file if it has been modified in the meantime)
-            if self.gui_config_file and os.path.exists(self.gui_config_file):
-                ts = os.stat(self.gui_config_file)[stat.ST_MTIME]
-                if ts <= self.timestamp:
-                    if configuration_suffix == '':
-                        logging.getLogger().debug("Saving configuration " + \
-                            "file to keep windows pos. and sizes")
-                    self.configuration.save(self.gui_config_file)
-
+                display_config_list.append({"name": window_cfg.name,
+                                            "posx": window.x(),
+                                            "posy": window.y(),
+                                            "width": window.width(),
+                                            "height": window.height()})
+            try:
+                user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                user_settings_file = open(user_settings_filename, "w")
+                user_settings_file.write(repr(display_config_list))
+                os.chmod(user_settings_filename, 0o660)
+            except:
+                logging.getLogger().exception(\
+                    "Unable to save window position and size in " + \
+                    "configuration file: %s" % user_settings_filename)
+            else:
+                user_settings_file.close()
+ 
     def finish_init(self, gui_config_file):
         """Finalize gui init"""
 

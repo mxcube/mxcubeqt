@@ -174,15 +174,6 @@ class WindowCfg(ContainerCfg):
         self.type = "window"
         self.properties.addProperty("caption", "string", "")
         self.properties.addProperty("show", "boolean", True)
-        for suffix in ['',
-                       '_%d' % Qt.Key_F9,
-                       '_%d' % Qt.Key_F10,
-                       '_%d' % Qt.Key_F11,
-                       '_%d' % Qt.Key_F12]:
-            self.properties.addProperty("x%s" % suffix, "integer", 0)
-            self.properties.addProperty("y%s" % suffix, "integer", 0)
-            self.properties.addProperty("w%s" % suffix, "integer", 0)
-            self.properties.addProperty("h%s" % suffix, "integer", 0)
         self.properties.addProperty("menubar", "boolean", False)
         self.properties.addProperty("statusbar", "boolean", False)
         self.properties.addProperty("menudata", "", {}, hidden=True)
@@ -211,26 +202,6 @@ class TabCfg(ContainerCfg):
 
         self.properties.addProperty("fontSize", "integer", 0)
         self.signals.update({"notebookPageChangedSignal": "pageName"})
-
-    """
-    def setProperties(self, properties):
-        for prop in properties:
-            if hasattr(prop, "getName"): 
-                prop_name = prop.getName()
-                if prop_name in self.properties.properties:
-                    self.properties.getProperty(prop_name).\
-                         setValue(prop.getUserValue())
-                elif prop.hidden or prop_name.startswith("closable_"):
-                    self.properties[prop_name] = prop
-
-            else:
-                prop_name = prop["name"]
-                if prop_name in self.properties.properties:
-                    self.properties.getProperty(prop_name).\
-                         setValue(prop["value"])
-                elif prop["hidden"] or prop_name.startswith("closable_"):
-                    self.properties[prop_name] = prop
-    """
 
     def __repr__(self):
         """
