@@ -227,22 +227,17 @@ class GUISupervisor(QWidget):
                     else:
                         self.configuration = config
 
-                    #try:
-                    if True:
-                       user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
-                       user_settings_file = open(user_settings_filename)
-                       self.user_settings = eval(user_settings_file.read())
-
-                       print "read: ", self.user_settings
-                    """
+                    try:
+                        user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                        user_settings_file = open(user_settings_filename)
+                        self.user_settings = eval(user_settings_file.read())
                     except:
-                       self.user_settings = []
-                       logging.getLogger().error(\
-                           "Unable to read user settings file: %s" % \
-                           user_settings_filename)
+                        self.user_settings = []
+                        logging.getLogger().error(\
+                            "Unable to read user settings file: %s" % \
+                            user_settings_filename)
                     else:
-                       user_settings_file.close()
-                    """
+                        user_settings_file.close()
 
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
@@ -396,63 +391,24 @@ class GUISupervisor(QWidget):
 
     def save_size(self, configuration_suffix=''):
         """Saves window size and coordinates in the gui file"""
-
         display_config_list = []
 
         if not self.launch_in_design_mode:
-            # save windows positions
             for window in self.windows:
                 window_cfg = self.configuration.windows[str(window.objectName())]
-
-                """
-                window_cfg["properties"].getProperty(\
-                    "x%s" % configuration_suffix).setValue(window.x())
-                window_cfg["properties"].getProperty(\
-                    "y%s" % configuration_suffix).setValue(window.y())
-                window_cfg["properties"].getProperty(\
-                    "w%s" % configuration_suffix).setValue(window.width())
-                window_cfg["properties"].getProperty(\
-                    "h%s" % configuration_suffix).setValue(window.height())
-
-                splitters = self.configuration.find_all_children_by_type(\
-                    "splitter", window_cfg)
-                if len(splitters):
-                    for widget in window.queryList("QSplitter"):
-                        try:
-                            splitter = splitters[widget.name()]
-                            splitter["properties"].getProperty("sizes%s" % \
-                               configuration_suffix).setValue(widget.sizes())
-                        except KeyError:
-                            continue
-                """
-
                 display_config_list.append({"name": window_cfg.name,
                                             "posx": window.x(),
                                             "posy": window.y(),
                                             "width": window.width(),
                                             "height": window.height()})
-
-            # save GUI file only if it is not more recent
-            # (to prevent overwritting file if it has been modified in the meantime)
-            """
-            if self.gui_config_file and os.path.exists(self.gui_config_file):
-                ts = os.stat(self.gui_config_file)[stat.ST_MTIME]
-                if ts <= self.timestamp:
-                    if configuration_suffix == '':
-                        logging.getLogger().debug("Saving configuration " + \
-                            "file to keep windows pos. and sizes")
-                    self.configuration.save(self.gui_config_file)
-            """
             try:
                 user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
                 user_settings_file = open(user_settings_filename, "w")
                 user_settings_file.write(repr(display_config_list))
-                print "write: ", display_config_list
             except:
                 logging.getLogger().exception(\
                     "Unable to save window position and size in " + \
                     "configuration file: %s" % user_settings_filename)
-         
             else:
                 user_settings_file.close()
  

@@ -113,11 +113,11 @@ def run(gui_config_file=None):
                       help="Visual style of the application (windows, motif," + \
                            "cde, plastique, windowsxp, or macintosh)",
                       dest='appStyle', default=None)
-    parser.add_option('', '--userFile', action='store', type='string',
+    parser.add_option('', '--userFileDir', action='store', type='string',
                       help="User settings file stores application related settings " + \
                            "(window size and position). If not defined then user home " + \
                            "directory is used",
-                      dest='userFile', default=None)
+                      dest='userFileDir', default=None)
 
     parser.add_option('', '--pyqt4', action='store_true', default=None)
     parser.add_option('', '--pyqt5', action='store_true', default=None)
@@ -137,8 +137,8 @@ def run(gui_config_file=None):
     log_template = opts.logTemplate
     hwobj_directory = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directory = opts.bricksDirs.split(os.path.pathsep)
-    if opts.userFile:
-        user_file_dir = opts.userFile
+    if opts.userFileDir:
+        user_file_dir = opts.userFileDir
     else:
         user_file_dir = os.path.join(os.path.expanduser("~"), ".mxcube")
 
