@@ -140,7 +140,7 @@ def run(gui_config_file=None):
     if opts.userFileDir:
         user_file_dir = opts.userFileDir
     else:
-        user_file_dir = os.path.join(os.path.expanduser("~"), ".mxcube")
+        user_file_dir = os.path.join(os.environ["HOME"], ".mxcube")
 
     app_style = opts.appStyle
 
@@ -205,6 +205,7 @@ def run(gui_config_file=None):
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_server)
     HardwareRepository.addHardwareObjectsDirs(hwobj_directory)
+    HardwareRepository.setUserFileDirectory(user_file_dir)
     BlissFramework.addCustomBricksDirs(custom_bricks_directory)
 
     # set log name and log file
