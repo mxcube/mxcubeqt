@@ -405,6 +405,7 @@ class GUISupervisor(QWidget):
                 user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
                 user_settings_file = open(user_settings_filename, "w")
                 user_settings_file.write(repr(display_config_list))
+                os.chmod(user_settings_filename, 0o660)
             except:
                 logging.getLogger().exception(\
                     "Unable to save window position and size in " + \
