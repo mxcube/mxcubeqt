@@ -359,10 +359,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             except:
                 pass
 
-        print step 
         if self.motor_hwobj.isReady():
             self.set_position_spinbox_color(self.motor_hwobj.READY)
-            print self.motor_hwobj
             self.motor_hwobj.moveRelative(step)
 
     def really_move_down(self):
@@ -487,8 +485,12 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         try:
+           self.position_spinbox.blockSignals(True)
+           self.position_slider.blockSignals(True)
            self.position_spinbox.setValue(float(new_position))
            self.position_slider.setValue(float(new_position))
+           self.position_spinbox.blockSignals(False)
+           self.position_slider.blockSignals(False)
         except:
            print(('ERROR!!! Setting position...' + str(new_position)))
            pass
@@ -759,7 +761,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             if new_value == "":
                 self.move_left_button.setToolTip("Moves the motor down (while pressed)")
             else:
-                self.move_left_button.set_tool_tip(new_value)
+                self.move_left_button.setToolTip(new_value)
         elif property_name == 'helpIncrease':
             if new_value == "" :
                 self.move_right_button.setToolTip("Moves the motor up (while pressed)")

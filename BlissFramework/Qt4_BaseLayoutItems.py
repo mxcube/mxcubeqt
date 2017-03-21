@@ -201,7 +201,7 @@ class TabCfg(ContainerCfg):
         ContainerCfg.__init__(self, *args)
 
         self.properties.addProperty("fontSize", "integer", 0)
-        self.signals.update({"notebookPageChangedSignal": "pageName"})
+        self.signals.update({"notebookPageChanged": "pageName"})
 
     def __repr__(self):
         """

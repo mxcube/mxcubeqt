@@ -146,7 +146,7 @@ class Qt4_DuoStateBrick(BlissWidget):
     def updateLabel(self,label):
         self.main_gbox.setTitle(label)
 
-    def stateChanged(self,state,state_ledit=""):
+    def stateChanged(self, state, state_label=""):
         state = str(state)
         try:
             color=self.STATES[state][0]
@@ -160,7 +160,7 @@ class Qt4_DuoStateBrick(BlissWidget):
                                            color,
                                            QPalette.Base)
         #self.state_ledit.setPaletteBackgroundColor(QColor(color))
-        if len(state_ledit) > 0:
+        if len(state_label) > 0:
             self.state_ledit.setText('%s' % state_label)
         else:
             label_str = state
