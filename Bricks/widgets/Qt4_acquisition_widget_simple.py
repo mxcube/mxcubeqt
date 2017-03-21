@@ -336,6 +336,14 @@ class AcquisitionWidgetSimple(QWidget):
                "Exposure time limits %0.3f : %0.3f" %(limits[0], limits[1]))
             self._acquisition_mib.validate_all()
 
+    def update_energy(self, energy, wav):
+        """
+        Descript. :
+        """
+        if "energy" not in self.value_changed_list and \
+           not self.acq_widget_layout.energy_ledit.hasFocus():
+            self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
+
     def init_detector_roi_modes(self):
         """
         Descript. :

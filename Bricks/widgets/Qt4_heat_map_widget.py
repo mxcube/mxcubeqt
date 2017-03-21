@@ -69,8 +69,8 @@ class HeatMapWidget(QWidget):
         _threshold_label = QLabel("Threshold: ", self._heat_map_tools_widget)
         self._threshold_slider = QSlider(Qt.Horizontal, 
                self._heat_map_tools_widget)
-        #self._relaunch_processing_button = QPushButton("Relaunch processing",
-        #     self._heat_map_tools_widget)
+        self._relaunch_processing_button = QPushButton("Relaunch processing",
+             self._heat_map_tools_widget)
         self._create_points_button = QPushButton("Create centring points", 
              self._heat_map_tools_widget)
 
@@ -87,7 +87,7 @@ class HeatMapWidget(QWidget):
         _heat_map_tools_hlayout.addWidget(_threshold_label)
         _heat_map_tools_hlayout.addWidget(self._threshold_slider)
         _heat_map_tools_hlayout.addStretch(0)
-        #_heat_map_tools_hlayout.addWidget(self._relaunch_processing_button)
+        _heat_map_tools_hlayout.addWidget(self._relaunch_processing_button)
         _heat_map_tools_hlayout.addWidget(self._create_points_button)
         _heat_map_tools_hlayout.setSpacing(2)
         _heat_map_tools_hlayout.setContentsMargins(2, 2, 2, 2)
@@ -125,8 +125,8 @@ class HeatMapWidget(QWidget):
         self._score_type_cbox.activated.connect(self.score_type_changed)
         self._threshold_slider.valueChanged.\
              connect(self.filter_min_slider_changed)
-        #self._relaunch_processing_button.clicked.\
-        #     connect(self.relaunch_processing_clicked)
+        self._relaunch_processing_button.clicked.\
+             connect(self.relaunch_processing_clicked)
         self._create_points_button.clicked.\
              connect(self.create_points_clicked)
         self._heat_map_plot.mouseClickedSignal.\
