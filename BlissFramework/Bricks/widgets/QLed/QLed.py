@@ -77,7 +77,7 @@ class QLed(QWidget):
         self._update()
 
     def setColor(self, color):
-        self.shape = shape
+        self.color = color
         self._update()
 
     def setShapeAndColor(self, shape, color):
