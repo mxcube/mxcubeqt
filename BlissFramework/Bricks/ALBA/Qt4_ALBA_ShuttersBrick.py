@@ -38,12 +38,12 @@ __category__ = 'ALBA'
 STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = \
          (0,1,9,11,13,23)
 
-STATES = {STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
-          STATE_OUT: Qt4_widget_colors.LIGHT_GRAY,
-          STATE_MOVING: Qt4_widget_colors.LIGHT_YELLOW,
-          STATE_FAULT: Qt4_widget_colors.LIGHT_RED,
-          STATE_ALARM: Qt4_widget_colors.LIGHT_RED,
-          STATE_UNKNOWN: Qt4_widget_colors.LIGHT_GRAY}
+STATES = {STATE_IN: [Qt4_widget_colors.LIGHT_GREEN,"green", "OPENED"],
+          STATE_OUT: [Qt4_widget_colors.LIGHT_GRAY, "purple", "CLOSED"],
+          STATE_MOVING: [Qt4_widget_colors.LIGHT_YELLOW, "yellow", "MOVING"],
+          STATE_FAULT: [Qt4_widget_colors.LIGHT_RED, "red", "FAULT"],
+          STATE_ALARM: [Qt4_widget_colors.LIGHT_RED, "red", "ALARM"],
+          STATE_UNKNOWN: [Qt4_widget_colors.LIGHT_GRAY, "gray", "UNKNOWN"]}
 
 class Qt4_ALBA_ShuttersBrick(BlissWidget):
     """
@@ -120,21 +120,18 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.fast_shut_ho = None
-        self.slow_shut_ho = None
-        self.photon_shut_ho = None
-        self.fe_ho = None
 
-        print("setting %s property to %s", property_name, new_value)
+        logging.getLogger("HWR").debug("setting %s property to %s" % (property_name, new_value))
 
         if property_name == 'fast_shutter':
             if self.fast_shut_ho is not None:
-                self.disconnect(self.fast_shut_ho, QtCore.SIGNAL('stateChanged'), self.fast_state_changed)
+                self.disconnect(self.fast_shut_ho, QtCore.SIGNAL('fastStateChanged'), self.fast_state_changed)
 
             self.fast_shut_ho = self.getHardwareObject(new_value)
 
             if self.fast_shut_ho is not None:
-                self.connect(self.fast_shut_ho, QtCore.SIGNAL('stateChanged'), self.fast_state_changed)
+                logging.getLogger("HWR").debug("Connecting %s" % self.fast_shut_ho.getUserName())
+                self.connect(self.fast_shut_ho, QtCore.SIGNAL('fastStateChanged'), self.fast_state_changed)
 
         elif property_name == 'slow_shutter':
             if self.slow_shut_ho is not None:
@@ -178,7 +175,8 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.fe_led.setFixedSize(self.led_size,self.led_size)
 
     def fast_state_changed(self,value):
-        led = self.fe_led
+        led = self.fast_led
+        logging.getLogger("HWR").debug("Fast shutter state changed.  It is %s" % value)
         self._update_led(led, value)
         
     def slow_state_changed(self,value):
@@ -194,7 +192,10 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self._update_led(led, value)
 
     def _update_led(self, led, value):
-        led.setState(value)
+        color,colorname, message = STATES[value]
+        led.setColor(colorname)
+        led.setMessage(message)
+        #led.setState(value)
 
 def test_brick(brick):
     """ Run test by running from command line test_mxcube <name of this file> """
