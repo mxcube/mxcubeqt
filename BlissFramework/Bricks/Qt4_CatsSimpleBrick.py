@@ -41,12 +41,11 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 __category__ = "Sample changer"
 
-class CatsStatusView(QGroupBox, BlissWidget):
+class CatsStatusView(QGroupBox):
 
     def __init__(self, parent, brick):
+        QGroupBox.__init__(self, "Sample Changer State", parent)
         
-        QGroupBox.__init__(self, "State", parent)
-        BlissWidget.__init__(self, parent)
         # Graphic elements ----------------------------------------------------
         #self.contents_widget = QGroupBox("Sample Changer State", self)
 
@@ -68,7 +67,7 @@ class CatsStatusView(QGroupBox, BlissWidget):
 
     def setState(self, state):
        
-        logging.getLogger().debug("SC StatusView. State changed %s" % str(state))
+        logging.getLogger("HWR").debug("SC StatusView. State changed %s" % str(state))
         color = SC_STATE_COLOR.get(state, None)
 
         if color is None:
@@ -196,7 +195,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
              self.baskets[-1].set_matrices(vials)
 
     def sc_state_changed(self, state, previous_state=None):
-        logging.getLogger().debug("SC State changed %s" % str(state))
+        logging.getLogger("HWR").debug("SC State changed %s" % str(state))
         Qt4_SampleChangerBrick3.sc_state_changed(self, state, previous_state)
 
         self.state = state
@@ -228,7 +227,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
             self.abort_button.setEnabled(False)
             abort_color = Qt4_widget_colors.LIGHT_GRAY
         elif ready:
-            logging.getLogger().info("Qt4_CatsSimpleBrick update buttons (ready)")
+            logging.getLogger("GUI").info("update buttons (ready)")
             self.load_button.setEnabled(True)
             if self.sample_changer_hwobj.hasLoadedSample():
                 self.unload_button.setEnabled(True)
@@ -237,7 +236,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
             self.abort_button.setEnabled(False)
             abort_color = Qt4_widget_colors.LIGHT_GRAY
         else:
-            logging.getLogger().info("Qt4_CatsSimpleBrick update buttons (other)")
+            logging.getLogger("GUI").info("update buttons (other)")
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(True)
@@ -250,7 +249,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
     def load_selected_sample(self):
 
         basket, vial = self.user_selected_sample
-        logging.getLogger("GUI").info("Loading sample: %s / %s" % (basket, vial))
+        logging.getLogger("GUI").info("Loading sample basket: %s / %s" % (basket, vial))
 
         if basket is not None and vial is not None:
             if basket != 100:
