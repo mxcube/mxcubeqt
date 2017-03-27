@@ -363,10 +363,6 @@ class CustomToolBar(QToolBar):
 class WindowDisplayWidget(QScrollArea):
     """Main widget"""
 
-    brickChangedSignal = pyqtSignal(str, str, str, tuple, bool)
-    tabChangedSignal = pyqtSignal(str, int)
-    enableExpertModeSignal = pyqtSignal(bool)
-
     class Spacer(QFrame):
         """Spacer widget"""
 
@@ -799,6 +795,10 @@ class WindowDisplayWidget(QScrollArea):
              "hsplitter": horizontalSplitter,
              "vsplitter": verticalSplitter}
 
+    brickChangedSignal = pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = pyqtSignal(str, int)
+    enableExpertModeSignal = pyqtSignal(bool)
+    windowClosedSignal = pyqtSignal()
     isShownSignal = pyqtSignal()
     isHiddenSignal = pyqtSignal()
     itemClickedSignal = pyqtSignal(str)
@@ -814,6 +814,7 @@ class WindowDisplayWidget(QScrollArea):
         self.preview_items = []
         self.current_window = None
         self.base_caption = ""
+        self.close_on_exit = False
         self.setWindowTitle("GUI preview")
 
         self.central_widget = QWidget(self.widget())
@@ -942,6 +943,11 @@ class WindowDisplayWidget(QScrollArea):
         self.isShownSignal.emit()
         #self.emit(SIGNAL("isShown"), ())
         return ret
+
+    def closeEvent(self, event):
+        event.accept()
+        if self.close_on_exit:
+            QApplication.exit(0)
 
     def hide(self, *args):
         """Hide"""
