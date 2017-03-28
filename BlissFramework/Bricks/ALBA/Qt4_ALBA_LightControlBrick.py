@@ -20,9 +20,7 @@
 import os
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
@@ -70,13 +68,13 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
 
         # Properties ---------------------------------------------------------- 
         self.addProperty('mnemonic', 'string', '')
-        self.addProperty('icons', 'string', '')
+        self.addProperty('icons', 'string', 'BulbDelete,BulbCheck')
 
         # Graphic elements ----------------------------------------------------
-        self.widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        self.widget = loadUi(os.path.join(os.path.dirname(__file__),
              'widgets/ui_files/alba_lightcontrol.ui'))
 
-        QtGui.QHBoxLayout(self)
+        QHBoxLayout(self)
   
         self.layout().addWidget(self.widget)
         self.layout().setContentsMargins(0,0,0,0)
@@ -87,10 +85,10 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         self.widget.slider.valueChanged.connect(self.do_set_level)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
 
         # Defaults 
-        self.set_icons('BulbCheck,BulbDelete')
+        self.set_icons('BulbDelete,BulbCheck')
 
         # Other --------------------------------------------------------------- 
         self.setToolTip("Control of light (set level and on/off switch.")
@@ -105,15 +103,15 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.light_ho is not None:
-                self.disconnect(self.light_ho, QtCore.SIGNAL('levelChanged'), self.level_changed)
-                self.disconnect(self.light_ho, QtCore.SIGNAL('stateChanged'), self.state_changed)
+                self.disconnect(self.light_ho, 'levelChanged', self.level_changed)
+                self.disconnect(self.light_ho, 'stateChanged', self.state_changed)
 
             self.light_ho = self.getHardwareObject(new_value)
 
             if self.light_ho is not None:
                 self.setEnabled(True)
-                self.connect(self.light_ho, QtCore.SIGNAL('levelChanged'), self.level_changed)
-                self.connect(self.light_ho, QtCore.SIGNAL('stateChanged'), self.state_changed)
+                self.connect(self.light_ho, 'levelChanged', self.level_changed)
+                self.connect(self.light_ho, 'stateChanged', self.state_changed)
                 self.light_ho.update_values()
                 self.setToolTip("Control of %s (light level and on/off switch." % self.light_ho.getUserName())
                 self.set_level_limits(self.light_ho.getLimits())
@@ -131,24 +129,21 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
+        logging.getLogger("HWR").debug(" updating light control. state is %s" % self.state)
         if self.light_ho is not None:
-            self.setEnabled(True)
+            self.set_enabled()
             if self.state is "on":
-                color = self.on_color
                 self.widget.slider.setEnabled(True)
                 if self.icons:
                     self.widget.button.setIcon(self.icons["on"])
                     self.widget.button.setToolTip("Set light Off")
             elif self.state is "off":
-                color = self.off_color
-                #self.widget.slider.setEnabled(False)
-                self.widget.slider.setEnabled(True)
+                self.widget.slider.setEnabled(False)
                 if self.icons:
                     self.widget.button.setIcon(self.icons["off"])
                     self.widget.button.setToolTip("Set light On")
             else:
-                color = self.fault_color
-                self.setEnabled(False)
+                self.set_disabled()
 
             if self.level is not None and None not in self.level_limits:
                 self.widget.slider.blockSignals(True)
@@ -156,13 +151,20 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
                 self.widget.slider.blockSignals(False)
                 self.widget.slider.setToolTip("Light Level: %s" % self.level) 
         else:
-            self.setEnabled(False)
-            color = self.unknown_color
+            self.set_disabled()
 
+    def set_disabled(self):
+        self.setEnabled(False)
+        color = self.unknown_color
+        self.widget.button.setStyleSheet("background-color: %s;" % color)
+
+    def set_enabled(self):
+        self.setEnabled(True)
+        color = self.on_color
         self.widget.button.setStyleSheet("background-color: %s;" % color)
 
     def set_icons(self, icons):
-        icons = icons.split(",")
+        icons = [icon.strip() for icon in icons.split(",")]
         if len(icons) == 2:
             self.icons = {'on': Qt4_Icons.load_icon(icons[0]), 
                           'off': Qt4_Icons.load_icon(icons[1])} 
@@ -173,11 +175,13 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         self.update()
 
     def state_changed(self, state):
+        logging.getLogger("HWR").debug(" state changed for light control. state is %s" % self.state)
         self.state = state
         self.update()
   
     def set_label(self, text):
         self.widget.label.setText(text)
+
     def set_level_limits(self, limits):
         self.level_limits = limits
         if None not in self.level_limits:
