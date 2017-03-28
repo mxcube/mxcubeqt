@@ -177,7 +177,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         if len(self._advanced_methods_widget.\
            grid_treewidget.selectedItems()) == 0:
             msg = "No grid selected. Please select a grid to continue!"
-            logging.getLogger("GUI").error(msg)
+            logging.getLogger("GUI").warning(msg)
             result = False
 
         return result
@@ -194,10 +194,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         CreateTaskBase.single_item_selection(self, tree_item)
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
+            pass
             #self._init_models()
             ##self._acq_widget.update_data_model(self._acquisition_parameters,
             #                                    self._path_template)            
-            pass
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):

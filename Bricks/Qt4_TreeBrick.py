@@ -761,7 +761,7 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.sample_changer_widget.details_button.setText("Show SC-details")
-        self.hide_dc_parameters.emit(True)
+        self.hide_dc_parameters_tab.emit(True)
         self.populate_sample_details.emit(item.get_model())
         self.hide_dcg_tab.emit(True)
         self.hide_sample_centring_tab.emit(False)

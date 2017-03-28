@@ -177,7 +177,8 @@ class EnergyScanParametersWidget(QWidget):
         self.energy_scan_model.edge = energy
 
     def set_enegy_scan_hwobj(self, energy_scan_hwobj):
-        if self.energy_scan_hwobj is None:
+        if self.energy_scan_hwobj is None and \
+           energy_scan_hwobj:
             self.energy_scan_hwobj = energy_scan_hwobj
             self.energy_scan_hwobj.connect("energyScanStarted", self.energy_scan_started)
             self.energy_scan_hwobj.connect("scanNewPoint", self.energy_scan_new_point) 

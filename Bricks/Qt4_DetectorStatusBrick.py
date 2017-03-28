@@ -36,8 +36,9 @@ class Qt4_DetectorStatusBrick(BlissWidget):
               'BAD': Qt4_widget_colors.LIGHT_RED}
     DETECTOR_STATES = {'busy': Qt4_widget_colors.LIGHT_GREEN,
                        'error': Qt4_widget_colors.LIGHT_RED,
-                       'initializing': Qt4_widget_colors.LIGHT_RED,
+                       'initializing': Qt4_widget_colors.LIGHT_YELLOW,
                        'calibrating': Qt4_widget_colors.LIGHT_YELLOW,
+                       'configuring': Qt4_widget_colors.LIGHT_YELLOW,
                        'slave': Qt4_widget_colors.LIGHT_RED,
                        'exposing': Qt4_widget_colors.LIGHT_GREEN,
                        'ready': Qt4_widget_colors.LIGHT_BLUE,
