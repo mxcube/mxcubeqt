@@ -282,10 +282,12 @@ class GUISupervisor(QWidget):
         for window in self.configuration.windows_list:
             display = Qt4_GUIDisplay.WindowDisplayWidget(\
                  None, window["name"],
-                 execution_mode=True, no_border=self.no_border)
+                 execution_mode=True,
+                 no_border=self.no_border)
             self.windows.append(display)
             display.set_caption(window["properties"]["caption"])
             display.draw_preview(window, id(display))
+            display.close_on_exit = window["properties"]["closeOnExit"]
             if window["properties"]["show"]:
                 display._show = True
             else:

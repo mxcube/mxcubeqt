@@ -174,6 +174,7 @@ class WindowCfg(ContainerCfg):
         self.type = "window"
         self.properties.addProperty("caption", "string", "")
         self.properties.addProperty("show", "boolean", True)
+        self.properties.addProperty("closeOnExit", "boolean", True)
         self.properties.addProperty("menubar", "boolean", False)
         self.properties.addProperty("statusbar", "boolean", False)
         self.properties.addProperty("menudata", "", {}, hidden=True)
