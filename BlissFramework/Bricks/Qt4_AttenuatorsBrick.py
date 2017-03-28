@@ -205,10 +205,6 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         else: 
             color = self.states["UNKNOWN"]
 
-        self.transmission_ledit.setStyleSheet("background-color: %s;" % color)
-
-        return
-
     def transmission_value_changed(self, new_value):
         """
         Descript. :

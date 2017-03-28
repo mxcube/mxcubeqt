@@ -381,6 +381,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             self.resolution_state_changed(None)
 
         self.new_value_ledit.setEnabled(self.door_interlocked)
+        self.setEnabled(self.door_interlocked)
         self.create_tool_tip()
 
     def resolution_ready(self):
