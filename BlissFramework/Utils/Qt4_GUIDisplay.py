@@ -601,9 +601,10 @@ class WindowDisplayWidget(QScrollArea):
             slot_name = "hidePage_%s" % label
 
             def tab_slot(self, hide=True, page={"widget" : scroll_area, \
-                         "label": self.tabText(self.indexOf(scroll_area)),
+                         "label": label,
                          "index": self.indexOf(scroll_area),
                          "icon": icon, "hidden": False}):
+
                 if hide:
                     if not page["hidden"]:
                         self.removeTab(self.indexOf(page["widget"]))
