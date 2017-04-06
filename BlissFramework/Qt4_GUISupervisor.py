@@ -128,6 +128,10 @@ class GUISupervisor(QWidget):
 
         self.timestamp = 0
 
+    def set_user_file_directory(self, user_file_directory):
+        self.user_file_dir = user_file_directory
+        BlissWidget.set_user_file_directory(user_file_directory)
+
     def load_gui(self, gui_config_file):
         """Loads gui"""
         self.configuration = Qt4_Configuration.Configuration()

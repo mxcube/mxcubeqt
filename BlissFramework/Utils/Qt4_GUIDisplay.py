@@ -527,7 +527,7 @@ class WindowDisplayWidget(QScrollArea):
     class CustomTabWidget(QTabWidget):
         """Tab widget"""
 
-        notebookPageChangedSignal = pyqtSignal(str)
+        #notebookPageChangedSignal = pyqtSignal(str)
         tabChangedSignal = pyqtSignal(int, object)
         
 
@@ -570,7 +570,7 @@ class WindowDisplayWidget(QScrollArea):
                 orig_label = " ".join(label_list[0:-1])
             else:
                 orig_label = " ".join(label_list)
-            self.notebookPageChangedSignal.emit(orig_label)
+            #self.notebookPageChangedSignal.emit(orig_label)
             self.tabChangedSignal.emit(index, page)
 
             tab_name = self.objectName()
@@ -1047,7 +1047,7 @@ class WindowDisplayWidget(QScrollArea):
                     getattr(tab, slot_name)()
 
                 def current_page_changed(index):
-                    item_cfg.notebookPageChanged(new_item.tabText(index))
+                    item_cfg.notebook_page_changed(new_item.tabText(index))
 
                 new_item._close_current_page_cb = close_current_page
                 new_item.currentChanged.connect(current_page_changed)

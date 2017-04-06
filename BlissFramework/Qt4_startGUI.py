@@ -296,7 +296,7 @@ def run(gui_config_file=None):
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
-    supervisor.user_file_dir = user_file_dir
+    supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))
