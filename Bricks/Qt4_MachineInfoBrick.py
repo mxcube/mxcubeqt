@@ -227,7 +227,7 @@ class CustomInfoWidget(QWidget):
             self.value_plot.set_tight_layout()
             self.value_plot.clear()
             self.value_plot.set_max_plot_point(max_plot_points)
-            self.value_plot.set_y_axis_limits([0, None])
+            #self.value_plot.set_y_axis_limits([0, None])
         self.update_info(info_dict)
 
     def update_info(self, info_dict):

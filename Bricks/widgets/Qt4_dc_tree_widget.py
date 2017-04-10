@@ -94,7 +94,8 @@ class DataCollectTree(QWidget):
         #self.clear_centred_positions_cb = None
         self.run_cb = None
         self.item_menu = None
-        self.item_history_dict = {}
+        self.item_history_list = []
+        self.samples_initialized = None
 
         # Signals ------------------------------------------------------------
 
@@ -147,7 +148,7 @@ class DataCollectTree(QWidget):
 
         self.tree_splitter = QSplitter(Qt.Vertical, self)
         self.sample_tree_widget = QTreeWidget(self.tree_splitter)
-        self.history_table_widget = QTableWidget(self.tree_splitter)
+        self.history_tree_widget = QTreeWidget(self.tree_splitter)
         self.history_enable_cbox = QCheckBox("Display history view", self)
         self.history_enable_cbox.setChecked(True)
  
@@ -195,10 +196,10 @@ class DataCollectTree(QWidget):
         self.confirm_dialog.continueClickedSignal.connect(self.collect_items)
         self.continue_button.clicked.connect(self.continue_button_click)
 
-        self.history_table_widget.cellDoubleClicked.\
-             connect(self.history_table_double_click)
+        #self.history_tree_widget.cellDoubleClicked.\
+        #     connect(self.history_table_double_click)
         self.history_enable_cbox.stateChanged.\
-             connect(self.history_table_widget.setVisible)
+             connect(self.history_tree_widget.setVisible)
 
         self.plate_navigator_cbox.stateChanged.\
              connect(self.use_plate_navigator)
@@ -215,34 +216,14 @@ class DataCollectTree(QWidget):
         self.setAttribute(Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
 
-        font = self.history_table_widget.font()
+        font = self.history_tree_widget.font()
         font.setPointSize(8)
-        self.history_table_widget.setFont(font)
-        self.history_table_widget.setEditTriggers(\
+        self.history_tree_widget.setFont(font)
+        self.history_tree_widget.setEditTriggers(\
              QAbstractItemView.NoEditTriggers)
-        self.history_table_widget.setColumnCount(5)
-        self.history_table_widget.setHorizontalHeaderItem(\
-             0, QTableWidgetItem("Sample"))
-        self.history_table_widget.setHorizontalHeaderItem(\
-             1, QTableWidgetItem("Time"))
-        self.history_table_widget.setHorizontalHeaderItem(\
-             2, QTableWidgetItem("Type"))
-        self.history_table_widget.setHorizontalHeaderItem(\
-             3, QTableWidgetItem("Status"))
-        self.history_table_widget.setHorizontalHeaderItem(\
-             4, QTableWidgetItem("Details"))
-        self.history_table_widget.setAlternatingRowColors(True)
-        self.history_table_widget.setSelectionBehavior(\
-             QAbstractItemView.SelectRows)
-        #self.history_table_widget.horizontalHeader().setSortIndicatorShown(True)
-
-        if qt_variant == 'PyQt5':
-            self.history_table_widget.verticalHeader().\
-               setSectionResizeMode(QHeaderView.Fixed)
-        else:    
-           self.history_table_widget.verticalHeader().\
-               setResizeMode(QHeaderView.Fixed)
-        self.history_table_widget.horizontalHeader().setMaximumHeight(18)
+        self.history_tree_widget.setColumnCount(5)
+        self.history_tree_widget.setHeaderLabels(\
+             ("Date/Time", "Sample", "Type", "Status", "Details"))
         self.tree_splitter.setSizes([200, 20])
       
 
@@ -345,7 +326,8 @@ class DataCollectTree(QWidget):
 
     def history_table_double_click(self, row, col):
         """Shows more details of a double clicked history view item"""
-        self.show_details([self.item_history_dict[row]])
+        #elf.show_details([self.item_history_list[row]])
+        pass
 
     def item_click(self):
         """Single item click verifies if there is a path conflict"""
@@ -574,7 +556,6 @@ class DataCollectTree(QWidget):
            If entry is a collection then it is selected and 
            selection callback is raised.
         """
-
         view_item = None
         parent_tree_item = self.get_item_by_model(parent)
 
@@ -597,6 +578,9 @@ class DataCollectTree(QWidget):
         self.sample_tree_widget_selection()
 
         self.last_added_item = view_item
+
+        if self.samples_initialized:
+            self.auto_save_queue()
 
     def get_selected_items(self):
         """Return a list with selected items"""
@@ -721,7 +705,11 @@ class DataCollectTree(QWidget):
             self.queue_model_hwobj.select_model('free-pin')
             self.set_sample_pin_icon()
         self.sample_tree_widget_selection()
-        
+        if not self.samples_initialized:
+            self.load_history_queue()
+
+        self.samples_initialized = True
+
     def set_centring_method(self, method_number):       
         """Sets centring method"""
         self.centring_method = method_number
@@ -795,8 +783,8 @@ class DataCollectTree(QWidget):
 
     def enable_sample_changer_widget(self, state):
         """Enables sample changer widget"""
-        self.parent().sample_changer_widget.centring_cbox.setEnabled(state)
-        self.parent().sample_changer_widget.filter_cbox.setEnabled(state)
+        self.tree_brick.sample_changer_widget.centring_cbox.setEnabled(state)
+        self.tree_brick.sample_changer_widget.filter_cbox.setEnabled(state)
 
     def is_mounted_sample_item(self, item):
         """Checks if item is mounted"""
@@ -915,38 +903,73 @@ class DataCollectTree(QWidget):
             sample_model = item_model.get_parent().get_parent()
 
             if isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
-                sample_model = item_model.get_parent().get_parent()
-                item_details = "%.1f%s, %.3f sec, %d images" % (\
-                   item_model.as_dict()["osc_range"],
-                   u"\u00b0",
-                   item_model.as_dict()["exp_time"],
-                   item_model.as_dict()["num_images"])
-
-            self.history_table_widget.insertRow(0)
+                item_details = "%.1f%s " % (item_model.as_dict()["osc_range"] ,
+                                            u"\u00b0") + \
+                               "%.3f sec, " % item_model.as_dict()["exp_time"] + \
+                               "%d images, " % item_model.as_dict()["num_images"] + \
+                               "%.2f keV, " % item_model.as_dict()["energy"] + \
+                               "%d%% transm, " % item_model.as_dict()["transmission"] + \
+                               "%.2f A" % item_model.as_dict()["resolution"]
+            elif isinstance(view_item, Qt4_queue_item.EnergyScanQueueItem):
+                item_details = "Element: %s, " % item_model.element_symbol + \
+                               "Edge: %s" % item_model.edge
             
-            self.history_table_widget.setItem(\
-                 0, 0, QTableWidgetItem(sample_model.get_display_name()))
-            self.history_table_widget.setItem(\
-                 0, 1, QTableWidgetItem(datetime.now().strftime("%H:%M:%S")))
-            self.history_table_widget.setItem(\
-                 0, 2, QTableWidgetItem(queue_entry.get_type_str()))
-            status_item = QTableWidgetItem(status)
-            self.history_table_widget.setItem(0, 3, status_item)
-            if status == "Successful":
-                status_item.setBackground(QBrush(Qt4_widget_colors.LIGHT_GREEN))
-            else:
-                status_item.setBackground(QBrush(Qt4_widget_colors.LIGHT_RED)) 
+            self.add_history_entry(sample_model.get_display_name(),
+                                   datetime.now().strftime("%Y.%m.%d"),
+                                   datetime.now().strftime("%H:%M:%S"),
+                                   queue_entry.get_type_str(),
+                                   status,
+                                   item_details, 
+                                   view_item)
+ 
+    def add_history_entry(self, sample_name, date, time, entry_type, status, entry_details, view_item=None):        
+        # At the top level insert date
+        date_item = None
+        for item_index in range(self.history_tree_widget.topLevelItemCount()):
+            if self.history_tree_widget.topLevelItem(item_index).text(0) == date:
+                date_item = self.history_tree_widget.topLevelItem(item_index)
+                break
+        if not date_item:
+            date_item = QTreeWidgetItem()
+            date_item.setText(0, date)
+            self.history_tree_widget.insertTopLevelItem(0, date_item)
 
-            self.history_table_widget.setItem(\
-                 0, 4, QTableWidgetItem(item_details))
-            self.history_table_widget.resizeRowsToContents()
-            self.history_table_widget.resizeColumnsToContents()
-            #self.history_table_widget.setSortingEnabled(True)
-            self.history_table_widget.setRowHeight(0, 17)
-            self.history_table_widget.setVerticalHeaderItem(\
-                 0, QTableWidgetItem(str(self.history_table_widget.rowCount())))
-            self.item_history_dict[self.history_table_widget.rowCount() - 1] = view_item
-            #self.delete_empty_finished_items()
+        time_item = None
+        for item_index in range(date_item.childCount()):
+            if date_item.child(item_index).text(0) == time.split(":")[0] + "h":
+                time_item = date_item.child(item_index)
+       
+        if not time_item:
+            time_item = QTreeWidgetItem()
+            time_item.setText(0, time.split(":")[0] + "h")
+            date_item.insertChild(0, time_item)
+
+        entry_item = QTreeWidgetItem()
+        entry_item.setText(0, time)
+        entry_item.setText(1, sample_name)
+        entry_item.setText(2, entry_type)
+        entry_item.setText(3, status)
+        entry_item.setText(4, entry_details)
+
+        if status == "Successful":
+            entry_item.setBackground(3, QBrush(Qt4_widget_colors.LIGHT_GREEN))
+        else:
+            entry_item.setBackground(3, QBrush(Qt4_widget_colors.LIGHT_RED))
+
+        time_item.insertChild(0, entry_item)
+
+        for col in range(1, 4):
+            self.history_tree_widget.resizeColumnToContents(col)
+        """
+        self.history_tree_widget.setItem(0, 4, QTableWidgetItem(entry_details))
+        self.history_tree_widget.resizeRowsToContents()
+        self.history_tree_widget.resizeColumnsToContents()
+        self.history_tree_widget.setRowHeight(0, 17)
+        self.history_tree_widget.setVerticalHeaderItem(\
+             0, QTableWidgetItem(str(self.history_tree_widget.rowCount())))
+        """
+        self.item_history_list.append((sample_name, date, time, entry_type,
+                                       status, entry_details))
 
     def queue_execution_completed(self, status):
         """Restores normal cursors, changes collect button
@@ -971,6 +994,7 @@ class DataCollectTree(QWidget):
         sample_item = self.get_mounted_sample_item()
         sample_item.setSelected(True)
         self.set_sample_pin_icon()
+        self.save_history_queue()
 
     def get_checked_items(self):
         """Returns all checked items"""
@@ -1447,9 +1471,41 @@ class DataCollectTree(QWidget):
                          "plate" : 2}
             return model_map[loaded_model]
 
+    def save_history_queue(self):
+        filename = os.path.join(self.tree_brick.user_file_directory,
+                                "queue_history.dat")
+
+        save_file = None
+        try:
+           save_file = open(filename, 'w')
+           #items_to_save = []
+           #for item in self.item_history_list:
+           #    items_to_save.append(item.get_model())
+           #save_file.write(jsonpickle.encode(items_to_save))
+           save_file.write(jsonpickle.encode(self.item_history_list))
+        except:
+           logging.getLogger().exception("Cannot save file %s", filename)
+           if save_file:
+               save_file.close()
+
+    def load_history_queue(self):
+        filename = os.path.join(self.tree_brick.user_file_directory,
+                                "queue_history.dat")
+
+        load_file = None
+        try:
+            load_file = open(filename, 'r')
+            for item in jsonpickle.decode(load_file.read()):
+                self.add_history_entry(*item)
+        except:
+            pass
+        finally:
+            if load_file:
+                load_file.close()
+
     def auto_save_queue(self):
         """Enable/disable queue autosave"""
-        raise NotImplementedError
+        self.queue_model_hwobj.save_queue()
 
     def undo_queue(self):
         """Undo last change"""

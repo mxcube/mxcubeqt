@@ -147,6 +147,8 @@
               type: string, value: '9'}
             - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
               name: frame, oldValue: 0, type: boolean, value: 0}
+            - {comment: '', defaultValue: '', hidden: false, name: hwobj_state_machine,
+              oldValue: '', type: string, value: ''}
             - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
               name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2078,21 +2080,20 @@
             oldValue: null, type: boolean, value: 1}
           - {comment: '', defaultValue: 1, hidden: false, name: closable_Characterisation,
             oldValue: null, type: boolean, value: 1}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_Data collection,
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_Data_collection,
             oldValue: null, type: boolean, value: 1}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_Data collection
-              group, oldValue: null, type: boolean, value: 1}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_Energy scan,
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_Data_collection_group, oldValue: null, type: boolean, value: 1}
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_Energy_scan,
             oldValue: null, type: boolean, value: 1}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_Plate manipulator,
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_Plate_manipulator,
             oldValue: null, type: boolean, value: 1}
           - {comment: '', defaultValue: 1, hidden: false, name: closable_Sample, oldValue: null,
             type: boolean, value: 1}
-          - {comment: '', defaultValue: 0, hidden: false, name: closable_Sample centring,
+          - {comment: '', defaultValue: 0, hidden: false, name: closable_Sample_centring,
             oldValue: null, type: boolean, value: 0}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_Sample changer,
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_Sample_changer,
             oldValue: null, type: boolean, value: 1}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_XRF spectrum,
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_XRF_spectrum,
             oldValue: null, type: boolean, value: 1}
           - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
             type: color, value: null}
@@ -2390,9 +2391,7 @@
           type: combo
           value: default
         type: vbox
-      connections:
-      - {receiver: log_view_brick, receiverWindow: mxCuBE, signal: notebookPageChangedSignal,
-        slot: tabSelected}
+      connections: []
       name: tab0
       properties:
       - choices: [none, top center, top left, top right, bottom center, bottom left,
@@ -2955,18 +2954,10 @@
     value: none
   - {comment: '', defaultValue: MXCuBE, hidden: false, name: caption, oldValue: null,
     type: string, value: MXCuBE}
+  - {comment: '', defaultValue: 1, hidden: false, name: closeOnExit, oldValue: null,
+    type: boolean, value: 1}
   - {comment: '', defaultValue: '123', hidden: false, name: expertPwd, oldValue: null,
     type: string, value: '123'}
-  - {comment: '', defaultValue: 1148, hidden: false, name: h, oldValue: 1148, type: integer,
-    value: 1148}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777275, oldValue: null,
-    type: integer, value: 0}
   - {comment: '', defaultValue: 1, hidden: false, name: menubar, oldValue: null, type: boolean,
     value: 1}
   - comment: ''
@@ -2980,36 +2971,6 @@
     value: 1}
   - {comment: '', defaultValue: 1, hidden: false, name: statusbar, oldValue: null,
     type: boolean, value: 1}
-  - {comment: '', defaultValue: 1898, hidden: false, name: w, oldValue: 1898, type: integer,
-    value: 1898}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 22, hidden: false, name: x, oldValue: 22, type: integer,
-    value: 12}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 52, hidden: false, name: y, oldValue: 52, type: integer,
-    value: 14}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777275, oldValue: null,
-    type: integer, value: 0}
   signals:
     enableExpertMode: !!python/tuple []
     isHidden: !!python/tuple []
@@ -3110,7 +3071,7 @@
       value: default
     type: hbox
   connections: []
-  name: window0
+  name: sample_changer_window
   properties:
   - choices: [none, top center, top left, top right, bottom center, bottom left, bottom
         right, center, hcenter, vcenter, left, right]
@@ -3123,18 +3084,10 @@
     value: none
   - {comment: '', defaultValue: Sample changer, hidden: false, name: caption, oldValue: null,
     type: string, value: Sample changer}
+  - {comment: '', defaultValue: 0, hidden: false, name: closeOnExit, oldValue: null,
+    type: boolean, value: 0}
   - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
     type: string, value: tonic}
-  - {comment: '', defaultValue: 854, hidden: false, name: h, oldValue: 854, type: integer,
-    value: 854}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: h_16777275, oldValue: null,
-    type: integer, value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
     value: 0}
   - comment: ''
@@ -3148,36 +3101,6 @@
     value: 0}
   - {comment: '', defaultValue: 0, hidden: false, name: statusbar, oldValue: null,
     type: boolean, value: 0}
-  - {comment: '', defaultValue: 279, hidden: false, name: w, oldValue: 279, type: integer,
-    value: 279}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: w_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 995, hidden: false, name: x, oldValue: 995, type: integer,
-    value: 995}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: x_16777275, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 150, hidden: false, name: y, oldValue: 150, type: integer,
-    value: 150}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777272, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777273, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777274, oldValue: null,
-    type: integer, value: 0}
-  - {comment: '', defaultValue: 0, hidden: false, name: y_16777275, oldValue: null,
-    type: integer, value: 0}
   signals:
     enableExpertMode: !!python/tuple []
     isHidden: !!python/tuple []

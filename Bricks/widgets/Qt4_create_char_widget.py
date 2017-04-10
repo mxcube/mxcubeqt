@@ -83,7 +83,7 @@ class CreateCharWidget(CreateTaskBase):
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.acq_parameters_changed)
+             connect(self.path_template_changed)
         self._acq_widget.acqParametersChangedSignal.\
              connect(self.acq_parameters_changed)
 
