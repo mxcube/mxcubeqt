@@ -278,11 +278,12 @@ class TabCfg(ContainerCfg):
                 slot_name = "resetTabCount_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")] = ()
 
-    def notebookPageChanged(self, new_page):
+    def notebook_page_changed(self, new_tab_label):
         """
         Descript. :
         """
-        if self.properties.getProperty("closable_%s" % new_page).getValue():
+        new_tab_label = new_tab_label.replace(" ", "_")
+        if self.properties.getProperty("closable_%s" % new_tab_label).getValue():
             self.widget.close_tab_button.show()
         else:
             self.widget.close_tab_button.hide()

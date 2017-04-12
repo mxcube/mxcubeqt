@@ -314,6 +314,10 @@ class BlissWidget(Connectable.Connectable, QFrame):
         if BlissWidget._statusBar:
             BlissWidget._statusBar.parent().stop_progress_bar()
 
+    @staticmethod
+    def set_user_file_directory(user_file_directory):
+        BlissWidget.user_file_directory = user_file_directory
+
     def shouldFilterEvent(self):
         """
         Descript. :
