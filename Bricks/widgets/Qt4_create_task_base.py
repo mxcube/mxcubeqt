@@ -156,14 +156,18 @@ class CreateTaskBase(QWidget):
                 model.run_processing_parallel = run_processing_parallel and \
                   model.acquisitions[0].acquisition_parameters.num_images > 19
 
-    def acq_parameters_changed(self):
-        self._data_path_widget.update_file_name()
+    def acq_parameters_changed(self, conflict):
         if self._tree_brick:
+            self._tree_brick.acq_parameters_changed(conflict)
+ 
+    def path_template_changed(self):
+        self._data_path_widget.update_file_name()
+        if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
             path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
                             check_for_path_collisions(self._path_template)
-            self._data_path_widget.indicate_path_conflict(path_conflict)                    
-            self._tree_brick.dc_tree_widget.item_parameters_changed()
+            self._data_path_widget.indicate_path_conflict(path_conflict)
+            self._tree_brick.data_path_changed(path_conflict)
         
     def set_tree_brick(self, brick):
         self._tree_brick = brick
@@ -555,35 +559,55 @@ class CreateTaskBase(QWidget):
         free_pin_mode = sample.free_pin_mode
         temp_tasks = self._create_task(sample, shape)
 
-        sample_is_mounted = True
+        if ((not free_pin_mode) and (not sample_is_mounted) or (not shape)):
+            # No centred positions selected, or selected sample not
+            # mounted create sample centring task.
 
-        if (not fully_automatic):
-            if ((not free_pin_mode) and (not sample_is_mounted) or (not shape)):
-                # No centred positions selected, or selected sample not
-                # mounted create sample centring task.
+            # Check if the tasks requires centring, assumes that all
+            # the "sub tasks" has the same centring requirements.
+            if temp_tasks[0].requires_centring():
+                if self._tree_brick.dc_tree_widget.centring_method == \
+                   queue_model_enumerables.CENTRING_METHOD.MANUAL:
 
-                # Check if the tasks requires centring, assumes that all
-                # the "sub tasks" has the same centring requirements.
-                if temp_tasks[0].requires_centring():
+                    #Manual 3 click centering
+                    acq_par = None
                     kappa = None
                     kappa_phi = None
-                    task_label = "Centring"
+                    task_label = "Manual centring"
+
                     if isinstance(temp_tasks[0], queue_model_objects.DataCollection):
-                        kappa = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa
-                        kappa_phi = temp_tasks[0].acquisitions[0].acquisition_parameters.kappa_phi
-                        if kappa is not None and \
-                           kappa_phi is not None:
-                            task_label = "Centring (kappa=%0.1f,phi=%0.1f)" %\
-                                         (kappa, kappa_phi)
+                        acq_par = temp_tasks[0].acquisitions[0].\
+                          acquisition_parameters
                     elif isinstance(temp_tasks[0], queue_model_objects.Characterisation):
-                        kappa = temp_tasks[0].reference_image_collection.\
-                               acquisitions[0].acquisition_parameters.kappa
-                        kappa_phi = temp_tasks[0].reference_image_collection.\
-                               acquisitions[0].acquisition_parameters.kappa_phi
-                        if kappa and kappa_phi:
-                            task_label = "Centring (kappa=%0.1f,phi=%0.1f)"  % \
-                                         (kappa, kappa_phi)
-                    sc = queue_model_objects.SampleCentring(task_label, kappa, kappa_phi)
+                        acq_par =  temp_tasks[0].reference_image_collection.\
+                           acquisitions[0].acquisition_parameters
+
+                    if acq_par:
+                        kappa = acq_par.kappa
+                        kappa_phi = acq_par.kappa_phi
+                        if kappa is not None and kappa_phi is not None:
+                            task_label = "Manual centring (kappa=%0.1f,phi=%0.1f)" % \
+                              (kappa, kappa_phi)
+
+                    sc = queue_model_objects.SampleCentring(task_label,
+                                                            kappa,
+                                                            kappa_phi)
+                elif self._tree_brick.dc_tree_widget.centring_method == \
+                   queue_model_enumerables.CENTRING_METHOD.LOOP:
+
+                    #Optical automatic centering with user confirmation
+                    sc = queue_model_objects.OpticalCentring(user_confirms=True)
+                elif self._tree_brick.dc_tree_widget.centring_method == \
+                   queue_model_enumerables.CENTRING_METHOD.FULLY_AUTOMATIC:
+
+                    #Optical automatic centering without user confirmation
+                    sc = queue_model_objects.OpticalCentring()
+                elif self._tree_brick.dc_tree_widget.centring_method == \
+                   queue_model_enumerables.CENTRING_METHOD.XRAY:
+
+                    #Xray centering
+                    sc = queue_model_objects.XrayCentering() 
+                if sc:
                     tasks.append(sc)
 
         for task in temp_tasks:

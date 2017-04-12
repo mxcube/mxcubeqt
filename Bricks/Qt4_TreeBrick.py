@@ -365,7 +365,7 @@ class Qt4_TreeBrick(BlissWidget):
         #elif property_name == 'usePlateNavigator':
         #      self.dc_tree_widget.show_plate_navigator_cbox.setVisible(new_value)
         elif property_name == 'useHistoryView':
-              self.dc_tree_widget.history_table_widget.setVisible(new_value)
+              self.dc_tree_widget.history_tree_widget.setVisible(new_value)
               self.dc_tree_widget.history_enable_cbox.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -747,11 +747,11 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_dc_parameters_tab.emit(True)
         self.hide_dcg_tab.emit(True)
         self.hide_sample_centring_tab.emit(False)
-        self.hide_sample_ta.emit(True)
+        self.hide_sample_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
         self.hide_char_parameters_tab.emit(True)
-        self.hide_energy_scan_ta.emit(True)
+        self.hide_energy_scan_tab.emit(True)
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)

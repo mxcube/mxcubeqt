@@ -226,7 +226,7 @@
            <widget class="QComboBox" name="centring_cbox">
             <property name="minimumSize">
              <size>
-              <width>110</width>
+              <width>150</width>
               <height>27</height>
              </size>
             </property>
@@ -239,19 +239,32 @@
             <property name="toolTip">
              <string>&lt;B&gt;Manual&lt;/B&gt; 3-Click centring &lt;BR&gt; &lt;B&gt;Semi Automatic&lt;/B&gt; - Gives the possibility to confirm centring &lt;BR&gt; &lt;B&gt;Fully Automatic&lt;/B&gt; - Continues without waiting for confirmation</string>
             </property>
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
             <item>
              <property name="text">
-              <string>Manual</string>
+              <string>No centring</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Semi Automatic</string>
+              <string>Manual 3-click</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Fully Automatic</string>
+              <string>Optical semi automatic </string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Optical fully automatic</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Automatic X-ray</string>
              </property>
             </item>
            </widget>

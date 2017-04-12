@@ -74,7 +74,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.acq_parameters_changed)
+             connect(self.path_template_changed)
         self.adjust_transmission_cbox.stateChanged.connect(\
              self.adjust_transmission_state_changed)
 

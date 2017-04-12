@@ -82,7 +82,7 @@ class CreateAdvancedWidget(CreateTaskBase):
              connect(self.set_max_osc_range_clicked)
 
         self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.acq_parameters_changed)
+             connect(self.path_template_changed)
 
         self._advanced_methods_widget.grid_treewidget.itemSelectionChanged.\
              connect(self.grid_treewidget_item_selection_changed)

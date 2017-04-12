@@ -72,7 +72,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._periodic_table_widget.elementEdgeSelectedSignal.\
              connect(self.acq_parameters_changed)
         self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.acq_parameters_changed)
+             connect(self.path_template_changed)
 
     def init_models(self):
         """
