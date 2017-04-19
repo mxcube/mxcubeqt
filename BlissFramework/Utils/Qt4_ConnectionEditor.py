@@ -42,7 +42,9 @@ class Qt4_ConnectionEditor(QDialog):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        top_panel = QWidget(self)
+        main_splitter = QSplitter(Qt.Vertical, self)
+        top_panel = QWidget(main_splitter)
+        bot_panel = QWidget(main_splitter)
 
         emitter_panel = QWidget(top_panel)
         self.emitter_windows_listwidget = QListWidget(emitter_panel)
@@ -60,9 +62,8 @@ class Qt4_ConnectionEditor(QDialog):
 
         self.add_connection_button = QPushButton('Add connection', self)
 
-        self.connections_treewidget = QTreeWidget(self)
-
-        button_panel = QWidget(self)
+        self.connections_treewidget = QTreeWidget(bot_panel)
+        button_panel = QWidget(bot_panel)
         self.remove_connection_button = QPushButton(\
              'Remove connection', button_panel)
         self.ok_button = QPushButton('OK', button_panel)
@@ -93,6 +94,7 @@ class Qt4_ConnectionEditor(QDialog):
         top_panel_layout = QHBoxLayout(top_panel)
         top_panel_layout.addWidget(emitter_panel)
         top_panel_layout.addWidget(receiver_panel)
+        top_panel_layout.addWidget(self.add_connection_button)
         top_panel_layout.setSpacing(0)
         top_panel_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -102,15 +104,19 @@ class Qt4_ConnectionEditor(QDialog):
         button_panel_layout.addWidget(self.ok_button, Qt.AlignRight)
         button_panel_layout.addWidget(self.cancel_button, Qt.AlignRight)
 
+        bot_panel_vlayout = QVBoxLayout(bot_panel)
+        bot_panel_vlayout.addWidget(QLabel('<h3>Established connections</h3>', bot_panel))
+        bot_panel_vlayout.addWidget(self.connections_treewidget)
+        bot_panel_vlayout.addWidget(button_panel)
+
+        main_splitter_vbox = QVBoxLayout(main_splitter)
+        main_splitter_vbox.addWidget(top_panel)
+        main_splitter_vbox.addWidget(bot_panel)
+        main_splitter_vbox.setSpacing(5)
+        main_splitter_vbox.setContentsMargins(2, 2, 2, 2)
+
         main_layout = QVBoxLayout(self)
-        main_layout.addWidget(top_panel)
-        main_layout.addWidget(self.add_connection_button)
-        main_layout.addWidget(QLabel(\
-             '<h3>Established connections</h3>', self))
-        main_layout.addWidget(self.connections_treewidget)
-        main_layout.addWidget(button_panel)
-        main_layout.setSpacing(5)
-        main_layout.setContentsMargins(2, 2, 2, 2)
+        main_layout.addWidget(main_splitter)
 
         # SizePolicies --------------------------------------------------------
         self.add_connection_button.setSizePolicy(QSizePolicy.Fixed,
@@ -148,6 +154,7 @@ class Qt4_ConnectionEditor(QDialog):
              ['', 'Emitter window', 'Emitter object', 'Signal',
               'Receiver window', 'Receiver object', 'Slot'])
         self.setWindowTitle('Connection Editor')
+        self.connections_treewidget.setSortingEnabled(True)
 
     def get_signalling_children(self, parent):
         """Gets signalling children"""
