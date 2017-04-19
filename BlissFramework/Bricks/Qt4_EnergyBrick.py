@@ -126,12 +126,14 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.disconnect(self.energy_hwobj, 'deviceReady', self.connected)
                 self.disconnect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
                 self.disconnect(self.energy_hwobj, 'energyChanged', self.energy_changed)
+                self.disconnect(self.energy_hwobj, 'stateChanged', self.state_changed)
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
                 self.connect(self.energy_hwobj, 'deviceReady', self.connected)
                 self.connect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
                 self.connect(self.energy_hwobj, 'energyChanged', self.energy_changed)
+                self.connect(self.energy_hwobj, 'stateChanged', self.state_changed)
                 self.energy_hwobj.update_values() 
                 if self.energy_hwobj.isReady():
                     self.connected()
@@ -191,6 +193,9 @@ class Qt4_EnergyBrick(BlissWidget):
         wavelength_value_str = self['angFormatString'] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
+
+    def state_changed(self, state):
+        self.setEnabled(state == "ready")
 
     def current_value_changed(self):
         """

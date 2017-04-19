@@ -111,8 +111,11 @@ class Qt4_CameraBrick(BlissWidget):
         self.display_beam_size_action = beam_mark_menu.addAction(\
              "Display size", self.display_beam_size_toggled)
         self.display_beam_size_action.setCheckable(True)
-        self.define_beam_action = beam_mark_menu.addAction(\
-             "Define size with slits", self.define_beam_size)
+
+        self.define_beam_action = self.popup_menu.addAction(\
+             Qt4_Icons.load_icon("Draw"),
+             "Define size with slits",
+             self.define_beam_size)
         self.define_beam_action.setEnabled(False)
         self.popup_menu.addSeparator()
 
@@ -132,7 +135,9 @@ class Qt4_CameraBrick(BlissWidget):
         self.popup_menu.addSeparator()
 
         self.display_grid_action = self.popup_menu.addAction(\
-             "Display grid", self.display_grid_toggled)
+             Qt4_Icons.load_icon("Grid"),
+             "Display grid",
+             self.display_grid_toggled)
         self.display_grid_action.setCheckable(True)
         self.magnification_action = self.popup_menu.addAction(\
              Qt4_Icons.load_icon("Magnify2"),

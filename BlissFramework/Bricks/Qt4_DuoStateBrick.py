@@ -38,8 +38,10 @@ class Qt4_DuoStateBrick(BlissWidget):
         'disabled': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
         'error': (Qt4_widget_colors.LIGHT_RED, True, True, False, False),
         'out': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
+        'closed': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
         'moving': (Qt4_widget_colors.LIGHT_YELLOW, False, False, None, None),
         'in': (Qt4_widget_colors.LIGHT_GREEN, True, True, True, False),
+        'opened': (Qt4_widget_colors.LIGHT_GREEN, True, True, True, False),
         'automatic': (Qt4_widget_colors.WHITE, True, True, False, False)
     }
 
@@ -172,12 +174,11 @@ class Qt4_DuoStateBrick(BlissWidget):
                  prop_label = self['out'].strip()
                  if prop_label:
                      label_str = prop_label
-                   
             self.state_ledit.setText('%s' % label_str)
 
         try:
-            in_enable=self.STATES[state][1]
-            out_enable=self.STATES[state][2]
+           in_enable=self.STATES[state][1]
+           out_enable=self.STATES[state][2]
         except KeyError:
             in_enable=False
             out_enable=False
@@ -357,7 +358,7 @@ class WrapperHO(QObject):
     motorWStateDict=('disabled', 'error', None, 'moving',\
         'moving', 'moving')
 
-    STATES = ('unknown','disabled','error','out','moving','in','automatic')
+    STATES = ('unknown','disabled','closed','error','out','moving','in','automatic')
 
     duoStateChangedSignal = pyqtSignal(str, str)
 
@@ -435,14 +436,15 @@ class WrapperHO(QObject):
         self.dev.openShutter()
     def setOutShutter(self):
         self.dev.closeShutter()
-    def stateChangedShutter(self, state, state_ledit=None):
+    def stateChangedShutter(self, state, state_label=None):
         try:
             state=WrapperHO.shutterStateDict[state]
         except KeyError:
             state='error'
-        if not state_ledit:
-            state_ledit=""
-        self.duoStateChangedSignal.emit(state, state_ledit)
+        if not state_label:
+            state_label=""
+        
+        self.duoStateChangedSignal.emit(state, state_label)
     def getStateShutter(self):
         state=self.dev.getShutterState()
         try:
