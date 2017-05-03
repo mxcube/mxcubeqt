@@ -799,6 +799,10 @@ class BlissWidget(Connectable.Connectable, QFrame):
                          'integer',
                          '-1',
                          comment="Set fixed height in pixels")
+        self.addProperty('hide',
+                         'boolean',
+                         False,
+                         comment="Hide widget")
 
         dispatcher.connect(self.__hardwareObjectDiscarded,
                            'hardwareObjectDiscarded',
@@ -1176,6 +1180,9 @@ class BlissWidget(Connectable.Connectable, QFrame):
         elif property_name == 'fixedHeight':
             if new_value > -1:
                 self.setFixedHeight(new_value)
+        elif property_name == 'hide':
+            if new_value:
+                self.setHidden(True)
         else:
             try:
                 self.propertyChanged(property_name, old_value, new_value)

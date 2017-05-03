@@ -42,6 +42,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.addProperty('defaultMode', 'combo', ('keV', 'Ang'), 'keV')
         self.addProperty('kevFormatString', 'formatString', '##.####')
         self.addProperty('angFormatString', 'formatString', '##.####')
+        self.addProperty('displayStatus', 'boolean', False)
 
         # Signals ------------------------------------------------------------
 
@@ -63,6 +64,10 @@ class Qt4_EnergyBrick(BlissWidget):
         self.energy_ledit.setReadOnly(True)
         self.wavelength_ledit = QLineEdit(self.group_box)
         self.wavelength_ledit.setReadOnly(True)
+
+        self.status_label = QLabel("Status:", self.group_box)
+        self.status_ledit = QLineEdit(self.group_box)
+        self.status_ledit.setReadOnly(True)
 
         self.new_value_widget = QWidget(self)
         self.set_to_label = QLabel("Set to: ", self)
@@ -88,8 +93,10 @@ class Qt4_EnergyBrick(BlissWidget):
         _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1) 
         _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
         _group_box_gridlayout.addWidget(self.wavelength_ledit, 1, 1)
-        _group_box_gridlayout.addWidget(self.set_to_label, 2, 0) 
-        _group_box_gridlayout.addWidget(self.new_value_widget, 2, 1)
+        _group_box_gridlayout.addWidget(self.status_label, 2, 0)
+        _group_box_gridlayout.addWidget(self.status_ledit, 2, 1)
+        _group_box_gridlayout.addWidget(self.set_to_label, 3, 0) 
+        _group_box_gridlayout.addWidget(self.new_value_widget, 3, 1)
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1) 
 
@@ -147,8 +154,9 @@ class Qt4_EnergyBrick(BlissWidget):
             else:
                 self.units_combobox.setCurrentIndex(1)
 
-        elif property_name == 'alwaysReadonly':
-            pass
+        elif property_name == 'displayStatus':
+            self.status_label.setVisible(new_value)
+            self.status_ledit.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
