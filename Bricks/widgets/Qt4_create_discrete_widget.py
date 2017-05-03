@@ -140,6 +140,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
             dc = tree_item.get_model()
+            self._acq_widget.use_kappa(False)
 
             if not dc.is_helical():
                 if dc.is_executed():

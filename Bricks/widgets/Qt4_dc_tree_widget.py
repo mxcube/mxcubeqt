@@ -525,8 +525,8 @@ class DataCollectTree(QWidget):
 
         self.selection_changed_cb(items)        
 
-        checked_items = self.get_checked_items()
-        self.collect_button.setEnabled((len(checked_items) > 1 and \
+    def toggle_collect_button_enabled(self):
+        self.collect_button.setEnabled((len(self.get_checked_items()) > 1 and \
                                        self.enable_collect_condition) or \
                                        self.collecting)
 
@@ -569,18 +569,19 @@ class DataCollectTree(QWidget):
 
         if isinstance(task, queue_model_objects.Basket):
             view_item.setExpanded(task.get_is_present() == True)
-            #view_item.setDisabled(not task.get_is_present())
+            view_item.setDisabled(not task.get_is_present())
         else:
             view_item.setExpanded(True)
 
         self.queue_model_hwobj.view_created(view_item, task)
         #self.collect_button.setDisabled(False)
-        self.sample_tree_widget_selection()
+        #self.sample_tree_widget_selection()
+        self.toggle_collect_button_enabled()
 
         self.last_added_item = view_item
 
-        if self.samples_initialized:
-            self.auto_save_queue()
+        #if self.samples_initialized:
+        #    self.auto_save_queue()
 
     def get_selected_items(self):
         """Return a list with selected items"""
@@ -863,13 +864,13 @@ class DataCollectTree(QWidget):
         
     def stop_collection(self):
         """Stops queue"""
-        QApplication.restoreOverrideCursor()
+        QApplication.setOverrideCursor(QCursor(Qt.ArrowCursor))
         self.queue_hwobj.stop()
         self.queue_stop_handler()
 
     def queue_stop_handler(self, status = None):
         """Stop handler"""
-        QApplication.restoreOverrideCursor()
+        QApplication.setOverrideCursor(QCursor(Qt.ArrowCursor))
         self.user_stopped = True
         self.queue_execution_completed(None)
 
@@ -975,7 +976,7 @@ class DataCollectTree(QWidget):
         """Restores normal cursors, changes collect button
            Deselects all items and selects mounted sample
         """
-        QApplication.restoreOverrideCursor() 
+        QApplication.setOverrideCursor(QCursor(Qt.ArrowCursor))
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(self.play_icon)
@@ -1555,16 +1556,20 @@ class DataCollectTree(QWidget):
 
         if sample_model.diffraction_plan.experimentKind in ("OSC", "Default"):
             acq = queue_model_objects.Acquisition()
+
+            #TODO create default_diffraction_plan_values
             acq.acquisition_parameters = self.beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_acquisition_values")
             if hasattr(sample_model.diffraction_plan, "oscillationRange"):
                 acq.acquisition_parameters.osc_range = \
                     sample_model.diffraction_plan.oscillationRange
+
+            acq.acquisition_parameters.exp_time = 0.04
             if hasattr(sample_model.diffraction_plan, "exposureTime"):
-                acq.acquisition_parameters.exp_time = \
-                    sample_model.diffraction_plan.exposureTime
-            else:
-                acq.acquisition_parameters.exp_time = 0.04
+                if sample_model.diffraction_plan.exposureTime > 0:
+                    acq.acquisition_parameters.exp_time = \
+                      sample_model.diffraction_plan.exposureTime
+
             acq.acquisition_parameters.centred_position.snapshot_image = snapshot
             path_template = self.beamline_setup_hwobj.get_default_path_template()
             path_template.base_prefix = prefix

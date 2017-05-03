@@ -142,7 +142,7 @@ class DataPathWidget(QWidget):
         cursor_pos = self.data_path_layout.folder_ledit.cursorPosition()
         if len(new_value) > 0:
             available_chars = string.ascii_lowercase + string.ascii_uppercase + \
-                              string.digits + "-_" 
+                              string.digits + "-_/" 
             if self.enable_macros:
                 available_chars += "%"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)

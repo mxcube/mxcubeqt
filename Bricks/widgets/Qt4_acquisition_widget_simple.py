@@ -46,6 +46,7 @@ class AcquisitionWidgetSimple(QWidget):
         self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
+        self.value_changed_list = []
 
         # Properties ---------------------------------------------------------- 
 

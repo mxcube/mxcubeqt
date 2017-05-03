@@ -272,6 +272,7 @@ class HeatMapWidget(QWidget):
                                           x_data,
                                           label="Total score",
                                           color="r")
+            """
             self._heat_map_plot.add_curve(self.__results["spots_num"],
                                           x_data,
                                           label="Number of spots",
@@ -290,14 +291,19 @@ class HeatMapWidget(QWidget):
                                           label="Resolution",
                                           color="m",
                                           marker="s")
-            self._heat_map_plot.enable_selection_range()
-            self._heat_map_plot.enable_legend()
+            """
+            #self._heat_map_plot.enable_selection_range()
+            #self._heat_map_plot.enable_legend()
         else:
-            self._heat_map_plot.plot_result(self.__result_display)
-
-            if self.__associated_grid: 
+            if self.__associated_grid:
                 self._summary_textbrowser.append("<b>Mesh parameters</b>")
                 grid_properties = self.__associated_grid.get_properties()
+
+
+                self._heat_map_plot.plot_result(self.__result_display,
+                                                aspect=grid_properties["dy_mm"] / \
+                                                       grid_properties["dx_mm"])
+
                 self._summary_textbrowser.append("Number of columns: %d" % \
                      grid_properties["steps_x"])
                 self._summary_textbrowser.append("Number of rows: %d" % \

@@ -92,7 +92,7 @@ class Qt4_DoorInterlockBrick(BlissWidget):
     def updateLabel(self,label):
         self.main_groupbox.setTitle(label)
 
-    def state_changed(self, state, state_label = None):
+    def state_changed(self, state, state_label=None):
         try:
             color = self.STATES[state]
         except KeyError:
@@ -118,6 +118,6 @@ class Qt4_DoorInterlockBrick(BlissWidget):
                 self.connect(self.door_interlock_hwobj,
                              'doorInterlockStateChanged',
                              self.state_changed)
-                self.state_changed(self.door_interlock_hwobj.getState())
+                self.door_interlock_hwobj.update_values()
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)

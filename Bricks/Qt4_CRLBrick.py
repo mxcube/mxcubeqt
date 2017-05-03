@@ -45,7 +45,6 @@ class Qt4_CRLBrick(BlissWidget):
 	
         # Hardware objects ----------------------------------------------------
         self.crl_hwobj = None
-        self.focusing_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.crl_value = []
@@ -54,7 +53,6 @@ class Qt4_CRLBrick(BlissWidget):
         self.addProperty('lenseCount', 'integer', 6)
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('formatString', 'formatString', '#.#')
-        self.addProperty('beamAlign', 'string', '')
 
         # Signals ------------------------------------------------------------
 
@@ -64,6 +62,7 @@ class Qt4_CRLBrick(BlissWidget):
         self.main_gbox = QGroupBox('CRL', self) 
         self.mode_combo = QComboBox(self.main_gbox)
         self.set_according_to_energy_button = QPushButton("Set", self.main_gbox)
+        self.set_out_button = QPushButton("Out", self.main_gbox)
         #self.align_beam_button = QtGui.QPushButton("Align", self.main_gbox)
         self.crl_value_table = QTableWidget(self.main_gbox)
         self.move_up_button = QPushButton("", self.main_gbox)
@@ -72,11 +71,11 @@ class Qt4_CRLBrick(BlissWidget):
         # Layout --------------------------------------------------------------
         _main_gbox_gridlayout = QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(self.mode_combo, 0, 0)
-        _main_gbox_gridlayout.addWidget(\
-             self.set_according_to_energy_button, 0, 1, 1, 2)
+        _main_gbox_gridlayout.addWidget(self.set_according_to_energy_button, 0, 1)
+        _main_gbox_gridlayout.addWidget(self.set_out_button, 1, 1)
         _main_gbox_gridlayout.addWidget(self.crl_value_table, 1, 0)
         #_main_gbox_gridlayout.addWidget(self.align_beam_button, 1, 1)
-        _main_gbox_gridlayout.addWidget(self.move_up_button, 1, 1)
+        _main_gbox_gridlayout.addWidget(self.move_up_button, 0, 2)
         _main_gbox_gridlayout.addWidget(self.move_down_button, 1, 2)
 
         _main_vlayout = QVBoxLayout(self)
@@ -105,6 +104,8 @@ class Qt4_CRLBrick(BlissWidget):
         self.crl_value_table.setFixedHeight(26)
 	self.crl_value_table.setShowGrid(True)
 
+        #self.set_according_to_energy_button.setIcon(Qt4_Icons.load_icon("Up2"))
+        #self.set_out_button.setIcon(Qt4_Icons.load_icon("Up2"))
         self.move_up_button.setIcon(Qt4_Icons.load_icon("Up2"))
         self.move_up_button.setFixedWidth(25)
         self.move_down_button.setIcon(Qt4_Icons.load_icon("Down2"))
@@ -123,8 +124,6 @@ class Qt4_CRLBrick(BlissWidget):
                 self.connect(self.crl_hwobj, 'crlModeChanged', self.crl_mode_changed)
                 self.connect(self.crl_hwobj, 'crlValueChanged', self.crl_value_changed)
                 self.crl_hwobj.update_values()
-        elif property_name == 'beamAlign':
-            self.beam_align_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'lenseCount':
             self.crl_value_table.setColumnCount(new_value)
             for col_index in range(new_value):
@@ -200,12 +199,6 @@ class Qt4_CRLBrick(BlissWidget):
         Descript. :
         """
         self.crl_hwobj.set_according_to_energy()
-
-    def align_beam(self):
-        """
-        Descript. :
-        """
-        self.beam_align_hwobj.align_beam() 
 
     def move_up(self):
         self.crl_hwobj.move_up()
