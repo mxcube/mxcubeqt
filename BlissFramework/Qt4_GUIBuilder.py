@@ -1109,7 +1109,7 @@ class GUIEditorWindow(QWidget):
 class GUIPreviewWindow(QWidget):
     """Main Gui preview"""
 
-    previewItemClickedSignal = pyqtSignal()
+    previewItemClickedSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """init"""

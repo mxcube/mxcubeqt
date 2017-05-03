@@ -136,11 +136,12 @@ class CustomMenuBar(QMenuBar):
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
 
-        self.clear()
-        self.menu_items.insert(position, new_menu_item)
+        if not new_menu_item in self.menu_items:
+            self.clear()
+            self.menu_items.insert(position, new_menu_item)
 
-        for menu_item in self.menu_items:
-            self.addMenu(menu_item)
+            for menu_item in self.menu_items:
+                self.addMenu(menu_item)
 
     def get_menu_bar(self):
         """Returns current menu bar. Method used by other widgets that
@@ -875,6 +876,9 @@ class WindowDisplayWidget(QScrollArea):
         self._statusbar_sc_label = QLabel(" <b>Sample changer: -</b>")
         self._progress_bar = QProgressBar()
         self._progress_bar.setEnabled(False)
+
+        #TODO make it via property
+        self._progress_bar.setVisible(False)
         self._statusbar_last_collect_label = QLabel(" <b>Last collect: -</b>")
 
         self._statusbar.addWidget(self._statusbar_user_label)
