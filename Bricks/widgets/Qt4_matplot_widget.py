@@ -189,7 +189,8 @@ class MplCanvas(FigureCanvas):
     def set_real_time(self, real_time):
         self.real_time = real_time
         #clear all axes after plot is called
-        self.axes.hold(not real_time)
+        #self.axes.hold(not real_time)
+        self.axes.clear()
 
     def set_max_plot_points(self, max_points):
         self.max_plot_points = max_points
@@ -203,13 +204,13 @@ class MplCanvas(FigureCanvas):
     def add_curve(self, y_axis_array, x_axis_array=None, label=None,
            linestyle="-", color='blue', marker=None):
         if x_axis_array is None:
-            self.curves.append(self.axes.fill(y_axis_array, 
+            self.curves.append(self.axes.plot(y_axis_array, 
                  label=label, linewidth=2, linestyle=linestyle,
-                 color=color, marker=marker))
+                 color=color))
         else:
-            self.curves.append(self.axes.fill(x_axis_array, y_axis_array, 
+            self.curves.append(self.axes.plot(x_axis_array, y_axis_array, 
                  label=label, linewidth=2, linestyle=linestyle,
-                 color=color, marker=marker))
+                 color=color))
         self.draw()
 
     def append_new_point(self, y, x=None):
@@ -414,7 +415,10 @@ class TwoDimenisonalPlotWidget(QWidget):
                 self.mpl_canvas.fig.canvas.draw()
                 self.mpl_canvas.fig.canvas.flush_events()
 
-    def plot_result(self, result, last_result=None):
+    def plot_result(self, result, aspect=None):
+        if not aspect:
+            aspect = 'auto'
+
         if self.im is None:
             self.im = self.mpl_canvas.axes.imshow(result, 
                       interpolation='none',  aspect='auto',
@@ -458,8 +462,7 @@ class TwoDimenisonalPlotWidget(QWidget):
                                   x_axis_array=None,
                                   label=None,
                                   linestyle=linestyle,
-                                  color=color,
-                                  marker=marker)
+                                  color=color)
         self.set_x_axis_limits((x_axis_array.min() - 1,
                                 x_axis_array.max() + 1))
 

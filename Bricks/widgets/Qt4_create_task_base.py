@@ -211,8 +211,19 @@ class CreateTaskBase(QWidget):
                     result = True
         return result
 
+    def _item_is_dc(self):
+        result = False
+
+        if self._current_selected_items:
+            item = self._current_selected_items[0]
+
+            if isinstance(item, Qt4_queue_item.TaskQueueItem) and \
+            not isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):   
+                result = True
+        return result
+
     def set_energy(self, energy, wavelength):         
-        if self._item_is_group_or_sample() and energy:
+        if not self._item_is_dc() and energy:
             acq_widget = self.get_acquisition_widget()
             
             if acq_widget:
@@ -222,31 +233,31 @@ class CreateTaskBase(QWidget):
     def set_transmission(self, trans):
         acq_widget = self.get_acquisition_widget()
         
-        if self._item_is_group_or_sample() and acq_widget:
+        if not self._item_is_dc() and acq_widget:
             acq_widget.update_transmission(trans)
 
     def set_resolution(self, res):
         acq_widget = self.get_acquisition_widget()
         
-        if self._item_is_group_or_sample() and acq_widget:
+        if not self._item_is_dc() and acq_widget:
             acq_widget.update_resolution(res)
 
     def set_detector_roi_mode(self, detector_roi_mode):
         acq_widget = self.get_acquisition_widget()
 
-        if self._item_is_group_or_sample() and acq_widget:
+        if not self._item_is_dc() and acq_widget:
             acq_widget.update_detector_roi_mode(detector_roi_mode)
 
     def set_kappa(self, kappa):
         acq_widget = self.get_acquisition_widget()
 
-        if self._item_is_group_or_sample() and acq_widget:
+        if not self._item_is_dc() and acq_widget:
             acq_widget.update_kappa(kappa)
 
     def set_kappa_phi(self, kappa_phi):
         acq_widget = self.get_acquisition_widget()
 
-        if self._item_is_group_or_sample() and acq_widget:
+        if not self._item_is_dc() and acq_widget:
             acq_widget.update_kappa_phi(kappa_phi)
                                                       
     def set_run_number(self, run_number):
@@ -343,6 +354,7 @@ class CreateTaskBase(QWidget):
         sample_item = self.get_sample_item(tree_item)
         if self._data_path_widget:
             self._data_path_widget.enable_macros = False
+        
 
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
@@ -389,6 +401,7 @@ class CreateTaskBase(QWidget):
             #Update energy transmission and resolution
             if self._acq_widget:
                 self._update_etr()
+                self._acq_widget.use_kappa(True)
                 sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
@@ -411,6 +424,7 @@ class CreateTaskBase(QWidget):
             #Update energy transmission and resolution
             if self._acq_widget:
                 self._update_etr()
+                self._acq_widget.use_kappa(True)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
             if self._data_path_widget:

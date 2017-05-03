@@ -50,6 +50,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         self.init_models()
         self._advanced_methods = None
         self._grid_map = {}
+        self.spacing = [0, 0]
 
         # Graphic elements ----------------------------------------------------
         self._advanced_methods_widget = loadUi(os.path.join(\
@@ -91,9 +92,9 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._advanced_methods_widget.remove_grid_button.clicked.\
              connect(self.remove_grid_button_clicked)
         self._advanced_methods_widget.hor_spacing_ledit.textChanged.\
-             connect(self.spacing_changed)
+             connect(self.hor_spacing_changed)
         self._advanced_methods_widget.ver_spacing_ledit.textChanged.\
-             connect(self.spacing_changed)
+             connect(self.ver_spacing_changed)
 
         self._advanced_methods_widget.move_right_button.clicked.\
              connect(lambda : self.move_grid("right"))
@@ -207,19 +208,20 @@ class CreateAdvancedWidget(CreateTaskBase):
             else:
                 self.setDisabled(False)
 
-            # sample_data_model = self.get_sample_item(tree_item).get_model()
-            #self._acq_widget.disable_inverse_beam(True)
-            #self._graphics_manager_hwobj.de_select_all()
-            self._graphics_manager_hwobj.select_shape(data_collection.grid)
+            if data_collection.is_mesh():
+                # sample_data_model = self.get_sample_item(tree_item).get_model()
+                #self._acq_widget.disable_inverse_beam(True)
+                #self._graphics_manager_hwobj.de_select_all()
+                self._graphics_manager_hwobj.select_shape(data_collection.grid)
 
-            self._path_template = data_collection.get_path_template()
-            self._data_path_widget.update_data_model(self._path_template)
+                self._path_template = data_collection.get_path_template()
+                self._data_path_widget.update_data_model(self._path_template)
 
-            self._acquisition_parameters = data_collection.acquisitions[0].\
-                                           acquisition_parameters
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
-            self.get_acquisition_widget().use_osc_start(True)
+                self._acquisition_parameters = data_collection.acquisitions[0].\
+                                              acquisition_parameters
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                   self._path_template)
+                self.get_acquisition_widget().use_osc_start(True)
         else:
             self.setDisabled(True)
         self.grid_treewidget_item_selection_changed()
@@ -399,7 +401,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def draw_grid_button_clicked(self):
         """Starts grid drawing
         """
-        self._graphics_manager_hwobj.create_grid(self.get_spacing())
+        self._graphics_manager_hwobj.create_grid(self.spacing)
 
     def remove_grid_button_clicked(self):
         """Removes selected grid
@@ -414,34 +416,33 @@ class CreateAdvancedWidget(CreateTaskBase):
             self._graphics_manager_hwobj.delete_shape(grid_to_delete)
             self._advanced_methods_widget.move_to_grid_button.setEnabled(False)           
 
-    def get_spacing(self):
-        """Returns spacing in microns
-
-        :returns: list of two floats
-        """
-        spacing = [0, 0]
-        try:
-           spacing[0] = float(self._advanced_methods_widget.\
-               hor_spacing_ledit.text()) / 1000.0
-        except:
-           pass
-        try:
-           spacing[1] = float(self._advanced_methods_widget.\
-               ver_spacing_ledit.text()) / 1000.0
-        except:
-           pass
-        return spacing
-
-    def spacing_changed(self, value):
+    def hor_spacing_changed(self, value):
         """Updates spacing of the selected grid
         """
-        spacing = self.get_spacing()
-        for grid_object, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                grid_object.set_spacing(spacing, adjust_size=\
-                     self._advanced_methods_widget.adjust_size_cbox.isChecked())
-                break
-        #self.grid_treewidget_item_selection_changed()
+        try:
+            self.spacing[0] = float(value) / 1000.
+            for grid_object, treewidget_item in self._grid_map.iteritems():
+                if treewidget_item.isSelected():
+                    grid_object.set_spacing(self.spacing, adjust_size=\
+                         self._advanced_methods_widget.adjust_size_cbox.isChecked())
+                    break
+            self.grid_treewidget_item_selection_changed()
+        except:
+            pass
+
+    def ver_spacing_changed(self, value):
+        """Updates spacing of the selected grid
+        """
+        try:
+            self.spacing[1] = float(value) / 1000.
+            for grid_object, treewidget_item in self._grid_map.iteritems():
+                if treewidget_item.isSelected():
+                    grid_object.set_spacing(self.spacing, adjust_size=\
+                         self._advanced_methods_widget.adjust_size_cbox.isChecked())
+                    break
+            self.grid_treewidget_item_selection_changed()
+        except:
+            pass
 
     def move_to_grid(self):
         """Moves diffractometer to the center of the grid

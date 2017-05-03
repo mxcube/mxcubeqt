@@ -257,6 +257,8 @@ class TaskToolBoxWidget(QWidget):
                 self.tool_box.setCurrentWidget(self.workflow_page)
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
+            elif isinstance(items[0], Qt4_queue_item.SampleCentringQueueItem):
+                self.create_task_button.setEnabled(False)
             self.method_label.setText(title) 
 
         current_page = self.tool_box.currentWidget()

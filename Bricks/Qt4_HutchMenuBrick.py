@@ -283,6 +283,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Qt4_widget_colors.set_widget_color(self.accept_button, 
                                            self.standard_color)
         self.reject_button.setEnabled(False)
+        self.centre_button.setEnabled(True)
+        self.accept_button.setEnabled(True)
         self.graphics_manager_hwobj.reject_centring()
 
     def centring_snapshots(self, state):
