@@ -592,7 +592,7 @@ class Qt4_TreeBrick(BlissWidget):
 
             basket_list = sc_basket_list
             
-            self.queue_sync_action.setEnabled(True)
+            #self.queue_sync_action.setEnabled(True)
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -1157,8 +1157,8 @@ class Qt4_TreeBrick(BlissWidget):
             self.update_enable_collect()
 
     def shutter_state_changed(self, state):
-        if self.enable_collect_conditions.get("shutter") != (state != "closed"):
-            self.enable_collect_conditions["shutter"] = state != "closed"
+        if self.enable_collect_conditions.get("shutter") != (state == "opened"):
+            self.enable_collect_conditions["shutter"] = state == "opened"
             self.update_enable_collect()
 
     def update_enable_collect(self):

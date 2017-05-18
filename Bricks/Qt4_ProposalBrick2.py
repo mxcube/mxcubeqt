@@ -852,7 +852,10 @@ class Qt4_ProposalBrick2(BlissWidget):
                                 if current_time >= start_time and current_time <= end_time:
                                     return prop_index
 
-        return 0 
+              
+        # If no proposal with valid session found then the last
+        # proposal from the list is selected
+        return len(proposal_list) - 1
 
 ### Auxiliary method to merge a person's name
 def personFullName(person):
