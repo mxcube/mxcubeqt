@@ -244,10 +244,11 @@ class DataCollectTree(QWidget):
         Descript. :
         """
         self.sample_tree_widget.setDisabled(not state)
-        self.collect_button.setDisabled(not state)
+        #self.collect_button.setDisabled(not state)
         #self.up_button.setDisabled(not state)
         #self.down_button.setDisabled(not state)
         self.delete_button.setDisabled(not state)
+        self.toggle_collect_button_enabled()
 
     def show_context_menu(self, context_menu_event):
         """When on a tree item clicked creates and opens popup menu"""
@@ -574,7 +575,6 @@ class DataCollectTree(QWidget):
             view_item.setExpanded(True)
 
         self.queue_model_hwobj.view_created(view_item, task)
-        #self.collect_button.setDisabled(False)
         #self.sample_tree_widget_selection()
         self.toggle_collect_button_enabled()
 
@@ -1449,6 +1449,8 @@ class DataCollectTree(QWidget):
     def save_queue(self):
         """Saves queue in the file"""
 
+        return 
+
         filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
@@ -1458,6 +1460,8 @@ class DataCollectTree(QWidget):
 
     def load_queue(self):
         """Loads queue from file"""
+
+        return
 
         filename = str(QFileDialog.getOpenFileName(self,
             "Open file", os.environ["HOME"],
@@ -1473,6 +1477,9 @@ class DataCollectTree(QWidget):
             return model_map[loaded_model]
 
     def save_history_queue(self):
+ 
+        return
+     
         filename = os.path.join(self.tree_brick.user_file_directory,
                                 "queue_history.dat")
 
@@ -1490,6 +1497,9 @@ class DataCollectTree(QWidget):
                save_file.close()
 
     def load_history_queue(self):
+
+        return
+
         filename = os.path.join(self.tree_brick.user_file_directory,
                                 "queue_history.dat")
 

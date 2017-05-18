@@ -260,6 +260,7 @@ class HeatMapWidget(QWidget):
         elif self.__score_type_index == 4:
             self.__result_display = copy(self.__results["image_num"])
 
+        self.__result_display = numpy.transpose(self.__result_display)
         self.__filter_min_value = self.__result_display.max() * \
              self._threshold_slider.value() / 100.0
         self.__result_display[self.__result_display < self.__filter_min_value] = 0
@@ -301,8 +302,8 @@ class HeatMapWidget(QWidget):
 
 
                 self._heat_map_plot.plot_result(self.__result_display,
-                                                aspect=grid_properties["dy_mm"] / \
-                                                       grid_properties["dx_mm"])
+                                                aspect=grid_properties["dx_mm"] / \
+                                                       grid_properties["dy_mm"])
 
                 self._summary_textbrowser.append("Number of columns: %d" % \
                      grid_properties["steps_x"])

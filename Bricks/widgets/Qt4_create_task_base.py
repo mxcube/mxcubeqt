@@ -128,6 +128,8 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
             bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_roi_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
+
+            self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)

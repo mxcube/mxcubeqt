@@ -344,8 +344,8 @@ class AcquisitionWidget(QWidget):
                                self.acq_widget_layout.resolution_ledit,
                                float,
                                self.resolution_validator)
-        self.update_resolution_limits((self.resolution_validator.bottom(),
-                                       self.resolution_validator.top()))
+        #self.update_resolution_limits((self.resolution_validator.bottom(),
+        #                               self.resolution_validator.top()))
 
         self._acquisition_mib.\
              bind_value_update('shutterless',
