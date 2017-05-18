@@ -262,6 +262,7 @@ class TabCfg(ContainerCfg):
         for child in self.children:
             if "label" in child["properties"].properties:
                 child_lbl = child["properties"]["label"]
+                child_lbl = child_lbl.replace(" ", "_")
                 self.properties.addProperty("closable_%s" % child_lbl,
                      "boolean", closable_props.get("closable_%s" % child_lbl,
                      False))

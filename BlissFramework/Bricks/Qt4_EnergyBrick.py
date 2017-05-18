@@ -67,7 +67,7 @@ class Qt4_EnergyBrick(BlissWidget):
 
         self.status_label = QLabel("Status:", self.group_box)
         self.status_ledit = QLineEdit(self.group_box)
-        self.status_ledit.setReadOnly(True)
+        self.status_ledit.setEnabled(False)
 
         self.new_value_widget = QWidget(self)
         self.set_to_label = QLabel("Set to: ", self)
@@ -134,6 +134,7 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.disconnect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
                 self.disconnect(self.energy_hwobj, 'energyChanged', self.energy_changed)
                 self.disconnect(self.energy_hwobj, 'stateChanged', self.state_changed)
+                self.disconnect(self.energy_hwobj, 'statusInfoChanged', self.status_info_changed)
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
@@ -141,6 +142,7 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.connect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
                 self.connect(self.energy_hwobj, 'energyChanged', self.energy_changed)
                 self.connect(self.energy_hwobj, 'stateChanged', self.state_changed)
+                self.connect(self.energy_hwobj, 'statusInfoChanged', self.status_info_changed)
                 self.energy_hwobj.update_values() 
                 if self.energy_hwobj.isReady():
                     self.connected()
@@ -204,6 +206,9 @@ class Qt4_EnergyBrick(BlissWidget):
 
     def state_changed(self, state):
         self.setEnabled(state == "ready")
+
+    def status_info_changed(self, status_info):
+        self.status_ledit.setText(status_info)
 
     def current_value_changed(self):
         """

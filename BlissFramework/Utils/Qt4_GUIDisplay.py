@@ -891,7 +891,7 @@ class WindowDisplayWidget(QScrollArea):
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
 
-    def update_status_info(self, info_type, info_message, info_state=None):
+    def update_status_info(self, info_type, info_message, info_state=""):
         """Updates status info"""
 
         if info_message == "":
@@ -915,11 +915,13 @@ class WindowDisplayWidget(QScrollArea):
                 (info_message, time.strftime("%Y-%m-%d %H:%M:%S"))
 
         selected_label.setText(msg)
+        #if info_state:
+        #    info_state = info_state.lower()
 
         if info_state == "ready":
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_GREEN)
-        elif info_state == "running":
+        elif info_state in ["running", "moving"]:
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_YELLOW)
         elif info_state == "action_req":
