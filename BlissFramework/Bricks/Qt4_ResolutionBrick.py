@@ -152,6 +152,9 @@ class Qt4_ResolutionBrick(BlissWidget):
                 self.disconnect(self.resolution_hwobj,
                                 'positionChanged',
                                 self.resolution_value_changed)
+                self.disconnect(self.resolution_hwobj,
+                                'limitsChanged',
+                                self.resolution_limits_changed)
 
             self.resolution_hwobj = self.getHardwareObject(new_value)
             if self.resolution_hwobj is not None:
@@ -167,6 +170,9 @@ class Qt4_ResolutionBrick(BlissWidget):
                 self.connect(self.resolution_hwobj,
                              'positionChanged',
                              self.resolution_value_changed)
+                self.connect(self.resolution_hwobj,
+                             'limitsChanged',
+                             self.resolution_limits_changed)
 
                 if self.resolution_hwobj.isReady():
                     self.resolution_hwobj.update_values()

@@ -290,7 +290,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
                     BlissWidget.INSTANCE_MODE_MASTER)
 
     @staticmethod
-    def set_status_info(info_type, info_message, info_status=None):
+    def set_status_info(info_type, info_message, info_status=""):
         """Updates status bar"""
         if BlissWidget._statusBar:
             BlissWidget._statusBar.parent().update_status_info(\
