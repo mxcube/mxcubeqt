@@ -14,12 +14,10 @@ if sys.argv[-1].upper() == "-QT4":
     sys.argv.pop(-1)
     import BlissFramework
     from BlissFramework import Qt4_startGUI
-    BlissFramework.set_gui_version("qt4")
     Qt4_startGUI.run(MXCUBE_GUI_FILE)
 else:
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT, "mxcube.gui")
     import BlissFramework 
     from BlissFramework import startGUI
-    BlissFramework.set_gui_version("qt3")
     startGUI.run(MXCUBE_GUI_FILE)
 
