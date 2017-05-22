@@ -66,12 +66,14 @@ class Qt4_DetectorStatusBrick(BlissWidget):
         # Graphic elements ----------------------------------------------------
         _main_groupbox = QGroupBox("Detector status", self) 
         self.status_label = QLabel("<b>unknown status</b>", _main_groupbox)
-        self.temperature_label = QLabel("Temperature:", _main_groupbox)
-        self.humidity_label = QLabel("Humidity:     ", _main_groupbox)
+        self.frame_rate_label = QLabel("   Frame rate     : ", _main_groupbox)
+        self.temperature_label = QLabel("   Temperature:", _main_groupbox)
+        self.humidity_label = QLabel("   Humidity:     ", _main_groupbox)
 
         # Layout -------------------------------------------------------------- 
         _main_groupbox_vlayout = QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.status_label)
+        _main_groupbox_vlayout.addWidget(self.frame_rate_label)
         _main_groupbox_vlayout.addWidget(self.temperature_label)
         _main_groupbox_vlayout.addWidget(self.humidity_label)
         _main_groupbox_vlayout.setSpacing(2)
@@ -93,11 +95,14 @@ class Qt4_DetectorStatusBrick(BlissWidget):
            Qt4_DetectorStatusBrick.STATES['unknown'])
         Qt4_widget_colors.set_widget_color(self.humidity_label, 
             Qt4_DetectorStatusBrick.STATES['unknown']) 
+        Qt4_widget_colors.set_widget_color(self.frame_rate_label,
+            Qt4_DetectorStatusBrick.STATES['OK'])        
 
         self.status_label.setMinimumHeight(20)
         self.status_label.setAlignment(Qt.AlignCenter)
         self.temperature_label.setMinimumHeight(20)
         self.humidity_label.setMinimumHeight(20)
+        self.frame_rate_label.setMinimumHeight(20)
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
@@ -111,6 +116,9 @@ class Qt4_DetectorStatusBrick(BlissWidget):
                 self.disconnect(self.detector_hwobj,
                                 'statusChanged',
                                 self.status_changed)
+                self.disconnect(self.detector_hwobj,
+                                'frameRateChanged',
+                                self.frame_rate_changed)
 	    self.detector_hwobj = self.getHardwareObject(new_value)
             if self.detector_hwobj is not None:
                 self.connect(self.detector_hwobj,
@@ -122,6 +130,9 @@ class Qt4_DetectorStatusBrick(BlissWidget):
                 self.connect(self.detector_hwobj,
                              'statusChanged',
                              self.status_changed)
+                self.connect(self.detector_hwobj,
+                             'frameRateChanged',
+                             self.frame_rate_changed)
                 self.detector_hwobj.update_values()             
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -159,3 +170,7 @@ class Qt4_DetectorStatusBrick(BlissWidget):
         else:
             Qt4_widget_colors.set_widget_color(self.humidity_label,
                 Qt4_DetectorStatusBrick.STATES['BAD'])
+
+    def frame_rate_changed(self, value):
+        if value is not None:
+            self.frame_rate_label.setText("   Frame rate     : %d Hz" % value)

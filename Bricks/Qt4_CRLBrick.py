@@ -91,9 +91,9 @@ class Qt4_CRLBrick(BlissWidget):
              self.crl_table_item_doubleclicked)
         self.set_according_to_energy_button.clicked.connect(\
              self.set_according_to_energy)
-        #self.align_beam_button.clicked.connect(self.align_beam)
-        self.move_up_button.clicked.connect(self.move_up)
-        self.move_down_button.clicked.connect(self.move_down)    
+        self.set_out_button.clicked.connect(self.set_out_clicked)
+        self.move_up_button.clicked.connect(self.move_up_clicked)
+        self.move_down_button.clicked.connect(self.move_down_clicked)    
 
         # Other ---------------------------------------------------------------
         self.mode_combo.setCurrentIndex(1)
@@ -200,8 +200,11 @@ class Qt4_CRLBrick(BlissWidget):
         """
         self.crl_hwobj.set_according_to_energy()
 
-    def move_up(self):
+    def set_out_clicked(self):
+        self.crl_hwobj.set_crl_value(0)
+
+    def move_up_clicked(self):
         self.crl_hwobj.move_up()
 
-    def move_down(self):
+    def move_down_clicked(self):
         self.crl_hwobj.move_down()
