@@ -174,12 +174,26 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         result = CreateTaskBase.approve_creation(self)
+        selected_grid = self.get_selected_grid()
 
-        if len(self._advanced_methods_widget.\
-           grid_treewidget.selectedItems()) == 0:
+        if not selected_grid:
             msg = "No grid selected. Please select a grid to continue!"
             logging.getLogger("GUI").warning(msg)
             result = False
+        else:
+            grid_properties = selected_grid.get_properties()
+            size_y_mm = grid_properties["dy_mm"]
+            exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
+            speed = grid_properties["dy_mm"] / (exp_time * grid_properties["num_images_per_line"])
+            if speed >= 0.8:
+                logging.getLogger("GUI").error("Translation speed %.3f is above the limit 0.8" % speed)
+                return False
+            osc_range_per_frame = float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())
+            speed = osc_range_per_frame / exp_time
+            if speed >= 166:
+                logging.getLogger("GUI").error("Rotation speed per frame %.3f is above the limit 166" % speed)
+                return False
+            result = True
 
         return result
             
@@ -235,57 +249,55 @@ class CreateAdvancedWidget(CreateTaskBase):
         :type shape: Qt4_GraphicsLib.GraphicsItem
         """
         tasks = []
-        selected_grids = self.get_selected_grids() 
+        selected_grid = self.get_selected_grid() 
 
-        if len(selected_grids) == 0:
-            selected_grids.append(self._graphics_manager_hwobj.\
-                update_auto_grid()) 
+        #if len(selected_grids) == 0:
+        #    selected_grids.append(self._graphics_manager_hwobj.\
+        #        update_auto_grid()) 
 
-        for grid in selected_grids:
-            grid.set_snapshot(self._graphics_manager_hwobj.\
-                  get_scene_snapshot(grid))
+        selected_grid.set_snapshot(self._graphics_manager_hwobj.\
+            get_scene_snapshot(selected_grid))
 
-            grid_properties = grid.get_properties()
+        grid_properties = selected_grid.get_properties()
 
-            acq = self._create_acq(sample)
-            acq.acquisition_parameters.centred_position = \
-                grid.get_centred_position()
-            acq.acquisition_parameters.mesh_range = \
-                [grid_properties["dx_mm"], grid_properties["dy_mm"]]
-            acq.acquisition_parameters.num_lines = \
-                grid_properties["num_lines"]
-            acq.acquisition_parameters.num_images = \
-                grid_properties["num_lines"] * \
-                grid_properties["num_images_per_line"]
-            grid.set_osc_range(acq.acquisition_parameters.osc_range)
+        acq = self._create_acq(sample)
+        acq.acquisition_parameters.centred_position = \
+            selected_grid.get_centred_position()
+        acq.acquisition_parameters.mesh_range = \
+            [grid_properties["dx_mm"],
+             grid_properties["dy_mm"]]
+        acq.acquisition_parameters.num_lines = \
+             grid_properties["num_lines"]
+        acq.acquisition_parameters.num_images = \
+             grid_properties["num_lines"] * \
+             grid_properties["num_images_per_line"]
+        selected_grid.set_osc_range(acq.acquisition_parameters.osc_range)
 
-            processing_parameters = deepcopy(self._processing_parameters)
+        processing_parameters = deepcopy(self._processing_parameters)
 
-            dc = queue_model_objects.DataCollection([acq],
+        dc = queue_model_objects.DataCollection([acq],
                                      sample.crystals[0],
                                      processing_parameters)
 
-            dc.set_name(acq.path_template.get_prefix())
-            dc.set_number(acq.path_template.run_number)
-            dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
-            dc.set_requires_centring(False)
-            dc.grid = grid
+        dc.set_name(acq.path_template.get_prefix())
+        dc.set_number(acq.path_template.run_number)
+        dc.set_experiment_type(EXPERIMENT_TYPE.MESH)
+        dc.set_requires_centring(False)
+        dc.grid = selected_grid
 
-     
-            exp_type = str(self._advanced_methods_widget.\
+        exp_type = str(self._advanced_methods_widget.\
                 method_combo.currentText())
-            print exp_type
-            if exp_type == "MeshScan":
-                tasks.append(dc)
-            elif exp_type == "XrayCentering":
-                xray_centering = queue_model_objects.XrayCentering(\
-                   dc, sample.crystals[0])
-                tasks.append(xray_centering)
+        if exp_type == "MeshScan":
+            tasks.append(dc)
+        elif exp_type == "XrayCentering":
+            xray_centering = queue_model_objects.XrayCentering(\
+                dc, sample.crystals[0])
+            tasks.append(xray_centering)
 
-            dc.run_processing_parallel = exp_type
-            self._path_template.run_number += 1
+        dc.run_processing_parallel = exp_type
+        self._path_template.run_number += 1
 
-            return tasks
+        return tasks
 
     def shape_created(self, shape, shape_type):
         """If a grid is created then adds it to the treewidget.
@@ -387,16 +399,28 @@ class CreateAdvancedWidget(CreateTaskBase):
             else:
                 grid.setSelected(False)
 
-    def get_selected_grids(self):
+    def refresh_grid_params(self):
+        for item in self._grid_map.items():
+            grid = item[0]
+            treewidget_item = item[1]
+
+            if treewidget_item.isSelected():
+                grid_properties = grid.get_properties()
+                treewidget_item.setText(3, str(grid_properties["num_lines"]))
+                treewidget_item.setText(4, str(grid_properties["num_images_per_line"]))
+                self._acq_widget.acq_widget_layout.num_images_ledit.setText(\
+                    str(grid_properties["num_lines"] * \
+                        grid_properties["num_images_per_line"]))
+
+
+    def get_selected_grid(self):
         """Returns selected grids
         
         :returns: list with grid objects
         """
-        selected_grids = [] 
         for grid, grid_treewidget_item in self._grid_map.iteritems():
             if grid_treewidget_item.isSelected():
-                selected_grids.append(grid)
-        return selected_grids
+                return grid
 
     def draw_grid_button_clicked(self):
         """Starts grid drawing
@@ -406,14 +430,10 @@ class CreateAdvancedWidget(CreateTaskBase):
     def remove_grid_button_clicked(self):
         """Removes selected grid
         """
-        grid_to_delete = None 
-        for grid, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                grid_to_delete = grid
-                break
+        selected_grid = self.get_selected_grid()
 
-        if grid_to_delete:
-            self._graphics_manager_hwobj.delete_shape(grid_to_delete)
+        if selected_grid:
+            self._graphics_manager_hwobj.delete_shape(selected_grid)
             self._advanced_methods_widget.move_to_grid_button.setEnabled(False)           
 
     def hor_spacing_changed(self, value):
@@ -421,63 +441,62 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         try:
             self.spacing[0] = float(value) / 1000.
-            for grid_object, treewidget_item in self._grid_map.iteritems():
-                if treewidget_item.isSelected():
-                    grid_object.set_spacing(self.spacing, adjust_size=\
-                         self._advanced_methods_widget.adjust_size_cbox.isChecked())
-                    break
-            self.grid_treewidget_item_selection_changed()
+ 
+            selected_grid = self.get_selected_grid()
+            if selected_grid:
+                print 111, self.spacing
+                selected_grid.set_spacing(self.spacing, adjust_size=\
+                   self._advanced_methods_widget.adjust_size_cbox.isChecked())
+                #self.refresh_grid_params()
         except:
             pass
+        self.refresh_grid_params()
 
     def ver_spacing_changed(self, value):
         """Updates spacing of the selected grid
         """
         try:
             self.spacing[1] = float(value) / 1000.
-            for grid_object, treewidget_item in self._grid_map.iteritems():
-                if treewidget_item.isSelected():
-                    grid_object.set_spacing(self.spacing, adjust_size=\
-                         self._advanced_methods_widget.adjust_size_cbox.isChecked())
-                    break
-            self.grid_treewidget_item_selection_changed()
+
+            selected_grid = self.get_selected_grid()
+            if selected_grid:
+                selected_grid.set_spacing(self.spacing, adjust_size=\
+                   self._advanced_methods_widget.adjust_size_cbox.isChecked())
+                #self.refresh_grid_params()
         except:
             pass
+        self.refresh_grid_params()
 
     def move_to_grid(self):
         """Moves diffractometer to the center of the grid
         """
-        for grid_object, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                self._beamline_setup_hwobj.diffractometer_hwobj.\
-                     move_to_centred_position(grid_object.get_centred_position())
-                break
+        selected_grid = self.get_selected_grid()
+        if selected_grid:
+            self._beamline_setup_hwobj.diffractometer_hwobj.\
+               move_to_centred_position(selected_grid.get_centred_position())
 
     def overlay_toggled(self, state):
         """Toggles (on/off) overlay
         """
-        for grid_object, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                grid_object.set_display_overlay(state)
-                break
+        selected_grid = self.get_selected_grid()
+        if selected_grid:
+            selected_grid.set_display_overlay(state)
            
     def overlay_alpha_changed(self, alpha_value):
         """Changes the transperency of the grid
         """
-        for grid_object, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                grid_object.set_fill_alpha(alpha_value)
-                break
+        selected_grid = self.get_selected_grid()
+        if selected_grid:
+            selected_grid.set_fill_alpha(alpha_value)
 
     def overlay_change_color(self):
         """Changes the default color (blue) of overlay
         """
-        color = QColorDialog.getColor()
-        if color.isValid():
-            for grid_object, treewidget_item in self._grid_map.iteritems():
-                if treewidget_item.isSelected():
-                    grid_object.set_base_color(color)
-                    break
+        selected_grid = self.get_selected_grid()
+        if selected_grid:
+            color = QColorDialog.getColor()
+            if color.isValid():
+                selected_grid.set_base_color(color)
 
     def move_grid(self, direction):
         """Moves grid by one pix in selected direction
@@ -485,12 +504,11 @@ class CreateAdvancedWidget(CreateTaskBase):
         :param direction: direction to move (right, left, up, down)
         :type direction: str
         """
-        for grid_object, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                grid_object.move_by_pix(direction)
-                self._graphics_manager_hwobj.\
-                     update_grid_motor_positions(grid_object)
-                break
+        selected_grid = self.get_selected_grid()
+        if selected_grid:
+            selected_grid.move_by_pix(direction)
+            self._graphics_manager_hwobj.\
+               update_grid_motor_positions(selected_grid)
 
     def enable_grid_controls(self, state):
         """Enables grid controls if a grid is selectd
@@ -510,12 +528,11 @@ class CreateAdvancedWidget(CreateTaskBase):
         """Sets the osc range based on grid (number of images per line
            and osc in the middle of the grid)        
         """
-        for grid_object, treewidget_item in self._grid_map.iteritems():
-            if treewidget_item.isSelected():
-                grid_properties = grid_object.get_properties()
-                self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
-                     "%.4f" % (self._acq_widget.osc_range_validator.top() - 0.0001))
-                self._acq_widget.update_num_images_limits(\
-                     grid_properties["num_lines"] * \
-                     grid_properties["num_images_per_line"])
-                break
+        selected_grid = self.get_selected_grid()
+        if selected_grid:
+            grid_properties = selected_grid.get_properties()
+            self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
+                 "%.4f" % (self._acq_widget.osc_range_validator.top() - 0.0001))
+            self._acq_widget.update_num_images_limits(\
+                 grid_properties["num_lines"] * \
+                 grid_properties["num_images_per_line"])
