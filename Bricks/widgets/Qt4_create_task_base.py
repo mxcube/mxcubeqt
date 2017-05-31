@@ -21,6 +21,7 @@ import os
 import abc
 import copy
 import logging
+from copy import deepcopy
 
 from QtImport import *
 
@@ -622,7 +623,8 @@ class CreateTaskBase(QWidget):
                    queue_model_enumerables.CENTRING_METHOD.XRAY:
 
                     #Xray centering
-                    sc = queue_model_objects.XrayCentering() 
+                    mesh_dc = self._create_dc_from_grid(sample)
+                    sc = queue_model_objects.XrayCentering(mesh_dc)
                 if sc:
                     tasks.append(sc)
 
@@ -719,6 +721,45 @@ class CreateTaskBase(QWidget):
             acq.acquisition_parameters.take_snapshots = 0
 
         return acq
+
+    def _create_dc_from_grid(self, sample, grid=None):
+        if grid is None:
+            grid = self._graphics_manager_hwobj.get_auto_grid()
+
+        print self._path_template.run_number
+        grid.set_snapshot(self._graphics_manager_hwobj.\
+                          get_scene_snapshot(grid))
+
+        grid_properties = grid.get_properties()
+
+        acq = self._create_acq(sample)
+        acq.acquisition_parameters.centred_position = \
+            grid.get_centred_position()
+        acq.acquisition_parameters.mesh_range = \
+            [grid_properties["dx_mm"],
+             grid_properties["dy_mm"]]
+        acq.acquisition_parameters.num_lines = \
+            grid_properties["num_lines"]
+        acq.acquisition_parameters.num_images = \
+            grid_properties["num_lines"] * \
+            grid_properties["num_images_per_line"]
+        grid.set_osc_range(acq.acquisition_parameters.osc_range)
+
+        processing_parameters = deepcopy(self._processing_parameters)
+
+        dc = queue_model_objects.DataCollection([acq],
+                                                sample.crystals[0],
+                                                processing_parameters)
+
+        dc.set_name(acq.path_template.get_prefix())
+        dc.set_number(acq.path_template.run_number)
+        dc.set_experiment_type(queue_model_enumerables.EXPERIMENT_TYPE.MESH)
+        dc.set_requires_centring(False)
+        dc.grid = grid
+
+        self._path_template.run_number += 1
+
+        return dc
 
     def shape_deleted(self, shape, shape_type):
         return

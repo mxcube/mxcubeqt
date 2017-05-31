@@ -56,7 +56,6 @@ class ConfirmDialog(QDialog):
         _main_vlayout.addWidget(self.conf_dialog_layout)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(0) 
-        self.setLayout(_main_vlayout)
 
         # Qt signal/slot connections ------------------------------------------
         self.conf_dialog_layout.continue_button.clicked.connect(\
@@ -65,7 +64,7 @@ class ConfirmDialog(QDialog):
              self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
-        self.setMinimumWidth(860)
+        #self.setMinimumWidth(860)
 
         # Other --------------------------------------------------------------- 
         self.setWindowTitle('Confirm collection')
@@ -128,7 +127,7 @@ class ConfirmDialog(QDialog):
                 sample_treewidget_item = QTreeWidgetItem(\
                    self.conf_dialog_layout.summary_treewidget,
                    info_str_list)
-                for col in range(9):
+                for col in range(12):
                     sample_treewidget_item.setBackground(col, \
                       QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
                 sample_treewidget_item.setExpanded(True)
@@ -167,6 +166,9 @@ class ConfirmDialog(QDialog):
                       'd', int(path_template.precision) * '#' )
                 file_name = file_name.strip(' ')
                 info_str_list.append(file_name)
+                info_str_list.append("%.2f keV" %acq_parameters.energy)
+                info_str_list.append("%.2f A" %acq_parameters.resolution)
+                info_str_list.append("%.2f %%" %acq_parameters.transmission)
                 info_str_list.append(str(acq_parameters.num_images))
                 info_str_list.append(str(acq_parameters.osc_range))
                 info_str_list.append(str(acq_parameters.exp_time))
@@ -177,7 +179,7 @@ class ConfirmDialog(QDialog):
 
                 collection_treewidget_item = QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
-                for col in range(9):
+                for col in range(12):
                     collection_treewidget_item.setBackground(col, \
                       QBrush(Qt4_widget_colors.TREE_ITEM_COLLECTION))  
              

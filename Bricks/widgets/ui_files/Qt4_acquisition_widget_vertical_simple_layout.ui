@@ -416,7 +416,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Oscillation range:</string>
+                 <string>Osc. range per frame:</string>
                 </property>
                 <property name="wordWrap">
                  <bool>false</bool>

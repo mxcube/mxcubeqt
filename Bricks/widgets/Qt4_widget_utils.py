@@ -92,11 +92,11 @@ class DataModelInputBinder(object):
                     == QValidator.Acceptable:
                 if self.bindings[field_name][3]:
                     Qt4_widget_colors.set_widget_color(widget,
-                                           Qt4_widget_colors.LINE_EDIT_CHANGED,
+                                           Qt4_widget_colors.LIGHT_YELLOW,
                                            QPalette.Base)
                 else:
                     Qt4_widget_colors.set_widget_color(widget, 
-                                                       Qt.white,
+                                                       Qt4_widget_colors.WHITE,
                                                        QPalette.Base) 
                 return True
             else:
@@ -105,6 +105,14 @@ class DataModelInputBinder(object):
                                                    QPalette.Base)
                 return False
         else:
+            if self.bindings[field_name][3]:
+                Qt4_widget_colors.set_widget_color(widget,
+                                                   Qt4_widget_colors.LIGHT_YELLOW,
+                                                   QPalette.Base)
+            else:
+                Qt4_widget_colors.set_widget_color(widget,
+                                                   Qt4_widget_colors.WHITE,
+                                                   QPalette.Base)
             return True
 
     def get_model(self):
@@ -113,6 +121,7 @@ class DataModelInputBinder(object):
     def set_model(self, obj):
         self.__model = obj
         self.init_bindings()
+        self.clear_edit()
         self.validate_all()
    
     def init_bindings(self):
@@ -210,7 +219,8 @@ class DataModelInputBinder(object):
             widget = item[1][0]
             validator = item[1][1]
             
-            if validator:
+            #if validator:
+            if True:
                 if isinstance(widget, QLineEdit):
                     if not self.__validated(key,
                                             validator,
