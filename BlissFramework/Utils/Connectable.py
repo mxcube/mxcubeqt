@@ -1,4 +1,6 @@
-class Connectable:
+
+class Connectable(object):
+
     def __init__(self):
         self.__signal = {}
         self.__slot = {}
@@ -12,7 +14,6 @@ class Connectable:
             raise ValueError
         
         self.__signal[str(signalName)] = args
-
 
     def defineSlot(self, slotName, slotArgs):
         try:

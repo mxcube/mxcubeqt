@@ -1,3 +1,21 @@
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube.
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Bricks import Qt4_MotorSpinBoxBrick
@@ -5,7 +23,7 @@ from BlissFramework import Qt4_Icons
 
 import logging
 
-from PyQt4 import QtGui, QtCore
+from QtImport import *
 
 '''
 Controls both the light on/off (light_actuator) and intensity (motor)
@@ -27,10 +45,10 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.addProperty('icons', 'string', '')
         self.addProperty('out_delta', 'string', '')
 
-        self.light_off_button=QtGui.QPushButton("",self.extra_button_box)
+        self.light_off_button=QPushButton("",self.extra_button_box)
         self.light_off_button.setIcon(Qt4_Icons.load_icon('BulbDelete'))
 
-        self.light_on_button=QtGui.QPushButton("",self.extra_button_box)
+        self.light_on_button=QPushButton("",self.extra_button_box)
         self.light_on_button.setIcon(Qt4_Icons.load_icon('BulbCheck'))
 
         self.light_on_button.clicked.connect(self.lightButtonOffClicked)
@@ -46,8 +64,8 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.light_off_button.setToolTip("Switches off the light and sets the intensity to zero")
         self.light_on_button.setToolTip("Switches on the light and sets the intensity back to the previous setting")        
 
-        self.light_off_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
-        self.light_on_button.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        self.light_off_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.light_on_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
 
 
     ### Light off pressed: switch off lamp and set out the wago

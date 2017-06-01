@@ -19,8 +19,7 @@
 
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
@@ -58,21 +57,21 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
 
         # Graphic elements-----------------------------------------------------
 
-        _main_groupbox = QtGui.QGroupBox(self)
-        self.kappa_dspinbox = QtGui.QDoubleSpinBox(_main_groupbox)
+        _main_groupbox = QGroupBox(self)
+        self.kappa_dspinbox = QDoubleSpinBox(_main_groupbox)
         self.kappa_dspinbox.setRange(-360, 360)
-        self.kappaphi_dspinbox = QtGui.QDoubleSpinBox(_main_groupbox)
+        self.kappaphi_dspinbox = QDoubleSpinBox(_main_groupbox)
         self.kappaphi_dspinbox.setRange(-360, 360)
-        self.step_cbox = QtGui.QComboBox(_main_groupbox)
+        self.step_cbox = QComboBox(_main_groupbox)
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
-        self.close_button = QtGui.QPushButton("Close", _main_groupbox)
-        self.stop_button = QtGui.QPushButton(_main_groupbox)
+        self.close_button = QPushButton("Close", _main_groupbox)
+        self.stop_button = QPushButton(_main_groupbox)
 
         # Layout --------------------------------------------------------------
-        _main_groupbox_hlayout = QtGui.QHBoxLayout(_main_groupbox)
-        _main_groupbox_hlayout.addWidget(QtGui.QLabel("Kappa:", _main_groupbox)) 
+        _main_groupbox_hlayout = QHBoxLayout(_main_groupbox)
+        _main_groupbox_hlayout.addWidget(QLabel("Kappa:", _main_groupbox)) 
         _main_groupbox_hlayout.addWidget(self.kappa_dspinbox)
-        _main_groupbox_hlayout.addWidget(QtGui.QLabel("Phi:", _main_groupbox))
+        _main_groupbox_hlayout.addWidget(QLabel("Phi:", _main_groupbox))
         _main_groupbox_hlayout.addWidget(self.kappaphi_dspinbox)
         _main_groupbox_hlayout.addWidget(self.step_cbox)
         _main_groupbox_hlayout.addWidget(self.close_button)
@@ -80,7 +79,7 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         _main_groupbox_hlayout.setSpacing(2)
         _main_groupbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_hlayout = QtGui.QHBoxLayout(self)
+        _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(_main_groupbox)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
@@ -106,13 +105,13 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
        
         #self.stop_button.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Minimum)
         # Other ---------------------------------------------------------------
-        self.kappa_dspinbox.setAlignment(QtCore.Qt.AlignRight)
+        self.kappa_dspinbox.setAlignment(Qt.AlignRight)
         self.kappa_dspinbox.setFixedWidth(75)
-        self.kappaphi_dspinbox.setAlignment(QtCore.Qt.AlignRight)
+        self.kappaphi_dspinbox.setAlignment(Qt.AlignRight)
         self.kappaphi_dspinbox.setFixedWidth(75)
 
         self.step_cbox.setEditable(True)
-        self.step_cbox.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_cbox))
+        self.step_cbox.setValidator(QDoubleValidator(0, 360, 5, self.step_cbox))
         self.step_cbox.setDuplicatesEnabled(False)
 
         self.stop_button.setIcon(Qt4_Icons.load_icon('Stop2'))
@@ -171,12 +170,12 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
     def kappa_value_edited(self, text):
         Qt4_widget_colors.set_widget_color(self.kappa_dspinbox.lineEdit(),
                                            Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                           QtGui.QPalette.Base)
+                                           QPalette.Base)
 
     def kappaphi_value_edited(self, text):
         Qt4_widget_colors.set_widget_color(self.kappaphi_dspinbox.lineEdit(),
                                            Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                           QtGui.QPalette.Base)
+                                           QPalette.Base)
 
     def kappa_value_accepted(self):
         self.diffractometer_hwobj.move_kappa_and_phi(\
@@ -210,11 +209,11 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(\
                 self.kappa_dspinbox.lineEdit(),
                 Qt4_widget_colors.LIGHT_GREEN,
-                QtGui.QPalette.Base)
+                QPalette.Base)
             Qt4_widget_colors.set_widget_color(\
                 self.kappaphi_dspinbox.lineEdit(),
                 Qt4_widget_colors.LIGHT_GREEN,
-                QtGui.QPalette.Base)
+                QPalette.Base)
         else:
             self.kappa_dspinbox.setEnabled(False)
             self.kappaphi_dspinbox.setEnabled(False) 
@@ -223,11 +222,11 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(\
                 self.kappa_dspinbox.lineEdit(),
                 Qt4_widget_colors.LIGHT_YELLOW, 
-                QtGui.QPalette.Base)
+                QPalette.Base)
             Qt4_widget_colors.set_widget_color(\
                 self.kappaphi_dspinbox.lineEdit(),
                 Qt4_widget_colors.LIGHT_YELLOW,
-                QtGui.QPalette.Base)
+                QPalette.Base)
 
     def go_to_step(self, step_index):
         """
@@ -263,7 +262,7 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         Return.   : 
         """
         Qt4_widget_colors.set_widget_color(self.step_cbox.lineEdit(),
-             QtCore.Qt.white, QtGui.QPalette.Base)
+             Qt.white, QPalette.Base)
 
     def step_edited(self, step):
         """
@@ -273,20 +272,20 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         """
         Qt4_widget_colors.set_widget_color(self.step_cbox,
                                            Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                           QtGui.QPalette.Button)
+                                           QPalette.Button)
 
-class SpinBoxEvent(QtCore.QObject):
-    returnPressedSignal = QtCore.pyqtSignal()
-    contextMenuSignal = QtCore.pyqtSignal()
+class SpinBoxEvent(QObject):
+    returnPressedSignal = pyqtSignal()
+    contextMenuSignal = pyqtSignal()
 
     def eventFilter(self,  obj,  event):
-        if event.type() == QtCore.QEvent.KeyPress:
-            if event.key() in [QtCore.Qt.Key_Enter,
-                               QtCore.Qt.Key_Return]:
+        if event.type() == QEvent.KeyPress:
+            if event.key() in [Qt.Key_Enter,
+                               Qt.Key_Return]:
                 self.returnPressedSignal.emit()
 
-        elif event.type() == QtCore.QEvent.MouseButtonRelease:
+        elif event.type() == QEvent.MouseButtonRelease:
             self.returnPressedSignal.emit()
-        elif event.type() == QtCore.QEvent.ContextMenu:
+        elif event.type() == QEvent.ContextMenu:
             self.contextMenuSignal.emit()
         return False

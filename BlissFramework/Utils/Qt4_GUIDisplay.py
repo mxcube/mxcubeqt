@@ -17,13 +17,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""GUIDisplay"""
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
+__license__ = "GPLv3+"
+__status__ = "Production"
+
 
 import os
 # LNLS
 # python2.7
 #import new
 # python3.4
+import sys
 import time
 import types
 import logging
@@ -31,33 +36,31 @@ import weakref
 import platform
 import webbrowser
 import collections
-
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 from functools import partial
 
+import BlissFramework
 from BlissFramework import Qt4_Icons
+from BlissFramework import Qt4_Configuration
 from BlissFramework.Utils import Qt4_widget_colors
+from BlissFramework.Utils import Qt4_PropertyEditor
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Qt4_BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
 from HardwareRepository import HardwareRepository
 
 
-__version__ = '2.2'
+class CustomMenuBar(QMenuBar):
+    """MenuBar displayed on the top of the window"""
 
-
-class CustomMenuBar(QtGui.QMenuBar):
-    """MenuBar"""
-
-    viewToolBarSignal = QtCore.pyqtSignal(bool)
+    viewToolBarSignal = pyqtSignal(bool)
 
     def __init__(self, parent):
         """Parent *must* be the window
            It contains a centralWidget in its viewport
         """
 
-        QtGui.QMenuBar.__init__(self)
+        QMenuBar.__init__(self)
 
         # Internal values -----------------------------------------------------
         self.parent = parent
@@ -75,7 +78,9 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.expert_mode_action.setCheckable(True)
         self.reload_hwr_action = self.file_menu.addAction(\
              "Reload hardware objects", self.reload_hwr_clicked)
-        #self.reload_hwr_action.setEnabled(False)
+        self.reload_hwr_action.setEnabled(False)
+        self.brick_properties_action = self.file_menu.addAction(\
+             "Edit brick properties", self.edit_brick_properties)
         self.file_menu.addAction("Quit", self.quit_clicked)
 
         self.view_menu = self.addMenu("View")
@@ -105,9 +110,12 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.help_menu.addSeparator()
         self.help_menu.addAction("About", self.about_clicked)
 
+        self.bricks_properties_editor = BricksPropertiesEditor()
+        self.bricks_properties_editor.close()
+
         # Layout --------------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
 
@@ -117,14 +125,23 @@ class CustomMenuBar(QtGui.QMenuBar):
                            self.view_menu,
                            self.help_menu]
         #self.setwindowIcon(Qt4_Icons.load_icon("desktop_icon"))
+        for widget in QApplication.allWidgets():
+            if isinstance(widget, BlissWidget):
+                self.bricks_properties_editor.add_brick(\
+                     widget.objectName(), 
+                     widget)
+        self.bricks_properties_editor.bricks_listwidget.\
+             sortItems(Qt.AscendingOrder)
 
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
 
-        self.clear()
-        self.menu_items.insert(position, new_menu_item)
-        for menu_item in self.menu_items:
-            self.addMenu(menu_item)
+        if not new_menu_item in self.menu_items:
+            self.clear()
+            self.menu_items.insert(position, new_menu_item)
+
+            for menu_item in self.menu_items:
+                self.addMenu(menu_item)
 
     def get_menu_bar(self):
         """Returns current menu bar. Method used by other widgets that
@@ -148,18 +165,18 @@ class CustomMenuBar(QtGui.QMenuBar):
             # restore colour if master/client/etc
             self.original_style = self.styleSheet()
         if self.expert_mode_action.isChecked():
-            res = QtGui.QInputDialog.getText(self,
+            res = QInputDialog.getText(self,
                 "Switch to expert mode", "Please enter the password:",
-                QtGui.QLineEdit.Password)
+                QLineEdit.Password)
             if res[1]:
                 if str(res[0]) == self.expert_pwd:
                     self.set_exp_mode(True)
                     self.expert_mode_action.setChecked(True)
                 else:
                     self.expert_mode_action.setChecked(False)
-                    QtGui.QMessageBox.critical(self,
+                    QMessageBox.critical(self,
                          "Switch to expert mode", "Wrong password!",
-                         QtGui.QMessageBox.Ok)
+                         QMessageBox.Ok)
             else:
                 self.expert_mode_action.setChecked(False)
         else:
@@ -172,14 +189,16 @@ class CustomMenuBar(QtGui.QMenuBar):
             return
 
         self.info_for_developers_action.setEnabled(state)
+        self.brick_properties_action.setEnabled(state)
 
         if state:
             # switch to expert mode
-            QtCore.QObject.emit(self.parent,
-                                QtCore.SIGNAL("enableExpertMode"),
-                                True)
+            #QObject.emit(self.parent,
+            #                    SIGNAL("enableExpertMode"),
+            #                    True)
+            self.parent.enableExpertModeSignal.emit(True)
             # go through all bricks and execute the method
-            for widget in QtGui.QApplication.allWidgets():
+            for widget in QApplication.allWidgets():
                 if isinstance(widget, BlissWidget):
                     try:
                         widget.set_expert_mode(True)
@@ -190,12 +209,9 @@ class CustomMenuBar(QtGui.QMenuBar):
             self.set_color("orange")
         else:
             # switch to user mode
-            QtCore.QObject.emit(self.parent,
-                                QtCore.SIGNAL("enableExpertMode"),
-                                False)
-
+            self.parent.enableExpertModeSignal.emit(False)
             # go through all bricks and execute the method
-            for widget in QtGui.QApplication.allWidgets():
+            for widget in QApplication.allWidgets():
                 if isinstance(widget, BlissWidget):
                     widget.setWhatsThis("")
                     try:
@@ -223,14 +239,18 @@ class CustomMenuBar(QtGui.QMenuBar):
             #reload(hwr.hardwareObjects[hwr_obj].__class__)
 
         from HardwareRepository import BaseHardwareObjects
-        import Qt4_VideoMockup
+        #import Qt4_VideoMockup
         reimport.reimport(BaseHardwareObjects)
-        reimport.reimport(Qt4_VideoMockup)
+        #reimport.reimport(Qt4_VideoMockup)
 
         for hwr_obj in hwr.hardwareObjects:
             for sender in connections:
                 hwr.hardwareObjects[hwr_obj].connect(\
                     sender, connections[sender]["signal"], connections[sender]["slot"])
+
+    def edit_brick_properties(self):
+        """Opens dialog that allows to edit propeties of gui bricks"""
+        self.bricks_properties_editor.show()
 
     def whats_this_clicked(self):
         """Whats this"""
@@ -241,19 +261,19 @@ class CustomMenuBar(QtGui.QMenuBar):
     def about_clicked(self):
         """Display dialog with info about mxcube"""
 
-        about_msg_box = QtGui.QMessageBox.about(self,
+        about_msg_box = QMessageBox.about(self,
              "About MXCuBE",
              """<b>MXCuBE v %s </b>
                 <p>Macromolecular Xtallography Customized Beamline Environment<p>
                 Python %s - Qt %s - PyQt %s on %s"""%(__version__,
-              platform.python_version(), QtCore.QT_VERSION_STR,
-              QtCore.PYQT_VERSION_STR, platform.system()))
+              platform.python_version(), QT_VERSION_STR,
+              PYQT_VERSION_STR, platform.system()))
 
     def quit_clicked(self):
         """Exit mxcube"""
 
         if self.execution_mode:
-            QtGui.QApplication.quit()
+            QApplication.quit()
 
     def info_for_developers_clicked(self):
         """Opens webpage with documentation"""
@@ -298,17 +318,17 @@ class CustomMenuBar(QtGui.QMenuBar):
     def view_max_clicked(self):
         """Show maximized"""
 
-        QtGui.QApplication.activeWindow().showMaximized()
+        QApplication.activeWindow().showMaximized()
 
     def view_normal_clicked(self):
         """Show normal window"""
 
-        QtGui.QApplication.activeWindow().showNormal()
+        QApplication.activeWindow().showNormal()
 
     def view_min_clicked(self):
         """Show minimized window"""
 
-        QtGui.QApplication.activeWindow().showMinimized()
+        QApplication.activeWindow().showMinimized()
 
     def append_windows_links(self, windows_list):
         """If there are more than one window then appends names
@@ -328,7 +348,7 @@ class CustomMenuBar(QtGui.QMenuBar):
         self.preview_windows[window_caption].activateWindow()
 
 
-class CustomToolBar(QtGui.QToolBar):
+class CustomToolBar(QToolBar):
     """Custom toolbar"""
 
     def __init__(self, parent):
@@ -336,24 +356,21 @@ class CustomToolBar(QtGui.QToolBar):
            It contains a centralWidget in its viewport
         """
 
-        QtGui.QToolBar.__init__(self)
+        QToolBar.__init__(self)
 
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                           QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.Fixed)
 
-class WindowDisplayWidget(QtGui.QScrollArea):
+class WindowDisplayWidget(QScrollArea):
     """Main widget"""
 
-    brickChangedSignal = QtCore.pyqtSignal(str, str, str, tuple, bool)
-    tabChangedSignal = QtCore.pyqtSignal(str, int)
-
-    class Spacer(QtGui.QFrame):
+    class Spacer(QFrame):
         """Spacer widget"""
 
         def __init__(self, *args, **kwargs):
             """init"""
 
-            QtGui.QFrame.__init__(self, args[0])
+            QFrame.__init__(self, args[0])
             self.setObjectName(args[1])
 
             self.orientation = kwargs.get("orientation", "horizontal")
@@ -362,9 +379,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             self.setFixedSize(-1)
 
             if self.orientation == "horizontal":
-                self.main_layout = QtGui.QHBoxLayout()
+                self.main_layout = QHBoxLayout()
             else:
-                self.main_layout = QtGui.QVBoxLayout()
+                self.main_layout = QVBoxLayout()
             self.main_layout.setSpacing(0)
             self.main_layout.setContentsMargins(0, 0, 0, 0)
             self.setLayout(self.main_layout)
@@ -374,12 +391,12 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
             if fixed_size >= 0:
                 hor_size_policy = self.orientation == "horizontal" and \
-                    QtGui.QSizePolicy.Fixed or \
-                    QtGui.QSizePolicy.MinimumExpanding
+                    QSizePolicy.Fixed or \
+                    QSizePolicy.MinimumExpanding
                 ver_size_policy = hor_size_policy == \
-                    QtGui.QSizePolicy.Fixed and \
-                    QtGui.QSizePolicy.MinimumExpanding or \
-                    QtGui.QSizePolicy.Fixed
+                    QSizePolicy.Fixed and \
+                    QSizePolicy.MinimumExpanding or \
+                    QSizePolicy.Fixed
 
                 if self.orientation == "horizontal":
                     self.setFixedWidth(fixed_size)
@@ -387,23 +404,23 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     self.setFixedHeight(fixed_size)
             else:
                 hor_size_policy = self.orientation == "horizontal" and \
-                    QtGui.QSizePolicy.Expanding or \
-                    QtGui.QSizePolicy.MinimumExpanding
+                    QSizePolicy.Expanding or \
+                    QSizePolicy.MinimumExpanding
                 ver_size_policy = hor_size_policy == \
-                    QtGui.QSizePolicy.Expanding and \
-                    QtGui.QSizePolicy.MinimumExpanding or \
-                    QtGui.QSizePolicy.Expanding
+                    QSizePolicy.Expanding and \
+                    QSizePolicy.MinimumExpanding or \
+                    QSizePolicy.Expanding
             self.setSizePolicy(hor_size_policy, ver_size_policy)
 
         def paintEvent(self, event):
             """Paints the widgets"""
 
-            QtGui.QFrame.paintEvent(self, event)
+            QFrame.paintEvent(self, event)
 
             if self.execution_mode:
                 return
-            painter = QtGui.QPainter(self)
-            painter.setPen(QtGui.QPen(QtCore.Qt.black, 3))
+            painter = QPainter(self)
+            painter.setPen(QPen(Qt.black, 3))
 
             if self.orientation == 'horizontal':
                 height = self.height() / 2
@@ -440,24 +457,24 @@ class WindowDisplayWidget(QtGui.QScrollArea):
     def horizontalSplitter(*args, **kwargs):
         """Horizontal splitter"""
 
-        return QtGui.QSplitter(QtCore.Qt.Horizontal, *args)
+        return QSplitter(Qt.Horizontal, *args)
 
     def verticalSplitter(*args, **kwargs):
         """Vertical splitter"""
 
-        return QtGui.QSplitter(QtCore.Qt.Vertical, *args)
+        return QSplitter(Qt.Vertical, *args)
 
     def verticalBox(*args, **kwargs):
         """Vertical box"""
 
         execution_mode = kwargs.get('execution_mode', False)
 
-        frame = QtGui.QFrame(args[0])
+        frame = QFrame(args[0])
         frame.setObjectName(args[1])
         if not execution_mode:
-            frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
+            frame.setFrameStyle(QFrame.Box | QFrame.Plain)
 
-        frame_layout = QtGui.QVBoxLayout(frame)
+        frame_layout = QVBoxLayout(frame)
         frame_layout.setSpacing(0)
         frame_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -468,13 +485,13 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         execution_mode = kwargs.get('execution_mode', False)
 
-        frame = QtGui.QFrame(args[0])
+        frame = QFrame(args[0])
         frame.setObjectName(args[1])
 
         if not execution_mode:
-            frame.setFrameStyle(QtGui.QFrame.Box | QtGui.QFrame.Plain)
+            frame.setFrameStyle(QFrame.Box | QFrame.Plain)
 
-        frame_layout = QtGui.QHBoxLayout(frame)
+        frame_layout = QHBoxLayout(frame)
         frame_layout.setSpacing(0)
         frame_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -483,12 +500,12 @@ class WindowDisplayWidget(QtGui.QScrollArea):
     def horizontalGroupBox(*args, **kwargs):
         """Horizontal group box"""
 
-        groupbox = QtGui.QGroupBox(args[0])
+        groupbox = QGroupBox(args[0])
         groupbox.setObjectName(args[1])
-        groupbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                               QtGui.QSizePolicy.Expanding)
+        groupbox.setSizePolicy(QSizePolicy.Expanding,
+                               QSizePolicy.Expanding)
 
-        group_box_layout = QtGui.QHBoxLayout(groupbox)
+        group_box_layout = QHBoxLayout(groupbox)
         group_box_layout.setSpacing(0)
         group_box_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -497,31 +514,35 @@ class WindowDisplayWidget(QtGui.QScrollArea):
     def verticalGroupBox(*args, **kwargs):
         """Vertical group box"""
 
-        groupbox = QtGui.QGroupBox(args[0])
+        groupbox = QGroupBox(args[0])
         groupbox.setObjectName(args[1])
-        groupbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                               QtGui.QSizePolicy.Expanding)
+        groupbox.setSizePolicy(QSizePolicy.Expanding,
+                               QSizePolicy.Expanding)
 
-        group_box_layout = QtGui.QVBoxLayout(groupbox)
+        group_box_layout = QVBoxLayout(groupbox)
         group_box_layout.setSpacing(0)
         group_box_layout.setContentsMargins(0, 0, 0, 0)
 
         return groupbox
 
-    class CustomTabWidget(QtGui.QTabWidget):
+    class CustomTabWidget(QTabWidget):
         """Tab widget"""
+
+        #notebookPageChangedSignal = pyqtSignal(str)
+        tabChangedSignal = pyqtSignal(int, object)
+        
 
         def __init__(self, *args, **kwargs):
             """init"""
 
-            QtGui.QTabWidget.__init__(self, args[0])
+            QTabWidget.__init__(self, args[0])
             self.setObjectName(args[1])
             self.close_tab_button = None
 
             #self.tab_widgets = []
             self.countChanged = {}
-            self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                               QtGui.QSizePolicy.Expanding)
+            self.setSizePolicy(QSizePolicy.Expanding,
+                               QSizePolicy.Expanding)
             self.currentChanged.connect(self._page_changed)
 
         def _page_changed(self, index):
@@ -550,10 +571,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 orig_label = " ".join(label_list[0:-1])
             else:
                 orig_label = " ".join(label_list)
-            self.emit(QtCore.SIGNAL("notebookPageChanged"), orig_label)
-            QtGui.QApplication.emit(self,
-                                    QtCore.SIGNAL('tab_changed'),
-                                    index, page)
+            #self.notebookPageChangedSignal.emit(orig_label)
+            self.tabChangedSignal.emit(index, page)
 
             tab_name = self.objectName()
             BlissWidget.update_tab_widget(tab_name, index)
@@ -583,9 +602,10 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             slot_name = "hidePage_%s" % label
 
             def tab_slot(self, hide=True, page={"widget" : scroll_area, \
-                         "label": self.tabText(self.indexOf(scroll_area)),
+                         "label": label,
                          "index": self.indexOf(scroll_area),
                          "icon": icon, "hidden": False}):
+
                 if hide:
                     if not page["hidden"]:
                         self.removeTab(self.indexOf(page["widget"]))
@@ -602,10 +622,14 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                             self.insertTab(page["index"],
                                            page["widget"],
                                            page["label"])
-                        self.showPage(page["widget"])
+                        slot_name = "showPage_%s" % page["label"].replace(' ', '_')
+                        getattr(self, slot_name)()
                         page["hidden"] = False
+                        self.setCurrentWidget(page["widget"])
                     else:
-                        self.showPage(page["widget"])
+                        slot_name = "showPage_%s" % page["label"].replace(' ', '_')
+                        getattr(self, slot_name)()
+                        self.setCurrentWidget(page["widget"])
             try:
                 # LNLS
                 # python2.7
@@ -751,15 +775,15 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             return scroll_area
 
 
-    class label(QtGui.QLabel):
+    class label(QLabel):
         """Label"""
 
         def __init__(self, *args, **kwargs):
             """init"""
 
-            QtGui.QLabel.__init__(self, args[0])
-            self.setSizePolicy(QtGui.QSizePolicy.Fixed,
-                               QtGui.QSizePolicy.Fixed)
+            QLabel.__init__(self, args[0])
+            self.setSizePolicy(QSizePolicy.Fixed,
+                               QSizePolicy.Fixed)
 
     items = {"vbox": verticalBox,
              "hbox": horizontalBox,
@@ -773,11 +797,18 @@ class WindowDisplayWidget(QtGui.QScrollArea):
              "hsplitter": horizontalSplitter,
              "vsplitter": verticalSplitter}
 
+    brickChangedSignal = pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = pyqtSignal(str, int)
+    enableExpertModeSignal = pyqtSignal(bool)
+    windowClosedSignal = pyqtSignal()
+    isShownSignal = pyqtSignal()
+    isHiddenSignal = pyqtSignal()
+    itemClickedSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """__init__ of WindowDisplayWidget"""
 
-        QtGui.QScrollArea.__init__(self, args[0])
+        QScrollArea.__init__(self, args[0])
 
         self.additional_windows = {}
         self.__put_back_colors = None
@@ -785,11 +816,12 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self.preview_items = []
         self.current_window = None
         self.base_caption = ""
+        self.close_on_exit = False
         self.setWindowTitle("GUI preview")
 
-        self.central_widget = QtGui.QWidget(self.widget())
+        self.central_widget = QWidget(self.widget())
         #self.central_widget.setObjectName("deee")
-        self.central_widget_layout = QtGui.QVBoxLayout(self.central_widget)
+        self.central_widget_layout = QVBoxLayout(self.central_widget)
         self.central_widget_layout.setSpacing(0)
         self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.central_widget.show()
@@ -798,14 +830,14 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self._toolbar.hide()
         self._menubar = CustomMenuBar(self)
         self._menubar.hide()
-        self._statusbar = QtGui.QStatusBar(self)
+        self._statusbar = QStatusBar(self)
         self._statusbar.hide()
 
         #_statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
         #_statusbar_hlayout.setSpacing(2)
         #_statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._menubar)
         _main_vlayout.addWidget(self._toolbar)
         _main_vlayout.addWidget(self.central_widget)
@@ -816,9 +848,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         self._menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
         self.setWindowFlags(self.windowFlags() |
-                            QtCore.Qt.WindowMaximizeButtonHint)
+                            Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(Qt4_Icons.load_icon("desktop_icon"))
-
+ 
     def view_toolbar_toggled(self, state):
         """Toggle toolbar visibility"""
 
@@ -838,68 +870,110 @@ class WindowDisplayWidget(QtGui.QScrollArea):
     def set_status_bar(self):
         """Sets statusbar"""
  
-        self._statusbar_user_label = QtGui.QLabel("-")
-        self._statusbar_state_label = QtGui.QLabel(" <b>State: </b>")
-        self._statusbar_diffractometer_label = QtGui.QLabel(" <b>Diffractometer: </b>")
-        self._statusbar_sc_label = QtGui.QLabel(" <b>Sample changer: </b>")
-        self._statusbar_action_label = QtGui.QLabel(" <b>Last collect: </b>")
-        
+        self._statusbar_user_label = QLabel("-")
+        self._statusbar_state_label = QLabel(" <b>State: -</b>")
+        self._statusbar_diffractometer_label = QLabel(" <b>Diffractometer: -</b>")
+        self._statusbar_sc_label = QLabel(" <b>Sample changer: -</b>")
+        self._progress_bar = QProgressBar()
+        self._progress_bar.setEnabled(False)
+
+        #TODO make it via property
+        self._progress_bar.setVisible(False)
+        self._statusbar_last_collect_label = QLabel(" <b>Last collect: -</b>")
+
         self._statusbar.addWidget(self._statusbar_user_label)
         self._statusbar.addWidget(self._statusbar_state_label)
         self._statusbar.addWidget(self._statusbar_diffractometer_label)
         self._statusbar.addWidget(self._statusbar_sc_label)
-        self._statusbar.addWidget(self._statusbar_action_label)
-         
+        self._statusbar.addWidget(self._progress_bar)
+        self._statusbar.addWidget(self._statusbar_last_collect_label)
+
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
 
-    def update_status_info(self, info_type, info_message):
+    def update_status_info(self, info_type, info_message, info_state=""):
         """Updates status info"""
 
         if info_message == "":
             info_message = "Ready"
 
         if info_type == "user":
-            self._statusbar_user_label.setText(info_message)
+            selected_label = self._statusbar_user_label
+            msg = info_message 
         elif info_type == "status":
-            self._statusbar_state_label.setText(\
-                " <b>State: </b> %s" % info_message)
+            selected_label = self._statusbar_state_label
+            msg = " <b>State: </b> %s" % info_message
         elif info_type == "diffractometer":
-            self._statusbar_diffractometer_label.setText(\
-                " <b>Diffractometer: </b>%s" % info_message)
+            selected_label = self._statusbar_diffractometer_label
+            msg = " <b>Diffractometer: </b>%s" % info_message
         elif info_type == "sc":
-            self._statusbar_sc_label.setText(\
-                " <b>Sample changer: </b> %s" % info_message)
-        elif info_type == "action":
-            self._statusbar_action_label.setText(\
-                " <b>Last collect: </b> %s (%s)" % \
-                (info_message, time.strftime("%Y-%m-%d %H:%M:%S")))
+            selected_label = self._statusbar_sc_label
+            msg = " <b>Sample changer: </b> %s" % info_message
+        elif info_type == "collect":
+            selected_label = self._statusbar_last_collect_label
+            msg = " <b>Last collect: </b> %s (%s)" % \
+                (info_message, time.strftime("%Y-%m-%d %H:%M:%S"))
+
+        selected_label.setText(msg)
+        #if info_state:
+        #    info_state = info_state.lower()
+
+        if info_state == "ready":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_GREEN)
+        elif info_state in ["running", "moving"]:
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_YELLOW)
+        elif info_state == "action_req":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_ORANGE)
+        elif info_state == "error":
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_RED)
+
+    def init_progress_bar(self, progress_type, number_of_steps):
+        self._progress_bar.setEnabled(True)
+        self._progress_bar.reset()
+        self._progress_bar.setMaximum(number_of_steps)
+
+    def set_progress_bar_step(self, step):
+        self._progress_bar.setValue(step)
+
+    def stop_progress_bar(self):
+        self._progress_bar.reset()
+        self._progress_bar.setEnabled(False)
 
     def show(self, *args):
         """Show"""
 
-        ret = QtGui.QWidget.show(self)
-        self.emit(QtCore.SIGNAL("isShown"), ())
+        ret = QWidget.show(self)
+        self.isShownSignal.emit()
+        #self.emit(SIGNAL("isShown"), ())
         return ret
+
+    def closeEvent(self, event):
+        event.accept()
+        if self.close_on_exit:
+            QApplication.exit(0)
 
     def hide(self, *args):
         """Hide"""
 
-        ret = QtGui.QWidget.hide(self)
-        self.emit(QtCore.SIGNAL("isHidden"), ())
+        ret = QWidget.hide(self)
+        self.isHiddenSignal.emit()
+        #self.emit(SIGNAL("isHidden"), ())
         return ret
 
     def set_caption(self, caption):
         """Set caption"""
-
-        ret = QtGui.QWidget.setWindowTitle(self, caption)
+        ret = QWidget.setWindowTitle(self, caption)
         self.base_caption = caption
         return ret
 
     def update_instance_caption(self, instance_caption):
         """Update caption if instance mode (master,slave) changed"""
 
-        QtGui.QWidget.setWindowTitle(self, self.base_caption + \
+        QWidget.setWindowTitle(self, self.base_caption + \
                                      instance_caption)
 
     def exitExpertMode(self, *args):
@@ -925,7 +999,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             new_item = klass(parent, item_cfg["name"], execution_mode=self.execution_mode)
             if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox"):
                 if item_cfg["properties"]["color"] is not None:
-                    qtcolor = QtGui.QColor(item_cfg["properties"]["color"])
+                    qtcolor = QColor(item_cfg["properties"]["color"])
                     Qt4_widget_colors.set_widget_color(new_item,
                                                         qtcolor)
 
@@ -933,15 +1007,21 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     new_item.setTitle(item_cfg["properties"]["label"])
 
                 new_item.layout().setSpacing(item_cfg["properties"]["spacing"])
-                new_item.layout().setMargin(item_cfg["properties"]["margin"])
-                frame_style = QtGui.QFrame.NoFrame
+                if hasattr(new_item.layout(), "setContentsMargins"):
+                    new_item.layout().setContentsMargins(item_cfg["properties"]["margin"],
+                                                         item_cfg["properties"]["margin"],
+                                                         item_cfg["properties"]["margin"],
+                                                         item_cfg["properties"]["margin"])
+                elif hasattr(new_item.layout(), "setMargins"):
+                    new_item.layout().setMargin(item_cfg["properties"]["margin"])
+                frame_style = QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"] != "default":
-                    frame_style = getattr(QtGui.QFrame,
+                    frame_style = getattr(QFrame,
                         item_cfg["properties"]["frameshape"])
                 if item_cfg["properties"]["shadowstyle"] != "default":
-                    frame_style = frame_style | getattr(QtGui.QFrame,
+                    frame_style = frame_style | getattr(QFrame,
                         item_cfg["properties"]["shadowstyle"].capitalize())
-                if frame_style != QtGui.QFrame.NoFrame:
+                if frame_style != QFrame.NoFrame:
                     try:
                         new_item.setFrameStyle(frame_style)
                     except:
@@ -955,14 +1035,14 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     new_item.setFixedHeight(\
                         item_cfg["properties"]["fixedheight"])
             elif item_type == "icon":
-                img = QtGui.QPixmap()
+                img = QPixmap()
                 if img.load(item_cfg["properties"]["filename"]):
                     new_item.setPixmap(img)
             elif item_type == "label":
                 new_item.setText(item_cfg["properties"]["text"])
             elif item_type == "tab":
                 item_cfg.widget = new_item
-                new_item.close_tab_button = QtGui.QToolButton(new_item)
+                new_item.close_tab_button = QToolButton(new_item)
                 new_item.close_tab_button.setIcon(\
                      Qt4_Icons.load_icon('delete_small'))
                 new_item.setCornerWidget(new_item.close_tab_button)
@@ -972,10 +1052,9 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     slot_name = "hidePage_%s" % str(tab.tabText(tab.currentIndex()))
                     slot_name = slot_name.replace(" ", "_")
                     getattr(tab, slot_name)()
-                    #QtGui.QApplication.emit(QtCore.SIGNAL('tab_closed'), tab, slotName)
 
                 def current_page_changed(index):
-                    item_cfg.notebookPageChanged(new_item.tabText(index))
+                    item_cfg.notebook_page_changed(new_item.tabText(index))
 
                 new_item._close_current_page_cb = close_current_page
                 new_item.currentChanged.connect(current_page_changed)
@@ -1043,7 +1122,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                     self.preview_items.append(new_item)
                     if alignment_flags is not None:
                         layout.addWidget(new_item, stretch,
-                             QtCore.Qt.Alignment(alignment_flags))
+                             Qt.Alignment(alignment_flags))
                     else:
                         layout.addWidget(new_item, stretch)
             self.make_item(child, new_item)
@@ -1064,8 +1143,8 @@ class WindowDisplayWidget(QtGui.QScrollArea):
            self.current_window != window_id:
             # remove all bricks and destroy all other items
             self.central_widget.close()
-            self.central_widget = QtGui.QWidget(self.viewport())
-            self.central_widget_layout = QtGui.QVBoxLayout(self.central_widget)
+            self.central_widget = QWidget(self.viewport())
+            self.central_widget_layout = QVBoxLayout(self.central_widget)
             self.central_widget.show()
 
         self.current_window = window_id
@@ -1169,11 +1248,11 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         if isinstance(self.__put_back_colors, collections.Callable):
             self.__put_back_colors()
-        original_color = widget.palette().color(QtGui.QPalette.Window)
-        selected_color = QtGui.QColor(150, 150, 200)
+        original_color = widget.palette().color(QPalette.Window)
+        selected_color = QColor(150, 150, 200)
         Qt4_widget_colors.set_widget_color(widget,
                                            selected_color,
-                                           QtGui.QPalette.Background)
+                                           QPalette.Background)
 
         def put_back_colors(wref=weakref.ref(widget),
                             bkgd_color=original_color):
@@ -1181,19 +1260,19 @@ class WindowDisplayWidget(QtGui.QScrollArea):
             if widget is not None:
                 Qt4_widget_colors.set_widget_color(widget,
                                                    bkgd_color,
-                                                   QtGui.QPalette.Background)
+                                                   QPalette.Background)
         self.__put_back_colors = put_back_colors
 
     def eventFilter(self, widget, event):
         """Even filter"""
 
         if widget is not None and event is not None:
-            if event.type() == QtCore.QEvent.MouseButtonRelease and \
-               event.button() == QtCore.Qt.LeftButton:
-                self.emit(QtCore.SIGNAL("itemClicked"), widget.objectName())
+            if event.type() == QEvent.MouseButtonRelease and \
+               event.button() == Qt.LeftButton:
+                self.itemClickedSignal.emit(widget.objectName())
                 return True
 
-        return QtGui.QScrollArea.eventFilter(self, widget, event)
+        return QScrollArea.eventFilter(self, widget, event)
 
     def getAlignmentFlags(self, alignment_directives_string):
         """Returns alignment flags"""
@@ -1207,28 +1286,28 @@ class WindowDisplayWidget(QtGui.QScrollArea):
         if "none" in alignment_directives:
             return alignment_flags
         if "hcenter" in alignment_directives:
-            return QtCore.Qt.AlignHCenter
+            return Qt.AlignHCenter
         if "vcenter" in alignment_directives:
-            return QtCore.Qt.AlignVCenter
+            return Qt.AlignVCenter
         if "top" in alignment_directives:
-            alignment_flags = QtCore.Qt.AlignTop
+            alignment_flags = Qt.AlignTop
         if "bottom" in alignment_directives:
-            alignment_flags = QtCore.Qt.AlignBottom
+            alignment_flags = Qt.AlignBottom
         if "center" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtCore.Qt.AlignCenter
+                alignment_flags = Qt.AlignCenter
             else:
-                alignment_flags = alignment_flags | QtCore.Qt.AlignHCenter
+                alignment_flags = alignment_flags | Qt.AlignHCenter
         if "left" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+                alignment_flags = Qt.AlignLeft | Qt.AlignVCenter
             else:
-                alignment_flags = alignment_flags | QtCore.Qt.AlignLeft
+                alignment_flags = alignment_flags | Qt.AlignLeft
         if "right" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
+                alignment_flags = Qt.AlignRight | Qt.AlignVCenter
             else:
-                alignment_flags = alignment_flags | QtCore.Qt.AlignRight
+                alignment_flags = alignment_flags | Qt.AlignRight
         return alignment_flags
 
     def getSizePolicy(self, hsizepolicy, vsizepolicy):
@@ -1236,62 +1315,67 @@ class WindowDisplayWidget(QtGui.QScrollArea):
 
         def _get_size_policy_flag(policy_flag):
             if policy_flag == "expanding":
-                return QtGui.QSizePolicy.Expanding
+                return QSizePolicy.Expanding
             elif policy_flag == "fixed":
-                return QtGui.QSizePolicy.Fixed
+                return QSizePolicy.Fixed
             else:
-                return QtGui.QSizePolicy.Preferred
+                return QSizePolicy.Preferred
 
-        return QtGui.QSizePolicy(_get_size_policy_flag(hsizepolicy),
-                                 _get_size_policy_flag(vsizepolicy))
+        return QSizePolicy(_get_size_policy_flag(hsizepolicy),
+                           _get_size_policy_flag(vsizepolicy))
 
     def append_windows_links(self, window_list):
         self._menubar.append_windows_links(window_list)
 
-def display(configuration, no_border=False):
-    """Display window"""
+class BricksPropertiesEditor(QWidget):
+    """Main Gui preview"""
 
-    windows = []
-    for window in configuration.windows_list:
-        BlissWidget.set_status_info("status", window["name"])
-        display = WindowDisplayWidget(None, window["name"],
-            execution_mode=True, no_border=no_border)
-        windows.append(display)
-        display.set_caption(window["properties"]["caption"])
-        display.draw_preview(window, id(display))
-        if window["properties"]["show"]:
-            display._show = True
-        else:
-            display._show = False
-        display.hide()
-        restoreSizes(configuration, window, display)
+    def __init__(self, *args, **kwargs):
+        """init"""
 
-    for window in windows:
-        window.append_windows_links(windows)
+        QWidget.__init__(self, *args)
 
-    return windows
+        self.bricks_dict = {}
+        self.selected_brick = None
 
-def restoreSizes(configuration, window, display, configuration_suffix="", move_window_flag=True):
-    """
-    Descript. :
-    """
-    splitters = configuration.find_all_children_by_type("splitter", window)
+        self.bricks_listwidget = QListWidget()
+        self.properties_table = Qt4_PropertyEditor.Qt4_ConfigurationTable(self)
 
-    if len(splitters):
-        for sw in display.queryList("QSplitter"):
-            try:
-                splitter = splitters[sw.name()]
-                sw.setSizes(eval(splitter["properties"]["sizes%s" % configuration_suffix]))
-            except KeyError:
-                continue
+        _main_vlayout = QHBoxLayout(self)
+        _main_vlayout.addWidget(self.bricks_listwidget)
+        _main_vlayout.addWidget(self.properties_table)
+        #_main_vlayout.setSpacing(2)
+        #_main_vlayout.setContentsMargins(2, 2, 6, 6)
 
-    if (window["properties"]["x%s" % configuration_suffix] +
-        window["properties"]["y%s" % configuration_suffix] +
-        window["properties"]["w%s" % configuration_suffix] +
-        window["properties"]["h%s" % configuration_suffix] > 0):
-        if move_window_flag:
-            display.move(window["properties"]["x%s" % configuration_suffix],
-                         window["properties"]["y%s" % configuration_suffix])
-        display.resize(QtCore.QSize(\
-             window["properties"]["w%s" % configuration_suffix],
-             window["properties"]["h%s" % configuration_suffix]))
+        self.bricks_listwidget.itemClicked.connect(\
+             self.bricks_listwidget_item_clicked)
+
+        self.properties_table.propertyChangedSignal.\
+             connect(self.property_changed)
+        #QtCore.QObject.connect(self.properties_table,
+                               #QtCore.SIGNAL("propertyChanged"),
+                               #self.property_changed)
+
+        self.bricks_listwidget.setSizePolicy(QSizePolicy.Fixed,
+                                             QSizePolicy.MinimumExpanding) 
+        #self.properties_table.setSizePolicy(QSizePolicy.Expanding,
+        #                                    QSizePolicy.MinimumExpanding)
+        #self.properties_table.horizontalHeader().setStretchLastSection(True)
+
+        self.setWindowTitle("Bricks properties")
+
+
+    def add_brick(self, name, brick):
+        if name != "":
+            self.bricks_dict[name] = brick
+            self.bricks_listwidget.addItem(name) 
+
+    def bricks_listwidget_item_clicked(self, listwidget_item):
+        brick_name = listwidget_item.text()
+        self.selected_brick = self.bricks_dict[brick_name]
+        self.properties_table.set_property_bag(\
+             self.bricks_dict[brick_name].property_bag)
+ 
+    def property_changed(self, property_name, old_value, new_value):
+        self.selected_brick._propertyChanged(property_name, old_value, new_value)
+        self.selected_brick.propertyChanged(property_name, old_value, new_value)

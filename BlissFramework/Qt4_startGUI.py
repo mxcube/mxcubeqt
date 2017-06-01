@@ -26,13 +26,12 @@ import tempfile
 import sys
 import os
 import logging
+import platform
 from optparse import OptionParser
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 
 import BlissFramework
-BlissFramework.set_gui_version("qt4")
 from BlissFramework import Qt4_GUISupervisor
 from BlissFramework.Utils import Qt4_ErrorHandler
 from BlissFramework.Utils import Qt4_GUILogHandler
@@ -46,11 +45,15 @@ _GUIhdlr = Qt4_GUILogHandler.GUILogHandler()
 _logger.addHandler(_GUIhdlr)
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = 2.3
+
+
 def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)
     """
 
-    if QtCore.QEventLoop():
+    if QEventLoop():
         try:
             gevent.wait(timeout=0.01)
         except AssertionError:
@@ -59,13 +62,13 @@ def do_gevent():
         # all that I tried with gevent here fails! => seg fault
         pass
 
-class MyCustomEvent(QtCore.QEvent):
+class MyCustomEvent(QEvent):
     """Custom event"""
 
     def __init__(self, event_type, data):
         """init"""
 
-        QtCore.QEvent.__init__(self, event_type)
+        QEvent.__init__(self, event_type)
         self.data = data
 
 def run(gui_config_file=None):
@@ -110,6 +113,15 @@ def run(gui_config_file=None):
                       help="Visual style of the application (windows, motif," + \
                            "cde, plastique, windowsxp, or macintosh)",
                       dest='appStyle', default=None)
+    parser.add_option('', '--userFileDir', action='store', type='string',
+                      help="User settings file stores application related settings " + \
+                           "(window size and position). If not defined then user home " + \
+                           "directory is used",
+                      dest='userFileDir', default=None)
+
+    parser.add_option('', '--pyqt4', action='store_true', default=None)
+    parser.add_option('', '--pyqt5', action='store_true', default=None)
+    parser.add_option('', '--pyside', action='store_true', default=None)
 
     (opts, args) = parser.parse_args()
 
@@ -125,6 +137,11 @@ def run(gui_config_file=None):
     log_template = opts.logTemplate
     hwobj_directory = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directory = opts.bricksDirs.split(os.path.pathsep)
+    if opts.userFileDir:
+        user_file_dir = opts.userFileDir
+    else:
+        user_file_dir = os.path.join(os.environ["HOME"], ".mxcube")
+
     app_style = opts.appStyle
 
     if opts.hardwareRepositoryServer:
@@ -149,12 +166,19 @@ def run(gui_config_file=None):
     except KeyError:
         pass
 
+    try:
+        if not os.path.exists(user_file_dir):
+            os.makedirs(user_file_dir)
+    except:
+        logging.getLogger().exception(\
+          "Unable to create user files directory: %s" % user_file_dir)
+
     custom_bricks_directory = [_directory for _directory in \
           custom_bricks_directory if _directory]
     hwobj_directory = [_directory for _directory in \
           hwobj_directory if _directory]
 
-    main_application = QtGui.QApplication([])
+    main_application = QApplication([])
     if app_style:
         main_application.setStyle(app_style)
     lockfile = None
@@ -181,6 +205,7 @@ def run(gui_config_file=None):
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_server)
     HardwareRepository.addHardwareObjectsDirs(hwobj_directory)
+    HardwareRepository.setUserFileDirectory(user_file_dir)
     BlissFramework.addCustomBricksDirs(custom_bricks_directory)
 
     # set log name and log file
@@ -248,20 +273,30 @@ def run(gui_config_file=None):
     # log startup details
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
-    print ("=================================================================================")
-    logging.getLogger().info("Starting MXCuBE")
-    logging.getLogger().info("Qt4 GUI file: %s" % (gui_config_file or "unnamed"))
+    #logging.getLogger().info("\n\n\n\n")
+    logging.getLogger().info("=================================================================================")
+    logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
+    logging.getLogger().info("GUI file: %s" % (gui_config_file or "unnamed"))
     logging.getLogger().info("Hardware repository: %s" % hwr_server)
-    print ("---------------------------------------------------------------------------------")
+    logging.getLogger().info("User file directory: %s" % user_file_dir)
+    if len(logFile) > 0:
+        logging.getLogger().info("Log file: %s" % logFile)
+    logging.getLogger().info("System info:")
+    logging.getLogger().info("    - Python %s on %s" %(platform.python_version(), platform.system()))
+    logging.getLogger().info("    - Qt %s - %s %s" % \
+                  ("%d.%d.%d" % tuple(qt_version_no), qt_variant, "%d.%d.%d" % tuple(pyqt_version_no)) )
+    if mpl_imported:
+        logging.getLogger().info("    - Matplotlib %s" % "%d.%d.%d" % tuple(mpl_version_no))
+    else:
+        logging.getLogger().info("    - Matplotlib not available")
+    logging.getLogger().info("---------------------------------------------------------------------------------")
 
-    QtGui.QApplication.setDesktopSettingsAware(False)
-    QtCore.QObject.connect(main_application,
-                           QtCore.SIGNAL("lastWindowClosed()"),
-                           main_application.quit)
- 
+    QApplication.setDesktopSettingsAware(False)
+
+    main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
-
+    supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))
@@ -269,8 +304,8 @@ def run(gui_config_file=None):
     # redirect errors to logger
     Qt4_ErrorHandler.enableStdErrRedirection()
 
-    gevent_timer = QtCore.QTimer()
-    gevent_timer.connect(gevent_timer, QtCore.SIGNAL("timeout()"), do_gevent)
+    gevent_timer = QTimer()
+    gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 
     main_application.setOrganizationName("MXCuBE")
@@ -278,6 +313,10 @@ def run(gui_config_file=None):
     main_application.setApplicationName("MXCuBE")
     #app.setWindowIcon(QIcon("images/icon.png"))
     main_application.exec_()
+
+    #gevent_timer = QTimer()
+    #gevent_timer.timeout.connect(do_gevent)
+    #gevent_timer.start(0)
 
     supervisor.finalize()
 

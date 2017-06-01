@@ -13,6 +13,13 @@ import types
 #
 import logging
 
+SPLASH_SCREEN = None
+def set_splash_screen(screen):
+    SPLASH_SCREEN = screen
+
+def get_splash_screen():
+    return SPLASH_SCREEN
+
 _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
 _formatter = logging.Formatter('%(asctime)s |%(levelname)-7s| %(message)s')
@@ -41,15 +48,6 @@ logging.getLogger().addHandler(_hdlr)
 blissframeworkpath = os.path.dirname(__file__)
 sys.path.insert(0, blissframeworkpath)
 
-
-_gui_version = 'qt3'
-
-def set_gui_version(verson_str):
-    global _gui_version
-    _gui_version = verson_str
-
-def get_gui_version():
-    return _gui_version  
 
 def getStdBricksPath():
     stdbrickspkg = __import__('BlissFramework.Bricks', globals(), locals(), [''])

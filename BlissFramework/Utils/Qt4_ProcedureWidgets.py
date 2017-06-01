@@ -17,42 +17,43 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 import logging
 
 from HardwareRepository import HardwareRepository
 from BlissFramework import Qt4_Icons
 
-class ProcedureBoxLayout(QtGui.QBoxLayout):
+class ProcedureBoxLayout(QBoxLayout):
     def addItem(self, item):
-        item.setAlignment(QtGui.Qt.AlignLeft)
-        QtGui.QBoxLayout.addItem(self, item)
+        item.setAlignment(Qt.AlignLeft)
+        QBoxLayout.addItem(self, item)
 
           
-class HorizontalSpacer(QtGui.QWidget):
+class HorizontalSpacer(QWidget):
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
 
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Fixed)
 
 
-class VerticalSpacer(QtGui.QWidget):
+class VerticalSpacer(QWidget):
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
         
-        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Fixed,
+                           QSizePolicy.Expanding)
         
 
-class ProcedurePanel(QtGui.QWidget):
+class ProcedurePanel(QWidget):
     """Container for Procedure widgets"""
-    def __init__(self, parent, orientation = QtCore.Qt.Vertical):
+    def __init__(self, parent, orientation = Qt.Vertical):
         """Constructor
 
         parent -- the parent QObject
         procedure -- the Procedure this panel belongs to (default: None)"""
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.currentWidget = None
         self.lastCommandID = None
@@ -64,10 +65,10 @@ class ProcedurePanel(QtGui.QWidget):
             #
             self.setProcedure(parent.getProcedure())
     
-        if orientation == QtCore.Qt.Vertical:
-            ProcedureBoxLayout(self, QtGui.QBoxLayout.Down, 10, 5)
+        if orientation == Qt.Vertical:
+            ProcedureBoxLayout(self, QBoxLayout.Down, 10, 5)
         else:
-            ProcedureBoxLayout(self, QtGui.QBoxLayout.LeftToRight, 10, 5)
+            ProcedureBoxLayout(self, QBoxLayout.LeftToRight, 10, 5)
             
         self.layout().setAutoAdd(True)
 
@@ -88,7 +89,8 @@ class ProcedurePanel(QtGui.QWidget):
         
             self.procedure = weakref.ref(proc)()
 
-            QtCore.QObject.connect(HardwareRepository.emitter(self.procedure), SIGNAL('replyArrived'), self.replyArrived)
+            self.connect( HardwareRepository.emitter(self.procedure), 'replyArrived', self.replyArrived)
+            #QtCore.QObject.connect(HardwareRepository.emitter(self.procedure), SIGNAL('replyArrived'), self.replyArrived)
 
 
     def getProcedure(self):
@@ -126,14 +128,14 @@ class ProcedurePanel(QtGui.QWidget):
                 self.currentWidget.validationPassed(reply)
 
                     
-class ProcedureEntryField(QtGui.QGroupBox):
+class ProcedureEntryField(QGroupBox):
     """Base class for entry widgets in Procedure panels"""
     def __init__(self, parent, caption = ''):
         """Constructor
 
         parent -- the parent ProcedurePanel
         caption -- caption (default: no caption)"""
-        QtGui.QGroupBox.__init__(self, parent)
+        QGroupBox.__init__(self, parent)
                             
         self.isValidating = False
         self.command = ''
@@ -347,10 +349,14 @@ class FloatEntryField(ProcedureEntryField):
         self.cmdOK.setPixmap(Qt4_Icons.load('button_ok_small')) #QPixmap(Icons.okXPM))
         self.cmdCancel.setPixmap(Qt4_Icons.load('button_cancel_small')) #QPixmap(Icons.cancelXPM))
         
-        QObject.connect(self.textbox, SIGNAL('returnPressed()'), self.valueChanged)
-        QObject.connect(self.textbox, SIGNAL('textChanged( const QString & )'), self.valueChanging)
-        QObject.connect(self.cmdOK, SIGNAL('clicked()'), self.valueChanged)
-        QObject.connect(self.cmdCancel, SIGNAL('clicked()'), self.cancelClicked)
+        self.textbox.returnPressed.connect(self.valueChanged)
+        self.textbox.textChanged.connect(self.valueChanging)
+        self.cmdOK.clicked.connect(self.valueChanged)
+        self.cmdCancel.clicked.connect(self.cancelClicked)
+        #QObject.connect(self.textbox, SIGNAL('returnPressed()'), self.valueChanged)
+        #QObject.connect(self.textbox, SIGNAL('textChanged( const QString & )'), self.valueChanging)
+        #QObject.connect(self.cmdOK, SIGNAL('clicked()'), self.valueChanged)
+        #QObject.connect(self.cmdCancel, SIGNAL('clicked()'), self.cancelClicked)
 
         self.cmdCancel.setEnabled(False)
         self.cmdOK.setEnabled(True)
@@ -459,10 +465,14 @@ class TextEntryField(ProcedureEntryField):
         self.cmdOK.setPixmap(Qt4_Icons.load('button_ok_small')) #QPixmap(Icons.okXPM))
         self.cmdCancel.setPixmap(Qt4_Icons.load('button_cancel_small')) #QPixmap(Icons.cancelXPM))
         
-        QObject.connect(self.textbox, SIGNAL('textChanged( const QString & )'), self.valueChanging)
-        QObject.connect(self.textbox, SIGNAL('returnPressed()'), self.valueChanged)
-        QObject.connect(self.cmdOK, SIGNAL('clicked()'), self.valueChanged)
-        QObject.connect(self.cmdCancel, SIGNAL('clicked()'), self.cancelClicked)
+        self.textbox.textChanged.connect(self.valueChanging)
+        self.textbox.returnPressed.connect(self.valueChanged)
+        self.cmdOK.clicked.connect(self.valueChanged)
+        self.cmdCancel.clicked.connect(self.cancelClicked)
+        #QObject.connect(self.textbox, SIGNAL('textChanged( const QString & )'), self.valueChanging)
+        #QObject.connect(self.textbox, SIGNAL('returnPressed()'), self.valueChanged)
+        #QObject.connect(self.cmdOK, SIGNAL('clicked()'), self.valueChanged)
+        #QObject.connect(self.cmdCancel, SIGNAL('clicked()'), self.cancelClicked)
 
         self.cmdCancel.setEnabled(False)
         self.cmdOK.setEnabled(True)
@@ -542,9 +552,9 @@ class TextEntryField(ProcedureEntryField):
         return self.cmdOK.isEnabled() == False and self.cmdCancel.setEnabled() == False
     
 
-class Label(QtGui.QGroupBox):
+class Label(QGroupBox):
     def __init__(self, parent, caption, value = '-'):
-        QtGui.QGroupBox.__init__(self, parent)
+        QGroupBox.__init__(self, parent)
 
         self.setSpacing(5)
         self.setMargin(0)
@@ -566,11 +576,11 @@ class Label(QtGui.QGroupBox):
         return self.value
 
 
-class MotorPositionReminder(QtGui.QTableWidgetItem):
+class MotorPositionReminder(QTableWidgetItem):
     NOPOSITION = 13*'-'
 
     def __init__(self, parent):
-        QtGui.QTableWidgetItem.__init__(self, parent, QtGui.QTableWidgetItem.Always, '')
+        QTableWidgetItem.__init__(self, parent, QTableWidgetItem.Always, '')
 
         self.motor = None
         self.controlDialog = None
@@ -637,11 +647,11 @@ class MotorPositionReminder(QtGui.QTableWidgetItem):
         self.controlDialog = None
       
 
-class ScanConfigurationTable(QtGui.QTableWidget):
+class ScanConfigurationTable(QTableWidget):
     def __init__(self, parent):
-        QtGui.QTableWidget.__init__(self, parent)
+        QTableWidget.__init__(self, parent)
 
-        self.motorsList = QStringList()
+        self.motorsList = []
         self.motors = {}
         self.customColumns = {}
 
@@ -690,7 +700,7 @@ class ScanConfigurationTable(QtGui.QTableWidget):
 
         self.customColumns[c] = {'type':str(type), 'label':str(label), 'opt':opt}
         if self.customColumns[c]['type'] == 'combo':
-            optList = QStringList()
+            optList = []
             
             try:
                 for opt in self.customColumns[c]['opt']:
@@ -719,7 +729,7 @@ class ScanConfigurationTable(QtGui.QTableWidget):
 
             for col in self.customColumns:
                 if self.customColumns[col]['type'] == 'combo':
-                    optList = QStringList()
+                    optList = []
             
                     try:
                         for opt in self.customColumns[col]['opt']:
@@ -749,7 +759,7 @@ class ScanConfigurationTable(QtGui.QTableWidget):
     
 
     def setMotors(self, motorSet):
-        self.motorsList = QStringList()
+        self.motorsList = []
         self.motors = {}
         
         #self.motorsList.append('')
@@ -833,9 +843,9 @@ class ScanConfigurationTable(QtGui.QTableWidget):
         return QTable.endEdit(self, row, col, accept, replace)
 
 
-class Table(QtGui.QTableWidget):
+class Table(QTableWidget):
     def __init__(self, parent):
-        QtGui.QTableWidget.__init__(self, parent)
+        QTableWidget.__init__(self, parent)
 
         self.customColumns = {}
 
@@ -873,7 +883,7 @@ class Table(QtGui.QTableWidget):
         
         self.customColumns[c] = {'type':str(type), 'label':str(label), 'opt':opt}
         if self.customColumns[c]['type'] == 'combo':
-            optList = QStringList()
+            optList = []
             
             try:
                 for opt in self.customColumns[c]['opt']:
@@ -895,7 +905,7 @@ class Table(QtGui.QTableWidget):
         for i in range(rows):
             for col in self.customColumns:
                 if self.customColumns[col]['type'] == 'combo':
-                    optList = QStringList()
+                    optList = []
             
                     try:
                         for opt in self.customColumns[col]['opt']:

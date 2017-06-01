@@ -17,13 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__version__ = "2.3"
 __category__ = 'General'
 
 
@@ -61,7 +62,7 @@ class Qt4_ToolsBrick(BlissWidget):
         # Other ---------------------------------------------------------------
 
     def run(self):
-        self.tools_menu = QtGui.QMenu("Tools", self)
+        self.tools_menu = QMenu("Tools", self)
         self.tools_menu.addSeparator()
         BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
         self.init_tools()

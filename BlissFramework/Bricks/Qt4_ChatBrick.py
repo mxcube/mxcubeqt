@@ -21,8 +21,7 @@ import os
 import time
 import InstanceServer
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -38,6 +37,9 @@ class Qt4_ChatBrick(BlissWidget):
     PRIORITY_COLORS = ('darkblue', 'black', 'red')
     MY_COLOR = 'darkgrey'
 
+    incoming_unread_messages = pyqtSignal(int,bool)
+    reset_unread_messages = pyqtSignal(bool)
+
     def __init__(self, *args):
         """
         Descript. :
@@ -52,8 +54,8 @@ class Qt4_ChatBrick(BlissWidget):
         self.addProperty('myTabLabel', 'string', '')
 
         # Signals ------------------------------------------------------------
-        self.defineSignal('incUnreadMessages',())
-        self.defineSignal('resetUnreadMessages',())
+        self.defineSignal('incoming_unread_messages',())
+        self.defineSignal('reset_unread_message',())
 
         # Slots ---------------------------------------------------------------
         self.defineSlot('tabSelected',())
@@ -68,23 +70,23 @@ class Qt4_ChatBrick(BlissWidget):
         self.role = BlissWidget.INSTANCE_ROLE_UNKNOWN
 
         # Graphic elements ----------------------------------------------------
-        self.conversation_textedit = QtGui.QTextEdit(self)
+        self.conversation_textedit = QTextEdit(self)
         self.conversation_textedit.setReadOnly(True)
-        _controls_widget = QtGui.QWidget(self)
-        _say_label = QtGui.QLabel("Say:", _controls_widget)
-        self.message_ledit = QtGui.QLineEdit(_controls_widget)
-        self.send_button = QtGui.QPushButton("Send", _controls_widget)
+        _controls_widget = QWidget(self)
+        _say_label = QLabel("Say:", _controls_widget)
+        self.message_ledit = QLineEdit(_controls_widget)
+        self.send_button = QPushButton("Send", _controls_widget)
         self.send_button.setEnabled(False)
 
         # Layout --------------------------------------------------------------
-        _controls_widget_hlayout = QtGui.QHBoxLayout(_controls_widget)
+        _controls_widget_hlayout = QHBoxLayout(_controls_widget)
         _controls_widget_hlayout.addWidget(_say_label)
         _controls_widget_hlayout.addWidget(self.message_ledit)
         _controls_widget_hlayout.addWidget(self.send_button)
         _controls_widget_hlayout.setSpacing(2)
         _controls_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.conversation_textedit)
         _main_vlayout.addWidget(_controls_widget)
         _main_vlayout.setSpacing(2)
@@ -204,7 +206,8 @@ class Qt4_ChatBrick(BlissWidget):
           chat_history_file.write("\n")
           chat_history_file.close()
 
-        self.emit(QtCore.SIGNAL("incUnreadMessages"),1, True)
+        #self.emit(QtCore.SIGNAL("incUnreadMessages"),1, True)
+        self.incoming_unread_messages.emit(1,True)
 
     def new_client(self,client_id):
         """
@@ -395,4 +398,5 @@ class Qt4_ChatBrick(BlissWidget):
         Return    : 
         """
         if tab_name==self['myTabLabel']:
-            self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
+            #self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
+            self.reset_unread_messages.emit(True)

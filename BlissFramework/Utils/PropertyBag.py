@@ -78,6 +78,14 @@ class Property:
     def get_comment(self):
         return comment
 
+    def as_dict(self):
+        return {"type": self.type,
+                "value": self.value}
+
+    def set_from_dict(self, property_dict):
+        self.type = property_dict["type"]
+        self.value = property_dict["value"]
+        
 
 class StringProperty(Property):
     def __init__(self, propertyName, defaultValue = ''):
@@ -386,25 +394,3 @@ class PropertyBag:
 
     def hasProperty(self, name):
         return name in self.properties
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

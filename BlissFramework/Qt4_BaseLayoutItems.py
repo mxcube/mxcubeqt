@@ -17,8 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from QtImport import *
 
 from BlissFramework.Utils import PropertyBag
 
@@ -55,12 +54,25 @@ class _CfgItem:
            Add new properties (if any) and remove odd ones (if any)
         """
         for item_property in properties:
-            prop_name = item_property.getName()
-            if prop_name in self.properties.properties:
-                self.properties.getProperty(prop_name).setValue(\
-                     item_property.getUserValue())
-            elif item_property.hidden:
-                self.properties[item_property.getName()] = item_property
+            if hasattr(item_property, "getName"):
+                prop_name = item_property.getName()
+                if prop_name in self.properties.properties:
+                    self.properties.getProperty(prop_name).setValue(\
+                         item_property.getUserValue())
+                elif item_property.hidden or prop_name.startswith("closable_"):
+                    self.properties[prop_name] = item_property
+            else:
+                if item_property["type"] == "combo":
+                    arg1 = item_property["choices"]
+                else:
+                    arg1 = item_property["value"]
+                arg2 = item_property["defaultValue"]
+                self.properties.addProperty(propertyName=item_property["name"],
+                                            propertyType=item_property["type"],
+                                            arg1=arg1,
+                                            arg2=arg2,
+                                            comment=item_property["comment"],
+                                            hidden=item_property["hidden"])
 
     def __getitem__(self, item):
         """
@@ -88,7 +100,6 @@ class _CfgItem:
         Descript. :
         """
         self.name = new_name
-
 
 class ContainerCfg(_CfgItem):
     """
@@ -163,15 +174,7 @@ class WindowCfg(ContainerCfg):
         self.type = "window"
         self.properties.addProperty("caption", "string", "")
         self.properties.addProperty("show", "boolean", True)
-        for suffix in ['',
-                       '_%d' % QtCore.Qt.Key_F9,
-                       '_%d' % QtCore.Qt.Key_F10,
-                       '_%d' % QtCore.Qt.Key_F11,
-                       '_%d' % QtCore.Qt.Key_F12]:
-            self.properties.addProperty("x%s" % suffix, "integer", 0)
-            self.properties.addProperty("y%s" % suffix, "integer", 0)
-            self.properties.addProperty("w%s" % suffix, "integer", 0)
-            self.properties.addProperty("h%s" % suffix, "integer", 0)
+        self.properties.addProperty("closeOnExit", "boolean", True)
         self.properties.addProperty("menubar", "boolean", False)
         self.properties.addProperty("statusbar", "boolean", False)
         self.properties.addProperty("menudata", "", {}, hidden=True)
@@ -200,18 +203,6 @@ class TabCfg(ContainerCfg):
 
         self.properties.addProperty("fontSize", "integer", 0)
         self.signals.update({"notebookPageChanged": "pageName"})
-
-    def setProperties(self, properties):
-        """
-        Descript. :
-        """
-        for prop in properties:
-            prop_name = prop.getName()
-            if prop_name in self.properties.properties:
-                self.properties.getProperty(prop_name).\
-                     setValue(prop.getUserValue())
-            elif prop.hidden or prop_name.startswith("closable_"):
-                self.properties[prop_name] = prop
 
     def __repr__(self):
         """
@@ -257,9 +248,13 @@ class TabCfg(ContainerCfg):
         """
         closable_props = {}
         for prop in self.properties:
-            if prop.name.startswith("closable_"):
-                closable_props[prop.name] = prop.getValue()
- 
+            if hasattr(prop, "name"):
+                if prop.name.startswith("closable_"):
+                    closable_props[prop.name] = prop.getValue()
+            else:
+                if prop["name"].startswith("closable_"):
+                    closable_props[prop["name"]] = prop["value"]
+
         for prop_name in closable_props.keys():
             self.properties.delProperty(prop_name)
 
@@ -267,6 +262,7 @@ class TabCfg(ContainerCfg):
         for child in self.children:
             if "label" in child["properties"].properties:
                 child_lbl = child["properties"]["label"]
+                child_lbl = child_lbl.replace(" ", "_")
                 self.properties.addProperty("closable_%s" % child_lbl,
                      "boolean", closable_props.get("closable_%s" % child_lbl,
                      False))
@@ -283,11 +279,12 @@ class TabCfg(ContainerCfg):
                 slot_name = "resetTabCount_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")] = ()
 
-    def notebookPageChanged(self, new_page):
+    def notebook_page_changed(self, new_tab_label):
         """
         Descript. :
         """
-        if self.properties.getProperty("closable_%s" % new_page).getValue():
+        new_tab_label = new_tab_label.replace(" ", "_")
+        if self.properties.getProperty("closable_%s" % new_tab_label).getValue():
             self.widget.close_tab_button.show()
         else:
             self.widget.close_tab_button.hide()
@@ -306,10 +303,10 @@ class SplitterCfg(ContainerCfg):
 
         self.properties.addProperty("sizes", "string", "[]",
                                     hidden=True)
-        for key in [QtCore.Qt.Key_F9,
-                    QtCore.Qt.Key_F10,
-                    QtCore.Qt.Key_F11,
-                    QtCore.Qt.Key_F12]:
+        for key in [Qt.Key_F9,
+                    Qt.Key_F10,
+                    Qt.Key_F11,
+                    Qt.Key_F12]:
             self.properties.addProperty("sizes_%d" % key,
                                         "string",
                                         "[]",
@@ -370,6 +367,9 @@ class BrickCfg(_CfgItem):
         Descript. :
         """
         _CfgItem.__init__(self, name, brick_type)
+
+        self.name = name
+        self.type = brick_type
 
         self.brick = brick
 

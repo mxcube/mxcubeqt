@@ -20,6 +20,8 @@ from BlissFramework.Utils import ProcedureWidgets
 from BlissFramework.Utils import widget_colors
 import BlissFramework
 
+from BlissFramework import get_splash_screen
+
 try:
   from louie import dispatcher
   from louie import saferef
@@ -779,6 +781,11 @@ class BlissWidget(QWidget, Connectable.Connectable):
     def getHardwareObject(self, hardwareObjectName):
         if not hardwareObjectName in self.__loadedHardwareObjects:
             self.__loadedHardwareObjects.append(hardwareObjectName)
+
+
+        screen=get_splash_screen()
+        if screen is not None:
+            screen.set_message("Loading hardware object: %s" % hardwareObjectName)
 
         ho = HardwareRepository.HardwareRepository().getHardwareObject(hardwareObjectName)
     

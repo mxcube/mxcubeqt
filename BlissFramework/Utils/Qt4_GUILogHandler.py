@@ -22,14 +22,13 @@ import time
 import weakref
 import gevent
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from QtImport import *
 
 _logHandler = None
 _timer = None
 
 
-class LogEvent(QtCore.QEvent):
+class LogEvent(QEvent):
     """
     Descript. :
     """
@@ -37,7 +36,7 @@ class LogEvent(QtCore.QEvent):
         """
         Descript. :
         """
-        QtCore.QEvent.__init__(self, QtCore.QEvent.User)
+        QEvent.__init__(self, QEvent.User)
         self.record = record
         
 
@@ -54,7 +53,7 @@ def processLogMessages():
         
         for viewer in _logHandler.registeredViewers:
             #viewer.appendLogRecord(record)
-            QtGui.QApplication.postEvent(viewer, LogEvent(record))
+            QApplication.postEvent(viewer, LogEvent(record))
             
         i += 1
         

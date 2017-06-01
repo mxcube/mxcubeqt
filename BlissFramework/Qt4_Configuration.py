@@ -20,7 +20,8 @@
 """Configuration
 """
 
-#import yaml
+import json
+import yaml
 import logging
 import imp
 import pprint
@@ -89,7 +90,7 @@ class Configuration:
                "vsplitter": Qt4_BaseLayoutItems.SplitterCfg}
 
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, load_from_dict=None):
         """__init__ method"""
         self.has_changed = False
 
@@ -99,7 +100,7 @@ class Configuration:
             self.bricks = {}
             self.items = {}
         else:
-            self.load(config)
+            self.load(config, load_from_dict)
 
     def find_container(self, container_name):
         """Returns container
@@ -425,47 +426,88 @@ class Configuration:
         """Prints window list"""
         wl = []
         for window_cfg in self.windows_list:
+            window_cfg_dict = {"type": "window",
+                               "name": window_cfg["name"],
+                               "properties": [],
+                               "signals": window_cfg.signals,
+                               "connections": window_cfg.connections}
+            for prop in window_cfg.properties:
+                window_cfg_dict["properties"].append(prop.__getstate__())
+
             children = []
 
             def add_children(item_cfg):
                 children = []
 
                 for child in item_cfg["children"]:
-                    children.append({"name": child["name"],
-                                     "children": add_children(child)})
+                    child_prop_dict = {"name": child["name"],
+                                       "type": child.type,
+                                       "properties": [],
+                                       "children": [],
+                                       "connections": child.connections}
+                    for prop in child.properties:
+                        child_prop_dict["properties"].append(prop.__getstate__())
+                    if hasattr(child, "brick"):
+                        child_prop_dict["brick"] = {"name": str(child.brick.objectName())}
+                        child_prop_dict["brick"]["class"] = child.brick.__class__.__name__
+                        #child_prop_dict["brick"]["signals"] = child.brick._Connectable__signal
+                        #child_prop_dict["brick"]["slots"] = child.brick._Connectable__slot
+                    #else:
+                    #    child["signals"] = child.signals
+                    #    child["slots"] = child.slots
+
+                    child_prop_dict["children"] = add_children(child)
+                    children.append(child_prop_dict)
 
                 return children
 
-            wl.append({"name": window_cfg["name"],
-                       "children": add_children(window_cfg)})
-        pprint.pprint(wl)
+            window_cfg_dict["children"] = add_children(window_cfg)
+
+            wl.append(window_cfg_dict)
+        return wl
+        #pprint.pprint(wl)
 
     def save(self, filename):
         """Saves config"""
 
-        try:
-            cfg = repr(self.windows_list)
-        except:
-            logging.getLogger().exception("An exception occured " + \
-                                          "while serializing GUI objects")
-            return False
-        else:
-            try:
-                config_file = open(filename, "w")
-            except:
-                logging.getLogger().exception(\
-                    "Cannot save configuration to %s", filename)
-                return False
-            else:
-                config_file.write(cfg)
-                config_file.close()
-                #with open("/tmp/mxcube_gui.yaml", 'w') as outfile:
-                #    outfile.write(yaml.dump(cfg, default_flow_style=True))
-                self.has_changed = False
+        if filename.endswith(".json"):
+            json_dict = self.dump_tree()
+            with open(filename, 'w') as outfile:
+                  json.dump(json_dict, outfile)
+            outfile.close()
+            self.has_changed = False
 
             return True
+        elif filename.endswith(".yml"):
+            yaml_dict = self.dump_tree()
+            with open(filename, 'w') as outfile:
+                  yaml.dump(yaml_dict, outfile)
+            outfile.close()
+            self.has_changed = False
 
-    def load(self, config):
+            return True
+        else:
+            try:
+                cfg = repr(self.windows_list)
+            except:
+                logging.getLogger().exception("An exception occured " + \
+                                          "while serializing GUI objects")
+                return False
+            else:
+                try:
+                    config_file = open(filename, "w")
+                except:
+                    logging.getLogger().exception(\
+                        "Cannot save configuration to %s", filename)
+                    return False
+                else:
+                    config_file.write(cfg)
+                    config_file.close()
+                    self.has_changed = False
+
+                return True
+
+    def load(self, config, as_json):
         """Loads config"""
         self.windows_list = []
         self.windows = {}

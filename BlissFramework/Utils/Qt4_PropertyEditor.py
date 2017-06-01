@@ -23,49 +23,50 @@ import types
 import weakref
 import logging
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-
-if sys.version_info > (3, 0):
-   StringList = list
-else:
-   StringList = QtCore.QStringList
+from QtImport import *
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Qt4_widget_colors
 
 
-class Qt4_ConfigurationTable(QtGui.QTableWidget):
+class Qt4_ConfigurationTable(QTableWidget):
     """
     Descript. :
     """
+
+    propertyChangedSignal = pyqtSignal(str, object, object)
 
     def __init__(self, parent):
         """
         Descript. :
         """
-        QtGui.QTableWidget.__init__(self, parent)
+        QTableWidget.__init__(self, parent)
 
         self.display_hwobj = False
         self.property_bag = None
 
         self.setObjectName("configurationTable")
-        self.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.setFrameShadow(QtGui.QFrame.Sunken)
+        self.setFrameShape(QFrame.StyledPanel)
+        self.setFrameShadow(QFrame.Sunken)
         self.setContentsMargins(0, 3, 0, 3)
         self.setColumnCount(4)
-        self.setSelectionMode(QtGui.QTableWidget.NoSelection)
+        self.setSelectionMode(QTableWidget.NoSelection)
 
-        self.setHorizontalHeaderLabels([self.trUtf8('Property'),  
-                                        self.trUtf8('Value'), 
-                                        self.trUtf8(''),
-                                        self.trUtf8('Comment')])
-        
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                           QtGui.QSizePolicy.Expanding)
+        #self.setHorizontalHeaderLabels([self.trUtf8('Property'),  
+        #                                self.trUtf8('Value'), 
+        #                                self.trUtf8(''),
+        #                                self.trUtf8('Comment')])
+        self.setHorizontalHeaderLabels(['Property',  
+                                        'Value', 
+                                        '',
+                                        'Comment'])
+         
+        self.setSizePolicy(QSizePolicy.MinimumExpanding,
+                           QSizePolicy.Fixed)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.cellChanged.connect(self.OnCellChanged)
+        self.cellChanged.connect(self.on_cell_changed)
         
     def clear(self):
         """
@@ -109,14 +110,14 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                         continue
 
                 self.setRowCount(i + 1)
-                temp_table_item = QtGui.QTableWidgetItem(prop_name)
-                temp_table_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                temp_table_item = QTableWidgetItem(prop_name)
+                temp_table_item.setFlags(Qt.ItemIsEnabled)
                 self.blockSignals(True) 
                 self.setItem(i, 0, temp_table_item)
-                self.setWidgetFromProperty(i, prop)
+                self.set_widget_from_property(i, prop)
 
-                temp_table_item = QtGui.QTableWidgetItem(prop.comment)
-                temp_table_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                temp_table_item = QTableWidgetItem(prop.comment)
+                temp_table_item.setFlags(Qt.ItemIsEnabled)
                 self.setItem(i, 3, temp_table_item)
                 
                 self.blockSignals(False)
@@ -133,23 +134,28 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             self.setEnabled(i > 0)    
         self.resizeColumnsToContents()
         self.setFixedHeight((self.rowCount() + 1)  * \
-                            (self.rowHeight(0) + 2) + 20)
+                            (self.rowHeight(0) + 2))
         #self.adjustSize()
         self.parent().adjustSize()
-        
-    def setWidgetFromProperty(self, row, prop):
-        """
-        Descript. :
+        #self.parent().resize(self.parent().sizeHint())
+
+    def set_widget_from_property(self, row, prop):
+        """Adds new property to the propery table
+
+        :param row: selected row
+        :type row: int
+        :param prop: property
+        :type prop: dict 
         """
         if prop.getType() == 'boolean':
-            new_property_item = QtGui.QTableWidgetItem(QtCore.QString(""))
+            new_property_item = QTableWidgetItem("")
             self.setItem(row, 1, new_property_item)
             if prop.getUserValue():
-                self.item(row, 1).setCheckState(QtCore.Qt.Checked)
+                self.item(row, 1).setCheckState(Qt.Checked)
             else:
-                self.item(row, 1).setCheckState(QtCore.Qt.Unchecked)
+                self.item(row, 1).setCheckState(Qt.Unchecked)
         elif prop.getType() == 'combo':
-            choicesList = StringList()
+            choicesList = []
             choices = prop.getChoices()
             for choice in choices:
                 choicesList.append(choice)
@@ -164,14 +170,16 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
             self.setCellWidget(row, 1, new_property_item)
         else:                                           
             if prop.getUserValue() is None:
-                temp_table_item = QtGui.QTableWidgetItem("")
+                temp_table_item = QTableWidgetItem("")
             else:
-                temp_table_item = QtGui.QTableWidgetItem(str(prop.getUserValue()))  
+                temp_table_item = QTableWidgetItem(str(prop.getUserValue()))  
             self.setItem(row, 1, temp_table_item)
+        self.resizeColumnsToContents()
+        #self.parent().adjustSize()
 
-    def OnCellChanged(self, row, col):
-        """
-        Descript. :
+    def on_cell_changed(self, row, col):
+        """Assignes new value to the property, clicked on the the
+           property table
         """
         col += 1
         prop_name = str(self.item(row, 0).text())
@@ -202,9 +210,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                 self.item(row, 1).setText(str(item_property.getUserValue()))
 
         if not old_value == item_property.getUserValue():
-            self.emit(QtCore.SIGNAL('propertyChanged'),
-                      prop_name, 
-                      old_value, item_property.getUserValue())
+            self.propertyChangedSignal.emit(prop_name, old_value, item_property.getUserValue())
 
     def on_validate_click(self):
         """
@@ -235,7 +241,7 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
         if not default_value == None:
             prop.setValue(default_value)
         
-        self.setWidgetFromProperty(self.currentRow(), prop)
+        self.set_widget_from_property(self.currentRow(), prop)
 
     def beginEdit(self, row, col, replace):
         """
@@ -277,13 +283,14 @@ class Qt4_ConfigurationTable(QtGui.QTableWidget):
                         self.setText(row, 1, str(prop.getUserValue()))
 
                 if not old_value == prop.getUserValue():
-                    self.emit(QtCore.SIGNAL('propertyChanged'), 
-                              (prop_name, old_value, prop.getUserValue(), ))
+                    self.propertyChangedSignal.emit(prop_name, old_value, prop.getUserValue())
+                    #self.emit(QtCore.SIGNAL('propertyChanged'), 
+                              #(prop_name, old_value, prop.getUserValue(), ))
 
         return QTable.endEdit(self, row, col, accept, replace)
 
 
-class ValidationTableItem(QtGui.QWidget):
+class ValidationTableItem(QWidget):
     """
     Descript. :
     """
@@ -293,20 +300,20 @@ class ValidationTableItem(QtGui.QWidget):
         Descript. : parent (QTreeWidget) : Item's QTreeWidget parent.
         """
 
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
        
-        self.ok_button = QtGui.QToolButton(parent)
+        self.ok_button = QToolButton(parent)
         self.ok_button.setAutoRaise(True)
         self.ok_button.setIcon(Qt4_Icons.load_icon('button_ok_small'))
-        self.cancel_button = QtGui.QToolButton(parent)
+        self.cancel_button = QToolButton(parent)
         self.cancel_button.setAutoRaise(True)
         self.cancel_button.setIcon(Qt4_Icons.load_icon('button_cancel_small'))
-        self.reset_button = QtGui.QToolButton(parent)
+        self.reset_button = QToolButton(parent)
         self.reset_button.setIcon(Qt4_Icons.load_icon('button_default_small'))
         self.reset_button.setAutoRaise(True)
         self.setEnabled(False)
 
-        _main_layout = QtGui.QHBoxLayout(self)
+        _main_layout = QHBoxLayout(self)
         _main_layout.addWidget(self.ok_button)
         _main_layout.addWidget(self.cancel_button)
         _main_layout.addWidget(self.reset_button)
@@ -326,7 +333,7 @@ class ValidationTableItem(QtGui.QWidget):
             self.ok_button.setEnabled(False)
             self.cancel_button.setEnabled(False)
 
-class ComboBoxTableItem(QtGui.QComboBox):
+class ComboBoxTableItem(QComboBox):
     """
     Descript. :
     """
@@ -335,7 +342,7 @@ class ComboBoxTableItem(QtGui.QComboBox):
         """ 
         Descript. :
         """
-        QtGui.QComboBox.__init__(self)
+        QComboBox.__init__(self)
         if items_list is not None:
             self.addItems(items_list)  
         self.col = col
@@ -347,9 +354,9 @@ class ComboBoxTableItem(QtGui.QComboBox):
         """
         Descript. :
         """
-        self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'), self.row, self.col) 
+        self.parent.cellChanged.emit(self.row, self.col) 
 
-class FileTableItem(QtGui.QWidget):
+class FileTableItem(QWidget):
     """
     Descript. :
     """
@@ -358,22 +365,22 @@ class FileTableItem(QtGui.QWidget):
         """
         Descript. :
         """
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
 
         self.file_filter = file_filter
         self.parent = parent
         self.col = col
         self.row = row
 
-        self.cmdBrowse = QtGui.QPushButton('Browse', self.parent.viewport())
+        self.cmdBrowse = QPushButton('Browse', self.parent.viewport())
 
-        main_layout = QtGui.QHBoxLayout()
+        main_layout = QHBoxLayout()
         main_layout.addWidget(self.cmdBrowse)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(main_layout) 
 
-        QtCore.QObject.connect(self.cmdBrowse, QtCore.SIGNAL('clicked()'), self.browse_clicked)      
+        self.cmdBrowse.clicked.connect(self.browse_clicked)      
         self.set_filename(filename)
 
     def set_filename(self, filename):
@@ -385,7 +392,7 @@ class FileTableItem(QtGui.QWidget):
         if self.cmdBrowse is not None:
             self.cmdBrowse.setToolTip(self.filename)
 
-        self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'), self.row, self.col)
+        self.parent.cellChanged.emit(self.row, self.col)
 
     def get_filename(self):
         """
@@ -397,7 +404,7 @@ class FileTableItem(QtGui.QWidget):
         """
         Descript. :
         """
-        new_filename = QtGui.QFileDialog.getOpenFileName(
+        new_filename = QFileDialog.getOpenFileName(
                              self, os.path.dirname(self.filename) or os.getcwd(), 
                              self.file_filter, '', 'Select a file')
         
@@ -405,25 +412,27 @@ class FileTableItem(QtGui.QWidget):
             self.set_filename(new_filename)
 
             
-class ColorTableItem(QtGui.QWidget):
+class ColorTableItem(QWidget):
     """
     Descript. :
     """
+
+    #cellChangedSignal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, parent, row, col, color):
         """
         Descript. :
         """
-        QtGui.QTableWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         self.col = col
         self.row = row
         self.parent = parent
 
-        self.change_color_button = QtGui.QPushButton('Color...', parent)
-        self.reset_color_button = QtGui.QPushButton('reset', parent)
+        self.change_color_button = QPushButton('Color...', parent)
+        self.reset_color_button = QPushButton('reset', parent)
 
-        main_layout = QtGui.QHBoxLayout(self)
+        main_layout = QHBoxLayout(self)
         main_layout.addWidget(self.change_color_button)
         main_layout.addWidget(self.reset_color_button)
         main_layout.setSpacing(0)
@@ -447,15 +456,15 @@ class ColorTableItem(QtGui.QWidget):
             Qt4_widget_colors.set_widget_color(\
                 self.change_color_button,
                 Qt4_widget_colors.BUTTON_ORIGINAL,
-                QtGui.QPalette.Button)
+                QPalette.Button)
         else:         
             try:
                 rgb = color.rgb()
             except:
                 try:
-                    self.qtcolor = QtGui.QColor(color)
+                    self.qtcolor = QColor(color)
                 except:
-                    self.qtcolor = QtGui.QtColor(QtCore.Qt.green)
+                    self.qtcolor = QtColor(Qt.green)
                     self.color = self.qtcolor.rgb()
                 else:
                     self.color = self.qtcolor.rgb()
@@ -465,15 +474,14 @@ class ColorTableItem(QtGui.QWidget):
         
             Qt4_widget_colors.set_widget_color(self.change_color_button,
                                                self.qtcolor,
-                                               QtGui.QPalette.Button)
-        self.parent.emit(QtCore.SIGNAL('cellChanged(int, int)'),
-                         self.row, self.col)
+                                               QPalette.Button)
+        self.parent.cellChanged.emit(self.row, self.col)
 
     def change_color_clicked(self):
         """Opens color dialog to choose color"""
 
-        new_color = QtGui.QColorDialog.getColor(\
-            self.qtcolor or QtGui.QColor("white"), None, 'Select a color')
+        new_color = QColorDialog.getColor(\
+            self.qtcolor or QColor("white"), None, 'Select a color')
         if new_color.isValid():
             self.set_color(new_color)
 

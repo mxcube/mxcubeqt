@@ -1,5 +1,5 @@
 import logging
-#from qt import *
+from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 try:
     from PyMca import QPeriodicTable

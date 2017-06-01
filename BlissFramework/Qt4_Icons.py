@@ -18,8 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import path
-
-from PyQt4 import QtGui
+from QtImport import *
 
 
 ICONS_DIR = path.join(path.dirname(__file__), 'Icons')
@@ -39,12 +38,12 @@ def load(icon_name):
                 break
         
     try:
-        icon = QtGui.QPixmap(filename)
+        icon = QPixmap(filename)
     except:
-        return QtGui.QPixmap(path.join(ICONS_DIR, 'brick.png'))
+        return QPixmap(path.join(ICONS_DIR, 'brick.png'))
     else:
         if icon.isNull():
-            return QtGui.QPixmap(path.join(ICONS_DIR, 'brick.png'))
+            return QPixmap(path.join(ICONS_DIR, 'brick.png'))
         else:
             return icon
 
@@ -65,7 +64,7 @@ def getIconPath(icon_name):
         return filename
         
 def load_icon(icon_name):
-    return QtGui.QIcon(load(icon_name))
+    return QIcon(load(icon_name))
 
 def load_pixmap(icon_name):
     return load(icon_name)

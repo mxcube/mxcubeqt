@@ -17,8 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging, sys, traceback
-from PyQt4 import QtGui
+import sys
+import logging
+import traceback
+from QtImport import *
 
 _handler = None
 
@@ -77,8 +79,7 @@ class __Handler:
         Descript. :
         """
         if type == KeyboardInterrupt:
-          #qt.qApp.quit()
-          QtGui.QApplication.quit()
+          getQApp().quit()
           return
         try: 
             exception = traceback.format_exception(type, value, tb)
