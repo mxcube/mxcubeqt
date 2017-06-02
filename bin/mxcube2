@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Launcher application template.
+# Copy and rename this file with the gui file name without extension.
+if [ -z "$MXCUBE_ROOT" ]; then
+    echo "MXCUBE_ROOT does not exists -> Exiting"
+    exit -1
+fi
+
+export APP_NAME=`basename "$0"`
+$MXCUBE_ROOT/bin/run_app.sh
