@@ -21,10 +21,13 @@ import os
 
 from QtImport import *
 
+import Qt4_queue_item
+
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_advanced_parameters_widget import AdvancedParametersWidget
 from widgets.Qt4_advanced_results_widget import AdvancedResultsWidget
 from widgets.Qt4_snapshot_widget import SnapshotWidget
+
 
 __credits__ = ["MXCuBE colaboration"]
 __version__ = "2.3"
@@ -78,7 +81,11 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.parameters_widget.populate_widget(item)
         self.results_widget.populate_widget(item)
 
-        data_collection = item.get_model()
+        if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
+            data_collection = item.get_model().reference_image_collection
+        else:
+            data_collection = item.get_model()
+
         self.snapshot_widget.display_snapshot(\
              data_collection.grid.get_snapshot())
 

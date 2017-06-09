@@ -1005,6 +1005,8 @@ class Qt4_TreeBrick(BlissWidget):
                 self.populate_workflow_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.populate_dc_group_tab(item)
+            elif isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
+                self.populate_advanced_tab(item)
 
         self.selection_changed.emit(items)
 

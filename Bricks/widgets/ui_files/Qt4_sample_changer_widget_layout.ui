@@ -240,13 +240,8 @@
              <string>&lt;B&gt;Manual&lt;/B&gt; 3-Click centring &lt;BR&gt; &lt;B&gt;Semi Automatic&lt;/B&gt; - Gives the possibility to confirm centring &lt;BR&gt; &lt;B&gt;Fully Automatic&lt;/B&gt; - Continues without waiting for confirmation</string>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
-            <item>
-             <property name="text">
-              <string>No centring</string>
-             </property>
-            </item>
             <item>
              <property name="text">
               <string>Manual 3-click</string>

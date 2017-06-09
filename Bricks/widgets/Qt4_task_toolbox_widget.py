@@ -222,6 +222,10 @@ class TaskToolBoxWidget(QWidget):
             elif isinstance(tree_item, Qt4_queue_item.GenericWorkflowQueueItem):
                 if self.tool_box.currentWidget() == self.workflow_page:
                     self.create_task_button.setEnabled(True)
+            elif isinstance(tree_item, Qt4_queue_item.XrayCenteringQueueItem):
+                #self.collect_now_button.show()
+                if self.tool_box.currentWidget() == self.advanced_page:
+                    self.create_task_button.setEnabled(True)
 
             self.tool_box.widget(page_index).selection_changed(tree_items)
             self.previous_page_index = page_index
@@ -259,6 +263,8 @@ class TaskToolBoxWidget(QWidget):
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
             elif isinstance(items[0], Qt4_queue_item.SampleCentringQueueItem):
                 self.create_task_button.setEnabled(False)
+            if isinstance(items[0], Qt4_queue_item.XrayCenteringQueueItem):
+                self.tool_box.setCurrentWidget(self.advanced_page)
             self.method_label.setText(title) 
 
         current_page = self.tool_box.currentWidget()

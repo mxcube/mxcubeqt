@@ -23,6 +23,7 @@ from QtImport import *
 
 import queue_model_objects_v1 as queue_model_objects
 
+import Qt4_queue_item
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_acquisition_widget import AcquisitionWidget
@@ -111,7 +112,11 @@ class AdvancedParametersWidget(QWidget):
 
     def populate_widget(self, tree_view_item):
         self._tree_view_item = tree_view_item
-        self._data_collection = tree_view_item.get_model()
+
+        if isinstance(tree_view_item, Qt4_queue_item.XrayCenteringQueueItem):
+            self._data_collection = tree_view_item.get_model().reference_image_collection
+        else:
+            self._data_collection = tree_view_item.get_model()
         executed = self._data_collection.is_executed()
 
         self._acq_widget.setEnabled(not executed)
