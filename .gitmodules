@@ -1,6 +1,3 @@
 [submodule "HardwareRepository"]
 	path = HardwareRepository
 	url = git://github.com/mxcube/HardwareRepository
-[submodule "HardwareObjects"]
-	path = HardwareObjects
-	url = git://github.com/mxcube/HardwareObjects
