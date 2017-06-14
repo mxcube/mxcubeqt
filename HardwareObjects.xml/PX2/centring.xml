@@ -1,9 +1,0 @@
-<equipment>
-    <motors>
-        <device role="rotation" hwrid="/phi"></device>
-        <device role="vertical" hwrid="/sampy"></device>
-        <device role="inBeam" hwrid="/sampx"></device>
-        <device role="table_y" hwrid="/horizontal"></device>
-        <device role="table_z" hwrid="/vertical"></device>
-    </motors>
-</equipment>

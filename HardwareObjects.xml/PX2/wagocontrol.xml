@@ -1,8 +1,0 @@
-<procedure>
-  <specversion>SPEC_HOST:SPEC_VERSION</specversion>
-  <command>
-     <type>spec</type>
-     <name>Adjust wago gains</name>
-     <toexecute>_wcadjall</toexecute>
-  </command>
-</procedure>

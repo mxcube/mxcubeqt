@@ -1,9 +1,0 @@
-<device class="TangoDCMotor">
-  <username>Focus</username>
-  <tangoname>i11-ma-cx1/ex/md2</tangoname>
-  <motor_name>AlignmentX</motor_name>
-  <command type="tango" name="limits">getMotorLimits</command>
-  <channel type="tango" polling="1000" name="position">AlignmentXPosition</channel>
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <interval>1000</interval>
-</device>

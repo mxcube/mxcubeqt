@@ -1,8 +1,0 @@
-<device class = "TangoResolutionComplex">
-  <username>Resolution</username>
-  <tangoname>i11-ma-cx1/dt/dtc_ccd.1-mt_ts</tangoname>
-  <tangoname2>i11-ma-c03/op/mono1</tangoname2>
-  <channel type="tango" polling="500" name="position">position</channel>
-  <channel type="tango" polling="500" name="state">State</channel>
-  <BLEnergy>/BLEnergy</BLEnergy>
-</device>

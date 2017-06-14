@@ -1,8 +1,0 @@
-<device class="TangoShutter">
-  <username>FrontEnd</username>
-  <tangoname>tdl-i11-ma/vi/tdl.1</tangoname>
-  <channel type="tango" polling="1000" name="State">State</channel>
-  <command type="tango" name="Open">Open</command>
-  <command type="tango" name="Close">Close</command>
-</device>
-
