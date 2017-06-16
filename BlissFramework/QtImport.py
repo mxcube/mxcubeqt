@@ -128,7 +128,9 @@ if (qt_variant == 'PyQt5') or (qt_variant is None and not qt_imported):
         qt_imported = True
         qt_variant = "PyQt5"
         qt_version_no = list(map(int,QT_VERSION_STR.split(".")))
-        pyqt_version_no = list(map(int,PYQT_VERSION_STR.split(".")))[:3]
+        _ver = PYQT_VERSION_STR.split(".")
+        ver = _ver + ['0']*(3 - len(_ver))
+        pyqt_version_no = list(map(int,ver))[:3]
     except:
         pass
 
@@ -168,7 +170,9 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
         qt_imported = True
         qt_variant = "PyQt4"
         qt_version_no = list(map(int,QT_VERSION_STR.split(".")))
-        pyqt_version_no = list(map(int,PYQT_VERSION_STR.split(".")))[:3]
+        _ver = PYQT_VERSION_STR.split(".")
+        ver = _ver + ['0']*(3 - len(_ver))
+        pyqt_version_no = list(map(int,ver))[:3]
     except:
         pass
 
