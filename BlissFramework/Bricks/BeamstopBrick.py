@@ -47,10 +47,13 @@ class beamstopLabel(QWidget):
     def setButtonStopEnabled(self,state):
         self.buttonStop.setEnabled(state)
 
-class BeamStopAlignmentDialog(QWidget):
-    def __init__(self, parent, caption):
-        QWidget.__init__(self, None)
-        self.setCaption(caption) 
+class BeamStopAlignmentDialog(QWidget): #QDialog):
+    def __init__(self, caption, okClickedCb=None, dismissClickedCb=None):
+        QWidget.__init__(self) #, '', True)
+
+        self.okClickedCb=okClickedCb
+        self.dismissClickedCb=dismissClickedCb
+        
         QVBoxLayout(self, 5, 5)
         self.alignmentWidget = TwoAxisAlignmentBrick.TwoAxisAlignmentBrick(self)
         cmdBox = QVBox(self)
@@ -70,15 +73,21 @@ class BeamStopAlignmentDialog(QWidget):
         self.layout().addWidget(self.alignmentWidget)
         self.layout().addWidget(cmdBox, 0, Qt.AlignRight | Qt.AlignBottom)
 
+        self.hide()
+
     def setMnemonic(self, mne):
         self.alignmentWidget["mnemonic"] = mne
 
     def dismissClicked(self):
-        self.close() # = False #done(0)
-
-    def okClicked(self):
-        self.emit(PYSIGNAL("aligned"), (True,))
         self.close()
+        if callable(self.dismissClickedCb):
+            self.dismissClickedCb()
+        
+    def okClicked(self):
+        self.close()
+        if callable(self.okClickedCb):
+            self.okClickedCb()
+
 
 ###
 ### Brick to control and align the beamstop
@@ -88,15 +97,16 @@ class BeamstopBrick(DuoStateBrick):
     
     def __init__(self, *args):
         DuoStateBrick.__init__.im_func(self, *args)
-        self.alignmentDialog = BeamStopAlignmentDialog(self, "Beamstop alignment")
-        self.alignmentDialog.hide()
-        QObject.connect(self.alignmentDialog, PYSIGNAL("aligned"), self.beamstopAligned)
+        self.alignmentDialog = BeamStopAlignmentDialog("Beamstop alignment", self.beamstopAligned, self.alignDismissClicked)
         self.beamstop = None
         self.positions = {}
         self.connect(self.stateLabel,PYSIGNAL('setupClicked'),self.setupClicked)
         self.connect(self.stateLabel,PYSIGNAL('stopClicked'),self.stopClicked)
         self.addProperty('setupIcon', 'string', '')
         self.addProperty('stopIcon', 'string', '')
+        
+    def alignDismissClicked(self):
+        pass
 
     #def allowSetup(self,state):
     def setExpertMode(self,state):
@@ -181,31 +191,33 @@ class BeamstopBrick(DuoStateBrick):
         self.setEnabled(True)
 
     def equipmentNotReady(self):
-        self.stateChanged('disabled')
+        #self.stateChanged('disabled')
         self.setEnabled(False)
 
     def setupClicked(self):
         self.alignmentDialog.show() #exec_loop()
-        
+
+
     def beamstopAligned(self):
-            try:
-                bstopz = self.beamstop.getDeviceByRole("vertical")
-                bstopy = self.beamstop.getDeviceByRole("horizontal")
-                bstopzPos = bstopz.getPosition()
-                bstopyPos = bstopy.getPosition()
-            except:
-                logging.getLogger().error("%s: could not find vertical and horizontal motors in hardware object %s", str(self.name()), self.beamstop.name())
-            else:
-                newInPos = { 'vertical': bstopzPos, 'horizontal': bstopyPos }
-                self.beamstop.setNewPositions("in", newInPos)
-                newOutPos = newInPos
-                newOutPos['vertical'] = self.beamstop.getDeviceByRole("vertical").getLimits()[0]
-                self.beamstop.setNewPositions("out", newOutPos)
+        try:
+            bstopz = self.beamstop.getDeviceByRole("vertical")
+            bstopy = self.beamstop.getDeviceByRole("horizontal")
+            bstopzPos = bstopz.getPosition()
+            bstopyPos = bstopy.getPosition()
+        except:
+            logging.getLogger().error("%s: could not find vertical and horizontal motors in hardware object %s", str(self.name()), self.beamstop.name())
+        else:
+            newInPos = { 'vertical': bstopzPos, 'horizontal': bstopyPos }
+            self.beamstop.setNewPositions("in", newInPos)
+            newOutPos = newInPos
+            newOutPos['vertical'] = self.beamstop.getDeviceByRole("vertical").getLimits()[0]
+            self.beamstop.setNewPositions("out", newOutPos)
 
-                QMessageBox.information(self, "Beamstop alignment", "New beamstop positions saved successfully.", QMessageBox.Ok)
-                return
+            QMessageBox.information(self, "Beamstop alignment", "New beamstop positions saved successfully.", QMessageBox.Ok)
+            return
 
-            QMessageBox.warning(self, "Beamstop alignment", "An error occured while trying to save beamstop positions.", QMessageBox.Cancel)
+        QMessageBox.warning(self, "Beamstop alignment", "An error occured while trying to save beamstop positions.", QMessageBox.Cancel)
+
 
     def positionChanged(self, positionName = ""):
         #print "BeamstopBrick.positionChanged",positionName
@@ -230,4 +242,4 @@ class BeamstopBrick(DuoStateBrick):
     def stopClicked(self):
         for motor in self.beamstop.motors:
             self.beamstop.motors[motor].stop()
-	    return
+	return
