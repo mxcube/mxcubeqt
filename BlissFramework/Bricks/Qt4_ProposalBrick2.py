@@ -112,14 +112,14 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.main_gbox = QGroupBox("ISPyB proposal", self)
 
         self.login_as_proposal_widget = QWidget(self.main_gbox)
-        code_label = QLabel("  Code: ", self.login_as_proposal_widget)
+        self.code_label = QLabel("  Code: ", self.login_as_proposal_widget)
         self.proposal_type_combox = QComboBox(self.login_as_proposal_widget)
         self.proposal_type_combox.setEditable(True)
         self.proposal_type_combox.setFixedWidth(60)
-        dash_label = QLabel(" - ", self.login_as_proposal_widget)
+        self.dash_label = QLabel(" - ", self.login_as_proposal_widget)
         self.proposal_number_ledit = QLineEdit(self.login_as_proposal_widget)
         self.proposal_number_ledit.setFixedWidth(60)
-        password_label = QLabel("   Password: ", self.login_as_proposal_widget)
+        self.password_label = QLabel("   Password: ", self.login_as_proposal_widget)
         self.proposal_password_ledit = QLineEdit(self.login_as_proposal_widget)
         self.proposal_password_ledit.setEchoMode(QLineEdit.Password)
         #self.proposal_password_ledit.setFixedWidth(40)
@@ -157,11 +157,11 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.user_group_widget.hide()
 
         _login_as_proposal_widget_layout = QHBoxLayout(self.login_as_proposal_widget)
-        _login_as_proposal_widget_layout.addWidget(code_label)
+        _login_as_proposal_widget_layout.addWidget(self.code_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_type_combox)
-        _login_as_proposal_widget_layout.addWidget(dash_label)
+        _login_as_proposal_widget_layout.addWidget(self.dash_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_number_ledit)
-        _login_as_proposal_widget_layout.addWidget(password_label)
+        _login_as_proposal_widget_layout.addWidget(self.password_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_password_ledit)
         _login_as_proposal_widget_layout.addWidget(self.login_button)
         _login_as_proposal_widget_layout.setSpacing(2)
@@ -233,6 +233,28 @@ class Qt4_ProposalBrick2(BlissWidget):
                                                Qt4_widget_colors.LIGHT_RED,
                                                QPalette.Base)
             
+    def set_login_mode(self,mode):
+        if mode == "logout":
+            self.login_button.hide()
+            self.proposal_password_ledit.hide()
+            self.code_label.hide()
+            self.proposal_type_combox.hide()
+            self.dash_label.hide()
+            self.proposal_number_ledit.hide()
+            self.password_label.hide()
+            self.logout_button.show()
+            self.user_group_widget.show()
+        else:
+            self.login_button.show()
+            self.proposal_password_ledit.show()
+            self.logout_button.hide()
+            self.user_group_widget.hide()
+            self.code_label.show()
+            self.proposal_type_combox.show()
+            self.dash_label.show()
+            self.proposal_number_ledit.show()
+            self.password_label.show()
+
     def user_group_changed(self, value):
         """
         Descript. :
@@ -316,8 +338,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         # Change mode from logout to login
         if not self.login_as_user: 
             self.login_as_proposal_widget.setEnabled(True)
-            self.login_button.show()
-            self.logout_button.hide()
+            self.set_login_mode("login")
         #self.title_label.hide()
         self.user_group_widget.hide()
        
@@ -352,11 +373,12 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.session_hwobj.proposal_id = proposal['proposalId']
         self.session_hwobj.proposal_number = proposal['number']
 
+        logging.getLogger("HWR").debug("Setting proposal %s" % self.login_as_user)
         # Change mode
         if not self.login_as_user:
-            self.login_button.hide()
+            logging.getLogger("HWR").debug("Hiding login controls")
+            self.set_login_mode("logout")
             self.login_as_proposal_widget.setDisabled(True)
-            self.logout_button.show()
 
         # Store info in the brick
         self.proposal = proposal
@@ -383,7 +405,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             if code not in codes_list:
                 codes = self["codes"] + " " + code
                 self["codes"] = codes
-                self.propertyBag.getProperty('codes').setValue(codes)
+                #self.propertyBag.getProperty('codes').setValue(codes)
 
             # Build the info for the interface
             title = str(proposal['title'])
@@ -466,9 +488,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         if not self.lims_hwobj:
             self.login_as_proposal_widget.hide()
             self.login_button.hide()
+            self.proposal_password_ledit.hide()
+            self.user_group_widget.show()
             #self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
             #self.title_label.show()
-            self.user_group_widget.show()
             self.session_hwobj.proposal_code = ""
             self.session_hwobj.session_id = 1
             self.session_hwobj.proposal_id = ""
@@ -681,9 +704,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         Descript. :
         """
         # Get proposal and sessions
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
+        logging.getLogger("HWR").debug('ProposalBrick: querying ISPyB database...')
         prop = self.lims_hwobj.getProposal(proposal_code, proposal_number)
 
+        logging.getLogger("HWR").debug('   got proposal info from lims: %s' % str(prop))
         # Check if everything went ok
         prop_ok = True
         try:
