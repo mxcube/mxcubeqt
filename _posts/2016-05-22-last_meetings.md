@@ -12,30 +12,30 @@ fa-icon: users
 
 ### Status reports
 
-ESRF – Antonia BETEVA
-ALBA – Jordi Andreu
-HZB – Michael Hellmig
-MAXIV – Jie Nan
-Soleil – Martin Savko
-EMBL-HH – Ivars Karpics
-Global Phasing – Gerad Bricogne
-<hr></hr>
-Daniele/Matias – MXCuBE : Past, present and future
+- ESRF – Antonia BETEVA
+- ALBA – Jordi Andreu
+- HZB – Michael Hellmig
+- MAXIV – Jie Nan
+- Soleil – Martin Savko
+- EMBL-HH – Ivars Karpics
+- Global Phasing – Gerad Bricogne
+<hr>
+- Daniele/Matias – MXCuBE : Past, present and future
 
 ### Hardware integration
 
-Matias GUIJARRO - FlexHCD Sample changer integration
-Martin Savko - Optical recognition of samples in cryogenic dewars
-Michael Hellmig - Integration of the GROB into BL 14.2 beamline
+- Matias GUIJARRO - FlexHCD Sample changer integration
+- Martin Savko - Optical recognition of samples in cryogenic dewars
+- Michael Hellmig - Integration of the GROB into BL 14.2 beamline
 
 ### Last developments
 
-Ivars Karpics - Qtx GUI: current status and latest developments
-Jie Nan - Users interfaces Last developments of v2/v3
-Olof Svensson - Pipelines at ESRF
-Rasmus Fogh - Third party control of an experiment via MXCuBE
-Marcus - MXCuBE3@ESRF
-Ivars Karpics - Embedding state persistence and user guidance in MXCuBE
+- Ivars Karpics - Qtx GUI: current status and latest developments
+- Jie Nan - Users interfaces Last developments of v2/v3
+- Olof Svensson - Pipelines at ESRF
+- Rasmus Fogh - Third party control of an experiment via MXCuBE
+- Marcus - MXCuBE3@ESRF
+- Ivars Karpics - Embedding state persistence and user guidance in MXCuBE
 
 
 # 10th. MXCuBE meeting @ ESRF (Grenoble, France), 16<sup>th</sup>-18<sup>th</sup> of January, 2017
