@@ -22,6 +22,7 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
 
         self.addProperty('label','string','')
         self.addProperty('listIndex','integer', -1)
+        self.addProperty('enableExpertMode', 'boolean', False)
 
         self.lblUsername.close()
         self.expertPanel.close()
@@ -40,6 +41,10 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
         QToolTip.add(self.lstPositions,"Moves the motor to a predefined position")
 
         self.defineSlot('setEnabled',())
+
+    def setExpertMode(self, expert):
+        if self['enableExpertMode']:
+            self.setEnabled(expert)
 
     def setToolTip(self,name=None,state=None):
         states=("NOTREADY","UNUSABLE","READY","MOVESTARTED","MOVING","ONLIMIT")
