@@ -3,9 +3,6 @@ from BlissFramework.Bricks import MotorWPredefinedPositionsBrick
 from qt import *
 from BlissFramework.Utils import widget_colors
 
-'''
-'''
-
 __category__ = 'Motor'
 
 class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositionsBrick):
@@ -65,25 +62,9 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
         QToolTip.add(self.label2,tip)
 
     def motorStateChanged(self, state):
-        """
-        if MotorPredefPosBrick.DISABLED_COLOR is None:
-            combobox_palette=self.lstPositions.palette()
-            disabled_group=QColorGroup(combobox_palette.disabled())
-            MotorPredefPosBrick.DISABLED_COLOR=self.colorGroup().background()
-        """
-
         MotorWPredefinedPositionsBrick.MotorWPredefinedPositionsBrick.motorStateChanged(self,state)
         color=MotorPredefPosBrick.STATE_COLORS[state]
         self.lstPositions.setPaletteBackgroundColor(color)
-
-        """
-        combobox_palette=self.lstPositions.palette()
-        disabled_group=QColorGroup(combobox_palette.disabled())
-        disabled_group.setColor(disabled_group.Background,\
-            self.colorGroup().background())
-        combobox_palette.setDisabled(disabled_group)
-        """
-
         self.setToolTip(state=state)
 
     def propertyChanged(self,propertyName,oldValue,newValue):
@@ -107,6 +88,7 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
             self.fillPositions()
         else:
             MotorWPredefinedPositionsBrick.MotorWPredefinedPositionsBrick.propertyChanged(self,propertyName,oldValue,newValue)
+       
 
     def setMnemonic(self,mne):
         MotorWPredefinedPositionsBrick.MotorWPredefinedPositionsBrick.setMnemonic(self,mne)
