@@ -85,18 +85,13 @@ class Qt4_LogBarBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def customEvent(self, event):
-        """
-        Descript. :
-        """
-        if self.isRunning():
-            self.append_log_record(event.record)
+        """Event to add a new log record"""
+        self.append_log_record(event.record)
 
     def append_log_record(self, record):
+        """Appends a new log line to the text edit
         """
-        Descript. :
-        """
-        if record.name == 'user_level_log' or \
-           record.name == 'GUI':
+        if self.isRunning() and record.name in ('user_level_log', 'GUI'):
             msg = record.getMessage()#.replace('\n',' ').strip()
             level = record.getLevel()
             color = Qt4_LogBarBrick.COLORS[level]
@@ -115,5 +110,3 @@ class Qt4_LogBarBrick(BlissWidget):
                 cursor.select(QTextCursor.BlockUnderCursor)
                 cursor.removeSelectedText()
                 cursor.deleteChar()
-
-    appendLogRecord = append_log_record
