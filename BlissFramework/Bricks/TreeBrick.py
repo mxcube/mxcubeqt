@@ -425,6 +425,10 @@ class TreeBrick(BaseComponents.BlissWidget):
                                 warning("No sample in ISPyB for location %s" % str(sc_sample.location))
                             sample_list.append(sc_sample)
 
+            # this is to force user to click on sample (and thus have data updated)
+            # before a data collection can be added
+            # this is a workaround to the bug described by S. Monaco and D. De Sanctis on 2.6.2017
+            self.enable_task_toolbox(False)    
             self.dc_tree_widget.populate_list_view(basket_list, sample_list)
 
     def get_sc_content(self):
@@ -657,6 +661,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                 self.populate_workflow_tab(item)
 
         self.emit(qt.PYSIGNAL("selection_changed"), (items,))
+        self.enable_task_toolbox(True)
 
     def emit_set_directory(self):
         directory = self.session_hwobj.get_base_image_directory()
