@@ -341,8 +341,8 @@ class TreeBrick(BaseComponents.BlissWidget):
     def samples_from_lims(self, samples):
         barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(samples)
         l_samples = dict()            
-   
-        if self.sample_changer_hwobj.__class__.__TYPE__ == 'Robodiff':
+  
+        if self.sample_changer_hwobj.__class__.__TYPE__ in ('Robodiff', 'HCD'):
           for location, l_sample in location_samples.iteritems():
             if l_sample.lims_location != (None, None):
               basket, sample = l_sample.lims_location
