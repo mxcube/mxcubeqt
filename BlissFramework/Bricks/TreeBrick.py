@@ -192,13 +192,9 @@ class TreeBrick(BaseComponents.BlissWidget):
 
         elif property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
-            self.beamline_config_hwobj = bl_setup
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
             self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
-            try:
-                self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
-            except AttributeError:
-                self.plate_manipulator_hwobj = None
+            self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
             self.dc_tree_widget.sample_changer_hwobj = self.sample_changer_hwobj
             self.dc_tree_widget.plate_manipulator_hwobj  = self.plate_manipulator_hwobj
             self.session_hwobj = bl_setup.session_hwobj
@@ -213,10 +209,12 @@ class TreeBrick(BaseComponents.BlissWidget):
                              self.set_sample_pin_icon)
 
             if self.plate_manipulator_hwobj is not None:
-                self.connect(self.plate_manipulator_hwobj, SampleChanger.STATE_CHANGED_EVENT,
+                self.connect(self.plate_manipulator_hwobj,
+                             SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
-                self.connect(self.plate_manipulator_hwobj, SampleChanger.INFO_CHANGED_EVENT,
-                             self.set_sample_pin_icon) 
+                self.connect(self.plate_manipulator_hwobj,
+                             SampleChanger.INFO_CHANGED_EVENT,
+                             self.set_sample_pin_icon)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
             if has_shutter_less:
@@ -240,8 +238,6 @@ class TreeBrick(BaseComponents.BlissWidget):
 
     def logged_in_old_version(self, logged_in):
         """
-        Reomve this method if logged_in finalized
-
         Connected to the signal loggedIn of ProposalBrick2.
         The signal is emitted when a user was succesfully logged in.
         """
