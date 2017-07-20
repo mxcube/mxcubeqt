@@ -248,10 +248,7 @@ class TreeBrick(BaseComponents.BlissWidget):
         else:
             sc_basket_content, sc_sample_content = self.get_sc_content()
 
-            if sc_basket_content and sc_sample_content:
-              sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
-                                                    sc_basket_content, sc_sample_content)
-              self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
+            if sc_sample_content:
               self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
               
               if sc_basket_content:
@@ -289,7 +286,7 @@ class TreeBrick(BaseComponents.BlissWidget):
                 sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
                        sc_basket_content, sc_sample_content)
 
-            self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
+                self.dc_tree_widget.populate_list_view(sc_basket_list, sc_sample_list)
             self.sample_changer_widget.child('filter_cbox').setCurrentItem(0)
 
             if self.dc_tree_widget.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
