@@ -52,7 +52,6 @@ def processLogMessages():
         record = _logHandler.buffer[i]
         
         for viewer in _logHandler.registeredViewers:
-            #viewer.appendLogRecord(record)
             QApplication.postEvent(viewer, LogEvent(record))
             
         i += 1
@@ -160,7 +159,7 @@ class __GUILogHandler(logging.Handler):
         """
         self.registeredViewers[viewer] = ''
         for rec in self.buffer:
-            viewer.appendLogRecord(rec)
+            viewer.append_log_record(rec)
     
     def emit(self, record):
         """

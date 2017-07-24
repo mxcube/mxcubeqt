@@ -358,7 +358,7 @@ class Qt4_LogViewBrick(BlissWidget):
             if tab_name == self['myTabLabel']:
                 self.resetUnreadMessagesSignal.emit(True)
 
-    def appendLogRecord(self, record):
+    def append_log_record(self, record):
         rec_level = record.getLevel()
 
         if rec_level == logging.DEBUG and not self['showDebug']:
@@ -391,7 +391,7 @@ class Qt4_LogViewBrick(BlissWidget):
                           
     def customEvent(self, event):
         if self.isRunning():
-            self.appendLogRecord(event.record)
+            self.append_log_record(event.record)
 
     def blockSignals(self, block):
         pass
