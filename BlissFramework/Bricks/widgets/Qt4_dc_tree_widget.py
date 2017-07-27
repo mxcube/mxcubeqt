@@ -345,7 +345,7 @@ class DataCollectTree(QtGui.QWidget):
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     msg = "Error loading sample, please check" +\
-                          " sample changer: " + e.message
+                          " sample changer: " + str(e)
                     logging.getLogger("user_level_log").error(msg)
                 finally:
                     self.enable_collect(True)
