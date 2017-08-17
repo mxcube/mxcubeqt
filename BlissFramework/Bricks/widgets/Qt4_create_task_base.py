@@ -80,9 +80,15 @@ class CreateTaskBase(QWidget):
                 self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
                 self._acq_widget.init_detector_roi_modes()
                 if bl_setup.diffractometer_hwobj.in_plate_mode():
-                    self._acq_widget.set_osc_start_limits(\
-                         bl_setup.diffractometer_hwobj.get_osc_dynamic_limits())
+                    #self._acq_widget.update_osc_start_limits(\
+                    #     bl_setup.diffractometer_hwobj.get_osc_limits())
+                    #self._acq_widget.update_osc_range_limits()
                     self._acq_widget.use_kappa(False)
+                    self._acq_widget.use_max_osc_range(True)
+                else:
+                    self._acq_widget.use_kappa(True)
+                    self._acq_widget.use_max_osc_range(False)
+                
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
@@ -726,7 +732,6 @@ class CreateTaskBase(QWidget):
         if grid is None:
             grid = self._graphics_manager_hwobj.get_auto_grid()
 
-        print self._path_template.run_number
         grid.set_snapshot(self._graphics_manager_hwobj.\
                           get_scene_snapshot(grid))
 

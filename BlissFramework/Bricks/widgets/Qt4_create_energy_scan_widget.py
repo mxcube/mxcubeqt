@@ -38,7 +38,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
     Descript. :
     """ 
 
-    def __init__(self, parent = None,name = None, fl = 0):
+    def __init__(self, parent=None,name=None, fl=0):
         """
         Descript. :
         """
@@ -58,21 +58,59 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._data_path_widget = DataPathWidget(self, 
              data_model = self._path_template, layout = 'vertical')
 
+        _parameters_gbox = QGroupBox('Parameters', self)
+        self._max_transmission_cbox = QCheckBox(\
+             "Adjust transmission", _parameters_gbox)
+        self._max_transmission_cbox.setChecked(False)
+        self._max_transmission_cbox.setEnabled(True)
+        self._max_transmission_ledit = QLineEdit("20", _parameters_gbox)
+        self._max_transmission_ledit.setFixedWidth(100)
+        self._max_transmission_ledit.setEnabled(False)
+
         # Layout --------------------------------------------------------------
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.addWidget(self._periodic_table_widget)
-        self.main_layout.addWidget(self._data_path_widget)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.setSpacing(6)
-        self.main_layout.addStretch(10)
+        _parameters_gbox_hlayout = QGridLayout(_parameters_gbox)
+        _parameters_gbox_hlayout.addWidget(self._max_transmission_cbox, 0, 0)
+        _parameters_gbox_hlayout.addWidget(QLabel("Maximum transmission:"), 1, 0) 
+        _parameters_gbox_hlayout.addWidget(self._max_transmission_ledit, 1, 1)
+        _parameters_gbox_hlayout.setColumnStretch(2, 1)
+        _parameters_gbox_hlayout.setSpacing(2)
+
+        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout.addWidget(self._periodic_table_widget)
+        _main_vlayout.addWidget(self._data_path_widget)
+        _main_vlayout.addWidget(_parameters_gbox)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        _main_vlayout.setSpacing(6)
+        _main_vlayout.addStretch(10)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._periodic_table_widget.elementEdgeSelectedSignal.\
-             connect(self.acq_parameters_changed)
-        self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.path_template_changed)
+        self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
+             self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.connect(\
+             self.path_template_changed)
+        self._max_transmission_cbox.stateChanged.connect(\
+             self.max_transmission_state_changed)
+        self._max_transmission_ledit.textEdited.connect(\
+             self.max_transmission_value_changed)
+
+    def set_beamline_setup(self, bl_setup_hwobj):
+        CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
+
+        self._periodic_table_widget.set_elements(\
+             self._beamline_setup_hwobj.energyscan_hwobj.getElements())
+
+        max_transmission_enabled = self._beamline_setup_hwobj.energyscan_hwobj.get_max_transmission_state()
+        max_transmission_value = self._beamline_setup_hwobj.energyscan_hwobj.get_max_transmission_value()
+
+        if max_transmission_enabled is not None:
+            self._max_transmission_cbox.setEnabled(True) 
+            self._max_transmission_cbox.setChecked(True)
+        self._beamline_setup_hwobj.energyscan_hwobj.enable_max_transmission(True)
+
+        if max_transmission_value:
+            self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
 
     def init_models(self):
         """
@@ -84,14 +122,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.start_num = 1
         self._path_template.num_files = 1
         self._path_template.suffix = 'raw'
-
-    def set_energy_scan_hwobj(self, energy_scan_hwobj):
-        """
-        Descript. :
-        """
- 
-        self._periodic_table_widget.set_elements(\
-             energy_scan_hwobj.getElements())
 
     def single_item_selection(self, tree_item):
         """
@@ -122,7 +152,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()
         if not selected_element:
             logging.getLogger("GUI").\
-                info("No element selected, please select an element.")
+                warning("No element selected, please select an element.")
 
         return base_result and selected_element
 
@@ -173,3 +203,14 @@ class CreateEnergyScanWidget(CreateTaskBase):
             if isinstance(item, Qt4_queue_item.EnergyScanQueueItem):
                 item.get_model().element_symbol = str(element)
                 item.get_model().edge = str(edge)
+
+    def max_transmission_state_changed(self, state):
+        self._max_transmission_ledit.setEnabled(state)
+        self._beamline_setup_hwobj.energyscan_hwobj.enable_max_transmission(state)
+   
+    def max_transmission_value_changed(self, value):
+        try:
+            max_transmission = float(value)
+            self._beamline_setup_hwobj.energyscan_hwobj.set_max_transmission(max_transmission)
+        except:
+            pass

@@ -78,6 +78,8 @@ class CreateHelicalWidget(CreateTaskBase):
              self.lines_treewidget_selection_changed)
         self._lines_widget.create_line_button.clicked.connect(\
              self.create_line_button_clicked)
+        #self._lines_widget.create_auto_line_button.clicked.connect(\
+        #     self.create_auto_line_button_clicked)
         self._lines_widget.remove_line_button.clicked.connect(\
              self.remove_line_button_clicked)  
         self._lines_widget.overlay_cbox.stateChanged.connect(\
@@ -89,11 +91,14 @@ class CreateHelicalWidget(CreateTaskBase):
 
         self._acq_widget.acqParametersChangedSignal.\
              connect(self.acq_parameters_changed)
+        self._acq_widget.madEnergySelectedSignal.connect(\
+             self.mad_energy_selected)
+        self._acq_widget.acq_widget_layout.set_max_osc_range_button.clicked.\
+             connect(self.set_max_osc_total_range_clicked)
+
         self._data_path_widget.pathTemplateChangedSignal.\
              connect(self.path_template_changed)
 
-        self._acq_widget.madEnergySelectedSignal.connect(\
-             self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
              self._run_processing_toggled)
 
@@ -302,6 +307,16 @@ class CreateHelicalWidget(CreateTaskBase):
 
         return data_collections
 
+    def set_max_osc_total_range_clicked(self):
+        num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
+        (lower, upper), exp_time = self._acq_widget.update_osc_total_range_limits()
+        self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
+            "%.2f" % lower)
+        self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
+            "%.2f" % abs(upper - lower))
+        self._acq_widget.acq_widget_layout.osc_range.setText(\
+            "%.2f" % (abs(lower - upper) / 2 / num_images))
+
     def lines_treewidget_selection_changed(self):
         self._lines_widget.remove_line_button.setEnabled(False)
         for shape, list_item in self._lines_map.iteritems():
@@ -312,6 +327,9 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def create_line_button_clicked(self):
         self._graphics_manager_hwobj.create_line()
+
+    def create_auto_line_button_clicked(self):
+        self._graphics_manager_hwobj.create_auto_line()
 
     def remove_line_button_clicked(self):
         line_to_delete = None

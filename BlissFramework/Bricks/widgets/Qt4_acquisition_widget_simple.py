@@ -100,7 +100,7 @@ class AcquisitionWidgetSimple(QWidget):
         self.transmission_validator = QDoubleValidator(\
              0, 100, 3, self.acq_widget_layout.transmission_ledit)
         self.exp_time_validator = QDoubleValidator(\
-             0, 10000, 5, self.acq_widget_layout.exp_time_ledit)
+             0, 10000, 6, self.acq_widget_layout.exp_time_ledit)
         self.acq_widget_layout.num_images_cbox.setCurrentIndex(1)
 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
@@ -142,6 +142,9 @@ class AcquisitionWidgetSimple(QWidget):
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
+
+    def use_max_osc_range(self, state):
+        pass
 
     def update_num_images(self, index = None, num_images = None):
         """
@@ -242,7 +245,7 @@ class AcquisitionWidgetSimple(QWidget):
         if 'exposure_time' in limits_dict:
             limits = tuple(map(float, limits_dict['exposure_time'].split(',')))
             (lower, upper) = limits
-            self.exp_time_validator.setRange(lower, upper, 5)
+            self.exp_time_validator.setRange(lower, upper, 6)
 
         self._acquisition_mib.bind_value_update('exp_time',
                               self.acq_widget_layout.exp_time_ledit,
@@ -271,6 +274,11 @@ class AcquisitionWidgetSimple(QWidget):
                                self.resolution_validator)
  
         self.set_tunable_energy(beamline_setup.tunable_wavelength())
+
+        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+            self.acq_widget_layout.num_images_cbox.clear()
+            self.acq_widget_layout.num_images_cbox.addItem("1")
+            self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
 
     def set_energy(self, energy, wav):
         """
@@ -370,6 +378,9 @@ class AcquisitionWidgetSimple(QWidget):
         if self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
             self.acq_widget_layout.detector_roi_mode_combo.\
                  setCurrentIndex(roi_mode_index)
+
+    def update_osc_range_limits(self, limits=None):
+        pass
 
     def detector_roi_mode_changed(self, roi_mode_index):
         """
