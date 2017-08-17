@@ -121,6 +121,9 @@ class Qt4_CRLBrick(BlissWidget):
                 self.disconnect(self.crl_hwobj, 'crlValueChanged', self.crl_value_changed)
             self.crl_hwobj = self.getHardwareObject(new_value)
             if self.crl_hwobj:
+                crl_modes = self.crl_hwobj.get_modes()
+                for crl_mode in crl_modes:
+                    self.mode_combo.addItem(crl_mode)
                 self.connect(self.crl_hwobj, 'crlModeChanged', self.crl_mode_changed)
                 self.connect(self.crl_hwobj, 'crlValueChanged', self.crl_value_changed)
                 self.crl_hwobj.update_values()
@@ -137,40 +140,29 @@ class Qt4_CRLBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
+    def set_expert_mode(self, is_expert_mode):
+        """In the expert mode crl position table is enabled"""
+        self.crl_value_table.setEnabled(is_expert_mode)
+
     def set_crl_mode(self):
-        """
-        Descript. :
-        """
+        """Sets crl mode based on the selected combobox element"""
         self.crl_hwobj.set_mode(self.mode_combo.currentText())
 
     def crl_mode_changed(self, mode):
-        """
-        Descript. :
-        """
-        self.mode_combo.clear()
-        crl_modes = self.crl_hwobj.get_modes()
-
-        self.setEnabled(False)
-        if crl_modes:
-            self.setEnabled(True)
-            for crl_mode in crl_modes:
-                self.mode_combo.addItem(crl_mode)
-            self.mode_combo.blockSignals(True)
-            if mode:
-                self.mode_combo.setCurrentIndex(self.mode_combo.findText(mode))
-            else:
-                self.mode_combo.setCurrentIndex(-1)
-            self.mode_combo.blockSignals(False)
-            self.crl_value_table.setEnabled(mode == "Manual")
-            self.move_up_button.setEnabled(mode == "Manual")
-            self.move_down_button.setEnabled(mode == "Manual")
-            self.set_according_to_energy_button.setEnabled(mode == "Manual")
-                
+        """Updates modes combobox and enables/disables control buttons"""
+        self.mode_combo.blockSignals(True)
+        if mode:
+            self.mode_combo.setCurrentIndex(self.mode_combo.findText(mode))
+        else:
+            self.mode_combo.setCurrentIndex(-1)
+        self.mode_combo.blockSignals(False)
+        self.crl_value_table.setEnabled(mode == "Manual")
+        self.move_up_button.setEnabled(mode == "Manual")
+        self.move_down_button.setEnabled(mode == "Manual")
+        self.set_according_to_energy_button.setEnabled(mode == "Manual")
 
     def crl_value_changed(self, value):
-        """
-        Descript. :
-        """
+        """Updates crl value table"""
         if value:
             self.setEnabled(True)
             for col_index in range(self.crl_value_table.columnCount()): 
@@ -187,24 +179,23 @@ class Qt4_CRLBrick(BlissWidget):
              
 
     def crl_table_item_doubleclicked(self, tablewidget_item):
-        """
-        Descript. :
-        """
+        """Double click on the table sets crl value"""
         self.crl_value[tablewidget_item.column()] = \
              1 - self.crl_value[tablewidget_item.column()]
         self.crl_hwobj.set_crl_value(self.crl_value)
 
     def set_according_to_energy(self):
-        """
-        Descript. :
-        """
+        """Sets crl value according to current energy"""
         self.crl_hwobj.set_according_to_energy()
 
     def set_out_clicked(self):
+        """Moves all lenses out"""
         self.crl_hwobj.set_crl_value(0)
 
     def move_up_clicked(self):
+        """Moves once up"""
         self.crl_hwobj.move_up()
 
     def move_down_clicked(self):
+        """Moves lenses setting by one down"""
         self.crl_hwobj.move_down()

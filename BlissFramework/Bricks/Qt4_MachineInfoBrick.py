@@ -219,6 +219,15 @@ class CustomInfoWidget(QWidget):
             font.setBold(True)
         self.value_label.setFont(font)
 
+        if info_dict.get("align") == "left":
+            self.value_label.setAlignment(Qt.AlignLeft)
+        elif info_dict.get("align") == "right":
+            self.value_label.setAlignment(Qt.AlignRight)
+        elif info_dict.get("align") == "center":
+            self.value_label.setAlignment(Qt.AlignHCenter)
+        elif info_dict.get("align") == "justify":
+            self.value_label.setAlignment(Qt.AlignJustify)
+
         if info_dict.get("history"):
             self.history_button.show() 
             self.value_plot = TwoAxisPlotWidget(self, realtime_plot=True)

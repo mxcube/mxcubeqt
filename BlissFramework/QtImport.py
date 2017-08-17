@@ -282,3 +282,75 @@ if qt_variant in ('PyQt4', 'PyQt5', 'PySide'):
             size = super(RotatedHeaderView, self).sectionSizeFromContents(logicalIndex)
             size.transpose()
             return size
+    """
+    class QDoubleSlider(QSlider):
+        def __init__(self, orientation=Qt.Horizontal, parent=None):
+            super(QSlider, self).__init__(orientation, parent)
+
+            self.decimal_places = 2
+
+            self.valueChanged.connect(self.value_changed)
+
+        def setMinimum(self, minimum):
+            QSlider.setMinimum(self, int(minimum * pow(10, self.decimal_places)))
+
+        def setMaximum(self, maximum):
+            QSlider.setMaximum(self, int(maximum * pow(10, self.decimal_places)))
+
+        def setValue(self, value):
+            QSlider.setValue(self, int(value * pow(10, self.decimal_places)))
+
+        def value_changed(self, value):
+            print "value changed ", value
+            QSlider.valueChanged(self, value / pow(10, self.decimal_places))
+    """
+
+    class QDoubleSlider(QSlider):
+
+        doubleValueChanged = pyqtSignal(float)
+
+        def __init__(self, orientation=Qt.Horizontal, parent=None):
+            super(QSlider, self).__init__(orientation, parent)
+            self.decimals = 5
+            self._max_int = 10 ** self.decimals
+
+            super(QSlider, self).setMinimum(0)
+            super(QSlider, self).setMaximum(self._max_int)
+
+            self._min_value = 0.0
+            self._max_value = 1.0
+
+            self.valueChanged.connect(self.value_changed)
+
+        def value_changed(self, value):
+            self.doubleValueChanged.emit(value / float(self._max_int))
+
+        @property
+        def _value_range(self):
+            return self._max_value - self._min_value
+
+        def value(self):
+            return float(super(QSlider, self).value()) / self._max_int * self._value_range + self._min_value
+
+        def setValue(self, value):
+            super(QSlider, self).setValue(int((value - self._min_value) / self._value_range * self._max_int))
+
+        def setMinimum(self, value):
+            if value > self._max_value:
+                raise ValueError("Minimum limit cannot be higher than maximum")
+
+            self._min_value = value
+            self.setValue(self.value())
+
+        def setMaximum(self, value):
+            if value < self._min_value:
+                raise ValueError("Minimum limit cannot be higher than maximum")
+
+            self._max_value = value
+            self.setValue(self.value())
+
+        def minimum(self):
+            return self._min_value
+
+        def maximum(self):
+            return self._max_value

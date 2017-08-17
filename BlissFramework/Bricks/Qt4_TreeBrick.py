@@ -88,6 +88,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.plate_manipulator_hwobj = None
         self.queue_hwobj = None
         self.state_machine_hwobj = None
+        self.redis_client_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.enable_collect_conditions = {}
@@ -101,12 +102,14 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("beamline_setup", "string", "/beamline-setup")
         self.addProperty("xml_rpc_server", "string", "/xml_rpc_server")
+        self.addProperty("redis_client", "string", "/redis")
         self.addProperty("useFilterWidget", "boolean", True)
         self.addProperty("useSampleWidget", "boolean", True)
         self.addProperty("scOneName", "string", "Sample changer")
         self.addProperty("scTwoName", "string", "Plate")
         self.addProperty("usePlateNavigator", "boolean", False)
         self.addProperty("useHistoryView", "boolean", True)
+        self.addProperty("enableQueueAutoSave", "boolean", True)
 
         # Properties to initialize hardware objects --------------------------
         self.addProperty("hwobj_state_machine", "string", "")
@@ -202,16 +205,17 @@ class Qt4_TreeBrick(BlissWidget):
         """Adds save, load and auto save menus to the menubar
            Emits signals to close tabs"""
 
-        """
         self.tools_menu = QMenu("Queue", self)
         self.tools_menu.addAction("Save",
-                                  self.queue_save_clicked)
+                                  self.save_queue)
         self.tools_menu.addAction("Load",
-                                  self.queue_load_clicked)
+                                  self.load_queue)
         self.queue_autosave_action = self.tools_menu.addAction(\
              "Auto save", self.queue_autosave_clicked)
+
         self.queue_autosave_action.setCheckable(True)
-        self.queue_autosave_action.setEnabled(False)
+        self.queue_autosave_action.setChecked(self['enableQueueAutoSave'])
+        self.queue_autosave_action.setEnabled(self['enableQueueAutoSave'])
         self.tools_menu.addSeparator()
 
         self.queue_undo_action = self.tools_menu.addAction(\
@@ -228,7 +232,6 @@ class Qt4_TreeBrick(BlissWidget):
 
         if BlissWidget._menuBar is not None:
             BlissWidget._menuBar.insert_menu(self.tools_menu, 1) 
-        """
 
         self.hide_dc_parameters_tab.emit(True)
         self.hide_dcg_tab.emit(True)
@@ -247,9 +250,7 @@ class Qt4_TreeBrick(BlissWidget):
         """
         Descript. :
         """
-        if property_name == 'holder_length_motor':
-            self.dc_tree_widget.hl_motor_hwobj = self.getHardwareObject(new_value)
-        elif property_name == "useFilterWidget":
+        if property_name == "useFilterWidget":
             self.sample_changer_widget.filter_label.setVisible(new_value)
             self.sample_changer_widget.filter_ledit.setVisible(new_value)
             self.sample_changer_widget.filter_combo.setVisible(new_value)
@@ -307,6 +308,9 @@ class Qt4_TreeBrick(BlissWidget):
                              SampleChanger.STATE_CHANGED_EVENT,
                              self.sample_load_state_changed)
                 self.connect(self.sample_changer_hwobj,
+                             SampleChanger.SELECTION_CHANGED_EVENT,
+                             self.sample_selection_changed)
+                self.connect(self.sample_changer_hwobj,
                              SampleChanger.INFO_CHANGED_EVENT, 
                              self.set_sample_pin_icon)
                 self.connect(self.sample_changer_hwobj,
@@ -319,10 +323,17 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(self.plate_manipulator_hwobj,
                              SampleChanger.INFO_CHANGED_EVENT,
                              self.plate_info_changed)
+                self.plate_manipulator_hwobj.update_values()
 
+            self.connect(bl_setup.shape_history_hwobj,
+                         "shapeCreated",
+                         self.dc_tree_widget.shape_created)
             self.connect(bl_setup.shape_history_hwobj,
                          "shapeChanged",
                          self.dc_tree_widget.shape_changed)
+            self.connect(bl_setup.shape_history_hwobj,
+                         "shapeDeleted",
+                         self.dc_tree_widget.shape_deleted)
             self.connect(bl_setup.shape_history_hwobj,
                          "diffractometerReady",
                          self.diffractometer_ready_changed)
@@ -339,12 +350,16 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(bl_setup.ppu_control_hwobj,
                              'ppuStatusChanged',
                              self.ppu_status_changed)
-                bl_setup.ppu_control_hwobj.update_values()
+                #bl_setup.ppu_control_hwobj.update_values()
             if hasattr(bl_setup, "safety_shutter_hwobj"):
                 self.connect(bl_setup.safety_shutter_hwobj,
                              'shutterStateChanged',
                              self.shutter_state_changed)
                 self.shutter_state_changed(bl_setup.safety_shutter_hwobj.getShutterState())
+            if hasattr(bl_setup, "machine_info_hwobj"):
+                self.connect(bl_setup.machine_info_hwobj,
+                             'machineCurrentChanged',
+                             self.machine_current_changed)
 
             has_shutter_less = bl_setup.detector_has_shutterless()
             if has_shutter_less:
@@ -361,14 +376,16 @@ class Qt4_TreeBrick(BlissWidget):
                              self.dc_tree_widget.collect_items)
         elif property_name == 'hwobj_state_machine':
               self.state_machine_hwobj = self.getHardwareObject(new_value)
+        elif property_name == 'redis_client':
+              self.redis_client_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'scOneName':
               self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == 'scTwoName':
               self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
-        #elif property_name == 'usePlateNavigator':
-        #      self.dc_tree_widget.show_plate_navigator_cbox.setVisible(new_value)
+        elif property_name == 'usePlateNavigator':
+              self.dc_tree_widget.plate_navigator_cbox.setVisible(new_value)
         elif property_name == 'useHistoryView':
-              self.dc_tree_widget.history_tree_widget.setVisible(new_value)
+              #self.dc_tree_widget.history_tree_widget.setVisible(new_value)
               self.dc_tree_widget.history_enable_cbox.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -395,6 +412,7 @@ class Qt4_TreeBrick(BlissWidget):
                    Then it tries to initialize two sample changers and create
                    two associated queue models.
         """
+        loaded_queue_index = None
         self.enable_collect(logged_in)
         if not logged_in:
             self.dc_tree_widget.sample_mount_method = 0
@@ -435,14 +453,19 @@ class Qt4_TreeBrick(BlissWidget):
                 #Enable buttons related to sample changer
                 self.sample_changer_widget.filter_cbox.setEnabled(True)
                 self.sample_changer_widget.details_button.setEnabled(True)
+                self.dc_tree_widget.scroll_to_item()
             if self.dc_tree_widget.sample_mount_method < 2:
                 self.sample_changer_widget.synch_ispyb_button.setEnabled(True)
 
-            #self.queue_model_hwobj.load_on_start()
+            if self.redis_client_hwobj is not None:
+                self.redis_client_hwobj.load_graphics()
+            loaded_queue_index = self.load_queue()
+            self.dc_tree_widget.samples_initialized = True
 
-        self.dc_tree_widget.sample_tree_widget_selection()
-        self.dc_tree_widget.set_sample_pin_icon()
-
+        #if not self.dc_tree_widget.samples_initialized
+        #    self.dc_tree_widget.sample_tree_widget_selection()
+        #    self.dc_tree_widget.set_sample_pin_icon()
+        #self.dc_tree_widget.scroll_to_item()
 
     def enable_collect(self, state):
         """
@@ -734,6 +757,14 @@ class Qt4_TreeBrick(BlissWidget):
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
         Qt4_widget_colors.set_widget_color(self.sample_changer_widget.details_button,
                                            QColor(s_color))
+        self.dc_tree_widget.scroll_to_item()
+
+    def sample_selection_changed(self):
+        """
+        Updates the selection of pucks. Method is called when the selection
+        of pucks in the dewar has been changed.
+        """
+        self.dc_tree_widget.update_basket_selection()
 
     def sample_changer_status_changed(self, state):
         BlissWidget.set_status_info("sc", state)
@@ -741,6 +772,7 @@ class Qt4_TreeBrick(BlissWidget):
     def plate_info_changed(self):
         self.set_sample_pin_icon()
         self.dc_tree_widget.plate_navigator_widget.refresh_plate_location() 
+        self.dc_tree_widget.scroll_to_item()
 
     def show_sample_centring_tab(self):
         """
@@ -1072,7 +1104,7 @@ class Qt4_TreeBrick(BlissWidget):
             item = item_iterator.value()
             while item:
                   hide = False
-                  item_model = item.get_model() 
+                  item_model = item.get_model()
                   if filter_index == 1:
                       hide = not item.has_star()
                   elif filter_index == 5:
@@ -1099,7 +1131,9 @@ class Qt4_TreeBrick(BlissWidget):
                       hide = not isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem)
                   #elif filter_index == 11:
                   #    hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
-                  if isinstance(item, Qt4_queue_item.TaskQueueItem) and not \
+                  if type(item) in (Qt4_queue_item.TaskQueueItem,
+                                    Qt4_queue_item.SampleQueueItem,
+                                    Qt4_queue_item.BasketQueueItem) and not \
                      isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                       item.set_hidden(hide)
                   item_iterator += 1
@@ -1112,25 +1146,26 @@ class Qt4_TreeBrick(BlissWidget):
              self.dc_tree_widget.sample_tree_widget) 
         item = item_iterator.value()
         filter_index = self.sample_changer_widget.filter_combo.currentIndex()
+
         while item:
               hide = False
               new_text = str(new_text)
-              if filter_index == 1:
+              if filter_index == 2:
                   if isinstance(item, Qt4_queue_item.SampleQueueItem):
                       hide = not new_text in item.text(0)
-              elif filter_index == 2:
+              elif filter_index == 3:
                   if isinstance(item, Qt4_queue_item.SampleQueueItem):
                       hide = not new_text in item.get_model().crystals[0].protein_acronym
-              elif filter_index == 3:
+              elif filter_index == 4:
                   if isinstance(item, Qt4_queue_item.BasketQueueItem):
                       if new_text.isdigit(): 
                           # Display one basket
-                          hide = item.get_model().location != int(new_text)
+                          hide = int(new_text) != item.get_model().location[0]
                       else: 
                           # Display several baskets. Separated with ","
                           enable_baskat_list = new_text.split(',')
                           if len(enable_baskat_list) > 1:
-                              hide = str(item.get_model().location) not in enable_baskat_list
+                              hide = item.get_model().location[0] not in enable_baskat_list
               item.set_hidden(hide) 
               item_iterator += 1
               item = item_iterator.value()
@@ -1163,10 +1198,17 @@ class Qt4_TreeBrick(BlissWidget):
             self.enable_collect_conditions["shutter"] = state == "opened"
             self.update_enable_collect()
 
+    def machine_current_changed(self, value, in_range):
+        return
+        if self.enable_collect_conditions.get("machine_current") != in_range:
+            self.enable_collect_conditions["machine_current"] = in_range
+            self.update_enable_collect()
+
     def update_enable_collect(self):
         enable_collect = all(item == True for item in self.enable_collect_conditions.values())
         if enable_collect:
-            logging.getLogger("GUI").info("Data collection is enabled")
+            if enable_collect != self.dc_tree_widget.enable_collect_condition:
+                logging.getLogger("GUI").info("Data collection is enabled")
         else:
             msg = ""
             logging.getLogger("GUI").warning("Data collect is disabled")
@@ -1179,27 +1221,50 @@ class Qt4_TreeBrick(BlissWidget):
                                "(Open the safety shutter to enable collections)")
                     elif key == "ppu":
                         logging.getLogger("GUI").error("  - PPU is in error state")
+                    elif key == "machine_current":
+                        logging.getLogger("GUI").error("  - Machine current is to low " + \
+                               "(Wait till the machine current reaches 90 mA)")
         self.dc_tree_widget.enable_collect_condition = enable_collect
         self.dc_tree_widget.toggle_collect_button_enabled()
 
-    def queue_save_clicked(self):
+    def save_queue(self):
         """Saves queue in the file"""
-     
-        self.dc_tree_widget.save_queue()
+        if self.redis_client_hwobj is not None:
+            self.redis_client_hwobj.save_queue()
+        #else:
+        #    self.dc_tree_widget.save_queue()
 
-    def queue_load_clicked(self):
+    def auto_save_queue(self):
+        """Saves queue in the file"""
+        if self.queue_autosave_action.isChecked():
+            if self.redis_client_hwobj is not None:
+                self.redis_client_hwobj.save_queue()
+            #else:
+            #    self.dc_tree_widget.save_queue()
+
+    def load_queue(self):
         """Loads queue from file"""
-            
-        loaded_model_index = self.dc_tree_widget.load_queue()
-        if loaded_model_index is not None:
-            self.sample_changer_widget.filter_cbox.\
-                 setCurrentIndex(loaded_model_index)
-            self.mount_mode_combo_changed(loaded_model_index)
+
+        loaded_model = None
+        if self.redis_client_hwobj is not None:
+            loaded_model = self.redis_client_hwobj.load_queue()
+
+            if loaded_model is not None:
+                self.dc_tree_widget.sample_tree_widget.clear()
+                model_map = {"free-pin" : 0,
+                             "ispyb" : 1,
+                             "plate" : 2}
+                self.sample_changer_widget.filter_cbox.\
+                      setCurrentIndex(model_map[loaded_model])
+                self.mount_mode_combo_changed(model_map[loaded_model])
+                self.select_last_added_item()
+                self.dc_tree_widget.scroll_to_item(self.dc_tree_widget.last_added_item)
+
+        return loaded_model
 
     def queue_autosave_clicked(self):
         """Enable/disable queue autosave"""
-
-        self.dc_tree_widget.auto_save_queue()
+        pass    
 
     def queue_undo_clicked(self):
         """If queue autosave is enabled then undo last change"""
@@ -1212,20 +1277,24 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.redo_queue()
 
     def queue_sync_clicked(self):
+        """Add diffraction plan from ISPyB to all samples"""
         self.dc_tree_widget.sample_tree_widget.selectAll()
         self.dc_tree_widget.sync_diffraction_plan()
 
     def data_path_changed(self, conflict):
+        """Data path changed event. Used in state machine"""
         self.dc_tree_widget.item_parameters_changed()
         self.set_condition_state("data_path_valid",
                                  not conflict)
 
     def acq_parameters_changed(self, conflict):
+        """Acq parameter changed event. Used in state machine"""
         self.dc_tree_widget.item_parameters_changed()
         self.set_condition_state("acq_parameters_valid",
                                  len(conflict) == 0)
 
     def set_condition_state(self, condition_name, value):
+        """Sets condition to defined state"""
         if self.state_machine_hwobj is not None:
             self.state_machine_hwobj.condition_changed(condition_name,
                                                        value)
