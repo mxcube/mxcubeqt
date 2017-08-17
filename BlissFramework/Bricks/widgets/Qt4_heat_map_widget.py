@@ -508,8 +508,8 @@ class HeatMapWidget(QWidget):
         Descript. : Displays 10 (if exists) best positions, estimated
                     by fast processing.
         """
-        self._best_pos_table.setRowCount(len(self.__results["best_positions"]))
-        for row in range(len(self.__results["best_positions"])):
+        self._best_pos_table.setRowCount(len(self.__results.get("best_positions", [])))
+        for row in range(len(self.__results.get("best_positions", []))):
             self._best_pos_table.setItem(row, 0, QTableWidgetItem(\
                  str(self.__results["best_positions"][row].get("index") + 1)))  
             self._best_pos_table.setItem(row, 1, QTableWidgetItem(\

@@ -386,7 +386,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../../../BlissFramework/Icons/Refresh2.png</normaloff>../../../BlissFramework/Icons/Refresh2.png</iconset>
+                <normaloff>../../../Icons/Refresh2.png</normaloff>../../../Icons/Refresh2.png</iconset>
               </property>
              </widget>
             </item>

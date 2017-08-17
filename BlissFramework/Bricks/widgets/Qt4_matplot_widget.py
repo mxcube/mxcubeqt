@@ -101,7 +101,6 @@ class TwoAxisPlotWidget(QWidget):
         self._two_axis_figure_canvas.clear()
         self._two_axis_figure_canvas.set_axes_labels("energy", "counts")
         self._two_axis_figure_canvas.set_title("Scan started")
-
     def plot_energy_scan_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
                      chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
         self._two_axis_figure_canvas.add_curve(\
@@ -215,7 +214,10 @@ class MplCanvas(FigureCanvas):
 
     def append_new_point(self, y, x=None):
         self._axis_y_array = np.append(self._axis_y_array, y)
-        self._axis_x_array = np.arange(len(self._axis_y_array)) 
+        if x:
+             self._axis_x_array = np.append(self._axis_x_array, x)
+        else:
+             self._axis_x_array = np.arange(len(self._axis_y_array)) 
 
         if self.max_plot_points:
             if self._axis_y_array.size > self.max_plot_points:
@@ -232,7 +234,6 @@ class MplCanvas(FigureCanvas):
         self.axes.set_ylim(self._axis_y_limits) 
         self.single_curve.set_xdata(self._axis_x_array)
         self.single_curve.set_ydata(self._axis_y_array)
-        #Need both of these in order to rescale
         self.axes.relim()
         self.axes.autoscale_view()
         #We need to draw *and* flush

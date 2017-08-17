@@ -21,6 +21,7 @@ import os
 
 from QtImport import *
 
+pymca_imported = False
 try:
    if qt_variant == "PyQt5":
        from PyMca5.PyMca import QPeriodicTable
@@ -28,12 +29,12 @@ try:
        from PyMca import QPeriodicTable
    pymca_imported = True
 except:
-   pymca_imported = False
+   pass
    
 
 from BlissFramework.Utils import Qt4_widget_colors
 
-EDGE_LIST = ["L1", "L2", "L3"]
+EDGE_LIST = ["K", "L1", "L2", "L3"]
 
 
 
@@ -91,15 +92,22 @@ class PeriodicTableWidget(QWidget):
         if pymca_imported:
             self.periodic_table.edgeSelectedSignal.connect(self.edge_selected)
         else:
-            self.periodic_elements_combo.activated.connect(self.edge_selected)
+            self.periodic_elements_combo.activated.connect(\
+                  self.element_combo_activated)
 
         self.edge_combo.activated.connect(self.edge_combo_activated)
 
         # Other ---------------------------------------------------------------
         for edge in EDGE_LIST:
             self.edge_combo.addItem(edge)
-        self.edge_combo.setCurrentIndex(2)
+        self.edge_combo.setCurrentIndex(0)
         #self.edge_widget.setEnabled(False)
+
+    def element_combo_activated(self, element):
+        self.selected_element = str(self.periodic_elements_combo.currentText())
+        self.selected_edge = str(self.edge_combo.currentText())
+        self.elementEdgeSelectedSignal.emit(self.selected_element,
+                                            self.selected_edge)
 
     def edge_selected(self, element, edge):
         self.selected_element = str(element)
@@ -111,15 +119,17 @@ class PeriodicTableWidget(QWidget):
                                             self.selected_edge)
         
     def set_current_element_edge(self, element, edge):
-        self.periodic_table.table_element_clicked(element, edge)
+        if pymca_imported:
+            self.periodic_table.table_element_clicked(element, edge)
 
     def get_selected_element_edge(self):
         return self.selected_element, self.selected_edge
 
     def edge_combo_activated(self, item_index):
         self.selected_edge = str(self.edge_combo.currentText())
-        self.periodic_table.table_element_clicked(self.selected_element,
-                                                  self.selected_edge)
+        if pymca_imported:
+            self.periodic_table.table_element_clicked(self.selected_element,
+                                                      self.selected_edge)
     def set_elements(self, elements):
         if pymca_imported:
             self.periodic_table.setElements(elements)

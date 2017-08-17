@@ -21,6 +21,7 @@
 #  https://www.python.org/dev/peps/pep-0008/
 
 import os
+import time
 
 import logging
 import gevent
@@ -77,14 +78,13 @@ class DataCollectTree(QWidget):
 
         # Internal values -----------------------------------------------------
         self.item_iterator = None
-        self.enable_collect_condition = None
+        self.enable_collect_condition = False
         self.collecting = False
         self.sample_mount_method = 0
         self.centring_method = 0
         self.sample_centring_result = gevent.event.AsyncResult()
         self.tree_brick = self.parent()
-        self.sample_item_list = []
-        self.collect_tree_task = None
+        self.samples_initialized = None
         self.user_stopped = False
         self.last_added_item = None
         self.item_copy = None
@@ -95,7 +95,6 @@ class DataCollectTree(QWidget):
         self.run_cb = None
         self.item_menu = None
         self.item_history_list = []
-        self.samples_initialized = None
 
         # Signals ------------------------------------------------------------
 
@@ -149,8 +148,9 @@ class DataCollectTree(QWidget):
         self.tree_splitter = QSplitter(Qt.Vertical, self)
         self.sample_tree_widget = QTreeWidget(self.tree_splitter)
         self.history_tree_widget = QTreeWidget(self.tree_splitter)
+        self.history_tree_widget.setHidden(True)
         self.history_enable_cbox = QCheckBox("Display history view", self)
-        self.history_enable_cbox.setChecked(True)
+        self.history_enable_cbox.setChecked(False)
  
         self.plate_navigator_cbox = QCheckBox("Plate navigator", self)
         self.plate_navigator_widget = PlateNavigatorWidget(self)
@@ -215,6 +215,7 @@ class DataCollectTree(QWidget):
         self.sample_tree_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setAttribute(Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
+        self.plate_navigator_widget.plate_navigator_cell.setFixedWidth(50)
 
         font = self.history_tree_widget.font()
         font.setPointSize(8)
@@ -225,7 +226,6 @@ class DataCollectTree(QWidget):
         self.history_tree_widget.setHeaderLabels(\
              ("Date/Time", "Sample", "Type", "Status", "Details"))
         self.tree_splitter.setSizes([200, 20])
-      
 
     def init_plate_navigator(self, plate_navigator_hwobj):
         """Initates plate navigator"""
@@ -334,6 +334,7 @@ class DataCollectTree(QWidget):
         """Single item click verifies if there is a path conflict"""
         self.check_for_path_collisions()
         self.sample_tree_widget_selection()
+        self.toggle_collect_button_enabled()
              
     def item_changed(self, item, column):
         """As there is no signal when item is checked/unchecked
@@ -427,7 +428,19 @@ class DataCollectTree(QWidget):
         for item in items:
             item.set_star(False)        
             if not item.has_star():
-                item.setIcon(0, QIcon())
+                if self.is_mounted_sample_item(item):
+                    item.set_mounted_style(True)
+                else:
+                    item.setIcon(0, QIcon())
+
+    def scroll_to_item(self, item=None):
+        if not item:
+            items = self.get_selected_items()
+            if len(items) > 0:
+                item = items[0]
+
+        if item:
+            self.sample_tree_widget.scrollToItem(item, QAbstractItemView.PositionAtCenter)
 
     def mount_sample(self):
         """Calls sample mounting"""
@@ -447,6 +460,8 @@ class DataCollectTree(QWidget):
                         self.sample_centring_result)
                 except Exception as e:
                     items[0].setText(1, "Error loading")
+                    items[0].set_background_color(3)
+                    
                     msg = "Error loading sample, please check" +\
                           " sample changer: " + str(e)
                     logging.getLogger("GUI").error(msg)
@@ -495,11 +510,33 @@ class DataCollectTree(QWidget):
                    sample_changer = None
 
             if sample_changer:
-                if hasattr(sample_changer, '__TYPE__')\
-                   and sample_changer.__TYPE__ in ('CATS', 'Marvin', 'Mockup'):
-                    sample_changer.unload(wait=True)
+                robot_action_dict = {"actionType": "UNLOAD",
+                                     "containerLocation": location[1],
+                                     "dewarLocation": location[0],
+                                     "sampleBarcode": items[0].get_model().code,
+                                     "sampleId": items[0].get_model().lims_id,
+                                     "sessionId": self.beamline_setup_hwobj.session_hwobj.session_id,
+                                     "startTime": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+                try:
+                    if hasattr(sample_changer, '__TYPE__')\
+                    and sample_changer.__TYPE__ in ('CATS', 'Marvin', 'Mockup'):
+                       sample_changer.unload(wait=True)
+                    else:
+                       sample_changer.unload(22, location, wait=False)
+                except Exception as e:
+                   items[0].setText(1, "Error un loading")
+                   msg = "Error unloading sample, please check" +\
+                          " sample changer: " + str(e)
+                   logging.getLogger("GUI").error(msg)
+
+                robot_action_dict["endTime"] = time.strftime("%Y-%m-%d %H:%M:%S")
+                if not sample_changer.hasLoadedSample():
+                    robot_action_dict['status'] = "SUCCESS"
                 else:
-                    sample_changer.unload(22, location, wait=False)
+                    robot_action_dict['message'] = "Sample was not unloaded"
+                    robot_action_dict['status'] = "ERROR"
+                self.beamline_setup_hwobj.lims_client_hwobj.store_robot_action(robot_action_dict)
 
             items[0].setOn(False)
             items[0].set_mounted_style(False)
@@ -525,6 +562,7 @@ class DataCollectTree(QWidget):
             break
 
         self.selection_changed_cb(items)        
+        self.toggle_collect_button_enabled()
 
     def toggle_collect_button_enabled(self):
         self.collect_button.setEnabled((len(self.get_checked_items()) > 1 and \
@@ -580,12 +618,17 @@ class DataCollectTree(QWidget):
 
         self.last_added_item = view_item
 
-        #if self.samples_initialized:
-        #    self.auto_save_queue()
+        if isinstance(view_item, Qt4_queue_item.TaskQueueItem) and \
+            self.samples_initialized:
+            self.tree_brick.auto_save_queue()
 
     def get_selected_items(self):
         """Return a list with selected items"""
-        return self.sample_tree_widget.selectedItems()
+        items = self.sample_tree_widget.selectedItems()
+        for item in items:
+            if item.isDisabled():
+                items.pop(item)
+        return items
 
     def de_select_items(self):
         """De selects all items"""
@@ -706,10 +749,6 @@ class DataCollectTree(QWidget):
             self.queue_model_hwobj.select_model('free-pin')
             self.set_sample_pin_icon()
         self.sample_tree_widget_selection()
-        if not self.samples_initialized:
-            self.load_history_queue()
-
-        self.samples_initialized = True
 
     def set_centring_method(self, method_number):       
         """Sets centring method"""
@@ -906,7 +945,7 @@ class DataCollectTree(QWidget):
             if isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
                 item_details = "%.1f%s " % (item_model.as_dict()["osc_range"] ,
                                             u"\u00b0") + \
-                               "%.3f sec, " % item_model.as_dict()["exp_time"] + \
+                               "%.5f sec, " % item_model.as_dict()["exp_time"] + \
                                "%d images, " % item_model.as_dict()["num_images"] + \
                                "%.2f keV, " % item_model.as_dict()["energy"] + \
                                "%d%% transm, " % item_model.as_dict()["transmission"] + \
@@ -993,7 +1032,8 @@ class DataCollectTree(QWidget):
  
         self.sample_tree_widget.clearSelection()
         sample_item = self.get_mounted_sample_item()
-        sample_item.setSelected(True)
+        if sample_item is not None:
+            sample_item.setSelected(True)
         self.set_sample_pin_icon()
         self.save_history_queue()
 
@@ -1057,6 +1097,8 @@ class DataCollectTree(QWidget):
 
         self.check_for_path_collisions()
         self.set_first_element()
+        self.toggle_collect_button_enabled()
+        self.tree_brick.auto_save_queue()
 
     def set_first_element(self):
         """Selects first element from the tree"""
@@ -1250,6 +1292,17 @@ class DataCollectTree(QWidget):
             it += 1
             item = it.value()
 
+    def update_basket_selection(self):
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
+        item = it.value()
+
+        while item:
+            if isinstance(item, Qt4_queue_item.BasketQueueItem):
+                item.setExpanded(item.get_model().get_is_present() == True)
+                item.setDisabled(not item.get_model().get_is_present())
+            it += 1
+            item = it.value()
+
     def check_for_path_collisions(self):
         """Checks for path conflicts"""
         conflict = False
@@ -1283,6 +1336,7 @@ class DataCollectTree(QWidget):
         if self.last_added_item:
             self.sample_tree_widget.clearSelection()
             self.last_added_item.setSelected(True) 
+            self.sample_tree_widget_selection()
 
     def hide_empty_baskets(self):
         """Hides empty baskets after the tree filtering"""
@@ -1446,11 +1500,8 @@ class DataCollectTree(QWidget):
 
         return task_group_node
 
-    def save_queue(self):
+    def save_queue_in_file(self):
         """Saves queue in the file"""
-
-        return 
-
         filename = str(QFileDialog.getSaveFileName(\
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
@@ -1458,11 +1509,8 @@ class DataCollectTree(QWidget):
             filename += ".dat"
         self.queue_model_hwobj.save_queue(filename)
 
-    def load_queue(self):
+    def load_queue_from_file(self):
         """Loads queue from file"""
-
-        return
-
         filename = str(QFileDialog.getOpenFileName(self,
             "Open file", os.environ["HOME"],
             "Item file (*.dat)", "Choose queue file to open"))
@@ -1470,19 +1518,14 @@ class DataCollectTree(QWidget):
             self.sample_tree_widget.clear()
             loaded_model = self.queue_model_hwobj.load_queue(filename, 
                self.beamline_setup_hwobj.shape_history_hwobj.get_scene_snapshot())
-            #this could be much better
-            model_map = {"free-pin" : 0,
-                         "ispyb" : 1,
-                         "plate" : 2}
-            return model_map[loaded_model]
+            return loaded_model
 
     def save_history_queue(self):
- 
-        return
-     
+        pass
+
+    def save_history_in_file(self):
         filename = os.path.join(self.tree_brick.user_file_directory,
                                 "queue_history.dat")
-
         save_file = None
         try:
            save_file = open(filename, 'w')
@@ -1496,10 +1539,7 @@ class DataCollectTree(QWidget):
            if save_file:
                save_file.close()
 
-    def load_history_queue(self):
-
-        return
-
+    def load_history_queue_from_file(self):
         filename = os.path.join(self.tree_brick.user_file_directory,
                                 "queue_history.dat")
 
@@ -1514,10 +1554,6 @@ class DataCollectTree(QWidget):
             if load_file:
                 load_file.close()
 
-    def auto_save_queue(self):
-        """Enable/disable queue autosave"""
-        self.queue_model_hwobj.save_queue()
-
     def undo_queue(self):
         """Undo last change"""
         raise NotImplementedError
@@ -1525,6 +1561,14 @@ class DataCollectTree(QWidget):
     def redo_queue(self):
         """Redo last changed"""
         raise NotImplementedError
+
+    def shape_created(self, shape, shape_type):
+        if self.tree_brick.redis_client_hwobj is not None:
+            self.tree_brick.redis_client_hwobj.save_graphics()
+
+    def shape_deleted(self, shape, shape_type):
+        if self.tree_brick.redis_client_hwobj is not None:
+            self.tree_brick.redis_client_hwobj.save_graphics() 
 
     def shape_changed(self, shape, shape_type):
         """Updates tree item if its related shape has changed"""
