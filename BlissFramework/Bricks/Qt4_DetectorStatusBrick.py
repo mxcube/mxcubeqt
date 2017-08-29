@@ -142,8 +142,9 @@ class Qt4_DetectorStatusBrick(BlissWidget):
         """
         if status:
             self.status_label.setText("<b>%s</b>" % status.title())
-            Qt4_widget_colors.set_widget_color(self.status_label,
-               Qt4_DetectorStatusBrick.DETECTOR_STATES[status])
+            Qt4_widget_colors.set_widget_color(\
+                   self.status_label,
+                   Qt4_DetectorStatusBrick.DETECTOR_STATES.get(status, Qt4_widget_colors.LIGHT_GRAY))
             self.setToolTip(status_message)
 
     def temperature_changed(self, value, status_ok):

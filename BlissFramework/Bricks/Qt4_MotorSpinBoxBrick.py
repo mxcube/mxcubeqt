@@ -124,7 +124,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.step_combo.setValidator(QDoubleValidator(0, 360, 5, self.step_combo))
         self.step_combo.setDuplicatesEnabled(False)
 
-        self.position_slider = QSlider(Qt.Horizontal, self.main_gbox)
+        self.position_slider = QDoubleSlider(Qt.Horizontal, self.main_gbox)
     
         # Layout --------------------------------------------------------------
         self.control_box_layout = QHBoxLayout(self.control_box)
@@ -185,8 +185,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.move_right_button.pressed.connect(self.move_up)
         self.move_right_button.released.connect(self.stop_moving)
 
-        self.position_slider.valueChanged.connect(\
-             self.position_slider_value_changed)
+        self.position_slider.doubleValueChanged.connect(\
+             self.position_slider_double_value_changed)
 
         # Other ---------------------------------------------------------------
         self.instance_synchronize("position_spinbox", "step_combo")
@@ -411,17 +411,18 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.position_spinbox.blockSignals(True)
-        self.position_spinbox.setMinimum(limits[0])
-        self.position_spinbox.setMaximum(limits[1])
-        self.position_spinbox.blockSignals(False)
+        if limits:
+            self.position_spinbox.blockSignals(True)
+            self.position_spinbox.setMinimum(limits[0])
+            self.position_spinbox.setMaximum(limits[1])
+            self.position_spinbox.blockSignals(False)
 
-        self.position_slider.blockSignals(True)
-        self.position_slider.setMinimum(limits[0])
-        self.position_slider.setMaximum(limits[1])
-        self.position_slider.blockSignals(False)
+            self.position_slider.blockSignals(True)
+            self.position_slider.setMaximum(limits[1])
+            self.position_slider.setMinimum(limits[0])
+            self.position_slider.blockSignals(False)
 
-        self.set_tool_tip(limits=limits)
+            self.set_tool_tip(limits=limits)
 
     def open_history_menu(self):
         """
@@ -493,7 +494,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
            self.position_slider.blockSignals(False)
         except:
            print(('ERROR!!! Setting position...' + str(new_position)))
-           pass
 
     def set_position_spinbox_color(self, state):
         """
@@ -697,7 +697,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         #self['label'] = self['label']
         #self['defaultStep']=self['defaultStep']
 
-    def position_slider_value_changed(self, value):
+    def position_slider_double_value_changed(self, value):
         """Sets motor postion based on the slider value"""
 
         if self.motor_hwobj is not None:

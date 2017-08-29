@@ -44,6 +44,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
 
         # Hardware objects ----------------------------------------------------
         self.beamline_test_hwobj = None
+        self.unittest_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.available_tests = None
@@ -51,6 +52,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("mnemonic", "string", "")
+        self.addProperty("hwobj_unittest", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -101,6 +103,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
              self.available_tests_double_clicked) 
          
         _load_last_test_button.clicked.connect(self.load_latest_test_results)
+        self.beamline_test_widget.ppu_restart_button.clicked.connect(self.restart_ppu)
 
         # Other ---------------------------------------------------------------
         #self.beamline_test_widget.setFixedWidth(600)
@@ -113,6 +116,9 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         self.beamline_test_widget.setFixedWidth(700)
         self.test_result_browser.navigation_bar.setHidden(True)
         #self.beamline_test_widget.splitter.setSizes([500, 1200])
+
+    def restart_ppu(self):
+        self.beamline_test_hwobj.ppu_restart_all()
 
     def setExpertMode(self, expert):
         self.setEnabled(expert)
@@ -149,6 +155,9 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                              'testFinished',
                              self.test_finished)
                 self.update_focus_status(None, None)
+                self.beamline_test_hwobj.update_values()
+        elif property_name == 'hwobj_unittest':
+            self.unittest_hwobj = self.getHardwareObject(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 

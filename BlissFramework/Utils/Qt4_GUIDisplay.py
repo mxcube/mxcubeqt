@@ -54,6 +54,7 @@ class CustomMenuBar(QMenuBar):
     """MenuBar displayed on the top of the window"""
 
     viewToolBarSignal = pyqtSignal(bool)
+    saveConfigSignal = pyqtSignal()
 
     def __init__(self, parent):
         """Parent *must* be the window
@@ -118,6 +119,8 @@ class CustomMenuBar(QMenuBar):
                            QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
+        self.bricks_properties_editor.propertyEditedSignal.connect(\
+             self.property_edited)
 
         # Other ---------------------------------------------------------------
         self.expert_mode_checkboxStdColor = None
@@ -135,13 +138,15 @@ class CustomMenuBar(QMenuBar):
 
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
+        for menu_item in self.menu_items:
+            if new_menu_item.title() == menu_item.title():
+                return
 
-        if not new_menu_item in self.menu_items:
-            self.clear()
-            self.menu_items.insert(position, new_menu_item)
+        self.clear()
+        self.menu_items.insert(position, new_menu_item)
 
-            for menu_item in self.menu_items:
-                self.addMenu(menu_item)
+        for menu_item in self.menu_items:
+            self.addMenu(menu_item)
 
     def get_menu_bar(self):
         """Returns current menu bar. Method used by other widgets that
@@ -190,6 +195,7 @@ class CustomMenuBar(QMenuBar):
 
         self.info_for_developers_action.setEnabled(state)
         self.brick_properties_action.setEnabled(state)
+        self.reload_hwr_action.setEnabled(state)
 
         if state:
             # switch to expert mode
@@ -225,32 +231,16 @@ class CustomMenuBar(QMenuBar):
 
     def reload_hwr_clicked(self):
         """Reloads hardware objects"""
-
-        #TODO: in development
         hwr = HardwareRepository.HardwareRepository()
-        import reimport
-        for hwr_obj in hwr.hardwareObjects:
-
-            connections = hwr.hardwareObjects[hwr_obj].connect_dict
-            for sender in connections:
-                hwr.hardwareObjects[hwr_obj].disconnect(\
-                    sender, connections[sender]["signal"], connections[sender]["slot"])
-
-            #reload(hwr.hardwareObjects[hwr_obj].__class__)
-
-        from HardwareRepository import BaseHardwareObjects
-        #import Qt4_VideoMockup
-        reimport.reimport(BaseHardwareObjects)
-        #reimport.reimport(Qt4_VideoMockup)
-
-        for hwr_obj in hwr.hardwareObjects:
-            for sender in connections:
-                hwr.hardwareObjects[hwr_obj].connect(\
-                    sender, connections[sender]["signal"], connections[sender]["slot"])
+        hwr.reloadHardwareObjects()
 
     def edit_brick_properties(self):
         """Opens dialog that allows to edit propeties of gui bricks"""
         self.bricks_properties_editor.show()
+
+    def property_edited(self):
+        print "Property edited"
+        self.saveConfigSignal.emit()
 
     def whats_this_clicked(self):
         """Whats this"""
@@ -850,7 +840,13 @@ class WindowDisplayWidget(QScrollArea):
         self.setWindowFlags(self.windowFlags() |
                             Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(Qt4_Icons.load_icon("desktop_icon"))
+
+        self._menubar.saveConfigSignal.connect(self.save_config_requested)
  
+    def save_config_requested(self):
+        print "requested " 
+        print self.central_widget.parent().parent()
+
     def view_toolbar_toggled(self, state):
         """Toggle toolbar visibility"""
 
@@ -891,7 +887,7 @@ class WindowDisplayWidget(QScrollArea):
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
 
-    def update_status_info(self, info_type, info_message, info_state=""):
+    def update_status_info(self, info_type, info_message, info_state="ready"):
         """Updates status info"""
 
         if info_message == "":
@@ -915,21 +911,26 @@ class WindowDisplayWidget(QScrollArea):
                 (info_message, time.strftime("%Y-%m-%d %H:%M:%S"))
 
         selected_label.setText(msg)
-        #if info_state:
-        #    info_state = info_state.lower()
+        if selected_label in (self._statusbar_user_label, 
+                              self._statusbar_last_collect_label):
+            return 
 
-        if info_state == "ready":
+        if info_state:
+            info_state = info_state.lower()
+
+        if info_state == "ready" or \
+           info_message.lower() == "ready":
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_GREEN)
-        elif info_state in ["running", "moving"]:
-            Qt4_widget_colors.set_widget_color(selected_label,
-                                               Qt4_widget_colors.LIGHT_YELLOW)
         elif info_state == "action_req":
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_ORANGE)
         elif info_state == "error":
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_RED)
+        else:
+            Qt4_widget_colors.set_widget_color(selected_label,
+                                               Qt4_widget_colors.LIGHT_YELLOW)
 
     def init_progress_bar(self, progress_type, number_of_steps):
         self._progress_bar.setEnabled(True)
@@ -1328,7 +1329,8 @@ class WindowDisplayWidget(QScrollArea):
         self._menubar.append_windows_links(window_list)
 
 class BricksPropertiesEditor(QWidget):
-    """Main Gui preview"""
+
+    propertyEditedSignal = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         """init"""
@@ -1337,6 +1339,7 @@ class BricksPropertiesEditor(QWidget):
 
         self.bricks_dict = {}
         self.selected_brick = None
+        self.property_edited = False
 
         self.bricks_listwidget = QListWidget()
         self.properties_table = Qt4_PropertyEditor.Qt4_ConfigurationTable(self)
@@ -1375,7 +1378,14 @@ class BricksPropertiesEditor(QWidget):
         self.selected_brick = self.bricks_dict[brick_name]
         self.properties_table.set_property_bag(\
              self.bricks_dict[brick_name].property_bag)
- 
+
     def property_changed(self, property_name, old_value, new_value):
         self.selected_brick._propertyChanged(property_name, old_value, new_value)
         self.selected_brick.propertyChanged(property_name, old_value, new_value)
+        self.property_edited = True
+
+    def closeEvent(self, event):
+        if self.property_edited:
+            self.propertyEditedSignal.emit()
+        self.property_edited = False
+        event.accept()

@@ -224,6 +224,7 @@ class Qt4_MarvinBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(self.central_puck_ledit,
                                                Qt4_widget_colors.LIGHT_GREEN,
                                                QPalette.Base)
+            self.central_puck_ledit.setText("Centre puck: %d" % info_dict.get("mounted_puck"))
             if info_dict.get('mounted_puck', 0) - 1 >= 0:
                 self.puck_switches_table.item(0, info_dict.get('mounted_puck', 0) - 1).\
                      setBackground(Qt4_widget_colors.LIGHT_GREEN)
@@ -244,10 +245,10 @@ class Qt4_MarvinBrick(BlissWidget):
                                                Qt4_widget_colors.LIGHT_GRAY,
                                                QPalette.Base) 
        
-        self.base_to_center_button.setDisabled(info_dict.get("centre_puck"))
-        self.center_to_base_button.setEnabled(info_dict.get("centre_puck"))
-        self.open_lid_button.setDisabled(info_dict.get("lid_opened"))
-        self.close_lid_button.setEnabled(info_dict.get("lid_opened"))
+        self.base_to_center_button.setDisabled(info_dict.get("centre_puck", True))
+        self.center_to_base_button.setEnabled(info_dict.get("centre_puck", False))
+        self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
+        self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
         #self.sample_detected_ledit = QLineEdit('', self)
         #self.last_command_ledit = QLineEdit('', self)

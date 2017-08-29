@@ -54,6 +54,7 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         self.addProperty('delta', 'string', '0.01')
         self.addProperty('predefinedPositions', 'string', '')
         self.addProperty('showMoveButtons', 'boolean', True)
+        self.addProperty('showSlider', 'boolean', False)
         self.addProperty('showStop', 'boolean', True)
         self.addProperty('showStep', 'boolean', True)
         self.addProperty('showEnableButtons', 'boolean', False)
@@ -94,20 +95,25 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
             hwobj_names_list = new_value.split()
             for hwobj_name in hwobj_names_list:
                 temp_motor_hwobj = self.getHardwareObject(hwobj_name)
-                temp_motor_widget = Qt4_MotorSpinBoxBrick(self)
-                temp_motor_widget.set_motor(temp_motor_hwobj, hwobj_name)
-                temp_motor_widget.move_left_button.setVisible(self['showMoveButtons'])
-                temp_motor_widget.move_right_button.setVisible(self['showMoveButtons'])
-                temp_motor_widget.step_button.setVisible(self['showStep'])
-                temp_motor_widget.stop_button.setVisible(self['showStop'])
-                temp_motor_widget.set_line_step(self['defaultStep'])
-                temp_motor_widget['defaultStep'] = self['defaultStep']
-                temp_motor_widget['delta'] = self['delta']
-                temp_motor_widget.step_changed(None)
-                self.main_groupbox_hlayout.addWidget(temp_motor_widget)
+                if temp_motor_hwobj is not None:
+                    temp_motor_widget = Qt4_MotorSpinBoxBrick(self)
+                    temp_motor_widget.set_motor(temp_motor_hwobj, hwobj_name)
+                    temp_motor_widget.move_left_button.setVisible(self['showMoveButtons'])
+                    temp_motor_widget.move_right_button.setVisible(self['showMoveButtons'])
+                    temp_motor_widget.position_slider.setVisible(self['showSlider'])
+                    temp_motor_widget.step_button.setVisible(self['showStep'])
+                    temp_motor_widget.stop_button.setVisible(self['showStop'])
+                    temp_motor_widget.set_line_step(self['defaultStep'])
+                    temp_motor_widget['defaultStep'] = self['defaultStep']
+                    temp_motor_widget['delta'] = self['delta']
+                    temp_motor_widget.step_changed(None)
+                    self.main_groupbox_hlayout.addWidget(temp_motor_widget)
 
-                self.motor_hwobj_list.append(temp_motor_hwobj)
-                self.motor_widget_list.append(temp_motor_widget)
+                    self.motor_hwobj_list.append(temp_motor_hwobj)
+                    self.motor_widget_list.append(temp_motor_widget) 
+
+                    temp_motor_hwobj.update_values()
+                    temp_motor_widget.update_gui()
 
             self.enable_motors_buttons.setVisible(self['showEnableButtons'])
             self.disable_motors_buttons.setVisible(self['showEnableButtons']) 

@@ -118,6 +118,7 @@ class Qt4_EnergyBrick(BlissWidget):
         #self.group_box.setChecked(True)
         self.new_value_validator = QDoubleValidator(\
              0, 15, 4, self.new_value_ledit)
+        self.status_ledit.setEnabled(False)
 
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 

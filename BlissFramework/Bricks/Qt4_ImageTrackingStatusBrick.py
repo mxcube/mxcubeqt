@@ -84,6 +84,9 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'mnemonic':
             if self.image_tracking_hwobj is not None:
+                self.disconnect(self.image_tracking_hwobj,
+                                'imageTrackingEnabledChanged',
+                                self.image_tracking_enabled_changed)
                 self.disconnect(self.image_tracking_hwobj, 
                                 'stateChanged', 
                                 self.state_changed)
@@ -93,6 +96,9 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
                 self.image_tracking_cbox.setChecked(\
                      self.image_tracking_hwobj.is_tracking_enabled() == True)
                 self.image_tracking_cbox.blockSignals(False)
+                self.connect(self.image_tracking_hwobj,
+                                'imageTrackingEnabledChanged',
+                                self.image_tracking_enabled_changed)
                 self.connect(self.image_tracking_hwobj, 
                              'stateChanged', 
                              self.state_changed)
@@ -106,6 +112,9 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
 
     def image_tracking_cbox_changed(self, state):
         self.image_tracking_hwobj.set_image_tracking_state(state)
+
+    def image_tracking_enabled_changed(self, state):
+        self.image_tracking_cbox.setChecked(state) 
 
     def state_changed(self, state, state_label = None):
         color = None
