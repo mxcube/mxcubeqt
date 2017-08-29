@@ -152,22 +152,12 @@
             </column>
             <column>
              <property name="text">
-              <string>Beam width (μm)</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Beam height (μm)</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
               <string>Lines</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Images per line</string>
+              <string>Frames per line</string>
              </property>
             </column>
            </widget>
@@ -187,7 +177,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../../../BlissFramework/Icons/Grid.png</normaloff>../../../BlissFramework/Icons/Grid.png</iconset>
+                <normaloff>../../../Icons/Grid.png</normaloff>../../../Icons/Grid.png</iconset>
               </property>
              </widget>
             </item>
@@ -228,7 +218,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Move to grid</string>
+               <string>Move to grid center</string>
               </property>
              </widget>
             </item>
@@ -492,7 +482,7 @@
                   </property>
                   <property name="icon">
                    <iconset>
-                    <normaloff>../../../BlissFramework/Icons/Left2.png</normaloff>../../../BlissFramework/Icons/Left2.png</iconset>
+                    <normaloff>../../../Icons/Left2.png</normaloff>../../../Icons/Left2.png</iconset>
                   </property>
                  </widget>
                 </item>
@@ -512,7 +502,7 @@
                   </property>
                   <property name="icon">
                    <iconset>
-                    <normaloff>../../../BlissFramework/Icons/Up2.png</normaloff>../../../BlissFramework/Icons/Up2.png</iconset>
+                    <normaloff>../../../Icons/Up2.png</normaloff>../../../Icons/Up2.png</iconset>
                   </property>
                  </widget>
                 </item>
@@ -564,7 +554,7 @@
                   </property>
                   <property name="icon">
                    <iconset>
-                    <normaloff>../../../BlissFramework/Icons/Right2.png</normaloff>../../../BlissFramework/Icons/Right2.png</iconset>
+                    <normaloff>../../../Icons/Right2.png</normaloff>../../../Icons/Right2.png</iconset>
                   </property>
                  </widget>
                 </item>
@@ -584,7 +574,7 @@
                   </property>
                   <property name="icon">
                    <iconset>
-                    <normaloff>../../../BlissFramework/Icons/Down2.png</normaloff>../../../BlissFramework/Icons/Down2.png</iconset>
+                    <normaloff>../../../Icons/Down2.png</normaloff>../../../Icons/Down2.png</iconset>
                   </property>
                  </widget>
                 </item>

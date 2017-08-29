@@ -64,7 +64,7 @@ class ConfirmDialog(QDialog):
              self.cancel_button_click)
 
         # SizePolicies --------------------------------------------------------
-        #self.setMinimumWidth(860)
+        self.setMinimumWidth(1200)
 
         # Other --------------------------------------------------------------- 
         self.setWindowTitle('Confirm collection')
@@ -171,11 +171,11 @@ class ConfirmDialog(QDialog):
                 info_str_list.append("%.2f %%" %acq_parameters.transmission)
                 info_str_list.append(str(acq_parameters.num_images))
                 info_str_list.append(str(acq_parameters.osc_range))
-                info_str_list.append(str(acq_parameters.exp_time))
+                info_str_list.append("%s s" % str(acq_parameters.exp_time))
                 info_str_list.append(str(acq_parameters.num_images * \
                                          acq_parameters.osc_range))
-                info_str_list.append(str(acq_parameters.num_images * \
-                                         acq_parameters.exp_time))
+                info_str_list.append("%s s" % str(acq_parameters.num_images * \
+                                                  acq_parameters.exp_time))
 
                 collection_treewidget_item = QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
@@ -216,7 +216,7 @@ class ConfirmDialog(QDialog):
         num_collections = len(collection_items)
 
         for col_index in range(self.conf_dialog_layout.summary_treewidget.columnCount()):
-            if col_index == 0 or col_index > 3:
+            if col_index != 2:
                 self.conf_dialog_layout.summary_treewidget.\
                      resizeColumnToContents(col_index)
         self.conf_dialog_layout.summary_label.setText(\

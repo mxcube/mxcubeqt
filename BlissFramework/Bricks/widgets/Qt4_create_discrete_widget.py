@@ -86,6 +86,8 @@ class CreateDiscreteWidget(CreateTaskBase):
              self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
              self._run_processing_toggled)
+        self._acq_widget.acq_widget_layout.set_max_osc_range_button.clicked.\
+             connect(self.set_max_osc_total_range_clicked)
 
         # Other ---------------------------------------------------------------
         #self._processing_widget.processing_widget.\
@@ -106,7 +108,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_acquisition_values")
-
+            
     def set_tunable_energy(self, state):
         """
         Descript. :
@@ -131,6 +133,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         Descript. :
         """
         CreateTaskBase.single_item_selection(self, tree_item)
+
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
             #self._processing_parameters = copy.deepcopy(self._processing_parameters)
@@ -177,6 +180,28 @@ class CreateDiscreteWidget(CreateTaskBase):
         Descript. :
         """
         result = CreateTaskBase.approve_creation(self)
+
+        try:
+            #This is very EMBL specific and soon will be removed
+            if self._beamline_setup_hwobj.detector_hwobj.get_roi_mode_name() == "16M":
+                file_size = 18.
+                total_num_of_images = 14400
+            else:
+                file_size = 18. / 4
+                total_num_of_images = 14400 * 4
+
+            num_images = float(self._acq_widget.acq_widget_layout.num_images_ledit.text())
+            total, free, perc = self._beamline_setup_hwobj.machine_info_hwobj.get_ramdisk_size()
+            free_mb = free / (2 ** 20)
+
+            if num_images > total_num_of_images * free_mb / (125.8 * 1024):
+                msg = "Ramdisk size (%d GB) is not enough to run the collection with " % (free_mb / 1024)
+                msg += "%d frames." % num_images
+                logging.getLogger("GUI").error(msg)
+                result = False
+        except:
+            pass    
+
         return result
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -262,3 +287,13 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         self._beamline_setup_hwobj.collect_hwobj.collect(\
              queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list)
+
+    def set_max_osc_total_range_clicked(self):
+        num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
+        (lower, upper), exp_time = self._acq_widget.update_osc_total_range_limits()
+        self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
+            "%.2f" % lower)
+        self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
+            "%.2f" % abs(upper - lower))
+        self._acq_widget.acq_widget_layout.num_images_ledit.setText(\
+            "%d" % (abs(upper - lower) / float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())))

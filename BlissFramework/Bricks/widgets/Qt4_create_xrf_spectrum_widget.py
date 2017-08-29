@@ -106,8 +106,8 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
             self.setDisabled(True)
 
     def approve_creation(self):
-        base_result = CreateTaskBase.approve_creation(self)
-
+        #base_result = CreateTaskBase.approve_creation(self)
+        base_result = True
         self.count_time = None
 
         try:
