@@ -20,14 +20,17 @@
 from QtImport import *
 PYMCA_EXISTS = False
 
-if qt_variant == 'PyQt5':
-    from Qt4_matplot_widget import TwoAxisPlotWidget as Graph
-else:
+
+"""
+if not qt_variant == 'PyQt5':
     try:
         from PyMca.QtBlissGraph import QtBlissGraph as Graph
         PYMCA_EXISTS = True
     except:
-        from Qt4_matplot_widget import TwoAxisPlotWidget as Graph    
+        pass
+"""
+if not PYMCA_EXISTS:
+    from Qt4_matplot_widget import TwoAxisPlotWidget as Graph
 
 from BlissFramework.Utils import Qt4_widget_colors
 
@@ -120,9 +123,10 @@ class PymcaPlotWidget(QWidget):
         """
         Descript. :
         """
-        self.pymca_graph.setx1axislimits(min(self.axis_x_array),
-                                         max(self.axis_x_array))
-        self.pymca_graph.replot()
+        if self.axis_x_array:
+            self.pymca_graph.setx1axislimits(min(self.axis_x_array),
+                                             max(self.axis_x_array))
+            self.pymca_graph.replot()
 
     def add_new_plot_value(self, x, y):
         """

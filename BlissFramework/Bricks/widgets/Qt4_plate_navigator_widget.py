@@ -99,11 +99,10 @@ class PlateNavigatorWidget(QWidget):
             if self.__current_location:
                 empty_item = QTableWidgetItem(QIcon(), "")
                 self.plate_navigator_table.setItem(self.__current_location[0],
-                                                   self.__current_location[1] - 1,
+                                                   self.__current_location[1],
                                                    empty_item)
             new_item = QTableWidgetItem(Qt4_Icons.load_icon("sample_axis"), "")
-            self.plate_navigator_table.setItem(row, col - 1, new_item)
-
+            self.plate_navigator_table.setItem(row, col, new_item)
             self.__current_location = new_location
 
     def init_plate_view(self, plate_manipulator_hwobj):
@@ -156,8 +155,8 @@ class PlateNavigatorWidget(QWidget):
         #TODO replace this with pos_x, pos_y
         drop = int(pos_y * self.num_drops) + 1
         self.plate_manipulator_hwobj.load_sample(\
-             (self.__current_location[0] + 1,
-              (self.__current_location[1] - 1) * self.num_drops + drop))
+             (int(self.__current_location[0] + 1),
+              int((self.__current_location[1]) * self.num_drops + drop)))
 
     def navigation_table_double_clicked(self, table_item):
         """Moves to the col/row double clicked by user

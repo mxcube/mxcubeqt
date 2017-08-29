@@ -80,6 +80,7 @@ class TaskToolBoxWidget(QWidget):
         self.create_task_button.setIcon(Qt4_Icons.load_icon("add_row.png"))
         msg = "Add the collection method to the selected sample"
         self.create_task_button.setToolTip(msg)
+        self.create_task_button.setEnabled(False)
 
         self.collect_now_button = QPushButton("Collect Now", self.button_box)
         self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
@@ -147,8 +148,6 @@ class TaskToolBoxWidget(QWidget):
                 if beamline_setup_hwobj.energyscan_hwobj is not None and \
                    beamline_setup_hwobj.tunable_wavelength():
                     has_energy_scan = True
-                    self.energy_scan_page.set_energy_scan_hwobj(\
-                         beamline_setup_hwobj.energyscan_hwobj)
 
             if hasattr(beamline_setup_hwobj, 'xrf_spectrum_hwobj'):
                 if beamline_setup_hwobj.xrf_spectrum_hwobj is not None:
@@ -181,6 +180,7 @@ class TaskToolBoxWidget(QWidget):
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
         #self.collect_now_button.setHidden(page_index > 0)
+        self.create_task_button.setEnabled(False)
 
         if len(tree_items) > 0:        
             tree_item = tree_items[0]
@@ -198,6 +198,7 @@ class TaskToolBoxWidget(QWidget):
                 new_pt.base_prefix = previous_pt.base_prefix
                 new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
                     get_next_run_number(new_pt)
+                self.create_task_button.setEnabled(True)
 
             elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem):
                 #self.collect_now_button.show()
@@ -223,7 +224,6 @@ class TaskToolBoxWidget(QWidget):
                 if self.tool_box.currentWidget() == self.workflow_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, Qt4_queue_item.XrayCenteringQueueItem):
-                #self.collect_now_button.show()
                 if self.tool_box.currentWidget() == self.advanced_page:
                     self.create_task_button.setEnabled(True)
 
@@ -237,12 +237,11 @@ class TaskToolBoxWidget(QWidget):
         title = "<b>Collection method template</b>"
 
         if len(items) == 1:
+            self.create_task_button.setEnabled(False)
             data_model = items[0].get_model()
             title = "<b>%s</b>" % data_model.get_display_name()
 
-            if isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
-                self.create_task_button.setEnabled(False)
-            else:
+            if not isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(True)
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
                 if data_model.is_helical():
@@ -259,14 +258,14 @@ class TaskToolBoxWidget(QWidget):
                 self.tool_box.setCurrentWidget(self.xrf_spectrum_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
+            elif isinstance(items[0], Qt4_queue_item.XrayCenteringQueueItem):
+                self.tool_box.setCurrentWidget(self.advanced_page)
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
-            elif isinstance(items[0], Qt4_queue_item.SampleCentringQueueItem):
-                self.create_task_button.setEnabled(False)
-            if isinstance(items[0], Qt4_queue_item.XrayCenteringQueueItem):
-                self.tool_box.setCurrentWidget(self.advanced_page)
-            self.method_label.setText(title) 
-
+            self.method_label.setText(title)
+        else:
+            self.create_task_button.setEnabled(True)
+         
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)
 

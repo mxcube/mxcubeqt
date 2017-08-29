@@ -48,6 +48,7 @@ import numpy as np
 
 from QtImport import *
 
+pymca_imported = False
 try:
     if qt_variant == "PyQt5":
         from PyMca5.PyMca import McaAdvancedFit
@@ -57,7 +58,9 @@ try:
         from PyMca import ConfigDict
     pymca_imported = True
 except:
-    pymca_imported = False
+    pass
+
+if not pymca_imported:
     from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -83,7 +86,8 @@ class McaSpectrumWidget(BlissWidget):
     def set_data(self, data, calib, config):
         try:
             configured = False
-            if os.path.exists(config.get("file", "")):
+            if os.path.exists(config.get("file", "")) and \
+               pymca_imported:
                 self._configure(config)
                 configured = True
             data = np.array(data)
@@ -103,6 +107,7 @@ class McaSpectrumWidget(BlissWidget):
                 #elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
                 self.mcafit_widget._energyAxis = False
                 self.mcafit_widget.toggleEnergyAxis()
+                self.mcafit_widget.setdata(x, y)
             #result = self._fit()
             #pyarch file name and directory
             pf = config["legend"].split(".")
