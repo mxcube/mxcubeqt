@@ -592,6 +592,7 @@ class CurrentSampleView(CurrentView):
 class StatusView(QWidget):
 
     statusMsgChangedSignal = pyqtSignal(str, QColor)
+    resetSampleChangerSignal = pyqtSignal()
 
     def __init__(self, parent):
         QWidget.__init__(self, parent)
@@ -651,7 +652,7 @@ class StatusView(QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.reset_button.clicked.connect(self.resetSampleChanger)
+        self.reset_button.clicked.connect(self.reset_sample_changer)
         self.sc_can_load_radiobutton.clicked.connect(self.sampleChangerMoveToLoadingPos)
         self.minidiff_can_move_radiobutton.clicked.connect(self.minidiffGetControl)
 
@@ -683,7 +684,7 @@ class StatusView(QWidget):
         self.sc_can_load_radiobutton.setEnabled(enabled)
         self.minidiff_can_move_radiobutton.setEnabled(enabled)
 
-    def setExpertMode(self, state):
+    def set_expert_mode(self, state):
         self.in_expert_mode = state
         self.reset_button.setEnabled(state)
         self.minidiff_can_move_radiobutton.setEnabled(state)
@@ -712,7 +713,7 @@ class StatusView(QWidget):
         self.minidiff_can_move_radiobutton.setEnabled(self.in_expert_mode)
         self.minidiff_can_move_radiobutton.setChecked(can_move)
 
-    def resetSampleChanger(self):
+    def reset_sample_changer(self):
         self.resetSampleChangerSignal.emit()
 
     def sampleChangerMoveToLoadingPos(self):
@@ -900,6 +901,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
 
         self.test_sample_changer_button.clicked.connect(self.test_sample_changer)
         self.reset_baskets_samples_button.clicked.connect(self.resetBasketsSamplesInfo)
+        self.status.resetSampleChangerSignal.connect(self.resetSampleChanger)
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'icons':
@@ -1053,14 +1055,14 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def resetBasketsSamplesInfo(self):
         self.sample_changer_hwobj.clearInfo()
 
-    def setExpertMode(self, state):
+    def set_expert_mode(self, state):
         self.in_expert_mode = state
         if self.sample_changer_hwobj is not None:
-            self.status.setExpertMode(state)
+            self.status.set_expert_mode(state)
 
     def run(self):
         if self.in_expert_mode is not None:
-            self.setExpertMode(self.in_expert_mode)
+            self.set_expert_mode(self.in_expert_mode)
         try:
             self.matrixCodesChanged(self.sample_changer_hwobj.getMatrixCodes())
         except:

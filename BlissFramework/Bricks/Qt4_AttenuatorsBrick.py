@@ -170,6 +170,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
            QValidator.Acceptable:
+            self.new_value_ledit.setEnabled(False)
             self.attenuators_hwobj.setTransmission(\
                  float(input_field_text))
             self.new_value_ledit.setText("") 
@@ -200,7 +201,8 @@ class Qt4_AttenuatorsBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        if transmission_state in self.states: 
+        self.new_value_ledit.setEnabled(transmission_state == "ready")
+        if transmission_state in self.states:
             color = self.states[transmission_state]
         else: 
             color = self.states["UNKNOWN"]

@@ -133,20 +133,20 @@ class Qt4_MarvinBrick(BlissWidget):
         self.focus_mode_ledit.setFixedWidth(80)
 
         self.puck_switches_table.setRowCount(1)
-        self.puck_switches_table.setColumnCount(16)
+        self.puck_switches_table.setColumnCount(17)
         self.puck_switches_table.verticalHeader().hide()
         self.puck_switches_table.horizontalHeader().hide()
         self.puck_switches_table.setRowHeight(0, 20)
         self.puck_switches_table.setFixedHeight(26)
         self.puck_switches_table.setShowGrid(True)
 
-        for col_index in range(16):
+        for col_index in range(17):
             temp_item = QTableWidgetItem(str(col_index + 1))
             temp_item.setFlags(Qt.ItemIsEnabled)
             temp_item.setBackground(Qt4_widget_colors.WHITE)
             self.puck_switches_table.setItem(0, col_index, temp_item)
             self.puck_switches_table.setColumnWidth(col_index, 22)
-            self.puck_switches_table.setFixedWidth(22 * 16 + 6)
+            self.puck_switches_table.setFixedWidth(22 * 17 + 6)
 
         self.status_table.setColumnCount(3)
         self.status_table.setHorizontalHeaderLabels(["Property", "Description", "Value"])

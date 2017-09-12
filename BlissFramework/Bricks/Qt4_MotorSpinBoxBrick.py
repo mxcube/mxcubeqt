@@ -73,6 +73,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.addProperty('showPosition', 'boolean', True)
         self.addProperty('invertButtons', 'boolean', False)
         self.addProperty('delta', 'string', '')
+        self.addProperty('decimals', 'integer', 2)
         self.addProperty('icons', 'string', '')
         self.addProperty('helpDecrease', 'string', '')
         self.addProperty('helpIncrease', 'string', '')
@@ -255,6 +256,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         return self.position_spinbox.singleStep()
+
+    def set_decimals(self, decimals):
+        self.position_spinbox.setDecimals(decimals)
 
     def set_line_step(self, val):
         """
@@ -773,6 +777,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 for default_step in default_step_list:
                     self.set_line_step(float(default_step))
                 self.step_changed(None)
+        elif property_name == 'decimals':
+             self.position_spinbox.setDecimals(new_value)
         elif property_name == 'showSlider':
             self.position_slider.setVisible(new_value)
         elif property_name == 'enableSliderTracking':

@@ -41,6 +41,7 @@ class Qt4_ToolsBrick(BlissWidget):
 
         # Hardware objects ----------------------------------------------------
         self.tools_hwobj = None
+        self.action_dict = {}
 
         # Internal values -----------------------------------------------------
 
@@ -79,14 +80,32 @@ class Qt4_ToolsBrick(BlissWidget):
         pass
 
     def init_tools(self):
-        """
-        Gets available methods and populates menubar with methods
-        If icon name exists then adds icon
+        """Gets available methods and populates menubar with methods
+           If icon name exists then adds icon
         """
         self.tools_list = self.tools_hwobj.get_tools_list()
-        for tool in self.tools_list:
-            if hasattr(tool["hwobj"], tool["method"]): 
+        for index, tool in enumerate(self.tools_list):
+            if tool == "separator":
+                self.tools_menu.addSeparator()
+            elif hasattr(tool["hwobj"], tool["method"]):
                 temp_action = self.tools_menu.addAction(\
-                   tool["display"], getattr(tool["hwobj"], tool["method"]))
-                if len(tool["icon"]) > 0:
+                    tool["display"],
+                    self.execute_tool)
+                if tool.get("icon"):
                     temp_action.setIcon(Qt4_Icons.load_icon(tool["icon"]))
+                self.action_dict[temp_action] = tool
+
+    def execute_tool(self):
+        """Executes tool asigned to the menu action
+           Asks for a confirmation if a tool has a conformation msg.
+        """
+        for key in self.action_dict.keys():
+            if key == self.sender():
+                tool = self.action_dict[key]
+                if tool.get("confirmation"):
+                    conf_dialog = QMessageBox.warning(None, "Question",
+                         tool["confirmation"], QMessageBox.Ok, QMessageBox.Cancel)
+                    if conf_dialog == QMessageBox.Ok:
+                        getattr(tool["hwobj"], tool["method"])()
+                else:
+                    getattr(tool["hwobj"], tool["method"])()

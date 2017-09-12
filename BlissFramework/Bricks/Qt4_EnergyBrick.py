@@ -207,6 +207,7 @@ class Qt4_EnergyBrick(BlissWidget):
 
     def state_changed(self, state):
         self.setEnabled(state == "ready")
+        BlissWidget.set_status_info("status", "", "")
 
     def status_info_changed(self, status_info):
         self.status_ledit.setText(status_info)
@@ -222,6 +223,7 @@ class Qt4_EnergyBrick(BlissWidget):
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
            QValidator.Acceptable:
             if self.units_combobox.currentIndex() == 0:
+                BlissWidget.set_status_info("status", "Setting energy...", "running")
                 self.energy_hwobj.move_energy(float(input_field_text))
             else:
                 self.energy_hwobj.move_wavelength(float(input_field_text))
