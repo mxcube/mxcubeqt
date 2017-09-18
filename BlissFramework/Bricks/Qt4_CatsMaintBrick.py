@@ -43,6 +43,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
         
         self.addProperty("mnemonic", "string", "")
+        self.addProperty("cats", "string", "")
+
         self.defineSlot('setExpertMode',())
 
         self.expert_mode = False
@@ -62,6 +64,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.widget.btLid3Open.clicked.connect(self.lid3_open)
         self.widget.btLid3Close.clicked.connect(self.lid3_close)
         self.widget.btRegulationOn.clicked.connect(self.regulation_set_on)                     
+
+        self.widget.barcodeCheck.stateChanged.connect(self.barcode_checked)                     
 
         self.widget.btOpenTool.clicked.connect(self.tool_open)                     
         self.widget.btCloseTool.clicked.connect(self.tool_close)                     
@@ -133,6 +137,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
                 self.connect(self.device, 'lid2StateChanged', self.update_lid2_state)
                 self.connect(self.device, 'lid3StateChanged', self.update_lid3_state)
                 self.connect(self.device, 'toolStateChanged', self.update_tool_state)
+                self.connect(self.device, 'barcodeChanged', self.update_barcode)
                 self.connect(self.device,
                              SampleChanger.STATUS_CHANGED_EVENT,
                              self.update_status)
@@ -140,6 +145,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
                              SampleChanger.STATE_CHANGED_EVENT,
                              self.update_state)
 
+        elif property == 'cats':
+            self.cats_device = self.getHardwareObject(newValue)                                    
 
     def setExpertMode(self, mode):
         if mode:
@@ -190,8 +197,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
             barcode = value
         else: 
             barcode = "----"
-        logging.getLogger().debug("CATS update barcode : " + str(barcode))
-        self.widget.lblMessage.setText(str(value))
+        logging.getLogger("HWR").debug("CATS update barcode : " + str(barcode))
+        self.widget.barcodeLabel.setText(str(value))
 
     def update_path_running(self, value):
         self.path_running = value
@@ -502,6 +509,11 @@ class Qt4_CatsMaintBrick(BlissWidget):
         except:
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
+    def barcode_checked(self, value):
+        val_bool = value != 0 and True or False
+        logging.getLogger("GUI").info("barcode option checked %s" % val_bool)
+        self.cats_device.setReadBarcode(val_bool)
+        
     def command_prompt(self, index):
         self.command_dialog = CatsCommandDialog(self)
         self.command_dialog.set_cats_device(self.device)

@@ -152,6 +152,8 @@ class SampleBox(QWidget):
         QWidget.__init__(self, *args)
         self.selected = False
         self.setMouseTracking(True)
+        Qt4_widget_colors.set_widget_color(self, \
+            Qt4_widget_colors.BUTTON_ORIGINAL)
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -166,9 +168,9 @@ class SampleBox(QWidget):
             Qt4_widget_colors.set_widget_color(self, \
                 Qt4_widget_colors.LIGHT_GREEN)
         else:
-            self.setStyleSheet("background-color: rgba(255,255,255,0);")
-            #Qt4_widget_colors.set_widget_color(self, \
-            #    Qt4_widget_colors.BUTTON_ORIGINAL)
+            logging.getLogger("HWR").debug("Original SampleBox") 
+            Qt4_widget_colors.set_widget_color(self, \
+                Qt4_widget_colors.BUTTON_ORIGINAL)
 
     def mouseMoveEvent(self, event):
         QWidget.mouseMoveEvent(self, event)
@@ -193,9 +195,12 @@ class SampleBox(QWidget):
 
     def leaveEvent(self, event):
         QWidget.leaveEvent(self, event)
-        if not self.selected:
-            # set transparent color
-            self.setStyleSheet("background-color: rgba(255,255,255,0);")
+        if self.selected:
+            Qt4_widget_colors.set_widget_color(self, \
+                Qt4_widget_colors.LIGHT_GREEN)
+        else:
+            Qt4_widget_colors.set_widget_color(self, \
+                Qt4_widget_colors.BUTTON_ORIGINAL)
 
 class SamplesView(QWidget):
 
