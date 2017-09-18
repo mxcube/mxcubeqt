@@ -93,7 +93,7 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         self.setToolTip("Control of light (set level and on/off switch.")
 
-        self.update()
+        #self.update()
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -150,16 +150,23 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
                 self.widget.slider.setValue(self.level) 
                 self.widget.slider.blockSignals(False)
                 self.widget.slider.setToolTip("Light Level: %s" % self.level) 
-        else:
-            self.set_disabled()
+        #else:
+        #    self.set_disabled()
 
     def set_disabled(self):
+        if self.light_ho is not None:
+            logging.getLogger("HWR").debug(" setting %s light_disabled" % self.light_ho.getUserName())
+        else:
+            logging.getLogger("HWR").debug(" setting light_disabled coz no hwo " )
         self.setEnabled(False)
         color = self.unknown_color
         self.widget.button.setStyleSheet("background-color: %s;" % color)
 
     def set_enabled(self):
+        logging.getLogger("HWR").debug(" setting %s light_enabled" % self.light_ho.getUserName())
         self.setEnabled(True)
+        self.widget.button.setEnabled(True)
+        self.widget.slider.setEnabled(True)
         color = self.on_color
         self.widget.button.setStyleSheet("background-color: %s;" % color)
 
