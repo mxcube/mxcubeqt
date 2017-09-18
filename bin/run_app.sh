@@ -46,10 +46,12 @@
 ##########################################################################
 
 # Define MXCuBE defaults
-MXCUBE_BRICKS_PATH=$MXCUBE_ROOT/Bricks # (This could be exported from python script)
-MXCUBE_HWOBJS_PATH=$MXCUBE_ROOT/HardwareObjects # (This could be exported from python script)
-MXCUBE_DEFAULT_GUI_FILE=$MXCUBE_ROOT/ExampleFiles/example_mxcube_qt4.yml
-MXCUBE_DEFAULT_XML_PATH=$MXCUBE_ROOT/ExampleFiles/HardwareObjects.xml
+MXCUBE_BRICKS_PATH=$MXCUBE_ROOT/BlissFramework/Bricks # (This could be exported from python script)
+MXCUBE_HWOBJS_PATH=$MXCUBE_ROOT/HardwareRepository/HardwareObjects # (This could be exported from python script)
+
+GUI_FILE=$MXCUBE_GUI_PATH/$APP_NAME.yml
+XML_PATH=$MXCUBE_XML_PATH
+LOG_PREFIX=$MXCUBE_LOG_PATH/$APP_NAME-$USER
 
 export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT
 export PYTHONPATH=$PYTHONPATH:$MXCUBE_BRICKS_PATH
@@ -64,25 +66,21 @@ if [ -z "$USER" ]; then
     USER=UNKWOWN
 fi
 
-GUI_FILE=$MXCUBE_ROOT/$APP_NAME.gui
-# Load defaults if GUI file does not exists
 if [ ! -f $GUI_FILE ]; then
-    GUI_FILE=$MXCUBE_DEFAULT_GUI_FILE
-    XML_PATH=$MXCUBE_DEFAULT_XML_PATH
-else
-    XML_PATH=$MXCUBE_XML_PATH
-    GUI_FILE=$MXCUBE_GUI_PATH/$APP_NAME.gui
+    echo "GUI file <$GUI_FILE> does not exists. Exiting!"
+    exit -1
 fi
 
 echo "######################################################################"
-echo " USER:        $USER"
-echo " INSTITUTE:   $INSTITUTE"
+echo " user:        $USER"
+echo " institute:   $INSTITUTE"
 echo " MXCUBE_ROOT: $MXCUBE_ROOT"
-echo " GUI_FILE:    $GUI_FILE"
+echo " gui file:    $GUI_FILE"
+echo " log files:   $LOG_PREFIX (log/out/err)"
 echo "######################################################################"
 
 # Running the application
 $MXCUBE_ROOT/bin/Qt4_startGUI --hardwareRepository=$XML_PATH \
 			      --bricksDir=$MXCUBE_BRICKS_PATH \
-			      --logFile=$MXCUBE_LOG_PATH/$APP_NAME-$USER.log \
-			      $GUI_FILE $* > $MXCUBE_LOG_PATH/$APP_NAME-$USER.out 2> $MXCUBE_LOGS_PATH/$APP_NAME-$USER.err
+			      --logFile=$LOG_PREFIX.log \
+			      $GUI_FILE $* > $LOG_PREFIX.out 2> $LOG_PREFIX.err

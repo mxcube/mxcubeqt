@@ -7,4 +7,4 @@ if [ -z "$MXCUBE_ROOT" ]; then
 fi
 
 export APP_NAME=`basename "$0"`
-$MXCUBE_ROOT/bin/run_app.sh
+$MXCUBE_ROOT/bin/run_app.sh $@
