@@ -280,7 +280,7 @@ class EDNAParameters(BlissWidget):
         self.beamline_params = dict()
 	# as XSDataSomethingSomething marshalling routing uses format string
 	# BUT does not enforces its arg type, we have to do some type
-	# conversion, lest it will explode when we call marshal() on it       
+	# conversion, lest it will explode when we call marshal() on it
         floats = ['exposure_time', 'resolution', 'resolution_at_corner', 'x_beam', 'y_beam', 'beam_size_x', 'beam_size_y', 'overlap', 'osc_start', 'osc_range', 'kappaStart', 'current_detdistance', 'current_wavelength', 'phiStart', 'current_energy', 'current_osc_start'] 
         ints = ['sessionId', 'blSampleId', 'first_image', 'number_images', 'run_number', 'number_passes'] 
         for k,v in params.iteritems():

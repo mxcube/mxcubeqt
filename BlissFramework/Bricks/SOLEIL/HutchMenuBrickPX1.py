@@ -24,6 +24,7 @@ class HutchMenuBrickPX1(HutchMenuBrick.HutchMenuBrick):
               try:
                 self.__beam.move(beam_x, beam_y)
                 try:
+                    # TODO FIXME ERROR: get_beam_info is a function - this cannot be right
                   get_beam_info = self.minidiff.getBeamInfo #getCommandObject("getBeamInfo")
                   if force or get_beam_info: #.isSpecReady():
                       self._updateBeam({"size_x":0.045, "size_y":0.025, "shape": "rectangular"})

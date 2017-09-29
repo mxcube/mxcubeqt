@@ -161,7 +161,7 @@ class EnergyScanBrick(BlissWidget):
         self.instanceSynchronize("parametersBox","prefixInput","directoryInput","peakInput","inflectionInput","remoteInput","remote2Input")
 
         self.choochGraphs = QtBlissGraph(self)
-	self.choochGraphs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed) 
+        self.choochGraphs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         QVBoxLayout(self)
         self.layout().addWidget(self.parametersBox)
