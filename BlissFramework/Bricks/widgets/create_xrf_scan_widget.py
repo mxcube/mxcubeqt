@@ -15,7 +15,7 @@ class CreateXRFScanWidget(CreateTaskBase):
     def __init__(self, parent = None, name = None, fl = 0):
         CreateTaskBase.__init__(self, parent, name, fl, 'XRF-scan')
 
-	self.count_time = None
+        self.count_time = None
 
         # Data attributes
         self.init_models()
@@ -30,12 +30,12 @@ class CreateXRFScanWidget(CreateTaskBase):
                                                data_model = self._path_template,
                                                layout = 'vertical')
 
-	parameters_hor_gbox = qt.QHGroupBox('Parameters', self)
+        parameters_hor_gbox = qt.QHGroupBox('Parameters', self)
 
-	self.count_time_label = qt.QLabel("Count time", parameters_hor_gbox)
+        self.count_time_label = qt.QLabel("Count time", parameters_hor_gbox)
         self.count_time_label.setFixedWidth(83) 
 
-	self.count_time_ledit = qt.QLineEdit("1.0", parameters_hor_gbox,"count_time_ledit")
+        self.count_time_ledit = qt.QLineEdit("1.0", parameters_hor_gbox,"count_time_ledit")
         self.count_time_ledit.setFixedWidth(50)
 
         self.xrfscan_mib.bind_value_update('count_time',
@@ -45,8 +45,8 @@ class CreateXRFScanWidget(CreateTaskBase):
         spacer = qt.QWidget(parameters_hor_gbox)
         spacer.setSizePolicy(qt.QSizePolicy.Expanding,qt.QSizePolicy.Fixed)
 
-	v_layout.addWidget(self._data_path_gbox)
-	v_layout.addWidget(parameters_hor_gbox)
+        v_layout.addWidget(self._data_path_gbox)
+        v_layout.addWidget(parameters_hor_gbox)
         v_layout.addStretch()
 
         self.connect(self._data_path_widget.data_path_widget_layout.child('run_number_ledit'),
@@ -98,11 +98,11 @@ class CreateXRFScanWidget(CreateTaskBase):
                 isinstance(shape, shape_history.CanvasGrid)):
                 result = False
 
-	self.count_time = None
-	try:
-	   self.count_time = float(str(self.count_time_ledit.text()))
-	except:
-	   logging.getLogger("user_level_log").\
+        self.count_time = None
+        try:
+           self.count_time = float(str(self.count_time_ledit.text()))
+        except:
+           logging.getLogger("user_level_log").\
                 info("Incorrect count time value.")
         return result and self.count_time
 
@@ -111,7 +111,7 @@ class CreateXRFScanWidget(CreateTaskBase):
     def _create_task(self, sample, shape):
         data_collections = []
 
-	if self.count_time is not None:
+        if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
                 cpos.snapshot_image = self._shape_history.get_snapshot([])
@@ -128,7 +128,7 @@ class CreateXRFScanWidget(CreateTaskBase):
             xrf_scan = queue_model_objects.XRFScan(sample, path_template, cpos)
             xrf_scan.set_name(path_template.get_prefix())
             xrf_scan.set_number(path_template.run_number)
-	    xrf_scan.count_time = self.count_time
+            xrf_scan.count_time = self.count_time
             data_collections.append(xrf_scan)
 
             self._path_template.run_number += 1

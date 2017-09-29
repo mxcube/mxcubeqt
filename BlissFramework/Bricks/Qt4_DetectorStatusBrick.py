@@ -119,7 +119,7 @@ class Qt4_DetectorStatusBrick(BlissWidget):
                 self.disconnect(self.detector_hwobj,
                                 'frameRateChanged',
                                 self.frame_rate_changed)
-	    self.detector_hwobj = self.getHardwareObject(new_value)
+            self.detector_hwobj = self.getHardwareObject(new_value)
             if self.detector_hwobj is not None:
                 self.connect(self.detector_hwobj,
                              'temperatureChanged',

@@ -319,7 +319,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         #self.title_label.hide()
         self.user_group_widget.hide()
        
-	#resets active proposal
+        #resets active proposal
         self.resetProposal()
  
         #self.proposalLabel.setText(Qt4_ProposalBrick2.NOBODY_STR)
@@ -337,7 +337,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.session_hwobj.proposal_code = None
         self.session_hwobj.session_id = None
         self.session_hwobj.proposal_id = None
-        self.session_hwobj.proposal_number = None 	
+        self.session_hwobj.proposal_number = None
 
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self, proposal, session):

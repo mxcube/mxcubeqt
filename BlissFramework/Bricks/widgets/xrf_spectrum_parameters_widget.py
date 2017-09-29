@@ -19,8 +19,8 @@ class XRFSpectrumParametersWidget(qt.QWidget):
         self.data_path_widget = DataPathWidget(self)
         self.other_parameters_gbox = qt.QHGroupBox("Other parameters", self)
         self.count_time_label = qt.QLabel("Count time:", self.other_parameters_gbox)
-	self.count_time_ledit = qt.QLineEdit(self.other_parameters_gbox,"count_time_ledit")
-	self.count_time_ledit.setFixedWidth(50)
+        self.count_time_ledit = qt.QLineEdit(self.other_parameters_gbox,"count_time_ledit")
+        self.count_time_ledit.setFixedWidth(50)
 
         spacer = qt.QWidget(self.other_parameters_gbox)
         spacer.setSizePolicy(qt.QSizePolicy.Expanding,qt.QSizePolicy.Fixed)

@@ -23,7 +23,7 @@ class NamedStateBrick(BaseComponents.BlissWidget):
         #
         # create GUI components
         #
-	self.lblUsername = QLabel('', self)
+        self.lblUsername = QLabel('', self)
         self.lstStates = QComboBox(self)
 
         #
@@ -64,7 +64,7 @@ class NamedStateBrick(BaseComponents.BlissWidget):
 
         logging.debug("Changing property for NamedStateBrick %s = %s" % (property,newValue))
 
-	if property == 'mnemonic':	
+        if property == 'mnemonic':
 
             self.setMnemonic(newValue)
 
@@ -83,14 +83,14 @@ class NamedStateBrick(BaseComponents.BlissWidget):
         
     def setMnemonic(self,mne):
         
-	if self.hwo is not None:
+        if self.hwo is not None:
             self.disconnect(self.hwo, PYSIGNAL('stateChanged'), self.stateChanged)
             self.disconnect(self.hwo, PYSIGNAL('hardwareStateChanged'), self.hdwStateChanged)
             self.disconnect(self.hwo, PYSIGNAL('newStateList'), self.stateList)
 
         self.hwo = self.getHardwareObject(mne)
         
-	if self.hwo is not None:
+        if self.hwo is not None:
 
             username = self.hwo.getUserName()
             if username.strip() != "":
@@ -98,16 +98,16 @@ class NamedStateBrick(BaseComponents.BlissWidget):
                 username += " :" 
             self.lblUsername.setText(username + ' :')
 
-	    self.fillStates()
+            self.fillStates()
 
             self.connect(self.hwo, PYSIGNAL('newStateList'), self.fillStates)
-	    self.connect(self.hwo, PYSIGNAL('stateChanged'), self.stateChanged)
-	    self.connect(self.hwo, PYSIGNAL('hardwareStateChanged'), self.hdwStateChanged)
+            self.connect(self.hwo, PYSIGNAL('stateChanged'), self.stateChanged)
+            self.connect(self.hwo, PYSIGNAL('hardwareStateChanged'), self.hdwStateChanged)
             
  
             if self.hwo.isReady():
                 self.stateChanged(self.hwo.getCurrentState())
-	else:
+        else:
             self.lblUsername.setText('State Object:')
             self.cleanStates()
           

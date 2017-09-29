@@ -24,7 +24,7 @@ class QSpecScan(QObject, SpecScan.SpecScanA):
         self.graph_data = None
 
     def newScanPoint(self, i, x, y):
-	# if x is in keV, transform into eV otherwise let it like it is
+        # if x is in keV, transform into eV otherwise let it like it is
         self.x.append(x < 1000 and x*1000.0 or x)
         self.y.append(y)
 
@@ -190,7 +190,7 @@ class EnergyScanBrickPX2(BlissWidget):
         self.instanceSynchronize("parametersBox","prefixInput","directoryInput","peakInput","inflectionInput","remoteInput","remote2Input")
 
         self.choochGraphs = QtBlissGraph(self)
-	self.choochGraphs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed) 
+        self.choochGraphs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         QVBoxLayout(self)
         self.layout().addWidget(self.parametersBox)
@@ -337,8 +337,8 @@ class EnergyScanBrickPX2(BlissWidget):
             self.clearEnergies()
             self.energyScan = self.getHardwareObject(newValue)
             if self.energyScan is not None:
-		self.scanObject = None
-		#try:
+                self.scanObject = None
+                #try:
                 #  specversion = self.energyScan.getCommandObject("doEnergyScan").specVersion
                 #except:
                 #  logging.getLogger().exception("%s: could not get spec version from Energy Scan Hardware Object", self.name())

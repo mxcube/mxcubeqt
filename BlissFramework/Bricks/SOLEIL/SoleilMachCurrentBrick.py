@@ -116,7 +116,7 @@ class SoleilMachCurrentBrick(BaseComponents.BlissWidget):
             self.mode.setText("<i>%s</i>" % fillmode)
 
         #<modif pierre.L 18.03.08
-	#try:
+        #try:
         #    refill_secs=int(refill)
         #    if refill_secs>=0:
         #        ts=time.gmtime(refill_secs)

@@ -119,13 +119,13 @@ class ZapScanBrick(BaseComponents.BlissWidget):
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
             scan = self.getHardwareObject(newValue)
-       	    self.setScan(scan)
+            self.setScan(scan)
         elif property == 'equipment':
             self.equipmentMnemonicChanged()
 
 
     def setMnemonic(self, mne):
-	self['mnemonic'] = mne
+        self['mnemonic'] = mne
 
 
     def setScan(self, scan):

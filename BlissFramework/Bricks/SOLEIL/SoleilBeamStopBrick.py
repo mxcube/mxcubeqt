@@ -230,4 +230,4 @@ class SoleilBeamStopBrick(DuoStateBrick):
     def stopClicked(self):
         for motor in self.beamstop.motors:
             self.beamstop.motors[motor].stop()
-	return
+        return

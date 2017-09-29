@@ -42,7 +42,7 @@ class Qt4_CRLBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-	
+
         # Hardware objects ----------------------------------------------------
         self.crl_hwobj = None
 
@@ -102,7 +102,7 @@ class Qt4_CRLBrick(BlissWidget):
         self.crl_value_table.horizontalHeader().hide()
         self.crl_value_table.setRowHeight(0, 20)
         self.crl_value_table.setFixedHeight(26)
-	self.crl_value_table.setShowGrid(True)
+        self.crl_value_table.setShowGrid(True)
 
         #self.set_according_to_energy_button.setIcon(Qt4_Icons.load_icon("Up2"))
         #self.set_out_button.setIcon(Qt4_Icons.load_icon("Up2"))

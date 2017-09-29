@@ -299,7 +299,7 @@ class DataCollectTree(qt.QWidget):
 
             #Estimate if minidiff is in plate mode
             #This could be done also in a different way
-	    
+
             if self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 self.plate_manipulator_hwobj._doUnload()
             else:

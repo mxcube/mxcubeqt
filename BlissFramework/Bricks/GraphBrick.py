@@ -412,7 +412,7 @@ class GraphBrick(BlissWidget):
             QToolTip.add(self.cmdSaveData, tp)
             
             self.cmdSaveData.setEnabled(len(newValue) > 0)
-	elif property.startswith('instanceAllow'):
+        elif property.startswith('instanceAllow'):
             BlissWidget.propertyChanged(self, property, oldValue, newValue)
         else:
             self.addCurve(newValue)

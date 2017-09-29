@@ -375,18 +375,18 @@ class CameraMotorToolsBrick(BlissWidget):
                 self.limitsAction = None
 
         if self.measureMode is not None:
-		if self.measureAction is None:
-			self.measureAction = QubOpenDialogAction(parent=self, name='measure', iconName='measure', label='Measure', group='Tools', place=self.measureMode)
-			self.measureAction.setConnectCallBack(self._measure_dialog_new)
+                if self.measureAction is None:
+                        self.measureAction = QubOpenDialogAction(parent=self, name='measure', iconName='measure', label='Measure', group='Tools', place=self.measureMode)
+                        self.measureAction.setConnectCallBack(self._measure_dialog_new)
                         logging.getLogger().info("setting measure mode")
-			if self.view is not None:
-				logging.getLogger().info("adding action")
-				self.view.addAction(self.measureAction)
-	else:
-		if self.measureAction is not None:
-			if self.view is not None:
-				self.view.delAction(self.measureAction)
-			self.measureAction = None
+                        if self.view is not None:
+                                logging.getLogger().info("adding action")
+                                self.view.addAction(self.measureAction)
+        else:
+                if self.measureAction is not None:
+                        if self.view is not None:
+                                self.view.delAction(self.measureAction)
+                        self.measureAction = None
 
         if self.movetoMode is not None:
             if self.__movetoActionMosaic is not None:
@@ -435,15 +435,15 @@ class CameraMotorToolsBrick(BlissWidget):
     
     def _measure_dialog_new(self,openDialogAction,aQubImage) :
         if  self.YSize is not None and self.ZSize is not None:
-    	  self.__measureDialog = QubMeasureListDialog(self,
+            self.__measureDialog = QubMeasureListDialog(self,
                                                       canvas=aQubImage.canvas(),
                                                       matrix=aQubImage.matrix(),
                                                       eventMgr=aQubImage)
-          self.__measureDialog.setXPixelSize(self.YSize/1000.0)
-          self.__measureDialog.setYPixelSize(self.ZSize/1000.0)
-          self.__measureDialog.connect(aQubImage, qt.PYSIGNAL("ForegroundColorChanged"),
+            self.__measureDialog.setXPixelSize(self.YSize/1000.0)
+            self.__measureDialog.setYPixelSize(self.ZSize/1000.0)
+            self.__measureDialog.connect(aQubImage, qt.PYSIGNAL("ForegroundColorChanged"),
                                        self.__measureDialog.setDefaultColor)
-          openDialogAction.setDialog(self.__measureDialog)
+            openDialogAction.setDialog(self.__measureDialog)
         
     def setHorizontalPosition(self, newPosition):
         if self.limitsAction is not None:        
@@ -510,7 +510,7 @@ class CameraMotorToolsBrick(BlissWidget):
         if sizey is not None:
             self.YSize = sizey * 1000
             try:
-		self.__measureDialog.setXPixelSize(sizey)
+                self.__measureDialog.setXPixelSize(sizey)
             except:
                 pass
         else:

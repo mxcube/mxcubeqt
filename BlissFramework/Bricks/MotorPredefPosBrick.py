@@ -118,7 +118,7 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
         if positions is None:
             positions=[]
 
-        list_index=self['listIndex']	  
+        list_index=self['listIndex']
         for p in positions:
             if list_index!=-1:
                 pos_list=p.split()
@@ -145,7 +145,7 @@ class MotorPredefPosBrick(MotorWPredefinedPositionsBrick.MotorWPredefinedPositio
             self.posButtonsPanel.show()
         else:
             self.lstPositions.show()
-            self.posButtonsPanel.hide()	      
+            self.posButtonsPanel.hide()
 
     def lstPositionsClicked(self, index):
         if index > 0:

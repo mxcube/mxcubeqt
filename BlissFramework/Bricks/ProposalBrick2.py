@@ -38,7 +38,7 @@ class ProposalBrick2(BlissWidget):
         self.laboratory=None
         #self.sessionId=None
         self.inhouseProposal=None
-	self.loginType = "proposal"
+        self.loginType = "proposal"
 
         self.instanceServer=None
 
@@ -78,12 +78,12 @@ class ProposalBrick2(BlissWidget):
         self.propNumber.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.propNumber.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.propNumber.setFixedWidth(50)
-	
+
         self.userName=QLineEdit(self.loginBox)
         self.userName.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.userName.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
         self.userName.setFixedWidth(75)
-	self.userName.hide()
+        self.userName.hide()
 
         password_label=QLabel("   Password: ",self.loginBox)
         self.propPassword=QLineEdit(self.loginBox)
@@ -241,8 +241,8 @@ class ProposalBrick2(BlissWidget):
         self.user_group_ledit.hide()
         self.user_group_save_button.hide()
        
-	#resets active proposal
-	self.resetProposal()
+        #resets active proposal
+        self.resetProposal()
  
         #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
         #QToolTip.add(self.proposalLabel,"")
@@ -256,7 +256,7 @@ class ProposalBrick2(BlissWidget):
         self.session_hwobj.proposal_code = None
         self.session_hwobj.session_id = None
         self.session_hwobj.proposal_id = None
-        self.session_hwobj.proposal_number = None 	
+        self.session_hwobj.proposal_number = None
 
     # Sets the current session; changes from login mode to logout mode
     def setProposal(self,proposal,person,laboratory,session,localcontact):
@@ -474,15 +474,15 @@ class ProposalBrick2(BlissWidget):
 
         propType=str(self.propType.currentText())
         propNumber=str(self.propNumber.text()) or ""
-	userName = str(self.userName.text()) or ""
+        userName = str(self.userName.text()) or ""
         password=str(self.propPassword.text())
         self.propPassword.setText("")
 
-	if self.loginType == "proposal":
-	    loginID = "%s%s" % (propType,propNumber)
-	else:
-	    loginID= userName
-	
+        if self.loginType == "proposal":
+            loginID = "%s%s" % (propType,propNumber)
+        else:
+            loginID= userName
+
         # try local login if userID is empty
         if propNumber =="" and userName == "":
             if self.localLogin is None:
@@ -512,19 +512,19 @@ class ProposalBrick2(BlissWidget):
         if self.dbConnection == None:
             return self.refuseLogin(False,'Not connected to the ISPyB database, unable to get proposal.')
          
-	loginRes=self.dbConnection.login(loginID,password)
-	try:
+        loginRes=self.dbConnection.login(loginID,password)
+        try:
             login_ok=(loginRes['status']['code']=='ok')
         except KeyError:
             login_ok=False
         if not login_ok:
-	    if loginRes['status']['code'] == 'ispybDown':
-		self.ispybDown()
-		return
+            if loginRes['status']['code'] == 'ispybDown':
+                self.ispybDown()
+                return
             else:
                 self.refuseLogin(False, loginRes['status']['msg'])
-	else:
-	    # login succeed but without a scheduled session, a newSession is created instead. Ask the user to accep the new session
+        else:
+            # login succeed but without a scheduled session, a newSession is created instead. Ask the user to accep the new session
             if loginRes['session']['new_session_flag']:
                 if not  self.askForNewSession():
                     return self.refuseLogin(None,None)
@@ -546,8 +546,8 @@ class ProposalBrick2(BlissWidget):
             self.localLogin=self.getHardwareObject(newValue)
         elif propertyName=='dbConnection':
             self.dbConnection = self.getHardwareObject(newValue)
-	    logging.getLogger().info("dbconnection is %s", str(newValue))
-	    self.updateLoginID()
+            logging.getLogger().info("dbconnection is %s", str(newValue))
+            self.updateLoginID()
         elif propertyName=='instanceServer':
             if self.instanceServer is not None:
                 self.disconnect(self.instanceServer,PYSIGNAL('passControl'), self.passControl)
@@ -572,18 +572,18 @@ class ProposalBrick2(BlissWidget):
             BlissWidget.propertyChanged(self,propertyName,oldValue,newValue)
 
     def updateLoginID(self):
-	if self.loginType == self.dbConnection.loginType:
-	    return
+        if self.loginType == self.dbConnection.loginType:
+            return
         self.loginType = self.dbConnection.loginType
         if self.loginType == "proposal":
-	    self.code_label.setText("  Code: ")
+            self.code_label.setText("  Code: ")
             self.userName.hide()
-	    self.propType.show()
-	    self.dash_label.show()
-	    self.propNumber.show()
-	else:
+            self.propType.show()
+            self.dash_label.show()
+            self.propNumber.show()
+        else:
             self.code_label.setText("  User ID: ")
-	    self.userName.show()
+            self.userName.show()
             self.propType.hide()
             self.dash_label.hide()
             self.propNumber.hide()

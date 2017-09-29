@@ -55,7 +55,7 @@ class BrowserBrick(BaseComponents.BlissWidget):
         self.sort_col = None
 
         self.history = QTable(self.history_box)
-	self.history.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding))
+        self.history.setSizePolicy(QSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding))
         self.history.setSelectionMode(QTable.SingleRow)
         self.history.setNumCols(3)
         self.history.verticalHeader().hide()
@@ -109,7 +109,7 @@ class BrowserBrick(BaseComponents.BlissWidget):
 
         self.browser = QTextBrowser(self.browser_box)
         self.browser.setReadOnly(True)
-	self.browser_box.layout().addWidget(self.browser)
+        self.browser_box.layout().addWidget(self.browser)
 
         self.layout.addWidget(self.main_layout)
 
@@ -173,7 +173,7 @@ class BrowserBrick(BaseComponents.BlissWidget):
             pass
 
     def new_html(self, html_path, image_prefix, run_number):
-	logging.getLogger().debug('got a new html page: %s, prefix: %r, run number: %s', html_path, image_prefix, run_number)
+        logging.getLogger().debug('got a new html page: %s, prefix: %r, run number: %s', html_path, image_prefix, run_number)
 
         # prepend the time and date to the path we just got so
         # the history is more readable

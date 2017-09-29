@@ -240,7 +240,7 @@ class MotorizedFilterTable( FilterTable ):
    def setFilters(self,axisno,filters):
         self.filtpos[axisno] = range(len(filters))
 
-	filts = []
+        filts = []
         for filterno in range(len(filters)):
             filter = filters[filterno][0] #username
             pos = filters[filterno][1] #offset

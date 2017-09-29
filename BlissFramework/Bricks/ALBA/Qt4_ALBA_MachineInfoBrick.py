@@ -133,7 +133,7 @@ class Qt4_ALBA_MachineInfoBrick(BlissWidget):
         Return.   : 
         """
         txt = '??? mA' if values[0] is None else '<b>%s</b> mA' % \
-	       str(self['formatString'] % abs(values[0]))
+               str(self['formatString'] % abs(values[0]))
         self.current_value_label.setText(txt)
         self.logger.debug("Setting values %s" % repr(values)) 
         

@@ -88,7 +88,7 @@ class CommandButton(QVBox):
           entryWidgetsGrid.setMargin(5)
 
           for argname, argtype, onchange, valuefrom in self.arguments:
-	    QLabel(argname, entryWidgetsGrid)
+            QLabel(argname, entryWidgetsGrid)
             QLabel(' : ', entryWidgetsGrid)
             cmdobj = DummyCallable()
             chanobj = None
@@ -160,8 +160,8 @@ class CommandButton(QVBox):
         cmdObject.connectSignal('commandAborted', self.commandReplyArrived)
         cmdObject.connectSignal('connected', self.connected)
         cmdObject.connectSignal('disconnected', self.disconnected)
-	cmdObject.connectSignal('commandReady', self.enableCommand)
-	cmdObject.connectSignal('commandNotReady', self.disableCommand)
+        cmdObject.connectSignal('commandReady', self.enableCommand)
+        cmdObject.connectSignal('commandNotReady', self.disableCommand)
         self.connect(self.cmdExecute, SIGNAL('clicked()'), self.launchCommand)
 
 
@@ -305,7 +305,7 @@ class CommandBrick(BlissWidget):
 
             if hasattr(self.hardwareObject, 'getChannels'):
                 for chan in self.hardwareObject.getChannels():
-	            self.channelLabels.append(QLabel('<nobr><b>%s</b></nobr>' % str(chan.name()), self.channelsBox))
+                    self.channelLabels.append(QLabel('<nobr><b>%s</b></nobr>' % str(chan.name()), self.channelsBox))
                     self.channelLabels[-1].setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                     self.channelLabels.append(ChannelLabel(chan, self.channelsBox))
                     self.channelLabels[-1].setNumberFormatString(self['numberFormatString'])
@@ -332,7 +332,7 @@ class CommandBrick(BlissWidget):
                         self.cmdButtons[-1].connected()
                     else:
                         self.cmdButtons[-1].disconnected()
-	    else:
+            else:
                 self.hardwareObject = None
                 logging.getLogger().error("%s: hardware object does not contain any command", ho.name())
 
@@ -344,11 +344,11 @@ class CommandBrick(BlissWidget):
                 if i % 2:
                     self.channelLabels[i].setNumberFormatString(self['numberFormatString'])
         elif property == 'title':
-	    if len(newValue) == 0:
-	       self.lblTitle.hide()
+            if len(newValue) == 0:
+               self.lblTitle.hide()
             else:
-	       self.lblTitle.show()
-	       self.lblTitle.setText(newValue)
+               self.lblTitle.show()
+               self.lblTitle.setText(newValue)
             self.adjustSize()
         elif property == 'commands_channels': 
             try:

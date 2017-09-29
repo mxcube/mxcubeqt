@@ -500,10 +500,10 @@ class SoleilHutchMenuBrick(BlissWidget):
           self.emit(PYSIGNAL("centringAccepted"), (state,centring_status))
 
         if self.beamInfo is not None:
-	   beam_info = self.beamInfo.get_beam_info()	
-	   if beam_info is not None:
-	       beam_info['size_x'] = beam_info['size_x'] * self.pixels_per_mm[0]
-	       beam_info['size_y'] = beam_info['size_y'] * self.pixels_per_mm[1]
+           beam_info = self.beamInfo.get_beam_info()
+           if beam_info is not None:
+               beam_info['size_x'] = beam_info['size_x'] * self.pixels_per_mm[0]
+               beam_info['size_y'] = beam_info['size_y'] * self.pixels_per_mm[1]
            self.emit(PYSIGNAL("newCentredPos"), (state, centring_status, beam_info))
            #self.emit(PYSIGNAL("newCentredPos"), (state, centring_status))
 
@@ -700,12 +700,12 @@ class SoleilHutchMenuBrick(BlissWidget):
         print "..... HutchMenuBrick:connectNotify  ", signalName
         if signalName=='beamPositionChanged':
             if self.minidiff and self.minidiff.isReady() and self.beamInfo is not None:
-		self.beam_position = self.beamInfo.get_beam_position()
-		self.pixels_per_mm = self.minidiff.get_pixels_per_mm()
+                self.beam_position = self.beamInfo.get_beam_position()
+                self.pixels_per_mm = self.minidiff.get_pixels_per_mm()
                 self.emit(PYSIGNAL("beamPositionChanged"), (self.beam_position[0],\
-							    self.beam_position[1],
+                                                            self.beam_position[1],
                                                             self.beam_size[0],\
-							    self.beam_size[1]))
+                                                            self.beam_size[1]))
             #if self.minidiff and self.minidiff.isReady():
             #    beam_xc = self.minidiff.getBeamPosX()
             #    beam_yc = self.minidiff.getBeamPosY()
@@ -727,7 +727,7 @@ class SoleilHutchMenuBrick(BlissWidget):
         try:
             self.pixels_per_mm = self.minidiff.get_pixels_per_mm()
             if self.beamInfo is not None:
-                self.beam_position = self.beamInfo.get_beam_position()	
+                self.beam_position = self.beamInfo.get_beam_position()
         except:
             import traceback
             logging.getLogger().error("error on minidiff ready %s", traceback.format_exc())
@@ -865,7 +865,7 @@ class SoleilHutchMenuBrick(BlissWidget):
           else:
             self.__rectangularBeam.setSlitboxSize(0,0)
             self.__beam.setSize(self.beam_size[0] * self.pixels_per_mm[0],\
-				self.beam_size[1] * self.pixels_per_mm[1])
+                                self.beam_size[1] * self.pixels_per_mm[1])
             logging.getLogger().info("beam drawn with size %s " % str(self.beam_size))
             #self.__beam.setSize(bx*pxmmy, by*pxmmz)
             self.__beam.show()

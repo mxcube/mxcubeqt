@@ -42,7 +42,7 @@ class Qt4_ProgressBarBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-	self.collect_hwobj = None	
+        self.collect_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.number_of_steps = 0
