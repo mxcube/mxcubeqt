@@ -116,7 +116,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         Descript. :
         """
         if self.diffractometer_hwobj is not None:
-            self.diffractometer_hwobj.set_phase(self.phase_combobox.currentText())
+            self.diffractometer_hwobj.set_phase(self.phase_combobox.currentText(), timeout=None)
 
     def phase_changed(self, phase):
         """
@@ -127,6 +127,5 @@ class Qt4_MDPhaseBrick(BlissWidget):
             #index = self.phase_combobox.findText(phase) 
             #self.phase_combobox.setEditText(phase)
             self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
-            self.phase_combobox.setEnabled(True)
         else:
-            self.phase_combobox.setEnabled(False) 
+            self.phase_combobox.setCurrentIndex(-1) 

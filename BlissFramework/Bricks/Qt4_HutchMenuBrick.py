@@ -265,14 +265,15 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        if self.full_centring_done:
+        #if self.full_centring_done:
+        if True:
             Qt4_widget_colors.set_widget_color(self.accept_button, 
                                                self.standard_color)
             self.reject_button.setEnabled(False)
             self.graphics_manager_hwobj.accept_centring()
             self.full_centring_done = False
-        else:
-            self.graphics_manager_hwobj.start_centring(tree_click=False)
+        #else:
+        #    self.graphics_manager_hwobj.start_centring(tree_click=False)
 
     def reject_clicked(self):
         """

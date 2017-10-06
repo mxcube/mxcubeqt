@@ -49,9 +49,10 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('labels', 'string','')
         self.addProperty('moveButtonIcons', 'string','') 
-        self.addProperty('alignment', 'combo', ('vertical', 'horizontal'), 'horizontal')
-        self.addProperty('defaultStep', 'string', '0.01')
-        self.addProperty('delta', 'string', '0.01')
+        self.addProperty('alignment', 'combo', ('vertical', 'horizontal'), 'vertical')
+        self.addProperty('defaultSteps', 'string', '')
+        self.addProperty('defaultDeltas', 'string', '')
+        self.addProperty('defaultDecimals', 'string', '')
         self.addProperty('predefinedPositions', 'string', '')
         self.addProperty('showMoveButtons', 'boolean', True)
         self.addProperty('showSlider', 'boolean', False)
@@ -93,7 +94,12 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'mnemonic':
             hwobj_names_list = new_value.split()
-            for hwobj_name in hwobj_names_list:
+
+            default_delta_list = self['defaultDeltas'].split()
+            default_decimal_list = self['defaultDecimals'].split()
+            default_step_list = self['defaultSteps'].split()
+
+            for index, hwobj_name in enumerate(hwobj_names_list):
                 temp_motor_hwobj = self.getHardwareObject(hwobj_name)
                 if temp_motor_hwobj is not None:
                     temp_motor_widget = Qt4_MotorSpinBoxBrick(self)
@@ -103,9 +109,23 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
                     temp_motor_widget.position_slider.setVisible(self['showSlider'])
                     temp_motor_widget.step_button.setVisible(self['showStep'])
                     temp_motor_widget.stop_button.setVisible(self['showStop'])
-                    temp_motor_widget.set_line_step(self['defaultStep'])
-                    temp_motor_widget['defaultStep'] = self['defaultStep']
-                    temp_motor_widget['delta'] = self['delta']
+                    
+                    try:  
+                        temp_motor_widget.set_line_step(default_step_list[index])
+                        temp_motor_widget['defaultStep'] = default_step_list[index]
+                    except:
+                        temp_motor_widget.set_line_step(0.001)
+                        temp_motor_widget['defaultStep'] = 0.001
+
+                    try:    
+                        temp_motor_widget['delta'] = default_delta_list[index]
+                    except:
+                        temp_motor_widget['delta'] = 0.001
+                    try:
+                        temp_motor_widget.set_decimals(default_decimal_list[index])
+                    except:
+                        pass
+                    
                     temp_motor_widget.step_changed(None)
                     self.main_groupbox_hlayout.addWidget(temp_motor_widget)
 
@@ -130,7 +150,7 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
                     self.motor_widget_list[index / 2].move_left_button.setIcon(\
                          Qt4_Icons.load_icon(icon_list[index]))
                     self.motor_widget_list[index / 2].move_right_button.setIcon(\
-                         Qt4_Icons.load_icon(icon_list[index + 1])) 
+                         Qt4_Icons.load_icon(icon_list[index + 1]))
         elif property_name == 'labels':
             self.motor_widget_labels = new_value.split()
             if len(self.motor_widget_list):
