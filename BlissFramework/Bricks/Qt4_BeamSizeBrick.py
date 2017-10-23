@@ -67,7 +67,7 @@ class Qt4_BeamSizeBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-	
+
         # Hardware objects ----------------------------------------------------
         self.beam_info_hwobj = None
 

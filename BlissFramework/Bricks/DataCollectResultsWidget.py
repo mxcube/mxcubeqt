@@ -125,7 +125,7 @@ class DetectorImage(VideoDisplay.VideoDisplayWidget):
         #print "setWantedImage",directory,template,image_number
         if self.imageServer is not None:
             self.wantedImage=[directory,template,image_number]
-	    self.wantedImageUpdated(delay)
+            self.wantedImageUpdated(delay)
 
     def clearImage(self,current_also=False):
         #print "clearImage"

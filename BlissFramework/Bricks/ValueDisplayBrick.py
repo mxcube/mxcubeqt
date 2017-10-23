@@ -46,8 +46,8 @@ class ValueDisplayBrick(SynopticBrick.SynopticBrick):
             elif type(value) == types.StringType:
                 svalue = str(value)
             else:
-				svalue = '-'
-				logging.getLogger().error('%s: cannot display value, unknown type %s', str(self.name()), type(value))
+                svalue = '-'
+                logging.getLogger().error('%s: cannot display value, unknown type %s', str(self.name()), type(value))
   
         self.lcdValue.display(svalue)
         self.lblValue.setText('<nobr><font face="courier">%s</font></nobr>' % svalue)

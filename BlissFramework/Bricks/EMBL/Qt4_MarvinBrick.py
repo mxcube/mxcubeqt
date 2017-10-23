@@ -39,7 +39,7 @@ class Qt4_MarvinBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-	
+
         # Hardware objects ----------------------------------------------------
         self.sample_changer_hwobj = None
 

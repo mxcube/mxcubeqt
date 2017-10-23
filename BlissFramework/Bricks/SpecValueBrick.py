@@ -241,7 +241,7 @@ class SpecValueBrick(BlissWidget):
         # to manage associative array, from the xml file use the
         # syntax MYARRAY/avalue to access the SPEC variable MYARRAY["avalue"].
         #if type(value) is  types.DictionaryType:
-	#    val = value[value.keys()[0]]
+        #    val = value[value.keys()[0]]
         #    if type(val) is  types.DictionaryType:
         #        val = val[val.keys()[0]]
         if self.varType in ["motor", "float"]:

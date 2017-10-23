@@ -18,17 +18,17 @@ class SynopticMotorWPredefinedPositionsBrick(SynopticBrick.SynopticBrick):
         self.buttons = []
 
         self.expertPanel = QVBox(self.containerBox)
-	self.motorWidget = MotorBrick.MotorBrick(self.expertPanel)
-	expertPanelButtonsBox = QGrid(2, Qt.Vertical, self.expertPanel)
+        self.motorWidget = MotorBrick.MotorBrick(self.expertPanel)
+        expertPanelButtonsBox = QGrid(2, Qt.Vertical, self.expertPanel)
         QLabel('pos. name :', expertPanelButtonsBox)
-	self.txtPositionName = QLineEdit(expertPanelButtonsBox)
+        self.txtPositionName = QLineEdit(expertPanelButtonsBox)
         QLabel('', expertPanelButtonsBox) #just a spacer in fact
-	self.cmdSetPosition = QPushButton('Set pos.', expertPanelButtonsBox)
+        self.cmdSetPosition = QPushButton('Set pos.', expertPanelButtonsBox)
                             
         self.motorWidget['appearance'] = 'tiny'
         self.motorWidget['allowDoubleClick'] = True
-	expertPanelButtonsBox.setMargin(5)
-	expertPanelButtonsBox.setSpacing(5)
+        expertPanelButtonsBox.setMargin(5)
+        expertPanelButtonsBox.setSpacing(5)
 
         QObject.connect(self.cmdSetPosition, SIGNAL('clicked()'), self.cmdSetPositionClicked)
 
@@ -106,7 +106,7 @@ class SynopticMotorWPredefinedPositionsBrick(SynopticBrick.SynopticBrick):
 
         
     def motorStateChanged(self, state):
-	s = state == self.motor.READY
+        s = state == self.motor.READY
         
         for button in self.buttons:
             button.setEnabled(s)

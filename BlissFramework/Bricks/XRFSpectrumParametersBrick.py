@@ -16,7 +16,7 @@ class XRFSpectrumParametersBrick(BaseComponents.BlissWidget):
         self.addProperty('xrf-spectrum', 'string', '')        
         self.addProperty("session", "string", "/session")
         self.session_hwobj = None
-	self.xrf_spectrum_hwobj = None
+        self.xrf_spectrum_hwobj = None
         
         # Layout
         main_layout = qt.QVBoxLayout(self)
@@ -38,8 +38,8 @@ class XRFSpectrumParametersBrick(BaseComponents.BlissWidget):
         Overriding BaseComponents.BlissWidget (propertyChanged object) 
         run method.
         """
-	if property_name == 'xrf-spectrum':
-	    self.xrf_spectrum_hwobj = self.getHardwareObject(new_value) 	 
+        if property_name == 'xrf-spectrum':
+            self.xrf_spectrum_hwobj = self.getHardwareObject(new_value)
             self.xrf_spectrum_widget.set_xrf_spectrum_hwobj(self.getHardwareObject(new_value))
         elif property_name == 'session':
             self.session_hwobj = self.getHardwareObject(new_value)

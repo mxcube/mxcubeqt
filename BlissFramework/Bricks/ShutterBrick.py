@@ -43,10 +43,10 @@ class ShutterBrick(SynopticBrick.SynopticBrick):
 
 
     def updateGUI(self):
-	self.shutter = self.getHardwareObject(self['mnemonic'])
+        self.shutter = self.getHardwareObject(self['mnemonic'])
 
         if self.shutter is not None:
-	    if self.isRunning():
+            if self.isRunning():
                 self.setEnabled(True)
 
             self.shutterStateChanged(self.shutter.getShutterState())

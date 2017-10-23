@@ -76,12 +76,12 @@ class ScanPlotWidget(qt.QWidget):
 
     def plotResults(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl,
                         rm, chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
-	self.graph.clearcurves()	
+        self.graph.clearcurves()
         self.graph.setTitle(title)
         self.graph.newcurve("spline", chooch_graph_x, chooch_graph_y1)
         self.graph.newcurve("fp", chooch_graph_x, chooch_graph_y2)
         self.graph.replot()
-	self.isScanning = False
+        self.isScanning = False
 
     def plotScanCurve(self, scan_data):
         self.graph.clearcurves()

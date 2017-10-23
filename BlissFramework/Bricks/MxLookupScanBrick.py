@@ -127,7 +127,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
        points = self._graphicSelection.points()
        if len(points) == 3 and self._XSize and self._YSize:
              self._graphicSelection._xy_in_mm = numpy.array([(points[0][0] - self._beamx) * self._XSize,
-					                     (points[0][1] - self._beamy) * self._YSize])
+                                                             (points[0][1] - self._beamy) * self._YSize])
              table = self._widgetTree.child('__gridTable')
              dist = math.sqrt(((points[0][0] - points[1][0]) * self._XSize ) ** 2 + \
                                  ((points[0][1] - points[1][1]) * self._YSize) ** 2)
@@ -207,7 +207,7 @@ class MxLookupScanBrick(BaseGraphicScan) :
              xori = (self._graphicSelection._xy_in_mm[0] / self._XSize) + self._beamx
              yori = (self._graphicSelection._xy_in_mm[1] / self._YSize) + self._beamy
              #xori, yori = points[0]
-	     
+
              #p = numpy.array([[xori,yori],[xori + width,yori],[xori + width,yori + height]])
              p = numpy.array([[0,0],[width,0],[width,height]])
              

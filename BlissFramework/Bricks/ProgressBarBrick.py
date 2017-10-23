@@ -9,17 +9,17 @@ class ProgressBarBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
-	self.collect_hwobj = None	
+        self.collect_hwobj = None
 
-	self.addProperty('mnemonic', 'string', '')
+        self.addProperty('mnemonic', 'string', '')
         self.addProperty('appearance','combo',('simple', 'normal'),'normal')
         self.addProperty('title', 'string','')
         self.addProperty('timeFormat','string','%H:%M:%S')
 
         self.executing = None
-	self.time_total_sec = 0
-	self.time_remaining_sec = 0
-	self.time_format = None
+        self.time_total_sec = 0
+        self.time_remaining_sec = 0
+        self.time_format = None
         self.progress_task = None
 
         self.container_hbox = qt.QHGroupBox(self)
@@ -32,7 +32,7 @@ class ProgressBarBrick(BlissWidget):
         self.progressBar.setCenterIndicator(True)
         self.time_remaining_label = qt.QLabel('Remaining:',self.container_hbox)
         self.time_remaining_value_label = qt.QLabel('??:??:??',self.container_hbox)
-	
+
         qt.QVBoxLayout(self)
         self.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.Fixed)
         self.layout().addWidget(self.container_hbox)
@@ -50,10 +50,10 @@ class ProgressBarBrick(BlissWidget):
         if not self.progress_task:
             self.setEnabled(True)
             self.progress_task = gevent.spawn(self.execute_progress)
-	
+
     def reset_progress(self):
         self.progressBar.reset()
-	self.time_total_value_label.setText(str(timedelta(seconds=0)))
+        self.time_total_value_label.setText(str(timedelta(seconds=0)))
         self.time_remaining_value_label.setText(str(timedelta(seconds=0)))
         if self.progress_task is not None:
             self.progress_task.kill()
@@ -64,14 +64,14 @@ class ProgressBarBrick(BlissWidget):
         self.reset_progress()
         self.time_total_sec = int(number_of_frames * exposure_time)
         self.progressBar.setTotalSteps(self.time_total_sec)
-	self.time_remaining_sec = self.time_total_sec
-	self.time_total_value_label.setText(str(timedelta(seconds = self.time_total_sec)))
+        self.time_remaining_sec = self.time_total_sec
+        self.time_total_value_label.setText(str(timedelta(seconds = self.time_total_sec)))
         self.setEnabled(True)
-	
+
     def execute_progress(self):
         while self.time_remaining_sec > -1:
-	    self.progressBar.setProgress(self.time_total_sec- self.time_remaining_sec)
-	    self.time_remaining_value_label.setText(str(timedelta(seconds = int(self.time_remaining_sec))))
+            self.progressBar.setProgress(self.time_total_sec- self.time_remaining_sec)
+            self.time_remaining_value_label.setText(str(timedelta(seconds = int(self.time_remaining_sec))))
             self.time_remaining_sec = self.time_remaining_sec -1
             time.sleep(1)
         self.setEnabled(False)
@@ -99,16 +99,16 @@ class ProgressBarBrick(BlissWidget):
             if newValue!="":
                 self.container_hbox.setTitle(newValue)
                 self.updateGeometry()      
-	elif propertyName == 'timeFormat':
-	    self.time_format=newValue
+        elif propertyName == 'timeFormat':
+            self.time_format=newValue
         elif propertyName == "mnemonic":
             if self.collect_hwobj is not None:
-		self.disconnect(self.collect_hwobj, qt.PYSIGNAL('collectNumberOfFrames'), self.set_progress_total_time)
-		self.disconnect(self.collect_hwobj, qt.PYSIGNAL('collectImageTaken'), self.start_progress)
-		self.disconnect(self.collect_hwobj, qt.PYSIGNAL('collectEnded'), self.stop_progress) 
+                self.disconnect(self.collect_hwobj, qt.PYSIGNAL('collectNumberOfFrames'), self.set_progress_total_time)
+                self.disconnect(self.collect_hwobj, qt.PYSIGNAL('collectImageTaken'), self.start_progress)
+                self.disconnect(self.collect_hwobj, qt.PYSIGNAL('collectEnded'), self.stop_progress)
             self.collect_hwobj = self.getHardwareObject(newValue)
             if self.collect_hwobj is not None:
-		self.connect(self.collect_hwobj, qt.PYSIGNAL('collectNumberOfFrames'), self.set_progress_total_time)
+                self.connect(self.collect_hwobj, qt.PYSIGNAL('collectNumberOfFrames'), self.set_progress_total_time)
                 self.connect(self.collect_hwobj, qt.PYSIGNAL('collectImageTaken'), self.start_progress)
                 self.connect(self.collect_hwobj, qt.PYSIGNAL('collectEnded'), self.stop_progress)
         else:

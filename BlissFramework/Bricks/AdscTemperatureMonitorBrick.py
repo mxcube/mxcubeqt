@@ -20,7 +20,7 @@ class TemperaturePanel(qt.QWidget):
 
   def setTemperatures(self, temp_list):
     try:
-    	self.temp_list = map(float, temp_list[:self.nccds])
+        self.temp_list = map(float, temp_list[:self.nccds])
     except:
         self.temp_list = self.nccds*[None]
 

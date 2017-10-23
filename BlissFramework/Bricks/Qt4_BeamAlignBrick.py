@@ -43,7 +43,7 @@ class Qt4_BeamAlignBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-	
+
         # Hardware objects ----------------------------------------------------
         self.beam_align_hwobj = None
 

@@ -262,7 +262,7 @@ class EDNAParameters(BlissWidget):
         #output_dir = self.beamline_params['directory'].replace('RAW_DATA', 'PROCESSED_DATA')
         # we'll need that one later to pass to the edna characterise HO
         #self.process_dir = output_dir
-	#if not os.path.exists(output_dir):
+        #if not os.path.exists(output_dir):
         #    os.makedirs(output_dir)
         #(handle, filename) = tempfile.mkstemp(suffix='.xml', prefix='edna_output_', dir=output_dir)
         #blparams.output_file = filename
@@ -278,9 +278,9 @@ class EDNAParameters(BlissWidget):
     def updateBeamlineParameters(self, params):
         logging.debug('got beamline param update, new values: %r', params)
         self.beamline_params = dict()
-	# as XSDataSomethingSomething marshalling routing uses format string
-	# BUT does not enforces its arg type, we have to do some type
-	# conversion, lest it will explode when we call marshal() on it       
+        # as XSDataSomethingSomething marshalling routing uses format string
+        # BUT does not enforces its arg type, we have to do some type
+        # conversion, lest it will explode when we call marshal() on it
         floats = ['exposure_time', 'resolution', 'resolution_at_corner', 'x_beam', 'y_beam', 'beam_size_x', 'beam_size_y', 'overlap', 'osc_start', 'osc_range', 'kappaStart', 'current_detdistance', 'current_wavelength', 'phiStart', 'current_energy', 'current_osc_start'] 
         ints = ['sessionId', 'blSampleId', 'first_image', 'number_images', 'run_number', 'number_passes'] 
         for k,v in params.iteritems():

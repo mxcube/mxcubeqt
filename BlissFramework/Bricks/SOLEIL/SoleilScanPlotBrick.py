@@ -17,7 +17,7 @@ class SoleilScanPlotBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         self.defineSlot('newScan', ())
-	
+
         self.defineSlot('newScanPoint',())
 
         self.scanObject = None

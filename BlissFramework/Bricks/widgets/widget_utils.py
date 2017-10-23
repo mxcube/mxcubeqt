@@ -57,8 +57,8 @@ class DataModelInputBinder(object):
             self._update_widget(field_name, None)
 
     def _update_widget(self, field_name, data_binder):
-	if data_binder == self:
-	    return
+        if data_binder == self:
+            return
         try:
             widget, validator, type_fn = self.bindings[field_name]
         except KeyError:

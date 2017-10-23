@@ -359,10 +359,10 @@ class CameraBrick(BlissWidget):
             self.__hwoName   = newValue
 
             if self.camera is not None:
-		try:
+                try:
                     self.__tangoName = self.camera.tangoname
-		except:
-		    self.__tangoName = ""
+                except:
+                    self.__tangoName = ""
 
                 try:
                     camera_role=self.camera.getDeviceByRole('camera')

@@ -17,7 +17,7 @@ SC_STATE_COLOR = { "FAULT": "red",
                    "UNKNOWN": "grey",
                    "CLOSE": "white",
                    "OFF": "white",
-		   "INIT": "yellow" }
+                   "INIT": "yellow" }
 
 
 class HorizontalSpacer(QWidget):

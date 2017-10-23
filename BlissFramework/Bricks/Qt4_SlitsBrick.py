@@ -105,7 +105,7 @@ class Qt4_SlitsBrick(BlissWidget):
         self.stop_hor_button.setEnabled(False)
         self.stop_hor_button.setFixedWidth(27)
 
-	#Vertical gap
+        #Vertical gap
         ver_label = QLabel("Vertical:", self.main_gbox)
         self.current_ver_pos_ledit = QLineEdit(self.main_gbox)
         self.current_ver_pos_ledit.setAlignment(Qt.AlignRight)
@@ -263,7 +263,7 @@ class Qt4_SlitsBrick(BlissWidget):
         if newGap[1] is None:
             self.current_ver_pos_ledit.setText("-")
         #elif newGap[1] < 0:
-	#     self.current_ver_pos_ledit.setText("-")
+        #     self.current_ver_pos_ledit.setText("-")
         else:
             gap_str = str(newGap[1] * 1000)
             self.current_ver_pos_ledit.setText('%d %sm' % (newGap[1] * 1000, unichr(956)))

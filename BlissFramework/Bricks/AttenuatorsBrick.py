@@ -97,7 +97,7 @@ from BlissFramework.Utils import widget_colors
 class AtteFilter(QCheckBox):
     def __init__(self,label,parent,idx):
         QCheckBox.__init__(self,str(label),parent)
-	self.idx=idx
+        self.idx=idx
         self.connect(self,SIGNAL("toggled(bool)"),self.toggleme)
 
     def toggleme(self):
@@ -389,7 +389,7 @@ class FiltersDialog(QDialog):
         self.accept()
 
     def toggleFilter(self,filter_id):
-    	#print "dialog.toggleFilter",filter_id
+        #print "dialog.toggleFilter",filter_id
         self.attenuators.toggle(filter_id)
 
     def filtersChanged(self,value):

@@ -88,7 +88,7 @@ class SynopticEquipmentMotorsBrick(SynopticBrick.SynopticBrick):
                     newMotorWidget.getProperty('formatString').setValue(self.getProperty('formatString').getUserValue())
                     newMotorWidget.getProperty('allowConfigure').setValue(True)
                     newMotorWidget.getProperty('allowDoubleClick').setValue(self['allowControl'])
-		    newMotorWidget.getProperty('dialogCaption').setValue("%s [%s] - %s" % (self['title'], motorCategory, motor.userName()))
+                    newMotorWidget.getProperty('dialogCaption').setValue("%s [%s] - %s" % (self['title'], motorCategory, motor.userName()))
                     newMotorWidget.readProperties()
 
                     if self.isRunning():
