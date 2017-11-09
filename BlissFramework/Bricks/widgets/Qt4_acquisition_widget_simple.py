@@ -44,6 +44,7 @@ class AcquisitionWidgetSimple(QWidget):
 
         # Hardware objects ----------------------------------------------------
         self._beamline_setup_hwobj = None
+        self._diffractometer_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.value_changed_list = []
@@ -206,6 +207,7 @@ class AcquisitionWidgetSimple(QWidget):
         Descript. :
         """
         self._beamline_setup_hwobj = beamline_setup
+        self._diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
         limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
 
         if 'osc_range' in limits_dict:
@@ -279,6 +281,8 @@ class AcquisitionWidgetSimple(QWidget):
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
+ 
+        self.init_detector_roi_modes()
 
     def set_energy(self, energy, wav):
         """
@@ -370,6 +374,17 @@ class AcquisitionWidgetSimple(QWidget):
                 #               self.acq_widget_layout.detector_roi_mode_combo,
                 #               str,
                 #               None)
+
+    def update_osc_range_limits(self, limits=None):
+        pass
+
+    def update_exp_time_limits(self):
+        exp_time_limits = self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
+        max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
+        top_limit = float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
+        limits = (max(exp_time_limits[0], top_limit), exp_time_limits[1])
+
+        self.update_detector_exp_time_limits(limits)
 
     def update_detector_roi_mode(self, roi_mode_index):
         """

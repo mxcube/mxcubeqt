@@ -123,7 +123,7 @@ class DCParametersWidget(QWidget):
         path_template = self._data_collection.acquisitions[0].path_template
 
         if state:
-            path_template.mad_prefix = name
+            path_template.mad_prefix = str(name)
         else:
             path_template.mad_prefix = ''
 

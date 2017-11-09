@@ -65,7 +65,7 @@ class CreateTaskBase(QWidget):
          self._session_hwobj = None
          self._beamline_setup_hwobj = None
          self._graphics_manager_hwobj = None
-         
+         self._in_plate_mode = None
 
     def init_models(self):
         self.init_acq_model()
@@ -77,12 +77,9 @@ class CreateTaskBase(QWidget):
         if bl_setup is not None:
             if self._acq_widget:
                 self._acq_widget.set_beamline_setup(bl_setup)
-                self._acquisition_parameters = bl_setup.get_default_acquisition_parameters()
-                self._acq_widget.init_detector_roi_modes()
-                if bl_setup.diffractometer_hwobj.in_plate_mode():
-                    #self._acq_widget.update_osc_start_limits(\
-                    #     bl_setup.diffractometer_hwobj.get_osc_limits())
-                    #self._acq_widget.update_osc_range_limits()
+                def_acq_parameters = bl_setup.get_default_acquisition_parameters()
+                self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
+                if self._in_plate_mode:
                     self._acq_widget.use_kappa(False)
                     self._acq_widget.use_max_osc_range(True)
                 else:
@@ -138,14 +135,15 @@ class CreateTaskBase(QWidget):
 
             self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
         except AttributeError as ex:
-            msg = 'Could not connect to one or more hardware objects' + str(ex)
-            logging.getLogger("HWR").warning(msg)
+            msg = 'Could not connect to one or more hardware objects: ' + str(ex)
+            logging.getLogger("GUI").warning(msg)
        
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
             self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
             self._graphics_manager_hwobj.connect('shapeChanged', self.shape_changed)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
+        self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
@@ -300,7 +298,7 @@ class CreateTaskBase(QWidget):
             acq_widget = self.get_acquisition_widget()
 
             if acq_widget:
-                acq_widget.update_detector_exp_time_limits(limits)
+                acq_widget.update_exp_time_limits()
 
     def get_default_prefix(self, sample_data_node = None, generic_name = False):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
@@ -568,19 +566,31 @@ class CreateTaskBase(QWidget):
     # a task. When a task_node is selected.
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
-       
-        try: 
-            sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
-                                getLoadedSample().getCoords() == sample.location
 
-        except AttributeError:
-            sample_is_mounted = False
+        dm = self._beamline_setup_hwobj.diffractometer_hwobj      
 
-        dm = self._beamline_setup_hwobj.diffractometer_hwobj
+        sample_is_mounted = False
+        if self._in_plate_mode:
+            try:
+               sample_is_mounted = self._beamline_setup_hwobj.plate_manipulator_hwobj.\
+                  getLoadedSample().getCoords() == sample.location
+            except:
+               sample_is_mounted = False
+        else: 
+            try: 
+               sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
+                  getLoadedSample().getCoords() == sample.location
+
+            except AttributeError:
+               sample_is_mounted = False
+
         fully_automatic = (not dm.user_confirms_centring)
 
         free_pin_mode = sample.free_pin_mode
         temp_tasks = self._create_task(sample, shape)
+
+        if len(temp_tasks) == 0:
+            return
 
         if ((not free_pin_mode) and (not sample_is_mounted) or (not shape)):
             # No centred positions selected, or selected sample not
@@ -630,6 +640,7 @@ class CreateTaskBase(QWidget):
 
                     #Xray centering
                     mesh_dc = self._create_dc_from_grid(sample)
+                    mesh_dc.run_processing_parallel = "XrayCentering"
                     sc = queue_model_objects.XrayCentering(mesh_dc)
                 if sc:
                     tasks.append(sc)
@@ -723,7 +734,7 @@ class CreateTaskBase(QWidget):
         
         acq.path_template = self._create_path_template(sample, path_template)
 
-        if bl_setup.diffractometer_hwobj.in_plate_mode():
+        if self._in_plate_mode:
             acq.acquisition_parameters.take_snapshots = 0
 
         return acq

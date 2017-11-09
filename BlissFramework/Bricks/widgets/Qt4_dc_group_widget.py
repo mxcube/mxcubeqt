@@ -25,7 +25,7 @@ from QtImport import *
 import Qt4_queue_item
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
-#from widgets.Qt4_matplot_widget import PolarScaterWidget
+from widgets.Qt4_matplot_widget import PolarScaterWidget
 
 
 
@@ -51,7 +51,7 @@ class DCGroupWidget(QWidget):
         self._tree_view_item = None
 
         _subwedge_widget = QGroupBox("Summary", self) 
-        #self.polar_scater_widget = PolarScaterWidget()
+        self.polar_scater_widget = PolarScaterWidget()
         self.subwedge_table = QTableWidget(_subwedge_widget)
         _snapshot_widget = QWidget(self)
         self.position_widget = loadUi(os.path.join(os.path.dirname(__file__),
@@ -59,7 +59,7 @@ class DCGroupWidget(QWidget):
         
         # Layout --------------------------------------------------------------
         _subwedge_widget_vlayout = QVBoxLayout(_subwedge_widget)
-        #_subwedge_widget_vlayout.addWidget(self.polar_scater_widget)
+        _subwedge_widget_vlayout.addWidget(self.polar_scater_widget)
         _subwedge_widget_vlayout.addWidget(self.subwedge_table)
         _subwedge_widget_vlayout.setContentsMargins(0, 4, 0, 0)
         _subwedge_widget_vlayout.setSpacing(6)
@@ -141,4 +141,4 @@ class DCGroupWidget(QWidget):
                 self.subwedge_table.item(row, col).setBackground(color)
                 #     QtGui.QColor(Qt4_widget_colors.TASK_GROUP[sw[0]]))
 
-        #self.polar_scater_widget.draw_multiwedge_scater(sw_list)
+        self.polar_scater_widget.draw_multiwedge_scater(sw_list)

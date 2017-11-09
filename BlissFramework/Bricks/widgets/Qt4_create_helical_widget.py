@@ -78,8 +78,8 @@ class CreateHelicalWidget(CreateTaskBase):
              self.lines_treewidget_selection_changed)
         self._lines_widget.create_line_button.clicked.connect(\
              self.create_line_button_clicked)
-        #self._lines_widget.create_auto_line_button.clicked.connect(\
-        #     self.create_auto_line_button_clicked)
+        self._lines_widget.create_auto_line_button.clicked.connect(\
+             self.create_auto_line_button_clicked)
         self._lines_widget.remove_line_button.clicked.connect(\
              self.remove_line_button_clicked)  
         self._lines_widget.overlay_cbox.stateChanged.connect(\

@@ -51,6 +51,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._advanced_methods = None
         self._grid_map = {}
         self.spacing = [0, 0]
+        self.dc_selected = False
 
         # Graphic elements ----------------------------------------------------
         self._advanced_methods_widget = loadUi(os.path.join(\
@@ -173,13 +174,13 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         self._acq_widget.acq_widget_layout.osc_start_label.\
              setText("Oscillation middle:")
-        self._acq_widget.acq_widget_layout.\
-             set_max_osc_range_button.setEnabled(False)
 
         hor_size, ver_size = bl_setup_hwobj.beam_info_hwobj.get_beam_size()
         self.spacing = [hor_size, ver_size] 
-        self._advanced_methods_widget.hor_spacing_ledit.setText("%.1f" % (hor_size * 1000))
-        self._advanced_methods_widget.ver_spacing_ledit.setText("%.1f" % (ver_size * 1000))
+        self._advanced_methods_widget.hor_spacing_ledit.setText(\
+             "%.1f" % (hor_size * 1000))
+        self._advanced_methods_widget.ver_spacing_ledit.setText(\
+             "%.1f" % (ver_size * 1000))
 
     def approve_creation(self):
         """
@@ -194,17 +195,21 @@ class CreateAdvancedWidget(CreateTaskBase):
             result = False
         else:
             grid_properties = selected_grid.get_properties()
-            exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
+            exp_time = float(self._acq_widget.\
+                acq_widget_layout.exp_time_ledit.text())
             speed = grid_properties["yOffset"] / exp_time
-            print speed
             if speed >= 0.8:
-                logging.getLogger("GUI").error("Translation speed %.3f is above the limit 0.8" % speed)
+                logging.getLogger("GUI").error(\
+                    "Translation speed " + \
+                    "%.3f is above the limit 0.8" % speed)
                 return False
-            osc_range_per_frame = float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())
+            osc_range_per_frame = float(self._acq_widget.\
+                acq_widget_layout.osc_range_ledit.text())
             speed = osc_range_per_frame / exp_time
-            print speed
             if speed >= 166:
-                logging.getLogger("GUI").error("Rotation speed per frame %.3f is above the limit 166" % speed)
+                logging.getLogger("GUI").error(\
+                    "Rotation speed per frame " + \
+                    "%.3f is above the limit 166" % speed)
                 return False
             result = True
 
@@ -221,13 +226,13 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         CreateTaskBase.single_item_selection(self, tree_item)
+        self.dc_selected = False
+
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
             pass
-            #self._init_models()
-            ##self._acq_widget.update_data_model(self._acquisition_parameters,
-            #                                    self._path_template)            
         elif isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
-            self.setDisabled(False)
+            pass
+            #self.setDisabled(False)
         elif isinstance(tree_item, Qt4_queue_item.DataCollectionQueueItem) or \
              isinstance(tree_item, Qt4_queue_item.XrayCenteringQueueItem):
 
@@ -246,6 +251,8 @@ class CreateAdvancedWidget(CreateTaskBase):
                 #self._acq_widget.disable_inverse_beam(True)
                 #self._graphics_manager_hwobj.de_select_all()
                 self._graphics_manager_hwobj.select_shape(data_collection.grid)
+                self._advanced_methods_widget.grid_treewidget.setCurrentItem(\
+                     self._grid_map[data_collection.grid])
 
                 self._path_template = data_collection.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
@@ -255,6 +262,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
                 self.get_acquisition_widget().use_osc_start(True)
+            self.dc_selected = True
         else:
             self.setDisabled(True)
         self.grid_treewidget_item_selection_changed()
@@ -269,6 +277,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         tasks = []
         selected_grid = self.get_selected_grid()
+
         mesh_dc = self._create_dc_from_grid(sample, selected_grid)
 
         exp_type = str(self._advanced_methods_widget.method_combo.currentText())
@@ -277,6 +286,9 @@ class CreateAdvancedWidget(CreateTaskBase):
         elif exp_type == "XrayCentering":
             xray_centering = queue_model_objects.XrayCentering(mesh_dc)
             tasks.append(xray_centering)
+        else:
+            logging.getLogger("GUI").\
+                warning("Method %s does not exist in queue_model_objects" % exp_type)
         mesh_dc.run_processing_parallel = exp_type
 
         return tasks
@@ -296,24 +308,23 @@ class CreateAdvancedWidget(CreateTaskBase):
             grid_properties = shape.get_properties()
             info_str_list = []
             info_str_list.append(grid_properties["name"])
-            #info_str_list.append("%d" % (grid_properties["beam_x_mm"] * 1000.0))
-            #info_str_list.append("%d" % (grid_properties["beam_y_mm"] * 1000.0))
             info_str_list.append("%d" % grid_properties["num_lines"])
             info_str_list.append("%d" % grid_properties["num_images_per_line"])
 
-            exp_time = max(float(grid_properties["yOffset"] / 0.8),
-                               self._acq_widget.exp_time_validator.bottom()+0.00001)
-            self._acq_widget.acq_widget_layout.exp_time_ledit.setText("%.6f" % exp_time)
-
+            if not self.dc_selected:
+                exp_time = max(float(grid_properties["yOffset"] / 0.795),
+                      self._acq_widget.exp_time_validator.bottom()+0.00001)
+                self._acq_widget.acq_widget_layout.exp_time_ledit.setText("%.6f" % exp_time)
+ 
             grid_treewidget_item = QTreeWidgetItem(\
                 self._advanced_methods_widget.grid_treewidget,
                 info_str_list)
-            grid_treewidget_item.setSelected(True)
             self._grid_map[shape] = grid_treewidget_item
-            self.grid_treewidget_item_selection_changed()
-            self.update_grid_osc_total_range()
 
-            
+            if not self.dc_selected:
+                grid_treewidget_item.setSelected(True)
+                self.grid_treewidget_item_selection_changed()
+                self.update_grid_osc_total_range()
             
     def shape_deleted(self, shape, shape_type):
         """Removes shape from QTreeWidget and self._grid_map
@@ -335,12 +346,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         self.enable_grid_controls(False)
       
-        osc_dynamic_limits = None
-
-        #if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
-        #    osc_dynamic_limits = self._beamline_setup_hwobj.\
-        #        diffractometer_hwobj.get_osc_dynamic_limits()
-
         for item in self._grid_map.items():
             grid = item[0]
             treewidget_item = item[1]
@@ -354,8 +359,6 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._acq_widget.acq_widget_layout.first_image_ledit.setText(\
                      "%d" % grid_properties["first_image_num"])
                 centred_point = grid.get_centred_position()
-                #self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
-                #     "%.2f" % float(centred_point.phi))
                 self._acq_widget.acq_widget_layout.kappa_ledit.setText(\
                      "%.2f" % float(centred_point.kappa))
                 self._acq_widget.acq_widget_layout.kappa_phi_ledit.setText(\
@@ -368,26 +371,6 @@ class CreateAdvancedWidget(CreateTaskBase):
                 treewidget_item.setText(3, str(grid_properties["num_lines"]))
                 treewidget_item.setText(4, str(grid_properties["num_images_per_line"]))
             
-                #exp_time = max(float(grid_properties["yOffset"] / 0.8),
-                #               self._acq_widget.exp_time_validator.bottom())
-                #self._acq_widget.acq_widget_layout.exp_time_ledit.setText("%.6f" % exp_time)
-                """
-                if osc_dynamic_limits:
-                    osc_range_limits = \
-                        (0, 
-                         min(abs(centred_point.phi - osc_dynamic_limits[0]),
-                             abs(osc_dynamic_limits[1] - centred_point.phi)) /\
-                         float(grid_properties["num_images_per_line"]))
-
-                    self._acq_widget.update_osc_range_limits(osc_range_limits)
-                    self._acq_widget.update_num_images_limits(\
-                         grid_properties["num_lines"] * \
-                         grid_properties["num_images_per_line"])
-                    self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(str(\
-                         grid_properties["num_images_per_line"] * \
-                         float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())))
-                """
-
                 grid.setSelected(True) 
                 self.enable_grid_controls(True)
             else:
@@ -524,8 +507,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._advanced_methods_widget.move_up_button.setEnabled(state)
         self._advanced_methods_widget.move_down_button.setEnabled(state)
 
-        self._acq_widget.acq_widget_layout.\
-             set_max_osc_range_button.setEnabled(state)
+        self._acq_widget.acq_widget_layout.set_max_osc_range_button.setEnabled(\
+             state and self._in_plate_mode)
 
     def grid_osc_range_ledit_changed(self, new_value):
         """Osc range per frame changed
@@ -548,7 +531,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         if grid_properties:
             try:
                 self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
-                     "%.4f" % (float(new_value) / grid_properties["num_images_per_line"]))
+                     "%.4f" % (float(new_value) / grid_properties["num_images_per_line"] - 1e-5))
             except:
                 pass
 
@@ -576,7 +559,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
                  "%.4f" % ((lower + upper) / 2))
             self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
-                 "%.4f" % (abs(upper - lower)))
+                 "%.4f" % (abs(upper - lower) - 1e-4))
             self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
                  "%.4f" % (abs(lower - upper) / grid_properties["num_images_per_line"]))
             self._acq_widget.acq_widget_layout.exp_time_ledit.setText(\

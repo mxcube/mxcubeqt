@@ -47,7 +47,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         if not name:
             self.setObjectName("create_discrete_widget")
-        self.init_models()
 
         # Hardware objects ----------------------------------------------------
 

@@ -101,6 +101,7 @@ class TwoAxisPlotWidget(QWidget):
         self._two_axis_figure_canvas.clear()
         self._two_axis_figure_canvas.set_axes_labels("energy", "counts")
         self._two_axis_figure_canvas.set_title("Scan started")
+
     def plot_energy_scan_results(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \
                      chooch_graph_x, chooch_graph_y1, chooch_graph_y2, title):
         self._two_axis_figure_canvas.add_curve(\
@@ -338,8 +339,10 @@ class TwoDimenisonalPlotWidget(QWidget):
     """
     Descript. :
     """
+    mouseMovedSignal = pyqtSignal(float, float)
     mouseClickedSignal = pyqtSignal(float, float)
     mouseDoubleClickedSignal = pyqtSignal(float, float)
+    mouseLeftSignal = pyqtSignal()
 
     def __init__(self, parent=None):
         """
@@ -363,7 +366,8 @@ class TwoDimenisonalPlotWidget(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding,
                            QSizePolicy.Expanding)
 
-        self.mpl_canvas.axes.grid(True)
+        #self.mpl_canvas.axes.grid(True)
+        self.mpl_canvas.axes.grid(color='r')
         self.mpl_canvas.fig.canvas.mpl_connect(\
              "button_press_event", self.button_pressed)
         self.mpl_canvas.fig.canvas.mpl_connect(\
@@ -390,6 +394,13 @@ class TwoDimenisonalPlotWidget(QWidget):
 
     def motion_notify_event(self, mouse_event):
         QApplication.restoreOverrideCursor()
+
+        if mouse_event.xdata and mouse_event.ydata:
+            self.mouseMovedSignal.emit(mouse_event.xdata,
+                                       mouse_event.ydata)
+        else:
+            self.mouseLeftSignal.emit()
+
         if self.selection_xrange and mouse_event.xdata:
             do_update = False
             (x_start, x_end) = self.mpl_canvas.axes.get_xlim()

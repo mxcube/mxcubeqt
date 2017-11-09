@@ -218,8 +218,8 @@ class AcquisitionWidget(QWidget):
         self.update_exp_time_limits()
 
     def update_osc_range_per_frame_limits(self):
-        max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
-        if max_osc_speed:  
+        try:
+            max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
             top_limit = max_osc_speed * float(self.acq_widget_layout.exp_time_ledit.text())
 
             self.osc_range_per_frame_validator.setTop(top_limit)
@@ -227,7 +227,9 @@ class AcquisitionWidget(QWidget):
                        "%0.4f\n4 digits precision." % top_limit
 
             self.acq_widget_layout.osc_range_ledit.setToolTip(tool_tip)
-            self._acquisition_mib.validate_all()            
+            self._acquisition_mib.validate_all()
+        except:
+            pass
 
     def update_osc_total_range(self):
         self.acq_widget_layout.osc_total_range_ledit.blockSignals(True)
@@ -243,9 +245,11 @@ class AcquisitionWidget(QWidget):
     def osc_total_range_ledit_changed(self, new_value):
         if not self.grid_mode:
             try:
+                num_images = int(float(new_value) / \
+                   float(self.acq_widget_layout.osc_range_ledit.text()))
                 self.acq_widget_layout.num_images_ledit.blockSignals(True)
-                self.acq_widget_layout.num_images_ledit.setText(\
-                   "%d" % (float(new_value) / float(self.acq_widget_layout.osc_range_ledit.text()))) 
+                self.acq_widget_layout.num_images_ledit.setText("%d" % num_images)
+                self._acquisition_parameters.num_images = num_images
                 self.acq_widget_layout.num_images_ledit.blockSignals(False)
             except:
                 pass
@@ -279,12 +283,15 @@ class AcquisitionWidget(QWidget):
             return scan_limits, result_exp_time
 
     def update_exp_time_limits(self):
-        exp_time_limits = self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
-        max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
-        top_limit = float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
-        limits = (max(exp_time_limits[0], top_limit), exp_time_limits[1]) 
+        try:
+           exp_time_limits = self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
+           max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
+           top_limit = float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
+           limits = (max(exp_time_limits[0], top_limit), exp_time_limits[1]) 
 
-        self.update_detector_exp_time_limits(limits)
+           self.update_detector_exp_time_limits(limits)
+        except:
+           pass
 
     def update_kappa(self, new_value):
         """
@@ -327,7 +334,7 @@ class AcquisitionWidget(QWidget):
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
 
     def use_max_osc_range(self, state):
-        self.acq_widget_layout.set_max_osc_range_button.setVisible(state)
+        self.acq_widget_layout.set_max_osc_range_button.setEnabled(state)
 
     def set_beamline_setup(self, beamline_setup):
         """
@@ -336,6 +343,7 @@ class AcquisitionWidget(QWidget):
         self._beamline_setup_hwobj = beamline_setup
         limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
         self._diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
+ 
         
         if 'osc_range' in limits_dict:
             limits = tuple(map(float, limits_dict['osc_range'].split(',')))
@@ -353,6 +361,7 @@ class AcquisitionWidget(QWidget):
                                                 self.acq_widget_layout.osc_range_ledit,
                                                 float, 
                                                 self.osc_range_per_frame_validator)
+
         self._acquisition_mib.bind_value_update('osc_total_range',
                                                 self.acq_widget_layout.osc_total_range_ledit,
                                                 float,
@@ -456,6 +465,8 @@ class AcquisitionWidget(QWidget):
             num_passes = self.acq_widget_layout.findChild(QLineEdit, "num_passes_ledit")
             if num_passes:
                 num_passes.setDisabled(True)
+
+        self.init_detector_roi_modes()
 
     def first_image_ledit_change(self, new_value):
         """
@@ -726,7 +737,7 @@ class AcquisitionWidget(QWidget):
 
         if mad:
             mad_prefix = self._path_template.mad_prefix
-            index = MAD_ENERGY_COMBO_NAMES[mad_prefix]
+            index = MAD_ENERGY_COMBO_NAMES[str(mad_prefix)]
             self.acq_widget_layout.energies_combo.setCurrentIndex(index)
             self.acq_widget_layout.mad_cbox.setChecked(True)
             self.acq_widget_layout.energies_combo.setEnabled(True)

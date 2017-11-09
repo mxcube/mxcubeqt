@@ -107,6 +107,8 @@ class ConfirmDialog(QDialog):
         self.conf_dialog_layout.file_treewidget.clear()
         self.conf_dialog_layout.interleave_cbx.setChecked(False)
         self.conf_dialog_layout.interleave_images_num_ledit.setText("")
+        self.conf_dialog_layout.inverse_cbx.setChecked(False)
+        self.conf_dialog_layout.inverse_beam_num_images_ledit.setText("")
 
         for item in checked_items:
             #item_type_name = ""
@@ -127,7 +129,7 @@ class ConfirmDialog(QDialog):
                 sample_treewidget_item = QTreeWidgetItem(\
                    self.conf_dialog_layout.summary_treewidget,
                    info_str_list)
-                for col in range(12):
+                for col in range(13):
                     sample_treewidget_item.setBackground(col, \
                       QBrush(Qt4_widget_colors.TREE_ITEM_SAMPLE))
                 sample_treewidget_item.setExpanded(True)
@@ -166,11 +168,12 @@ class ConfirmDialog(QDialog):
                       'd', int(path_template.precision) * '#' )
                 file_name = file_name.strip(' ')
                 info_str_list.append(file_name)
-                info_str_list.append("%.2f keV" %acq_parameters.energy)
+                info_str_list.append("%.3f keV" %acq_parameters.energy)
                 info_str_list.append("%.2f A" %acq_parameters.resolution)
                 info_str_list.append("%.2f %%" %acq_parameters.transmission)
-                info_str_list.append(str(acq_parameters.num_images))
+                info_str_list.append("%.1f" %acq_parameters.osc_start)
                 info_str_list.append(str(acq_parameters.osc_range))
+                info_str_list.append(str(acq_parameters.num_images))
                 info_str_list.append("%s s" % str(acq_parameters.exp_time))
                 info_str_list.append(str(acq_parameters.num_images * \
                                          acq_parameters.osc_range))
@@ -179,7 +182,7 @@ class ConfirmDialog(QDialog):
 
                 collection_treewidget_item = QTreeWidgetItem(\
                      collection_group_treewidget_item, info_str_list)
-                for col in range(12):
+                for col in range(13):
                     collection_treewidget_item.setBackground(col, \
                       QBrush(Qt4_widget_colors.TREE_ITEM_COLLECTION))  
              
@@ -211,6 +214,7 @@ class ConfirmDialog(QDialog):
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)
         self.conf_dialog_layout.interleave_cbx.setEnabled(interleave_items > 1)
+        self.conf_dialog_layout.inverse_cbx.setEnabled(interleave_items == 1)
 
         num_samples = len(self.sample_items)
         num_collections = len(collection_items)
@@ -247,6 +251,12 @@ class ConfirmDialog(QDialog):
                     item_model.interleave_num_images = \
                       int(self.conf_dialog_layout.\
                       interleave_images_num_ledit.text())
+                except:
+                    pass
+                try:
+                    item_model.inverse_beam_num_images = \
+                      int(self.conf_dialog_layout.\
+                          inverse_beam_num_images_ledit.text())
                 except:
                     pass
             if acq_parameters: 

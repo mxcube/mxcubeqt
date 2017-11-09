@@ -21,14 +21,13 @@ from QtImport import *
 PYMCA_EXISTS = False
 
 
-"""
 if not qt_variant == 'PyQt5':
     try:
         from PyMca.QtBlissGraph import QtBlissGraph as Graph
         PYMCA_EXISTS = True
     except:
         pass
-"""
+
 if not PYMCA_EXISTS:
     from Qt4_matplot_widget import TwoAxisPlotWidget as Graph
 
@@ -118,7 +117,7 @@ class PymcaPlotWidget(QWidget):
         self.pymca_graph.replot()
         self.pymca_graph.setx1axislimits(min(chooch_graph_x),
                                          max(chooch_graph_x))
-     
+ 
     def plot_finished(self):
         """
         Descript. :
