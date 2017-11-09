@@ -1251,17 +1251,19 @@ class WindowDisplayWidget(QScrollArea):
             self.__put_back_colors()
         original_color = widget.palette().color(QPalette.Window)
         selected_color = QColor(150, 150, 200)
-        Qt4_widget_colors.set_widget_color(widget,
-                                           selected_color,
-                                           QPalette.Background)
+        widget.set_background_color(selected_color)
+        #Qt4_widget_colors.set_widget_color(widget,
+        #                                   selected_color,
+        #                                   QPalette.Background)
 
         def put_back_colors(wref=weakref.ref(widget),
                             bkgd_color=original_color):
             widget = wref()
             if widget is not None:
-                Qt4_widget_colors.set_widget_color(widget,
-                                                   bkgd_color,
-                                                   QPalette.Background)
+                widget.set_background_color(bkgd_color)
+                #Qt4_widget_colors.set_widget_color(widget,
+                #                                   bkgd_color,
+                #                                   QPalette.Background)
         self.__put_back_colors = put_back_colors
 
     def eventFilter(self, widget, event):

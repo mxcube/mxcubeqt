@@ -66,8 +66,3 @@ API
 ===
 * :doc:`packages/HardwareObjects`
 * :doc:`packages/example_files`
-
-Other information
-*****************
-* :doc:`mxcube_meetings`
-* :doc:`changelog`

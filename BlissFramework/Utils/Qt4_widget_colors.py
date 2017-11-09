@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+from QtImport import Qt, QColor, QPalette
 
 from random import randint
 import numpy as np

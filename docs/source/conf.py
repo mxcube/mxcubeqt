@@ -181,7 +181,7 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('user_manual', 'MxCuBE2.tex', u'MxCuBE 2.0 Documentation',
+  ('user_manual', 'MxCuBE2.tex', u'MxCuBE User manual',
    u'MxCuBE Collaboration', 'manual'),
 ]
 
