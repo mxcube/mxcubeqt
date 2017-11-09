@@ -162,7 +162,7 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
         from PyQt4.QtCore import *
         from PyQt4.QtGui import *
         from PyQt4.uic import *
-        from PyQt4.QtSvg import *
+        #from PyQt4.QtSvg import *
         
         def getQApp():
             return qApp
@@ -282,28 +282,6 @@ if qt_variant in ('PyQt4', 'PyQt5', 'PySide'):
             size = super(RotatedHeaderView, self).sectionSizeFromContents(logicalIndex)
             size.transpose()
             return size
-    """
-    class QDoubleSlider(QSlider):
-        def __init__(self, orientation=Qt.Horizontal, parent=None):
-            super(QSlider, self).__init__(orientation, parent)
-
-            self.decimal_places = 2
-
-            self.valueChanged.connect(self.value_changed)
-
-        def setMinimum(self, minimum):
-            QSlider.setMinimum(self, int(minimum * pow(10, self.decimal_places)))
-
-        def setMaximum(self, maximum):
-            QSlider.setMaximum(self, int(maximum * pow(10, self.decimal_places)))
-
-        def setValue(self, value):
-            QSlider.setValue(self, int(value * pow(10, self.decimal_places)))
-
-        def value_changed(self, value):
-            print "value changed ", value
-            QSlider.valueChanged(self, value / pow(10, self.decimal_places))
-    """
 
     class QDoubleSlider(QSlider):
 

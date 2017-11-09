@@ -1,197 +1,278 @@
-Qt version user manual
+MXCuBE user manual
 #############################
 
 This manual describes :ref:`graphical user interface <gui>` of MXCuBE
 and basic operations how to run a necessary data collection (see :ref:`How to's section <howto>`).
 GUI layout described in this manual could differ from the actual MXCuBE GUI at the beamline.
 
-.. _gui:
-
 ***************************
-1. Graphical User Interface
+Graphical User Interface
 ***************************
 
-In this section  the graphical user interface is described.
+In this section the graphical user interface is described.
 :ref:`Main screen <figure_main_screen>` of MXCuBE is divided into areas:
 
-1. :ref:`Login and proposal <login_and_proposal>`
-2. :ref:`Sample list and data collection queue <sample_list_queue>`
-3. :ref:`Sample video and centring <sample_video_centring>`
-4. :ref:`Beam definition tools <beam_definition>`
-5. :ref:`Collection methods <collection_methods>`
-6. :ref:`Machine status <machine_status>`
-7. :ref:`Logging and chat <logging_chat>`
+* :ref:`Login and proposal <login_and_proposal>`
+* :ref:`Sample tree <sample_tree>`
+* :ref:`Sample video and centring <sample_video_centring>`
+* :ref:`Beam defining tools <beam_definition>`
+* :ref:`Collection methods <collection_methods>`
+* :ref:`Machine status <machine_status>`
+* :ref:`Logging and chat <logging_chat>`
 
 .. _figure_main_screen:
 
 .. figure:: images/manual_main_screen.png
-   :scale: 30 %
    :alt: manual_main_screen
-
-   Fig. 1. Main screen.
-
-Further each area is described in details.
 
 .. _login_and_proposal:
 
-1.1. Login and proposal
+Login and proposal
 =======================
 
 Area is used to identify user and link ISPyB with MXCuBE. 
 Depending on the beamline one of two authentication methods is possible:
 
-1. User is authenticated automaticaly based on the computer login name. In this case MXCuBE retrieves all proposals associated with current user and populates combobox. Proposal that have a session on the current day is selected as active proposal.
+1. User is authenticated automaticaly based on the computer login name.
 
 .. figure:: images/manual_ispyb_proposal.png
-   :scale: 80 %
+   :scale: 70 %
    :alt: manual_ispyb_proposal
 
 2. User manually has to enter user name and password.
 
 After a **successfull login**:
 
-* Proposal combobox becomes available and if several proposals are found then user canselect the neccessary proposal from combobox.
+* All proposals with the current user are retrieved and combobox with proposals is populated.
+* Proposal having a session on the current day is selected as active proposal. If no proposal has a scheduled session then the newest proposal is selected and a 24h session is created.
+* If several proposals exist, then user can select necessary proposal from proposol combobox.
 * Data collection methods and sample tree becomes available.
 * The path where user's data are recorded will apper in the collection method area.
 
-If **no proposal** is found then informations is not stored in ISPyB.
+.. warning::
+   If **no proposal** is found then the information about collections is not stored in ISPyB.
 
-.. _sample_list_queue:
+.. figure:: images/no_proposal.png
+   :scale: 70 %
+   :alt: manual_ispyb_proposal
 
-1.2 Sample list and data collection queue
-=========================================
+.. _sample_tree:
 
-Screen area is used to choose sample mounting mode and control execution of the task queue.
+Sample tree
+===========
 
-1.2.1. Basic operations with sample entry
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sample tree is used to mount/dismount samples on the goniometer and schedule, executed necessary data collections.
 
-1. Select the sample mounting mode.
+Basic operations with the sample tree
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Manually mounted
-* Sample changer
-* Plate
-* Mounted sample
+**1. Sample mounting mode**
 
 .. figure:: images/manual_sample_mount_mode.png
    :scale: 80 %
    :alt: manual_sample_mount_mode
 
-Based on the beamline configuration sample changer availability and type could differ.
+* *Manually mounted*. In the tree a single sample item is display and user has to manualy mount a sample on the goniometer. Use this mode if sample changer is not used.
+* *Sample changer*. Sample tree is populated with Pucks and Samples according to the content of the sample changer.
+* *Plate*. Sample tree is populated with Rows and Cells corresponding to the plate.
+* *Mounted sample*. If the sample changer of plate manipulator is used and a sample is mounted then sample tree is filtered and just the mounted sample is displayed.
 
-2. Select the default sample centring mode:
+.. image:: images/manual_sample_tree_manual.png
+    :width: 15 %
+    :alt: Sample tree in the Manually mounted mode
+.. image:: images/manual_sample_tree_sc.png
+    :width: 15 %
+    :alt: Sample tree in the Sample changer mode
 
-* Manual: manual 3 click centring procedure.
-* Semi automatic: auto-loop centring requesting user validation (most common option).
-* Fully automatic: auto-loop centring without user validation (for automatic pipelines).
+.. note::
+   Based on the beamline configuration sample changer and plate availability may differ.
+
+**2. Sample centering mode**
+
+Sample centring mode defines the type of centring that will be requested before executing a collection without a pre-centered position.
 
 .. figure:: images/manual_sample_centring_mode.png
    :scale: 80 %
    :alt: manual_sample_centring_mode
 
-3. Show sample changer details.
-4. Synchronize with ISPyB database to display a sample list.
-5. In sample changer mode: sample list sorted by puck appears, 1:1 = puck1: sample1
-6. Delete the selected collection(s).
-7. Pause the running task queue.
+* *Manual 3-click*: manual 3 click centring procedure.
+* *Optical semi automatic*: auto-loop visual centring requesting user validation (most common option).
+* *Optical fully automatic*: auto-loop visual centring without user validation (for automatic pipelines).
+* *Automatic X-ray*: method performs a mesh scan and a line scan to locate a crystal.
 
-.. figure:: images/manual_sample_tree_manual.png
-   :scale: 80 %
-   :alt: manual_sample_tree_manual
+**3. Sample**
 
-.. figure:: images/manual_sample_tree_sc.png
-   :scale: 80 %
-   :alt: manual_sample_tree_sc
+Combobox allows to link a sample from ISPyB to the manually mounted sample. Combobox becomes active if the manually mode is selected and synchronization with ISPyB has been done (button ISPyB pressed).
 
-1.2.2. Detailed information about the sample tree
+**4. Filter**
+
+Filter sample tree based on the selected filter:
+
+* *No filter*: remove selected filter.
+* *Star*: display entries with added star (right click on the entry and click "Add star").
+* *Sample name*
+* *Protein name*
+* *Basket index*
+* *Executed*
+* *Not executed*
+* *OSC*
+* *Helical*
+* *Characterisation*
+* *Energy scan*
+* *XRF spectrum*
+* *Advanced*
+
+**5. Show SC-Details details**
+
+Opens a new tab with detailed information about the sample changer.
+
+.. figure:: images/manual_sc_brick.png
+   :scale: 50 %
+   :alt: manual_sc_brick
+
+**6. ISPyB**
+
+Link samples with ISPyB.
+
+Detailed information about the sample tree
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Sample list not updated with ISPyB content.
-2. Sample list updated with ISPyB content.
-3. Tick the box corresponding to:
+Sample tree describe user created data collections sequences.
+After starting MXCuBE tree is populated with Pucks/Rows and sample(s) corresponing to the content of sample changer or plate.
+Data collection items are added to the tree by selecting necessary sample, choosing collection method and adding method to the tree (see :ref:`collection methods <collection_methods>` and :ref:`How to create a new data collection<create_new_collection>` sections).
+Several actions are available by right clicking on the tree item:
 
-* a puck, to collect every tasks for this puck when clicking on “collect queue”.
-* a sample line, to collect every tasks for this sample when clicking on “collect queue”.
+**Puck or Row**:
+
+* *Rename* item
+* *Add star* for filtering
+* *Paste* collection item
+* *Add collection from file*
+
+**Sample**:
+
+* *Rename* item
+* *Add star* for filtering
+* *Paste* collection item
+* *Mount* sample on the goniometer
+* *Dismount* sample if sample is mounted on the goniometer
+* *Add diffraction plan from ISPyB*
+* *Add collection from file*
+* *Details*
+
+**Data collection**:
+
+* *Rename item*
+* *Add star*
+* *Cut*
+* *Copy*
+* *Paste*
+* *Save in file*
+* *Load from file*
+* *Add collection from file*
+* *Remove*
+* *Details*
+
+Tick the box corresponding to:
+
+* a puck, to add a collection item to all corresponding samples or to collect every tasks for this puck when clicking on “Collect queue”.
+* a sample item, to add a collection item or to collect every tasks for this sample when clicking on “Collect queue”.
 * a particular task, to collect only this task when clicking on “collect queue”.
 
 .. figure:: images/manual_sample_tree_ispyb.png
    :scale: 80 %
    :alt: manual_sample_tree_ispyb
 
-4. Sample status: 
+Tree items are painted based on the following color scheme:
 
-* blue: mounted on the goniostat.
-* black: selected.
-* no color: not selected.
-
-5. List of tasks done or to be performed.
-
+* no color: not yet performed and not selected.
+* blue: item is selected.
+* violet: sample mounted on the goniostat.
 * green: done
 * red: failed
 * yellow: done but no result
-* no color: to be done
 
 .. figure:: images/manual_sample_tree_colors.png
    :scale: 80 %
    :alt: manual_sample_tree_colors
 
-6. Double click on the task to see the task plan/details (if not performed yet) 
-or results (if performed).
-
-.. figure:: images/manual_sc_brick.png
-   :scale: 80 %
-   :alt: manual_sc_brick
-
-1.2.3. Sample changer controls
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. hint::
+   * Moving cursor over a data collection entry opens a tooltip with collection parameters.
+   * Double click on the tree item opens a tab with details (if not performed yet) or results (if performed).
 
 .. _sample_video_centring:
 
-1.3. Sample video and centring
+Sample video and centring
 ==============================
 
-Sample position is defined by diffractometer motors:
+A life view of the sample is the center element of the MXCuBE GUI:
+
+* At the bottom left corner a scale is displayed.
+* White line correspons to the osciallation axis (current angle of the axis is displayed next to the line)
+* The blue circle reflects the beam size defined by an aperture and the rectangle shape describes the beam defined by slits.
+
+Sample positioning tools
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Double click on the sample moves the sample to the beam. Additionaly to define a new sample position several widgets to change osciallation angle, kappa, phi angles are available. Motor control widget contains:
+ 
+1. Motor name.
+2. Current position of the motor. To change it write a new value and press Enter.
+3. Move the current value up or down by a step defined in the step combobox.
+4. Stop the movement.
+5. Step definition combobox.
 
 .. figure:: images/manual_motor_control.png
    :scale: 80 %
    :alt: manual_motor_control
 
-1. Motor name.
-2. Current value. To change it wite a new value and press Enter.
-3. Move the current value op or down by a step.
-4. Step definition.
-
-1.3.1. Sample positioning tools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Additional widgets to control **Zoom**, **Focus**, **Holder lenght**, **Front** and **Back light** are available.
 
 .. figure:: images/manual_sample_control.png
-   :scale: 50 %
    :alt: manual_sample_control.png
 
-1. Holder length
-2. Front light
-3. Back light
-4. Zoom
+.. hint::
+   * Use mouse wheel to rotate the sample.
+   * Double click on the crystal to move it into the beam.
 
-1.3.2. Main tools
-^^^^^^^^^^^^^^^^^
+Graphical tools
+^^^^^^^^^^^^^^^
 
-.. figure:: images/manual_main_tools.png
-   :scale: 50 %
-   :alt: manual_main_tools
+Right next to the sample life view graphical tools are available:
 
-1. Three click centering of the sample.
-2. Save current centred position.
-3. Create helical line (select two centring points to create a line).
-4. Draw 2D mesh.
-5. Autofocus.
-6. Take a snapshot (automatically done at the data collection start)
-7. Crystal visual realign.
-8. Select all centring points.
-9. Delete all centring points.
-10. Auto centering of the sample.
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_center.png   | Three click centering of the sample |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_save.png     | Save current centred position       |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_line.png     | Create a helical line               |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_grid.png     | Draw a 2D mesh                      |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_focus.png    | Autofocus                           |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_snapshot.png | Take a snapshot                     |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_align.png    | Visual kappa realign                |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_selectall.png| Select all centring points          |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_clear.png    | Delete all graphical objects        |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
+| .. image:: images/button_auto.png     | Auto centering of the sample        |
+|    :scale: 80%                        |                                     |
++---------------------------------------+-------------------------------------+
 
-The same functions are available via a popup menu. Do a right click on the screen to show tools options.
+Right click on the screen opens a popup with the graphical tools.
 
 .. figure:: images/manual_left_click1.png
    :scale: 80 %
@@ -201,21 +282,30 @@ The same functions are available via a popup menu. Do a right click on the scree
    :scale: 80 %
    :alt: manual_left_click2
 
+.. hint::
+   For more information on how to perform a visual realign (see :ref:`How to do visual reorientation <visual_reorient>`)
+
 .. _beam_definition:
 
-1.4. Beam definition tools
-==========================
+Beam defining tools
+===================
 
-1. Select aperture.
-2. Select horizontal and vertical slit size.
-3. Select beam focusing mode (check if available at the beamline).
-4. Final beam size at sample.
+Beam defining tools allows to change the beam conditions. From the left side to right following widgets are available:
+
+* Beam size. Displays beam size at the sample.
+* Beam focusing. Controls beamline focusing mode (focused or unfocused beam).
+* CRL. Allows to define the setting of comound refractive lenses (CRLs). Combobox sets CRLs in *Manual* and *Automatic* mode or removes all lenses (*Out*). Button *Set* sets the lenses according to the current energy. Double click on the table cell sets in or out individual lens. Arrows up and down changes the setting of lenses. 
+* Slits. Allows to define beam with slits.
+* Aperture.
+* Phase. Changes the phase of the diffractometer.
+
+.. hint::
+   To match the beam size to the crystal use graphical tool *Define beam size with slits* available in menu after right click on the screen.
 
 .. _collection_methods:
 
-1.5. Collection methods
+Collection methods
 =======================
-
 
 1. Collection method option (NB : For more information on the different options please refer to the “How to” section
 ).
@@ -228,10 +318,10 @@ The same functions are available via a popup menu. Do a right click on the scree
 
 3. For each collection method, once you have adjusted the parameters, "Add to queue" will add the collection to the selected sample(s) and display it in the queue of the sample list area. 
 
-1.5.1. Standart collection
+Standart collection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use the standard collection when you know your diffraction plan
+Use the standard collection when you know your diffraction plan.
 
 .. figure:: images/manual_create_dc_parameters.png
    :scale: 60 %
@@ -245,7 +335,7 @@ Use the standard collection when you know your diffraction plan
 6. If necessary adjust processing parameters and tick "Run autoprocessing" 
 (not ticked by default) to run automatic EDNA processing.
 
-1.5.2. Characterisation
+Characterisation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the characterisation option when you want to automatically obtain a diffraction plan from EDNA.
@@ -265,7 +355,7 @@ Use the characterisation option when you want to automatically obtain a diffract
 9. Untick "Characterisation" group box to take reference images but not execute EDNA characterisation
 
 
-1.5.3. Helical collection
+Helical collection
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the helical collection to collect along a specified line to minimize radiation damage
@@ -281,7 +371,7 @@ Use the helical collection to collect along a specified line to minimize radiati
 5. Tick to collect in shutterless mode (ticked by default)
 6. Fill in if you want to force a particular space group in the EDNA auto-processing.
 
-1.5.4. Energy scan
+Energy scan
 ^^^^^^^^^^^^^^^^^^
 
 Perform an energy scan if you expect your crystal to contain a particular element that might be excited (Selenium, Iron, Magnesium...)
@@ -293,7 +383,7 @@ Perform an energy scan if you expect your crystal to contain a particular elemen
 1 Select an element in the periodic table and click on “Add to queue”.
 
 
-1.5.5. XRF spectrum
+XRF spectrum
 ^^^^^^^^^^^^^^^^^^^
 
 .. figure:: images/manual_create_xrfspectrum.png
@@ -303,7 +393,7 @@ Perform an energy scan if you expect your crystal to contain a particular elemen
 1 Enter the count time and add to queue.
 2 and 2’ Tick the XRF spectrum parameters box and choose where to save your data (NB : to know more about XRF spectrum go to “how to” section).
 
-1.5.6. Advanced
+Advanced
 ^^^^^^^^^^^^^^^
 
 “Advanced” displays collection types made of task and decision series. Example: “X-ray centering” will center the best part of your crystal in the beam by doing a MESH scan followed by a line scan at 90° and will analyse the diffraction images
@@ -315,7 +405,7 @@ For more information on the different advanced options please refer to “How to
 
 .. _machine_status:
 
-1.6. Machine status
+Machine status
 ===================
 
 1. Machine current and Synchrotron filling mode.
@@ -335,7 +425,7 @@ For more information on the different advanced options please refer to “How to
 
 .. _logging_chat:
 
-1.7. Log and chat
+Log and chat
 =================
 
 Dialogue area : here MXCuBE indicates what it is doing or its status. It will flashes orange when a new information is displayed or when user input is required.
@@ -343,11 +433,17 @@ Dialogue area : here MXCuBE indicates what it is doing or its status. It will fl
 
 .. _howto:
 
+Beamline test
+=================
+
+Toolbar
+================
+
 ***********
-2. How to's
+How to's
 ***********
 
-2.1. Use the basics of MXCuBE
+Use the basics of MXCuBE
 =============================
 
 **In basic mode**:
@@ -367,7 +463,7 @@ Dialogue area : here MXCuBE indicates what it is doing or its status. It will fl
 5. Collect queue.
 
 
-2.2. Link your samples with ISPyB
+Link your samples with ISPyB
 =================================
 
 Why linking my samples from ISPyB to MXCuBE ?
@@ -385,17 +481,19 @@ Facilitate your experiment (image prefix and directories are automatically fille
 3. Synchronize with ISPyB.
 4. View your sample list -> “1:1” becomes “1:1- Acronyme-sample1”.
 
-2.3. Select a sample from sample changer and mount it
+Select a sample from sample changer and mount it
 =====================================================
 
 1. Click on a sample to select it. The sample name will be highlighted in black
 2. Right click to access the sample changer mounting menu and click on mount
 3. To un-mount manually a mounted sample, right click on the sample name to access the sample changer mounting menu then select un-mount
 
-2.5. Create a new collection
+Create a new collection
 ============================
 
-2.5.1. Center your sample and save a centring position
+.. _create_new_collection:
+
+Center your sample and save a centring position
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Dialogue box : After auto loop-centring is finished you can save the current position or re-center.
@@ -403,7 +501,7 @@ Facilitate your experiment (image prefix and directories are automatically fille
 3. Save this position (mandatory to start a collection), a yellow circle with a number appears .
 4. Once selected, the yellow crossed circle becomes bold green.
 
-2.5.2. Create a task by using created centring position
+Create a task by using created centring position
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Having a sample selected and a position saved and selected for this sample (see previous page):
@@ -414,7 +512,7 @@ Having a sample selected and a position saved and selected for this sample (see 
 4. You can stop, pause or continue the process at any time (effective at the end of the current task).
 5. When finished, sample list will become green (if successful), yellow or red. If results are expected (EDNA characterisation...) double click on the result line to view them.
 
-2.5.3. Perform same collection method on several positions of one sample
+Perform same collection method on several positions of one sample
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Follow this process to perform the same action on various parts of the same sample. 
@@ -428,7 +526,7 @@ Example: EDNA characterisation
 NB: It is possible at this level to rank the positions automatically within ISPyB (see ISPyB
 manual) and to select the crystal part which is of best quality.
 
-2.5.3. Perform same collection method on multiple samples
+Perform same collection method on multiple samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Follow this process to perform the same action(s) on each sample of a selected pool.
@@ -444,7 +542,7 @@ Example: EDNA characterisation on each sample to select the best suitable crysta
 4. If semi-automatic centring was selected, a centring step is added to the queue. For each sample, press continue to accept the automatic centring or re-center. This is not the case in fully automatic mode.
 5. “Collect queue” will collect all ticked tasks from the queue (untick a task if you do not want it to be performed straightaway).
 
-2.5.3. Perform a helical data collection
+Perform a helical data collection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the helical data collection to collect along a specified axis along the spindle axis:
@@ -457,37 +555,50 @@ Use the helical data collection to collect along a specified axis along the spin
 
 NB: The saved positions are numbered and the helical collection will start at the first selected point (here “10”).
 
-2.5.4. Define a grid for a mesh scan or a X-ray centring
+Define a grid for a mesh scan or a X-ray centring
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Click on this icon to start grid drawing.
 2. To set the grid: click on the first corner (A) then drag until you obtain the desired shape (B).
-3. Select the appropriate workflow in “Collection method/ Advanced” and “Add to queue”
-4. Each node of the grid will be the location of a data collection.
-5. It is possible to adjust spacing between beam within the grid before or after drawing the grid.
+3. During and after the drawing total number of scan lines and number of images per line are displayed on the top right corner.
+
+* Horizontal and vertical spacing in microns defines distance between collection frames.
+* If beam size is more than 20 pixels then grid is displayed with beam shapes. Otherwise rectange defines the scan area.
+* If the grid is not parallel to the screen, then a projection of a grid is displayed.
+* Use slider to change the transperancy of the grid. 
+
+Perform a mesh scan
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Create a grid as described in 2.5.4.
+2. Select the MeshScan method in “Collection method/Advanced” tab and press "Add to queue"
+3. Press "Collect queue
 
 NB: You can draw several grid to work on different part of your crystal.
 
-2.5.5. Perform a mesh scan
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-2.5.6. Perform a X-ray centring
+Perform a X-ray centring
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.5.8. Measure an energy scan (MAD/SAD)
+Measure an energy scan (MAD/SAD)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.5.9. Measure a X-ray fluorescence (XRF) spectrum
+Measure a X-ray fluorescence (XRF) spectrum
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.6. Measure distance, angle or area
-====================================
-
-2.7. Visualy re-orient crystal
+.. _visual_reorient:
+Visualy re-orient crystal
 ==============================
 
+Align beam
+================
+
+Check processing results
+=========================
+
+1. Right click on the data collection entry and select "View in ISPyB".
+
 *******************
-3. Trouble shooting
+Trouble shooting
 *******************
 
 .. note::
@@ -498,7 +609,7 @@ NB: You can draw several grid to work on different part of your crystal.
 .. note::
     MXCuBE does not respond anymore.
 
-* Kill MXCuBE and restart it.
+* Start a new MXCuBE instance by clicking on the MXCuBE icon. Previous instnce will be terminated and a new one will be started.
 
 .. note::
    My sample is not mounted/unmounted when I click on mount/unmount.
@@ -529,3 +640,9 @@ NB: You can draw several grid to work on different part of your crystal.
 
 * Click on the line corresponding to this method in the queue. This will open tab where you can edit parameters.
 
+.. note::
+   I added a collection entry, but the Collect button is disabled.
+
+* Check if the safety shutter is opened.
+* Check if there is no error from PPU server.
+* Make sure data collection item, group and sample is ticked.

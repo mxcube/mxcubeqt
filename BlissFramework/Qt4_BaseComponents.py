@@ -28,6 +28,8 @@ import weakref
 from QtImport import *
 
 import BlissFramework
+from BlissFramework.Utils import Qt4_widget_colors
+
 from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
@@ -1095,19 +1097,27 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """
         return self.property_bag.delProperty(property_name)
 
-    def getHardwareObject(self, hardware_object_name):
+    def getHardwareObject(self, hardware_object_name, optional=False):
         """
         Descript. :
         """
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        screen=get_splash_screen()
-        if screen is not None:
-            screen.set_message("Loading hardware object: %s" % hardwareObjectName)
+        #screen=get_splash_screen()
+        #if screen is not None:
+        #    screen.set_message("Loading hardware object: %s" % hardwareObjectName)
 
-        return HardwareRepository.HardwareRepository().\
-               getHardwareObject(hardware_object_name)
+        hwobj = HardwareRepository.HardwareRepository().\
+                   getHardwareObject(hardware_object_name)
+        if hwobj is None and not optional:
+            logging.getLogger("GUI").error(\
+                 "%s: " % self.objectName() + \
+                 "Unable to add hardware object: '%s'" % hardware_object_name)
+            self.set_background_color(Qt4_widget_colors.LIGHT_RED)
+
+        return hwobj
+            
 
     def __hardwareObjectDiscarded(self, hardware_object_name):
         """
@@ -1226,15 +1236,10 @@ class BlissWidget(Connectable.Connectable, QFrame):
             if hasattr(widget, "configuration"):
                 return widget
 
-    def add_state(self, state_arg):
-        logging.getLogger().debug("Adding FSM state: % s" % str(state_arg))
-        top_level_widget = self.get_window_display_widget()
-        return top_level_widget.add_state(state_arg)
-
-    def add_transition(self, source, dest, trigger_widget, trigger_signal):
-        logging.getLogger().debug("Adding FSM transition: ")
-        top_level_widget = self.get_window_display_widget()
-        return top_level_widget.add_transition(source, dest, trigger_widget, trigger_signal)
+    def set_background_color(self, color):
+        Qt4_widget_colors.set_widget_color(self,
+                                           color,
+                                           QPalette.Background)
 
 class NullBrick(BlissWidget):
 
