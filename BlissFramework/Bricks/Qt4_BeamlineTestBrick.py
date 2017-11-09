@@ -156,8 +156,8 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                              self.test_finished)
                 self.update_focus_status(None, None)
                 self.beamline_test_hwobj.update_values()
-        elif property_name == 'hwobj_unittest':
-            self.unittest_hwobj = self.getHardwareObject(new_value)
+        #elif property_name == 'hwobj_unittest':
+        #    self.unittest_hwobj = self.getHardwareObject(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 

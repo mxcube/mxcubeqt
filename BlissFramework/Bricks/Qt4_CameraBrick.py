@@ -79,10 +79,17 @@ class Qt4_CameraBrick(BlissWidget):
             "Centring point on current position",
             self.create_point_current_clicked)
         temp_action.setShortcut("Ctrl+2")
+        create_menu.addAction(Qt4_Icons.load_icon("ThumbUp"),
+                              "Centring points with one click",
+                              self.create_points_one_click_clicked)
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("Line.png"),
             "Helical line",
             self.create_line_clicked)
+        temp_action = create_menu.addAction(
+            Qt4_Icons.load_icon("Line.png"),
+            "Automatic helical line",
+            self.create_auto_line_clicked) 
         temp_action.setShortcut("Ctrl+3")
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("Grid"),
@@ -104,17 +111,17 @@ class Qt4_CameraBrick(BlissWidget):
         beam_mark_menu = self.popup_menu.addMenu("Beam mark")
         self.move_beam_mark_manual_action = beam_mark_menu.addAction(\
              "Set position manually", self.move_beam_mark_manual)
-        self.move_beam_mark_manual_action.setEnabled(False)
+        #self.move_beam_mark_manual_action.setEnabled(False)
         self.move_beam_mark_auto_action = beam_mark_menu.addAction(\
              "Set position automaticaly", self.move_beam_mark_auto)
-        self.move_beam_mark_auto_action.setEnabled(False)
+        #self.move_beam_mark_auto_action.setEnabled(False)
         self.display_beam_size_action = beam_mark_menu.addAction(\
              "Display size", self.display_beam_size_toggled)
         self.display_beam_size_action.setCheckable(True)
 
         self.define_beam_action = self.popup_menu.addAction(\
              Qt4_Icons.load_icon("Draw"),
-             "Define size with slits",
+             "Define beam size with slits",
              self.define_beam_size)
         self.define_beam_action.setEnabled(False)
         self.popup_menu.addSeparator()
@@ -262,10 +269,11 @@ class Qt4_CameraBrick(BlissWidget):
                  ["", "Controls are disabled in the Slave mode",
                   "", "Ask for control to be able to control MXCuBE"
                   ""], hide_msg=False)
-   
+    """
     def set_expert_mode(self, is_expert_mode):
         self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
         self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
+    """
 
     def set_info_msg(self, msg):
         self.info_label.setText(msg)
@@ -323,11 +331,17 @@ class Qt4_CameraBrick(BlissWidget):
     def create_point_click_clicked(self):
         self.graphics_manager_hwobj.start_centring(tree_click=True)
 
+    def create_points_one_click_clicked(self):
+        self.graphics_manager_hwobj.start_one_click_centring()
+
     def create_point_current_clicked(self):
         self.graphics_manager_hwobj.start_centring(tree_click=False)
 
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
+
+    def create_auto_line_clicked(self):
+        self.graphics_manager_hwobj.create_auto_line()
 
     def create_grid(self):
         self.graphics_manager_hwobj.create_grid()

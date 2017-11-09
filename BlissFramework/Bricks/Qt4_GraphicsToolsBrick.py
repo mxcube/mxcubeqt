@@ -93,7 +93,11 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
              Qt4_Icons.load_icon("Line.png"),
              "Helical line",
              self.create_line_clicked)
-        temp_action.setShortcut("Ctrl+L")
+        temp_action.setShortcut("Ctrl+3")
+        temp_action = _create_menu.addAction(\
+             Qt4_Icons.load_icon("Line.png"),
+             "Automatic helical line",
+             self.create_auto_line_clicked) 
         temp_action = _create_menu.addAction(\
              Qt4_Icons.load_icon("Grid"),
              "Grid",
@@ -234,13 +238,13 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
             self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
 
     def measure_distance_clicked(self):
-        self.graphics_manager_hwobj.start_measure_distance(wait_click = True)
+        self.graphics_manager_hwobj.start_measure_distance(wait_click=True)
 
     def measure_angle_clicked(self):
-        self.graphics_manager_hwobj.start_measure_angle(wait_click = True)
+        self.graphics_manager_hwobj.start_measure_angle(wait_click=True)
 
     def measure_area_clicked(self):
-        self.graphics_manager_hwobj.start_measure_area(wait_click = True)
+        self.graphics_manager_hwobj.start_measure_area(wait_click=True)
 
     def create_point_click_clicked(self): 
         if self.isEnabled():
@@ -253,6 +257,10 @@ class Qt4_GraphicsToolsBrick(BlissWidget):
     def create_line_clicked(self):
         if self.isEnabled():
             self.graphics_manager_hwobj.create_line()
+
+    def create_auto_line_clicked(self):
+        if self.isEnabled():
+            self.graphics_manager_hwobj.create_auto_line()
 
     def create_grid_clicked(self):
         if self.isEnabled():

@@ -106,6 +106,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.position_spinbox.setMaximum(10000)
         self.position_spinbox.setMinimumSize(QSize(75, 25))
         self.position_spinbox.setMaximumSize(QSize(75, 25))
+        self.position_spinbox.setDecimals(3)
         self.position_spinbox.setToolTip("Moves the motor to a specific " + \
               "position or step by step; right-click for motor history")
 

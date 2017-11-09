@@ -224,7 +224,11 @@ class Qt4_MarvinBrick(BlissWidget):
             Qt4_widget_colors.set_widget_color(self.central_puck_ledit,
                                                Qt4_widget_colors.LIGHT_GREEN,
                                                QPalette.Base)
-            self.central_puck_ledit.setText("Centre puck: %d" % info_dict.get("mounted_puck"))
+            if info_dict.get("mounted_puck"):  
+                self.central_puck_ledit.setText("Center puck: %d" % \
+                                                info_dict.get("mounted_puck"))
+            else:
+                self.central_puck_ledit.setText("No center puck")
             if info_dict.get('mounted_puck', 0) - 1 >= 0:
                 self.puck_switches_table.item(0, info_dict.get('mounted_puck', 0) - 1).\
                      setBackground(Qt4_widget_colors.LIGHT_GREEN)
