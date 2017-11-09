@@ -52,3 +52,4 @@ class SnapshotWidget(QWidget):
                              Qt.KeepAspectRatio,
                              Qt.SmoothTransformation)
         self.snapshot_label.setPixmap(QPixmap(image))
+        self.setFixedWidth(width)

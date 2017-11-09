@@ -71,6 +71,15 @@ class PlateNavigatorWidget(QWidget):
         self.plate_navigator_table.setEditTriggers(\
              QAbstractItemView.NoEditTriggers)
 
+        self.plate_navigator_table.setHorizontalScrollBarPolicy(\
+                 Qt.ScrollBarAlwaysOff)
+        self.plate_navigator_table.setVerticalScrollBarPolicy(\
+                 Qt.ScrollBarAlwaysOff)
+        self.plate_navigator_cell.setHorizontalScrollBarPolicy(\
+                 Qt.ScrollBarAlwaysOff)
+        self.plate_navigator_cell.setVerticalScrollBarPolicy(\
+                 Qt.ScrollBarAlwaysOff)
+
     def sample_table_double_clicked(self, table_item):
         """
         Descript. : when user double clicks on plate table then sample in
@@ -122,21 +131,21 @@ class PlateNavigatorWidget(QWidget):
             temp_header_item = QTableWidgetItem("%d" % (col + 1))
             self.plate_navigator_table.setHorizontalHeaderItem(\
                  col, temp_header_item)
-            self.plate_navigator_table.setColumnWidth(col, 25)
+            self.plate_navigator_table.setColumnWidth(col, 24)
 
         for row in range(self.num_rows):
             temp_header_item = QTableWidgetItem(chr(65 + row))
             self.plate_navigator_table.setVerticalHeaderItem(\
                  row, temp_header_item)
-            self.plate_navigator_table.setRowHeight(row, 25)
+            self.plate_navigator_table.setRowHeight(row, 24)
 
         for col in range(self.num_cols):
             for row in range(self.num_rows):
                 temp_item = QTableWidgetItem()
                 self.plate_navigator_table.setItem(row, col, temp_item)
 
-        table_height = 25 * (self.num_rows + 1)
-        table_width = 25 * (self.num_cols + 1)
+        table_height = 24 * (self.num_rows + 1)
+        table_width = 24 * (self.num_cols + 1)
         self.plate_navigator_table.setFixedWidth(table_width)
         self.plate_navigator_table.setFixedHeight(table_height)
         #self.plate_navigator_cell.setFixedHeight(table_height)
@@ -144,7 +153,7 @@ class PlateNavigatorWidget(QWidget):
         self.setFixedHeight(table_height + 2)
 
         # TODO replace 150 with actual size
-        self.navigation_item.set_size(50, table_height)
+        self.navigation_item.set_size(20, table_height)
         self.navigation_item.set_num_drops_per_cell(plate_info['num_drops'])
         self.refresh_plate_location()
 
@@ -163,6 +172,10 @@ class PlateNavigatorWidget(QWidget):
         """
         self.plate_manipulator_hwobj.load_sample(\
             (table_item.row() + 1, table_item.column() * self.num_drops + 1))
+
+    #def set_navigation_cell_width(self, width):
+    #    self.plate_navigator_cell.setFixedWidth(width)
+    #    self.navigation_item.rect.setWidth(width)
 
 class NavigationItem(QGraphicsItem):
 
@@ -203,6 +216,8 @@ class NavigationItem(QGraphicsItem):
         pen.setWidth(1)
         pen.setColor(Qt.black)
         painter.setPen(pen)
+
+        print self.scene().width()
         if self.__num_drops:
             for drop_index in range(self.__num_drops):
                 pos_x = self.scene().width() / 2
@@ -218,10 +233,10 @@ class NavigationItem(QGraphicsItem):
         #pen.setColor(QtCore.Qt.blue)
         painter.setPen(pen)
         if self.__navigation_posx and self.__navigation_posy:
-            painter.drawLine(self.__navigation_posx - 10, self.__navigation_posy,
-                             self.__navigation_posx + 10, self.__navigation_posy)
-            painter.drawLine(self.__navigation_posx, self.__navigation_posy - 10,
-                             self.__navigation_posx, self.__navigation_posy + 10)
+            painter.drawLine(self.__navigation_posx - 5, self.__navigation_posy,
+                             self.__navigation_posx + 5, self.__navigation_posy)
+            painter.drawLine(self.__navigation_posx, self.__navigation_posy - 5,
+                             self.__navigation_posx, self.__navigation_posy + 5)
 
     def set_navigation_pos(self, pos_x, pos_y):
         """
@@ -244,5 +259,5 @@ class NavigationItem(QGraphicsItem):
         position = QPointF(event.pos())
         #this is ugly.
         self.parent.navigation_item_double_clicked(\
-              position.x() / self.scene().width(),
+              0.5 + 0.5 * position.x() / self.scene().width(),
               position.y() / self.scene().height())

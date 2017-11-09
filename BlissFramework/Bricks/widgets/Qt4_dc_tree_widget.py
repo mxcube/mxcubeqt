@@ -26,6 +26,7 @@ import time
 import logging
 import gevent
 import jsonpickle
+import webbrowser
 from datetime import datetime
 from collections import namedtuple
 
@@ -215,7 +216,6 @@ class DataCollectTree(QWidget):
         self.sample_tree_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setAttribute(Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
-        self.plate_navigator_widget.plate_navigator_cell.setFixedWidth(50)
 
         font = self.history_tree_widget.font()
         font.setPointSize(8)
@@ -252,9 +252,12 @@ class DataCollectTree(QWidget):
 
     def show_context_menu(self, context_menu_event):
         """When on a tree item clicked creates and opens popup menu"""
+        if len(self.get_selected_items()) > 1:
+            return
+
         self.item_menu = QMenu(self.sample_tree_widget)
         item = self.sample_tree_widget.currentItem()
-
+        
         if item:
             add_remove = True
             add_details = False
@@ -319,8 +322,12 @@ class DataCollectTree(QWidget):
                 self.item_menu.addAction("Remove", self.delete_click) 
             if add_details:
                 self.item_menu.addAction("Details", self.show_details)
+            if isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
+                open_in_ispyb_action = self.item_menu.addAction(\
+                    "View results in ISPyB", self.open_ispyb_link)
+                open_in_ispyb_action.setEnabled(item.get_model().id > 0)
             self.item_menu.popup(QCursor.pos())
-        
+         
     def item_double_click(self):
         """Shows more details of a double clicked tree item"""
         self.show_details()
@@ -333,7 +340,7 @@ class DataCollectTree(QWidget):
     def item_click(self):
         """Single item click verifies if there is a path conflict"""
         self.check_for_path_collisions()
-        self.sample_tree_widget_selection()
+        #self.sample_tree_widget_selection()
         self.toggle_collect_button_enabled()
              
     def item_changed(self, item, column):
@@ -441,6 +448,7 @@ class DataCollectTree(QWidget):
 
         if item:
             self.sample_tree_widget.scrollToItem(item, QAbstractItemView.PositionAtCenter)
+            self.sample_tree_widget.horizontalScrollBar().setValue(0)
 
     def mount_sample(self):
         """Calls sample mounting"""
@@ -777,6 +785,10 @@ class DataCollectTree(QWidget):
         """Pause handlers"""
         if state:
             self.continue_button.setText('Continue')
+            QToolTip.showText(self.continue_button.mapToGlobal(\
+                QPoint(0, 10)),
+                "If necessary please center a new point.\n\n" + \
+                "Press 'Continue' to continue." )
             Qt4_widget_colors.set_widget_color(self.continue_button, 
                                                Qt4_widget_colors.LIGHT_YELLOW, 
                                                QPalette.Button)
@@ -789,7 +801,9 @@ class DataCollectTree(QWidget):
 
     def collect_stop_toggle(self):
         """Stops queue"""
-        checked_items = self.get_checked_items()
+        #checked_items = self.get_checked_items()
+        checked_items = self.get_collect_items()
+
         self.queue_hwobj.disable(False)
 
         path_conflict = self.check_for_path_collisions()     
@@ -1045,6 +1059,25 @@ class DataCollectTree(QWidget):
         while item: 
             if item.checkState(0) > 0 and not \
                item.isHidden():
+                checked_items.append(item)
+            it += 1
+            item = it.value()
+        return checked_items
+
+    def get_collect_items(self):
+        """Returns a list of all items to be collected
+           Do not include samples without data collection(s)
+        """
+        checked_items = []
+        it = QTreeWidgetItemIterator(self.sample_tree_widget)
+        item = it.value()
+        while item:
+            append = False 
+            if item.checkState(0) > 0 and not item.isHidden():
+                append = True  
+                if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                    append = len(item.get_all_grand_children()) > 0
+            if append:
                 checked_items.append(item)
             it += 1
             item = it.value()
@@ -1469,6 +1502,15 @@ class DataCollectTree(QWidget):
                     "Cannot insert an item from file %s", filename)
                 if load_file:
                     load_file.close() 
+
+    def open_ispyb_link(self):
+        selected_items = self.get_selected_items()
+        if selected_items:
+            item_model = selected_items[0].get_model().id
+            if item_model:
+                webbrowser.open("%s%d" % \
+                  (self.beamline_setup_hwobj.lims_client_hwobj.get_dc_display_link(),
+                   item_model))
 
     def create_task_group(self, sample_item_model, ref_item=None):
         """Creates empty task group"""

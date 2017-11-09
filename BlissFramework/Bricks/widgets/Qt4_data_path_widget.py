@@ -114,6 +114,11 @@ class DataPathWidget(QWidget):
                 available_chars += "%"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)
 
+        if len(new_value) > 50:
+            logging.getLogger("GUI").\
+                error("Current prefix is to long (max 50 characters are allowed)")
+            new_value = new_value[:-1]
+
         self.data_path_layout.prefix_ledit.setText(new_value)
         self.data_path_layout.prefix_ledit.setCursorPosition(cursor_pos)
 

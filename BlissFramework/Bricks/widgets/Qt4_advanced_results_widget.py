@@ -37,7 +37,7 @@ class AdvancedResultsWidget(QWidget):
         # Internal variables --------------------------------------------------
         self._initialized = None
         self._tree_view_item = None
-        self._half_widget_size = 900
+        self._half_widget_size = 1200
 
         # Graphic elements ----------------------------------------------------
         self.heat_map_widget = HeatMapWidget(self)

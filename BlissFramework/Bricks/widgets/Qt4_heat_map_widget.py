@@ -43,18 +43,21 @@ class HeatMapWidget(QWidget):
 
         # Internal values -----------------------------------------------------
         self.__results = None
-        self.__result_display = None
+        self.__result_display = {}
         self.__associated_grid = None
         self.__associated_data_collection = None
         self.__selected_x = 0
         self.__selected_y = 0
         self.__selected_image_serial = 0
         self.__is_map_plot = None
-        self.__score_type_index = 0
+        self.__score_key = "score"
         self.__max_value = 0
         self.__filter_min_value = 0
         self.__best_pos_list = None
         self.__heat_map_max_size = []
+        self.__heatmap_clicked = False
+        self.__enable_continues_image_display = True
+        self.__tooltip_text = None
 
         # Graphic elements ----------------------------------------------------
         self._heat_map_gbox = QGroupBox('Heat map', self)
@@ -117,7 +120,7 @@ class HeatMapWidget(QWidget):
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self._image_info_label.setAlignment(Qt.AlignRight)
+        self._image_info_label.setAlignment(Qt.AlignLeft)
         self._image_info_label.setSizePolicy(QSizePolicy.Expanding, 
                                              QSizePolicy.Fixed)
 
@@ -129,23 +132,48 @@ class HeatMapWidget(QWidget):
              connect(self.relaunch_processing_clicked)
         self._create_points_button.clicked.\
              connect(self.create_points_clicked)
+        self._heat_map_plot.mouseMovedSignal.\
+             connect(self.mouse_moved)
         self._heat_map_plot.mouseClickedSignal.\
              connect(self.mouse_clicked)
         self._heat_map_plot.mouseDoubleClickedSignal.\
              connect(self.move_to_position_clicked)
+        self._heat_map_plot.mouseLeftSignal.connect(\
+             self.mouse_left_plot)
+             
 
         # Other ---------------------------------------------------------------
-        tooltip_text = "Double click to move to the position. " + \
-                       "Right click to open menu."
-        self._heat_map_plot.setToolTip(tooltip_text) 
+        self.__tooltip_text = "Double click to move to the position. " + \
+                              "Right click to open menu."
+        self._heat_map_plot.setToolTip(self.__tooltip_text) 
         self._heat_map_popup_menu.addSeparator()
         self._heat_map_popup_menu.addAction(\
-             "Move to position", self.move_to_position_clicked)
+             "Move to position",
+             self.move_to_position_clicked)
         self._heat_map_popup_menu.addAction(\
-             "Create centring point", self.create_centring_point_clicked)
+             "Create centring point",
+             self.create_centring_point_clicked)
+
+        self._heat_map_popup_menu.addAction(\
+             "Create helical line",
+             self.create_helical_line_clicked)
+        self._heat_map_popup_menu.addAction(\
+             "Rotate 90 degrees and create helical line",
+             self.rotate_and_create_helical_line_clicked)
+        
         self._heat_map_popup_menu.addSeparator()
         self._heat_map_popup_menu.addAction(\
              "Open image in ADXV", self.display_image_clicked)
+        self.continues_display_action = \
+             self._heat_map_popup_menu.addAction(\
+             "Continues image display in ADXV",
+              self.toogle_continues_image_display)
+        self.continues_display_action.setCheckable(True)
+        self.continues_display_action.setChecked(True)
+
+        self._heat_map_popup_menu.addSeparator()
+        options_menu = self._heat_map_popup_menu.addMenu("Options")
+
         self._heat_map_plot.contextMenuEvent = self.open_heat_map_popup_menu
 
         score_types = ["Score", "Spots num", "Int aver.", "Resolution"]
@@ -186,9 +214,10 @@ class HeatMapWidget(QWidget):
              "Move to position",
               self.move_to_best_position_clicked)
         self._best_pos_table.contextMenuEvent = self.open_best_pos_popup_menu
+        #self._best_pos_table.setHidden(True)
 
         screenShape = QDesktopWidget().screenGeometry()
-        self.__heat_map_max_size = (screenShape.width() / 2 - 200,
+        self.__heat_map_max_size = (screenShape.width() / 2,
                                     screenShape.height() / 2)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
@@ -239,8 +268,16 @@ class HeatMapWidget(QWidget):
             self._best_pos_popup_menu.popup(point)  
 
     def score_type_changed(self, score_type_index):
-        self.__score_type_index = score_type_index
-        #self._threshold_slider.setValue(0)
+        if score_type_index == 0:
+            self.__score_key = "score"
+        elif score_type_index == 1:
+            self.__score_key = "spots_num"
+        elif score_type_index == 2:
+            self.__score_key = "spots_int_aver"
+        elif score_type_index == 3:
+            self.__score_key = "spots_resolution"
+        elif score_type_index == 4:
+            self.__score_key = "image_num"
         self.refresh()         
 
     def refresh(self):
@@ -248,25 +285,17 @@ class HeatMapWidget(QWidget):
         if self.__results is None:
             return         
 
-        self.__result_display = copy(self.__results["score"])
-        if self.__score_type_index == 0:
-            self.__result_display = copy(self.__results["score"])
-        elif self.__score_type_index == 1:    
-            self.__result_display = copy(self.__results["spots_num"])
-        elif self.__score_type_index == 2:
-            self.__result_display = copy(self.__results["spots_int_aver"])
-        elif self.__score_type_index == 3:
-            self.__result_display = copy(self.__results["spots_resolution"])
-        elif self.__score_type_index == 4:
-            self.__result_display = copy(self.__results["image_num"])
+        for key in self.__results.keys():
+            self.__result_display[key] = copy(self.__results[key])
 
-        self.__result_display = numpy.transpose(self.__result_display)
-        self.__filter_min_value = self.__result_display.max() * \
+        self.__filter_min_value = \
+             self.__result_display[self.__score_key].max() * \
              self._threshold_slider.value() / 100.0
-        self.__result_display[self.__result_display < self.__filter_min_value] = 0
+        self.__result_display[self.__score_key][self.__result_display[self.__score_key] < \
+                                                self.__filter_min_value] = 0
     
-        if len(self.__result_display.shape) == 1:
-            x_data = numpy.arange(1, self.__result_display.shape[0] + 1)
+        if len(self.__result_display[self.__score_key].shape) == 1:
+            x_data = numpy.arange(1, self.__result_display[self.__score_key].shape[0] + 1)
             self._heat_map_plot.clear()
             #self._heat_map_plot.add_curve(self.__result_display, x_data, "Dozor result")
             self._heat_map_plot.add_curve(self.__results["score"],
@@ -300,8 +329,8 @@ class HeatMapWidget(QWidget):
                 self._summary_textbrowser.append("<b>Mesh parameters</b>")
                 grid_properties = self.__associated_grid.get_properties()
 
-
-                self._heat_map_plot.plot_result(self.__result_display,
+                print self.__result_display[self.__score_key]
+                self._heat_map_plot.plot_result(numpy.transpose(self.__result_display[self.__score_key]),
                                                 aspect=grid_properties["dx_mm"] / \
                                                        grid_properties["dy_mm"])
 
@@ -313,8 +342,8 @@ class HeatMapWidget(QWidget):
                     (grid_properties["xOffset"], u"\u00B5"))
                 self._summary_textbrowser.append("Vertical spacing: %.1f %sm" % \
                     (grid_properties["yOffset"], u"\u00B5"))
-                self._summary_textbrowser.append("Beam size : %.1f x %.1f %sm" % \
-                    (grid_properties["beam_x_mm"], grid_properties["beam_y_mm"], u"\u00B5"))
+                #self._summary_textbrowser.append("Beam size : %.1f x %.1f %sm" % \
+                #    (grid_properties["beam_x_mm"], grid_properties["beam_y_mm"], u"\u00B5"))
                 self._summary_textbrowser.append("Scan range : %.1f x %.1f mm" % \
                     (grid_properties["dx_mm"], grid_properties["dy_mm"]))
 
@@ -330,21 +359,36 @@ class HeatMapWidget(QWidget):
         #self.__associated_grid.set_min_score(self._threshold_slider.value() / 100.0)
         self.refresh()
 
+    def mouse_moved(self, pos_x, pos_y):
+        if self.__enable_continues_image_display and \
+           self.__heatmap_clicked:
+            if abs(int(self.__selected_x) - int(pos_x)) >= 1 or \
+               abs(int(self.__selected_y) - int(pos_y)) >= 1:
+                self.__selected_x = pos_x
+                self.__selected_y = pos_y
+                self.display_image_clicked()
+                self.display_image_tooltip()
+
     def mouse_clicked(self, pos_x, pos_y):
+        self.__heatmap_clicked = True
         self.__selected_x = pos_x
         self.__selected_y = pos_y
         image, line, self.selected_image_serial, image_path = \
               self.get_image_parameters_from_coord()
         try:
            col, row = self.get_col_row_from_image_line(line, image)
-           msg = "Image: %d, value: %.3f" %(self.selected_image_serial,
-                 self.__result_display[row][col])
+           msg = "Image: %d, value: %.1f" %(self.selected_image_serial,
+                 self.__result_display[self.__score_key][col][row])
         except:
            msg = "Image: %d" % self.selected_image_serial
         self._image_info_label.setText(msg)
 
     def plot_double_clicked(self, event):
         self.move_to_selected_position()
+
+    def mouse_left_plot(self):
+        self.__heatmap_clicked = False
+        self._heat_map_plot.setToolTip(self.__tooltip_text)
 
     def move_to_position_clicked(self):
         self.move_to_selected_position()
@@ -355,9 +399,7 @@ class HeatMapWidget(QWidget):
         """
         self.__results = results
         self.refresh()
-        if last_results:
-            self.set_best_pos()
-            self.setEnabled(True)
+        self.set_best_pos()
 
     def clean_result(self):
         """
@@ -387,7 +429,7 @@ class HeatMapWidget(QWidget):
          then screen x and y coordinates are estimated.
         """
         if self.__is_map_plot:
-            result_display = numpy.transpose(self.__result_display)
+            result_display = numpy.transpose(self.__result_display[self.__score_key])
             #step_x = pix_width / self.__result_display.shape[0]
             #step_y = pix_height / self.__result_display.shape[1]
             for col in range(result_display.shape[0]):
@@ -407,8 +449,29 @@ class HeatMapWidget(QWidget):
         Displays image in image tracker (by default adxv)
         """
         image, line, image_num, image_path = self.get_image_parameters_from_coord()
-        if self._beamline_setup_hwobj.image_tracking_hwobj is not None:
+        try:
             self._beamline_setup_hwobj.image_tracking_hwobj.load_image(image_path)
+        except:
+            pass
+
+    def display_image_tooltip(self):
+        image, line, self.selected_image_serial, image_path = \
+              self.get_image_parameters_from_coord()
+        tooltip_text = "Image no. %d" % self.selected_image_serial
+        if self.__results is not None:
+            try:
+                col, row = self.get_col_row_from_image_line(line, image)
+                tooltip_text += "\nTotal score: %.1f" %  \
+                                self.__result_display['score'][col][row] +\
+                                "\nNumber of spots: %d" % \
+                                self.__result_display['spots_num'][col][row]
+            except:
+                pass
+        self._heat_map_plot.setToolTip(tooltip_text)
+
+    def toogle_continues_image_display(self):
+        self.__enable_continues_image_display = \
+            self.continues_display_action.isChecked()
 
     def get_image_parameters_from_coord(self, coord_x=None, coord_y=None):
         """
@@ -443,7 +506,9 @@ class HeatMapWidget(QWidget):
         """
         Returns col and row from image and line
         """
-        return self.__associated_grid.get_col_row_from_line_image(line, image)
+        col, row = self.__associated_grid.get_col_row_from_line_image(line, image)
+        row = self.__result_display[self.__score_key].shape[1] - row - 1    
+        return col, row
 
     def create_centring_point(self, coord_x=None, coord_y=None):
         """
@@ -477,6 +542,16 @@ class HeatMapWidget(QWidget):
         self._beamline_setup_hwobj.shape_history_hwobj.\
              create_centring_point(True, {"motors": motor_pos_dict})
 
+    def create_helical_line_clicked(self):
+        motor_pos_dict = self.__associated_grid.\
+              get_motor_pos_from_col_row(self.__selected_x, self.__selected_y)
+        self._beamline_setup_hwobj.shape_history_hwobj.create_auto_line(motor_pos_dict)
+
+    def rotate_and_create_helical_line_clicked(self):
+        self.move_to_selected_position()
+        self._beamline_setup_hwobj.diffractometer_hwobj.move_omega_relative(90)
+        self._beamline_setup_hwobj.shape_history_hwobj.create_auto_line()
+
     def move_to_selected_position(self):
         """
         Descript. : Moves to grid position
@@ -501,7 +576,7 @@ class HeatMapWidget(QWidget):
                       int(self.__selected_x), num_images)
 
         self._beamline_setup_hwobj.diffractometer_hwobj.\
-             move_to_motors_positions(motor_pos_dict)
+             move_to_motors_positions(motor_pos_dict, wait=True)
 
     def set_best_pos(self):
         """
@@ -509,26 +584,26 @@ class HeatMapWidget(QWidget):
                     by fast processing.
         """
         self._best_pos_table.setRowCount(len(self.__results.get("best_positions", [])))
-        for row in range(len(self.__results.get("best_positions", []))):
-            self._best_pos_table.setItem(row, 0, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("index") + 1)))  
-            self._best_pos_table.setItem(row, 1, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("score"))))
-            self._best_pos_table.setItem(row, 2, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("spots_num"))))
-            self._best_pos_table.setItem(row, 3, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("spots_int_aver"))))
-            self._best_pos_table.setItem(row, 4, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("spots_resolution"))))
+        for row, best_pos in enumerate(self.__results.get("best_positions", [])):
+            self._best_pos_table.setItem(row, 0, QTableWidgetItem("%d" \
+                 % (best_pos.get("index") + 1)))  
+            self._best_pos_table.setItem(row, 1, QTableWidgetItem("%.2f"\
+                 % (best_pos.get("score"))))
+            self._best_pos_table.setItem(row, 2, QTableWidgetItem("%d"\
+                 % (best_pos.get("spots_num"))))
+            self._best_pos_table.setItem(row, 3, QTableWidgetItem("%.2f"\
+                 % (best_pos.get("spots_int_aver"))))
+            self._best_pos_table.setItem(row, 4, QTableWidgetItem("%.2f"\
+                 % (best_pos.get("spots_resolution"))))
             self._best_pos_table.setItem(row, 5, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("filename"))))
-            self._best_pos_table.setItem(row, 6, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("col"))))
-            self._best_pos_table.setItem(row, 7, QTableWidgetItem(\
-                 str(self.__results["best_positions"][row].get("row"))))
-            if self.__results["best_positions"][row]["cpos"]:
+                 str(best_pos.get("filename"))))
+            self._best_pos_table.setItem(row, 6, QTableWidgetItem("%d" \
+                 % (best_pos.get("col"))))
+            self._best_pos_table.setItem(row, 7, QTableWidgetItem("%d"\
+                 % (best_pos.get("row"))))
+            if best_pos["cpos"]:
                 self._best_pos_table.setItem(row, 8, QTableWidgetItem(\
-                   self.__results["best_positions"][row]["cpos"].as_str()))
+                 str(best_pos["cpos"])))
         self._best_pos_table.setSortingEnabled(True)
 
     def move_to_best_position_clicked(self):
@@ -538,7 +613,7 @@ class HeatMapWidget(QWidget):
         if self._best_pos_table.currentRow() > -1:
             self._beamline_setup_hwobj.diffractometer_hwobj.\
                 move_to_motors_positions(self.__results["best_positions"]\
-                [self._best_pos_table.currentRow()].get("cpos").as_dict())
+                [self._best_pos_table.currentRow()]["cpos"])
 
     def create_best_centring_point_clicked(self):
         """

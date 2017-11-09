@@ -88,8 +88,18 @@ class DataModelInputBinder(object):
 
     def __validated(self, field_name, validator, widget, new_value):
         if validator:
-            if validator.validate(new_value, widget.cursorPosition())[0] \
-                    == QValidator.Acceptable:
+            try:
+               flt_value = float(new_value)
+            except:
+               Qt4_widget_colors.set_widget_color(widget,
+                                                   Qt4_widget_colors.LIGHT_RED,
+                                                   QPalette.Base)
+               return False
+
+            if flt_value >= validator.bottom() and \
+               flt_value <= validator.top():
+            #if validator.validate(new_value, widget.cursorPosition())[0] \
+            #        == QValidator.Acceptable:
                 if self.bindings[field_name][3]:
                     Qt4_widget_colors.set_widget_color(widget,
                                            Qt4_widget_colors.LIGHT_YELLOW,
