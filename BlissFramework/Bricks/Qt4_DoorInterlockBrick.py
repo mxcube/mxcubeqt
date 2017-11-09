@@ -87,6 +87,7 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         self.unlock_door_button.setToolTip("Unlocks the doors")
 
     def unlock_doors(self):
+        self.unlock_door_button.setEnabled(False)
         self.door_interlock_hwobj.unlock_door_interlock()
 
     def updateLabel(self,label):
@@ -105,7 +106,7 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         else:
             self.state_label.setText('<b>%s</b>' % state)
 
-        self.unlock_door_button.setEnabled(state == 'locked_active')
+        self.unlock_door_button.setEnabled(state=='locked_active')
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name=='mnemonic':

@@ -156,10 +156,10 @@ class Qt4_CRLBrick(BlissWidget):
         else:
             self.mode_combo.setCurrentIndex(-1)
         self.mode_combo.blockSignals(False)
-        self.crl_value_table.setEnabled(mode == "Manual")
-        self.move_up_button.setEnabled(mode == "Manual")
-        self.move_down_button.setEnabled(mode == "Manual")
-        self.set_according_to_energy_button.setEnabled(mode == "Manual")
+        self.crl_value_table.setEnabled(mode=="Manual")
+        self.move_up_button.setEnabled(mode=="Manual")
+        self.move_down_button.setEnabled(mode=="Manual")
+        self.set_according_to_energy_button.setEnabled(mode=="Manual")
 
     def crl_value_changed(self, value):
         """Updates crl value table"""

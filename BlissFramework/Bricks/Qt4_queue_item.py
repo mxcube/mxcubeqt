@@ -195,11 +195,21 @@ class QueueItem(QTreeWidgetItem):
     def update_display_name(self):
         self.setText(0, self._data_model.get_display_name())
 
+    def update_tool_tip(self):
+        pass
+
     def set_star(self, state):
         self._star = state
 
     def has_star(self):
         return self._star == True
+
+    def get_all_grand_children(self):
+        grand_children_list = []
+        for child_index in range(self.childCount()):
+            for grand_child_index in range(self.child(child_index).childCount()):
+                grand_children_list.append(self.child(child_index).child(grand_child_index))
+        return grand_children_list
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
@@ -282,6 +292,69 @@ class DataCollectionQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
+    def update_tool_tip(self):
+        dc_model = self.get_model()
+        dc_parameters = dc_model.as_dict()
+        dc_parameters_table = \
+          '''<b>Collection parameters:</b>
+             <table border='0.5'>
+             <tr><td>Osc start</td><td>%.2f</td></tr>
+             <tr><td>Osc range</td><td>%.2f</td></tr>
+             <tr><td>Num images</td><td>%d</td></tr>
+             <tr><td>Exposure time</td><td>%.4fs</td></tr>
+             <tr><td>Energy</td><td>%.2f keV</td></tr>
+             <tr><td>Resolution</td><td>%.2f Ang</td></tr>
+             <tr><td>Transmission</td><td>%.2f %%</td></tr>
+             </table>
+          ''' % (dc_parameters["osc_start"],
+                 dc_parameters["osc_range"],
+                 dc_parameters["num_images"],
+                 dc_parameters["exp_time"],
+                 dc_parameters["energy"],
+                 dc_parameters["resolution"],
+                 dc_parameters["transmission"])
+
+        thumb_info = ''
+        if dc_model.is_executed():
+            paths = dc_model.acquisitions[0].get_preview_image_paths()
+            first_image_path = dc_model.acquisitions[0].path_template.\
+                get_image_file_name() % dc_parameters["first_image"]
+            if len(paths) == 1:
+                thumb_info = \
+                   '''<br><table border='0.5'>
+                      <tr><td>%s</td></tr>
+                      <tr><td><img src="%s" width=200></td></tr>
+                      </table>
+                  ''' % (first_image_path, paths[0])
+            else:
+                last_image_path = dc_model.acquisitions[0].\
+                   path_template.get_image_file_name() % (dc_parameters["first_image"] + \
+                                                          dc_parameters["num_images"])
+                thumb_info = \
+                   '''<br><table border='0.5'>
+                      <tr><td>%s</td><td>%s</td></tr>
+                      <tr><td><img src="%s" width=200></td>
+                          <td><img src="%s" width=200></tr>
+                      </table>
+                  ''' % (first_image_path, last_image_path, paths[0], paths[-1])
+
+        processing_msg = ''
+        if len(dc_model.processing_msg_list) > 0:
+            processing_msg = '<br><br><b>Processing info</b>'
+            for msg in dc_model.processing_msg_list:
+                processing_msg += '<br>%s' % msg
+
+        tool_tip = '''<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+                    <html lang="en">
+                    <body>
+                       %s
+                       %s
+                       %s
+                    </body>
+                    </html>''' % (dc_parameters_table,
+                                  thumb_info,
+                                  processing_msg)
+        self.setToolTip(0, tool_tip)
 
 class CharacterisationQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):

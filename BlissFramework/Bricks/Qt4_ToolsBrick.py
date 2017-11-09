@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+from QtImport import QMenu, QMessageBox
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -29,8 +29,8 @@ __category__ = 'General'
 
 
 class Qt4_ToolsBrick(BlissWidget):
-    """
-    Descript. : Brick is like a menu in the menuBar or/and in the toolbar
+    """Adds a tool menu to the toolbar. Actions are configured via xml.
+       Action call method from hwobj.
     """
  
     def __init__(self, *args):
@@ -63,21 +63,27 @@ class Qt4_ToolsBrick(BlissWidget):
         # Other ---------------------------------------------------------------
 
     def run(self):
+        """Adds menu to the tool bar"""
         self.tools_menu = QMenu("Tools", self)
         self.tools_menu.addSeparator()
         BlissWidget._menuBar.insert_menu(self.tools_menu, 2)
         self.init_tools()
 
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        """
+        """Defines behaviour of the brick"""
         if property_name == "mnemonic":
             self.tools_hwobj = self.getHardwareObject(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def set_expert_mode(self, is_expert_mode):
-        pass
+        """Enables/Disables action if in/not in export mode and
+           action has expertMode=True
+        """
+        for key in self.action_dict.keys():
+            tool = self.action_dict[key]
+            if tool.get("expertMode") is not None:
+               key.setEnabled(is_expert_mode)
 
     def init_tools(self):
         """Gets available methods and populates menubar with methods
@@ -93,6 +99,7 @@ class Qt4_ToolsBrick(BlissWidget):
                     self.execute_tool)
                 if tool.get("icon"):
                     temp_action.setIcon(Qt4_Icons.load_icon(tool["icon"]))
+                temp_action.setDisabled(tool.get("expertMode", False))
                 self.action_dict[temp_action] = tool
 
     def execute_tool(self):

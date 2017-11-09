@@ -109,6 +109,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("scTwoName", "string", "Plate")
         self.addProperty("usePlateNavigator", "boolean", False)
         self.addProperty("useHistoryView", "boolean", True)
+        self.addProperty("useCentringMethods", "boolean", True)
         self.addProperty("enableQueueAutoSave", "boolean", True)
 
         # Properties to initialize hardware objects --------------------------
@@ -257,6 +258,9 @@ class Qt4_TreeBrick(BlissWidget):
         elif property_name == "useSampleWidget":
             self.sample_changer_widget.sample_label.setVisible(new_value)
             self.sample_changer_widget.sample_combo.setVisible(new_value)
+        elif property_name == "useCentringMethods":
+            self.sample_changer_widget.centring_cbox.setEnabled(new_value)
+            self.sample_changer_widget.centring_mode_label.setEnabled(new_value)
         elif property_name == 'queue':            
             self.queue_hwobj = self.getHardwareObject(new_value)
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
@@ -374,6 +378,9 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(xml_rpc_server_hwobj,
                              'start_queue',
                              self.dc_tree_widget.collect_items)
+                self.connect(xml_rpc_server_hwobj,
+                             'open_dialog',
+                             self.open_xmlrpc_dialog)
         elif property_name == 'hwobj_state_machine':
               self.state_machine_hwobj = self.getHardwareObject(new_value)
         elif property_name == 'redis_client':
@@ -1077,6 +1084,10 @@ class Qt4_TreeBrick(BlissWidget):
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
         self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
 
+    def open_xmlrpc_dialog(self, dialog_dict):
+        QMessageBox.information(self, "Message from beamline operator",
+            dialog_dict["msg"], QMessageBox.Ok) 
+
     def select_last_added_item(self):
         self.dc_tree_widget.select_last_added_item()
 
@@ -1131,10 +1142,10 @@ class Qt4_TreeBrick(BlissWidget):
                       hide = not isinstance(item, Qt4_queue_item.XRFSpectrumQueueItem)
                   #elif filter_index == 11:
                   #    hide = not isinstance(item, Qt4_queue_item.AdvancedQueueItem)
-                  if type(item) in (Qt4_queue_item.TaskQueueItem,
-                                    Qt4_queue_item.SampleQueueItem,
-                                    Qt4_queue_item.BasketQueueItem) and not \
-                     isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
+                  if type(item) not in (Qt4_queue_item.TaskQueueItem,
+                                        Qt4_queue_item.SampleQueueItem,
+                                        Qt4_queue_item.BasketQueueItem,
+                                        Qt4_queue_item.DataCollectionGroupQueueItem):
                       item.set_hidden(hide)
                   item_iterator += 1
                   item = item_iterator.value()
@@ -1193,7 +1204,7 @@ class Qt4_TreeBrick(BlissWidget):
             self.enable_collect_conditions["ppu"] = in_error != True
             self.update_enable_collect()
 
-    def shutter_state_changed(self, state):
+    def shutter_state_changed(self, state, msg=None):
         if self.enable_collect_conditions.get("shutter") != (state == "opened"):
             self.enable_collect_conditions["shutter"] = state == "opened"
             self.update_enable_collect()

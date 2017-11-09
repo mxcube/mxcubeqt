@@ -122,7 +122,7 @@ class Qt4_MultipleMotorsBrick(BlissWidget):
                     except:
                         temp_motor_widget['delta'] = 0.001
                     try:
-                        temp_motor_widget.set_decimals(default_decimal_list[index])
+                        temp_motor_widget.set_decimals(float(default_decimal_list[index]))
                     except:
                         pass
                     

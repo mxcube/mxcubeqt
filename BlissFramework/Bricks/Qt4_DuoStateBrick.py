@@ -36,7 +36,8 @@ class Qt4_DuoStateBrick(BlissWidget):
     STATES = {
         'unknown': (Qt4_widget_colors.LIGHT_GRAY, True, True, False, False),
         'disabled': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
-        'error': (Qt4_widget_colors.LIGHT_RED, True, True, False, False),
+        'noperm': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
+        'error': (Qt4_widget_colors.LIGHT_RED, False, False, False, False),
         'out': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
         'closed': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
         'moving': (Qt4_widget_colors.LIGHT_YELLOW, False, False, None, None),
@@ -129,6 +130,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         
     def set_in(self, state):
         if state:
+            self.set_in_button.setEnabled(False)
             self.wrapper_hwobj.setIn()
         else:
             self.set_in_button.blockSignals(True)
@@ -138,6 +140,7 @@ class Qt4_DuoStateBrick(BlissWidget):
 
     def set_out(self, state):
         if state:
+            self.set_out_button.setEnabled(False)
             self.wrapper_hwobj.setOut()
         else:
             self.set_out_button.blockSignals(True)
@@ -149,6 +152,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         self.main_gbox.setTitle(label)
 
     def stateChanged(self, state, state_label=""):
+        self.setEnabled(True)
         state = str(state)
         try:
             color=self.STATES[state][0]
@@ -243,7 +247,7 @@ class Qt4_DuoStateBrick(BlissWidget):
                 self.set_out_button.setToolTip(help_text)
                 self.main_gbox.setTitle(self['username'])
                 self.wrapper_hwobj.duoStateChangedSignal.connect(self.stateChanged)
-                self.stateChanged(self.wrapper_hwobj.getState())
+                self.wrapper_hwobj.getState()
             else:
                 self.wrapper_hwobj=None
                 #self.main_gbox.hide()
@@ -274,13 +278,13 @@ class Qt4_DuoStateBrick(BlissWidget):
                 self.set_out_button.setText(self['setout'])
                 #self.set_out_button.setMinimumWidth(w)
 
-        elif propertyName=='in':
-            if self.wrapper_hwobj is not None:
-                self.stateChanged(self.wrapper_hwobj.getState())
+        #elif propertyName=='in':
+        #    if self.wrapper_hwobj is not None:
+        #        self.stateChanged(self.wrapper_hwobj.getState())
 
-        elif propertyName=='out':
-            if self.wrapper_hwobj is not None:
-                self.stateChanged(self.wrapper_hwobj.getState())
+        #elif propertyName=='out':
+        #    if self.wrapper_hwobj is not None:
+        #        self.stateChanged(self.wrapper_hwobj.getState())
 
         elif propertyName=='setin':
             icons=self['icons']
@@ -345,7 +349,7 @@ class WrapperHO(QObject):
 
     wagoStateDict={'in':'in', 'out':'out', 'unknown':'unknown'}
 
-    shutterStateDict = {'fault': 'error', 'opened': 'in', 
+    shutterStateDict = {'fault': 'error', 'opened': 'in', 'noperm': 'noperm', 
                         'closed': 'out', 'unknown': 'unknown', 
                         'moving': 'moving', 'automatic': 'automatic',
                         'disabled': 'disabled', 'error':'error'}
@@ -358,7 +362,7 @@ class WrapperHO(QObject):
     motorWStateDict=('disabled', 'error', None, 'moving',\
         'moving', 'moving')
 
-    STATES = ('unknown','disabled','closed','error','out','moving','in','automatic')
+    STATES = ('unknown','disabled','closed','error','out','moving','in','automatic', 'noperm')
 
     duoStateChangedSignal = pyqtSignal(str, str)
 
@@ -414,8 +418,6 @@ class WrapperHO(QObject):
         self.duoStateChangedSignal.emit('moving') 
         self.dev.wagoOut()
     def stateChangedWagoPneu(self,state):
-       
-
         try:
             state=WrapperHO.wagoStateDict[state]
         except KeyError:
@@ -437,16 +439,12 @@ class WrapperHO(QObject):
     def setOutShutter(self):
         self.dev.closeShutter()
     def stateChangedShutter(self, state, state_label=None):
-        try:
-            state=WrapperHO.shutterStateDict[state]
-        except KeyError:
-            state='error'
+        state=WrapperHO.shutterStateDict.get(state, "unknown")
         if not state_label:
             state_label=""
-        
         self.duoStateChangedSignal.emit(state, state_label)
     def getStateShutter(self):
-        state=self.dev.getShutterState()
+        state = self.dev.getShutterState()
         try:
             state=WrapperHO.shutterStateDict[state]
         except KeyError:
