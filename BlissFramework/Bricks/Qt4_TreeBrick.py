@@ -382,9 +382,9 @@ class Qt4_TreeBrick(BlissWidget):
                              'open_dialog',
                              self.open_xmlrpc_dialog)
         elif property_name == 'hwobj_state_machine':
-              self.state_machine_hwobj = self.getHardwareObject(new_value)
+              self.state_machine_hwobj = self.getHardwareObject(new_value, optional=True)
         elif property_name == 'redis_client':
-              self.redis_client_hwobj = self.getHardwareObject(new_value)
+              self.redis_client_hwobj = self.getHardwareObject(new_value, optional=True)
         elif property_name == 'scOneName':
               self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == 'scTwoName':
