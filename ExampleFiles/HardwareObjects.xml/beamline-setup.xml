@@ -1,5 +1,4 @@
 <!-- Example beamline setup file -->
-
 <object class="BeamlineSetup" role="BeamlineSetup">
   <!-- Objects directly associatd with hardware -->
   <object href="/attenuators-mockup" role="transmission"/>
@@ -13,6 +12,7 @@
   <object href="/energy-mockup" role="energy"/>
 
   <!-- Software (abstract) concepts -->
+  <object href="/beam-info" role="beam_info"/>
   <object href="/Qt4_graphics-manager" role="shape_history"/>
   <object href="/session" role="session"/>
   <object href="/lims-client-mockup" role="lims_client"/>

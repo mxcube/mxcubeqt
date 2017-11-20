@@ -35,6 +35,8 @@
               type: string, value: '9'}
             - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
               name: frame, oldValue: 0, type: boolean, value: 0}
+            - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+              type: boolean, value: 0}
             - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
               type: string, value: Login2 Logout2}
             - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
@@ -139,6 +141,8 @@
             properties:
             - {comment: '', defaultValue: /beamline-setup, hidden: false, name: beamline_setup,
               oldValue: /beamline-setup, type: string, value: /beamline-setup}
+            - {comment: '', defaultValue: 1, hidden: false, name: enableQueueAutoSave,
+              oldValue: 1, type: boolean, value: 1}
             - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false,
               name: fixedHeight, oldValue: -1, type: integer, value: -1}
             - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false,
@@ -147,6 +151,8 @@
               type: string, value: '9'}
             - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
               name: frame, oldValue: 0, type: boolean, value: 0}
+            - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+              type: boolean, value: 0}
             - {comment: '', defaultValue: '', hidden: false, name: hwobj_state_machine,
               oldValue: '', type: string, value: ''}
             - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
@@ -157,10 +163,14 @@
               type: string, value: /queue}
             - {comment: '', defaultValue: /queue-model, hidden: false, name: queue_model,
               oldValue: /queue-model, type: string, value: /queue-model}
+            - {comment: '', defaultValue: /redis, hidden: false, name: redis_client,
+              oldValue: /redis, type: string, value: /redis}
             - {comment: '', defaultValue: Sample changer, hidden: false, name: scOneName,
               oldValue: Sample changer, type: string, value: Sample changer}
             - {comment: '', defaultValue: Plate, hidden: false, name: scTwoName, oldValue: Plate,
               type: string, value: Plate}
+            - {comment: '', defaultValue: 1, hidden: false, name: useCentringMethods,
+              oldValue: 1, type: boolean, value: 1}
             - {comment: '', defaultValue: 1, hidden: false, name: useFilterWidget,
               oldValue: 1, type: boolean, value: 1}
             - {comment: '', defaultValue: 1, hidden: false, name: useHistoryView,
@@ -185,6 +195,8 @@
               type: string, value: '9'}
             - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
               name: frame, oldValue: 0, type: boolean, value: 0}
+            - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+              type: boolean, value: 0}
             - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
               name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -261,6 +273,8 @@
                     connections: []
                     name: omega_brick
                     properties:
+                    - {comment: '', defaultValue: 2, hidden: false, name: decimals,
+                      oldValue: 2, type: integer, value: 2}
                     - {comment: '', defaultValue: 180 90 45 30 10, hidden: false,
                       name: defaultSteps, oldValue: 180 90 45 30 10, type: string,
                       value: 180 90 45 30 10}
@@ -283,6 +297,8 @@
                       oldValue: '', type: string, value: ''}
                     - {comment: '', defaultValue: '', hidden: false, name: helpIncrease,
                       oldValue: '', type: string, value: ''}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: 0, hidden: false, name: hideInUser,
                       oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: icons,
@@ -319,6 +335,8 @@
                     connections: []
                     name: kappa_phi_brick
                     properties:
+                    - {comment: '', defaultValue: 2, hidden: false, name: decimals,
+                      oldValue: 2, type: integer, value: 2}
                     - {comment: '', defaultValue: 180 90 45 30 10, hidden: false,
                       name: defaultSteps, oldValue: 180 90 45 30 10, type: string,
                       value: 180 90 45 30 10}
@@ -341,6 +359,8 @@
                       oldValue: '', type: string, value: ''}
                     - {comment: '', defaultValue: '', hidden: false, name: helpIncrease,
                       oldValue: '', type: string, value: ''}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: 0, hidden: false, name: hideInUser,
                       oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: icons,
@@ -456,6 +476,8 @@
                     connections: []
                     name: kappa_brick
                     properties:
+                    - {comment: '', defaultValue: 2, hidden: false, name: decimals,
+                      oldValue: 2, type: integer, value: 2}
                     - {comment: '', defaultValue: 180 90 45 30 10, hidden: false,
                       name: defaultSteps, oldValue: 180 90 45 30 10, type: string,
                       value: 180 90 45 30 10}
@@ -478,6 +500,8 @@
                       oldValue: '', type: string, value: ''}
                     - {comment: '', defaultValue: '', hidden: false, name: helpIncrease,
                       oldValue: '', type: string, value: ''}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: 0, hidden: false, name: hideInUser,
                       oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: icons,
@@ -522,6 +546,8 @@
                       oldValue: '11', type: string, value: '9'}
                     - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                       name: frame, oldValue: 0, type: boolean, value: 0}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: icons,
                       oldValue: '', type: string, value: ''}
                     - {comment: Allow to control brick in all modes, defaultValue: 0,
@@ -642,6 +668,8 @@
                         oldValue: '11', type: string, value: '9'}
                       - {comment: Draw a frame around the widget, defaultValue: 0,
                         hidden: false, name: frame, oldValue: 0, type: boolean, value: 0}
+                      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                        oldValue: 0, type: boolean, value: 0}
                       - {comment: Allow to control brick in all modes, defaultValue: 0,
                         hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                         value: 0}
@@ -684,6 +712,8 @@
                         oldValue: '11', type: string, value: '9'}
                       - {comment: Draw a frame around the widget, defaultValue: 0,
                         hidden: false, name: frame, oldValue: 0, type: boolean, value: 0}
+                      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                        oldValue: 0, type: boolean, value: 0}
                       - {comment: Allow to control brick in all modes, defaultValue: 0,
                         hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                         value: 0}
@@ -780,6 +810,8 @@
                       name: frame, oldValue: 0, type: boolean, value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: graphicsManager,
                       oldValue: '', type: string, value: /Qt4_graphics-manager}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, defaultValue: 0,
                       hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                       value: 0}
@@ -881,6 +913,8 @@
                       value: '###'}
                     - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                       name: frame, oldValue: 0, type: boolean, value: 0}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, defaultValue: 0,
                       hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                       value: 0}
@@ -906,6 +940,8 @@
                       value: '###'}
                     - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                       name: frame, oldValue: 0, type: boolean, value: 0}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, defaultValue: 0,
                       hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                       value: 0}
@@ -928,6 +964,8 @@
                       oldValue: '11', type: string, value: '9'}
                     - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                       name: frame, oldValue: 0, type: boolean, value: 0}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, defaultValue: 0,
                       hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                       value: 0}
@@ -969,6 +1007,8 @@
                       oldValue: '11', type: string, value: '9'}
                     - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                       name: frame, oldValue: 0, type: boolean, value: 0}
+                    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                      oldValue: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, defaultValue: 0,
                       hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                       value: 0}
@@ -1113,6 +1153,8 @@
                   oldValue: '11', type: string, value: '9'}
                 - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                   name: frame, oldValue: 0, type: boolean, value: 0}
+                - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                  oldValue: 0, type: boolean, value: 0}
                 - {comment: Allow to control brick in all modes, defaultValue: 0,
                   hidden: false, name: instanceAllowAlways, oldValue: 0, type: boolean,
                   value: 0}
@@ -1258,6 +1300,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1340,6 +1384,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1425,6 +1471,8 @@
                   oldValue: '11', type: string, value: '9'}
                 - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                   name: frame, oldValue: 0, type: boolean, value: 0}
+                - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                  oldValue: 0, type: boolean, value: 0}
                 - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
                   type: string, value: ''}
                 - {comment: Allow to control brick in all modes, defaultValue: 0,
@@ -1592,6 +1640,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1674,6 +1724,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1754,6 +1806,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1834,6 +1888,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1918,6 +1974,8 @@
                 type: string, value: '9'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -1996,6 +2054,8 @@
                 type: string, value: '11'}
               - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
                 name: frame, oldValue: 0, type: boolean, value: 0}
+              - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide,
+                oldValue: 0, type: boolean, value: 0}
               - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
                 type: string, value: ''}
               - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
@@ -2082,7 +2142,8 @@
             oldValue: null, type: boolean, value: 1}
           - {comment: '', defaultValue: 1, hidden: false, name: closable_Data_collection,
             oldValue: null, type: boolean, value: 1}
-          - {comment: '', defaultValue: 1, hidden: false, name: closable_Data_collection_group, oldValue: null, type: boolean, value: 1}
+          - {comment: '', defaultValue: 1, hidden: false, name: closable_Data_collection_group,
+            oldValue: null, type: boolean, value: 1}
           - {comment: '', defaultValue: 1, hidden: false, name: closable_Energy_scan,
             oldValue: null, type: boolean, value: 1}
           - {comment: '', defaultValue: 1, hidden: false, name: closable_Plate_manipulator,
@@ -2233,6 +2294,8 @@
             name: frame, oldValue: 0, type: boolean, value: 0}
           - {comment: '', defaultValue: '', hidden: false, name: fromEmailAddress,
             oldValue: '', type: string, value: ''}
+          - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+            type: boolean, value: 0}
           - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
             name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
           - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2325,6 +2388,10 @@
             type: string, value: '9'}
           - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
             name: frame, oldValue: 0, type: boolean, value: 0}
+          - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+            type: boolean, value: 0}
+          - {comment: '', defaultValue: '', hidden: false, name: hwobj_unittest, oldValue: '',
+            type: string, value: ''}
           - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
             name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
           - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2474,6 +2541,8 @@
           type: string, value: '9'}
         - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
           name: frame, oldValue: 0, type: boolean, value: 1}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: '', defaultValue: '', hidden: false, name: hwobj_mach_info, oldValue: '',
           type: string, value: /mach-info-mockup}
         - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
@@ -2501,6 +2570,8 @@
           oldValue: keV
           type: combo
           value: keV
+        - {comment: '', defaultValue: 0, hidden: false, name: displayStatus, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
           oldValue: -1, type: integer, value: -1}
         - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
@@ -2509,6 +2580,8 @@
           type: string, value: '9'}
         - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
           name: frame, oldValue: 0, type: boolean, value: 1}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
           name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2535,6 +2608,8 @@
           value: '###.##'}
         - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
           name: frame, oldValue: 0, type: boolean, value: 1}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
           name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2563,7 +2638,7 @@
         - {comment: '', defaultValue: '', hidden: false, name: detectorDistance, oldValue: '',
           type: string, value: /detector-distance-mockup}
         - {comment: '', defaultValue: '', hidden: false, name: doorInterlock, oldValue: '',
-          type: string, value: ''}
+          type: string, value: /door-interlock-mockup}
         - {comment: '', defaultValue: '', hidden: false, name: energy, oldValue: '',
           type: string, value: /energy-mockup}
         - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
@@ -2574,6 +2649,8 @@
           type: string, value: '9'}
         - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
           name: frame, oldValue: 0, type: boolean, value: 1}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
           name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2615,6 +2692,8 @@
           type: string, value: '9'}
         - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
           name: frame, oldValue: 0, type: boolean, value: 1}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
           name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2639,6 +2718,8 @@
           type: boolean, value: 0}
         - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
           name: frame, oldValue: 0, type: boolean, value: 1}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
           type: string, value: ''}
         - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: in, type: string,
@@ -2675,6 +2756,8 @@
           name: frame, oldValue: 0, type: boolean, value: 1}
         - {comment: '', defaultValue: 30, hidden: false, name: giveControlTimeout,
           oldValue: 30, type: integer, value: 30}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+          type: boolean, value: 0}
         - {comment: '', defaultValue: '', hidden: false, name: hwobj_hutch_trigger,
           oldValue: '', type: string, value: /door-interlock-mockup}
         - {comment: '', defaultValue: /instanceconnection, hidden: false, name: hwobj_instance_connection,
@@ -2821,6 +2904,8 @@
       type: string, value: '9'}
     - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false, name: frame,
       oldValue: 0, type: boolean, value: 0}
+    - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+      type: boolean, value: 0}
     - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
       name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
     - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2843,13 +2928,15 @@
       name: chat_brick
       properties:
       - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: -1, type: integer, value: 200}
+        oldValue: 200, type: integer, value: -1}
       - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
         oldValue: -1, type: integer, value: -1}
       - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
         type: string, value: '9'}
       - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
         name: frame, oldValue: 0, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+        type: boolean, value: 0}
       - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
         type: string, value: ''}
       - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
@@ -2867,13 +2954,15 @@
       name: log_bar_brick
       properties:
       - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: -1, type: integer, value: 200}
+        oldValue: 200, type: integer, value: -1}
       - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
         oldValue: -1, type: integer, value: -1}
       - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
         type: string, value: '9'}
       - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
         name: frame, oldValue: 0, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+        type: boolean, value: 0}
       - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
         name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
       - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -2998,6 +3087,8 @@
         type: string, value: '11'}
       - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
         name: frame, oldValue: 0, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+        type: boolean, value: 0}
       - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
         type: string, value: ''}
       - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
