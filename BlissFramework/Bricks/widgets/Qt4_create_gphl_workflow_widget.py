@@ -53,7 +53,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         processing_layout = self._processing_widget.processing_widget
         processing_layout.num_residues_label.hide()
         processing_layout.num_residues_ledit.hide()
-        processing_layout.run_processing_cbox.hide()
+        processing_layout.run_processing_after_cbox.hide()
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = QtGui.QVBoxLayout(self._workflow_type_widget)
@@ -74,8 +74,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
                      self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
-                     self._run_number_ledit_change)
+        # Removed in porting to master branch
+        # self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
+        #              self._run_number_ledit_change)
         self._workflow_cbox.currentIndexChanged[str].connect(
             self.workflow_selected
         )
@@ -235,3 +236,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         tasks.append(wf)
 
         return tasks
+
+    # Added in porting to master branch
+    def _prefix_ledit_change(self, new_value):
+        prefix = self._data_collection.acquisitions[0]. \
+            path_template.get_prefix()
+        self._data_collection.set_name(prefix)
+        self._tree_view_item.setText(0, self._data_collection.get_name())
