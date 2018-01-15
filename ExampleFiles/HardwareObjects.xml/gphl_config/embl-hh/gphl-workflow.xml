@@ -46,8 +46,8 @@
             <!-- Default wavelengths (in A) and their roles -->
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <!-- <strategy>DiffractCal</strategy> -->
-                <strategy>DiffractCal_ex</strategy>
+                <strategy>DiffractCal</strategy>
+                <!--<strategy>DiffractCal_ex</strategy>-->
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
