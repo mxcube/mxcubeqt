@@ -54,6 +54,11 @@ class SelectionTable(QtGui.QTableWidget):
                            QtGui.QSizePolicy.Expanding)
         self.setFont(QtGui.QFont("Courier"))
 
+        hdr = self.horizontalHeader()
+        hdr.setResizeMode(0, QtGui.QHeaderView.Stretch)
+        for ii in range(1, len(header)):
+            hdr.setResizeMode(ii, QtGui.QHeaderView.ResizeToContents)
+
     def resizeData(self, ii):
         """Dummy method, recommended by docs when not using std cell widgets"""
         pass
@@ -115,6 +120,7 @@ class GphlDataDialog(QtGui.QDialog):
 
         # Special parameter box
         self.cplx_gbox = QtGui.QGroupBox('Indexing solution', self)
+        QtGui.QVBoxLayout(self.cplx_gbox)
         main_layout.addWidget(self.cplx_gbox)
         self.cplx_widget = None
 
@@ -193,6 +199,7 @@ class GphlDataDialog(QtGui.QDialog):
             if cplx.get('type') == 'selection_table':
                 self.cplx_widget = SelectionTable(self.cplx_gbox, 'cplx_widget',
                                                 cplx['header'])
+                self.cplx_gbox.layout().addWidget(self.cplx_widget)
                 self.cplx_gbox.setTitle(cplx.get('uiLabel'))
                 for ii,values in enumerate(cplx['defaultValue']):
                     self.cplx_widget.populateColumn(ii, values,
