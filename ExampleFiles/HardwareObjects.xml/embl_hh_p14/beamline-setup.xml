@@ -7,18 +7,21 @@
 
   <object href="/eh1/detector" role="detector"/>
   <object href="/eh1/resolution" role="resolution"/>
-  <object href="/eh1/beamFocusing" role="beam_definer"/>
+  <!-- <object href="/eh1/beamFocusing" role="beam_definer"/> -->
   <object href="/attenuators" role="transmission"/>
   <object href="/beam-info" role="beam_info"/>
   <object href="/energy" role="energy"/>
   <object href="/safshut" role="safety_shutter"/>
   <object href="/fast-shut" role="fast_shutter"/>
+  <object href="/flux" role="flux"/>
 
   <object href="/Qt4_graphics-manager" role="shape_history"/>
   <object href="/mini-diff" role="diffractometer"/>
   <object href="/mxcollect" role="collect"/>
   <object href="/plate-manipulator" role="plate_manipulator"/>
+  <object href="/sc-generic" role="sample_changer"/>
 
+  <object href="/mach-info" role="machine_info"/>
   <object href="/dbconnection" role="lims_client"/>
   <object href="/data-analysis" role="data_analysis"/>
   <object href="/energyscan" role="energyscan"/>
@@ -47,12 +50,12 @@
   <disable_num_passes>True</disable_num_passes>
 
   <acquisition_limit_values>
-    <exposure_time>0.040, 10000</exposure_time>
+    <!-- <exposure_time>0.040, 10000</exposure_time> -->
     <kappa>-5, 240</kappa>
   </acquisition_limit_values>
 
   <default_acquisition_values>
-    <exposure_time>0.040</exposure_time>
+    <exposure_time>0.010</exposure_time>
     <start_angle>0.0</start_angle>
     <range>0.1</range>
     <number_of_passes>1</number_of_passes>
@@ -63,7 +66,7 @@
     <detector_mode>1</detector_mode>
   </default_acquisition_values>
   <default_helical_values>
-    <exposure_time>0.040</exposure_time>
+    <exposure_time>0.010</exposure_time>
     <start_angle>0.0</start_angle>
     <range>0.1</range>
     <number_of_passes>1</number_of_passes>
@@ -85,7 +88,7 @@
     <detector_mode>1</detector_mode>
   </default_characterisation_values>
    <default_advanced_values>
-    <exposure_time>0.040</exposure_time>
+    <exposure_time>0.0014</exposure_time>
     <start_angle>0.0</start_angle>
     <range>0.0062</range>
     <number_of_passes>1</number_of_passes>

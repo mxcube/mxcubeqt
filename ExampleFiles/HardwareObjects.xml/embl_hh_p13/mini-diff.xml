@@ -14,7 +14,6 @@
   <command type="exporter" name="saveCentringPositions">saveCentringPositions</command>
   <command type="exporter" name="getOmegaMotorDynamicScanLimits">getOmegaMotorDynamicScanLimits</command>
 
-
   <object href="/eh1/diff-omega" role="phi"/>
   <object href="/eh1/diff-phiz" role="phiz"/>
   <object href="/eh1/diff-phiy" role="phiy"/>
@@ -29,12 +28,12 @@
   <object href="/centring-math" role="centring"/>
   <object href="/minikappa-correction" role="minikappa_correction"/>
 
-  <use_sample_changer>True</use_sample_changer>
+  <use_sample_changer>True</use_sample_changer> 
   <zoom_centre>{"x": 668,"y": 612}</zoom_centre>
 
   <!-- Alignment Z -->
   <!-- old value -0.101 -->
-  <omega_reference>{"motor_name": "phiz", "position": -0.143, "camera_axis":"y","direction": -1}</omega_reference>
+  <omega_reference>{"motor_name": "phiz", "position": -0.153, "camera_axis":"y","direction": -1}</omega_reference>
   <grid_direction>{"fast": (1, 0), "slow": (0, -1), "omega_ref" : 0.0}</grid_direction>
   <reversing_rotation>True</reversing_rotation>
 </object>

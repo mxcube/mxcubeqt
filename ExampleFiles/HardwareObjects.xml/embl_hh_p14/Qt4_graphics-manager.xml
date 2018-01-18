@@ -5,4 +5,5 @@
    <imageScaleList>[0.5, 1, 1.5, 2]</imageScaleList>
    <auto_grid_size_mm>(0.2, 0.2)</auto_grid_size_mm>
    <!-- <store_graphics_config>True</store_graphics_config> -->
+   <magnification_tool>{"scale": 4, "area_size": 80}</magnification_tool>
 </object>

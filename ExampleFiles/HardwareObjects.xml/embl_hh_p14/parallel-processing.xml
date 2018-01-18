@@ -2,4 +2,5 @@
   <object href="/mxcollect" role="collect"/>
   <object href="/eh1/diff-beamstop" role="beamstop"/>
   <processing_command>/opt/embl-hh/bin/edna_dozor.sh</processing_command>
+  <kill_command>/opt/embl-hh/bin/edna_kill_dozor.csh</kill_command>
 </object>

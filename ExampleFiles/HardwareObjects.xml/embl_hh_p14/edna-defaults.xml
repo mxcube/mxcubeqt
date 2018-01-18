@@ -16,24 +16,18 @@
         <complexity>
             <value>min</value>
         </complexity>
-        <forcedSpaceGroup>
-            <value>P1</value>
-        </forcedSpaceGroup>
         <maxExposureTimePerDataCollection>
             <value>6000</value>
         </maxExposureTimePerDataCollection>
-        <minExposureTimePerImage>
-           <value>0.040</value>
-        </minExposureTimePerImage>
         <goniostatMaxOscillationSpeed>
            <value>160</value>
         </goniostatMaxOscillationSpeed>
         <goniostatMinOscillationWidth>
-           <value>1.000000e-01</value>
+           <value>0.2500000e-01</value>
         </goniostatMinOscillationWidth>
         <detectorDistanceMin>
-        <value>130</value>
-           </detectorDistanceMin>
+           <value>130</value>
+        </detectorDistanceMin>
         <detectorDistanceMax>
            <value>2400</value>
         </detectorDistanceMax>
@@ -44,7 +38,7 @@
                 <value>3.000000e+12</value>
             </flux>
             <minExposureTimePerImage>
-                <value>0.040</value>
+                <value>0.0076</value>
             </minExposureTimePerImage>
             <size>
                 <x>

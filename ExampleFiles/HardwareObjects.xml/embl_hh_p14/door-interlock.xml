@@ -1,16 +1,15 @@
 <device class="EMBLDoorInterlock">
-  <object href="/eh1/detector-distance" role="detector_distance"/>  
+  <object href="/eh1/detector-distance" role="detector_distance"/>
+  <object href="/mini-diff" role="diffractometer"/>
 
-  <command type="tine" name="cmdBreakInterlock" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface" timeout="6000">BreakInterlock14.2a</command>
-  <channel type="tine" name="chanCanUnlockCond" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface">BS14_1_offen</channel>
-  <channel type="tine" name="chanDoorInterlocked" tinename="/P14/EMBL_ICS_IFace/ICS_PHP_Interface">G14_2a_TI</channel>
+  <channel type="tine" name="chanStateBreakable" tinename="/P14/ics/interlock-EH1" attach="datachange">state-breakable</channel>
+  <channel type="tine" name="chanStateLocked" tinename="/P14/ics/interlock-EH1" attach="datachange">state-locked</channel>
+  <command type="tine" name="cmdBreak" tinename="/P14/ics/interlock-EH1" timeout="5000">break</command>
 
-  <canUnlockCond>3</canUnlockCond>
-  <doorInterlockedCond>0</doorInterlockedCond>
-  <executeCommandsBeforeUnlock>True</executeCommandsBeforeUnlock>
+  <channel type="tine" name="chanIcsErrorOne" tinename="/P14/ics/state" attach="datachange" timeout="100">error</channel>
+  <channel type="tine" name="chanCmdBreakError" tinename="/P14/ics/interlock-EH" attach="datachange" timeout="100">break</channel>
 
-  <beforeUnlockCommandsPresent>True</beforeUnlockCommandsPresent>
+  <!-- <beforeUnlockCommandsPresent>True</beforeUnlockCommandsPresent>
   <beforeUnlockCommands>[{"address":"/P14/MD3/MD3_0","property":"startSetPhase","type":"query","argument":"Transfer"}]</beforeUnlockCommands>
-
-  <useDoorInterlock>True</useDoorInterlock>
+  -->
 </device>

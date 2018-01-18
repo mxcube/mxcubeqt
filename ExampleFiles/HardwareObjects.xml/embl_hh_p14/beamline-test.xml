@@ -2,6 +2,8 @@
     <device_list>/opt/embl-hh/etc/p14/app/beamline-test-tool/p14devicesList.csv</device_list>
     <object hwrid="/oh1/motor-roll-second" role="horizontal_motor"/>
     <object hwrid="/oh1/motor-perp" role="vertical_motor"/>
+    <object hwrid="/oh1/motor-hfm-pitch" role="horizontal_double_mode_motor"/>
+    <object hwrid="/oh1/motor-vfm-pitch" role="vertical_double_mode_motor"/>
     <object href="/beamline-setup" role="beamline_setup"/>
     <object href="/crl" role="crl"/>
 
@@ -11,14 +13,23 @@
     <command type="tine" name="setIntensAcqTime" tinename="/P14/BCUIntensity/Device0" timeout="3000">AcquisitionTime.set</command>
     <command type="tine" name="setIntensRange" tinename="/P14/BCUIntensity/Device0" timeout="3000">CurrentRange.set</command>
 
-    <channel type="tine" name="chanPitchScanStatus" tinename="/P14/p14mono.cdi/ScanStatus">RECV</channel>
+    <channel type="tine" name="chanPitchScanStatus" tinename="/P14/p14mono.cdi/ScanStatus" attach="datachange">RECV</channel>
+
+    <channel type="tine" name="chanEncoderAr" tinename="/P14/p14mono.cdi/EncAr">RECV</channel>
+    <channel type="tine" name="chanQBPMAr" tinename="/p14/p14mono.cdi/QBPMAr">RECV</channel>
+    <channel type="tine" name="chanPitchPositionAr" tinename="/P14/p14mono.cdi/PitchPosAr">RECV</channel>
+
+    <command type="tine" name="cmdSetPitchPosition" tinename="/P14/p14mono.cdi/PitchPos">SEND</command>
+    <command type="tine" name="cmdSetPitch" tinename="/P14/p14mono.cdi/SetPitch">SEND</command>
     <command type="tine" name="cmdStartPitchScan" tinename="/P14/p14mono.cdi/StartPitchScan">SEND</command>
     <command type="tine" name="cmdSetVMaxPitch" tinename="/p14/p14mono.cdi/SetVMaxPitch">SEND</command>
 
     <scale_hor>0.041</scale_hor>
-    <scale_ver>-0.5</scale_ver>
+    <scale_ver>-1</scale_ver>
+    <scale_double_hor>-0.5</scale_double_hor>
+    <scale_double_ver>-0.5</scale_double_ver>
 
-    <available_tests>["ppu", "aperture", "autocentring", "summary", "com", "focusing", "measure_intensity"]</available_tests>
+    <available_tests>["ppu", "focusing", "measure_intensity", "sc_stats"]</available_tests>
     <startup_tests>["ppu", "focusing", "measure_intensity"]</startup_tests>
 
     <!-- Available tests
