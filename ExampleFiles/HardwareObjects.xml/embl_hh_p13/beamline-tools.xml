@@ -4,9 +4,9 @@
       <tool>
        <hwobj>beamline_test</hwobj>
        <display>Center beam</display>
-       <method>align_beam_test</method>
+       <method>center_beam_report</method>
        <icon>QuickRealign</icon>
-     </tool>
+     </tool> 
      <tool>
        <hwobj>beamline_test</hwobj>
        <display>Measure intensity</display>

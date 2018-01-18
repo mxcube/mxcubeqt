@@ -1,19 +1,27 @@
 <object class="BeamlineTools">
    <object href="/beamline-test" role="beamline_test"/>
-   <object href="/mach-info" role="machine_current"/>
-
+   <object href="/eh1/detector" role="detector"/>
    <tools>
      <tool>
        <hwobj>beamline_test</hwobj>
-       <display>Realign beam</display>
-       <method>align_beam_test</method>
+       <display>Center beam</display>
+       <method>center_beam_report</method>
        <icon>QuickRealign</icon>
+       <confirmation>This will start automatic beam centering. Continue?</confirmation>
      </tool>
      <tool>
        <hwobj>beamline_test</hwobj>
        <display>Measure intensity</display>
        <method>measure_intensity</method>
+       <confirmation>This will measure flux. Continue?</confirmation>
        <icon>Sun</icon>
+     </tool>
+     <tool>
+       <hwobj>detector</hwobj>
+       <display>Restart Eiger DAQ</display>
+       <method>restart_daq</method>
+       <expertMode>True</expertMode>
+       <confirmation>This will restart Eiger DAQ. Continue?</confirmation>
      </tool>
    </tools>
 </object>

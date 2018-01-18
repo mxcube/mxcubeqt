@@ -6,13 +6,19 @@
   <object hwrid="/dbconnection" role="dbserver"/>
 
   <channel type="tine" name="energyScanStart" tinename="/P14/fluorescence-scan/fls-scan" attach="event">start</channel>
-  <channel type="tine" name="energyScanStatus" tinename="/P14/fluorescence-scan/fls-scan" attach="event">status</channel>	
+  <channel type="tine" name="energyScanStatus" tinename="/P14/fluorescence-scan/fls-scan" attach="event">status</channel>
+  <channel type="tine" name="energyScanError" tinename="/P14/fluorescence-scan/fls-scan" attach="event">error</channel>
+	
   <command type="tine" name="energyScanAbort" tinename="/P14/fluorescence-scan/fls-scan">abort</command>
+  <command type="tine" name="cmdEnableMaxTransmission" tinename="/P14/fluorescence-scan/fls-scan">attenuate-state</command>
+  <command type="tine" name="cmdSetMaxTransmission" tinename="/P14/fluorescence-scan/fls-scan">max-transmission</command>
 
   <energy2WavelengthConstant>12.3980</energy2WavelengthConstant>
   <defaultWavelength>0.976</defaultWavelength>
   <theoritical_edge_threshold>5</theoritical_edge_threshold>
   <numPoints>60</numPoints> 
+
+  <chooch_command>/opt/embl-hh/bin/runchooch.py</chooch_command>
 
   <elements>
     <element>
@@ -84,7 +90,19 @@
       <energy>L</energy>
     </element>
     <element>
+      <symbol>Tb</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Dy</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
       <symbol>Ho</symbol>
+      <energy>L</energy>
+    </element>
+    <element>
+      <symbol>Er</symbol>
       <energy>L</energy>
     </element>
     <element>

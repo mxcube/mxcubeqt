@@ -13,6 +13,9 @@
   <channel type="tine" name="chanFrameRate" tinename="/P13/detector/pilatus6m">frame-rate</channel> 
   <channel type="tine" name="chanBeamXY" tinename="/P13/detector/pilatus6m">beam-xy</channel>
 
+  <channel type="tine" name="chanCoverState" tinename="/P13/P13DetTrans.CDI/GuillCmd" size="2">RECV</channel>
+  <command type="tine" name="cmdCloseCover"   tinename="/P13/P13DetTrans.CDI/GuillCmd">GuillCmd</command>
+
   <!-- generic properties -->
   <type>pilatus</type>
   <model>6M_F</model>
