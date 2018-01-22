@@ -525,10 +525,10 @@ class ProposalBrick2(BlissWidget):
                 self.refuseLogin(False, loginRes['status']['msg'])
 	else:
 	    # login succeed but without a scheduled session, a newSession is created instead. Ask the user to accep the new session
-            if loginRes['session']['new_session_flag']:
+            if loginRes['Session']['new_session_flag']:
                 if not  self.askForNewSession():
                     return self.refuseLogin(None,None)
-            self.acceptLogin(loginRes['Proposal'],loginRes['person'],loginRes['laboratory'],loginRes['session']['session'],loginRes['local_contact'])
+            self.acceptLogin(loginRes['Proposal'],loginRes['Person'],loginRes['Laboratory'],loginRes['Session']['session'],loginRes['local_contact'])
 
     def passControl(self,has_control_id):
         pass
