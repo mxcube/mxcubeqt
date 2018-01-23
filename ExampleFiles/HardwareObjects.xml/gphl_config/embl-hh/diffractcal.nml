@@ -1,20 +1,19 @@
-! Cobbled together by hand from information on http://confluence.globalphasing.com/x/YY17
-! to look a bit like the output of aP_wf_rotcal
+! Handmade to fit gleb email data
 
 &sdcp_instrument_list
 
-diffractcal_timestamp       = '2016-03-29T00:00:00'
-diffractcal_data_collection = '/data/private/ESRF/ID30B/AndrewMcCarthy/20160327'
+diffractcal_timestamp       = '2017-01-17T00:00:00'
+diffractcal_data_collection = '/data/emaik/gleb/bourenko/20170410'
 enactment_id                = 'cca45de1-44bd-432f-8421-9072841a0b13'
-! final residual =   4.0488458E+01
+! final residual =   0.0
 
- beam            = 5.700000000000000E-004,  1.084000000000000E-003,  0.999999000000000
- DET_X_AXIS      =  0.999997427274940     ,  2.227644399828078E-003, -4.278363354498227E-004
- DET_Y_AXIS      = -2.226824771901868E-003,  0.999995702736496     ,  1.906766890824954E-003
- DET_ORG_X       =   1222.08977205696
- DET_ORG_Y       =   1259.90372330786
- DET_ORG_DIST    =   239.908779158150
- gonio_axis_dirs = 0.999993000000000     , -3.547000000000000E-003,  9.760000000000000E-004,
-                   0.913889120082702     , -0.277194242287368     , -0.296597417785787     ,
-                   0.999999974538920     ,  2.256593893960457E-004,  0.000000000000000E+000
+ beam            =  0.0,  0.0,  1.0
+ DET_X_AXIS      =  1.0, 0.0, 0.0
+ DET_Y_AXIS      =  0.0, 1.0, 0.0
+ DET_ORG_X       =  2074.790
+ DET_ORG_Y       =  2180.120
+ DET_ORG_DIST    =  240.581970
+ gonio_axis_dirs =  0.0 -1.0 0.0,
+                    0.186051,-0.913545,0.36169,
+                    0.0 -1.0 0.0
 /
