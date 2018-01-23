@@ -11,6 +11,7 @@
   <object href="/resolution-mockup" role="resolution"/>
 
   <object href="/mach-info-mockup" role="machine_info"/>
+   <object href="/sc-mockup" role="sample_changer"/>
 
   <!--<auto_processing>-->
     <!--<program>-->
@@ -23,8 +24,8 @@
 
   <!-- From here on specific to emulator -->
 
-  <!-- Name of test sample to use - source of input parameter file -->
-  <sample_name>4k61</sample_name>
+  <!-- Name of default test sample to use - source of input parameter file -->
+  <default_sample_name>4k61</default_sample_name>
 
   <!-- All simcal_parameters are passed to the simcal input namelist file -->
   <!-- See Simcal documentation for more parameters and options -->
