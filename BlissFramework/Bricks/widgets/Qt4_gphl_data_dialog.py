@@ -3,6 +3,7 @@
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 from Qt4_paramsgui import FieldsWidget
+from Utils import Qt4_widget_colors
 
 try:
     from collections import OrderedDict
@@ -75,7 +76,12 @@ class SelectionTable(QtGui.QTableWidget):
             if colours:
                 colour = colours[rowNum]
                 if colour:
-                    wdg.setBackground(getattr(QtGui.QColor, colour))
+                    Qt4_widget_colors.set_widget_color(
+                        wdg,
+                        getattr(Qt4_widget_colors, colour),
+                        QtGui.QPalette.Base
+                    )
+                    # wdg.setBackground(getattr(QtGui.QColor, colour))
             self.setCellWidget(rowNum, colNum, wdg)
 
     def get_value(self):
