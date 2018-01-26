@@ -46,11 +46,11 @@ det_gonio_axis_types= 'Translation'
 det_gonio_axis_calibratable = 'False'
 gain= 1.0
 background= 8.0
-det_filename_suffix= '.cfg'
+det_filename_suffix= '.cbf'
 
 gonio_name= "MiniKappa"
 gonio_axis_dirs= 0.0 -1.0 0.0,
-   0.195169, -0.913545, 0.356853
+   0.195169, -0.9135452905193042, 0.356853
    0.0 -1.0 0.0
 gonio_axis_datum_settings= 0 0 0
 gonio_axis_limits= , , -8, 256, , ,
@@ -59,9 +59,13 @@ gonio_axis_scannable= 'True' 'False' 'False'
 gonio_axis_calibratable= 'False' 'True' 'True'
 
 ! Nominal centring axis directions with correct signs
-gonio_centring_axis_dirs=  0.0,  1.0,  0.0,
-                           -0.959683,  0, -0.281085,
-                           0.281085,  0, -0.959683
+! Try higher precision as advised by Claus
+! gonio_centring_axis_dirs=  0.0,  -1.0,  0.0,
+!                            -0.959683,  0, -0.281085,
+!                           0.281085,  0, -0.959683
+gonio_centring_axis_dirs =  0.000000000000000E+000,  -1.000000000000000     ,  0.000000000000000E+000
+                           -0.959683000000000     ,   0.000000000000000E+000, -0.28108457714894284110
+                            0.28108457714894284110,   0.000000000000000E+000, -0.959683000000000
 ! Actual limits on centring axes
 gonio_centring_axis_limits= -116.998, 10.5, -2.396, 2.4, -2.3988, 2.4
 gonio_centring_axis_names= 'phiy', 'sampy', 'sampx'

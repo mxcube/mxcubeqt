@@ -34,6 +34,9 @@
     <background>2.0</background>
     <!-- Number of rays for simcal ray tracing (2000 minimum for testing, 5000 for use-->
     <n_rays>2001</n_rays>
+    <!-- Unit cell orientation mode. 1 is calculate-from-cell, real-space -->
+    <!-- -1 is from-cell, reciprocal-space. Default is 0 (CELL_AXIS vectors) -->
+    <orient_mode>1</orient_mode>
     <!-- Intensity generation mode - 0 means read directly from hkli file -->
     <gen_mode>0</gen_mode>
     <!-- sim_mode 0 turns off threaded calculation for multi-segment detectors -->
@@ -44,6 +47,8 @@
   <simcal_options>
     <!-- Simcal memory pool option, in Gb - should be 50-66% of available memory -->
     <memory-pool>9</memory-pool>
+    <!-- Default is 1.0. 50 needed for teh germanate test case. Try globally for now -->
+    <hkl-scale>50</hkl-scale>
   </simcal_options>
 
   <!-- Both thread number variables should be less than all available threads -->
