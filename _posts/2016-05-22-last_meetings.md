@@ -4,8 +4,87 @@ bg: turquoise
 color: white
 fa-icon: users 
 ---
+# 11th. MXCuBE meeting @ SOLEIL (Saint-Aubin, France), 12<sup>th</sup>-14<sup>th</sup> of June, 2017
 
-# 9th. MXCuBE meeting @ EMBL (Hamburg), 27<sup>st</sup>-29<sup>nd</sup> of June, 2016
+![group photo](img/soleil-group-062017.jpg)
+
+## Presentations
+
+### Status reports
+
+- ESRF – Antonia BETEVA
+- ALBA – Jordi Andreu
+- HZB – Michael Hellmig
+- MAXIV – Jie Nan
+- Soleil – Martin Savko
+- EMBL-HH – Ivars Karpics
+- Global Phasing – Gerad Bricogne
+<hr>
+- Daniele/Matias – MXCuBE : Past, present and future
+
+### Hardware integration
+
+- Matias GUIJARRO - FlexHCD Sample changer integration
+- Martin Savko - Optical recognition of samples in cryogenic dewars
+- Michael Hellmig - Integration of the GROB into BL 14.2 beamline
+
+### Last developments
+
+- Ivars Karpics - Qtx GUI: current status and latest developments
+- Jie Nan - Users interfaces Last developments of v2/v3
+- Olof Svensson - Pipelines at ESRF
+- Rasmus Fogh - Third party control of an experiment via MXCuBE
+- Marcus - MXCuBE3@ESRF
+- Ivars Karpics - Embedding state persistence and user guidance in MXCuBE
+
+
+# 10th. MXCuBE meeting @ ESRF (Grenoble, France), 16<sup>th</sup>-18<sup>th</sup> of January, 2017
+
+## Full list of presentations
+
+### Status reports
+
+- [ESRF](doc/meetings_2017_ESRF/ESRF_Status_20170116.pdf)
+- [ALBA](doc/meetings_2017_ESRF/MXCuBE-Grenoble_20170116-ALBA_status_report.pdf)
+- [HZB](doc/meetings_2017_ESRF/mxcube_workshop_bessy2_status_2017-01-16.odp)
+- [MAX IV](doc/meetings_2017_ESRF/BIOMAX_Status Report_JN.pdf)
+- [Soleil](doc/meetings_2017_ESRF/00-SOLEIL-MXCUBE-2017.pdf)
+- [EMBL Hamburg](doc/meetings_2017_ESRF/missing)
+- [BM30 (FIP)](doc/meetings_2017_ESRF/FIP.pdf)
+
+### Hardware integration
+
+- [Newest developments at P11 (Petra III)](doc/meetings_2017_ESRF/Newest_Developments_at_P11.ppt)
+- [FlexHCD sample changer](doc/meetings_2017_ESRF/Didier-Gergely.pptx)
+- [Crystallisation plates integration within MXCuBE](doc/meetings_2017_ESRF/Plate Manipulator.pptx)
+- [Eiger integration at BioMax](doc/meetings_2017_ESRF/Eiger_integration.pdf)
+- [NanoDiff@P11 - Usage and Setup From Actuators to Controls](doc/meetings_2017_ESRF/NanoDiff-P11.pdf)
+- [Implementation of interactive mesh scans & serial crystallography](doc/meetings_2017_ESRF/missing)
+
+### User Interfaces
+
+- [WIFIP, web application for FIP](doc/meetings_2017_ESRF/meetings_2017_ESRF/wifip.pdf)
+- [MXCuBE 3: status, ongoing developments and milestones](doc/meetings_2017_ESRF/MxCube3_Eguiraun_Jan17.pdf)
+- [Remote Access in MXCuBE 3](doc/meetings_2017_ESRF/remote_access.pdf)
+
+### Scientific applications
+
+- [Automatic data processing](doc/meetings_2017_ESRF/Autoproc_mxcube_meeting.pptx)
+- [SSX experiments with MXCuBE](doc/meetings_2017_ESRFvonStetten_MXCuBE_2017.pdf)
+- [Automating complex data collection using workflows](doc/meetings_2017_ESRF/autocomplexdc_olof.pdf)
+- Global Phasing workflow calculation within MXCuBE, [part 1](doc/meetings_2017_ESRF/MXCuBE-Grenoble-2017_GB.pdf) and [part 2](doc/meetings_2017_ESRF/MXCuBE-Grenoble-2017_RHF.pdf)
+
+### Developers meeting
+
+- [Aligning Samples in Refractive Media](http://bit.ly/aligning_samples_in_refractive_media)
+- [Improving Abstractions](doc/meetings_2017_ESRF/ImprovingAbstractions.pptx)
+- [Branches and git workflow](http://slides.com/matiasg/git_mxcube)
+- [Beamline control software fault-tolerance for MXCuBE 3](http://slides.com/matiasg/blctrlsw_fault_mxcube3)
+- [MXCuBE and Docker](doc/meetings_2017_ESRF/mxcube_and_docker.pdf)
+- [Testing Single Page Applications](doc/meetings_2017_ESRF/testing_spa.pdf)
+
+
+# 9th. MXCuBE meeting @ EMBL (Hamburg, Germany), 27<sup>th</sup>-29<sup>th</sup> of June, 2016
 
 ![embl group photo](img/2016-embl-meeting-group.jpg)
 
