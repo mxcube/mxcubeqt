@@ -17,6 +17,7 @@
  ! 42-48 deg gives you both main and cusp axes
  U_MAT_ANG_DEG     = 0.0 44.0 90.0
  U_MAT_SD_DEG      = 3*0.145
+ ! U_MAT_SD_DEG      = 3*0.25
 
  !RES_LIMIT_DEF    =  1.030
  ! New resolution limit suggested by Claus
