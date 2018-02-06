@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ GPHL (Cambridge, UK), December 2017
+# Next MXCuBE meeting @ Elettra (Trieste, Italy), September (?) 2018
