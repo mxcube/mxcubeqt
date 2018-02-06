@@ -2,8 +2,55 @@
 title: "Last meetings"
 bg: turquoise
 color: white
-fa-icon: users 
+fa-icon: users
 ---
+
+# 12th. MXCuBE meeting @ Diamond (Oxfordshire, UK), January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
+
+![group photo](img/2018-diamond-meeting-group.jpg)
+
+## Full list of presentations
+
+### Status reports
+
+- [Elettra](doc/meetings_2018_Diamond/Elettra_mxcube.01.2018.pdf)
+- [HZB](doc/meetings_2018_Diamond/mxcube_meeting_bessy2_status_2018-02-01.pdf)
+- [MAX IV](doc/meetings_2018_Diamond/mxcube-meeting-maxiv-status.pdf)
+- [ESRF](doc/meetings_2018_Diamond/ESRF_Status_Jan2018.pptx)
+- DESY - Presentation without slides
+- [ALBA](doc/meetings_2018_Diamond/MXCuBE-Diamond_20180201-ALBA_status_report.pptx)
+- [Soleil](doc/meetings_2018_Diamond/MXCuBE status at SOLEIL January 2018.pdf)
+- [EMBL Hamburg](doc/meetings_2018_Diamond/HH-mxcube_dls_status.pptx)
+- [GPhL](doc/meetings_2018_Diamond/MXCuBE-DLS-GPhL-2018-GB.pptx)
+
+### MXCuBE development highlights
+
+- [Scientific data management and integration in MXCuBE](doc/meetings_2018_Diamond/MAX IV SDM.pptx)
+- [MXCuBE3 release and deployment at ESRF](doc/meetings_2018_Diamond/MXCuBE3 release,  and deployment at ESRF.pdf)
+- [New interactive graphical features in Qt4 MXCuBE](doc/meetings_2018_Diamond/HH-mxcube_dls_qt_graphics.pptx)
+- [Taming the SmarGon multi-axis goniometer](doc/meetings_2018_Diamond/MXCUBE-20180131-SOLEIL.pptx)
+- [Connection and execution of GPhL workflows through MXCuBE: status report and demonstration](doc/meetings_2018_Diamond/MXCuBE-Diamond_2018_GPhL.pdf)
+
+### Evolving scientific capabilities at beamlines and in MXCuBE
+
+- [Implementation of a dual gripper sample changer in MXCuBE](doc/meetings_2018_Diamond/MxCube-RB.pptx)
+- [Integration of new/non-traditional data collection methods in MXCuBE](doc/meetings_2018_Diamond/Implementing_new_methods_in_MXCuBE_martin.pdf)
+- [Multi-crystal data collection capabilities at ESRF](doc/meetings_2018_Diamond/Multi-crystal_data_collection_capabilities_at_the_ESRF.pdf)
+- [Performance issues arising in Mesh&Collect-like experiments](doc/meetings_2018_Diamond/GB-mxcube_2018_1.pptx)
+
+### The MXCuBE collaboration in action
+
+- [A hitch-hiker's guide to MXCuBE development - a discussions starter](doc/meetings_2018_Diamond/MXCuBE-Diamond_2018_GPhL_Dev.pdf)
+- ["Less is more": a proposal for enhancing collaboration](doc/meetings_2018_Diamond/mxcubemeeting_dls_lessismore.pdf)
+- [Licensing MXCuBE under the LGPL](doc/meetings_2018_Diamond/GPhL_Keller_MXCuBE-2018-01.pdf)
+
+___
+
+
+___
+
+
+
 # 11th. MXCuBE meeting @ SOLEIL (Saint-Aubin, France), 12<sup>th</sup>-14<sup>th</sup> of June, 2017
 
 ![group photo](img/soleil-group-062017.jpg)
@@ -19,7 +66,6 @@ fa-icon: users
 - Soleil – Martin Savko
 - EMBL-HH – Ivars Karpics
 - Global Phasing – Gerad Bricogne
-<hr>
 - Daniele/Matias – MXCuBE : Past, present and future
 
 ### Hardware integration
@@ -36,6 +82,12 @@ fa-icon: users
 - Rasmus Fogh - Third party control of an experiment via MXCuBE
 - Marcus - MXCuBE3@ESRF
 - Ivars Karpics - Embedding state persistence and user guidance in MXCuBE
+
+___
+
+
+___
+
 
 
 # 10th. MXCuBE meeting @ ESRF (Grenoble, France), 16<sup>th</sup>-18<sup>th</sup> of January, 2017
@@ -83,6 +135,14 @@ fa-icon: users
 - [MXCuBE and Docker](doc/meetings_2017_ESRF/mxcube_and_docker.pdf)
 - [Testing Single Page Applications](doc/meetings_2017_ESRF/testing_spa.pdf)
 
+___
+
+
+___
+
+
+
+
 
 # 9th. MXCuBE meeting @ EMBL (Hamburg, Germany), 27<sup>th</sup>-29<sup>th</sup> of June, 2016
 
@@ -129,6 +189,14 @@ Photo credit: Alejandro De Maria Antolinos (ESRF)
 - [Implementing mesh scan, interleaved collection and other potential methods in MXCuBE](doc/meetings_2016_EMBL/03_mxcube_karpics_collect_methods.pdf)
 - [Python3 support and other developments](doc/meetings_2016_EMBL/04_mxcube_karpics_ongoing_dev.pdf)
 
+___
+
+
+___
+
+
+
+
 # 8th. MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
 ![alba group photo](img/alba-meeting-group.jpg)
@@ -163,7 +231,15 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [MXCuBE and Qt4](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_03_qt4.pdf)
 - [Advanced methods and abstraction](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_02_advanced.pdf)
 
-# 7th. MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015 
+
+___
+
+
+___
+
+
+
+# 7th. MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015
 
 ![hzb group photo](img/hzb-meeting-group.jpg)
 
