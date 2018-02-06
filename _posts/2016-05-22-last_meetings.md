@@ -35,7 +35,7 @@ fa-icon: users
 
 - [Implementation of a dual gripper sample changer in MXCuBE](doc/meetings_2018_Diamond/MxCube-RB.pptx)
 - [Integration of new/non-traditional data collection methods in MXCuBE](doc/meetings_2018_Diamond/Implementing_new_methods_in_MXCuBE_martin.pdf)
-- [Multi-crystal data collection capabilities at ESRF](doc/meetings_2018_Diamond/[Multi-crystal data collection capabilities at the ESRF.pdf)
+- [Multi-crystal data collection capabilities at ESRF](doc/meetings_2018_Diamond/Multi-crystal_data_collection_capabilities_at_the_ESRF.pdf)
 - [Performance issues arising in Mesh&Collect-like experiments](doc/meetings_2018_Diamond/GB-mxcube_2018_1.pptx)
 
 ### The MXCuBE collaboration in action
