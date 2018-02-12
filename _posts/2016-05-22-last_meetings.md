@@ -44,6 +44,11 @@ fa-icon: users
 - ["Less is more": a proposal for enhancing collaboration](doc/meetings_2018_Diamond/mxcubemeeting_dls_lessismore.pdf)
 - [Licensing MXCuBE under the LGPL](doc/meetings_2018_Diamond/GPhL_Keller_MXCuBE-2018-01.pdf)
 
+### Minuters and reports
+- [Developers' Committee minutes](doc/meetings_2018_Diamond/MXCuBE_201801_devel_minutes.pdf)
+- [Scientific and Steering Committee minutes](doc/meetings_2018_Diamond/MXCuBE_201801_minutes.pdf)
+- [Overview of MXCuBE versions](doc/meetings_2018_Diamond/MXCuBEversions201801.pdf)
+
 ___
 
 
