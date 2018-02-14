@@ -5,6 +5,16 @@ color: white
 fa-icon: users
 ---
 
+## Developers' Committee meetings
+The Developers' Committee started a series of monthly web meetings in Feb 2018, to plan and coordinate code reorganisation:
+- [Meeting minutes](doc/developers_meetings/index.html)
+
+___
+
+
+___
+
+
 # 12th. MXCuBE meeting @ Diamond (Oxfordshire, UK), January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
 
 ![group photo](img/2018-diamond-meeting-group.jpg)
