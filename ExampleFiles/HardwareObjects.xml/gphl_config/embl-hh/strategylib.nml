@@ -8,7 +8,7 @@ goniostat_axis_settings= 0.0 0.0 0.0
 id= 'dset01'
 !detector_axis_settings= 291.0
 !detector_axis_settings= 260.96
-detector_axis_settings= 392.36
+detector_axis_settings= 240.581970
 /
 
 &beam_setting_list

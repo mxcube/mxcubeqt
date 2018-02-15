@@ -48,8 +48,8 @@
   <simcal_options>
     <!-- Simcal memory pool option, in Gb - should be 50-66% of available memory -->
     <memory-pool>9</memory-pool>
-    <!-- Default is 1.0. 50 needed for the germanate test case. Try globally for now -->
-    <hkl-scale>50</hkl-scale>
+    <!--&lt;!&ndash; Default is 1.0. 50 needed for the germanate test case. Try globally for now &ndash;&gt;-->
+    <!--<hkl-scale>50</hkl-scale>-->
   </simcal_options>
 
   <!-- Both thread number variables should be less than all available threads -->
