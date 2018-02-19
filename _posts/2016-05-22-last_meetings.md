@@ -22,11 +22,10 @@ ___
 ## Background
 
 The Jan 2018 meeting has been 
-[organised on different lines](doc/meetings_2018_Diamond/Proposed Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 v4.pdf)), to put more emphasis on [the scientific goals of the project](Background and suggestions for presentations ISPyB-MXCuBE meeting Jan-Feb 2018.pdf) and on how to make them feed through into the
+[organised on different lines](doc/meetings_2018_Diamond/Proposed Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 v4.pdf), to put more emphasis on [the scientific goals of the project](Background and suggestions for presentations ISPyB-MXCuBE meeting Jan-Feb 2018.pdf) and on how to make them feed through into the
 development priorities and the coordination of activities.
 
-The meeting was organised in cooperation with ISPyB with the folowing, joint [Agenda](doc/meetings_2018_Diamond/Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 final.pdf')
-==
+The meeting was held together with ISPyB, with the following, joint [Agenda](doc/meetings_2018_Diamond/Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 final.pdf)
 
 ## Full list of presentations
 
