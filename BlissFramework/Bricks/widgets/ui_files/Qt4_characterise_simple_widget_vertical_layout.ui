@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>123</height>
+    <height>177</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -113,12 +113,32 @@
                 <property name="text">
                  <string>Account for radiation damage</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QCheckBox" name="optimised_sad_cbx">
                 <property name="text">
                  <string>Optimised SAD</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="wait_result_cbx">
+                <property name="text">
+                 <string>Wait for result</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="execute_plan_cbx">
+                <property name="text">
+                 <string>Automaticaly execute diffraction plan</string>
                 </property>
                </widget>
               </item>

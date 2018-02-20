@@ -101,7 +101,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
 
         _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(self.main_group_box)
-        _main_hlayout.setSpacing(2)
+        _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # Size Policy ---------------------------------------------------------
