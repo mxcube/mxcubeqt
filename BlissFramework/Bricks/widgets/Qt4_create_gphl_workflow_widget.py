@@ -72,8 +72,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
-                     self._prefix_ledit_change)
+        # TODO check if this is needed
+        # self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
+        #              self._prefix_ledit_change)
         # Removed in porting to master branch
         # self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
         #              self._run_number_ledit_change)
@@ -217,7 +218,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
 
         wf = queue_model_objects.GphlWorkflow(self._workflow_hwobj)
-        wf.set_type(str(self._workflow_cbox.currentText()))
+        wf_type = str(self._workflow_cbox.currentText())
+        wf.set_type(wf_type)
+        interleave_order = ho.get_available_workflows()[wf_type].get(
+            'interleaveOrder', ''
+        )
+        wf.set_interleave_order(interleave_order)
 
         if self.current_prefix:
             path_template.base_prefix = self.current_prefix
@@ -226,9 +232,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf.set_name(wf.path_template.get_prefix())
         wf.set_number(wf.path_template.run_number)
 
-        data_object = self._gphl_acq_param_widget.get_data_object()
 
-        wf.set_expected_resolution(data_object.expected_resolution)
+        expected_resolution = self._gphl_acq_param_widget.get_parameter_value(
+            'expected_resolution'
+        )
+        wf.set_expected_resolution(expected_resolution)
 
         dd = self._gphl_acq_param_widget.get_energy_dict()
         wf.set_beam_energies(dd)
@@ -237,9 +245,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         return tasks
 
-    # Added in porting to master branch
-    def _prefix_ledit_change(self, new_value):
-        prefix = self._data_collection.acquisitions[0]. \
-            path_template.get_prefix()
-        self._data_collection.set_name(prefix)
-        self._tree_view_item.setText(0, self._data_collection.get_name())
+    # NB do we need this? Check what happens when prefix is changed
+    # # Added in porting to master branch
+    # def _prefix_ledit_change(self, new_value):
+    #     prefix = self._data_path_widget._data_model.base_prefix
+    #     self._data_collection.set_name(prefix)
+    #     self._tree_view_item.setText(0, self._data_collection.get_name())

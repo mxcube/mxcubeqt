@@ -168,5 +168,15 @@ class GphlAcquisitionWidget(QtGui.QWidget):
                 "GPhL acquisition widget has no parameter named %s" % name
             )
 
+    def get_parameter_value(self, name):
+        """Return value of parameter <name> or None if it does not exist
+
+        NB, the attributes defined on the _data_object depend on context,
+        so it is practical not to get errors for unknown names """
+        if hasattr(self._data_object, name):
+            return getattr(self._data_object, name)
+        else:
+            return None
+
     def _get_label_name(self, name):
         return name + '_label'
