@@ -1,0 +1,19 @@
+! Handmade to fit gleb email data
+
+&sdcp_instrument_list
+
+diffractcal_timestamp       = '2017-01-17T00:00:00'
+diffractcal_data_collection = '/data/emaik/gleb/bourenko/20170410'
+enactment_id                = 'cca45de1-44bd-432f-8421-9072841a0b13'
+! final residual =   0.0
+
+ beam            =  0.0,  0.0,  1.0
+ DET_X_AXIS      =  1.0, 0.0, 0.0
+ DET_Y_AXIS      =  0.0, 1.0, 0.0
+ DET_ORG_X       =  2074.790
+ DET_ORG_Y       =  2180.120
+ DET_ORG_DIST    =  240.581970
+ gonio_axis_dirs =  0.0 -1.0 0.0,
+                    0.186051,-0.913545,0.36169,
+                    0.0 -1.0 0.0
+/

@@ -11,5 +11,7 @@
  ! Get longet axis (Y) AND another  aaxis within 48 deg of omega
  U_MAT_ANG_DEG     = 46.0,  0.0,  0.0
  U_MAT_SD_DEG    = 3*0.114
- RES_LIMIT_DEF   =  1.194
+ ! highest inherent res of hkli data: 1.033
+ ! highest to-edge resolution supported: 1.45
+ RES_LIMIT_DEF   =  1.033
  /

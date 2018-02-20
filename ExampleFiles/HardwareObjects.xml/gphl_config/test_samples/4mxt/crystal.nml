@@ -11,5 +11,7 @@
  ! Should get unique b axis and orthogonal axis in range
  U_MAT_ANG_DEG   = 0.0  0.0  45.0
  U_MAT_SD_DEG    = 3*0.188
- RES_LIMIT_DEF   =  1.145
+ ! highest inherent res of hkli data: 1.395
+ ! highest to-edge resolution supported: 1.95
+ RES_LIMIT_DEF   =  1.4
  /

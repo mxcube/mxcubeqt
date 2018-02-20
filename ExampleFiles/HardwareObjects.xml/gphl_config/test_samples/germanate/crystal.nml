@@ -15,6 +15,7 @@
  U_MAT_ANG_DEG   = 0.0, 10.0, 20.0
  ! Take mosaicity value from CORRECT
  U_MAT_SD_DEG    = 3*0.2
- ! RES_LIMIT_DEF   =   0.8
- RES_LIMIT_DEF   =   2.2
+ ! highest inherent res of hkli data: 0.799
+ ! highest to-edge resolution supported: 1.12
+ RES_LIMIT_DEF   =   0.8
  /

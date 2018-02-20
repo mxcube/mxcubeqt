@@ -11,5 +11,7 @@
  ! just get it off the exact alignment
  U_MAT_ANG_DEG   = 0.0 10.0 10.0
  U_MAT_SD_DEG    = 3*0.067
- RES_LIMIT_DEF   =  1.478
+ ! highest inherent res of hkli data: 2.323
+ ! highest to-edge resolution supported: 3.25
+ RES_LIMIT_DEF   =  2.323
  /

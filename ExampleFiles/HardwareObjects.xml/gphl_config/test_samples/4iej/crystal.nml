@@ -13,5 +13,7 @@
  U_MAT_ANG_DEG   = 0.0 136.0 95.0
  U_MAT_SD_DEG    = 3*0.093
  CELL_DIM_SD     = 0.0373563 0.0373563 0.229969
- RES_LIMIT_DEF   = 2.2
+ ! highest inherent res of hkli data: 1.45
+ ! highest to-edge resolution supported: 2.03
+ RES_LIMIT_DEF   = 1.45
  /

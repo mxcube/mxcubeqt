@@ -11,5 +11,7 @@
  ! 42-48 deg gives you both main and cusp axes
  U_MAT_ANG_DEG   = 0.0, 44.0, 90.0
  U_MAT_SD_DEG    = 3*0.103
- RES_LIMIT_DEF   =  1.479
+ ! highest inherent res of hkli data: 2.100
+ ! highest to-edge resolution supported: 2.94
+ RES_LIMIT_DEF   =  2.1
  /

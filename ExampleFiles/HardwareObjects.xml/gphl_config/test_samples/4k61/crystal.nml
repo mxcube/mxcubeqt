@@ -19,7 +19,8 @@
  U_MAT_SD_DEG      = 3*0.145
  ! U_MAT_SD_DEG      = 3*0.25
 
- !RES_LIMIT_DEF    =  1.030
- ! New resolution limit suggested by Claus
- RES_LIMIT_DEF=2
+ ! New resolution limit suggested by Claus : 2.0
+ ! highest inherent res of hkli data: 1.700
+ ! highest to-edge resolution supported: 2.38
+ RES_LIMIT_DEF = 1.7
  /
