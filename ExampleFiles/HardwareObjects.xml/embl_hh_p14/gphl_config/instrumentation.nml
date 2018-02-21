@@ -34,7 +34,7 @@ det_org_x= 2074.790
 det_org_y= 2180.120
 ! Reference distance - no effect on actual experiments
 ! for potential refinement of det_gonio_axis_dirs
-det_org_dist= 240.581970
+det_org_dist= 450.0
 
 det_gonio_axis_dirs=  0.0  0.0  1.0
  ! Actual value is irrelevant, since axis is (nominally) parallel to beam

@@ -18,4 +18,8 @@
  ! highest inherent res of hkli data: 0.799
  ! highest to-edge resolution supported: 1.12
  RES_LIMIT_DEF   =   0.8
+ ! B factor to cause intensities to drop off (a bit).
+ ! 10.0 is a pretty random value
+ B_WILSON = 10.0
+ GEN_MODE = -1
  /
