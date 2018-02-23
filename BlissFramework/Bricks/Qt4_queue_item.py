@@ -376,6 +376,11 @@ class GenericWorkflowQueueItem(TaskQueueItem):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
 
+class GphlWorkflowQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
+
 class SampleCentringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
@@ -399,6 +404,7 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Sample: SampleQueueItem,
      queue_model_objects.Basket: BasketQueueItem, 
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
+     queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
      queue_model_objects.XrayCentering: XrayCenteringQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 
