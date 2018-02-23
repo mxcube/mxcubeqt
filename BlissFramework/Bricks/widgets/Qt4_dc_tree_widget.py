@@ -947,14 +947,15 @@ class DataCollectTree(QWidget):
         view_item.setSelected(True)
 
     def queue_entry_execution_finished(self, queue_entry, status):
-        """Slot connected to the signal comming from QueueManager
+        """Slot connected to the signal coming from QueueManager
            Adds executed queue entry to the history view
         """
         view_item = queue_entry.get_view()
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
             item_model = queue_entry.get_data_model()
             item_details = ""
-            sample_model = item_model.get_parent().get_parent()
+            sample_model = item_model.get_sample_node()
+            # sample_model = item_model.get_parent().get_parent()
 
             if isinstance(view_item, Qt4_queue_item.DataCollectionQueueItem):
                 item_details = "%.1f%s " % (item_model.as_dict()["osc_range"] ,

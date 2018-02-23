@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from QtImport import *
 
 
@@ -46,6 +47,11 @@ class SnapshotWidget(QWidget):
         _main_vlayout.addStretch(0)
 
     def display_snapshot(self, image, width=600):
+        if not image:
+            logging.getLogger('GUI').warning(
+                "No snapshot to display - skipping..."
+            )
+            return
         ration = image.height() / float(image.width())
         image = image.scaled(width, 
                              width * ration, 
