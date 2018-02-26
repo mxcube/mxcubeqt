@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import path
-from QtImport import *
+from QtImport import QPixmap, QIcon
 
 
 ICONS_DIR = path.join(path.dirname(__file__), 'Icons')

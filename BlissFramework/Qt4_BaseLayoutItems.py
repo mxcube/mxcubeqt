@@ -21,8 +21,8 @@ from QtImport import *
 
 from BlissFramework.Utils import PropertyBag
 
-DEFAULT_MARGIN = 5
-DEFAULT_SPACING = 5
+DEFAULT_MARGIN = 2
+DEFAULT_SPACING = 2
 DEFAULT_ALIGNMENT = "top center"
 
 
@@ -60,6 +60,8 @@ class _CfgItem:
                     self.properties.getProperty(prop_name).setValue(\
                          item_property.getUserValue())
                 elif item_property.hidden or prop_name.startswith("closable_"):
+                    self.properties[prop_name] = item_property
+                elif item_property.hidden or prop_name.startswith("newdialog_"):
                     self.properties[prop_name] = item_property
             else:
                 if item_property["type"] == "combo":
@@ -247,15 +249,22 @@ class TabCfg(ContainerCfg):
         Descript. :
         """
         closable_props = {}
+        new_dialog_props = {}
         for prop in self.properties:
             if hasattr(prop, "name"):
                 if prop.name.startswith("closable_"):
                     closable_props[prop.name] = prop.getValue()
+                elif prop.name.startswith("newdialog_"):
+                    closable_props[prop.name] = prop.getValue()
             else:
                 if prop["name"].startswith("closable_"):
                     closable_props[prop["name"]] = prop["value"]
+                if prop["name"].startswith("newdialog_"):
+                    closable_props[prop["name"]] = prop["value"]
 
         for prop_name in closable_props.keys():
+            self.properties.delProperty(prop_name)
+        for prop_name in new_dialog_props.keys():
             self.properties.delProperty(prop_name)
 
         self.slots = {}
@@ -265,6 +274,9 @@ class TabCfg(ContainerCfg):
                 child_lbl = child_lbl.replace(" ", "_")
                 self.properties.addProperty("closable_%s" % child_lbl,
                      "boolean", closable_props.get("closable_%s" % child_lbl,
+                     False))
+                self.properties.addProperty("newdialog_%s" % child_lbl,
+                     "boolean", closable_props.get("newdialog_%s" % child_lbl,
                      False))
                 slot_name = "showPage_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")] = ()
@@ -288,6 +300,10 @@ class TabCfg(ContainerCfg):
             self.widget.close_tab_button.show()
         else:
             self.widget.close_tab_button.hide()
+        if self.properties.getProperty("newdialog_%s" % new_tab_label).getValue():
+            self.widget.open_in_dialog_button.show()
+        else:
+            self.widget.open_in_dialog_button.hide()
 
 
 class SplitterCfg(ContainerCfg):
