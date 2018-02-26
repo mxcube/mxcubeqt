@@ -91,6 +91,8 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         # Other --------------------------------------------------------------- 
         self.setEnabled(self.ispyb_logged_in)
 
+    def set_expert_mode(self, state):
+        self.task_tool_box_widget.set_expert_mode(state)
 
     def run(self):
         """

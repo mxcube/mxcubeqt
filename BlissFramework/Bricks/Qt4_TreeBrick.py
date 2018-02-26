@@ -169,11 +169,11 @@ class Qt4_TreeBrick(BlissWidget):
         #    self.clear_centred_positions
 
         # Layout --------------------------------------------------------------
-        main_layout = QVBoxLayout(self)
-        main_layout.addWidget(self.sample_changer_widget)
-        main_layout.addWidget(self.dc_tree_widget)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0, 0, 0, 0) 
+        __main_layout = QVBoxLayout(self)
+        __main_layout.addWidget(self.sample_changer_widget)
+        __main_layout.addWidget(self.dc_tree_widget)
+        __main_layout.setSpacing(0)
+        __main_layout.setContentsMargins(0, 0, 0, 0) 
 
         # SizePolicies --------------------------------------------------------
 
@@ -320,6 +320,7 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(self.sample_changer_hwobj,
                              SampleChanger.STATUS_CHANGED_EVENT,
                              self.sample_changer_status_changed)
+                self.sample_changer_hwobj.update_values()
             if self.plate_manipulator_hwobj is not None:
                 self.connect(self.plate_manipulator_hwobj,
                              SampleChanger.STATE_CHANGED_EVENT,
@@ -585,7 +586,7 @@ class Qt4_TreeBrick(BlissWidget):
         accordingly.
         """
         lims_client = self.lims_hwobj
-        log = logging.getLogger("GUI") 
+        log = logging.getLogger("user_level_log") 
 
         self.lims_samples = lims_client.get_samples(\
              self.session_hwobj.proposal_id,
@@ -597,7 +598,7 @@ class Qt4_TreeBrick(BlissWidget):
         sample_changer = None
 
         self.sample_changer_widget.sample_combo.clear()
-        logging.getLogger("GUI").debug("LIMS samples: %s" % self.lims_samples)
+        log.debug("LIMS samples: %s" % self.lims_samples)
         for sample in self.lims_samples:
             if sample.containerSampleChangerLocation:
                 self.filtered_lims_samples.append(sample)
@@ -605,6 +606,8 @@ class Qt4_TreeBrick(BlissWidget):
                 if sample.code:
                     item_text += " (%s)" % sample.code
                 self.sample_changer_widget.sample_combo.addItem(item_text)
+
+        self.sample_changer_widget.sample_label.setEnabled(True)
         self.sample_changer_widget.sample_combo.setEnabled(True)
         self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
                  
@@ -985,8 +988,8 @@ class Qt4_TreeBrick(BlissWidget):
         self.dc_tree_widget.filter_sample_list(index)
         self.sample_changer_widget.details_button.setEnabled(index > 0) 
         self.sample_changer_widget.synch_ispyb_button.setEnabled(index < 2)
-        self.sample_changer_widget.sample_label.setEnabled(index == 0)
-        self.sample_changer_widget.sample_combo.setEnabled(index == 0)
+        #self.sample_changer_widget.sample_label.setEnabled(False)
+        #self.sample_changer_widget.sample_combo.setEnabled(index == 0)
         if index == 0:
             self.hide_sample_changer_tab.emit(True)
             self.hide_plate_manipulator_tab.emit(True)

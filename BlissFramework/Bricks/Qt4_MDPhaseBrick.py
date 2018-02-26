@@ -59,7 +59,7 @@ class Qt4_MDPhaseBrick(BlissWidget):
         _group_box_vlayout = QVBoxLayout(self.group_box)
         _group_box_vlayout.addWidget(self.phase_combobox)
         _group_box_vlayout.addStretch()
-        _group_box_vlayout.setSpacing(0)
+        _group_box_vlayout.setSpacing(2)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QVBoxLayout(self)

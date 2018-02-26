@@ -75,9 +75,9 @@ class CreateCharWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-        _main_vlayout.setSpacing(2)
-        _main_vlayout.addStretch(10)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        _main_vlayout.setSpacing(6)
+        _main_vlayout.addStretch(0)
 
         # SizePolicies --------------------------------------------------------
 
@@ -94,6 +94,11 @@ class CreateCharWidget(CreateTaskBase):
 
         self._char_widget.characterisation_gbox.toggled.connect(\
              self.characterisation_gbox_toggled)
+        self._char_widget.wait_result_cbx.toggled.connect(\
+             self.wait_results_cbx_toggled)
+        self._char_widget.execute_plan_cbx.toggled.connect(\
+             self.run_diffraction_plan_cbx_toggled)
+
         # Other ---------------------------------------------------------------
         self._char_params_mib.bind_value_update(
              'opt_sad', self._char_widget.optimised_sad_cbx,
@@ -233,7 +238,7 @@ class CreateCharWidget(CreateTaskBase):
 
             self._acq_widget.update_data_model(self._acquisition_parameters,
                                                self._path_template)
-            self.get_acquisition_widget().use_osc_start(True)
+            #self.get_acquisition_widget().use_osc_start(True)
 
             if len(data_collection.acquisitions) == 1:
                 self.select_shape_with_cpos(self._acquisition_parameters.\
@@ -308,6 +313,8 @@ class CreateCharWidget(CreateTaskBase):
         char.set_number(dc.acquisitions[0].\
                         path_template.run_number)
         char.run_characterisation = self._char_widget.characterisation_gbox.isChecked()
+        char.wait_result = self._char_widget.wait_result_cbx.isChecked()
+        char.run_diffraction_plan = self._char_widget.execute_plan_cbx.isChecked()
 
         tasks.append(char)
         self._path_template.run_number += 1
@@ -317,3 +324,11 @@ class CreateCharWidget(CreateTaskBase):
     def characterisation_gbox_toggled(self, state):
         if self._char:
             self._char.run_characterisation = state
+
+    def wait_results_cbx_toggled(self, state):
+        if self._char:
+            self._char.wait_result = state
+ 
+    def run_diffraction_plan_cbx_toggled(self, state):
+        if self._char:
+            self._char.run_diffraction_plan = state

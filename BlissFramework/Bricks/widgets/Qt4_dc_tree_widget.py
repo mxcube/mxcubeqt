@@ -38,6 +38,7 @@ import queue_model_objects_v1 as queue_model_objects
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
+from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_confirm_dialog import ConfirmDialog
 from widgets.Qt4_plate_navigator_widget import PlateNavigatorWidget
 from queue_model_enumerables_v1 import CENTRING_METHOD
@@ -150,7 +151,7 @@ class DataCollectTree(QWidget):
         self.sample_tree_widget = QTreeWidget(self.tree_splitter)
         self.history_tree_widget = QTreeWidget(self.tree_splitter)
         self.history_tree_widget.setHidden(True)
-        self.history_enable_cbox = QCheckBox("Display history view", self)
+        self.history_enable_cbox = QCheckBox("Queue history", self)
         self.history_enable_cbox.setChecked(False)
  
         self.plate_navigator_cbox = QCheckBox("Plate navigator", self)
@@ -205,10 +206,15 @@ class DataCollectTree(QWidget):
         self.plate_navigator_cbox.stateChanged.\
              connect(self.use_plate_navigator)
 
-        # Other ---------------------------------------------------------------    
-        self.sample_tree_widget.setColumnCount(2)
+        # Other ---------------------------------------------------------------
+        #TODO number of columns should not be hard coded but come from processing methods
+        self.sample_tree_widget.setColumnCount(6)
         #self.sample_tree_widget.setColumnWidth(0, 150)
         self.sample_tree_widget.setColumnWidth(1, 130)
+        for col in range (4):
+            self.sample_tree_widget.setColumnWidth(2 + col, 15)
+        
+        #self.sample_tree_widget.header().setDefaultSectionSize(180)
         self.sample_tree_widget.header().setDefaultSectionSize(280)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
@@ -217,9 +223,6 @@ class DataCollectTree(QWidget):
         self.setAttribute(Qt.WA_WState_Polished)      
         self.sample_tree_widget.viewport().installEventFilter(self)
 
-        font = self.history_tree_widget.font()
-        font.setPointSize(8)
-        self.history_tree_widget.setFont(font)
         self.history_tree_widget.setEditTriggers(\
              QAbstractItemView.NoEditTriggers)
         self.history_tree_widget.setColumnCount(5)
@@ -458,7 +461,7 @@ class DataCollectTree(QWidget):
     def mount_sample_task(self):
         """Sample mount task via queue_entry"""
         items = self.get_selected_items()
-        
+
         if len(items) == 1:
             if not items[0].get_model().free_pin_mode:
                 self.sample_centring_result = gevent.event.AsyncResult()
@@ -504,6 +507,7 @@ class DataCollectTree(QWidget):
                      "sample will be lost.")
 
             location = items[0].get_model().location
+            self.tree_brick.enable_widgets.emit(False)
 
             sample_changer = None
             if self.sample_mount_method == 1:
@@ -549,6 +553,7 @@ class DataCollectTree(QWidget):
             items[0].setOn(False)
             items[0].set_mounted_style(False)
         self.enable_collect(True)
+        self.tree_brick.enable_widgets.emit(True)
 
     def sample_tree_widget_selection(self):
         """Callback when a tree item is selected.
@@ -574,6 +579,7 @@ class DataCollectTree(QWidget):
 
     def toggle_collect_button_enabled(self):
         self.collect_button.setEnabled((len(self.get_checked_items()) > 1 and \
+                                       len(self.get_checked_samples()) and
                                        self.enable_collect_condition) or \
                                        self.collecting)
 
@@ -629,6 +635,11 @@ class DataCollectTree(QWidget):
         if isinstance(view_item, Qt4_queue_item.TaskQueueItem) and \
             self.samples_initialized:
             self.tree_brick.auto_save_queue()
+        self.sample_tree_widget.resizeColumnToContents(0)
+
+        if isinstance(task, queue_model_objects.DataCollection):
+            view_item.init_tool_tip()
+            view_item.init_processing_info() 
 
     def get_selected_items(self):
         """Return a list with selected items"""
@@ -702,6 +713,13 @@ class DataCollectTree(QWidget):
                   return item
            it += 1
            item = it.value()
+
+    def get_checked_samples(self):
+        res_list = []
+        for item in self.get_checked_items():
+            if isinstance(item,  Qt4_queue_item.SampleQueueItem):
+               res_list.append(item)
+        return res_list
 
     def filter_sample_list(self, option):
         """Updates sample tree based on the sample mount"""
@@ -1527,7 +1545,7 @@ class DataCollectTree(QWidget):
             elif self.item_copy[0].is_mesh():
                 group_name = "Advanced"
             else:
-                group_name = "Standart"
+                group_name = "Standard"
         elif isinstance(self.item_copy[0], queue_model_objects.Characterisation):
             group_name = "Characterisation" 
         elif isinstance(self.item_copy[0], queue_model_objects.EnergyScan):

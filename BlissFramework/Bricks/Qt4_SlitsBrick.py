@@ -99,11 +99,11 @@ class Qt4_SlitsBrick(BlissWidget):
         self.set_hor_gap_button = QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
         self.set_hor_gap_button.setEnabled(False)
-        self.set_hor_gap_button.setFixedWidth(27)
+        self.set_hor_gap_button.setFixedSize(27, 27)
         self.stop_hor_button = QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
         self.stop_hor_button.setEnabled(False)
-        self.stop_hor_button.setFixedWidth(27)
+        self.stop_hor_button.setFixedSize(27, 27)
 
         #Vertical gap
         ver_label = QLabel("Vertical:", self.main_gbox)
@@ -118,11 +118,11 @@ class Qt4_SlitsBrick(BlissWidget):
         self.set_ver_gap_button = QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
         self.set_ver_gap_button.setEnabled(False)
-        self.set_ver_gap_button.setFixedWidth(27)
+        self.set_ver_gap_button.setFixedSize(27, 27)
         self.stop_ver_button = QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
         self.stop_ver_button.setEnabled(False)
-        self.stop_ver_button.setFixedWidth(27)
+        self.stop_ver_button.setFixedSize(27, 27)
 
         self.test_button = QPushButton("Test", self.main_gbox)
         self.test_button.hide()
@@ -140,7 +140,7 @@ class Qt4_SlitsBrick(BlissWidget):
         _main_gbox_gridlayout.addWidget(self.set_ver_gap_button, 1, 3)
         _main_gbox_gridlayout.addWidget(self.stop_ver_button, 1, 4)
         _main_gbox_gridlayout.setSpacing(2)
-        _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
+        _main_gbox_gridlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_gbox_gridlayout.addWidget(self.test_button, 0, 5)
 

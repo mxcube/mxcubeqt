@@ -33,15 +33,24 @@ __category__ = 'Motor'
 
 
 class Qt4_MotorSpinBoxBrick(BlissWidget):
+    """STATE COLORS are based on the motor states:
+
     """
-    Descript. :
-    """
-    STATE_COLORS = (Qt4_widget_colors.LIGHT_RED,     # error
-                    Qt4_widget_colors.DARK_GRAY,     # unknown
-                    Qt4_widget_colors.LIGHT_GREEN,   # ready
-                    Qt4_widget_colors.LIGHT_YELLOW,  
-                    Qt4_widget_colors.LIGHT_YELLOW,
-                    Qt4_widget_colors.LIGHT_YELLOW)
+    STATE_COLORS = (Qt4_widget_colors.LIGHT_YELLOW,  # INITIALIZING
+                    Qt4_widget_colors.LIGHT_GREEN,   # ON
+                    Qt4_widget_colors.DARK_GRAY,     # OFF
+                    Qt4_widget_colors.LIGHT_GREEN,   # READY
+                    Qt4_widget_colors.LIGHT_YELLOW,  # BUSY
+                    Qt4_widget_colors.LIGHT_YELLOW,  # MOVING
+                    Qt4_widget_colors.LIGHT_GREEN,   # STANDBY
+                    Qt4_widget_colors.DARK_GRAY,     # DISABLED
+                    Qt4_widget_colors.DARK_GRAY,     # UNKNOWN
+                    Qt4_widget_colors.LIGHT_RED,     # ALARM
+                    Qt4_widget_colors.LIGHT_RED,     # FAULT
+                    Qt4_widget_colors.LIGHT_RED,     # INVALID
+                    Qt4_widget_colors.DARK_GRAY,     # OFFLINE
+                    Qt4_widget_colors.LIGHT_RED,     # LOWLIMIT
+                    Qt4_widget_colors.LIGHT_RED)     # HIGHLIMIT 
 
     MAX_HISTORY = 20
 
@@ -91,82 +100,59 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.motor_label = QLabel(self.main_gbox)
 
         #Main controls
-        self.control_box = QWidget(self.main_gbox)
-        self.move_left_button = QPushButton(self.control_box)
+        self.move_left_button = QPushButton(self)
         self.move_left_button.setIcon(Qt4_Icons.load_icon('Left2'))
         self.move_left_button.setToolTip("Moves the motor down (while pressed)")
-        self.move_left_button.setFixedWidth(25)
-        self.move_right_button = QPushButton(self.control_box)
+        self.move_left_button.setFixedSize(27, 27)
+        self.move_right_button = QPushButton(self)
         self.move_right_button.setIcon(Qt4_Icons.load_icon('Right2'))
         self.move_right_button.setToolTip("Moves the motor up (while pressed)")  
-        self.move_right_button.setFixedWidth(25)
+        self.move_right_button.setFixedSize(27, 27)
         
-        self.position_spinbox = QDoubleSpinBox(self.control_box)
+        self.position_spinbox = QDoubleSpinBox(self)
         self.position_spinbox.setMinimum(-10000)
         self.position_spinbox.setMaximum(10000)
-        self.position_spinbox.setMinimumSize(QSize(75, 25))
-        self.position_spinbox.setMaximumSize(QSize(75, 25))
+        self.position_spinbox.setMinimumSize(QSize(75, 27))
+        self.position_spinbox.setMaximumSize(QSize(75, 27))
         self.position_spinbox.setDecimals(3)
         self.position_spinbox.setToolTip("Moves the motor to a specific " + \
               "position or step by step; right-click for motor history")
 
         #Extra controls
-        self.extra_button_box = QWidget(self.main_gbox)
-        self.stop_button = QPushButton(self.extra_button_box)
+        self.stop_button = QPushButton(self)
         self.stop_button.setIcon(Qt4_Icons.load_icon('Stop2'))
         self.stop_button.setEnabled(False)
         self.stop_button.setToolTip("Stops the motor")
-        self.stop_button.setFixedWidth(25)
-        self.step_button = QPushButton(self.extra_button_box)
+        self.stop_button.setFixedSize(27, 27)
+        self.step_button = QPushButton(self)
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
-        self.step_combo = QComboBox(self.extra_button_box)
+        self.step_button.setFixedSize(27, 27)
+        self.step_combo = QComboBox(self)
         self.step_combo.setEditable(True)
         self.step_combo.setValidator(QDoubleValidator(0, 360, 5, self.step_combo))
         self.step_combo.setDuplicatesEnabled(False)
+        self.step_combo.setFixedHeight(27) 
 
         self.position_slider = QDoubleSlider(Qt.Horizontal, self.main_gbox)
     
         # Layout --------------------------------------------------------------
-        self.control_box_layout = QHBoxLayout(self.control_box)
-        self.control_box_layout.addWidget(self.position_spinbox)
-        self.control_box_layout.addWidget(self.move_left_button)
-        self.control_box_layout.addWidget(self.move_right_button)
-        self.control_box_layout.setSpacing(2)
-        self.control_box_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.extra_button_box_layout = QHBoxLayout(self.extra_button_box)
-        self.extra_button_box_layout.addWidget(self.stop_button)
-        self.extra_button_box_layout.addWidget(self.step_button)
-        self.extra_button_box_layout.addWidget(self.step_combo)
-        self.extra_button_box_layout.setSpacing(2)
-        self.extra_button_box_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.main_gbox_layout = QHBoxLayout(self.main_gbox)
-        self.main_gbox_layout.addWidget(self.motor_label)
-        self.main_gbox_layout.addWidget(self.control_box)
-        self.main_gbox_layout.addWidget(self.extra_button_box)
-        self.main_gbox_layout.addWidget(self.position_slider)
-        self.main_gbox_layout.setSpacing(2)
-        self.main_gbox_layout.setContentsMargins(2, 2, 2, 2)
-
-        self.main_layout = QHBoxLayout(self)
-        self.main_layout.addWidget(self.main_gbox)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        _main_hbox_layout = QHBoxLayout(self)
+        _main_hbox_layout.addWidget(self.motor_label)
+        _main_hbox_layout.addWidget(self.position_spinbox)
+        _main_hbox_layout.addWidget(self.move_left_button)
+        _main_hbox_layout.addWidget(self.move_right_button)
+        _main_hbox_layout.addWidget(self.position_slider)
+        _main_hbox_layout.addWidget(self.stop_button)
+        _main_hbox_layout.addWidget(self.step_button)
+        _main_hbox_layout.addWidget(self.step_combo) 
+        _main_hbox_layout.setSpacing(2)
+        _main_hbox_layout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicy (horizontal, vertical) -----------------------------------
-        self.move_left_button.setSizePolicy(QSizePolicy.Fixed, 
-                                            QSizePolicy.Minimum)
-        self.move_right_button.setSizePolicy(QSizePolicy.Fixed, 
-                                             QSizePolicy.Minimum)
-        self.stop_button.setSizePolicy(QSizePolicy.Fixed, 
-                                       QSizePolicy.Minimum)
-        self.step_button.setSizePolicy(QSizePolicy.Fixed, 
-                                       QSizePolicy.Minimum)
-        self.extra_button_box.setSizePolicy(QSizePolicy.Fixed,
-                                            QSizePolicy.Fixed)
+        #self.setSizePolicy(QSizePolicy.Fixed,
+        #                   QSizePolicy.Fixed)
 
         # Object events ------------------------------------------------------
         spinbox_event = SpinBoxEvent(self.position_spinbox) 
@@ -212,7 +198,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        Qt4_widget_colors.set_widget_color(self.step_combo,
+        Qt4_widget_colors.set_widget_color(self.step_combo.lineEdit(),
                                            Qt4_widget_colors.LINE_EDIT_CHANGED, 
                                            QPalette.Button)
 
@@ -325,7 +311,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         #self.demand_move = 1
         self.update_gui()
-        state = self.motor_hwobj.getState()
+        state = self.motor_hwobj.get_state()
         if state == self.motor_hwobj.READY:
             if self['invertButtons']:
                 self.really_move_down()
@@ -340,7 +326,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         #self.demand_move = -1
         self.update_gui()
-        state = self.motor_hwobj.getState()
+        state = self.motor_hwobj.get_state()
         if state == self.motor_hwobj.READY:
             if self['invertButtons']:
                 self.really_move_up()
@@ -364,9 +350,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             except:
                 pass
 
-        if self.motor_hwobj.isReady():
+        if self.motor_hwobj.is_ready():
             self.set_position_spinbox_color(self.motor_hwobj.READY)
-            self.motor_hwobj.moveRelative(step)
+            self.motor_hwobj.move_relative(step)
 
     def really_move_down(self):
         """
@@ -385,9 +371,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             except:
                 pass
 
-        if self.motor_hwobj.isReady():
+        if self.motor_hwobj.is_ready():
             self.set_position_spinbox_color(self.motor_hwobj.READY)
-            self.motor_hwobj.moveRelative(-step)
+            self.motor_hwobj.move_relative(-step)
 
     def update_gui(self):
         """
@@ -397,16 +383,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         if self.motor_hwobj is not None: 
             self.main_gbox.setEnabled(True)
-            try:
-                if self.motor_hwobj.isReady():
-                    self.limits_changed(self.motor_hwobj.getLimits())
-                    self.position_changed(self.motor_hwobj.getPosition())
-                self.state_changed(self.motor_hwobj.getState())
-            except:
-                if self.motor_hwobj is not None:
-                    self.state_changed(self.motor_hwobj.UNUSABLE)
-                else:
-                    pass
+            if self.motor_hwobj.is_ready():
+                self.limits_changed(self.motor_hwobj.get_limits())
+                self.position_changed(self.motor_hwobj.get_position())
+                self.state_changed(self.motor_hwobj.get_state())
         else:
             self.main_gbox.setEnabled(False)
 
@@ -436,21 +416,17 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         menu = QMenu(self)
-        menu.addAction("Previous positions")
-        #menu.insertSeparator()
-        for i in range(len(self.pos_history)):
-            menu.addAction(self.pos_history[i], i)
+        for item in self.pos_history:
+            menu.addAction(item, self.go_to_history_pos)
         menu.popup(QCursor.pos())
-        menu.activated.connect(self.go_to_history_pos)
 
-    def go_to_history_pos(self, index):
+    def go_to_history_pos(self):
         """
         Descript. :
         Args.     :
         Return.   : 
         """
-        pos = self.pos_history[index]
-        self.motor_hwobj.move(float(pos))
+        self.motor_hwobj.move(float(self.sender))
 
     def update_history(self, pos):
         """
@@ -498,7 +474,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
            self.position_spinbox.blockSignals(False)
            self.position_slider.blockSignals(False)
         except:
-           print(('ERROR!!! Setting position...' + str(new_position)))
+           logging.getLogger('user_level_log').debug(\
+              "Unable to set motor position: %s" % str(new_position))
 
     def set_position_spinbox_color(self, state):
         """
@@ -518,9 +495,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         self.set_position_spinbox_color(state)
-        if state == self.motor_hwobj.MOVESTARTED:
-            self.update_history(self.motor_hwobj.getPosition())
-        if state == self.motor_hwobj.READY:
+        if state == self.motor_hwobj.motor_states.READY:
             if self.demand_move == 1:
                 if self['invertButtons']:
                     self.really_move_down()
@@ -539,18 +514,20 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.move_left_button.setEnabled(True)
             self.move_right_button.setEnabled(True)
             self.step_combo.setEnabled(True)
-        elif state in (self.motor_hwobj.NOTINITIALIZED, self.motor_hwobj.UNUSABLE):
+        elif state in (self.motor_hwobj.motor_states.NOTINITIALIZED,
+                       self.motor_hwobj.motor_states.UNUSABLE):
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(False)
             self.move_left_button.setEnabled(False)
             self.move_right_button.setEnabled(False)
-        elif state in (self.motor_hwobj.MOVING, self.motor_hwobj.MOVESTARTED):
+        elif state == self.motor_hwobj.motor_states.MOVING:
+            #self.update_history(self.motor_hwobj.getPosition()) 
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(True)
             self.move_left_button.setEnabled(False)
             self.move_right_button.setEnabled(False)
             self.step_combo.setEnabled(False)
-        elif state == self.motor_hwobj.ONLIMIT:
+        elif state == self.motor_hwobj.motor_states.ONLIMIT:
             self.position_spinbox.setEnabled(True)
             self.stop_button.setEnabled(False)
             self.move_left_button.setEnabled(True)
@@ -564,8 +541,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Return.   : 
         """
         if self.motor_hwobj is not None:
-            if self.motor_hwobj.isReady():
-                self.motor_hwobj.moveRelative(self.position_spinbox.lineStep())
+            if self.motor_hwobj.is_ready():
+                self.motor_hwobj.move_relative(self.position_spinbox.lineStep())
 
     def change_position(self):
         """
@@ -575,6 +552,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         """
         if self.motor_hwobj is not None:
             self.motor_hwobj.move(self.position_spinbox.value())
+        self.update_history(self.position_spinbox.value())
 
     def position_value_edited(self, value):
         Qt4_widget_colors.set_widget_color(self.position_spinbox.lineEdit(),
@@ -597,16 +575,16 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         else:
             try:
                 if state is None:
-                    state = self.motor_hwobj.getState()
+                    state = self.motor_hwobj.get_state()
             except:
-                logging.exception("%s: could not get motor state", self.objectName())
+                logging.getLogger('user_level_log').exception("%s: could not get motor state", self.objectName())
                 state = self.motor_hwobj.UNUSABLE
                 
             try:
-                if limits is None and self.motor_hwobj.isReady():
-                    limits = self.motor_hwobj.getLimits()
+                if limits is None and self.motor_hwobj.is_ready():
+                    limits = self.motor_hwobj.get_limits()
             except:
-                logging.exception("%s: could not get motor limits", self.objectName())
+                logging.getLogger('user_level_log').exception("%s: could not get motor limits", self.objectName())
                 limits = None
 
             try:

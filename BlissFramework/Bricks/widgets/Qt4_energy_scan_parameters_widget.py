@@ -195,6 +195,7 @@ class EnergyScanParametersWidget(QWidget):
         self.periodic_table_widget.setEnabled(False)
 
     def energy_scan_new_point(self, x, y):
+        print x, y
         self.scan_actual_plot_widget.add_new_plot_value(x, y)
 
     def chooch_finished(self, pk, fppPeak, fpPeak, ip, fppInfl, fpInfl, rm, \

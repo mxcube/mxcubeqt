@@ -70,8 +70,8 @@ class Qt4_LogBarBrick(BlissWidget):
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, 
-                           QSizePolicy.Fixed)
+        #self.setSizePolicy(QSizePolicy.MinimumExpanding, 
+        #                   QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
 

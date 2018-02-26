@@ -329,7 +329,6 @@ class HeatMapWidget(QWidget):
                 self._summary_textbrowser.append("<b>Mesh parameters</b>")
                 grid_properties = self.__associated_grid.get_properties()
 
-                print self.__result_display[self.__score_key]
                 self._heat_map_plot.plot_result(numpy.transpose(self.__result_display[self.__score_key]),
                                                 aspect=grid_properties["dx_mm"] / \
                                                        grid_properties["dy_mm"])
@@ -429,7 +428,8 @@ class HeatMapWidget(QWidget):
          then screen x and y coordinates are estimated.
         """
         if self.__is_map_plot:
-            result_display = numpy.transpose(self.__result_display[self.__score_key])
+            #result_display = numpy.transpose(self.__result_display[self.__score_key])
+            result_display = self.__result_display[self.__score_key]
             #step_x = pix_width / self.__result_display.shape[0]
             #step_y = pix_height / self.__result_display.shape[1]
             for col in range(result_display.shape[0]):
@@ -507,6 +507,7 @@ class HeatMapWidget(QWidget):
         Returns col and row from image and line
         """
         col, row = self.__associated_grid.get_col_row_from_line_image(line, image)
+        ## TODO check if next line needs to be removed
         row = self.__result_display[self.__score_key].shape[1] - row - 1    
         return col, row
 
@@ -548,9 +549,13 @@ class HeatMapWidget(QWidget):
         self._beamline_setup_hwobj.shape_history_hwobj.create_auto_line(motor_pos_dict)
 
     def rotate_and_create_helical_line_clicked(self):
+        print 1
         self.move_to_selected_position()
+        print 2
         self._beamline_setup_hwobj.diffractometer_hwobj.move_omega_relative(90)
+        print 3
         self._beamline_setup_hwobj.shape_history_hwobj.create_auto_line()
+        print 4
 
     def move_to_selected_position(self):
         """

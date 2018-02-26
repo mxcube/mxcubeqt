@@ -146,7 +146,8 @@ class ConfirmDialog(QDialog):
             elif isinstance(item, Qt4_queue_item.DataCollectionQueueItem):
                 acq_parameters = item_model.acquisitions[0].\
                      acquisition_parameters
-                interleave_items += 1
+                if not item_model.is_helical() and not item_model.is_mesh():
+                    interleave_items += 1
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                     acquisitions[0].acquisition_parameters
@@ -188,7 +189,7 @@ class ConfirmDialog(QDialog):
              
                 collection_items.append(item)
                 file_paths = path_template.get_files_to_be_written()
-                num_images += len(file_paths)
+                num_images += acq_parameters.num_images
 
                 if len(file_paths) > 20:
                     file_paths = (file_paths[:20])

@@ -26,7 +26,11 @@ from BlissFramework.Utils import Qt4_widget_colors
 import queue_model_objects_v1 as queue_model_objects
 
 
-PIN_PIXMAP = Qt4_Icons.load("sample_axis.png")
+PIN_ICON = Qt4_Icons.load_icon("sample_axis")
+BALL_UNKNOWN = Qt4_Icons.load_icon("sphere_white")
+BALL_RUNNING = Qt4_Icons.load_icon("sphere_orange")
+BALL_FAILED = Qt4_Icons.load_icon("sphere_red")
+BALL_FINISHED = Qt4_Icons.load_icon("sphere_green")
 
 
 class QueueItem(QTreeWidgetItem):
@@ -56,7 +60,7 @@ class QueueItem(QTreeWidgetItem):
         self._previous_check_state = False
         self._font_is_bold = False
         self._star = False
-        self.setText(1, '')         
+        self.setText(1, '')
  
     def listView(self):
         #remove this
@@ -233,7 +237,7 @@ class SampleQueueItem(QueueItem):
         self.mounted_style = state
 
         if state:
-            self.setIcon(0, QIcon(PIN_PIXMAP))
+            self.setIcon(0, PIN_ICON)
             self.setBackground(0, QBrush(Qt4_widget_colors.PLUM)) 
             self.setBackground(1, QBrush(Qt4_widget_colors.PLUM))
             self.setSelected(True)
@@ -292,7 +296,15 @@ class DataCollectionQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
-    def update_tool_tip(self):
+
+    def init_processing_info(self):
+        dc_model = self.get_model()
+        dc_parameters = dc_model.as_dict()
+        if dc_parameters["num_images"] > 19:
+            for index, processing_method in enumerate(dc_model.processing_methods):
+                self.setIcon(2 + index, BALL_UNKNOWN)
+
+    def init_tool_tip(self):
         dc_model = self.get_model()
         dc_parameters = dc_model.as_dict()
         dc_parameters_table = \

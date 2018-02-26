@@ -80,6 +80,7 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(Qt.AlignCenter)
         self.state_changed("unknown")
+        self.state_label.setFixedHeight(20)
         
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'mnemonic':

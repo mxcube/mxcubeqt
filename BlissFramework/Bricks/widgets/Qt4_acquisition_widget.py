@@ -86,6 +86,7 @@ class AcquisitionWidget(QWidget):
             self.acq_widget_layout = loadUi(os.path.join(\
                  os.path.dirname(__file__),
                  "ui_files/Qt4_acquisition_widget_horizontal_layout.ui"))
+            self.use_osc_start(False)
         else:
             self.acq_widget_layout = loadUi(os.path.join(\
                  os.path.dirname(__file__),
@@ -241,6 +242,14 @@ class AcquisitionWidget(QWidget):
             except:
                 pass
         self.acq_widget_layout.osc_total_range_ledit.blockSignals(False)
+
+    def update_total_exp_time(self):
+        try:
+            self.acq_widget_layout.total_exp_time_ledit.setText("%.2f" % \
+                 (float(self.acq_widget_layout.exp_time_ledit.text()) * \
+                  float(self.acq_widget_layout.num_images_ledit.text())))
+        except:
+            pass
 
     def osc_total_range_ledit_changed(self, new_value):
         if not self.grid_mode:
@@ -483,6 +492,7 @@ class AcquisitionWidget(QWidget):
            and if necessary update osc range per frame
         """
         self.update_osc_range_per_frame_limits()
+        self.update_total_exp_time()
         self.acqParametersChangedSignal.emit(\
              self.check_parameter_conflict())
 
@@ -492,7 +502,8 @@ class AcquisitionWidget(QWidget):
         """
         if str(new_value).isdigit():
             #self._path_template.num_files = int(new_value)
-            self.update_osc_total_range() 
+            self.update_osc_total_range()
+            self.update_total_exp_time()
             self.acqParametersChangedSignal.emit(\
                  self.check_parameter_conflict())
 
@@ -696,7 +707,7 @@ class AcquisitionWidget(QWidget):
         Descript. :
         """
         if self._beamline_setup_hwobj is not None:
-            roi_modes = self._beamline_setup_hwobj._get_roi_modes()
+            roi_modes = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
             if (len(roi_modes) > 0 and
                 self.acq_widget_layout.detector_roi_mode_combo.count() == 0):
                 for roi_mode in roi_modes:
@@ -713,7 +724,8 @@ class AcquisitionWidget(QWidget):
         """
         Descript. :
         """
-        if self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
+        if roi_mode_index and \
+           self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
             self.acq_widget_layout.detector_roi_mode_combo.\
                  setCurrentIndex(roi_mode_index)
 
@@ -736,7 +748,7 @@ class AcquisitionWidget(QWidget):
         mad = True if self._path_template.mad_prefix != '' else False
 
         if mad:
-            mad_prefix = self._path_template.mad_prefix
+            mad_prefix = str(self._path_template.mad_prefix)
             index = MAD_ENERGY_COMBO_NAMES[str(mad_prefix)]
             self.acq_widget_layout.energies_combo.setCurrentIndex(index)
             self.acq_widget_layout.mad_cbox.setChecked(True)

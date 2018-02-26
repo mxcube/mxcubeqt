@@ -66,6 +66,9 @@ class CreateTaskBase(QWidget):
          self._beamline_setup_hwobj = None
          self._graphics_manager_hwobj = None
          self._in_plate_mode = None
+        
+    def set_expert_mode(self, state):
+        pass 
 
     def init_models(self):
         self.init_acq_model()
@@ -79,7 +82,7 @@ class CreateTaskBase(QWidget):
                 self._acq_widget.set_beamline_setup(bl_setup)
                 def_acq_parameters = bl_setup.get_default_acquisition_parameters()
                 self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
-                if self._in_plate_mode:
+                if bl_setup.diffractometer_hwobj.in_plate_mode():
                     self._acq_widget.use_kappa(False)
                     self._acq_widget.use_max_osc_range(True)
                 else:
@@ -119,6 +122,7 @@ class CreateTaskBase(QWidget):
 
     def set_beamline_setup(self, bl_setup_hwobj):
         self._beamline_setup_hwobj = bl_setup_hwobj
+        self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
 
         try:
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
@@ -130,20 +134,19 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.set_osc_start)
             bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
-            bl_setup_hwobj.detector_hwobj.connect('detectorModeChanged', self.set_detector_roi_mode)
+            bl_setup_hwobj.detector_hwobj.connect('detectorRoiModeChanged', self.set_detector_roi_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
 
             self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
         except AttributeError as ex:
-            msg = 'Could not connect to one or more hardware objects: ' + str(ex)
-            logging.getLogger("GUI").warning(msg)
+            msg = 'Could not connect to one or more hardware objects' + str(ex)
+            logging.getLogger("HWR").warning(msg)
        
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
         if self._graphics_manager_hwobj: 
             self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
             self._graphics_manager_hwobj.connect('shapeChanged', self.shape_changed)
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
-        self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
@@ -735,7 +738,7 @@ class CreateTaskBase(QWidget):
         acq.path_template = self._create_path_template(sample, path_template)
 
         if self._in_plate_mode:
-            acq.acquisition_parameters.take_snapshots = 0
+            acq.acquisition_parameters.take_snapshots = 1
 
         return acq
 

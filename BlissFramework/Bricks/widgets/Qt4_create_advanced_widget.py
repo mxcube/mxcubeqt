@@ -71,7 +71,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addStretch(0)
-        _main_vlayout.setSpacing(2)
+        _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
@@ -193,25 +193,20 @@ class CreateAdvancedWidget(CreateTaskBase):
             msg = "No grid selected. Please select a grid to continue!"
             logging.getLogger("GUI").warning(msg)
             result = False
+            #selected_grid = self._graphics_manager_hwobj.get_auto_grid()
         else:
             grid_properties = selected_grid.get_properties()
-            exp_time = float(self._acq_widget.\
-                acq_widget_layout.exp_time_ledit.text())
+            exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
             speed = grid_properties["yOffset"] / exp_time
             if speed >= 0.8:
-                logging.getLogger("GUI").error(\
-                    "Translation speed " + \
-                    "%.3f is above the limit 0.8" % speed)
+                logging.getLogger("GUI").error("Translation speed %.3f is above the limit 0.8" % speed)
                 return False
-            osc_range_per_frame = float(self._acq_widget.\
-                acq_widget_layout.osc_range_ledit.text())
+            osc_range_per_frame = float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())
             speed = osc_range_per_frame / exp_time
             if speed >= 166:
-                logging.getLogger("GUI").error(\
-                    "Rotation speed per frame " + \
-                    "%.3f is above the limit 166" % speed)
+                logging.getLogger("GUI").error("Rotation speed per frame %.3f is above the limit 166" % speed)
                 return False
-            result = True
+        result = True
 
         return result
             
@@ -277,7 +272,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         tasks = []
         selected_grid = self.get_selected_grid()
-
         mesh_dc = self._create_dc_from_grid(sample, selected_grid)
 
         exp_type = str(self._advanced_methods_widget.method_combo.currentText())

@@ -94,12 +94,12 @@ class Qt4_MDApertureBrick(BlissWidget):
         _main_gbox_vlayout.addWidget(self.aperture_position_combo)
         _main_gbox_vlayout.addStretch()
         _main_gbox_vlayout.setSpacing(2)
-        _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
+        _main_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
-        _main_vlayout.addSpacing(0)
+        #_main_vlayout.addSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------

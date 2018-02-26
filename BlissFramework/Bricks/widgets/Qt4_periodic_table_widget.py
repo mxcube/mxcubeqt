@@ -84,7 +84,7 @@ class PeriodicTableWidget(QWidget):
         _main_vlayout.addWidget(self.edge_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
 
