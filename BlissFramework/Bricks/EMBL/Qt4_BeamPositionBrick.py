@@ -65,44 +65,32 @@ class Qt4_BeamPositionBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_group_box = QGroupBox(self)
-        motors_widget = QWidget(self.main_group_box)
-        self.unf_hor_motor_brick = Qt4_MotorSpinBoxBrick(motors_widget)
-        self.unf_ver_motor_brick = Qt4_MotorSpinBoxBrick(motors_widget)
-        self.double_hor_motor_brick = Qt4_MotorSpinBoxBrick(motors_widget)
-        self.double_ver_motor_brick = Qt4_MotorSpinBoxBrick(motors_widget)
+        self.unf_hor_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
+        self.unf_ver_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
+        self.double_hor_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
+        self.double_ver_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
         self.motor_widget_list = (self.unf_hor_motor_brick,
                                   self.unf_ver_motor_brick,
                                   self.double_hor_motor_brick,
                                   self.double_ver_motor_brick)
-        button_widget = QWidget(self.main_group_box)
-        self.center_beam_button = QPushButton(button_widget)
-        self.measure_flux_button = QPushButton(button_widget)
+        self.center_beam_button = QPushButton(self.main_group_box)
+        self.measure_flux_button = QPushButton(self.main_group_box)
         
         # Layout -------------------------------------------------------------- 
-        _motor_vlayout = QVBoxLayout(motors_widget)
-        _motor_vlayout.setSpacing(2)
-        _motor_vlayout.setContentsMargins(0, 0, 0, 0)
-        _motor_vlayout.addWidget(self.unf_hor_motor_brick)
-        _motor_vlayout.addWidget(self.unf_ver_motor_brick)
-        _motor_vlayout.addWidget(self.double_hor_motor_brick)
-        _motor_vlayout.addWidget(self.double_ver_motor_brick)
-
-        _button_vlayout = QVBoxLayout(button_widget)
-        _button_vlayout.setSpacing(2)
-        _button_vlayout.setContentsMargins(0, 0, 0, 0)
-        _button_vlayout.addWidget(self.center_beam_button)  
-        _button_vlayout.addWidget(self.measure_flux_button)
-
-        _groupbox_hlayout = QHBoxLayout(self.main_group_box)
-        _groupbox_hlayout.setSpacing(2)
-        _groupbox_hlayout.setContentsMargins(0, 0, 0, 0)
-        _groupbox_hlayout.addWidget(motors_widget)
-        _groupbox_hlayout.addWidget(button_widget)
+        _gbox_grid_layout = QGridLayout(self.main_group_box)
+        _gbox_grid_layout.addWidget(self.unf_hor_motor_brick, 0, 0)
+        _gbox_grid_layout.addWidget(self.unf_ver_motor_brick, 1, 0)
+        _gbox_grid_layout.addWidget(self.double_hor_motor_brick, 0, 1)
+        _gbox_grid_layout.addWidget(self.double_ver_motor_brick, 1, 1)
+        _gbox_grid_layout.addWidget(self.center_beam_button, 0, 2)  
+        _gbox_grid_layout.addWidget(self.measure_flux_button, 1, 2)
+        _gbox_grid_layout.setSpacing(0)
+        _gbox_grid_layout.setContentsMargins(2, 2, 2, 2)
 
         _main_hlayout = QHBoxLayout(self)
         _main_hlayout.addWidget(self.main_group_box)
         _main_hlayout.setSpacing(0)
-        _main_hlayout.setContentsMargins(2, 2, 2, 2)
+        _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
         # Size Policy ---------------------------------------------------------
 
