@@ -187,6 +187,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
     _menuBackgroundColor = None
     _menuBar = None
     _statusBar = None
+    _progressBar = None
 
     _applicationEventFilter = InstanceEventFilter(None)
 
@@ -315,6 +316,21 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """Updates status bar"""
         if BlissWidget._statusBar:
             BlissWidget._statusBar.parent().stop_progress_bar()
+
+    @staticmethod
+    def open_progress_dialog(msg, max_steps):
+        if BlissWidget._progressDialog:
+            BlissWidget._progressDialog.parent().open_progress_dialog(msg, max_steps)
+
+    @staticmethod
+    def set_progress_dialog_step(step):
+        if BlissWidget._progressDialog:
+            BlissWidget._progressDialog.parent().set_progress_dialog_step(step)
+
+    @staticmethod
+    def close_progress_dialog():
+        if BlissWidget._progressDialog:
+            BlissWidget._progressDialog.parent().close_progress_dialog()
 
     @staticmethod
     def set_user_file_directory(user_file_directory):
@@ -762,6 +778,12 @@ class BlissWidget(Connectable.Connectable, QFrame):
                 pass
         BlissWidget._eventsCache = {}
 
+    @staticmethod
+    def set_gui_enabled(enabled):
+        for widget in QApplication.allWidgets():
+            if isinstance(widget, BlissWidget):
+                widget.setEnabled(enabled)
+
     def __init__(self, parent=None, widget_name=''):
         """
         Descript. :
@@ -1104,20 +1126,27 @@ class BlissWidget(Connectable.Connectable, QFrame):
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        #screen=get_splash_screen()
-        #if screen is not None:
-        #    screen.set_message("Loading hardware object: %s" % hardwareObjectName)
-
         hwobj = HardwareRepository.HardwareRepository().\
                    getHardwareObject(hardware_object_name)
+
+        if hwobj is not None: 
+            self.connect(hwobj,
+                         "progressInit",
+                         self.progress_init)
+
         if hwobj is None and not optional:
             logging.getLogger("GUI").error(\
-                 "%s: " % self.objectName() + \
-                 "Unable to add hardware object: '%s'" % hardware_object_name)
+               "Unable to initialize hardware: %s.xml. " % \
+               hardware_object_name[1:] + \
+               "If the restarting of MXCuBE do not help, " + \
+               "please contact your local support.")
             self.set_background_color(Qt4_widget_colors.LIGHT_RED)
 
         return hwobj
             
+
+    def progress_init(self, msg, step_count, show_dialog):
+        pass
 
     def __hardwareObjectDiscarded(self, hardware_object_name):
         """

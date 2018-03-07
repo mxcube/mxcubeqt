@@ -149,20 +149,20 @@ def run(gui_config_file=None):
     else:
         # try to set Hardware Repository server from environment
         try:
-            hwr_server = os.environ['HARDWARE_REPOSITORY_SERVER']
+            hwr_server = os.environ.get('HARDWARE_REPOSITORY_SERVER', '')
         except KeyError:
             hwr_server = default_hwr_server
 
     # add bricks directories and hardware objects directories from environment
     try:
         custom_bricks_directory += \
-           os.environ['CUSTOM_BRICKS_PATH'].split(os.path.pathsep)
+           os.environ.get('CUSTOM_BRICKS_PATH', '').split(os.path.pathsep)
     except KeyError:
         pass
 
     try:
         hwobj_directory += \
-           os.environ['CUSTOM_HARDWARE_OBJECTS_PATH'].split(os.path.pathsep)
+           os.environ.get('CUSTOM_HARDWARE_OBJECTS_PATH', '').split(os.path.pathsep)
     except KeyError:
         pass
 

@@ -205,6 +205,8 @@ class CustomMenuBar(QMenuBar):
             self.parent.enableExpertModeSignal.emit(True)
             # go through all bricks and execute the method
             for widget in QApplication.allWidgets():
+                if hasattr(widget, 'set_expert_mode'):
+                    widget.set_expert_mode(True)
                 if isinstance(widget, BlissWidget):
                     try:
                         widget.set_expert_mode(True)
@@ -218,7 +220,8 @@ class CustomMenuBar(QMenuBar):
             self.parent.enableExpertModeSignal.emit(False)
             # go through all bricks and execute the method
             for widget in QApplication.allWidgets():
-                if isinstance(widget, BlissWidget):
+                if hasattr(widget, "set_expert_mode"):
+                #if isinstance(widget, BlissWidget):
                     widget.setWhatsThis("")
                     try:
                         widget.set_expert_mode(False)
@@ -369,12 +372,11 @@ class WindowDisplayWidget(QScrollArea):
             self.setFixedSize(-1)
 
             if self.orientation == "horizontal":
-                self.main_layout = QHBoxLayout()
+                self.main_layout = QHBoxLayout(self)
             else:
-                self.main_layout = QVBoxLayout()
+                self.main_layout = QVBoxLayout(self)
             self.main_layout.setSpacing(0)
             self.main_layout.setContentsMargins(0, 0, 0, 0)
-            self.setLayout(self.main_layout)
 
         def setFixedSize(self, fixed_size):
             """Sets fixed size"""
@@ -432,6 +434,63 @@ class WindowDisplayWidget(QScrollArea):
                 painter.drawLine(width, self.height(),
                                  width + 5, self.height() - 5)
 
+    class CustomFrame(QFrame):
+
+        def __init__(self, *args, **kwargs):
+            """init"""
+            QFrame.__init__(self, args[0])
+
+            self.setObjectName(args[1])
+            self.pinned = True
+            self.dialog = None
+            self.origin_parent = self.parent()
+            self.origin_index = None
+            execution_mode = kwargs.get('execution_mode', False)
+
+            if not execution_mode:
+                self.setFrameStyle(QFrame.Box | QFrame.Plain)
+
+            if kwargs.get('layout') == 'vertical':
+                __frame_layout = QVBoxLayout(self)
+            else:
+                __frame_layout = QHBoxLayout(self)
+
+            self.open_in_dialog_button = QPushButton(Qt4_Icons.load_icon("UnLock"), "")
+            self.open_in_dialog_button.setFixedWidth(30)
+            self.open_in_dialog_button.setObjectName("pin")
+
+            self.dialog = QDialog(self.parent())
+            self.dialog_layout = QVBoxLayout(self.dialog)
+
+            __frame_layout.addWidget(self.open_in_dialog_button)
+            __frame_layout.setSpacing(0)
+            __frame_layout.setContentsMargins(0, 0, 0, 0)
+
+            self.open_in_dialog_button.clicked.connect(self.show_in_dialog_toggled)
+
+        def show_in_dialog_toggled(self):
+            if self.pinned:
+                self.pinned = False
+                self.open_in_dialog_button.setIcon(Qt4_Icons.load_icon("Lock"))
+                self.origin_index = self.origin_parent.layout().indexOf(self)
+                self.origin_parent.layout().removeWidget(self)
+                self.dialog_layout.addWidget(self)
+                self.dialog.show()
+            else:
+                self.pinned = True
+                self.open_in_dialog_button.setIcon(Qt4_Icons.load_icon("UnLock"))
+                self.dialog_layout.removeWidget(self)
+                self.origin_parent.layout().insertWidget(self.origin_index, self)
+                self.dialog.close()
+  
+        def set_background_color(self, color):
+            Qt4_widget_colors.set_widget_color(self,
+                                               color,
+                                               QPalette.Background)
+
+        def set_expert_mode(self, expert_mode):
+            self.open_in_dialog_button.setVisible(expert_mode)
+
     def verticalSpacer(*args, **kwargs):
         """Vertical spacer"""
 
@@ -456,23 +515,16 @@ class WindowDisplayWidget(QScrollArea):
 
     def verticalBox(*args, **kwargs):
         """Vertical box"""
-
-        execution_mode = kwargs.get('execution_mode', False)
-
-        frame = QFrame(args[0])
-        frame.setObjectName(args[1])
-        if not execution_mode:
-            frame.setFrameStyle(QFrame.Box | QFrame.Plain)
-
-        frame_layout = QVBoxLayout(frame)
-        frame_layout.setSpacing(0)
-        frame_layout.setContentsMargins(0, 0, 0, 0)
-
-        return frame
+        kwargs['layout'] = 'vertical'
+        return WindowDisplayWidget.CustomFrame(*args, **kwargs)
 
     def horizontalBox(*args, **kwargs):
         """Horizontal box"""
 
+        kwargs['layout'] = 'horizontal'
+        return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+
+        """
         execution_mode = kwargs.get('execution_mode', False)
 
         frame = QFrame(args[0])
@@ -486,6 +538,7 @@ class WindowDisplayWidget(QScrollArea):
         frame_layout.setContentsMargins(0, 0, 0, 0)
 
         return frame
+        """
 
     def horizontalGroupBox(*args, **kwargs):
         """Horizontal group box"""
@@ -527,13 +580,19 @@ class WindowDisplayWidget(QScrollArea):
 
             QTabWidget.__init__(self, args[0])
             self.setObjectName(args[1])
+            self.open_in_dialog_button = None
             self.close_tab_button = None
+            self.pinned = True
 
             #self.tab_widgets = []
             self.countChanged = {}
             self.setSizePolicy(QSizePolicy.Expanding,
                                QSizePolicy.Expanding)
             self.currentChanged.connect(self._page_changed)
+
+            self.dialog = QDialog(self.parent())
+            self.dialog_layout = QVBoxLayout(self.dialog)
+ 
 
         def _page_changed(self, index):
             """Page changed event"""
@@ -823,6 +882,14 @@ class WindowDisplayWidget(QScrollArea):
         self._statusbar = QStatusBar(self)
         self._statusbar.hide()
 
+        self._progress_dialog = QProgressDialog(self)
+        self._progress_dialog.setWindowFlags(Qt.Window | \
+                                             Qt.WindowTitleHint | \
+                                             Qt.CustomizeWindowHint)
+        self._progress_dialog.setWindowTitle("Please wait...")
+        self._progress_dialog.setCancelButton(None)
+        self._progress_dialog.setModal(True)
+
         #_statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
         #_statusbar_hlayout.setSpacing(2)
         #_statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
@@ -842,6 +909,8 @@ class WindowDisplayWidget(QScrollArea):
         self.setWindowIcon(Qt4_Icons.load_icon("desktop_icon"))
 
         self._menubar.saveConfigSignal.connect(self.save_config_requested)
+
+       
  
     def save_config_requested(self):
         print "requested " 
@@ -886,6 +955,9 @@ class WindowDisplayWidget(QScrollArea):
 
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
+
+    def set_progress_dialog(self):
+        BlissWidget._progressDialog = self._progress_dialog
 
     def update_status_info(self, info_type, info_message, info_state="ready"):
         """Updates status info"""
@@ -943,6 +1015,19 @@ class WindowDisplayWidget(QScrollArea):
     def stop_progress_bar(self):
         self._progress_bar.reset()
         self._progress_bar.setEnabled(False)
+
+    def open_progress_dialog(self, msg, max_steps):
+        QApplication.setOverrideCursor(QCursor(Qt.BusyCursor))
+        self._progress_dialog.setLabelText(msg)
+        self._progress_dialog.setMaximum(max_steps)
+        self._progress_dialog.show()
+
+    def set_progress_dialog_step(self, step):
+        self._progress_dialog.setValue(step)
+
+    def close_progress_dialog(self):
+        QApplication.setOverrideCursor(QCursor(Qt.ArrowCursor))
+        self._progress_dialog.close()
 
     def show(self, *args):
         """Show"""
@@ -1043,16 +1128,50 @@ class WindowDisplayWidget(QScrollArea):
                 new_item.setText(item_cfg["properties"]["text"])
             elif item_type == "tab":
                 item_cfg.widget = new_item
-                new_item.close_tab_button = QToolButton(new_item)
+                button_widget = QWidget(new_item)
+
+                new_item.open_in_dialog_button = QToolButton(button_widget)
+                new_item.open_in_dialog_button.setIcon(\
+                     Qt4_Icons.load_icon('Frames2'))
+                new_item.open_in_dialog_button.setFixedSize(22, 22)
+
+                new_item.close_tab_button = QToolButton(button_widget)
                 new_item.close_tab_button.setIcon(\
                      Qt4_Icons.load_icon('delete_small'))
-                new_item.setCornerWidget(new_item.close_tab_button)
+                new_item.close_tab_button.setFixedSize(22, 22)
+
+                __button_widget_vlayout = QHBoxLayout(button_widget)
+                __button_widget_vlayout.addWidget(new_item.open_in_dialog_button)
+                __button_widget_vlayout.addWidget(new_item.close_tab_button)
+                __button_widget_vlayout.setSpacing(2)
+                __button_widget_vlayout.setContentsMargins(0, 0, 0, 0)
+
+                new_item.setCornerWidget(button_widget)
+                new_item.open_in_dialog_button.hide()
                 new_item.close_tab_button.hide()
+
                 def close_current_page():
                     tab = new_item
                     slot_name = "hidePage_%s" % str(tab.tabText(tab.currentIndex()))
                     slot_name = slot_name.replace(" ", "_")
                     getattr(tab, slot_name)()
+
+                def open_in_dialog():
+                    if new_item.pinned:
+                        new_item.pinned = False
+                        new_item.open_in_dialog_button.setIcon(Qt4_Icons.load_icon("Lock"))
+                        current_widget = new_item.currentWidget()
+                        print current_widget 
+                        new_item.removeTab(new_item.currentIndex())
+                        new_item.dialog_layout.addWidget(current_widget)
+                        new_item.dialog.show()
+                    else:
+                        new_item.pinned = True
+                        new_item.open_in_dialog_button.setIcon(Qt4_Icons.load_icon("UnLock"))
+                        ##self.dialog_layout.removeWidget(self)
+                        #self.origin_parent.layout().insertWidget(self.origin_index, self)
+                        new_item.dialog.close()
+                    
 
                 def current_page_changed(index):
                     item_cfg.notebook_page_changed(new_item.tabText(index))
@@ -1060,6 +1179,8 @@ class WindowDisplayWidget(QScrollArea):
                 new_item._close_current_page_cb = close_current_page
                 new_item.currentChanged.connect(current_page_changed)
                 new_item.close_tab_button.clicked.connect(close_current_page)
+                new_item.open_in_dialog_button.clicked.connect(open_in_dialog)
+                
             elif item_type == "vsplitter" or type == "hsplitter":
                 pass
 
@@ -1174,6 +1295,8 @@ class WindowDisplayWidget(QScrollArea):
             if container_cfg.properties["statusbar"]:
                 self.set_status_bar()
 
+        self.set_progress_dialog()
+
     def remove_widget(self, item_name, child_name_list):
         """Remove widget"""
 
@@ -1251,19 +1374,17 @@ class WindowDisplayWidget(QScrollArea):
             self.__put_back_colors()
         original_color = widget.palette().color(QPalette.Window)
         selected_color = QColor(150, 150, 200)
-        widget.set_background_color(selected_color)
-        #Qt4_widget_colors.set_widget_color(widget,
-        #                                   selected_color,
-        #                                   QPalette.Background)
+        Qt4_widget_colors.set_widget_color(widget,
+                                           selected_color,
+                                           QPalette.Background)
 
         def put_back_colors(wref=weakref.ref(widget),
                             bkgd_color=original_color):
             widget = wref()
             if widget is not None:
-                widget.set_background_color(bkgd_color)
-                #Qt4_widget_colors.set_widget_color(widget,
-                #                                   bkgd_color,
-                #                                   QPalette.Background)
+                Qt4_widget_colors.set_widget_color(widget,
+                                                   bkgd_color,
+                                                   QPalette.Background)
         self.__put_back_colors = put_back_colors
 
     def eventFilter(self, widget, event):
