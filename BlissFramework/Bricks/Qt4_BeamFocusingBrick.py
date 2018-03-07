@@ -114,11 +114,13 @@ class Qt4_BeamFocusingBrick(BlissWidget):
             confDialog = QMessageBox.warning(None, "Focus mode", txt,
                   QMessageBox.Ok, QMessageBox.Cancel)
             if confDialog == QMessageBox.Ok:
+                self.beam_focusing_combo.setCurrentIndex(-1)
                 self.beam_focusing_hwobj.set_focus_mode(focus_mode_name)
             else:
                 self.beam_focusing_combo.setCurrentIndex(\
                     self.beam_focusing_combo.findText(self.active_focus_mode))
         else:
+            self.beam_focusing_combo.setCurrentIndex(-1)
             self.beam_focusing_hwobj.set_focus_mode(focus_mode_name)
 
     def focus_mode_changed(self, new_focus_mode, beam_size):

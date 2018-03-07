@@ -105,9 +105,10 @@ class Qt4_BeamSizeBrick(BlissWidget):
         _main_gbox_gridlayout.addWidget(hor_label, 0, 0)
         _main_gbox_gridlayout.addWidget(self.hor_size_ledit, 0, 1)
         _main_gbox_gridlayout.addWidget(ver_label, 1, 0)
-        _main_gbox_gridlayout.addWidget(self.ver_size_ledit, 1, 1) 
+        _main_gbox_gridlayout.addWidget(self.ver_size_ledit, 1, 1)
+        _main_gbox_gridlayout.setRowStretch(2, 10)
         _main_gbox_gridlayout.setSpacing(2)
-        _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
+        _main_gbox_gridlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
