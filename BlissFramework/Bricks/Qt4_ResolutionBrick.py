@@ -447,7 +447,7 @@ class Qt4_ResolutionBrick(BlissWidget):
                 detector_ready=self.detector_distance_hwobj.is_ready()
 
         if detector_ready:
-            self.detector_distance_limits_changed(self.detector_distance_hwobj.getLimits())
+            self.detector_distance_limits_changed(self.detector_distance_hwobj.get_limits())
         else:
             self.detector_distance_limits = None
 
