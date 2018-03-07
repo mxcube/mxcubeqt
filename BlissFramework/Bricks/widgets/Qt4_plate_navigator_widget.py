@@ -131,21 +131,21 @@ class PlateNavigatorWidget(QWidget):
             temp_header_item = QTableWidgetItem("%d" % (col + 1))
             self.plate_navigator_table.setHorizontalHeaderItem(\
                  col, temp_header_item)
-            self.plate_navigator_table.setColumnWidth(col, 24)
+            self.plate_navigator_table.setColumnWidth(col, 20)
 
         for row in range(self.num_rows):
             temp_header_item = QTableWidgetItem(chr(65 + row))
             self.plate_navigator_table.setVerticalHeaderItem(\
                  row, temp_header_item)
-            self.plate_navigator_table.setRowHeight(row, 24)
+            self.plate_navigator_table.setRowHeight(row, 20)
 
         for col in range(self.num_cols):
             for row in range(self.num_rows):
                 temp_item = QTableWidgetItem()
                 self.plate_navigator_table.setItem(row, col, temp_item)
 
-        table_height = 24 * (self.num_rows + 1)
-        table_width = 24 * (self.num_cols + 1)
+        table_height = 20 * (self.num_rows + 1)
+        table_width = 20 * (self.num_cols + 1)
         self.plate_navigator_table.setFixedWidth(table_width)
         self.plate_navigator_table.setFixedHeight(table_height)
         #self.plate_navigator_cell.setFixedHeight(table_height)
@@ -217,7 +217,6 @@ class NavigationItem(QGraphicsItem):
         pen.setColor(Qt.black)
         painter.setPen(pen)
 
-        print self.scene().width()
         if self.__num_drops:
             for drop_index in range(self.__num_drops):
                 pos_x = self.scene().width() / 2

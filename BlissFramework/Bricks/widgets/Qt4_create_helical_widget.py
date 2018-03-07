@@ -68,8 +68,8 @@ class CreateHelicalWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.addStretch(0)
-        _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        _main_vlayout.setSpacing(6)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
 
@@ -241,7 +241,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-                self.get_acquisition_widget().use_osc_start(True)
+                #self.get_acquisition_widget().use_osc_start(True)
                 
                 self._processing_parameters = data_collection.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)

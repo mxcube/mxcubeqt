@@ -122,6 +122,10 @@ class TaskToolBoxWidget(QWidget):
 
         # Other ---------------------------------------------------------------   
 
+    def set_expert_mode(self, state):
+        for i in range(0, self.tool_box.count()):
+            self.tool_box.widget(i).set_expert_mode(state)
+
     def set_tree_brick(self, brick):
         """
         Sets the tree brick of each page in the toolbox.
@@ -256,9 +260,9 @@ class TaskToolBoxWidget(QWidget):
         Called by the parent widget when selection in the tree changes.
         """
         title = "<b>Collection method template</b>"
-        self.create_task_button.setEnabled(False)
 
         if len(items) == 1:
+            self.create_task_button.setEnabled(False)
             data_model = items[0].get_model()
             title = "<b>%s</b>" % data_model.get_display_name()
 
@@ -286,7 +290,7 @@ class TaskToolBoxWidget(QWidget):
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
             self.method_label.setText(title)
-        elif len(items) > 1:
+        else:
             self.create_task_button.setEnabled(True)
          
         current_page = self.tool_box.currentWidget()
@@ -371,7 +375,7 @@ class TaskToolBoxWidget(QWidget):
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             new_snapshot = self._beamline_setup_hwobj.\
                 shape_history_hwobj.get_scene_snapshot()
-
+            
             if isinstance(task_node, queue_model_objects.Characterisation):
                 new_node.reference_image_collection.acquisitions[0].\
                    acquisition_parameters.centred_position.snapshot_image = \
@@ -382,6 +386,7 @@ class TaskToolBoxWidget(QWidget):
             elif type(task_node) in (queue_model_objects.DataCollection,
                                      queue_model_objects.XRFSpectrum):
                 new_node.centred_position.snapshot_image = new_snapshot
+
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
 
     def collect_now_button_click(self):

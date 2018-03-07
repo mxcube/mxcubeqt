@@ -42,10 +42,9 @@ class Qt4_ProgressBarBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.collect_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.number_of_steps = 0
+        self.use_dialog = False
 
         # Properties ----------------------------------------------------------
         self.addProperty('mnemonicList', 'string', '')
@@ -68,27 +67,35 @@ class Qt4_ProgressBarBrick(BlissWidget):
         self.setEnabled(False)
 
     def stop_progress(self, *args):
-        self.progress_bar.reset()
-        self.progress_type_label.setText("")
-        self.setEnabled(False)
-        BlissWidget.set_status_info("status", "")
-        BlissWidget.stop_progress_bar()
+        if self.use_dialog:
+            BlissWidget.close_progress_dialog()
+        else:
+            self.progress_bar.reset()
+            self.progress_type_label.setText("")
+            self.setEnabled(False)
+            BlissWidget.set_status_info("status", "")
+            BlissWidget.stop_progress_bar()
 
     def step_progress(self, step):
-        self.progress_bar.setValue(step)
-        self.setEnabled(True)
-        BlissWidget.set_progress_bar_step(step)
-        #if step >= self.number_of_steps:
-        #    self.stop_progress()
+        if self.use_dialog:
+            BlissWidget.set_progress_dialog_step(step)
+        else:
+            self.progress_bar.setValue(step)
+            self.setEnabled(True)
+            BlissWidget.set_progress_bar_step(step)
 
-    def init_progress(self, progress_type, number_of_steps):
-        self.setEnabled(True)
-        self.progress_bar.reset()
-        self.progress_type_label.setText(progress_type)
-        self.number_of_steps = number_of_steps
-        self.progress_bar.setMaximum(self.number_of_steps)
-        BlissWidget.set_status_info("status", progress_type)
-        BlissWidget.init_progress_bar(progress_type, number_of_steps)
+    def init_progress(self, progress_type, number_of_steps, use_dialog=False):
+        self.use_dialog = use_dialog
+
+        if self.use_dialog:
+            BlissWidget.open_progress_dialog(progress_type, number_of_steps)
+        else:
+            self.setEnabled(True)
+            self.progress_bar.reset()
+            self.progress_type_label.setText(progress_type)
+            self.progress_bar.setMaximum(number_of_steps)
+            BlissWidget.set_status_info("status", progress_type)
+            BlissWidget.init_progress_bar(progress_type, number_of_steps)
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == "mnemonicList":

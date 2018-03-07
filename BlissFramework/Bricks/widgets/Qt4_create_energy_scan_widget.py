@@ -63,6 +63,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
              "Adjust transmission", _parameters_gbox)
         self._adjust_transmission_cbox.setChecked(False)
         self._adjust_transmission_cbox.setEnabled(True)
+        self._max_transmission_label = QLabel("Maximum transmission:")
         self._max_transmission_ledit = QLineEdit("20", _parameters_gbox)
         self._max_transmission_ledit.setFixedWidth(80)
         self._max_transmission_ledit.setEnabled(False)
@@ -70,7 +71,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QGridLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(self._adjust_transmission_cbox, 0, 0)
-        _parameters_gbox_hlayout.addWidget(QLabel("Maximum transmission:"), 1, 0) 
+        _parameters_gbox_hlayout.addWidget(self._max_transmission_label, 1, 0) 
         _parameters_gbox_hlayout.addWidget(self._max_transmission_ledit, 1, 1)
         _parameters_gbox_hlayout.setColumnStretch(2, 1)
         _parameters_gbox_hlayout.setSpacing(2)
@@ -95,24 +96,29 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._max_transmission_ledit.textEdited.connect(\
              self.max_transmission_value_changed)
 
+    def set_expert_mode(self, state):
+        self._adjust_transmission_cbox.setEnabled(state)
+        self._max_transmission_label.setEnabled(state)
+        self._max_transmission_ledit.setEnabled(state)
+
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
         self._periodic_table_widget.set_elements(\
              self._beamline_setup_hwobj.energyscan_hwobj.getElements())
 
-        adjust_transmission_enabled = self._beamline_setup_hwobj.\
-             energyscan_hwobj.get_adjust_transmission_state()
-        max_transmission_value = self._beamline_setup_hwobj.\
-             energyscan_hwobj.get_max_transmission_value()
+        try:
+            max_transmission_value = self._beamline_setup_hwobj.\
+                 energyscan_hwobj.get_max_transmission_value()
 
-        if adjust_transmission_enabled is not None:
             self._adjust_transmission_cbox.setEnabled(True) 
             self._adjust_transmission_cbox.setChecked(True)
-        self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(True)
-
-        if max_transmission_value:
-            self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
+            self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(True)
+  
+            if max_transmission_value:
+                self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
+        except:
+            pass
 
     def init_models(self):
         """
@@ -208,7 +214,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
     def adjust_transmission_state_changed(self, state):
         self._max_transmission_ledit.setEnabled(state)
-        self._beamline_setup_hwobj.energyscan_hwobj.enable_max_transmission(state)
+        self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(state)
    
     def max_transmission_value_changed(self, value):
         try:

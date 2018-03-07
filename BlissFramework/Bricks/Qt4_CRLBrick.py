@@ -77,6 +77,8 @@ class Qt4_CRLBrick(BlissWidget):
         #_main_gbox_gridlayout.addWidget(self.align_beam_button, 1, 1)
         _main_gbox_gridlayout.addWidget(self.move_up_button, 0, 2)
         _main_gbox_gridlayout.addWidget(self.move_down_button, 1, 2)
+        _main_gbox_gridlayout.setSpacing(2)
+        _main_gbox_gridlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
@@ -140,9 +142,9 @@ class Qt4_CRLBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    def set_expert_mode(self, is_expert_mode):
-        """In the expert mode crl position table is enabled"""
-        self.crl_value_table.setEnabled(is_expert_mode)
+    #def set_expert_mode(self, is_expert_mode):
+    #    """In the expert mode crl position table is enabled"""
+    #    self.crl_value_table.setEnabled(is_expert_mode)
 
     def set_crl_mode(self):
         """Sets crl mode based on the selected combobox element"""

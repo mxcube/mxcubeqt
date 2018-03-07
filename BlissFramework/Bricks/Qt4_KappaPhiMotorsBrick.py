@@ -56,31 +56,24 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements-----------------------------------------------------
-
-        _main_groupbox = QGroupBox(self)
-        self.kappa_dspinbox = QDoubleSpinBox(_main_groupbox)
+        self.kappa_dspinbox = QDoubleSpinBox(self)
         self.kappa_dspinbox.setRange(-360, 360)
-        self.kappaphi_dspinbox = QDoubleSpinBox(_main_groupbox)
+        self.kappaphi_dspinbox = QDoubleSpinBox(self)
         self.kappaphi_dspinbox.setRange(-360, 360)
-        self.step_cbox = QComboBox(_main_groupbox)
+        self.step_cbox = QComboBox(self)
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
-        self.close_button = QPushButton("Close", _main_groupbox)
-        self.stop_button = QPushButton(_main_groupbox)
+        self.close_button = QPushButton("Close", self)
+        self.stop_button = QPushButton(self)
 
         # Layout --------------------------------------------------------------
-        _main_groupbox_hlayout = QHBoxLayout(_main_groupbox)
-        _main_groupbox_hlayout.addWidget(QLabel("Kappa:", _main_groupbox)) 
-        _main_groupbox_hlayout.addWidget(self.kappa_dspinbox)
-        _main_groupbox_hlayout.addWidget(QLabel("Phi:", _main_groupbox))
-        _main_groupbox_hlayout.addWidget(self.kappaphi_dspinbox)
-        _main_groupbox_hlayout.addWidget(self.step_cbox)
-        _main_groupbox_hlayout.addWidget(self.close_button)
-        _main_groupbox_hlayout.addWidget(self.stop_button)
-        _main_groupbox_hlayout.setSpacing(2)
-        _main_groupbox_hlayout.setContentsMargins(0, 0, 0, 0)
-
         _main_hlayout = QHBoxLayout(self)
-        _main_hlayout.addWidget(_main_groupbox)
+        _main_hlayout.addWidget(QLabel("Kappa:", self)) 
+        _main_hlayout.addWidget(self.kappa_dspinbox)
+        _main_hlayout.addWidget(QLabel("Phi:", self))
+        _main_hlayout.addWidget(self.kappaphi_dspinbox)
+        _main_hlayout.addWidget(self.step_cbox)
+        _main_hlayout.addWidget(self.close_button)
+        _main_hlayout.addWidget(self.stop_button)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
@@ -116,7 +109,7 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
 
         self.stop_button.setIcon(Qt4_Icons.load_icon('Stop2'))
         self.stop_button.setEnabled(False)
-        self.stop_button.setFixedWidth(25)
+        self.stop_button.setFixedWidth(27)
         
     def propertyChanged(self,property_name, old_value, new_value):
         if property_name == 'mnemonic':
@@ -265,12 +258,9 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
              Qt.white, QPalette.Base)
 
     def step_edited(self, step):
+        """Paints step combobox when value is edited
         """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
-        Qt4_widget_colors.set_widget_color(self.step_cbox,
+        Qt4_widget_colors.set_widget_color(self.step_cbox.lineEdit(),
                                            Qt4_widget_colors.LINE_EDIT_CHANGED,
                                            QPalette.Button)
 

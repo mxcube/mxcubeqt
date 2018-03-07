@@ -80,10 +80,7 @@ class AdvancedParametersWidget(QWidget):
         self._acq_widget.acq_widget_layout.mad_cbox.hide()
         self._acq_widget.acq_widget_layout.energies_combo.hide()
         self._acq_widget.acq_widget_layout.num_images_ledit.setEnabled(False)
-        self._acq_widget.acq_widget_layout.inverse_beam_cbx.hide()
         self._acq_widget.acq_widget_layout.shutterless_cbx.hide()
-        self._acq_widget.acq_widget_layout.subwedge_size_label.hide()
-        self._acq_widget.acq_widget_layout.subwedge_size_ledit.hide()
 
     def set_beamline_setup(self, bl_setup):
         self._beamline_setup_hwobj = bl_setup

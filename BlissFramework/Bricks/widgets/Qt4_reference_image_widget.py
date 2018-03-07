@@ -41,10 +41,7 @@ class ReferenceImageWidget(QWidget):
         self.page_widget = QWidget(self.tool_box)
         self.path_widget = DataPathWidget(self.page_widget)
         self.acq_widget = AcquisitionWidget(self.page_widget, 'horizontal')
-        self.acq_widget.acq_widget_layout.inverse_beam_cbx.hide()
         self.acq_widget.acq_widget_layout.shutterless_cbx.hide()
-        self.acq_widget.acq_widget_layout.subwedge_size_label.hide()
-        self.acq_widget.acq_widget_layout.subwedge_size_ledit.hide()
         #self.acq_widget.acq_widget_layout.setFixedHeight(130)
         self.tool_box.addItem(self.page_widget, "Acquisition parameters")
 

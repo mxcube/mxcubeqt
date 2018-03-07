@@ -43,7 +43,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         """
 
         CreateTaskBase.__init__(self, parent, name, 
-            Qt.WindowFlags(fl), "Standart")
+            Qt.WindowFlags(fl), "Standard")
 
         if not name:
             self.setObjectName("create_discrete_widget")
@@ -70,8 +70,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
         _main_vlayout.addStretch(0)
-        _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setSpacing(6)
+        _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
         

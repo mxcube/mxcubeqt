@@ -66,7 +66,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(_parameters_gbox)
-        _main_vlayout.setSpacing(2)
+        _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.addStretch(0)
 
@@ -79,6 +79,9 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
              self.adjust_transmission_state_changed)
 
         # Other ---------------------------------------------------------------
+
+    def set_expert_mode(self, state):
+        self.adjust_transmission_cbox.setEnabled(state)
 
     def init_models(self):
         CreateTaskBase.init_models(self)

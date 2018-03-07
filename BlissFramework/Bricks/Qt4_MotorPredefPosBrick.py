@@ -57,44 +57,33 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.defineSlot('setEnabled',())
 
         # Graphic elements ----------------------------------------------------
-        _group_box = QGroupBox(self)
-        self.label = QLabel("motor:", _group_box)
-        self.positions_combo = QComboBox(_group_box)
-        self.previous_position_button = QPushButton(_group_box)
-        self.next_position_button = QPushButton(_group_box)
+        self.label = QLabel("motor:", self)
+        self.positions_combo = QComboBox(self)
+        self.previous_position_button = QPushButton(self)
+        self.next_position_button = QPushButton(self)
 
         # Layout -------------------------------------------------------------- 
-        _group_box_hlayout = QHBoxLayout(_group_box)
-        _group_box_hlayout.addWidget(self.label)
-        _group_box_hlayout.addWidget(self.positions_combo) 
-        _group_box_hlayout.addWidget(self.previous_position_button)
-        _group_box_hlayout.addWidget(self.next_position_button)
-        _group_box_hlayout.setSpacing(2)
-        _group_box_hlayout.setContentsMargins(2, 2, 2, 2)
-
-        main_layout = QHBoxLayout(self)
-        main_layout.addWidget(_group_box)
-        main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-
+        _main_hbox_hlayout = QHBoxLayout(self)
+        _main_hbox_hlayout.addWidget(self.label)
+        _main_hbox_hlayout.addWidget(self.positions_combo) 
+        _main_hbox_hlayout.addWidget(self.previous_position_button)
+        _main_hbox_hlayout.addWidget(self.next_position_button)
+        _main_hbox_hlayout.setSpacing(2)
+        _main_hbox_hlayout.setContentsMargins(2, 2, 2, 2)
         # Size Policy ---------------------------------------------------------
-        #box1.setSizePolicy(QtGui.QSizePolicy.Fixed, 
-        #                   QtGui.QSizePolicy.Fixed)
-        self.label.setSizePolicy(QSizePolicy.Fixed,
-                                 QSizePolicy.Fixed)
-        #self.setSizePolicy(QtGui.QSizePolicy.Minimum,
-        #                   QtGui.QSizePolicy.Fixed)
+
         # Qt signal/slot connections ------------------------------------------
         self.positions_combo.activated.connect(self.position_selected)
         self.previous_position_button.clicked.connect(self.select_previous_position)
         self.next_position_button.clicked.connect(self.select_next_position)
 
         # Other ---------------------------------------------------------------
+        self.positions_combo.setFixedHeight(27)
         self.positions_combo.setToolTip("Moves the motor to a predefined position")
         self.previous_position_button.setIcon(Qt4_Icons.load_icon('Minus2'))
-        self.previous_position_button.setFixedWidth(27) 
+        self.previous_position_button.setFixedSize(27, 27) 
         self.next_position_button.setIcon(Qt4_Icons.load_icon('Plus2'))
-        self.next_position_button.setFixedWidth(27)
+        self.next_position_button.setFixedSize(27, 27)
        
     def setToolTip(self, name=None, state=None):
         states = ("NOTREADY", "UNUSABLE", "READY", "MOVESTARTED", "MOVING", "ONLIMIT")

@@ -140,9 +140,10 @@ class Qt4_ProposalBrick2(BlissWidget):
         #self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.user_group_label = QLabel("  Group: ", self.user_group_widget)
         self.user_group_ledit = QLineEdit(self.user_group_widget)
-        #self.user_group_ledit.setFixedWidth(40)
+        self.user_group_ledit.setFixedHeight(27)
         self.user_group_save_button = QToolButton(self.user_group_widget)
         self.user_group_save_button.setText("Set")
+        self.user_group_save_button.setFixedHeight(27)
         self.saved_group = True 
 
         # Layout --------------------------------------------------------------
@@ -178,7 +179,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         #_main_vlayout.addSpacing(10)
         _main_gboxlayout.addWidget(self.user_group_widget)
         _main_gboxlayout.setSpacing(2)
-        _main_gboxlayout.setContentsMargins(2, 2, 2, 2)
+        _main_gboxlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
@@ -186,6 +187,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
+        #  self.user_group_ledit
 
         # Qt signal/slot connections ------------------------------------------
         self.proposal_password_ledit.returnPressed.connect(self.login)
@@ -631,7 +633,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         if property_name == 'codes':
             self.setCodes(new_value)
         elif property_name == 'localLogin':
-            self.local_login_hwobj = self.getHardwareObject(new_value)
+            self.local_login_hwobj = self.getHardwareObject(new_value, optional=True)
         elif property_name == 'dbConnection':
             self.lims_hwobj = self.getHardwareObject(new_value)
             self.login_as_user = self.lims_hwobj.get_login_type() == "user"
@@ -649,7 +651,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                 self.disconnect(self.instanceServer,
                                 'haveControl',
                                 self.haveControl)
-            self.instanceServer = self.getHardwareObject(new_value)
+            self.instanceServer = self.getHardwareObject(new_value, optional=True)
             if self.instanceServer is not None:
                 self.connect(self.instanceServer,
                              'passControl',

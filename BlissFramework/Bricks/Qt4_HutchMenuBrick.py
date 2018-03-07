@@ -54,7 +54,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
 
         # Internal values -----------------------------------------------------
         self.inside_data_collection =  None
-        self.full_centring_done = None  
         self.directory = "/tmp"
         self.prefix = "snapshot" 
         self.file_index = 1
@@ -85,7 +84,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.auto_focus_button = MonoStateButton(self, "Focus", "Eyeball")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
-        self.visual_align_button = MonoStateButton(self, "Visual align", "Align")
+        self.visual_align_button = MonoStateButton(self, "Align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
         self.clear_all_button = MonoStateButton(self, "Clear all", "Delete")
         self.auto_center_button = MonoStateButton(self, "Auto", "VCRPlay2")
@@ -265,15 +264,10 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        #if self.full_centring_done:
-        if True:
-            Qt4_widget_colors.set_widget_color(self.accept_button, 
-                                               self.standard_color)
-            self.reject_button.setEnabled(False)
-            self.graphics_manager_hwobj.accept_centring()
-            self.full_centring_done = False
-        #else:
-        #    self.graphics_manager_hwobj.start_centring(tree_click=False)
+        Qt4_widget_colors.set_widget_color(self.accept_button, 
+                                           self.standard_color)
+        self.reject_button.setEnabled(False)
+        self.graphics_manager_hwobj.accept_centring()
 
     def reject_clicked(self):
         """
@@ -308,9 +302,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         self.setEnabled(True)
-        #self.GNAL("enableMinidiff"), (False,))
-        #if self.inside_data_collection:
-        #    self.emit(QtCore.SIGNAL("centringStarted"), ())
         self.centre_button.command_started()
         self.accept_button.setEnabled(False)
         self.reject_button.setEnabled(True)
@@ -321,7 +312,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Args.     : 
         Return    : 
         """
-        self.full_centring_done = True
         self.centre_button.command_done()
         self.accept_button.setEnabled(True)
         self.reject_button.setEnabled(True)
@@ -332,7 +322,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
                                                Qt4_widget_colors.LIGHT_RED)
 
         self.setEnabled(True)
-        #self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
     def centring_failed(self, method, centring_status):
         """
@@ -341,9 +330,9 @@ class Qt4_HutchMenuBrick(BlissWidget):
         Return    : 
         """
         self.centre_button.command_failed()
-        self.accept_button.setEnabled(False)
+        self.accept_button.setEnabled(True)
         if self.inside_data_collection:
-            Qt4_widget_colors.set_widget_color(self.accept_button, self.button_standart_color)
+            Qt4_widget_colors.set_widget_color(self.accept_button, self.standard_color)
             self.reject_button.setEnabled(True)
             Qt4_widget_colors.set_widget_color(self.reject_button, Qt.red)
         else:
@@ -381,7 +370,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.graphics_manager_hwobj.start_auto_centring()
 
 class MonoStateButton(QToolButton):
-    def __init__(self, parent, caption=None, icon=None, fixed_size=(75, 40)):
+    def __init__(self, parent, caption=None, icon=None, fixed_size=(70, 40)):
         QToolButton.__init__(self, parent)
 
         self.setFixedSize(fixed_size[0], fixed_size[1])
@@ -415,10 +404,9 @@ class DuoStateButton(QToolButton):
         self.run_icon = None
         self.stop_icon = None
         self.standard_color = self.palette().color(QPalette.Window)
-        self.standard_color = self.palette().color(QPalette.Window)
         #self.setToolButtonStyle(True)
         self.setText(caption)
-        self.setFixedSize(75, 40)
+        self.setFixedSize(70, 40)
         self.setSizePolicy(QSizePolicy.Fixed,
                            QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
