@@ -819,39 +819,39 @@ class DataCollectTree(QWidget):
 
     def collect_stop_toggle(self):
         """Stops queue"""
-        #checked_items = self.get_checked_items()
-        checked_items = self.get_collect_items()
 
         self.queue_hwobj.disable(False)
-
-        path_conflict = self.check_for_path_collisions()     
-
-        if path_conflict:
-            self.queue_hwobj.disable(True)
-        
-        if self.queue_hwobj.is_disabled():
-            logging.getLogger("GUI").\
-                error('Can not start collect, see the tasks marked' +\
-                      ' in the tree and solve the prorblems.')
-            
-        elif not self.collecting:
-            # Unselect selected items.
-            selected_items = self.get_selected_items()
-            for item in selected_items:
-                item.setSelected(False)
-                #self.sample_tree_widget.setSelected(item, False)
-            
-            if len(checked_items):
-                self.confirm_dialog.set_items(checked_items)
-                self.confirm_dialog.show()
-            else:
-                message = "No data collections selected, please select one" + \
-                          " or more data collections"
-
-                QMessageBox.information(self,"Data collection",
-                                              message, "OK")
-        else:
+        if self.collecting:
             self.stop_collection()
+
+        else:
+            path_conflict = self.check_for_path_collisions()
+
+            if path_conflict:
+                self.queue_hwobj.disable(True)
+
+            if self.queue_hwobj.is_disabled():
+                logging.getLogger("GUI").\
+                    error('Can not start collect, see the tasks marked' +\
+                          ' in the tree and solve the prorblems.')
+
+            else:
+                checked_items = self.get_collect_items()
+                # Unselect selected items.
+                selected_items = self.get_selected_items()
+                for item in selected_items:
+                    item.setSelected(False)
+                    #self.sample_tree_widget.setSelected(item, False)
+
+                if len(checked_items):
+                    self.confirm_dialog.set_items(checked_items)
+                    self.confirm_dialog.show()
+                else:
+                    message = "No data collections selected, please select one" + \
+                              " or more data collections"
+
+                    QMessageBox.information(self,"Data collection",
+                                                  message, "OK")
 
     def enable_sample_changer_widget(self, state):
         """Enables sample changer widget"""

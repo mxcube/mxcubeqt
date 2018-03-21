@@ -12,7 +12,7 @@
 
     <!-- Global phasing installation directory -->
     <!-- os.path.joined with individual gphl_program_locations (below)-->
-    <gphl_installation_dir>/users/blissadm/local/gphl/GPhL-ESRF-20171110/exe/</gphl_installation_dir>
+    <gphl_installation_dir>/users/blissadm/local/gphl/gphl_latest/exe/</gphl_installation_dir>
     <!--<gphl_installation_dir>/MXCuBE/softwares/GPhL-ESRF-20171005/20171005/bin/linux64/</gphl_installation_dir>-->
 
     <!-- Location of global phasing programs relative to installation directory -->

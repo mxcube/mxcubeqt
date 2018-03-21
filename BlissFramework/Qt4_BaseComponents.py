@@ -1145,7 +1145,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         return hwobj
             
 
-    def progress_init(self, msg, step_count, show_dialog):
+    def progress_init(self, msg, step_count, show_dialog=False):
         pass
 
     def __hardwareObjectDiscarded(self, hardware_object_name):
