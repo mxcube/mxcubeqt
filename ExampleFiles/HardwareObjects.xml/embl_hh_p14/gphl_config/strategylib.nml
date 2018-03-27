@@ -6,10 +6,10 @@ goniostat_axis_settings= 0.0 0.0 0.0
 
 &sdcp_detector_setting_list
 id= 'dset01'
-!detector_axis_settings= 291.0
+detector_axis_settings= 291.0
 !detector_axis_settings= 260.96
 !detector_axis_settings= 240.581970
-detector_axis_settings= 450.0
+!detector_axis_settings= 450.0
 /
 
 &beam_setting_list
@@ -170,7 +170,7 @@ length_deg= 60
 /
 
 &stratcal_sweep_list
-group_no= 2
+group_no= 1
 goniostat_setting_id= 'dcalgsetk0_p0'
 detector_setting_id= 'dset01'
 beam_setting_id= 'dcalbset'
@@ -179,7 +179,7 @@ length_deg= 60
 /
 
 &stratcal_sweep_list
-group_no= 3
+group_no= 2
 goniostat_setting_id= 'dcalgsetk90_p180'
 detector_setting_id= 'dset01'
 beam_setting_id= 'dcalbset'
@@ -188,7 +188,7 @@ length_deg= 60
 /
 
 &stratcal_sweep_list
-group_no= 4
+group_no= 2
 goniostat_setting_id= 'dcalgsetk90_p180'
 detector_setting_id= 'dset01'
 beam_setting_id= 'dcalbset'
@@ -197,7 +197,7 @@ length_deg= 60
 /
 
 &stratcal_sweep_list
-group_no= 5
+group_no= 3
 goniostat_setting_id= 'dcalgsetk180_p0'
 detector_setting_id= 'dset01'
 beam_setting_id= 'dcalbset'
@@ -206,7 +206,7 @@ length_deg= 60
 /
 
 &stratcal_sweep_list
-group_no= 6
+group_no= 3
 goniostat_setting_id= 'dcalgsetk180_p0'
 detector_setting_id= 'dset01'
 beam_setting_id= 'dcalbset'

@@ -299,11 +299,12 @@ class DataCollectionQueueItem(TaskQueueItem):
 
     def init_processing_info(self):
         dc_model = self.get_model()
-        if hasattr(dc_model, "processing_methods"):
-            dc_parameters = dc_model.as_dict()
-            if dc_parameters["num_images"] > 19:
-                for index, processing_method in enumerate(dc_model.processing_methods):
-                    self.setIcon(2 + index, BALL_UNKNOWN)
+        dc_parameters = dc_model.as_dict()
+        if dc_parameters["num_images"] > 19:
+            pass
+            # @~@~ Code below breaks - no such attribute 'processing_methods'
+            # for index, processing_method in enumerate(dc_model.processing_methods):
+            #     self.setIcon(2 + index, BALL_UNKNOWN)
 
     def init_tool_tip(self):
         dc_model = self.get_model()
