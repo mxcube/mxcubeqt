@@ -8,7 +8,7 @@
     <gphl_samples_subdir>gphl_config/test_samples</gphl_samples_subdir>
     <!-- Directory for (optional) output of instrument calbration results-->
     <!-- combined with instcfgout parameter (see below); see also <newconfig> -->
-    <instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>
+    <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
 
     <!-- Subdirectory under Session.get_process_directory() for GPhL persistence data-->
     <gphl_subdir>GPHL</gphl_subdir>
@@ -37,7 +37,7 @@
                 <!-- updateconfig option, automaticallly updates entire configuration -->
                 <!--<grid>grid_axes_spec</grid>-->
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
-                <instcfgout>gphl_transcal_out.nml</instcfgout>
+                <!--<instcfgout>gphl_transcal_out.nml</instcfgout>-->
             </options>
         </TranslationalCalibration>
 
@@ -55,7 +55,7 @@
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
-                <instcfgout>gphl_diffractcal_out.nml</instcfgout>
+                <!--<instcfgout>gphl_diffractcal_out.nml</instcfgout>-->
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
