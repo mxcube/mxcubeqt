@@ -166,7 +166,7 @@ class GphlDataDialog(QtGui.QDialog):
 
     def cancel_button_click(self):
         self.reject()
-        self.parent().workflow_model.workflow_hwobj.abort("Manual abort")
+        self.parent()._workflow_hwobj.abort("Manual abort")
 
     def open_dialog(self, field_list, async_result):
 

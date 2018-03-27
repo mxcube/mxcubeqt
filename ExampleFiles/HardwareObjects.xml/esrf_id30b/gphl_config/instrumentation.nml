@@ -22,9 +22,9 @@ det_qy= 0.172000
 
 det_nx= 2463
 det_ny= 2527
-! Input values to XCalibra from http://confluence.globalphasing.com/x/YY17
-det_org_x= 1220.336304
-det_org_y= 1262.813232
+! Input values to XCalibra from ESRF image headers March 2018
+det_org_x= 1230.37
+det_org_y= 1297.13
 det_org_dist= 240.581970
 
 det_gonio_axis_dirs=  0.0  0.0  1.0

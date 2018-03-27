@@ -19,8 +19,8 @@
     <gphl_program_locations>
         <!-- Location of GPhL .license directory -->
 	    <!-- Only needed if you do NOT use the wrapper script : -->
-         <co.gphl.wf.bdg_licence_dir>/MXCuBE/gphl_java_classes</co.gphl.wf.bdg_licence_dir>
-        <!--<co.gphl.wf.bdg_licence_dir>/MXCuBE/softwares/GPhL-ESRF-20171005/20171005</co.gphl.wf.bdg_licence_dir>-->
+         <!--<co.gphl.wf.bdg_licence_dir>/MXCuBE/gphl_java_classes</co.gphl.wf.bdg_licence_dir>-->
+        <co.gphl.wf.bdg_licence_dir>/MXCuBE/softwares/Server-nightly-alpha-bdg-linux64</co.gphl.wf.bdg_licence_dir>
         <!-- Location of stratcal binary -->
         <co.gphl.wf.stratcal.bin>stratcal</co.gphl.wf.stratcal.bin>
         <!-- Location of stratcal-specific license directory - OPTIONAL ->
