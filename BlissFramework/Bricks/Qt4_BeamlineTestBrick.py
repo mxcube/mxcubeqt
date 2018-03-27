@@ -127,7 +127,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
         if property_name == 'mnemonic':
             if self.beamline_test_hwobj is not None:
                 self.disconnect(self.beamline_test_hwobj, 
-                                'testProgress', 
+                                'progressStep', 
                                 self.update_test_progress)
                 self.disconnect(self.beamline_test_hwobj, 
                                 'focusingModeChanged', 
@@ -143,7 +143,7 @@ class Qt4_BeamlineTestBrick(BlissWidget):
                 self.init_com_table()                
                 self.init_test_queue()
                 self.connect(self.beamline_test_hwobj, 
-                             'testProgress', 
+                             'progressStep', 
                              self.update_test_progress)
                 self.connect(self.beamline_test_hwobj, 
                              'focusingModeChanged', 
@@ -188,13 +188,12 @@ class Qt4_BeamlineTestBrick(BlissWidget):
     def test_focus_button_pressed(self):
         self.test_focus_mode()
 
-    def update_test_progress(self, progress_value, progress_info):
-        self.beamline_test_widget.progress_bar.setMaximum(\
-             progress_info["progress_total"])
+    def update_test_progress(self, progress_value, progress_msg):
+        #self.beamline_test_widget.progress_bar.setMaximum(\
+        #     progress_info["progress_total"])
         self.beamline_test_widget.progress_bar.setValue(progress_value)
         self.beamline_test_widget.progress_bar.setEnabled(True)
-        self.beamline_test_widget.progress_msg_ledit.setText(\
-             progress_info["progress_msg"])
+        self.beamline_test_widget.progress_msg_ledit.setText(progress_msg)
 
     def update_focus_status(self, focus_mode, beam_size):
         self.test_focus_mode()

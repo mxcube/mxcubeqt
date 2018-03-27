@@ -355,12 +355,13 @@ class Qt4_TreeBrick(BlissWidget):
                 self.connect(bl_setup.ppu_control_hwobj,
                              'ppuStatusChanged',
                              self.ppu_status_changed)
-                #bl_setup.ppu_control_hwobj.update_values()
+                bl_setup.ppu_control_hwobj.update_values()
             if hasattr(bl_setup, "safety_shutter_hwobj"):
                 self.connect(bl_setup.safety_shutter_hwobj,
                              'shutterStateChanged',
                              self.shutter_state_changed)
-                self.shutter_state_changed(bl_setup.safety_shutter_hwobj.getShutterState())
+                bl_setup.safety_shutter_hwobj.update_values()
+                #self.shutter_state_changed(bl_setup.safety_shutter_hwobj.getShutterState())
             if hasattr(bl_setup, "machine_info_hwobj"):
                 self.connect(bl_setup.machine_info_hwobj,
                              'machineCurrentChanged',
@@ -1220,6 +1221,10 @@ class Qt4_TreeBrick(BlissWidget):
 
     def update_enable_collect(self):
         enable_collect = all(item == True for item in self.enable_collect_conditions.values())
+
+        #if self.dc_tree_widget.enable_collect_condition == enable_collect:
+        #    return
+
         if enable_collect:
             if enable_collect != self.dc_tree_widget.enable_collect_condition:
                 logging.getLogger("GUI").info("Data collection is enabled")

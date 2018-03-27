@@ -110,8 +110,13 @@ class Qt4_ToolsBrick(BlissWidget):
             if key == self.sender():
                 tool = self.action_dict[key]
                 if tool.get("confirmation"):
-                    conf_dialog = QMessageBox.warning(None, "Question",
+                    print 1
+                    conf_dialog = QMessageBox(None, "Question",
                          tool["confirmation"], QMessageBox.Ok, QMessageBox.Cancel)
+                    print 2
+                    conf_dialog.move(10, 10)
+                    conf_dialog.show() 
+                    print 3
                     if conf_dialog == QMessageBox.Ok:
                         getattr(tool["hwobj"], tool["method"])()
                 else:

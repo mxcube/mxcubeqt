@@ -141,12 +141,18 @@ class Qt4_CameraBrick(BlissWidget):
         temp_action.setShortcut("Ctrl+X")
         self.popup_menu.addSeparator()
 
-        self.display_grid_action = self.popup_menu.addAction(\
+        tools_menu = self.popup_menu.addMenu("Tools") 
+        self.display_grid_action = tools_menu.addAction(\
              Qt4_Icons.load_icon("Grid"),
              "Display grid",
              self.display_grid_toggled)
         self.display_grid_action.setCheckable(True)
-        self.magnification_action = self.popup_menu.addAction(\
+        self.display_histogram_action = tools_menu.addAction(\
+             Qt4_Icons.load_icon("Grid"),
+             "Display historgram",
+             self.display_histogram_toggled)
+        self.display_histogram_action.setCheckable(True)
+        self.magnification_action = tools_menu.addAction(\
              Qt4_Icons.load_icon("Magnify2"),
              "Magnification tool", self.start_magnification_tool)
         #self.magnification_action.setCheckable(True)
@@ -323,10 +329,8 @@ class Qt4_CameraBrick(BlissWidget):
         self.graphics_manager_hwobj.start_measure_area(wait_click=True)
 
     def display_histogram_toggled(self):
-        return
-
-    def define_histogram_clicked(self):
-        return
+        self.graphics_manager_hwobj.display_histogram(\
+             self.display_histogram_action.isChecked())
 
     def create_point_click_clicked(self):
         self.graphics_manager_hwobj.start_centring(tree_click=True)

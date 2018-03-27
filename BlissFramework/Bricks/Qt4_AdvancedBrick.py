@@ -56,10 +56,15 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.tool_box = QToolBox(self)
         self.parameters_widget = AdvancedParametersWidget(self) 
         self.results_widget = AdvancedResultsWidget(self)
+
+        self.line_parameters_widget = AdvancedParametersWidget(self)
+        self.line_results_widget = AdvancedResultsWidget(self)
         self.snapshot_widget = SnapshotWidget(self)
 
-        self.tool_box.addItem(self.parameters_widget, "Parameters")
-        self.tool_box.addItem(self.results_widget, "Results - Heat map")
+        self.tool_box.addItem(self.parameters_widget, "2D Heat map: Parameters")
+        self.tool_box.addItem(self.results_widget, "2D Heat map: Results")
+        self.tool_box.addItem(self.line_parameters_widget, "Line scan: Parameters")
+        self.tool_box.addItem(self.line_results_widget, "Line scan: Results")
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QHBoxLayout(self)
@@ -71,6 +76,7 @@ class Qt4_AdvancedBrick(BlissWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
+        
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = \
@@ -78,13 +84,28 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.parameters_widget._data_path_widget._base_process_dir = \
             self.session_hwobj.get_base_process_directory()
 
-        self.parameters_widget.populate_widget(item)
-        self.results_widget.populate_widget(item)
+        self.line_parameters_widget._data_path_widget._base_image_dir = \
+            self.session_hwobj.get_base_image_directory()
+        self.line_parameters_widget._data_path_widget._base_process_dir = \
+            self.session_hwobj.get_base_process_directory()
+
+        #self.parameters_widget.populate_widget(item)
+        #self.results_widget.populate_widget(item)
 
         if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
+            self.parameters_widget.populate_widget(item, data_collection)
+            self.results_widget.populate_widget(item, data_collection)   
+
+            self.line_parameters_widget.populate_widget(item, item.get_model().line_collection)
+            self.line_results_widget.populate_widget(item, item.get_model().line_collection) 
         else:
             data_collection = item.get_model()
+            self.parameters_widget.populate_widget(item, data_collection)
+            self.results_widget.populate_widget(item, data_collection) 
+
+        self.line_parameters_widget.setEnabled(isinstance(item, Qt4_queue_item.XrayCenteringQueueItem))
+        self.line_results_widget.setEnabled(isinstance(item, Qt4_queue_item.XrayCenteringQueueItem))
 
         self.snapshot_widget.display_snapshot(\
              data_collection.grid.get_snapshot())
@@ -101,3 +122,6 @@ class Qt4_AdvancedBrick(BlissWidget):
             self.session_hwobj = bl_setup.session_hwobj
             self.parameters_widget.set_beamline_setup(bl_setup)
             self.results_widget.set_beamline_setup(bl_setup)
+
+            self.line_parameters_widget.set_beamline_setup(bl_setup)
+            self.line_results_widget.set_beamline_setup(bl_setup)

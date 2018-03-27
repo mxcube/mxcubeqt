@@ -299,10 +299,11 @@ class DataCollectionQueueItem(TaskQueueItem):
 
     def init_processing_info(self):
         dc_model = self.get_model()
-        dc_parameters = dc_model.as_dict()
-        if dc_parameters["num_images"] > 19:
-            for index, processing_method in enumerate(dc_model.processing_methods):
-                self.setIcon(2 + index, BALL_UNKNOWN)
+        if hasattr(dc_model, "processing_methods"):
+            dc_parameters = dc_model.as_dict()
+            if dc_parameters["num_images"] > 19:
+                for index, processing_method in enumerate(dc_model.processing_methods):
+                    self.setIcon(2 + index, BALL_UNKNOWN)
 
     def init_tool_tip(self):
         dc_model = self.get_model()
@@ -405,6 +406,10 @@ class XrayCenteringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
+class XrayImagingQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
 
 MODEL_VIEW_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueItem,
@@ -418,5 +423,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
      queue_model_objects.XrayCentering: XrayCenteringQueueItem,
+     queue_model_objects.XrayImaging: XrayImagingQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

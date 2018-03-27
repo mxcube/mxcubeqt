@@ -39,6 +39,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
+        self.flux_hwobj = None
         self.beam_focusing_hwobj = None
         self.beamline_test_hwobj = None
         self.diffractometer_hwobj = None
@@ -74,7 +75,9 @@ class Qt4_BeamPositionBrick(BlissWidget):
                                   self.double_hor_motor_brick,
                                   self.double_ver_motor_brick)
         self.center_beam_button = QPushButton(self.main_group_box)
+        self.center_beam_button.setFixedSize(27, 27)
         self.measure_flux_button = QPushButton(self.main_group_box)
+        self.measure_flux_button.setFixedSize(27, 27)
         
         # Layout -------------------------------------------------------------- 
         _gbox_grid_layout = QGridLayout(self.main_group_box)
@@ -84,7 +87,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
         _gbox_grid_layout.addWidget(self.double_ver_motor_brick, 1, 1)
         _gbox_grid_layout.addWidget(self.center_beam_button, 0, 2)  
         _gbox_grid_layout.addWidget(self.measure_flux_button, 1, 2)
-        _gbox_grid_layout.setSpacing(0)
+        _gbox_grid_layout.setSpacing(2)
         _gbox_grid_layout.setContentsMargins(2, 2, 2, 2)
 
         _main_hlayout = QHBoxLayout(self)
