@@ -73,7 +73,7 @@ class BlissSplashScreen(QSplashScreen):
         top_y = 334
         right_x = 390
         bot_y = 334 + painter.fontMetrics().height()
-        pxsize = 12
+        pxsize = 11
 
         painter.font().setPixelSize(pxsize)
         painter.setPen(QPen(Qt.black))

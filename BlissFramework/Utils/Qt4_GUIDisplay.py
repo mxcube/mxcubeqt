@@ -663,10 +663,10 @@ class WindowDisplayWidget(QScrollArea):
                 else:
                     if page["hidden"]:
                         if icon:
-                            self.insertTab(page["widget"],
+                            self.insertTab(page["index"],
+                                           page["widget"],
                                            Qt4_Icons.load_icon(icon),
-                                           label,
-                                           page["index"])
+                                           label)
                         else:
                             self.insertTab(page["index"],
                                            page["widget"],
@@ -867,6 +867,7 @@ class WindowDisplayWidget(QScrollArea):
         self.base_caption = ""
         self.close_on_exit = False
         self.setWindowTitle("GUI preview")
+        self.progress_dialog_base_label = ""
 
         self.central_widget = QWidget(self.widget())
         #self.central_widget.setObjectName("deee")
@@ -1018,12 +1019,16 @@ class WindowDisplayWidget(QScrollArea):
 
     def open_progress_dialog(self, msg, max_steps):
         QApplication.setOverrideCursor(QCursor(Qt.BusyCursor))
+        self.progress_dialog_base_label = msg
+        self._progress_dialog.setWindowTitle(msg)
         self._progress_dialog.setLabelText(msg)
         self._progress_dialog.setMaximum(max_steps)
         self._progress_dialog.show()
 
-    def set_progress_dialog_step(self, step):
+    def set_progress_dialog_step(self, step, msg):
         self._progress_dialog.setValue(step)
+        if msg:
+            self._progress_dialog.setLabelText(msg)
 
     def close_progress_dialog(self):
         QApplication.setOverrideCursor(QCursor(Qt.ArrowCursor))

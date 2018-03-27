@@ -479,13 +479,19 @@ class Configuration:
 
             return True
         elif filename.endswith(".yml"):
-            yaml_dict = self.dump_tree()
-            with open(filename, 'w') as outfile:
-                  yaml.dump(yaml_dict, outfile)
-            outfile.close()
-            self.has_changed = False
+            try:
+                yaml_dict = self.dump_tree()
+                with open(filename, 'w') as outfile:
+                      yaml.dump(yaml_dict, outfile)
+                outfile.close()
+                self.has_changed = False
 
-            return True
+                return True
+            except Exception as ex:
+                logging.getLogger("HWR").exception(\
+                   "Could not save configuration to %s:" % filename + \
+                   str(ex))
+                return False
         else:
             try:
                 cfg = repr(self.windows_list)
@@ -498,7 +504,7 @@ class Configuration:
                     config_file = open(filename, "w")
                 except:
                     logging.getLogger().exception(\
-                        "Cannot save configuration to %s", filename)
+                        "Cannot save configuration to %s" % filename)
                     return False
                 else:
                     config_file.write(cfg)

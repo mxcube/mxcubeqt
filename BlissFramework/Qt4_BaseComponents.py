@@ -323,9 +323,9 @@ class BlissWidget(Connectable.Connectable, QFrame):
             BlissWidget._progressDialog.parent().open_progress_dialog(msg, max_steps)
 
     @staticmethod
-    def set_progress_dialog_step(step):
+    def set_progress_dialog_step(step, msg):
         if BlissWidget._progressDialog:
-            BlissWidget._progressDialog.parent().set_progress_dialog_step(step)
+            BlissWidget._progressDialog.parent().set_progress_dialog_step(step, msg)
 
     @staticmethod
     def close_progress_dialog():
@@ -795,6 +795,8 @@ class BlissWidget(Connectable.Connectable, QFrame):
 
         self.__enabledState = True
         self.__loaded_hardware_objects = []
+        self.__failed_to_load_hwobj = False
+        self.__use_progress_dialog = False
         self._signal_slot_filters = {}
         self._widget_events = []
 
@@ -1133,20 +1135,37 @@ class BlissWidget(Connectable.Connectable, QFrame):
             self.connect(hwobj,
                          "progressInit",
                          self.progress_init)
+            self.connect(hwobj,
+                         'progressStep',
+                         self.progress_step)
+            self.connect(hwobj,
+                         'progressStop',
+                         self.progress_stop)
 
         if hwobj is None and not optional:
             logging.getLogger("GUI").error(\
-               "Unable to initialize hardware: %s.xml. " % \
-               hardware_object_name[1:] + \
+               "Unable to initialize hardware: %s.xml. " % hardware_object_name[1:] + \
                "If the restarting of MXCuBE do not help, " + \
                "please contact your local support.")
             self.set_background_color(Qt4_widget_colors.LIGHT_RED)
+            self.__failed_to_load_hwobj = True
+            self.setDisabled(True)
 
         return hwobj
             
 
-    def progress_init(self, msg, step_count, show_dialog=False):
-        pass
+    def progress_init(self, progress_type, number_of_steps, use_dialog=False):
+        self.__use_progress_dialog = use_dialog
+        if self.__use_progress_dialog:
+            BlissWidget.open_progress_dialog(progress_type, number_of_steps)
+
+    def progress_step(self, step, msg=None):
+        if self.__use_progress_dialog:
+            BlissWidget.set_progress_dialog_step(step, msg)
+
+    def progress_stop(self):
+        if self.__use_progress_dialog:
+            BlissWidget.close_progress_dialog()
 
     def __hardwareObjectDiscarded(self, hardware_object_name):
         """
@@ -1246,6 +1265,9 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """
         Descript. :
         """
+        if self.__failed_to_load_hwobj:
+            state = False       
+ 
         if state:
             self.setEnabled(True)
         else:
@@ -1255,6 +1277,9 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """
         Descript. :
         """
+        if self.__failed_to_load_hwobj:
+            state = True 
+
         if state:
             self.setDisabled(True)
         else:
