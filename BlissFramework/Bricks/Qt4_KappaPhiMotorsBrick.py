@@ -56,26 +56,33 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements-----------------------------------------------------
-        self.kappa_dspinbox = QDoubleSpinBox(self)
+        _main_gbox = QGroupBox(self)
+
+        self.kappa_dspinbox = QDoubleSpinBox(_main_gbox)
         self.kappa_dspinbox.setRange(-360, 360)
-        self.kappaphi_dspinbox = QDoubleSpinBox(self)
+        self.kappaphi_dspinbox = QDoubleSpinBox(_main_gbox)
         self.kappaphi_dspinbox.setRange(-360, 360)
-        self.step_cbox = QComboBox(self)
+        self.step_cbox = QComboBox(_main_gbox)
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
-        self.close_button = QPushButton("Close", self)
-        self.stop_button = QPushButton(self)
+        self.close_button = QPushButton(_main_gbox)
+        self.stop_button = QPushButton(_main_gbox)
 
         # Layout --------------------------------------------------------------
+        _main_gbox_hlayout = QHBoxLayout(_main_gbox)
+        _main_gbox_hlayout.addWidget(QLabel("Kappa:", _main_gbox)) 
+        _main_gbox_hlayout.addWidget(self.kappa_dspinbox)
+        _main_gbox_hlayout.addWidget(QLabel("Phi:", _main_gbox))
+        _main_gbox_hlayout.addWidget(self.kappaphi_dspinbox)
+        _main_gbox_hlayout.addWidget(self.step_cbox)
+        _main_gbox_hlayout.addWidget(self.close_button)
+        _main_gbox_hlayout.addWidget(self.stop_button)
+        _main_gbox_hlayout.setSpacing(2)
+        _main_gbox_hlayout.setContentsMargins(2, 2, 2, 2)
+
         _main_hlayout = QHBoxLayout(self)
-        _main_hlayout.addWidget(QLabel("Kappa:", self)) 
-        _main_hlayout.addWidget(self.kappa_dspinbox)
-        _main_hlayout.addWidget(QLabel("Phi:", self))
-        _main_hlayout.addWidget(self.kappaphi_dspinbox)
-        _main_hlayout.addWidget(self.step_cbox)
-        _main_hlayout.addWidget(self.close_button)
-        _main_hlayout.addWidget(self.stop_button)
-        _main_hlayout.setSpacing(2)
-        _main_hlayout.setContentsMargins(2, 2, 2, 2)
+        _main_hlayout.addWidget(_main_gbox)
+        _main_hlayout.setSpacing(0)
+        _main_hlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
@@ -106,10 +113,14 @@ class Qt4_KappaPhiMotorsBrick(BlissWidget):
         self.step_cbox.setEditable(True)
         self.step_cbox.setValidator(QDoubleValidator(0, 360, 5, self.step_cbox))
         self.step_cbox.setDuplicatesEnabled(False)
+        self.step_cbox.setFixedHeight(27)
+
+        self.close_button.setIcon(Qt4_Icons.load_icon('Home2'))
+        self.close_button.setFixedSize(27, 27)
 
         self.stop_button.setIcon(Qt4_Icons.load_icon('Stop2'))
         self.stop_button.setEnabled(False)
-        self.stop_button.setFixedWidth(27)
+        self.stop_button.setFixedSize(27, 27)
         
     def propertyChanged(self,property_name, old_value, new_value):
         if property_name == 'mnemonic':

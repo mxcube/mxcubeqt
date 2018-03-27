@@ -66,7 +66,6 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(_main_groupbox)
         _main_vlayout.setSpacing(0)
-        _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------

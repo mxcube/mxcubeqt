@@ -114,7 +114,7 @@ class Qt4_DCParametersBrick(BlissWidget):
             self.parameters_widget.setEnabled(True)
 
         self.parameters_widget.populate_widget(item)
-        self.advance_results_widget.populate_widget(item)
+        self.advance_results_widget.populate_widget(item, data_collection)
 
     def populate_results(self, data_collection):
         """

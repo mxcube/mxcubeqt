@@ -407,6 +407,10 @@ class XrayCenteringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
+class XrayImagingQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
 
 MODEL_VIEW_MAPPINGS = \
     {queue_model_objects.DataCollection: DataCollectionQueueItem,
@@ -420,5 +424,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
      queue_model_objects.XrayCentering: XrayCenteringQueueItem,
+     queue_model_objects.XrayImaging: XrayImagingQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

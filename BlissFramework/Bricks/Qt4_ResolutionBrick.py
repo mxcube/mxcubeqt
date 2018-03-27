@@ -174,7 +174,6 @@ class Qt4_ResolutionBrick(BlissWidget):
                              'limitsChanged',
                              self.resolution_limits_changed)
 
-                print 222, self.resolution_hwobj.isReady()
                 if self.resolution_hwobj.isReady():
                     self.resolution_hwobj.update_values()
                     self.connected()
@@ -430,7 +429,7 @@ class Qt4_ResolutionBrick(BlissWidget):
                     resolution_ready = self.resolution_hwobj.isReady()
 
         if resolution_ready:
-            self.resolution_limits_changed(self.resolution_hwobj.getLimits())
+            self.resolution_limits_changed(self.resolution_hwobj.get_limits())
         else:
             self.resolution_limits = None
 
@@ -452,7 +451,6 @@ class Qt4_ResolutionBrick(BlissWidget):
             self.detector_distance_limits = None
 
     def resolution_value_changed(self, value):
-        print 111, value
         if value:
             resolution_str = self['angFormatString'] % float(value)
             self.resolution_ledit.setText("%s %s" % (resolution_str, u"\u212B"))
@@ -471,15 +469,14 @@ class Qt4_ResolutionBrick(BlissWidget):
 
             unit = self.units_combobox.currentText()
             if unit is chr(197):
-                if state == self.detector_distance_hwobj.READY:
+                if state == self.detector_distance_hwobj.motor_states.READY:
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")
                     self.new_value_ledit.blockSignals(False)
                     self.new_value_ledit.setEnabled(True)
                 else:
                     self.new_value_ledit.setEnabled(False)
-                if state == self.detector_distance_hwobj.MOVING or \
-                   state == self.detector_distance_hwobj.MOVESTARTED:
+                if state == self.detector_distance_hwobj.motor_states.MOVING: #or state == self.detector_distance_hwobj.motor_states.MOVESTARTED:
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
@@ -493,15 +490,15 @@ class Qt4_ResolutionBrick(BlissWidget):
         color = Qt4_ResolutionBrick.STATE_COLORS[state]
         unit = self.units_combobox.currentText()
         if unit == "mm":
-            if state == self.detector_distance_hwobj.READY:
+            if state == self.detector_distance_hwobj.motor_states.READY:
                 self.new_value_ledit.blockSignals(True)
                 self.new_value_ledit.setText("")
                 self.new_value_ledit.blockSignals(False)
                 self.new_value_ledit.setEnabled(True)
             else:
                 self.new_value_ledit.setEnabled(False)
-            if state == self.detector_distance_hwobj.MOVING or \
-               state == self.detector_distance_hwobj.MOVESTARTED:
+            if state == self.detector_distance_hwobj.motor_states.MOVING : #or \
+                #state == self.detector_distance_hwobj.motor_states.MOVESTARTED:
                 self.stop_button.setEnabled(True)
             else:
                 self.stop_button.setEnabled(False)

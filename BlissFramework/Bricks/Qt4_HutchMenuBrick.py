@@ -59,7 +59,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.file_index = 1
 
         # Properties ----------------------------------------------------------
-        self.addProperty('collection', 'string', '')
         self.addProperty('graphicsManager', 'string', '')
         self.addProperty('enableAutoFocus', 'boolean', True)
         self.addProperty('enableRefreshCamera', 'boolean', False)

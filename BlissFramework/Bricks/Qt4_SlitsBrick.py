@@ -95,10 +95,10 @@ class Qt4_SlitsBrick(BlissWidget):
         self.current_hor_pos_ledit.setEnabled(False)
         self.hor_pos_dspinbox = QSpinBox(self.main_gbox)
         self.hor_pos_dspinbox.setMaximumWidth(70)
-        self.hor_pos_dspinbox.setEnabled(False)
+        #self.hor_pos_dspinbox.setEnabled(False)
         self.set_hor_gap_button = QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
-        self.set_hor_gap_button.setEnabled(False)
+        #self.set_hor_gap_button.setEnabled(False)
         self.set_hor_gap_button.setFixedSize(27, 27)
         self.stop_hor_button = QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
@@ -114,10 +114,10 @@ class Qt4_SlitsBrick(BlissWidget):
         self.current_ver_pos_ledit.setEnabled(False)
         self.ver_pos_dspinbox = QSpinBox(self.main_gbox)
         self.ver_pos_dspinbox.setMaximumWidth(70)
-        self.ver_pos_dspinbox.setEnabled(False)
+        #self.ver_pos_dspinbox.setEnabled(False)
         self.set_ver_gap_button = QPushButton(\
              Qt4_Icons.load_icon("Draw"), "", self.main_gbox)
-        self.set_ver_gap_button.setEnabled(False)
+        #self.set_ver_gap_button.setEnabled(False)
         self.set_ver_gap_button.setFixedSize(27, 27)
         self.stop_ver_button = QPushButton(\
              Qt4_Icons.load_icon("Stop2"), "", self.main_gbox)
@@ -150,12 +150,18 @@ class Qt4_SlitsBrick(BlissWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------
+        hor_spinbox_event = SpinBoxEvent(self.hor_pos_dspinbox)
+        self.hor_pos_dspinbox.installEventFilter(hor_spinbox_event)
+        hor_spinbox_event.returnPressedSignal.connect(self.change_hor_gap)
+
         self.hor_pos_dspinbox.lineEdit().textChanged.\
              connect(self.hor_gap_edited)
-        self.hor_pos_dspinbox.lineEdit().returnPressed.\
-             connect(self.change_hor_gap)
         self.set_hor_gap_button.clicked.connect(self.change_hor_gap)
         self.stop_hor_button.clicked.connect(self.stop_hor_clicked)
+
+        ver_spinbox_event = SpinBoxEvent(self.ver_pos_dspinbox)
+        self.ver_pos_dspinbox.installEventFilter(ver_spinbox_event)
+        ver_spinbox_event.returnPressedSignal.connect(self.change_ver_gap)
 
         self.ver_pos_dspinbox.lineEdit().textChanged.\
              connect(self.ver_gap_edited)
@@ -190,8 +196,8 @@ class Qt4_SlitsBrick(BlissWidget):
                 self.connect(self.slitbox_hwobj, 'focusModeChanged', self.focus_mode_changed)
                 self.connect(self.slitbox_hwobj, 'gapLimitsChanged', self.gap_limits_changed)
 
-                self.slitbox_hwobj.update_values()
                 self.slitBoxReady()
+                self.slitbox_hwobj.update_values()
             else:
                 self.slitBoxNotReady()
         else:
@@ -302,11 +308,11 @@ class Qt4_SlitsBrick(BlissWidget):
                  Qt4_widget_colors.LIGHT_GREEN,
                  QPalette.Base)
 
-    def focus_mode_changed(self, horFocMode, verFocMode):
-        self.hor_pos_dspinbox.setEnabled(horFocMode)
-        self.set_hor_gap_button.setEnabled(horFocMode)
-        self.ver_pos_dspinbox.setEnabled(verFocMode)
-        self.set_ver_gap_button.setEnabled(verFocMode)
+    def focus_mode_changed(self, hor_gab_enabled, ver_gap_enabled):
+        self.hor_pos_dspinbox.setEnabled(hor_gab_enabled)
+        self.set_hor_gap_button.setEnabled(hor_gab_enabled)
+        self.ver_pos_dspinbox.setEnabled(ver_gap_enabled)
+        self.set_ver_gap_button.setEnabled(ver_gap_enabled)
 
     def gap_limits_changed(self, newMaxLimits):
         if newMaxLimits is not None:
@@ -325,3 +331,18 @@ class Qt4_SlitsBrick(BlissWidget):
                self.slitbox_hwobj.set_gap('Hor', gap_mm)
                self.slitbox_hwobj.set_gap('Ver', gap_mm)
                counter += 1
+
+class SpinBoxEvent(QObject):
+    returnPressedSignal = pyqtSignal()
+
+    def eventFilter(self,  obj,  event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() in [Qt.Key_Enter,
+                               Qt.Key_Return]:
+                self.returnPressedSignal.emit()
+
+        elif event.type() == QEvent.MouseButtonRelease:
+            self.returnPressedSignal.emit()
+        #elif event.type() == QEvent.ContextMenu:
+        #    self.contextMenuSignal.emit()
+        return False
