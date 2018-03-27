@@ -37,7 +37,7 @@ class AdvancedResultsWidget(QWidget):
         # Internal variables --------------------------------------------------
         self._initialized = None
         self._tree_view_item = None
-        self._half_widget_size = 1200
+        self._half_widget_size = 2000
 
         # Graphic elements ----------------------------------------------------
         self.heat_map_widget = HeatMapWidget(self)
@@ -65,11 +65,11 @@ class AdvancedResultsWidget(QWidget):
                 self._initialized = True
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
-    def populate_widget(self, item):
-        if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
-            data_collection = item.get_model().reference_image_collection
-        else: 
-            data_collection = item.get_model()
+    def populate_widget(self, item, data_collection):
+        #if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
+        #    data_collection = item.get_model().reference_image_collection
+        #else: 
+        #    data_collection = item.get_model()
 
         executed = data_collection.is_executed()
 

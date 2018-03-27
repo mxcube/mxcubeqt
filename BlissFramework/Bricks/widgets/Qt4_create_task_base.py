@@ -70,6 +70,12 @@ class CreateTaskBase(QWidget):
     def set_expert_mode(self, state):
         pass 
 
+    def enable_compression(self, state):
+        if self._data_path_widget:
+           
+            self._data_path_widget.data_path_layout.compression_cbox.setChecked(state)
+            self._data_path_widget.data_path_layout.compression_cbox.setEnabled(state)
+
     def init_models(self):
         self.init_acq_model()
         self.init_data_path_model()
@@ -125,6 +131,9 @@ class CreateTaskBase(QWidget):
         self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
 
         try:
+            self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
+            self.set_resolution(bl_setup_hwobj.resolution_hwobj.getPosition())
+
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
             bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
@@ -137,7 +146,7 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.detector_hwobj.connect('detectorRoiModeChanged', self.set_detector_roi_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
 
-            self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
+            bl_setup_hwobj.detector_hwobj.update_values()
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
@@ -163,8 +172,7 @@ class CreateTaskBase(QWidget):
             model = item.get_model()
             if isinstance(model, queue_model_objects.DataCollection):
                 model.run_processing_after = run_processing_after
-                model.run_processing_parallel = run_processing_parallel and \
-                  model.acquisitions[0].acquisition_parameters.num_images > 19
+                model.run_processing_parallel = run_processing_parallel
 
     def acq_parameters_changed(self, conflict):
         if self._tree_brick:
