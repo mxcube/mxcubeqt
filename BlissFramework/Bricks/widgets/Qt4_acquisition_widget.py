@@ -76,7 +76,7 @@ class AcquisitionWidget(QWidget):
             self._acquisition_parameters = acq_params
 
         if path_template is None:
-           self._path_template = queue_model_objects.PathTemplate()
+            self._path_template = queue_model_objects.PathTemplate()
         else:
             self._path_template = path_template
 
@@ -724,7 +724,7 @@ class AcquisitionWidget(QWidget):
         """
         Descript. :
         """
-        if roi_mode_index and \
+        if roi_mode_index is not None and \
            self.acq_widget_layout.detector_roi_mode_combo.count() > 0:
             self.acq_widget_layout.detector_roi_mode_combo.\
                  setCurrentIndex(roi_mode_index)
