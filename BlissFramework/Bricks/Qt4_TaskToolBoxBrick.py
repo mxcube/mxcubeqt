@@ -187,8 +187,8 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
 
         elif property_name == 'useOscStartCbox':
             self.task_tool_box_widget.use_osc_start_cbox(new_value)
-        elif property_name == 'useCompression':
-            self.task_tool_box_widget.enable_compression(new_value)
+        #elif property_name == 'useCompression':
+        #    self.task_tool_box_widget.enable_compression(new_value)
 
     def selection_changed(self, items):
         """
