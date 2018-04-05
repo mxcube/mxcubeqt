@@ -24,7 +24,6 @@ import logging
 from QtImport import *
 
 import Qt4_queue_item
-import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
 
 from Qt4_create_task_base import CreateTaskBase
@@ -198,16 +197,14 @@ class CreateAdvancedWidget(CreateTaskBase):
             grid_properties = selected_grid.get_properties()
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
             speed = grid_properties["yOffset"] / exp_time
-            if speed >= 0.8:
-                logging.getLogger("GUI").error("Translation speed %.3f is above the limit 0.8" % speed)
+            if speed >= 2.25:
+                logging.getLogger("GUI").error("Translation speed %.3f is above the limit 2.25" % speed)
                 return False
             osc_range_per_frame = float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())
             speed = osc_range_per_frame / exp_time
-            if speed >= 166:
-                logging.getLogger("GUI").error("Rotation speed per frame %.3f is above the limit 166" % speed)
+            if speed >= 300:
+                logging.getLogger("GUI").error("Rotation speed per frame %.3f is above the limit 300" % speed)
                 return False
-        result = True
-
         return result
             
     def update_processing_parameters(self, crystal):
@@ -306,7 +303,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             info_str_list.append("%d" % grid_properties["num_images_per_line"])
 
             if not self.dc_selected:
-                exp_time = max(float(grid_properties["yOffset"] / 0.795),
+                exp_time = max(float(grid_properties["yOffset"] / 2.245),
                       self._acq_widget.exp_time_validator.bottom()+0.00001)
                 self._acq_widget.acq_widget_layout.exp_time_ledit.setText("%.6f" % exp_time)
  

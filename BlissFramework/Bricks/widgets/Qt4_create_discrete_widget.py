@@ -89,15 +89,15 @@ class CreateDiscreteWidget(CreateTaskBase):
              connect(self.set_max_osc_total_range_clicked)
 
         # Other ---------------------------------------------------------------
-        #self._processing_widget.processing_widget.\
-        #     run_processing_parallel_cbox.hide()
+        self._processing_widget.processing_widget.\
+             run_processing_parallel_cbox.setChecked(False)
 
     def init_models(self):
         """
         Descript. :
         """
         CreateTaskBase.init_models(self)
-        self._energy_scan_result = queue_model_objects.EnergyScanResult()
+        #self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
@@ -107,6 +107,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_acquisition_values")
+            self._acquisition_parameters.compression = True
             
     def set_tunable_energy(self, state):
         """
@@ -263,8 +264,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         dc.run_processing_after = self._processing_widget.processing_widget.\
            run_processing_after_cbox.isChecked()
         dc.run_processing_parallel = self._processing_widget.processing_widget.\
-           run_processing_parallel_cbox.isChecked() and \
-           acq.acquisition_parameters.num_images > 19
+           run_processing_parallel_cbox.isChecked()
 
         tasks.append(dc)
 

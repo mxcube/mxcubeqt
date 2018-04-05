@@ -78,6 +78,8 @@ class DataPathWidget(QWidget):
              connect(self._browse_clicked)
         self.data_path_layout.folder_ledit.textChanged.\
              connect(self._folder_ledit_change)
+        self.data_path_layout.compression_cbox.toggled.\
+             connect(self._compression_toggled)
 
         # Other ---------------------------------------------------------------
         self._data_model_pm.bind_value_update('base_prefix', 
@@ -86,6 +88,9 @@ class DataPathWidget(QWidget):
         self._data_model_pm.bind_value_update('run_number', 
              self.data_path_layout.run_number_ledit,
              int, QIntValidator(0, 1000, self))
+
+        self._data_model_pm.bind_value_update('compression',
+             self.data_path_layout.compression_cbox, bool, None)
 
     def _browse_clicked(self):
         """
@@ -170,6 +175,11 @@ class DataPathWidget(QWidget):
         Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
                                            Qt4_widget_colors.WHITE)
 
+        self.pathTemplateChangedSignal.emit()
+
+    def _compression_toggled(self, state):
+        self._data_model.compression = state
+        self.update_file_name()
         self.pathTemplateChangedSignal.emit()
 
     def update_file_name(self):

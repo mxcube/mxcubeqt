@@ -209,8 +209,8 @@ class DataCollectTree(QWidget):
         # Other ---------------------------------------------------------------
         #TODO number of columns should not be hard coded but come from processing methods
         self.sample_tree_widget.setColumnCount(6)
-        #self.sample_tree_widget.setColumnWidth(0, 150)
-        self.sample_tree_widget.setColumnWidth(1, 130)
+        self.sample_tree_widget.setColumnWidth(0, 150)
+        self.sample_tree_widget.setColumnWidth(1, 160)
         for col in range (4):
             self.sample_tree_widget.setColumnWidth(2 + col, 15)
         
@@ -409,6 +409,8 @@ class DataCollectTree(QWidget):
                 self.tree_brick.show_workflow_tab(item)
             elif isinstance(item, Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.tree_brick.show_dcg_tab(item)
+            elif isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
+                self.tree_brick.show_advanced_tab(item)
         #elif len(items) == 0:
         #    self.tree_brick.show_sample_tab()
 
@@ -635,7 +637,7 @@ class DataCollectTree(QWidget):
         if isinstance(view_item, Qt4_queue_item.TaskQueueItem) and \
             self.samples_initialized:
             self.tree_brick.auto_save_queue()
-        self.sample_tree_widget.resizeColumnToContents(0)
+        #self.sample_tree_widget.resizeColumnToContents(0)
 
         if isinstance(task, queue_model_objects.DataCollection):
             view_item.init_tool_tip()
@@ -899,6 +901,7 @@ class DataCollectTree(QWidget):
             item.reset_style()
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 collection_par_list.append(item.get_model().as_dict())
+        """
         invalid_parameters = self.beamline_setup_hwobj.\
             check_collection_parameters(collection_par_list)
         if len(invalid_parameters) > 0:
@@ -910,6 +913,7 @@ class DataCollectTree(QWidget):
                    "and run queue again"
             logging.getLogger("GUI").error(msg)
             return
+        """
         
         self.user_stopped = False
         self.delete_button.setEnabled(False)

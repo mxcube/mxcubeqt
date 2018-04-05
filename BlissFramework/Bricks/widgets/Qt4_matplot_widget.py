@@ -202,15 +202,15 @@ class MplCanvas(FigureCanvas):
         self.axes.grid(True)
 
     def add_curve(self, y_axis_array, x_axis_array=None, label=None,
-           linestyle="-", color='blue', marker=None):
+           linestyle="-", color='blue', marker='None'):
         if x_axis_array is None:
             self.curves.append(self.axes.plot(y_axis_array, 
                  label=label, linewidth=2, linestyle=linestyle,
-                 color=color))
+                 color=color, marker=marker))
         else:
             self.curves.append(self.axes.plot(x_axis_array, y_axis_array, 
                  label=label, linewidth=2, linestyle=linestyle,
-                 color=color))
+                 color=color, marker=marker))
         self.draw()
 
     def append_new_point(self, y, x=None):
@@ -227,7 +227,8 @@ class MplCanvas(FigureCanvas):
 
         if self.single_curve is None:
             self.single_curve, = self.axes.plot(self._axis_y_array,
-                                                linewidth=2)
+                                                linewidth=2,
+                                                marker='s')
         else:  
             self.axes.fill(self._axis_y_array, 'r', linewidth=2)
 
@@ -474,7 +475,8 @@ class TwoDimenisonalPlotWidget(QWidget):
                                   x_axis_array=None,
                                   label=None,
                                   linestyle=linestyle,
-                                  color=color)
+                                  color=color,
+                                  marker=marker)
         self.set_x_axis_limits((x_axis_array.min() - 1,
                                 x_axis_array.max() + 1))
 

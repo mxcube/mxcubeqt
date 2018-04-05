@@ -47,7 +47,7 @@ class CharTypeWidget(QWidget):
 
         # Fix the widths of the widgets to make the layout look nicer,
         # and beacuse the qt layout engine is so tremendosly good.
-        self.charact_type_gbox.setFixedWidth(621)
+        self.charact_type_gbox.setFixedWidth(800)
         self.charact_type_gbox.setFixedHeight(220)
 
         self.charact_type_tbox = QToolBox(self.charact_type_gbox)

@@ -79,7 +79,6 @@ class AdvancedParametersWidget(QWidget):
         self._acq_widget.use_osc_start(False)
         self._acq_widget.acq_widget_layout.mad_cbox.hide()
         self._acq_widget.acq_widget_layout.energies_combo.hide()
-        self._acq_widget.acq_widget_layout.num_images_ledit.setEnabled(False)
         self._acq_widget.acq_widget_layout.shutterless_cbx.hide()
 
     def set_beamline_setup(self, bl_setup):
@@ -107,13 +106,14 @@ class AdvancedParametersWidget(QWidget):
         if self._tree_view_item:
             self.populate_widget(self._tree_view_item)
 
-    def populate_widget(self, tree_view_item):
+    def populate_widget(self, tree_view_item, data_collection):
         self._tree_view_item = tree_view_item
+        self._data_collection = data_collection
 
-        if isinstance(tree_view_item, Qt4_queue_item.XrayCenteringQueueItem):
-            self._data_collection = tree_view_item.get_model().reference_image_collection
-        else:
-            self._data_collection = tree_view_item.get_model()
+        #if isinstance(tree_view_item, Qt4_queue_item.XrayCenteringQueueItem):
+        #    self._data_collection = tree_view_item.get_model().reference_image_collection
+        #else:
+        #    self._data_collection = tree_view_item.get_model()
         executed = self._data_collection.is_executed()
 
         self._acq_widget.setEnabled(not executed)
@@ -135,6 +135,8 @@ class AdvancedParametersWidget(QWidget):
              self._data_collection.acquisitions[0].acquisition_parameters,
              self._data_collection.acquisitions[0].path_template)
         #self._acq_widget.use_osc_start(False)
+
+        self._acq_widget.acq_widget_layout.num_images_ledit.setDisabled(data_collection.is_mesh())
         invalid = self._acquisition_mib.validate_all()
         if invalid:
             msg = "This data collection has one or more incorrect parameters,"+\

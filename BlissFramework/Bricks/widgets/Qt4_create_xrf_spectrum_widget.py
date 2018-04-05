@@ -80,6 +80,10 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
 
+    def enable_compression(self, state):
+        self._data_path_widget.data_path_layout.compression_cbox.setChecked(False)
+        self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+
     def set_expert_mode(self, state):
         self.adjust_transmission_cbox.setEnabled(state)
 

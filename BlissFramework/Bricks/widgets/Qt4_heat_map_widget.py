@@ -82,6 +82,7 @@ class HeatMapWidget(QWidget):
         self._best_pos_gbox = QGroupBox("Best positions", self)
         self._best_pos_table = QTableWidget(self._best_pos_gbox)
         self._best_pos_popup_menu = QMenu(self._heat_map_gbox)
+        self._best_pos_gbox.setHidden(True)
 
         # Layout --------------------------------------------------------------
         _heat_map_tools_hlayout = QHBoxLayout(self._heat_map_tools_widget)
@@ -285,8 +286,8 @@ class HeatMapWidget(QWidget):
         if self.__results is None:
             return         
 
-        for key in self.__results.keys():
-            self.__result_display[key] = copy(self.__results[key])
+        #for key in self.__results.keys():
+        #    self.__result_display[key] = copy(self.__results[key])
 
         self.__filter_min_value = \
              self.__result_display[self.__score_key].max() * \
@@ -301,7 +302,9 @@ class HeatMapWidget(QWidget):
             self._heat_map_plot.add_curve(self.__results["score"],
                                           x_data,
                                           label="Total score",
-                                          color="r")
+                                          linestyle="None",
+                                          color="b",
+                                          marker="s")
             """
             self._heat_map_plot.add_curve(self.__results["spots_num"],
                                           x_data,
@@ -333,6 +336,7 @@ class HeatMapWidget(QWidget):
                                                 aspect=grid_properties["dx_mm"] / \
                                                        grid_properties["dy_mm"])
 
+                """ 
                 self._summary_textbrowser.append("Number of columns: %d" % \
                      grid_properties["steps_x"])
                 self._summary_textbrowser.append("Number of rows: %d" % \
@@ -341,8 +345,6 @@ class HeatMapWidget(QWidget):
                     (grid_properties["xOffset"], u"\u00B5"))
                 self._summary_textbrowser.append("Vertical spacing: %.1f %sm" % \
                     (grid_properties["yOffset"], u"\u00B5"))
-                #self._summary_textbrowser.append("Beam size : %.1f x %.1f %sm" % \
-                #    (grid_properties["beam_x_mm"], grid_properties["beam_y_mm"], u"\u00B5"))
                 self._summary_textbrowser.append("Scan range : %.1f x %.1f mm" % \
                     (grid_properties["dx_mm"], grid_properties["dy_mm"]))
 
@@ -351,8 +353,9 @@ class HeatMapWidget(QWidget):
                      grid_properties["num_lines"])
                 self._summary_textbrowser.append("Images per line: %d" % \
                      grid_properties["num_images_per_line"])
-        self._summary_textbrowser.append("Number of frames with diffraction spots: %d" % \
-             (self.__results["score"] > 0).sum())
+                """
+        #self._summary_textbrowser.append("Number of frames with diffraction spots: %d" % \
+        #     (self.__results["score"] > 0).sum())
 
     def filter_min_slider_changed(self, value):
         #self.__associated_grid.set_min_score(self._threshold_slider.value() / 100.0)
@@ -397,8 +400,9 @@ class HeatMapWidget(QWidget):
         Displays results on the widget
         """
         self.__results = results
+        self.__result_display = results
         self.refresh()
-        self.set_best_pos()
+        #self.set_best_pos()
 
     def clean_result(self):
         """
@@ -549,13 +553,9 @@ class HeatMapWidget(QWidget):
         self._beamline_setup_hwobj.shape_history_hwobj.create_auto_line(motor_pos_dict)
 
     def rotate_and_create_helical_line_clicked(self):
-        print 1
         self.move_to_selected_position()
-        print 2
         self._beamline_setup_hwobj.diffractometer_hwobj.move_omega_relative(90)
-        print 3
         self._beamline_setup_hwobj.shape_history_hwobj.create_auto_line()
-        print 4
 
     def move_to_selected_position(self):
         """
