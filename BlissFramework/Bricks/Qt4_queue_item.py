@@ -424,6 +424,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
      queue_model_objects.XrayCentering: XrayCenteringQueueItem,
-     queue_model_objects.XrayImaging: XrayImagingQueueItem,
+     #queue_model_objects.XrayImaging: XrayImagingQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

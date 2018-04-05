@@ -109,7 +109,11 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
             tip = "Status: unknown motor " + name
         else:
             if state is None:
-                state = self.motor_hwobj.get_state()
+                #TODO remove this check
+                if hasattr(self.motor_hwobj, "getState"):
+                    state = self.motor_hwobj.getState()
+                else:
+                    state = self.motor_hwobj.get_state()
             try:
                 state_str = states[state]
             except IndexError:
@@ -119,9 +123,14 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.label.setToolTip(tip)
 
     def motor_state_changed(self, state):
-        s = state in (self.motor_hwobj.motor_states.READY,
-                      self.motor_hwobj.motor_states.LOWLIMIT,
-                      self.motor_hwobj.motor_states.HIGHLIMIT)
+        #TODO remove this check and use motor_states as in AbstractMotor
+        if hasattr(self.motor_hwobj, "motor_state"):
+            s = state in (self.motor_hwobj.motor_states.READY,
+                          self.motor_hwobj.motor_states.LOWLIMIT,
+                          self.motor_hwobj.motor_states.HIGHLIMIT)
+        else:
+            s = state in (self.motor_hwobj.READY,
+                          self.motor_hwobj.ONLIMIT)
         self.positions_combo.setEnabled(s)
         Qt4_widget_colors.set_widget_color(self.positions_combo, 
                                            Qt4_MotorPredefPosBrick.STATE_COLORS[state],
@@ -158,14 +167,21 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
                              self.predefined_position_changed)
                 self.fill_positions()
                 if self.motor_hwobj.is_ready():
-                    self.predefined_position_changed(self.motor_hwobj.get_current_position_name(), 0)
+                    if hasattr(self.motor_hwobj, "getCurrentPositionName"):
+                        self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)
+                    else:
+                        self.predefined_position_changed(self.motor_hwobj.get_current_position_name(), 0)
                 if self['label'] == "":
                     lbl=self.motor_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
                 Qt4_widget_colors.set_widget_color(self.positions_combo,
                                                    Qt4_MotorPredefPosBrick.STATE_COLORS[0],
                                                    QPalette.Button)
-                self.motor_state_changed(self.motor_hwobj.get_state())
+                #TODO remove this check
+                if hasattr(self.motor_hwobj, "getState"):
+                    self.motor_state_changed(self.motor_hwobj.getState())
+                else:
+                    self.motor_state_changed(self.motor_hwobj.get_state())
         elif property_name == 'showMoveButtons':
             if new_value:
                 self.previous_position_button.show()
@@ -189,7 +205,11 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.positions_combo.clear()
         if self.motor_hwobj is not None:
             if positions is None:
-                positions = self.motor_hwobj.get_predefined_positions_list()
+                #TODO remove this check
+                if hasattr(self.motor_hwobj, "getPredefinedPositionsList"):
+                    positions = self.motor_hwobj.getPredefinedPositionsList()
+                else:
+                    positions = self.motor_hwobj.get_predefined_positions_list()
         if positions is None:
             positions=[]
         for p in positions:
@@ -199,12 +219,20 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
         self.positions=positions
         if self.motor_hwobj is not None:
             if self.motor_hwobj.is_ready():
-                self.predefined_position_changed(self.motor_hwobj.get_current_position_name(), 0)
+                #TODO remove this check
+                if hasattr(self.motor_hwobj, "getCurrentPositionName"):
+                    self.predefined_position_changed(self.motor_hwobj.getCurrentPositionName(), 0)
+                else:
+                    self.predefined_position_changed(self.motor_hwobj.get_current_position_name(), 0)
 
     def position_selected(self, index):
         if index >= 0:
             if self.motor_hwobj.is_ready():
-                self.motor_hwobj.move_to_position(self.positions[index])
+                #TODO remove this check
+                if hasattr(self.motor_hwobj, "moveToPosition"):
+                    self.motor_hwobj.moveToPosition(self.positions[index])
+                else:
+                    self.motor_hwobj.move_to_position(self.positions[index])
             else:
                 self.positions_combo.setCurrentIndex(0)
         self.next_position_button.setEnabled(index < (len(self.positions) - 1))

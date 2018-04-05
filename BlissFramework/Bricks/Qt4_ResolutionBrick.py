@@ -429,7 +429,11 @@ class Qt4_ResolutionBrick(BlissWidget):
                     resolution_ready = self.resolution_hwobj.isReady()
 
         if resolution_ready:
-            self.resolution_limits_changed(self.resolution_hwobj.get_limits())
+            #TODO remove this check and use get_limits
+            if hasattr(self.resolution_hwobj, "getLimits"):
+                self.resolution_limits_changed(self.resolution_hwobj.getLimits())
+            else:
+                self.resolution_limits_changed(self.resolution_hwobj.get_limits())
         else:
             self.resolution_limits = None
 

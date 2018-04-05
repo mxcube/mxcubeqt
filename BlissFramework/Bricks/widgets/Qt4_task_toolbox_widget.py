@@ -33,8 +33,7 @@ from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.Qt4_create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.Qt4_create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
-from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
-
+#from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
 
 class TaskToolBoxWidget(QWidget):
     def __init__(self, parent = None, name = "task_toolbox"):
@@ -70,7 +69,7 @@ class TaskToolBoxWidget(QWidget):
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
         self.gphl_workflow_page = CreateGphlWorkflowWidget(self.tool_box, "gphl_workflow")
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
-        self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
+        #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
         
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
@@ -79,7 +78,7 @@ class TaskToolBoxWidget(QWidget):
         self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         self.tool_box.addItem(self.gphl_workflow_page, "Workflow")
         self.tool_box.addItem(self.advanced_page, "Advanced")
-        self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
+        #self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
 
         self.button_box = QWidget(self)
         self.create_task_button = QPushButton("  Add to queue", self.button_box)
@@ -181,9 +180,10 @@ class TaskToolBoxWidget(QWidget):
             self.xrf_spectrum_page.hide()
             logging.getLogger("GUI").warning("XRF spectrum task not available")
         if not has_xray_imaging:
-            self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
-            self.xray_imaging_page.hide()
-            logging.getLogger("GUI").warning("Xray Imaging task not available")
+            pass
+            #self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
+            #self.xray_imaging_page.hide()
+            #logging.getLogger("GUI").warning("Xray Imaging task not available")
 
         has_gphl_workflow = False
         if hasattr(beamline_setup_hwobj, 'gphl_workflow_hwobj'):

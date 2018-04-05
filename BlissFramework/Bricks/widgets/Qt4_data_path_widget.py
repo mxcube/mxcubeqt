@@ -89,8 +89,8 @@ class DataPathWidget(QWidget):
              self.data_path_layout.run_number_ledit,
              int, QIntValidator(0, 1000, self))
 
-        self._data_model_pm.bind_value_update('compression',
-             self.data_path_layout.compression_cbox, bool, None)
+        #self._data_model_pm.bind_value_update('compression',
+        #     self.data_path_layout.compression_cbox, bool, None)
 
     def _browse_clicked(self):
         """
