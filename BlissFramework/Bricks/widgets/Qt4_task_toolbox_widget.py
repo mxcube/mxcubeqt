@@ -35,7 +35,6 @@ from widgets.Qt4_create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
 #from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
 
-
 class TaskToolBoxWidget(QWidget):
     def __init__(self, parent = None, name = "task_toolbox"):
         QWidget.__init__(self, parent)
