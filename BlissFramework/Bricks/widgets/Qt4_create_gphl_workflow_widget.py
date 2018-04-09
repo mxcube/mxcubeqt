@@ -245,7 +245,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_space_group(crystal_data.space_group)
             wf.set_cell_parameters(
                 tuple(getattr(crystal_data, tag)
-                      for tag in ('a', 'b', 'c' 'alpha', 'beta', 'gamma'))
+                      for tag in ('a', 'b', 'c', 'alpha', 'beta', 'gamma'))
             )
         else:
             expected_resolution = None

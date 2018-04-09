@@ -43,6 +43,8 @@ class GphlSetupWidget(QtGui.QWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
+        dispatcher.connect(self._refresh_interface, 'model_update',
+                           dispatcher.Any)
 
         # Hardware objects ----------------------------------------------------
 
@@ -50,6 +52,7 @@ class GphlSetupWidget(QtGui.QWidget):
         self._widget_data = OrderedDict()
         self._data_object = GphlAcquisitionData()
         self._pulldowns = {}
+        self._parameter_mib = DataModelInputBinder(self._data_object)
 
         # Graphic elements ----------------------------------------------------
         _parameters_widget = self._parameters_widget = QtGui.QWidget(self)
@@ -88,9 +91,7 @@ class GphlSetupWidget(QtGui.QWidget):
     def populate_widget(self, **kw):
 
         data_object = self._data_object = GphlAcquisitionData()
-        dispatcher.connect(self._refresh_interface, 'model_update', data_object)
-
-        self._parameter_mib = DataModelInputBinder(data_object)
+        self._parameter_mib.set_model(data_object)
         for field_name, tags in self._pulldowns.items():
             widget = self._widget_data[field_name][0]
             widget.clear()

@@ -39,7 +39,7 @@
         <!-- Path of application that analyses diffractcal (aka rotational
         calibration) data. In practice, this will almost always be a wrapper
         script that sets up the environment properly. -->
-        <co.gphl.wf.diffractcal.bin>/users/blissadm/local/bin/gphl_diffractcal_submit</co.gphl.wf.diffractcal.bin>
+        <co.gphl.wf.diffractcal.bin>aP_wf_rotcal</co.gphl.wf.diffractcal.bin>
     </gphl_program_locations>
 
     <!-- Hosts and ports for py4j java-python gateway, all OPTIONAL-->
