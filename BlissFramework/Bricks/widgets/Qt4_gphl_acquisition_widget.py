@@ -90,7 +90,9 @@ class GphlSetupWidget(QtGui.QWidget):
 
     def populate_widget(self, **kw):
 
-        data_object = self._data_object = GphlAcquisitionData()
+        self._data_object = data_object = GphlAcquisitionData()
+        self._parameter_mib.bindings.clear()
+        # NB must be done here to set empty model, and also in subclasses:
         self._parameter_mib.set_model(data_object)
         for field_name, tags in self._pulldowns.items():
             widget = self._widget_data[field_name][0]
@@ -219,7 +221,8 @@ class GphlDiffractcalWidget(GphlSetupWidget):
                 value = kw[tag]
             setattr(data_object, tag, value)
             self._parameter_mib.bind_value_update(tag, widget, w_type, validator)
-        self._parameter_mib.init_bindings()
+        # Must be redone here, after values and bindings are set
+        self._parameter_mib.set_model(data_object)
 
         # Special case, reset space_group pulldown
         # which changes with crystal_system
@@ -376,7 +379,8 @@ class GphlAcquisitionWidget(GphlSetupWidget):
                 setattr(data_object, tag, value)
                 self._parameter_mib.bind_value_update(tag, widget, w_type, validator)
 
-        self._parameter_mib.init_bindings()
+        # Must be redone here, after values and bindings are set
+        self._parameter_mib.set_model(data_object)
 
     def get_energy_dict(self):
         """get role:value dict for energies"""
