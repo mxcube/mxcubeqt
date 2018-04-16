@@ -180,8 +180,8 @@
                 <!-- grid: Grid definition [axis_name:start:end:step], slowest-varying to fastest varying -->
                 <!-- EITHER file OR grid must be set. NBNB REDO! -->
                 <file>transcal_2stage.json</file>
-                <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
+                <!-- copy calibration result to configuration directory, replacing previous value -->
+                <newconfig/>
                 <!-- updateconfig option, automaticallly updates entire configuration -->
                 <!--<grid>grid_axes_spec</grid>-->
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
@@ -198,14 +198,16 @@
             <options>
                 <!-- Name of strategy from library to use -->
                 <strategy>DiffractCal_ex</strategy>
+                <!-- Working subdirectory for workflow-side application data-->
+                <appdir>calculations</appdir>
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
                 <!--<instcfgout>gphl_diffractcal_out.nml</instcfgout>-->
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
-                <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
+                <!-- copy calibration result to configuration directory, replacing previous value -->
+                <newconfig/>
             </options>
         </DiffractometerCalibration>
 
@@ -218,14 +220,16 @@
             <options>
                 <!-- Name of strategy from library to use -->
                 <strategy>DiffractCal</strategy>
+                <!-- Working subdirectory for workflow-side application data-->
+                <appdir>calculations</appdir>
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
                 <!--<instcfgout>gphl_diffractcal_out.nml</instcfgout>-->
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
-                <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
+                <!-- copy calibration result to configuration directory, replacing previous value -->
+                <newconfig/>
             </options>
         </DiffractometerCalibration_short>
     </workflows>
