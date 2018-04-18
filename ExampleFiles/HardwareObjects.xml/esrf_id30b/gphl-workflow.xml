@@ -1,17 +1,14 @@
 <object class="GphlWorkflow">
 
-    <!-- GPHL configuration subdirectory
+    <!-- GPHL beamline configuration subdirectory
          (relative to HardwareObjects config xml directories-->
-    <gphl_config_subdir>esrf_id30b/gphl_config</gphl_config_subdir>
-    <!-- GPHL test samples subdirectory (for simcal test input)
+    <gphl_beamline_config>esrf_id30b/gphl_beamline_config</gphl_beamline_config>
+    <!-- GPHL configuration subdirectory (for test_camples/, scripts/)
          (will be searched for in HardwareObjects config xml directories-->
-    <gphl_samples_subdir>gphl_config/test_samples</gphl_samples_subdir>
+    <gphl_config>gphl_config</gphl_config>
     <!-- Directory for (optional) output of instrument calbration results-->
     <!-- combined with instcfgout parameter (see below); see also <newconfig> -->
     <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
-
-    <!-- Subdirectory under Session.get_process_directory() for GPhL persistence data-->
-    <gphl_subdir>GPHL</gphl_subdir>
 
     <!-- Describes the test crystals used for diffractometer calibration -->
     <test_crystals>
@@ -176,7 +173,7 @@
                 <!-- Name for translation calibration output -->
                 <calibration>transcal</calibration>
                 <!-- file: File containing settings of rotation axes for calibration -->
-                <!-- The name is the relative path from the gphl_config directory -->
+                <!-- The name is the relative path from the gphl_beamline_config directory -->
                 <!-- grid: Grid definition [axis_name:start:end:step], slowest-varying to fastest varying -->
                 <!-- EITHER file OR grid must be set. NBNB REDO! -->
                 <file>transcal_2stage.json</file>
