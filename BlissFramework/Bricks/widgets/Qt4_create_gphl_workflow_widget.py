@@ -69,12 +69,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        # TODO check if this is needed
-        # self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
-        #              self._prefix_ledit_change)
-        # Removed in porting to master branch
-        # self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
-        #              self._run_number_ledit_change)
         self._workflow_cbox.currentIndexChanged[str].connect(
             self.workflow_selected
         )
@@ -107,7 +101,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # if reset or name != self._previous_workflow:
         xx = self._workflow_cbox
         xx.setCurrentIndex(xx.findText(name))
-        # self._previous_workflow = name
 
         parameters = self._workflow_hwobj.get_available_workflows()[name]
         beam_energies = parameters.get('beam_energies', {})

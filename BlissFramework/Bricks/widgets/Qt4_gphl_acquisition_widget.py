@@ -154,7 +154,7 @@ class GphlSetupWidget(QtGui.QWidget):
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
     def __init__(self, parent=None, name='gphl_acquisition_widget'):
-        super(GphlDiffractcalWidget, self).__init__(parent=parent, name=name)
+        GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
 
@@ -209,7 +209,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         )
 
     def populate_widget(self, **kw):
-        super(GphlDiffractcalWidget, self).populate_widget(**kw)
+        GphlSetupWidget.populate_widget(self, **kw)
 
         data_object = self._data_object
 
@@ -273,7 +273,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
     ))
 
     def __init__(self, parent=None, name='gphl_acquisition_widget'):
-        super(GphlAcquisitionWidget, self).__init__(parent=parent, name=name)
+        GphlSetupWidget.__init__(self, parent=parent, name=name)
 
          # Internal variables -------------------------------------------------
         self.beam_energy_tags = ()
@@ -345,7 +345,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             )
 
     def populate_widget(self, beam_energies={}, **kw):
-        super(GphlAcquisitionWidget, self).populate_widget(**kw)
+        GphlSetupWidget.populate_widget(self, **kw)
 
         data_object = self._data_object
 
