@@ -362,9 +362,12 @@ class PolarScater(FigureCanvas):
         self.axes.clear()
         col_count = 0
         for sw_index, sw in enumerate(sw_list):
+            color = sw[-1]
+            if color.shape == (3, 1):
+                color = color.T
             bars = self.axes.bar(np.radians(sw[4]), 1, 
                 width=np.radians(sw[5]), bottom = sw[0],
-                color=sw[-1],
+                color=color,
                 alpha=0.3)
             x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
                     bars[0].get_bbox().xmin) / 2.0 
