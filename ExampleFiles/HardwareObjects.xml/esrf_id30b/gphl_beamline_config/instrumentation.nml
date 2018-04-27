@@ -44,7 +44,9 @@ gonio_name= "MiniKappa"
 ! component of kappa perpendicular to omega is vertical at omega = -46 degree
 gonio_axis_dirs= 1.0 0.0 0.0,
    ! Numbers for home = -46 degrees
-   0.913545457643, -0.282545014, -0.292581885, 
+   ! values taken from http://confluence.globalphasing.com/display/SDCP/ID30B+Calibration+-+20171010+and+20171012
+   ! NBNB axis lengths must be normalied to high precision; 7e-7 off causes a crash
+   0.913545457643, -0.282543013685, -0.292581855621
    1.0 0.0 0.0
 gonio_axis_datum_settings= 0 0 0
 gonio_axis_limits= , , -8, 256, , ,
