@@ -1,20 +1,14 @@
-! Cobbled together by hand from information on http://confluence.globalphasing.com/x/YY17
-! to look a bit like the output of aP_wf_rotcal
-
 &sdcp_instrument_list
-
-diffractcal_timestamp       = '2016-03-29T00:00:00'
-diffractcal_data_collection = '/data/private/ESRF/ID30B/AndrewMcCarthy/20160327'
-enactment_id                = 'cca45de1-44bd-432f-8421-9072841a0b13'
-! final residual =   4.0488458E+01
-
- beam            = 5.700000000000000E-004,  1.084000000000000E-003,  0.999999000000000
- DET_X_AXIS      =  0.999997427274940     ,  2.227644399828078E-003, -4.278363354498227E-004
- DET_Y_AXIS      = -2.226824771901868E-003,  0.999995702736496     ,  1.906766890824954E-003
- DET_ORG_X       =   1222.08977205696
- DET_ORG_Y       =   1259.90372330786
- DET_ORG_DIST    =   239.908779158150
- gonio_axis_dirs = 0.999993000000000     , -3.547000000000000E-003,  9.760000000000000E-004,
-                   0.913889120082702     , -0.277194242287368     , -0.296597417785787     ,
-                   0.999999974538920     ,  2.256593893960457E-004,  0.000000000000000E+000
+diffractcal_timestamp       = '2018-04-25T20:22:42'
+diffractcal_data_collection = '/data/id30b/inhouse/opid30b/20180425/RAW_DATA/gphl_wf_001'
+enactment_id                = 'c7f31098-fc08-4258-aae9-aa28afb29422'
+beam                        = -2.599070319141478E-003 , -5.010000000000000E-004 , 0.999996676108214
+det_x_axis                  = 0.999991011849215 , -9.167145473141251E-004 , 4.096013355019136E-003
+det_y_axis                  = 9.169264349112566E-004 , 0.999999838296773 , -5.010514907769098E-005
+det_org_x                   = 1227.46463126356
+det_org_y                   = 1294.95080981018
+det_org_dist                = 392.669022613473
+gonio_axis_dirs             = 1.00000000000000 , 0.000000000000000E+000 , 0.000000000000000E+000 , 
+                              0.913106591595726 , -0.281570947950061 , -0.294879897000354 , 
+                              0.999998364278384 , 4.640453361512226E-004 , -1.748171182431222E-003
 /
