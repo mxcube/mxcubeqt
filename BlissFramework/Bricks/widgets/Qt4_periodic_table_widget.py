@@ -140,7 +140,7 @@ class PeriodicTableWidget(QWidget):
 if pymca_imported: 
     class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
 
-        elementClicked = pyqtSignal(str)
+        #elementClicked = pyqtSignal(str)
         edgeSelectedSignal = pyqtSignal(str, str)
 
         def __init__(self, *args):
