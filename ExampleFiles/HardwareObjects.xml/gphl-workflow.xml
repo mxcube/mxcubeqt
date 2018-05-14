@@ -1,67 +1,45 @@
 <object class="GphlWorkflow">
 
-    <!-- GPHL configuration subdirectory
+    <!-- GPHL beamline configuration subdirectory
          (relative to HardwareObjects config xml directories-->
-    <gphl_config_subdir>embl_hh_p14/gphl_config</gphl_config_subdir>
-    <!-- GPHL test samples subdirectory (for simcal test input)
+    <gphl_beamline_config>embl_hh_p14/gphl_beamline_config</gphl_beamline_config>
+    <!-- GPHL configuration subdirectory (for test_camples/, scripts/)
          (will be searched for in HardwareObjects config xml directories-->
-    <gphl_samples_subdir>gphl_config/test_samples</gphl_samples_subdir>
+    <gphl_config>gphl_config</gphl_config>
     <!-- Directory for (optional) output of instrument calbration results-->
     <!-- combined with instcfgout parameter (see below); see also <newconfig> -->
-    <instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>
+    <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
 
-    <!-- Subdirectory under Session.get_process_directory() for GPhL persistence data-->
-    <gphl_subdir>GPHL</gphl_subdir>
+    <!-- default image width selection  if None are given by the workflow-->
+    <!-- First value is the ddfault; values are sorted before use -->
+    <default_image_widths> 0.1 0.05 0.2</default_image_widths>
+
+    <!-- Describes the test crystals used for diffractometer calibration -->
+    <test_crystals>
+        <test_crystal>
+            <name>Thaumatin</name>
+            <space_group>P41212</space_group>
+            <a>57.6</a>
+            <b>57.6</b>
+            <c>149.6</c>
+            <alpha>90</alpha>
+            <beta>90</beta>
+            <gamma>90</gamma>
+        </test_crystal>
+        <test_crystal>
+            <name>Germanate</name>
+            <space_group>Ia-3d</space_group>
+            <a>51.2487</a>
+            <b>51.2487</b>
+            <c>51.2487</c>
+            <alpha>90</alpha>
+            <beta>90</beta>
+            <gamma>90</gamma>
+        </test_crystal>
+    </test_crystals>
 
     <!-- List of supported workflows, with options for each -->
     <workflows>
-        <TranslationalCalibration>
-            <application>co.gphl.wf.workflows.WFTransCal</application>
-            <strategy_type>transcal</strategy_type>
-            <documentation>Translational calibration.
-                Designed for use by beamline personnel.
-                Will produce a series of goniostat positions compatible with
-                the inbuilt collision checker, move the goniostat to each
-                position, and ask for centring.
-            </documentation>
-            <options>
-                <!-- Name for translation calibration output -->
-                <calibration>transcal</calibration>
-                <!-- file: File containing settings of rotation axes for calibration -->
-                <!-- The name is the relative path from the gphl_config directory -->
-                <!-- grid: Grid definition [axis_name:start:end:step], slowest-varying to fastest varying -->
-                <!-- EITHER file OR grid must be set. NBNB REDO! -->
-                <file>transcal_2stage.json</file>
-                <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
-                <!-- updateconfig option, automaticallly updates entire configuration -->
-                <!--<grid>grid_axes_spec</grid>-->
-                <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
-                <instcfgout>gphl_transcal_out.nml</instcfgout>
-            </options>
-        </TranslationalCalibration>
-
-        <DiffractometerCalibration>
-            <application>co.gphl.wf.workflows.WFDiffractCal</application>
-            <strategy_type>diffractcal</strategy_type>
-            <documentation>Diffractometer calibration.
-                Designed for use by beamline personnel.
-            </documentation>
-            <!-- Default wavelengths (in A) and their roles -->
-            <options>
-                <!-- Name of initial strategy from library to use -->
-                <strategy>DiffractCal</strategy>
-                <!--<strategy>DiffractCal_ex</strategy>-->
-                <!-- Name for diffractometer calibration output -->
-                <calibration>diffractcal</calibration>
-                <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
-                <instcfgout>gphl_diffractcal_out.nml</instcfgout>
-                <!-- Pattern name for characterisation collections - used for all data here-->
-                <charpattern>multiorientation</charpattern>
-                <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
-            </options>
-        </DiffractometerCalibration>
 
         <SingleWavelengthAcquisition>
             <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
@@ -185,6 +163,76 @@
                 <prefix>gphl_data</prefix>
             </options>
         </ThreeWavelengthMAD>
+
+        <TranslationalCalibration>
+            <application>co.gphl.wf.workflows.WFTransCal</application>
+            <strategy_type>transcal</strategy_type>
+            <documentation>Translational calibration.
+                Designed for use by beamline personnel.
+                Will produce a series of goniostat positions compatible with
+                the inbuilt collision checker, move the goniostat to each
+                position, and ask for centring.
+            </documentation>
+            <options>
+                <!-- Name for translation calibration output -->
+                <calibration>transcal</calibration>
+                <!-- file: File containing settings of rotation axes for calibration -->
+                <!-- The name is the relative path from the gphl_beamline_config directory -->
+                <!-- grid: Grid definition [axis_name:start:end:step], slowest-varying to fastest varying -->
+                <!-- EITHER file OR grid must be set. NBNB REDO! -->
+                <file>transcal_2stage.json</file>
+                <!-- copy calibration result to configuration directory, replacing previous value -->
+                <newconfig/>
+                <!-- updateconfig option, automaticallly updates entire configuration -->
+                <!--<grid>grid_axes_spec</grid>-->
+                <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
+                <!--<instcfgout>gphl_transcal_out.nml</instcfgout>-->
+            </options>
+        </TranslationalCalibration>
+
+        <DiffractometerCalibration>
+            <application>co.gphl.wf.workflows.WFDiffractCal</application>
+            <strategy_type>diffractcal</strategy_type>
+            <documentation>Diffractometer calibration.
+                Designed for use by beamline personnel.
+            </documentation>
+            <options>
+                <!-- Name of strategy from library to use -->
+                <strategy>DiffractCal_ex</strategy>
+                <!-- Working subdirectory for workflow-side application data-->
+                <appdir>calculations</appdir>
+                <!-- Name for diffractometer calibration output -->
+                <calibration>diffractcal</calibration>
+                <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
+                <!--<instcfgout>gphl_diffractcal_out.nml</instcfgout>-->
+                <!-- Pattern name for characterisation collections - used for all data here-->
+                <charpattern>multiorientation</charpattern>
+                <!-- copy calibration result to configuration directory, replacing previous value -->
+                <newconfig/>
+            </options>
+        </DiffractometerCalibration>
+
+        <DiffractometerCalibration_short>
+            <application>co.gphl.wf.workflows.WFDiffractCal</application>
+            <strategy_type>diffractcal</strategy_type>
+            <documentation>Diffractometer calibration.
+                Designed for use by beamline personnel.
+            </documentation>
+            <options>
+                <!-- Name of strategy from library to use -->
+                <strategy>DiffractCal</strategy>
+                <!-- Working subdirectory for workflow-side application data-->
+                <appdir>calculations</appdir>
+                <!-- Name for diffractometer calibration output -->
+                <calibration>diffractcal</calibration>
+                <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
+                <!--<instcfgout>gphl_diffractcal_out.nml</instcfgout>-->
+                <!-- Pattern name for characterisation collections - used for all data here-->
+                <charpattern>multiorientation</charpattern>
+                <!-- copy calibration result to configuration directory, replacing previous value -->
+                <newconfig/>
+            </options>
+        </DiffractometerCalibration_short>
     </workflows>
 
 
