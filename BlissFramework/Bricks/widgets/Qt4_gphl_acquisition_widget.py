@@ -165,6 +165,10 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         wf_hwobj = HardwareRepository.HardwareRepository().getHardwareObject(
             'gphl-workflow'
         )
+
+        if not wf_hwobj:
+            return
+
         xx = next(wf_hwobj.getObjects("test_crystals"))
         for test_crystal in xx.getObjects("test_crystal"):
             dd = test_crystal.getProperties()
