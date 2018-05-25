@@ -35,8 +35,6 @@ from widgets.Qt4_create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
 #from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
 
-from HardwareRepository import HardwareRepository
-
 class TaskToolBoxWidget(QWidget):
     def __init__(self, parent = None, name = "task_toolbox"):
         QWidget.__init__(self, parent)
@@ -69,7 +67,7 @@ class TaskToolBoxWidget(QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        if HardwareRepository.HardwareRepository().getHardwareObject('gphl-workflow') is None:
+        if parent.getHardwareObject('gphl-workflow') is None:
             self.gphl_workflow_page = None
             
             logging.getLogger("GUI").info("GPhL workflow is not available")
