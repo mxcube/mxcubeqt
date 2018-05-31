@@ -35,7 +35,6 @@ det_gonio_axis_limits= 195 1000
 det_gonio_axis_names= 'Distance'
 det_gonio_axis_types= 'Translation'
 det_gonio_axis_calibratable = 'False'
-gain= 1.0
 background= 8.0
 det_filename_suffix= '.cbf'
 
