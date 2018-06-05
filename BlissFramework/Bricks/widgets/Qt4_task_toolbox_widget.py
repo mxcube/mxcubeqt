@@ -67,12 +67,14 @@ class TaskToolBoxWidget(QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        if parent.getHardwareObject('gphl-workflow') is None:
-            self.gphl_workflow_page = None
-            
-            logging.getLogger("GUI").info("GPhL workflow is not available")
+        if hasattr(parent.getHardwareObject('beamline-setup'),
+                   'gphl_workflow_hwobj'):
+            self.gphl_workflow_page = CreateGphlWorkflowWidget(self.tool_box,
+                                                               "gphl_workflow")
         else:
-            self.gphl_workflow_page = CreateGphlWorkflowWidget(self.tool_box, "gphl_workflow")
+            self.gphl_workflow_page = None
+            logging.getLogger("GUI").info("GPhL workflow is not available")
+
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
         #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
         
