@@ -330,7 +330,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         # Emit signals clearing the proposal and session
         self.setWindowTitle.emit(self["titlePrefix"])
         #self.sessionSelected.emit(None, None, None, None, None, None, None)
-        self.loggedIne.mit(False)
+        self.loggedIn.emit(False)
 
     def resetProposal(self):
         """
