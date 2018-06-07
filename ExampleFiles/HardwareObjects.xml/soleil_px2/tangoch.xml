@@ -1,4 +1,0 @@
-<device class="TangoChannel">
-    <tangoname>test/cats/robot</tangoname> 
-    <channel type="tango" tangoname="test/cats/robot" polling="1000" name="channel">Well</channel>
-</device>

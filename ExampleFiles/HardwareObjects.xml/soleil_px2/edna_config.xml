@@ -1,9 +1,0 @@
-<procedure class="EDNACharacterise">
-  <StartEdnaCommand>/home/experiences/proxima2a/com-proxima2a/bin/edna_script.sh</StartEdnaCommand>
-  <edna_default_file>/home/experiences/proxima2a/com-proxima2a/mxcube_v2/HardwareObjects.xml/PX2_Jlib/edna_defaults.xml</edna_default_file>
-  <fluxSource>currentFlux</fluxSource>
-
-  <device href="/mxlocal" role="beamline_pars"/>
-  <device href="/mxcollect" role="dataCollect"/>
-
-</procedure>

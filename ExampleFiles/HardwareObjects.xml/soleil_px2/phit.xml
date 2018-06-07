@@ -1,6 +1,0 @@
-<device class="TangoDCMotor">
-  <username>Phi</username>
-  <tangoname>i11-ma-cx1/ex/md2</tangoname>
-  <channel type="tango" polling="1000" name="position">PhiPosition</channel>
-  <channel type="tango" polling="1000" name="state">State</channel>
-</device>

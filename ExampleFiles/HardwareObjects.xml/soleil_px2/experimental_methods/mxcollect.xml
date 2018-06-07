@@ -1,0 +1,12 @@
+<object class="PX2Collect">
+  <object href="/goniometer/diffractometer" role="diffractometer"/>
+  <object href="/singleton_objects/Qt4_graphics-manager" role="graphics_manager"/>
+  <object href="/singleton_objects/dbconnection" role="lims_client"/>
+
+  <object href="/singleton_motors/photon_energy" role="energy"/>
+  <object href="/singleton_motors/transmission" role="transmission"/>
+  <object href="/mockups/detector-mockup" role="detector"/>
+  <object href="/singleton_motors/resolution" role="resolution"/>
+
+  <object href="/singleton_objects/mach-info" role="machine_info"/>
+</object>

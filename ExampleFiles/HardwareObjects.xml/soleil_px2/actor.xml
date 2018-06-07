@@ -1,7 +1,0 @@
-<!-- Will need to modify for CATS robot.  -->
-<equipment class = "SampleChanger">
-<!--   <username>Actor Robot</username>    -->
-  <username>CATS Robot</username>
- <!-- <tangoname>ActorPublisher</tangoname>-->
-  <tangoname>CATSPublisher</tangoname>
-</equipment>

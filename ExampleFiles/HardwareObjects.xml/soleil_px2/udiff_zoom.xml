@@ -1,6 +1,0 @@
-<device class="MicrodiffZoomPX2">
-  <username>zoom</username>
-  <tangoname>i11-ma-cx1/ex/md2</tangoname>
-<!--   <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="position">Zoom</channel> -->
-  <position>1</position>
-</device>

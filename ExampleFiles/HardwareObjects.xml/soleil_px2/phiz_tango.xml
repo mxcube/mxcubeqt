@@ -1,7 +1,0 @@
-<device class="TangoDCMotor">
-  <username>phiz</username>
-  <tangoname>i11-ma-cx1/ex/md2</tangoname>
-  <motor_name>PhiTableZAxis</motor_name>
-  <channel type="tango" polling="1000" name="position">AlignmentZPosition</channel>
-  <channel type="tango" polling="1000" name="state">State</channel>
-</device>

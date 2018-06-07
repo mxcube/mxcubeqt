@@ -1,9 +1,0 @@
-<!-- No PX2 equivalent? -->
-<device class = "TangoMotor3">
-  <username>Beam center Z</username>
-  <tangoname>i11-ma-cx1/ex/md2</tangoname> <!-- i10-c-cx1/ex/beamposition -->
-  <channel type="tango" polling="1000" name="attributeName">BeamPositionHorizontal</channel>
-  <interval>1000</interval>
-</device>
-
-

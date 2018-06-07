@@ -1,5 +1,0 @@
-<device class="MicrodiffMotor">
-  <username>phiz</username>
-  <motor_name>AlignmentZ</motor_name>
-  <exporter_address>G030910-938.proxima2a.rcl:9001</exporter_address>
-</device>
