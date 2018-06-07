@@ -197,8 +197,6 @@ class DataPathWidget(QWidget):
             file_name = file_name.strip(' ')
             self.data_path_layout.file_name_value_label.setText(file_name)
 
-        print "update file name"
-
     def set_data_path(self, path):
         """
         Descript. :

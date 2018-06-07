@@ -114,7 +114,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("enableQueueAutoSave", "boolean", True)
 
         # Properties to initialize hardware objects --------------------------
-        self.addProperty("hwobj_unittest", "string", "/unittest")
+        self.addProperty("hwobj_unittest", "string", "")
         self.addProperty("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
