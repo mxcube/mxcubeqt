@@ -192,7 +192,7 @@ class DataPathWidget(QWidget):
         """
         if str(self._data_model.precision).isdigit():
             file_name = self._data_model.get_image_file_name()
-            file_name = file_name.replace('%' + self._data_model.precision + 'd',
+            file_name = file_name.replace('%' + str(self._data_model.precision) + 'd',
                                           int(self._data_model.precision) * '#' )
             file_name = file_name.strip(' ')
             self.data_path_layout.file_name_value_label.setText(file_name)
@@ -203,7 +203,7 @@ class DataPathWidget(QWidget):
         """
         (dir_name, file_name) = os.path.split(path)
         self.set_directory(dir_name)
-        file_name = file_name.replace('%' + self._data_model.precision + 'd',
+        file_name = file_name.replace('%' + str(self._data_model.precision) + 'd',
                                       int(self._data_model.precision) * '#' )
         self.data_path_layout.file_name_value_label.setText(file_name)
     
@@ -238,7 +238,7 @@ class DataPathWidget(QWidget):
         self._data_model.base_prefix = str(base_prefix)
         self.data_path_layout.prefix_ledit.setText(str(base_prefix))
         file_name = self._data_model.get_image_file_name()
-        file_name = file_name.replace('%' + self._data_model.precision + 'd',
+        file_name = file_name.replace('%' + str(self._data_model.precision) + 'd',
                                       int(self._data_model.precision) * '#' )
         self.data_path_layout.file_name_value_label.setText(file_name)
 
