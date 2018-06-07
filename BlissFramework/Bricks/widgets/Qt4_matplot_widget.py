@@ -46,6 +46,7 @@ import matplotlib.pyplot as plt
 
 from BlissFramework.Utils import Qt4_widget_colors
 
+import traceback
 
 class TwoAxisPlotWidget(QWidget):
     """
@@ -362,24 +363,49 @@ class PolarScater(FigureCanvas):
         self.axes.clear()
         col_count = 0
         for sw_index, sw in enumerate(sw_list):
-            color = sw[-1]
+            if type(sw) is list:
+                color = sw[-1]
+            elif type(sw) is dict:
+                color = sw['color']
+            
             if color.shape == (3, 1):
                 color = color.T
-            bars = self.axes.bar(np.radians(sw[4]), 1, 
-                width=np.radians(sw[5]), bottom = sw[0],
-                color=color,
-                alpha=0.3)
-            x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
-                    bars[0].get_bbox().xmin) / 2.0 
-            y_mid = bars[0].get_bbox().ymin + (bars[0].get_bbox().ymax - \
-                    bars[0].get_bbox().ymin) / 2.0
-            self.axes.text(x_mid, y_mid, "%d (%d:%d)" % \
-                           (sw_index + 1, sw[0] + 1, sw[1] + 1),
-                           horizontalalignment='center',
-                           verticalalignment='center',
-                           weight='bold')
-            if sw[0] > col_count:
-                col_count = sw[0] 
+
+            if type(sw) is list:
+                bars = self.axes.bar(np.radians(sw[4]), 1, 
+                    width=np.radians(sw[5]), bottom = sw[0],
+                    color=color,
+                    alpha=0.3)
+                x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
+                        bars[0].get_bbox().xmin) / 2.0 
+                y_mid = bars[0].get_bbox().ymin + (bars[0].get_bbox().ymax - \
+                        bars[0].get_bbox().ymin) / 2.0
+                self.axes.text(x_mid, y_mid, "%d (%d:%d)" % \
+                            (sw_index + 1, sw[0] + 1, sw[1] + 1),
+                            horizontalalignment='center',
+                            verticalalignment='center',
+                            weight='bold')
+                if sw[0] > col_count:
+                    col_count = sw[0] 
+            
+            elif type(sw) is dict:
+                bars = self.axes.bar(np.radians(sw['sw_actual_size']), 1, 
+                    width=np.radians(sw['sw_osc_start']), bottom = sw['collect_index'],
+                    color=color,
+                    alpha=0.3)
+                x_mid = bars[0].get_bbox().xmin + (bars[0].get_bbox().xmax - \
+                        bars[0].get_bbox().xmin) / 2.0 
+                y_mid = bars[0].get_bbox().ymin + (bars[0].get_bbox().ymax - \
+                        bars[0].get_bbox().ymin) / 2.0
+                self.axes.text(x_mid, y_mid, "%d (%d:%d)" % \
+                            (sw_index + 1, sw['collect_index'] + 1, sw['sw_index'] + 1),
+                            horizontalalignment='center',
+                            verticalalignment='center',
+                            weight='bold')
+                if sw['collect_index'] > col_count:
+                    col_count = sw['collect_index']  
+                
+        
         self.axes.set_yticks(np.arange(1, col_count + 2))
         self.fig.canvas.draw_idle()
 
