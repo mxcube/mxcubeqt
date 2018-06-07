@@ -1,0 +1,5 @@
+<device class="Qt4_TangoLimaVideo">
+   <type>prosilica</type>
+   <tangoname>i11-ma-cx1/ex/imag.1</tangoname>
+   <interval>10</interval>
+</device>

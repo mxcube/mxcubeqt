@@ -1,0 +1,16 @@
+<device class="PX2Guillotine">
+    <username>guillotine</username>
+    <tangoname>i11-MA-cx1/DT/guillot-ev</tangoname> 
+    <tangoname_pss>i11-ma-ce/pss/db_data</tangoname_pss>
+    
+    <channel type="tango" polling="1000" name="memInt" tangoname="i11-ma-ce/pss/db_data">memInt</channel>
+    <channel type="tango" polling="1000" name="State">State</channel>
+    <command type="tango" name="_Insert">Insert</command>
+    <command type="tango" name="_Extract">Extract</command>
+    <object href="/singleton_objects/pss_exp" role="pss" />
+    <object href="/tango_motors/detector_distance" role="detectordistance"/>
+
+    <security_distance>180</security_distance>
+    <safe_distance>300</safe_distance>
+
+</device>

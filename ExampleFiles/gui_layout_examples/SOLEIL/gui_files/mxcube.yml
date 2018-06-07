@@ -1,0 +1,888 @@
+- children:
+  - children:
+    - children:
+      - children:
+        - brick: {class: Qt4_CameraBrick, name: Qt4_CameraBrick0}
+          children: []
+          connections: []
+          name: Qt4_CameraBrick0
+          properties:
+          - {comment: '', defaultValue: 0, hidden: false, name: beamDefiner, oldValue: null,
+            type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: cameraControls, oldValue: 0,
+            type: boolean, value: 1}
+          - {comment: '', defaultValue: 1, hidden: false, name: displayBeam, oldValue: null,
+            type: boolean, value: 1}
+          - {comment: '', defaultValue: 1, hidden: false, name: displayOmegaAxis,
+            oldValue: null, type: boolean, value: 1}
+          - {comment: '', defaultValue: 1, hidden: false, name: displayScale, oldValue: null,
+            type: boolean, value: 1}
+          - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false,
+            name: fixedHeight, oldValue: null, type: integer, value: -1}
+          - {comment: '', defaultValue: '', hidden: false, name: fixedSize, oldValue: null,
+            type: string, value: ''}
+          - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false,
+            name: fixedWidth, oldValue: null, type: integer, value: -1}
+          - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+            type: string, value: '11'}
+          - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+            name: frame, oldValue: null, type: boolean, value: 0}
+          - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+            type: boolean, value: 0}
+          - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+            name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+          - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+            name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: /Qt4_graphics-manager, hidden: false, name: mnemonic,
+            oldValue: /Qt4_graphics-manager, type: string, value: /singleton_objects/Qt4_graphics-manager}
+          type: Qt4_CameraBrick
+        - brick: {class: Qt4_HutchMenuBrick, name: Qt4_HutchMenuBrick0}
+          children: []
+          connections: []
+          name: Qt4_HutchMenuBrick0
+          properties:
+          - {comment: '', defaultValue: 1, hidden: false, name: enableAutoCenter,
+            oldValue: null, type: boolean, value: 1}
+          - {comment: '', defaultValue: 1, hidden: false, name: enableAutoFocus, oldValue: null,
+            type: boolean, value: 1}
+          - {comment: '', defaultValue: 0, hidden: false, name: enableRealignBeam,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: enableRefreshCamera,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 1, hidden: false, name: enableVisualAlign,
+            oldValue: null, type: boolean, value: 1}
+          - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false,
+            name: fixedHeight, oldValue: null, type: integer, value: -1}
+          - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false,
+            name: fixedWidth, oldValue: null, type: integer, value: -1}
+          - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+            type: string, value: '11'}
+          - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+            name: frame, oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: '', hidden: false, name: graphicsManager,
+            oldValue: '', type: string, value: /singleton_objects/Qt4_graphics-manager}
+          - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+            type: boolean, value: 0}
+          - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+            name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+          - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+            name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+          type: Qt4_HutchMenuBrick
+        connections: []
+        name: hbox1
+        properties:
+        - choices: [none, top center, top left, top right, bottom center, bottom left,
+            bottom right, center, hcenter, vcenter, left, right]
+          comment: ''
+          defaultValue: none
+          hidden: false
+          name: alignment
+          oldValue: null
+          type: combo
+          value: none
+        - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+          type: color, value: null}
+        - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+          type: integer, value: -1}
+        - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+          type: integer, value: -1}
+        - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+          comment: ''
+          defaultValue: default
+          hidden: false
+          name: frameshape
+          oldValue: null
+          type: combo
+          value: default
+        - choices: [fixed, expanding, default]
+          comment: ''
+          defaultValue: default
+          hidden: false
+          name: hsizepolicy
+          oldValue: null
+          type: combo
+          value: default
+        - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null,
+          type: string, value: ''}
+        - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+          type: string, value: ''}
+        - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+          type: integer, value: 2}
+        - choices: [plain, raised, sunken, default]
+          comment: ''
+          defaultValue: default
+          hidden: false
+          name: shadowstyle
+          oldValue: null
+          type: combo
+          value: default
+        - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+          type: integer, value: 2}
+        - choices: [fixed, expanding, default]
+          comment: ''
+          defaultValue: default
+          hidden: false
+          name: vsizepolicy
+          oldValue: null
+          type: combo
+          value: default
+        type: hbox
+      connections: []
+      name: vbox0
+      properties:
+      - choices: [none, top center, top left, top right, bottom center, bottom left,
+          bottom right, center, hcenter, vcenter, left, right]
+        comment: ''
+        defaultValue: none
+        hidden: false
+        name: alignment
+        oldValue: null
+        type: combo
+        value: none
+      - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+        type: color, value: null}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+        type: integer, value: -1}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+        type: integer, value: -1}
+      - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: frameshape
+        oldValue: null
+        type: combo
+        value: default
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: hsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+        type: integer, value: 2}
+      - choices: [plain, raised, sunken, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: shadowstyle
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+        type: integer, value: 2}
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: vsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      type: vbox
+    - children:
+      - brick: {class: Qt4_ProposalBrick2, name: Qt4_ProposalBrick20}
+        children: []
+        connections: []
+        name: Qt4_ProposalBrick20
+        properties:
+        - {comment: '', defaultValue: '', hidden: false, name: autoSessionUsers, oldValue: '',
+          type: string, value: com-proxima2a}
+        - {comment: '', defaultValue: fx ifx ih im ix ls mx opid, hidden: false, name: codes,
+          oldValue: fx ifx ih im ix ls mx opid, type: string, value: mx}
+        - {comment: '', defaultValue: '', hidden: false, name: dbConnection, oldValue: '',
+          type: string, value: /singleton_objects/dbconnection}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+          type: string, value: ''}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: 0, type: boolean, value: 1}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: instanceServer, oldValue: '',
+          type: string, value: /singleton_objects/instanceconnection}
+        - {comment: '', defaultValue: '', hidden: false, name: localLogin, oldValue: /singleton_obj,
+          type: string, value: /singleton_objects/locallogin}
+        - {comment: '', defaultValue: '', hidden: false, name: secondaryProposals,
+          oldValue: null, type: string, value: ''}
+        - {comment: '', defaultValue: 500, hidden: false, name: serverStartDelay,
+          oldValue: null, type: integer, value: 500}
+        - {comment: '', defaultValue: /session, hidden: false, name: session, oldValue: /session,
+          type: string, value: /singleton_objects/session}
+        - {comment: '', defaultValue: '', hidden: false, name: titlePrefix, oldValue: null,
+          type: string, value: ''}
+        type: Qt4_ProposalBrick2
+      - brick: {class: Qt4_TaskToolBoxBrick, name: Qt4_TaskToolBoxBrick0}
+        children: []
+        connections: []
+        name: Qt4_TaskToolBoxBrick0
+        properties:
+        - {comment: '', defaultValue: /beamline-setup, hidden: false, name: beamline_setup,
+          oldValue: /beamline-setup, type: string, value: /singleton_objects/beamline-setup}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: /queue-model, hidden: false, name: queue_model,
+          oldValue: /queue-model, type: string, value: /singleton_objects/queue-model}
+        - {comment: '', defaultValue: 0, hidden: false, name: useCompression, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: 0, hidden: false, name: useOscStartCbox, oldValue: null,
+          type: boolean, value: 0}
+        type: Qt4_TaskToolBoxBrick
+      - brick: {class: Qt4_ChatBrick, name: Qt4_ChatBrick0}
+        children: []
+        connections: []
+        name: Qt4_ChatBrick0
+        properties:
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+          type: string, value: ''}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+          type: string, value: /singleton_objects/instanceconnection}
+        - {comment: '', defaultValue: '', hidden: false, name: myTabLabel, oldValue: null,
+          type: string, value: ''}
+        type: Qt4_ChatBrick
+      connections: []
+      name: vbox1
+      properties:
+      - choices: [none, top center, top left, top right, bottom center, bottom left,
+          bottom right, center, hcenter, vcenter, left, right]
+        comment: ''
+        defaultValue: none
+        hidden: false
+        name: alignment
+        oldValue: null
+        type: combo
+        value: none
+      - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+        type: color, value: null}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+        type: integer, value: -1}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+        type: integer, value: -1}
+      - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: frameshape
+        oldValue: null
+        type: combo
+        value: default
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: hsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+        type: integer, value: 2}
+      - choices: [plain, raised, sunken, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: shadowstyle
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+        type: integer, value: 2}
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: vsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      type: vbox
+    - children:
+      - brick: {class: Qt4_TreeBrick, name: Qt4_TreeBrick0}
+        children: []
+        connections: []
+        name: Qt4_TreeBrick0
+        properties:
+        - {comment: '', defaultValue: /beamline-setup, hidden: false, name: beamline_setup,
+          oldValue: /beamline-setup, type: string, value: /singleton_objects/beamline-setup}
+        - {comment: '', defaultValue: 1, hidden: false, name: enableQueueAutoSave,
+          oldValue: null, type: boolean, value: 1}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: hwobj_state_machine,
+          oldValue: null, type: string, value: ''}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: /queue, hidden: false, name: queue, oldValue: /queue,
+          type: string, value: /singleton_objects/queue}
+        - {comment: '', defaultValue: /queue-model, hidden: false, name: queue_model,
+          oldValue: /queue-model, type: string, value: /singleton_objects/queue-model}
+        - {comment: '', defaultValue: /redis, hidden: false, name: redis_client, oldValue: /redis,
+          type: string, value: /singleton_objects/redis}
+        - {comment: '', defaultValue: Sample changer, hidden: false, name: scOneName,
+          oldValue: null, type: string, value: Sample changer}
+        - {comment: '', defaultValue: Plate, hidden: false, name: scTwoName, oldValue: null,
+          type: string, value: Plate}
+        - {comment: '', defaultValue: 1, hidden: false, name: useCentringMethods,
+          oldValue: null, type: boolean, value: 1}
+        - {comment: '', defaultValue: 1, hidden: false, name: useFilterWidget, oldValue: null,
+          type: boolean, value: 1}
+        - {comment: '', defaultValue: 1, hidden: false, name: useHistoryView, oldValue: null,
+          type: boolean, value: 1}
+        - {comment: '', defaultValue: 0, hidden: false, name: usePlateNavigator, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: 1, hidden: false, name: useSampleWidget, oldValue: null,
+          type: boolean, value: 1}
+        - {comment: '', defaultValue: /xml_rpc_server, hidden: false, name: xml_rpc_server,
+          oldValue: /xml_rpc_server, type: string, value: /singleton_objects/xml-rpc-server}
+        type: Qt4_TreeBrick
+      - brick: {class: Qt4_LogBarBrick, name: Qt4_LogBarBrick0}
+        children: []
+        connections: []
+        name: Qt4_LogBarBrick0
+        properties:
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: 0, type: boolean, value: 1}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: -1, hidden: false, name: maxLogLines, oldValue: -1,
+          type: integer, value: 15}
+        type: Qt4_LogBarBrick
+      connections: []
+      name: vbox2
+      properties:
+      - choices: [none, top center, top left, top right, bottom center, bottom left,
+          bottom right, center, hcenter, vcenter, left, right]
+        comment: ''
+        defaultValue: none
+        hidden: false
+        name: alignment
+        oldValue: null
+        type: combo
+        value: none
+      - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+        type: color, value: null}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+        type: integer, value: -1}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+        type: integer, value: -1}
+      - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: frameshape
+        oldValue: null
+        type: combo
+        value: default
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: hsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+        type: integer, value: 2}
+      - choices: [plain, raised, sunken, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: shadowstyle
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+        type: integer, value: 2}
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: vsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      type: vbox
+    - children:
+      - brick: {class: Qt4_MachineInfoBrick, name: Qt4_MachineInfoBrick0}
+        children: []
+        connections: []
+        name: Qt4_MachineInfoBrick0
+        properties:
+        - {comment: Disk threshold, defaultValue: 200.0, hidden: false, name: diskThreshold,
+          oldValue: null, type: float, value: 200.0}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: hwobj_mach_info, oldValue: '',
+          type: string, value: /singleton_objects/mach-info}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: Maximal number of plot points, defaultValue: 100, hidden: false,
+          name: maxPlotPoints, oldValue: null, type: integer, value: 100}
+        - {comment: Display information about disk size, defaultValue: 1, hidden: false,
+          name: showDiskSize, oldValue: null, type: boolean, value: 1}
+        type: Qt4_MachineInfoBrick
+      - brick: {class: Qt4_EnergyBrick, name: Qt4_EnergyBrick0}
+        children: []
+        connections: []
+        name: Qt4_EnergyBrick0
+        properties:
+        - {comment: '', defaultValue: '##.####', formatString: '%2.4f', formatStringLength: 7,
+          hidden: false, name: angFormatString, oldValue: null, type: formatString,
+          value: '##.####'}
+        - choices: [keV, Ang]
+          comment: ''
+          defaultValue: keV
+          hidden: false
+          name: defaultMode
+          oldValue: null
+          type: combo
+          value: keV
+        - {comment: '', defaultValue: 0, hidden: false, name: displayStatus, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '##.####', formatString: '%2.4f', formatStringLength: 7,
+          hidden: false, name: kevFormatString, oldValue: null, type: formatString,
+          value: '##.####'}
+        - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: /singleton_motors/photon-energy,
+          type: string, value: /singleton_motors/photon_energy}
+        type: Qt4_EnergyBrick
+      - brick: {class: Qt4_ResolutionBrick, name: Qt4_ResolutionBrick0}
+        children: []
+        connections: []
+        name: Qt4_ResolutionBrick0
+        properties:
+        - {comment: '', defaultValue: '##.###', formatString: '%2.3f', formatStringLength: 6,
+          hidden: false, name: angFormatString, oldValue: null, type: formatString,
+          value: '##.###'}
+        - choices: [Ang, mm]
+          comment: ''
+          defaultValue: Ang
+          hidden: false
+          name: defaultMode
+          oldValue: null
+          type: combo
+          value: Ang
+        - {comment: '', defaultValue: '', hidden: false, name: detectorDistance, oldValue: '',
+          type: string, value: /tango_motors/detector_distance}
+        - {comment: '', defaultValue: '', hidden: false, name: doorInterlock, oldValue: null,
+          type: string, value: /mockups/door-interlock-mockup}
+        - {comment: '', defaultValue: '', hidden: false, name: energy, oldValue: /singleton_motors/photon_energy,
+          type: string, value: /singleton_motors/photon_energy}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '###.##', formatString: '%3.2f', formatStringLength: 6,
+          hidden: false, name: mmFormatString, oldValue: null, type: formatString,
+          value: '###.##'}
+        - {comment: '', defaultValue: '', hidden: false, name: resolution, oldValue: '',
+          type: string, value: /singleton_motors/resolution}
+        type: Qt4_ResolutionBrick
+      - brick: {class: Qt4_AttenuatorsBrick, name: Qt4_AttenuatorsBrick0}
+        children: []
+        connections: []
+        name: Qt4_AttenuatorsBrick0
+        properties:
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: '', defaultValue: '###.##', formatString: '%3.2f', formatStringLength: 6,
+          hidden: false, name: formatString, oldValue: null, type: formatString, value: '###.##'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+          type: string, value: /singleton_motors/transmission}
+        - {comment: '', defaultValue: '', hidden: false, name: mockup_mnemonic, oldValue: null,
+          type: string, value: ''}
+        type: Qt4_AttenuatorsBrick
+      - brick: {class: Qt4_DuoStateBrick, name: Qt4_DuoStateBrick0}
+        children: []
+        connections: []
+        name: Qt4_DuoStateBrick0
+        properties:
+        - {comment: '', defaultValue: 0, hidden: false, name: expertModeControlOnly,
+          oldValue: null, type: boolean, value: 0}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: '', defaultValue: 0, hidden: false, name: forceNoControl, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+          type: string, value: ''}
+        - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: close,
+          type: string, value: closed}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: /singleton_objects/frontend,
+          type: string, value: /singleton_objects/frontendshutter}
+        - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: out,
+          type: string, value: open}
+        - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: Set
+            in, type: string, value: Open}
+        - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: Set
+            out, type: string, value: Close}
+        - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: FrontEnd,
+          type: string, value: Frontend}
+        type: Qt4_DuoStateBrick
+      - brick: {class: Qt4_DuoStateBrick, name: Qt4_DuoStateBrick1}
+        children: []
+        connections: []
+        name: Qt4_DuoStateBrick1
+        properties:
+        - {comment: '', defaultValue: 0, hidden: false, name: expertModeControlOnly,
+          oldValue: null, type: boolean, value: 0}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: '', defaultValue: 0, hidden: false, name: forceNoControl, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+          type: string, value: ''}
+        - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: in, type: string,
+          value: closed}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+          type: string, value: /singleton_objects/safetyshutter}
+        - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: out,
+          type: string, value: open}
+        - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: Set
+            in, type: string, value: Close}
+        - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: Set
+            out, type: string, value: Open}
+        - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: '',
+          type: string, value: Safety shutter}
+        type: Qt4_DuoStateBrick
+      - children: []
+        connections: []
+        name: vspacer0
+        properties:
+        - choices: [none, top center, top left, top right, bottom center, bottom left,
+            bottom right, center, hcenter, vcenter, left, right]
+          comment: ''
+          defaultValue: none
+          hidden: false
+          name: alignment
+          oldValue: null
+          type: combo
+          value: none
+        - {comment: '', defaultValue: 0, hidden: false, name: fixed_size, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: 100, hidden: false, name: size, oldValue: null,
+          type: integer, value: 100}
+        type: vspacer
+      - brick: {class: Qt4_InstanceListBrick, name: Qt4_InstanceListBrick0}
+        children: []
+        connections: []
+        name: Qt4_InstanceListBrick0
+        properties:
+        - {comment: '', defaultValue: '', hidden: false, name: controlEmails, oldValue: null,
+          type: string, value: ''}
+        - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+          oldValue: null, type: integer, value: -1}
+        - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+          oldValue: null, type: integer, value: -1}
+        - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+          type: string, value: '11'}
+        - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+          name: frame, oldValue: null, type: boolean, value: 0}
+        - {comment: '', defaultValue: 30, hidden: false, name: giveControlTimeout,
+          oldValue: null, type: integer, value: 30}
+        - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: '', hidden: false, name: hwobj_hutch_trigger,
+          oldValue: null, type: string, value: ''}
+        - {comment: '', defaultValue: /instanceconnection, hidden: false, name: hwobj_instance_connection,
+          oldValue: /instanceconnection, type: string, value: /singleton_objects/instanceconnection}
+        - {comment: '', defaultValue: /xml-rpc-server, hidden: false, name: hwobj_xmlrpc_server,
+          oldValue: /xml-rpc-server, type: string, value: /singleton_objects/xml-rpc-server}
+        - {comment: '', defaultValue: 0, hidden: false, name: initializeServer, oldValue: null,
+          type: boolean, value: 0}
+        - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+          name: instanceAllowAlways, oldValue: 0, type: boolean, value: 1}
+        - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+          name: instanceAllowConnected, oldValue: 0, type: boolean, value: 1}
+        type: Qt4_InstanceListBrick
+      connections: []
+      name: vbox3
+      properties:
+      - choices: [none, top center, top left, top right, bottom center, bottom left,
+          bottom right, center, hcenter, vcenter, left, right]
+        comment: ''
+        defaultValue: none
+        hidden: false
+        name: alignment
+        oldValue: null
+        type: combo
+        value: none
+      - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+        type: color, value: null}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+        type: integer, value: -1}
+      - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+        type: integer, value: -1}
+      - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: frameshape
+        oldValue: null
+        type: combo
+        value: default
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: hsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+        type: integer, value: 2}
+      - choices: [plain, raised, sunken, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: shadowstyle
+        oldValue: null
+        type: combo
+        value: default
+      - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+        type: integer, value: 2}
+      - choices: [fixed, expanding, default]
+        comment: ''
+        defaultValue: default
+        hidden: false
+        name: vsizepolicy
+        oldValue: null
+        type: combo
+        value: default
+      type: vbox
+    connections: []
+    name: hbox0
+    properties:
+    - choices: [none, top center, top left, top right, bottom center, bottom left,
+        bottom right, center, hcenter, vcenter, left, right]
+      comment: ''
+      defaultValue: none
+      hidden: false
+      name: alignment
+      oldValue: null
+      type: combo
+      value: none
+    - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+      type: color, value: null}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+      type: integer, value: -1}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+      type: integer, value: -1}
+    - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: frameshape
+      oldValue: null
+      type: combo
+      value: default
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: hsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null, type: string,
+      value: ''}
+    - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+      type: string, value: ''}
+    - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+      type: integer, value: 2}
+    - choices: [plain, raised, sunken, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: shadowstyle
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+      type: integer, value: 2}
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: vsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    type: hbox
+  connections: []
+  name: window0
+  properties:
+  - choices: [none, top center, top left, top right, bottom center, bottom left, bottom
+        right, center, hcenter, vcenter, left, right]
+    comment: ''
+    defaultValue: none
+    hidden: false
+    name: alignment
+    oldValue: null
+    type: combo
+    value: none
+  - {comment: '', defaultValue: '', hidden: false, name: caption, oldValue: null,
+    type: string, value: ''}
+  - {comment: '', defaultValue: 1, hidden: false, name: closeOnExit, oldValue: null,
+    type: boolean, value: 1}
+  - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
+    type: string, value: tonic}
+  - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
+    value: 0}
+  - comment: ''
+    defaultValue: &id001 {}
+    hidden: true
+    name: menudata
+    oldValue: null
+    type: undefined
+    value: *id001
+  - {comment: '', defaultValue: 1, hidden: false, name: show, oldValue: null, type: boolean,
+    value: 1}
+  - {comment: '', defaultValue: 0, hidden: false, name: statusbar, oldValue: null,
+    type: boolean, value: 0}
+  signals:
+    enableExpertMode: !!python/tuple []
+    isHidden: !!python/tuple []
+    isShown: !!python/tuple []
+    quit: !!python/tuple []
+  type: window

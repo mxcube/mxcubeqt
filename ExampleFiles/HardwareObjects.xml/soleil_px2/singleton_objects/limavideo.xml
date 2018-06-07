@@ -1,0 +1,6 @@
+<device class="PX2Qt4_LimaVideo">
+    <type>prosilica</type>
+    <address>172.19.10.156</address>
+    <cam_address>172.19.10.156</cam_address>
+    <interval>30</interval>
+</device>

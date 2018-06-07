@@ -1,0 +1,136 @@
+- children:
+  - children:
+    - brick: {class: Qt4_DuoStateBrick, name: Qt4_DuoStateBrick0}
+      children: []
+      connections: []
+      name: Qt4_DuoStateBrick0
+      properties:
+      - {comment: '', defaultValue: 0, hidden: false, name: expertModeControlOnly,
+        oldValue: 0, type: boolean, value: 0}
+      - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+        oldValue: -1, type: integer, value: -1}
+      - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+        oldValue: -1, type: integer, value: -1}
+      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
+        type: string, value: '11'}
+      - {comment: '', defaultValue: 0, hidden: false, name: forceNoControl, oldValue: 0,
+        type: boolean, value: 0}
+      - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+        name: frame, oldValue: 0, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
+        type: string, value: ''}
+      - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: in, type: string,
+        value: open}
+      - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+        name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
+      - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+        name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+        type: string, value: /singleton_objects/safetyshutter}
+      - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: out,
+        type: string, value: closed}
+      - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: Set
+          in, type: string, value: Open}
+      - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: Set
+          out, type: string, value: Close}
+      - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: '',
+        type: string, value: Safety shutter}
+      type: Qt4_DuoStateBrick
+    connections: []
+    name: vbox0
+    properties:
+    - choices: [none, top center, top left, top right, bottom center, bottom left,
+        bottom right, center, hcenter, vcenter, left, right]
+      comment: ''
+      defaultValue: none
+      hidden: false
+      name: alignment
+      oldValue: null
+      type: combo
+      value: none
+    - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+      type: color, value: null}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+      type: integer, value: -1}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+      type: integer, value: -1}
+    - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: frameshape
+      oldValue: null
+      type: combo
+      value: default
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: hsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null, type: string,
+      value: ''}
+    - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+      type: string, value: ''}
+    - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+      type: integer, value: 2}
+    - choices: [plain, raised, sunken, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: shadowstyle
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+      type: integer, value: 2}
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: vsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    type: vbox
+  connections: []
+  name: window0
+  properties:
+  - choices: [none, top center, top left, top right, bottom center, bottom left, bottom
+        right, center, hcenter, vcenter, left, right]
+    comment: ''
+    defaultValue: none
+    hidden: false
+    name: alignment
+    oldValue: null
+    type: combo
+    value: none
+  - {comment: '', defaultValue: '', hidden: false, name: caption, oldValue: null,
+    type: string, value: ''}
+  - {comment: '', defaultValue: 1, hidden: false, name: closeOnExit, oldValue: null,
+    type: boolean, value: 1}
+  - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
+    type: string, value: tonic}
+  - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
+    value: 0}
+  - comment: ''
+    defaultValue: &id001 {}
+    hidden: true
+    name: menudata
+    oldValue: null
+    type: undefined
+    value: *id001
+  - {comment: '', defaultValue: 1, hidden: false, name: show, oldValue: null, type: boolean,
+    value: 1}
+  - {comment: '', defaultValue: 0, hidden: false, name: statusbar, oldValue: null,
+    type: boolean, value: 0}
+  signals:
+    enableExpertMode: !!python/tuple []
+    isHidden: !!python/tuple []
+    isShown: !!python/tuple []
+    quit: !!python/tuple []
+  type: window

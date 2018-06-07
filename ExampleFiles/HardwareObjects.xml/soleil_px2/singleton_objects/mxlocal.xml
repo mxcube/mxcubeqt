@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<beamline_pars>
+    <BEAMLINE_PARS>
+        <synchrotron_name>Soleil</synchrotron_name>
+        <beamline_name>PROXIMA2A</beamline_name>
+        <undulator>
+            <type>u24</type>
+        </undulator> 
+    </BEAMLINE_PARS>
+    <COLLECT_PARS>
+        <escan_dir>/tmp/Escans</escan_dir> <!--  /data/proxima1-soleil/temp/Escans</escan_dir> change! -->
+        <escan_prefix>eprefix</escan_prefix> <!-- change! -->
+        <fileinfo>
+            <directory>/tmp/images</directory> <!-- /data/proxima1-soleil/temp/images change! -->
+            <prefix>img_</prefix>
+            <run_number>1</run_number>
+        </fileinfo>
+        <current_filename>test</current_filename>
+        <dark>1</dark>
+    </COLLECT_PARS>
+    <SPEC_PARS>
+        <phi>phi</phi>
+        <wavmot>lambda</wavmot>
+        <emot>energy</emot>
+        <detdistmot>distccd</detdistmot> <!-- ? -->
+        <beam>
+            <ax>0.010184</ax> <!-- <ax>0.002513</ax> -->
+            <ay>0.003451</ay> <!-- values for y valid for energy 12.65keV (0.98 A) --> 
+            <bx>1509.09</bx> <!-- <bx>1593.04</bx> Center of the beam on detector? -->
+            <by>1593.41</by> <!-- values for y valid for energy 12.65keV (0.98 A) --> 
+        </beam>
+        <detector>
+            <binning>2</binning>
+            <!--             <TacoDeviceName>d14/marccd/1</TacoDeviceName> -->
+            <save_raw>0</save_raw>
+            <no_xform>0</no_xform>
+            <UseDefaultDarkTime>1</UseDefaultDarkTime>
+        </detector>
+    </SPEC_PARS>
+    <BCM_PARS>
+        <detector>
+            <manufacturer>DECTRIS</manufacturer>   <!--<manufacturer>Dectris</manufacturer> -->
+            <type>EIGER</type>                <!--       <type>PILATUS</type> -->
+            <model>9M</model>                 <!--       <model>6M</model> -->
+        </detector>
+        <detector_radius>116.62</detector_radius> <!--might need to be changed to 157.5? -->
+        <FileSuffix>h5</FileSuffix>
+        <default_exposure_time>0.10</default_exposure_time>
+        <minimum_exposure_time>0.004202</minimum_exposure_time>
+        <minimum_phi_speed>0.01</minimum_phi_speed>
+        <minimum_phi_oscillation>0.01</minimum_phi_oscillation>
+        <maximum_phi_speed>130</maximum_phi_speed>
+        <maximum_radiation_exposure>4000</maximum_radiation_exposure>
+    </BCM_PARS>
+    <VALIDATE_PARS>
+        <exposure_time>0.001,1000</exposure_time>
+        <start_angle>-360,360</start_angle>
+        <range>-360,360</range>
+        <number_of_passes>1,10</number_of_passes>
+        <start_image_number>0,100000</start_image_number>
+        <run_number>0,10000</run_number>
+        <overlap>-90,0.99</overlap>
+        <number_of_images>1,100000</number_of_images>
+    </VALIDATE_PARS>
+    <EXTRAVALIDATE_PARS>
+        <rotation_speed>0.01,130</rotation_speed>
+    </EXTRAVALIDATE_PARS>
+    <INHOUSE_USERS>
+        <proposal>
+            <code>opd</code>
+            <number>14</number>
+        </proposal>
+    </INHOUSE_USERS>
+</beamline_pars>

@@ -1,0 +1,3 @@
+<object class="QueueManager">
+    <object href="/singleton_objects/beamline-setup" role="beamline_setup"/>
+</object>

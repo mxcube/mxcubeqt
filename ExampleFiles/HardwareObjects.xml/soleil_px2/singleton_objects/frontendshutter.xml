@@ -1,0 +1,5 @@
+<object class="SOLEILSafetyShutter">
+    <username>Safety Shutter</username>
+    <object href="/singleton_objects/frontend" role="shutter"></object>
+    <object href="/singleton_objects/pss_opt" role="pss"></object>
+</object>

@@ -1,0 +1,7 @@
+<device class = "SOLEILPss">
+    <username>expPss</username>
+    <tangoname>i11-ma-ce/pss/db_data-parser</tangoname>
+    <channel type="tango" polling="500" name="State">prmObt</channel>
+    <hutch>experimental</hutch>
+    <interval>500</interval>
+</device>
