@@ -56,6 +56,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.addProperty('hwobj_beamline_test', 'string', '/beamline-test')
         self.addProperty('hwobj_diffractometer', 'string', '/mini-diff')
         self.addProperty('hwobj_motors_list', 'string', '')
+        self.addProperty('icon_list', 'string', '')
         self.addProperty('defaultSteps', 'string', '')
         self.addProperty('defaultDeltas', 'string', '')
         self.addProperty('defaultDecimals', 'string', '')
@@ -107,14 +108,8 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.double_hor_motor_brick.setLabel("Horizontal")
         self.double_ver_motor_brick.setLabel("Vertical")
 
-        self.unf_ver_motor_brick.move_left_button.setIcon(Qt4_Icons.load_icon("Down2"))
-        self.unf_ver_motor_brick.move_right_button.setIcon(Qt4_Icons.load_icon("Up2"))
         self.unf_hor_motor_brick.setEnabled(False)
         self.unf_ver_motor_brick.setEnabled(False)
-        self.double_hor_motor_brick.move_left_button.setIcon(Qt4_Icons.load_icon("Right2"))
-        self.double_hor_motor_brick.move_right_button.setIcon(Qt4_Icons.load_icon("Left2"))
-        self.double_ver_motor_brick.move_left_button.setIcon(Qt4_Icons.load_icon("Down2"))
-        self.double_ver_motor_brick.move_right_button.setIcon(Qt4_Icons.load_icon("Up2"))
         self.double_hor_motor_brick.setEnabled(False)
         self.double_ver_motor_brick.setEnabled(False)
 
@@ -133,6 +128,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
             default_delta_list = self['defaultDeltas'].split()
             default_decimal_list = self['defaultDecimals'].split()
             default_step_list = self['defaultSteps'].split()
+            icon_list = self['icon_list'].split()
 
             for index, hwobj_name in enumerate(hwobj_names_list):
                 temp_motor_hwobj = self.getHardwareObject(hwobj_name)
@@ -156,10 +152,23 @@ class Qt4_BeamPositionBrick(BlissWidget):
                         temp_motor_widget['delta'] = default_delta_list[index]
                     except:
                         temp_motor_widget['delta'] = 0.001
+
                     try:
                         temp_motor_widget.set_decimals(float(default_decimal_list[index]))
                     except:
                         pass
+
+                    try:
+                        temp_motor_widget.move_left_button.setIcon(\
+                            Qt4_Icons.load_icon(icon_list[index * 2]))
+                        temp_motor_widget.move_right_button.setIcon(\
+                            Qt4_Icons.load_icon(icon_list[index * 2 + 1]))
+                    except:
+                        temp_motor_widget.move_left_button.setIcon(\
+                            Qt4_Icons.load_icon("Right2"))
+                        temp_motor_widget.move_right_button.setIcon(\
+                            Qt4_Icons.load_icon("Left2"))
+
                     
                     temp_motor_widget.step_changed(None)
                     temp_motor_hwobj.update_values()
@@ -209,6 +218,8 @@ class Qt4_BeamPositionBrick(BlissWidget):
         else:
             self.unf_hor_motor_brick.setVisible(True)
             self.unf_ver_motor_brick.setVisible(True)
+            self.double_hor_motor_brick.setVisible(False)
+            self.double_ver_motor_brick.setVisible(False)
             self.main_group_box.setTitle("Beam positioning")
 
         self.unf_hor_motor_brick.setEnabled(self.is_beam_location_phase)

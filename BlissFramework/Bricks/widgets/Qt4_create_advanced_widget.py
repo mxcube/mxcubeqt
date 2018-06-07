@@ -132,6 +132,11 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         self._acq_widget.acq_widget_layout.osc_total_range_label.setText(\
             "Total osc. range per line")
+        self.enable_widgets(False)
+
+    def enable_widgets(self, state):
+        self._acq_widget.setEnabled(state)
+        self._data_path_widget.setEnabled(state)
 
     def init_models(self):
         """
@@ -186,7 +191,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         result = CreateTaskBase.approve_creation(self)
-        selected_grid = self.get_selected_grid()
+        selected_grid = self.get_selected_shapes()[0]
 
         if not selected_grid:
             msg = "No grid selected. Please select a grid to continue!"
@@ -253,7 +258,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                                               acquisition_parameters
                 self._acq_widget.update_data_model(self._acquisition_parameters,
                                                    self._path_template)
-                self.get_acquisition_widget().use_osc_start(True)
+                #self.get_acquisition_widget().use_osc_start(True)
             self.dc_selected = True
         else:
             self.setDisabled(True)
@@ -268,7 +273,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         :type shape: Qt4_GraphicsLib.GraphicsItem
         """
         tasks = []
-        selected_grid = self.get_selected_grid()
+        selected_grid = self.get_selected_shapes()[0]
         mesh_dc = self._create_dc_from_grid(sample, selected_grid)
 
         exp_type = str(self._advanced_methods_widget.method_combo.currentText())
@@ -367,14 +372,16 @@ class CreateAdvancedWidget(CreateTaskBase):
             else:
                 grid.setSelected(False)
 
-    def get_selected_grid(self):
+    def get_selected_shapes(self):
         """Returns selected grids
         
         :returns: selected grid objects
         """
+        shapes = []
         for grid, grid_treewidget_item in self._grid_map.iteritems():
             if grid_treewidget_item.isSelected():
-                return grid
+                shapes.append(grid)
+        return shapes
 
     def get_selected_grid_properties(self):
         """Returns properties of the selected grid
@@ -394,7 +401,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def remove_grid_button_clicked(self):
         """Removes selected grid
         """
-        grid_to_delete = self.get_selected_grid()
+        grid_to_delete = self.get_selected_shapes()[0]
 
         if grid_to_delete:
             self._graphics_manager_hwobj.delete_shape(grid_to_delete)
@@ -440,7 +447,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def move_to_grid(self):
         """Moves diffractometer to the center of the grid
         """
-        grid = self.get_selected_grid()
+        grid = self.get_selected_shapes()[0]
 
         if grid:
             self._beamline_setup_hwobj.diffractometer_hwobj.\
@@ -449,7 +456,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def overlay_toggled(self, state):
         """Toggles (on/off) overlay
         """
-        grid = self.get_selected_grid()
+        grid = self.get_selected_shapes()[0]
 
         if grid:
             grid.set_display_overlay(state)
@@ -457,7 +464,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def overlay_alpha_changed(self, alpha_value):
         """Changes the transperency of the grid
         """
-        grid = self.get_selected_grid()
+        grid = self.get_selected_shapes()[0]
 
         if grid:
             grid.set_fill_alpha(alpha_value)
@@ -466,7 +473,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         """Changes the default color (blue) of overlay
         """
         color = QColorDialog.getColor()
-        grid = self.get_selected_grid()
+        grid = self.get_selected_shapes()[0]
 
         if color.isValid() and grid:
             grid.set_base_color(color)
@@ -477,7 +484,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         :param direction: direction to move (right, left, up, down)
         :type direction: str
         """
-        grid = self.get_selected_grid()
+        grid = self.get_selected_shapes()[0]
 
         if grid:
             grid.move_by_pix(direction)
@@ -501,6 +508,9 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acq_widget.acq_widget_layout.set_max_osc_range_button.setEnabled(\
              state and self._in_plate_mode)
 
+        self.enable_widgets(state)
+        self._acq_widget.emit_acq_parameters_changed()
+
     def grid_osc_range_ledit_changed(self, new_value):
         """Osc range per frame changed
 
@@ -523,6 +533,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             try:
                 self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
                      "%.4f" % (float(new_value) / grid_properties["num_images_per_line"] - 1e-5))
+                self._acq_widget.emit_acq_parameters_changed()
             except:
                 pass
 

@@ -94,6 +94,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.enable_collect_conditions = {}
         self.current_view = None
         self.current_queue_entry = None
+        self.is_logged_in = False
         self.lims_samples = None
         self.filtered_lims_samples = None
 
@@ -113,6 +114,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.addProperty("enableQueueAutoSave", "boolean", True)
 
         # Properties to initialize hardware objects --------------------------
+        self.addProperty("hwobj_unittest", "string", "/unittest")
         self.addProperty("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
@@ -196,7 +198,8 @@ class Qt4_TreeBrick(BlissWidget):
              self.sample_combo_changed)
 
         # Other --------------------------------------------------------------- 
-        self.enable_collect(False)
+        self.enable_collect(True)
+        self.sample_changer_widget.synch_ispyb_button.setEnabled(False)
         #self.setFixedWidth(315) 
         #self.sample_changer_widget.setFixedHeight(46)
         #self.dc_tree_widget.set_centring_method(1)
@@ -387,6 +390,8 @@ class Qt4_TreeBrick(BlissWidget):
               self.state_machine_hwobj = self.getHardwareObject(new_value, optional=True)
         elif property_name == 'redis_client':
               self.redis_client_hwobj = self.getHardwareObject(new_value, optional=True)
+        elif property_name == 'hwobj_unittest':
+              self.unittest_hwobj = self.getHardwareObject(new_value, optional=True)
         elif property_name == 'scOneName':
               self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == 'scTwoName':
@@ -422,8 +427,11 @@ class Qt4_TreeBrick(BlissWidget):
                    two associated queue models.
         """
         loaded_queue_index = None
-        self.enable_collect(logged_in)
-        if not logged_in:
+        self.is_logged_in = logged_in
+        #self.enable_collect(logged_in)
+
+        #if not logged_in:
+        if True:
             self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
             self.dc_tree_widget.plate_navigator_cbox.setVisible(False)
@@ -463,7 +471,7 @@ class Qt4_TreeBrick(BlissWidget):
                 self.sample_changer_widget.filter_cbox.setEnabled(True)
                 self.sample_changer_widget.details_button.setEnabled(True)
                 self.dc_tree_widget.scroll_to_item()
-            if self.dc_tree_widget.sample_mount_method < 2:
+            if self.dc_tree_widget.sample_mount_method < 2 and logged_in:
                 self.sample_changer_widget.synch_ispyb_button.setEnabled(True)
 
             if self.redis_client_hwobj is not None:
@@ -496,6 +504,7 @@ class Qt4_TreeBrick(BlissWidget):
     def queue_entry_execution_finished(self, queue_entry, status):
         self.current_queue_entry = None
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
+        self.enable_widgets.emit(True)
       
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
             BlissWidget.set_status_info("collect", "%s : %s" % \
@@ -507,7 +516,7 @@ class Qt4_TreeBrick(BlissWidget):
         BlissWidget.set_status_info("status", "Queue paused", "action_req")
 
     def queue_execution_finished(self, status):
-        self.enable_widgets.emit(True)
+        #self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_execution_completed(status)
         if status == "Failed":
             BlissWidget.set_status_info("status", "Queue execution failed", "error")
@@ -599,13 +608,12 @@ class Qt4_TreeBrick(BlissWidget):
         sample_changer = None
 
         self.sample_changer_widget.sample_combo.clear()
-        log.debug("LIMS samples: %s" % self.lims_samples)
         for sample in self.lims_samples:
             if sample.containerSampleChangerLocation:
                 self.filtered_lims_samples.append(sample)
                 item_text = "%s-%s" %(sample.proteinAcronym, sample.sampleName)
-                if sample.code:
-                    item_text += " (%s)" % sample.code
+                #if hasattr(sample, "code"):
+                #    item_text += " (%s)" % sample.code
                 self.sample_changer_widget.sample_combo.addItem(item_text)
 
         self.sample_changer_widget.sample_label.setEnabled(True)
@@ -616,8 +624,13 @@ class Qt4_TreeBrick(BlissWidget):
             sample_changer = self.sample_changer_hwobj
         elif self.dc_tree_widget.sample_mount_method == 2:
             sample_changer = self.plate_manipulator_hwobj
+
+        #if len(self.lims_samples) == 0:
+        #    log.warning("No sample available in LIMS")
+        #    self.mount_mode_combo_changed(self.sample_changer_widget.filter_cbox.currentIndex())
+        #    return 
      
-        if self.lims_samples and sample_changer is not None:
+        if sample_changer is not None:
             (barcode_samples, location_samples) = \
              self.dc_tree_widget.samples_from_lims(self.lims_samples)
             sc_basket_content, sc_sample_content = self.get_sc_content()
@@ -988,7 +1001,7 @@ class Qt4_TreeBrick(BlissWidget):
     def mount_mode_combo_changed(self, index):
         self.dc_tree_widget.filter_sample_list(index)
         self.sample_changer_widget.details_button.setEnabled(index > 0) 
-        self.sample_changer_widget.synch_ispyb_button.setEnabled(index < 2)
+        self.sample_changer_widget.synch_ispyb_button.setEnabled(index < 2 and self.is_logged_in)
         #self.sample_changer_widget.sample_label.setEnabled(False)
         #self.sample_changer_widget.sample_combo.setEnabled(index == 0)
         if index == 0:

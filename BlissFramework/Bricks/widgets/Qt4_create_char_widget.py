@@ -139,8 +139,7 @@ class CreateCharWidget(CreateTaskBase):
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 
     def enable_compression(self, state):
-        self._data_path_widget.data_path_layout.compression_cbox.setChecked(False)
-        self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+        CreateTaskBase.enable_compression(self, False)
 
     def use_induced_burn(self, state):
         """
@@ -201,8 +200,8 @@ class CreateCharWidget(CreateTaskBase):
         self._char.characterisation_software =\
             queue_model_enumerables.COLLECTION_ORIGIN.EDNA
         self._path_template.num_files = 2
+        self._path_template.compression = False
         self._acquisition_parameters.shutterless = False
-        self._acquisition_parameters.compression = False
 
     def single_item_selection(self, tree_item):
         """
@@ -310,6 +309,7 @@ class CreateCharWidget(CreateTaskBase):
         
         dc.acquisitions[0] = acq
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
+        dc.run_processing_parallel = False
 
         char = queue_model_objects.Characterisation(dc, 
                                                     char_params)

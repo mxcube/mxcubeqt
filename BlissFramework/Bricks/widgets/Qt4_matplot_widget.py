@@ -171,7 +171,6 @@ class MplCanvas(FigureCanvas):
 
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
-        self.single_curve = None
 
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -180,11 +179,19 @@ class MplCanvas(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-        self.curves = []
+        self.single_curve = None
         self._axis_x_array = np.empty(0)
         self._axis_y_array = np.empty(0)
         self._axis_x_limits = [None, None]
         self._axis_y_limits = [None, None]
+
+        self._curves_dict = {}
+ 
+    def refresh(self):
+        self.axes.relim()
+        self.axes.autoscale_view()
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
 
     def set_real_time(self, real_time):
         self.real_time = real_time
@@ -196,22 +203,59 @@ class MplCanvas(FigureCanvas):
         self.max_plot_points = max_points
 
     def clear(self):
-        self.curves = []
+        self._curves_dict = {}
         self.single_curve = None
         self.axes.cla()
         self.axes.grid(True)
 
-    def add_curve(self, y_axis_array, x_axis_array=None, label=None,
+    def hide_curves(self):
+        for curve in self._curves_dict.values():
+            curve.set_visible(False)
+
+    def show_curve(self, name):
+        for key in self._curves_dict.keys():
+            if key == name:
+                self._curves_dict[key].set_visible(True)
+
+    def adjust_axes(self, name):
+        for key in self._curves_dict.keys():
+            if key == name:
+                curve = self._curves_dict[key]
+                data = curve.get_data()
+                if data[1].min() != data[1].max():
+                    self.axes.set_ylim(0, data[1].max())
+                    self.refresh()
+                break
+
+    def plot_curve(self, name, y_axis_array, x_axis_array=None, label=None,
            linestyle="-", color='blue', marker='None'):
+
         if x_axis_array is None:
-            self.curves.append(self.axes.plot(y_axis_array, 
+            line, = self.axes.plot(y_axis_array, 
                  label=label, linewidth=2, linestyle=linestyle,
-                 color=color, marker=marker))
+                 color=color, marker=marker)
         else:
-            self.curves.append(self.axes.plot(x_axis_array, y_axis_array, 
+            line, = self.axes.plot(x_axis_array, y_axis_array, 
                  label=label, linewidth=2, linestyle=linestyle,
-                 color=color, marker=marker))
-        self.draw()
+                 color=color, marker=marker)
+
+        self._curves_dict[name] = line
+
+        self.refresh()
+
+        return line
+
+    def update_curves(self, data_dict):
+        for data_key in data_dict:
+            for curve_key in self._curves_dict.keys():
+                if data_key == curve_key:
+                    self._curves_dict[curve_key].set_ydata(data_dict[data_key])
+                    self._curves_dict[curve_key].set_xdata(data_dict['x_array'])
+
+        #self.axes.relim()
+        #self.axes.autoscale_view()
+        self.fig.canvas.draw()
+        #self.fig.canvas.flush_events()
 
     def append_new_point(self, y, x=None):
         self._axis_y_array = np.append(self._axis_y_array, y)
@@ -238,7 +282,6 @@ class MplCanvas(FigureCanvas):
         self.single_curve.set_ydata(self._axis_y_array)
         self.axes.relim()
         self.axes.autoscale_view()
-        #We need to draw *and* flush
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
         self.axes.grid(True)
@@ -353,14 +396,14 @@ class TwoDimenisonalPlotWidget(QWidget):
 
         self.im = None
         self.mpl_canvas = MplCanvas(self)
-        self.ntb = NavigationToolbar(self.mpl_canvas, self)
+        #self.ntb = NavigationToolbar(self.mpl_canvas, self)
         self.selection_xrange = None
         self.selection_span = None
         self.mouse_clicked = None
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.mpl_canvas)
-        _main_vlayout.addWidget(self.ntb)
+        #_main_vlayout.addWidget(self.ntb)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -457,6 +500,16 @@ class TwoDimenisonalPlotWidget(QWidget):
     def set_y_axis_limits(self, limits):
         self.mpl_canvas.axes.set_ylim(limits)
 
+    def set_ytick_labels(self, labels):
+        self.mpl_canvas.axes.set_yticklabels(labels)
+        self.mpl_canvas.fig.canvas.draw()
+        self.mpl_canvas.fig.canvas.flush_events() 
+
+    def set_yticks(self, ticks):
+        self.mpl_canvas.axes.set_yticks(ticks)
+        self.mpl_canvas.fig.canvas.draw()
+        self.mpl_canvas.fig.canvas.flush_events()
+
     def add_divider(self):
         self.divider = make_axes_locatable(self.mpl_canvas.axes)
         self.cax = self.divider.append_axes("right", size=0.3, pad=0.05)
@@ -469,16 +522,34 @@ class TwoDimenisonalPlotWidget(QWidget):
         self.selection_span = None
         self.mpl_canvas.clear()
 
-    def add_curve(self, y_axis_array, x_axis_array=None, label=None,
-            linestyle='-', color='blue', marker=None):
-        self.mpl_canvas.add_curve(y_axis_array,
-                                  x_axis_array=None,
-                                  label=None,
-                                  linestyle=linestyle,
-                                  color=color,
-                                  marker=marker)
-        self.set_x_axis_limits((x_axis_array.min() - 1,
-                                x_axis_array.max() + 1))
+    def hide_all_curves(self):
+        self.mpl_canvas.hide_curves()
+
+    def show_curve(self, name):
+        self.mpl_canvas.show_curve(name)
+        self.mpl_canvas.refresh()
+
+    def adjust_axes(self, name):
+        self.mpl_canvas.adjust_axes(name)
+        self.mpl_canvas.refresh()
+
+    def add_curve(self, name, y_axis_array, x_axis_array=None, label=None,
+            linestyle='-', color='blue', marker=None, ytick_labels=None):
+        self.mpl_canvas.plot_curve(name,
+                                   y_axis_array,
+                                   x_axis_array=None,
+                                   label=None,
+                                   linestyle=linestyle,
+                                   color=color,
+                                   marker=marker)
+        if x_axis_array:
+            self.set_x_axis_limits((x_axis_array.min(),
+                                    x_axis_array.max()))
+        if ytick_labels:
+            self.set_ytick_labels(ytick_labels)
+          
+    def update_curves(self, data):
+        self.mpl_canvas.update_curves(data)
 
     def enable_selection_range(self):
         (x_start, x_end) = self.mpl_canvas.axes.get_xlim()
@@ -488,10 +559,8 @@ class TwoDimenisonalPlotWidget(QWidget):
         self.selection_span = self.mpl_canvas.axes.axvspan(\
              self.selection_xrange[0], self.selection_xrange[1],
              facecolor='g', alpha=0.3)
-        self.mpl_canvas.fig.canvas.draw()
-        self.mpl_canvas.fig.canvas.flush_events()
+        self.mpl_canvas.refresh()
 
     def enable_legend(self):
         self.mpl_canvas.axes.legend()
-        self.mpl_canvas.fig.canvas.draw()
-        self.mpl_canvas.fig.canvas.flush_events()
+        self.mpl_canvas.refresh()

@@ -89,8 +89,8 @@ class CreateDiscreteWidget(CreateTaskBase):
              connect(self.set_max_osc_total_range_clicked)
 
         # Other ---------------------------------------------------------------
-        self._processing_widget.processing_widget.\
-             run_processing_parallel_cbox.setChecked(False)
+        #self._processing_widget.processing_widget.\
+        #     run_processing_parallel_cbox.setChecked(False)
 
     def init_models(self):
         """
@@ -291,8 +291,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
         (lower, upper), exp_time = self._acq_widget.update_osc_total_range_limits()
         self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
-            "%.2f" % lower)
+            "%.3f" % (lower + 0.001))
         self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
-            "%.2f" % abs(upper - lower))
+            "%.3f" % abs(upper - lower))
         self._acq_widget.acq_widget_layout.num_images_ledit.setText(\
             "%d" % (abs(upper - lower) / float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())))

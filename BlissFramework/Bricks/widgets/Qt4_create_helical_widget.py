@@ -108,6 +108,13 @@ class CreateHelicalWidget(CreateTaskBase):
         #self._processing_widget.processing_widget.\
         #     run_processing_parallel_cbox.setChecked(False)
 
+        self.enable_widgets(False)
+
+    def enable_widgets(self, state):
+        self._acq_widget.setEnabled(state)
+        self._data_path_widget.setEnabled(state)
+        self._processing_widget.setEnabled(state)
+
     def init_models(self):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
@@ -261,7 +268,7 @@ class CreateHelicalWidget(CreateTaskBase):
     def _create_task(self,  sample, shape):
         data_collections = []
 
-        for shape in self.get_selected_lines():
+        for shape in self.get_selected_shapes():
             snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
 
             # Acquisition for start position
@@ -318,12 +325,16 @@ class CreateHelicalWidget(CreateTaskBase):
             "%.2f" % (abs(lower - upper) / 2 / num_images))
 
     def lines_treewidget_selection_changed(self):
-        self._lines_widget.remove_line_button.setEnabled(False)
+        self.enable_widgets(\
+            len(self._lines_widget.lines_treewidget.selectedItems()) > 0)
+        self._lines_widget.remove_line_button.setEnabled(\
+            len(self._lines_widget.lines_treewidget.selectedItems()) > 0)
+        self._lines_widget.swap_points_button.setEnabled(\
+            len(self._lines_widget.lines_treewidget.selectedItems()) > 0)
+
         for shape, list_item in self._lines_map.iteritems():
             self._graphics_manager_hwobj.select_shape(shape, list_item.isSelected())
-            self._lines_widget.remove_line_button.setEnabled(True)
-            self._lines_widget.swap_points_button.setEnabled(True)
-            #shape.setSelected(list_item.isSelected())
+        self._acq_widget.emit_acq_parameters_changed()
 
     def create_line_button_clicked(self):
         self._graphics_manager_hwobj.create_line()
@@ -339,8 +350,9 @@ class CreateHelicalWidget(CreateTaskBase):
                 break
         if line_to_delete:
             self._graphics_manager_hwobj.delete_shape(line_to_delete)
+        self.lines_treewidget_selection_changed()
 
-    def get_selected_lines(self):
+    def get_selected_shapes(self):
         selected_lines = []
         for line, treewidget_item in self._lines_map.iteritems():
             if treewidget_item.isSelected():

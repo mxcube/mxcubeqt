@@ -45,10 +45,13 @@ class CreateTaskBase(QWidget):
     be made, to make this class generic for widgets not using
     the objects PathTemplate and AcquisitionParameters.
     """
+    acqParametersConflictSignal = pyqtSignal(bool)
+    pathTempleConflictSignal = pyqtSignal(bool)
+
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
          QWidget.__init__(self, parent, Qt.WindowFlags(fl))
          self.setObjectName(name)
-         
+        
          self._tree_brick = None
          self._task_node_name = task_node_name
 
@@ -68,13 +71,15 @@ class CreateTaskBase(QWidget):
          self._in_plate_mode = None
         
     def set_expert_mode(self, state):
-        pass 
+        if self._acq_widget:
+            self._acq_widget.acq_widget_layout.energy_label.setEnabled(state)
+            self._acq_widget.acq_widget_layout.energy_ledit.setEnabled(state)
 
     def enable_compression(self, state):
         if self._data_path_widget:
-           
             self._data_path_widget.data_path_layout.compression_cbox.setChecked(state)
             self._data_path_widget.data_path_layout.compression_cbox.setEnabled(state)
+            self._data_path_widget.update_file_name()
 
     def init_models(self):
         self.init_acq_model()
@@ -132,7 +137,6 @@ class CreateTaskBase(QWidget):
 
         try:
             self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
-            self.set_resolution(bl_setup_hwobj.resolution_hwobj.getPosition())
 
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
@@ -146,6 +150,7 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.detector_hwobj.connect('detectorRoiModeChanged', self.set_detector_roi_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
 
+            bl_setup_hwobj.resolution_hwobj.update_values()
             bl_setup_hwobj.detector_hwobj.update_values()
         except AttributeError as ex:
             msg = 'Could not connect to one or more hardware objects' + str(ex)
@@ -177,6 +182,7 @@ class CreateTaskBase(QWidget):
     def acq_parameters_changed(self, conflict):
         if self._tree_brick:
             self._tree_brick.acq_parameters_changed(conflict)
+            self.acqParametersConflictSignal.emit(len(conflict) > 0)
  
     def path_template_changed(self):
         self._data_path_widget.update_file_name()
@@ -186,7 +192,8 @@ class CreateTaskBase(QWidget):
                             check_for_path_collisions(self._path_template)
             self._data_path_widget.indicate_path_conflict(path_conflict)
             self._tree_brick.data_path_changed(path_conflict)
-        
+            self.pathTempleConflictSignal.emit(path_conflict)
+
     def set_tree_brick(self, brick):
         self._tree_brick = brick
 

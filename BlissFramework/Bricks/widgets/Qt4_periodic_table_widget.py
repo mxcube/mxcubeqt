@@ -18,25 +18,18 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-
 from QtImport import *
 
-pymca_imported = False
+PYMCA_IMPORTED = False
 try:
    if qt_variant == "PyQt5":
        from PyMca5.PyMca import QPeriodicTable
    else:
        from PyMca import QPeriodicTable
-   pymca_imported = True
+   PYMCA_IMPORTED = True
 except:
    pass
    
-
-from BlissFramework.Utils import Qt4_widget_colors
-
-EDGE_LIST = ["K", "L1", "L2", "L3"]
-
-
 
 class PeriodicTableWidget(QWidget):
     """
@@ -57,7 +50,7 @@ class PeriodicTableWidget(QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        if pymca_imported:
+        if PYMCA_IMPORTED:
             self.periodic_table = CustomPeriodicTable(self)
             self.periodic_table.setFixedSize(470, 230)
         else:
@@ -70,7 +63,7 @@ class PeriodicTableWidget(QWidget):
 
         # Layout --------------------------------------------------------------
         _edge_hlayout = QHBoxLayout(self.edge_widget)
-        if not pymca_imported:
+        if not PYMCA_IMPORTED:
             _edge_hlayout.addWidget(self.periodic_elements_combo)
         _edge_hlayout.addWidget(edge_label)
         _edge_hlayout.addWidget(self.edge_combo)  
@@ -79,7 +72,7 @@ class PeriodicTableWidget(QWidget):
         _edge_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QVBoxLayout(self)
-        if pymca_imported:
+        if PYMCA_IMPORTED:
             _main_vlayout.addWidget(self.periodic_table, Qt.AlignHCenter)
         _main_vlayout.addWidget(self.edge_widget)
         _main_vlayout.addStretch(0)
@@ -89,19 +82,16 @@ class PeriodicTableWidget(QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        if pymca_imported:
+        if PYMCA_IMPORTED:
             self.periodic_table.edgeSelectedSignal.connect(self.edge_selected)
         else:
             self.periodic_elements_combo.activated.connect(\
                   self.element_combo_activated)
-
+        self.edge_combo.addItem("K")
         self.edge_combo.activated.connect(self.edge_combo_activated)
+        self.edge_combo.setEnabled(False)
 
         # Other ---------------------------------------------------------------
-        for edge in EDGE_LIST:
-            self.edge_combo.addItem(edge)
-        self.edge_combo.setCurrentIndex(0)
-        #self.edge_widget.setEnabled(False)
 
     def element_combo_activated(self, element):
         self.selected_element = str(self.periodic_elements_combo.currentText())
@@ -113,13 +103,21 @@ class PeriodicTableWidget(QWidget):
         self.selected_element = str(element)
         self.selected_edge = str(edge)
         self.edge_widget.setEnabled(self.selected_edge != "K")
-        if self.selected_edge in EDGE_LIST:
-            self.edge_combo.setCurrentIndex(EDGE_LIST.index(self.selected_edge))
+
+        self.edge_combo.clear()
+        if edge == "K":
+            edge_list = ("K")
+        else:
+            edge_list = ("L1", "L2", "L3")
+        for item in edge_list:
+            self.edge_combo.addItem(item)
+        self.edge_combo.setCurrentIndex(edge_list.index(item))
+        self.edge_combo.setEnabled(self.edge_combo.count() > 1)
         self.elementEdgeSelectedSignal.emit(self.selected_element, 
                                             self.selected_edge)
         
     def set_current_element_edge(self, element, edge):
-        if pymca_imported:
+        if PYMCA_IMPORTED:
             self.periodic_table.table_element_clicked(element, edge)
 
     def get_selected_element_edge(self):
@@ -127,20 +125,19 @@ class PeriodicTableWidget(QWidget):
 
     def edge_combo_activated(self, item_index):
         self.selected_edge = str(self.edge_combo.currentText())
-        if pymca_imported:
-            self.periodic_table.table_element_clicked(self.selected_element,
-                                                      self.selected_edge)
+        self.elementEdgeSelectedSignal.emit(self.selected_element,
+                                            self.selected_edge)
+
     def set_elements(self, elements):
-        if pymca_imported:
+        if PYMCA_IMPORTED:
             self.periodic_table.setElements(elements)
         else:
             for element in elements:
                 self.periodic_elements_combo.addItem(element['symbol']) 
 
-if pymca_imported: 
+if PYMCA_IMPORTED: 
     class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
 
-        #elementClicked = pyqtSignal(str)
         edgeSelectedSignal = pyqtSignal(str, str)
 
         def __init__(self, *args):

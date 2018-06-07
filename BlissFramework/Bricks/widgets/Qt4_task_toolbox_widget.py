@@ -25,7 +25,6 @@ import Qt4_queue_item
 import queue_model_objects_v1 as queue_model_objects
 
 from BlissFramework import Qt4_Icons
-#from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_create_discrete_widget import CreateDiscreteWidget
 from widgets.Qt4_create_helical_widget import CreateHelicalWidget
 from widgets.Qt4_create_char_widget import CreateCharWidget
@@ -35,8 +34,10 @@ from widgets.Qt4_create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
 #from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
 
+
 class TaskToolBoxWidget(QWidget):
-    def __init__(self, parent = None, name = "task_toolbox"):
+
+    def __init__(self, parent = None, name="task_toolbox"):
         QWidget.__init__(self, parent)
         self.setObjectName = name
 
@@ -47,21 +48,24 @@ class TaskToolBoxWidget(QWidget):
         self.tree_brick = None
         self.previous_page_index = 0
         self.is_running = None
+        self.path_conflict = False
+        self.acq_conflict = False
+        self.enable_collect = False
 
         # Graphic elements ----------------------------------------------------
         self.method_label = QLabel("Collection method", self)
-        self.method_label.setAlignment(Qt.AlignCenter) 
+        self.method_label.setAlignment(Qt.AlignCenter)
         #Qt4_widget_colors.set_widget_color(self.method_label,
         #                                   Qt4_widget_colors.SKY_BLUE)
         #font = self.method_group_box.font()
         #font.setPointSize(10)
         #self.method_group_box.setFont(font)
-    
+
         self.tool_box = QToolBox(self)
         self.tool_box.setObjectName("tool_box")
         self.tool_box.setFixedWidth(475)
         #self.tool_box.setFont(font)
-        
+
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
@@ -74,10 +78,9 @@ class TaskToolBoxWidget(QWidget):
         else:
             self.gphl_workflow_page = None
             logging.getLogger("GUI").info("GPhL workflow is not available")
-
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
         #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
-        
+
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
@@ -98,14 +101,10 @@ class TaskToolBoxWidget(QWidget):
 
         self.collect_now_button = QPushButton("Collect Now", self.button_box)
         self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
-        self.collect_now_button.hide()
-        
-        # Layout --------------------------------------------------------------
-        #_method_group_box_vlayout = QtGui.QVBoxLayout(self.method_group_box)
-        #_method_group_box_vlayout.addWidget(self.tool_box)
-        #_method_group_box_vlayout.setSpacing(2)
-        #_method_group_box_vlayout.setContentsMargins(2, 2, 2, 2)
+        self.collect_now_button.setToolTip(
+            "Add the collection method to the queue and execute it")
 
+        # Layout --------------------------------------------------------------
         _button_box_hlayout = QHBoxLayout(self.button_box)
         _button_box_hlayout.addWidget(self.collect_now_button)
         _button_box_hlayout.addStretch(0)
@@ -116,7 +115,6 @@ class TaskToolBoxWidget(QWidget):
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.method_label)
         _main_vlayout.addWidget(self.tool_box)
-        #_main_vlayout.addStretch(0)  
         _main_vlayout.addWidget(self.button_box)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -131,19 +129,25 @@ class TaskToolBoxWidget(QWidget):
         self.collect_now_button.clicked.connect(self.collect_now_button_click)
         self.tool_box.currentChanged.connect(self.current_page_changed)
 
-        # Other ---------------------------------------------------------------   
+        for i in range(0, self.tool_box.count()):
+            self.tool_box.widget(i).acqParametersConflictSignal.connect(\
+               self.acq_parameters_conflict_changed)
+            self.tool_box.widget(i).pathTempleConflictSignal.connect(\
+               self.path_template_conflict_changed)
+
+        # Other ---------------------------------------------------------------
 
     def set_expert_mode(self, state):
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_expert_mode(state)
 
     def set_tree_brick(self, brick):
-        """
-        Sets the tree brick of each page in the toolbox.
+        """Sets the tree brick of each page in the toolbox.
         """
         self.tree_brick = brick
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_tree_brick(brick)
+        self.tree_brick.dc_tree_widget.enableCollectSignal.connect(self.enable_collect_changed)
 
     def use_osc_start_cbox(self, status):
         for i in range(0, self.tool_box.count()):
@@ -193,10 +197,19 @@ class TaskToolBoxWidget(QWidget):
             #self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
             #self.xray_imaging_page.hide()
             #logging.getLogger("GUI").warning("Xray Imaging task not available")
-        if self.gphl_workflow_page is not None:
+
+        has_gphl_workflow = False
+        if hasattr(beamline_setup_hwobj, 'gphl_workflow_hwobj'):
+            if beamline_setup_hwobj.gphl_workflow_hwobj:
+                has_gphl_workflow = True
+
+        if has_gphl_workflow:
             self.gphl_workflow_page.initialise_workflows(
                 beamline_setup_hwobj.gphl_workflow_hwobj
             )
+        else:
+            logging.getLogger("GUI").info("GPhL workflow task not available")
+
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
@@ -207,21 +220,21 @@ class TaskToolBoxWidget(QWidget):
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)
-        login, ie ProposalBrick. The signal is emitted when a user was 
+        login, ie ProposalBrick. The signal is emitted when a user was
         succesfully logged in.
         """
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).ispyb_logged_in(logged_in)
-            
+
     def current_page_changed(self, page_index):
         tree_items =  self.tree_brick.get_selected_items()
         #self.collect_now_button.setHidden(page_index > 0)
         self.create_task_button.setEnabled(False)
 
-        if len(tree_items) > 0:        
+        if len(tree_items) > 0:
             tree_item = tree_items[0]
 
-            # Get the directory form the previous page and update 
+            # Get the directory form the previous page and update
             # the new page with the direcotry and run_number from the old.
             # IF sample, basket group selected.
             if type(tree_item) in (Qt4_queue_item.DataCollectionGroupQueueItem, \
@@ -306,7 +319,7 @@ class TaskToolBoxWidget(QWidget):
             self.method_label.setText(title)
         else:
             self.create_task_button.setEnabled(True)
-         
+
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)
 
@@ -329,8 +342,8 @@ class TaskToolBoxWidget(QWidget):
                     # Create a new group if sample is selected
                     if isinstance(task_model, queue_model_objects.Sample):
                         task_model = self.create_task_group(task_model)
-                        if self.tool_box.currentWidget() in (self.discrete_page, 
-                           self.char_page, self.energy_scan_page, 
+                        if self.tool_box.currentWidget() in (self.discrete_page,
+                           self.char_page, self.energy_scan_page,
                            self.xrf_spectrum_page) and len(shapes):
                             #This could be done in more nicer way...
                             for shape in shapes:
@@ -341,7 +354,7 @@ class TaskToolBoxWidget(QWidget):
                         for sample_node in task_model.get_sample_list():
                             child_task_model = self.create_task_group(sample_node)
                             if self.tool_box.currentWidget() in (self.discrete_page,
-                               self.char_page, self.energy_scan_page, 
+                               self.char_page, self.energy_scan_page,
                                self.xrf_spectrum_page) and len(shapes):
                                 for shape in shapes:
                                     self.create_task(child_task_model, shape)
@@ -349,7 +362,7 @@ class TaskToolBoxWidget(QWidget):
                                 self.create_task(child_task_model)
                     else:
                         if self.tool_box.currentWidget() in (self.discrete_page,
-                           self.char_page, self.energy_scan_page, 
+                           self.char_page, self.energy_scan_page,
                            self.xrf_spectrum_page) and len(shapes):
                             for shape in shapes:
                                 self.create_task(task_model, shape)
@@ -389,7 +402,7 @@ class TaskToolBoxWidget(QWidget):
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
             new_snapshot = self._beamline_setup_hwobj.\
                 shape_history_hwobj.get_scene_snapshot()
-            
+
             if isinstance(task_node, queue_model_objects.Characterisation):
                 new_node.reference_image_collection.acquisitions[0].\
                    acquisition_parameters.centred_position.snapshot_image = \
@@ -404,20 +417,41 @@ class TaskToolBoxWidget(QWidget):
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
 
     def collect_now_button_click(self):
-        if self.is_running:
-            self._beamline_setup_hwobj.collect_hwobj.stop_collect()
-            self.is_running = False
-            self.collect_now_button.setText("Collect Now")
-            self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
-        elif self.tool_box.currentWidget().approve_creation():
-            sample_item = self.tree_brick.dc_tree_widget.\
-                 get_mounted_sample_item()
-            self.collect_now_button.setText("Stop")   
-            self.collect_now_button.setIcon(Qt4_Icons.load_icon("Stop.png"))
+        self.create_task_button_click()
+        collect_items = []
+        for item in self.tree_brick.dc_tree_widget.get_collect_items():
+            if isinstance(item, Qt4_queue_item.SampleCentringQueueItem):
+                item.setOn(False)
+                item.setText(1, "Skipped")
+                item.get_model().set_executed(True)
+                item.get_model().set_running(False)
+                item.get_model().set_enabled(False)
+            else:
+                collect_items.append(item)
+        if self.tree_brick.dc_tree_widget.enable_collect_condition:
+            self.tree_brick.dc_tree_widget.collect_items(collect_items)
+        else:
+            logging.getLogger("GUI").warning("Collections are disabled")
 
-            self.is_running = True 
-            self.tool_box.currentWidget().execute_task(\
-                 sample_item.get_model())
-            self.is_running = False
-            self.collect_now_button.setText("Collect Now")
-            self.collect_now_button.setIcon(Qt4_Icons.load_icon("VCRPlay2.png"))
+    def path_template_conflict_changed(self, is_conflict):
+        self.path_conflict = is_conflict
+        self.toggle_queue_button_enable()
+
+    def acq_parameters_conflict_changed(self, is_conflict):
+        self.acq_conflict = is_conflict
+        self.toggle_queue_button_enable()
+
+    def enable_collect_changed(self, enable_collect):
+        self.enable_collect = enable_collect
+        self.toggle_queue_button_enable()
+
+
+    def toggle_queue_button_enable(self):
+        self.create_task_button.setDisabled(self.path_conflict or self.acq_conflict)
+        self.collect_now_button.setDisabled(self.path_conflict or 
+                                            self.acq_conflict or
+                                            not self.enable_collect)  
+        if self.tool_box.currentWidget() in (self.helical_page, self.advanced_page):
+            if len(self.tool_box.currentWidget().get_selected_shapes()) == 0:
+                self.create_task_button.setEnabled(False)
+                self.collect_now_button.setEnabled(False)
