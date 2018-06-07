@@ -38,8 +38,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
     """
     STATE_COLORS = (Qt4_widget_colors.LIGHT_YELLOW,  # INITIALIZING
                     Qt4_widget_colors.LIGHT_GREEN,   # ON
-                    Qt4_widget_colors.DARK_GRAY,     # OFF
+                    #Qt4_widget_colors.DARK_GRAY,     # OFF
                     Qt4_widget_colors.LIGHT_GREEN,   # READY
+                    Qt4_widget_colors.LIGHT_YELLOW,  # MOVING
                     Qt4_widget_colors.LIGHT_YELLOW,  # BUSY
                     Qt4_widget_colors.LIGHT_YELLOW,  # MOVING
                     Qt4_widget_colors.LIGHT_GREEN,   # STANDBY
@@ -125,35 +126,38 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.stop_button.setEnabled(False)
         self.stop_button.setToolTip("Stops the motor")
         self.stop_button.setFixedSize(27, 27)
+        
         self.step_button = QPushButton(self.main_gbox)
         self.step_button_icon = Qt4_Icons.load_icon('TileCascade2')
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
         self.step_button.setFixedSize(27, 27)
+        
         self.step_combo = QComboBox(self.main_gbox)
         self.step_combo.setEditable(True)
         self.step_combo.setValidator(QDoubleValidator(0, 360, 5, self.step_combo))
         self.step_combo.setDuplicatesEnabled(False)
         self.step_combo.setFixedHeight(27) 
+        
         self.position_slider = QDoubleSlider(Qt.Horizontal, self.main_gbox)
     
         # Layout --------------------------------------------------------------
-        _gbox_hbox_layout = QHBoxLayout(self.main_gbox)
-        _gbox_hbox_layout.addWidget(self.motor_label)
-        _gbox_hbox_layout.addWidget(self.position_spinbox)
-        _gbox_hbox_layout.addWidget(self.move_left_button)
-        _gbox_hbox_layout.addWidget(self.move_right_button)
-        _gbox_hbox_layout.addWidget(self.position_slider)
-        _gbox_hbox_layout.addWidget(self.stop_button)
-        _gbox_hbox_layout.addWidget(self.step_button)
-        _gbox_hbox_layout.addWidget(self.step_combo) 
-        _gbox_hbox_layout.setSpacing(2)
-        _gbox_hbox_layout.setContentsMargins(2, 2, 2, 2)
+        self._gbox_hbox_layout = QHBoxLayout(self.main_gbox)
+        self._gbox_hbox_layout.addWidget(self.motor_label)
+        self._gbox_hbox_layout.addWidget(self.position_spinbox)
+        self._gbox_hbox_layout.addWidget(self.move_left_button)
+        self._gbox_hbox_layout.addWidget(self.move_right_button)
+        self._gbox_hbox_layout.addWidget(self.position_slider)
+        self._gbox_hbox_layout.addWidget(self.stop_button)
+        self._gbox_hbox_layout.addWidget(self.step_button)
+        self._gbox_hbox_layout.addWidget(self.step_combo) 
+        self._gbox_hbox_layout.setSpacing(2)
+        self._gbox_hbox_layout.setContentsMargins(2, 2, 2, 2)
 
-        _main_hbox_layout = QVBoxLayout(self)
-        _main_hbox_layout.addWidget(self.main_gbox)
-        _main_hbox_layout.setSpacing(0)
-        _main_hbox_layout.setContentsMargins(0, 0, 0, 0)
+        self._main_hbox_layout = QVBoxLayout(self)
+        self._main_hbox_layout.addWidget(self.main_gbox)
+        self._main_hbox_layout.setSpacing(0)
+        self._main_hbox_layout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicy (horizontal, vertical) -----------------------------------
         #self.setSizePolicy(QSizePolicy.Fixed,
@@ -347,14 +351,12 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         step = 1.0
         if self.move_step is not None:
             step = self.move_step
+        elif hasattr(self.motor_hwobj, 'GUIstep'):
+            if self.motor_hwobj.GUIstep is not None:
+                step = self.motor_hwobj.GUIstep
         elif self['delta'] != "":
             step = float(self['delta'])
-        else:        
-            try:
-                step = self.motor_hwobj.GUIstep
-            except:
-                pass
-
+        
         if self.motor_hwobj.is_ready():
             self.set_position_spinbox_color(self.motor_hwobj.motor_states.READY)
             self.motor_hwobj.move_relative(step)
@@ -368,13 +370,11 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         step = 1.0
         if self.move_step is not None:
             step = self.move_step
+        elif hasattr(self.motor_hwobj, 'GUIstep'):
+            if self.motor_hwobj.GUIstep is not None:
+                step = self.motor_hwobj.GUIstep
         elif self['delta'] != "":
             step = float(self['delta'])
-        else:        
-            try:
-                step = self.motor_hwobj.GUIstep
-            except:
-                pass
 
         if self.motor_hwobj.is_ready():
             self.set_position_spinbox_color(self.motor_hwobj.motor_states.READY)
@@ -390,9 +390,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.main_gbox.setEnabled(True)
             if self.motor_hwobj.is_ready():
                 self.motor_hwobj.update_values()
-                #self.limits_changed(self.motor_hwobj.get_limits())
-                #self.position_changed(self.motor_hwobj.get_position())
-                #self.state_changed(self.motor_hwobj.get_state())
+                self.limits_changed(self.motor_hwobj.get_limits())
+                self.position_changed(self.motor_hwobj.get_position())
+                self.state_changed(self.motor_hwobj.get_state())
         else:
             self.main_gbox.setEnabled(False)
 
@@ -402,6 +402,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
+        
         if limits and not None in limits:
             self.position_spinbox.blockSignals(True)
             self.position_spinbox.setMinimum(limits[0])
@@ -554,11 +555,14 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        states = ("NOTINITIALIZED", "READY", 
-                  "MOVESTARTED", "MOVING",
+        states = ("NOTINITIALIZED", "MOVESTARTED", 
+                  "READY", "MOVING", 
                   "HIGHLIMIT", "LOWLIMIT")
         if name is None:
-            name = self['mnemonic']
+            try:
+                name = self.motor_hwobj.motor_name
+            except:
+                name = self['mnemonic']
 
         if self.motor_hwobj is None:
             tip = "Status: unknown motor "+name
@@ -587,7 +591,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                 l_bot = self['formatString'] % float(limits[0])
                 l_top = self['formatString'] % float(limits[1])
                 limits_str = " Limits:%s,%s" % (l_bot, l_top)
-            tip = "State: " + state_str + limits_str
+            tip = name + " State: " + state_str + limits_str
 
         self.motor_label.setToolTip(tip)
         if not self['showBox']:
