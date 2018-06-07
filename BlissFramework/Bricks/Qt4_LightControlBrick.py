@@ -45,21 +45,19 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.addProperty('icons', 'string', '')
         self.addProperty('out_delta', 'string', '')
 
-        self.light_off_button=QPushButton("",self.extra_button_box)
+        self.light_off_button=QPushButton(self.main_gbox)
         self.light_off_button.setIcon(Qt4_Icons.load_icon('BulbDelete'))
-
-        self.light_on_button=QPushButton("",self.extra_button_box)
+        self.light_off_button.setFixedSize(27, 27)
+        
+        self.light_on_button=QPushButton(self.main_gbox)
         self.light_on_button.setIcon(Qt4_Icons.load_icon('BulbCheck'))
+        self.light_on_button.setFixedSize(27, 27)
+        
+        self.light_off_button.clicked.connect(self.lightButtonOffClicked)
+        self.light_on_button.clicked.connect(self.lightButtonOnClicked)
 
-        self.light_on_button.clicked.connect(self.lightButtonOffClicked)
-        self.light_off_button.clicked.connect(self.lightButtonOnClicked)
-
-        self.extra_button_box_layout.addWidget(self.light_off_button)
-        self.extra_button_box_layout.addWidget(self.light_on_button)
-
-        #self.position_spinbox.close()
-        #self.step_button.close()
-        #self.stop_button.close()
+        self._gbox_hbox_layout.addWidget(self.light_off_button)
+        self._gbox_hbox_layout.addWidget(self.light_on_button)
 
         self.light_off_button.setToolTip("Switches off the light and sets the intensity to zero")
         self.light_on_button.setToolTip("Switches on the light and sets the intensity back to the previous setting")        
@@ -67,9 +65,12 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.light_off_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
         self.light_on_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
 
-
+               
     ### Light off pressed: switch off lamp and set out the wago
     def lightButtonOffClicked(self):
+        if self.motor_hwobj is not None and hasattr(self.motor_hwobj, 'move_in'):
+            self.motor_hwobj.move_in()
+            return
         #self.lightOffButton.setDown(True)
         if self.light_actuator_hwo is not None:
             if self.light_actuator_hwo.getState() != STATE_OUT:
@@ -95,6 +96,9 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
 
     ### Light on pressed: set in the wago and set lamp to previous position
     def lightButtonOnClicked(self):
+        if self.motor_hwobj is not None and hasattr(self.motor_hwobj, 'move_out'):
+            self.motor_hwobj.move_out()
+            return
         if self.light_actuator_hwo is not None:
             if self.light_actuator_hwo.getState() != STATE_IN:
                 self.lightStateChanged(STATE_UNKNOWN)
