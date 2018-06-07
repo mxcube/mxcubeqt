@@ -250,7 +250,8 @@ class MplCanvas(FigureCanvas):
             for curve_key in self._curves_dict.keys():
                 if data_key == curve_key:
                     self._curves_dict[curve_key].set_ydata(data_dict[data_key])
-                    self._curves_dict[curve_key].set_xdata(data_dict['x_array'])
+                    if 'x_array' in data_dict:
+                        self._curves_dict[curve_key].set_xdata(data_dict['x_array'])
 
         #self.axes.relim()
         #self.axes.autoscale_view()
