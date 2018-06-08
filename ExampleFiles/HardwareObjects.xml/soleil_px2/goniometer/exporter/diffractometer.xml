@@ -6,6 +6,8 @@
     <channel type="exporter" name="CurrentPhase">CurrentPhase</channel>
     <channel type="exporter" name="FastShutterIsOpen">FastShutterIsOpen</channel>
     <channel type="exporter" name="State">State</channel>
+    <channel type="exporter" name="Status">Status</channel>
+
     <channel type="exporter" name="ScintillatorPosition">ScintillatorPosition</channel>
     <channel type="exporter" name="CapillaryPosition">CapillaryPosition</channel>
     <channel type="exporter" name="TransferMode">TransferMode</channel>
