@@ -19,6 +19,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import logging
 
 from QtImport import *
 
@@ -32,18 +33,13 @@ MAD_ENERGY_COMBO_NAMES = {'ip': 0, 'pk': 1, 'rm1': 2, 'rm2': 3}
 
 
 class AcquisitionWidget(QWidget):
-    """
-    Descript. :
-    """
   
     acqParametersChangedSignal = pyqtSignal(list)
     madEnergySelectedSignal = pyqtSignal(str, float, bool)
 
-    def __init__(self, parent = None, name = None, fl = 0, acq_params = None,
-                 path_template = None, layout = 'horizontal'):
-        """
-        Descript. :
-        """
+    def __init__(self, parent=None, name=None, fl=0, acq_params=None,
+                 path_template=None, layout='horizontal'):
+
         QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         
         if name is not None:
@@ -127,6 +123,10 @@ class AcquisitionWidget(QWidget):
              self.transmission_ledit_changed)
         self.acq_widget_layout.resolution_ledit.textEdited.connect(\
              self.resolution_ledit_changed)
+        self.acq_widget_layout.kappa_ledit.textEdited.connect(\
+             self.kappa_ledit_changed)
+        self.acq_widget_layout.kappa_phi_ledit.textEdited.connect(\
+             self.kappa_phi_ledit_changed)
         
         overlap_ledit = self.acq_widget_layout.findChild(\
             QLineEdit, "overlap_ledit")
@@ -137,7 +137,8 @@ class AcquisitionWidget(QWidget):
         self.value_changed_list = []
 
         self.acq_widget_layout.energies_combo.setDisabled(True)
-        self.acq_widget_layout.energies_combo.addItems(['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
+        self.acq_widget_layout.energies_combo.addItems(\
+             ['ip: -', 'pk: -', 'rm1: -', 'rm2: -'])
 
         self.osc_start_validator = QDoubleValidator(\
              -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit)
@@ -163,9 +164,6 @@ class AcquisitionWidget(QWidget):
              1, 99999, self.acq_widget_layout.num_images_ledit) 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
-
-        #if self.acq_widget_layout.findChild(QPushButton, "set_max_osc_range_button"):
-        #    self.acq_widget_layout.set_max_osc_range_button.hide()
 
     def fix_osc_start(self, state):
         """
@@ -198,16 +196,28 @@ class AcquisitionWidget(QWidget):
             self.value_changed_list.append("osc_start")
         self.update_osc_total_range_limits()
         self.update_num_images_limits()
+        self.emit_acq_parameters_changed()
 
     def update_osc_start_limits(self):
         """In the plate mode sets osc start limits"""
         if self._diffractometer_hwobj.in_plate_mode():
-            limits = self._diffractometer_hwobj.get_osc_limits()
+
+            #limits = self._diffractometer_hwobj.get_osc_limits()
+            """
+            num_images = int(self.acq_widget_layout.num_images_ledit.text())
+            exposure_time = float(self.acq_widget_layout.exp_time_ledit.text())
+
+            limits, result_exp_time = self.update_osc_total_range_limits(\
+                 calc_by_speed=False,
+                 num_images=num_images,
+                 exp_time=exposure_time)
+
             self.osc_start_validator.setRange(limits[0], limits[1], 4)
             self.acq_widget_layout.osc_start_ledit.setToolTip(
                "Oscillation start limits %0.2f : %0.2f\n" % \
                (limits[0], limits[1]) +
                "4 digits precision.")
+            """
 
             self.update_osc_total_range_limits()
             self.update_num_images_limits()
@@ -217,6 +227,7 @@ class AcquisitionWidget(QWidget):
         self.update_osc_total_range()
         self.update_num_images_limits()
         self.update_exp_time_limits()
+        self.emit_acq_parameters_changed()
 
     def update_osc_range_per_frame_limits(self):
         try:
@@ -262,6 +273,7 @@ class AcquisitionWidget(QWidget):
                 self.acq_widget_layout.num_images_ledit.blockSignals(False)
             except:
                 pass
+            self.emit_acq_parameters_changed()
 
     def update_osc_total_range_limits(self, calc_by_speed=True, num_images=None, exp_time=None):
         """Updates osc totol range. Limits are changed if a plate is used.
@@ -271,21 +283,37 @@ class AcquisitionWidget(QWidget):
              and osc in the middle of mesh  
         """
         if self._diffractometer_hwobj.in_plate_mode():
+            scan_limits = None
+            result_exp_time = None
+ 
             if calc_by_speed:
-                scan_limits, result_exp_time = self._diffractometer_hwobj.get_scan_limits(\
-                   speed=float(self.acq_widget_layout.osc_range_ledit.text()) /\
-                         float(self.acq_widget_layout.exp_time_ledit.text()))
+                exp_time = float(self.acq_widget_layout.exp_time_ledit.text())
+                osc_range_per_frame = float(self.acq_widget_layout.osc_range_ledit.text())
+
+                if exp_time > 0:
+                    scan_limits, result_exp_time = self._diffractometer_hwobj.get_scan_limits(\
+                       speed=osc_range_per_frame / exp_time)
             else:
                 scan_limits, result_exp_time = self._diffractometer_hwobj.get_scan_limits(\
                     num_images=num_images, exp_time=exp_time)
+
+            if not scan_limits:
+                scan_limits = [0, 0] 
+
             osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
             top_limit = abs(scan_limits[1] - osc_start)
  
             self.osc_total_range_validator.setTop(abs(scan_limits[1] - scan_limits[0]))
 
             tool_tip = "Oscillation range limits 0 : %0.5f\n4 digits precision." % \
-                abs(scan_limits[1] - scan_limits[0])
+                  abs(scan_limits[1] - scan_limits[0])
             self.acq_widget_layout.osc_total_range_ledit.setToolTip(tool_tip)
+
+            self.osc_start_validator.setRange(scan_limits[0], scan_limits[1], 4)
+            self.acq_widget_layout.osc_start_ledit.setToolTip(
+                "Oscillation start limits %0.2f : %0.2f\n" % \
+                (scan_limits[0], scan_limits[1]) +
+                "4 digits precision.")
 
             self._acquisition_mib.validate_all()
 
@@ -309,8 +337,7 @@ class AcquisitionWidget(QWidget):
         if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
            new_value:
             self.acq_widget_layout.kappa_ledit.setText(str(new_value))
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+            self.emit_acq_parameters_changed()
 
     def update_kappa_phi(self, new_value):
         """
@@ -319,8 +346,7 @@ class AcquisitionWidget(QWidget):
         if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and \
            new_value:
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+            self.emit_acq_parameters_changed()
 
     def use_osc_start(self, state):
         """
@@ -405,7 +431,7 @@ class AcquisitionWidget(QWidget):
                                                 self.exp_time_validator)
 
         if 'number_of_images' in limits_dict:
-            limits = tuple(map(int, limits_dict['number_of_images'].split(',')))
+            limits = tuple(map(float, limits_dict['number_of_images'].split(',')))
             (lower, upper) = limits
             self.num_img_validator.setRange(lower, upper)
             self.first_img_validator.setRange(lower, upper)
@@ -481,20 +507,19 @@ class AcquisitionWidget(QWidget):
         """
         Descript. :
         """
-        if str(new_value).isdigit():
-            #self._path_template.start_num = int(new_value)
-            #widget = self.acq_widget_layout.first_image_ledit
-            self.acqParametersChangedSignal.emit(\
-                 self.check_parameter_conflict())
+        #if str(new_value).isdigit():
+        #    #self._path_template.start_num = int(new_value)
+        #    #widget = self.acq_widget_layout.first_image_ledit
+        self.emit_acq_parameters_changed()
 
     def exposure_time_ledit_changed(self, new_values):
         """If the exposure time changes we have to check the osc speed
            and if necessary update osc range per frame
         """
         self.update_osc_range_per_frame_limits()
+        self.update_osc_total_range_limits()
         self.update_total_exp_time()
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+        self.emit_acq_parameters_changed()
 
     def num_images_ledit_change(self, new_value):
         """
@@ -502,10 +527,11 @@ class AcquisitionWidget(QWidget):
         """
         if str(new_value).isdigit():
             #self._path_template.num_files = int(new_value)
+            self.update_osc_range_per_frame_limits()
+            self.update_osc_total_range_limits()
             self.update_osc_total_range()
             self.update_total_exp_time()
-            self.acqParametersChangedSignal.emit(\
-                 self.check_parameter_conflict())
+        self.emit_acq_parameters_changed()
 
     def overlap_changed(self, new_value):
         """
@@ -594,9 +620,8 @@ class AcquisitionWidget(QWidget):
 
     def energy_ledit_changed(self, new_value):
         if "energy" not in self.value_changed_list:
-            self.value_changed_list.append("energy") 
-        self.acqParametersChangedSignal.emit(\
-            self.check_parameter_conflict())
+            self.value_changed_list.append("energy")
+        self.emit_acq_parameters_changed()
 
     def update_energy(self, energy, wav=None):
         """
@@ -605,33 +630,28 @@ class AcquisitionWidget(QWidget):
         if "energy" not in self.value_changed_list and \
            not self.acq_widget_layout.energy_ledit.hasFocus():
             self.acq_widget_layout.energy_ledit.setText(str(energy))
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+        self.emit_acq_parameters_changed()
 
     def transmission_ledit_changed(self, transmission):
         if "transmission" not in self.value_changed_list:
             self.value_changed_list.append("transmission")
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+        self.emit_acq_parameters_changed()
 
     def update_transmission(self, transmission):
         if "transmission" not in self.value_changed_list:
             self.acq_widget_layout.transmission_ledit.setText(str(transmission))
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+        self.emit_acq_parameters_changed()
            
     def resolution_ledit_changed(self, resolution):
         if "resolution" not in self.value_changed_list:
-            self.value_changed_list.append("resolution") 
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+            self.value_changed_list.append("resolution")
+        self.emit_acq_parameters_changed()
 
     def update_resolution(self, resolution):
         if "resolution" not in self.value_changed_list and \
            not self.acq_widget_layout.resolution_ledit.hasFocus():
             self.acq_widget_layout.resolution_ledit.setText(str(resolution))
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
+        self.emit_acq_parameters_changed()
 
     def update_energy_limits(self, limits):
         if limits:
@@ -670,14 +690,10 @@ class AcquisitionWidget(QWidget):
                "Exposure time limits %0.6f s : %0.1f s\n" % \
                (limits[0], limits[1]) + \
                "6 digits precision.")
-            #self.acq_widget_layout.exp_time_ledit.setText(\
-            #   "%.6f" % (limits[0] + 1e-5))
-
             self._acquisition_mib.validate_all()
 
     def update_num_images_limits(self, num_images_limits=None):
-        """Updates number of images limit
-           Method used if plate mode.
+        """Updates number of images limit. Method used if plate mode.
         """
 
         self._acquisition_mib.validate_all()
@@ -736,6 +752,16 @@ class AcquisitionWidget(QWidget):
         if self._beamline_setup_hwobj is not None:
             self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(roi_mode_index)
 
+    def kappa_ledit_changed(self, new_value):
+        if "kappa" not in self.value_changed_list:
+            self.value_changed_list.append("kappa")
+        self.emit_acq_parameters_changed()
+
+    def kappa_phi_ledit_changed(self, new_value):
+        if "kappa_phi" not in self.value_changed_list:
+            self.value_changed_list.append("kappa_phi")
+        self.emit_acq_parameters_changed()
+
     def update_data_model(self, acquisition_parameters, path_template):
         """
         Descript. :
@@ -757,11 +783,10 @@ class AcquisitionWidget(QWidget):
             self.acq_widget_layout.mad_cbox.setChecked(False)
             self.acq_widget_layout.energies_combo.setEnabled(False)
             self.acq_widget_layout.energies_combo.setCurrentIndex(0)
-        self.acqParametersChangedSignal.emit(\
-             self.check_parameter_conflict())
 
         self.update_osc_start_limits()
         self.update_osc_total_range()
+        self.emit_acq_parameters_changed()
 
     def set_tunable_energy(self, state):
         """
@@ -770,6 +795,9 @@ class AcquisitionWidget(QWidget):
         self.acq_widget_layout.energy_ledit.setEnabled(state)
         self.acq_widget_layout.mad_cbox.setEnabled(state)
         self.acq_widget_layout.energies_combo.setEnabled(state)
-
+  
     def check_parameter_conflict(self):
         return self._acquisition_mib.validate_all()
+
+    def emit_acq_parameters_changed(self):
+        self.acqParametersChangedSignal.emit(self._acquisition_mib.validate_all())

@@ -87,8 +87,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
-             self.acq_parameters_changed)
+        #self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
+        #     self.acq_parameters_changed)
         self._data_path_widget.pathTemplateChangedSignal.connect(\
              self.path_template_changed)
         self._adjust_transmission_cbox.stateChanged.connect(\
@@ -96,20 +96,20 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._max_transmission_ledit.textEdited.connect(\
              self.max_transmission_value_changed)
 
-    def enable_compression(self, state):
-        self._data_path_widget.data_path_layout.compression_cbox.setChecked(False)
-        self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
-
     def set_expert_mode(self, state):
         self._adjust_transmission_cbox.setEnabled(state)
         self._max_transmission_label.setEnabled(state)
         self._max_transmission_ledit.setEnabled(state)
+
+    def enable_compression(self, state):
+        CreateTaskBase.enable_compression(self, False)
 
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
         self._periodic_table_widget.set_elements(\
              self._beamline_setup_hwobj.energyscan_hwobj.getElements())
+        self.enable_compression(False)
 
         try:
             max_transmission_value = self._beamline_setup_hwobj.\
@@ -134,6 +134,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.start_num = 1
         self._path_template.num_files = 1
         self._path_template.suffix = 'raw'
+        self._path_template.compression = False
 
     def single_item_selection(self, tree_item):
         """

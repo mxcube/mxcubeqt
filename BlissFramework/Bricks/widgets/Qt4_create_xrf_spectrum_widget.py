@@ -81,8 +81,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         # Other ---------------------------------------------------------------
 
     def enable_compression(self, state):
-        self._data_path_widget.data_path_layout.compression_cbox.setChecked(False)
-        self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+        CreateTaskBase.enable_compression(self, False)
 
     def set_expert_mode(self, state):
         self.adjust_transmission_cbox.setEnabled(state)
@@ -93,6 +92,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self._path_template.start_num = 1
         self._path_template.num_files = 1
         self._path_template.suffix = 'raw'
+        self._path_template.compression = False
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)

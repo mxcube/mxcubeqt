@@ -19,18 +19,20 @@
 
 import os
 import numpy
+from scipy import ndimage
 
 from QtImport import *
 
-from copy import copy
+from copy import deepcopy
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_matplot_widget import TwoDimenisonalPlotWidget
 
 
 class HeatMapWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, allow_adjust_size=True):
         QWidget.__init__(self, parent)
         self.setObjectName('heat_map_widget')
+        self.allow_adjust_size = allow_adjust_size
 
         # Properties ---------------------------------------------------------- 
 
@@ -43,17 +45,17 @@ class HeatMapWidget(QWidget):
 
         # Internal values -----------------------------------------------------
         self.__results = None
-        self.__result_display = {}
+        self.__results_display = None
         self.__associated_grid = None
         self.__associated_data_collection = None
         self.__selected_x = 0
         self.__selected_y = 0
         self.__selected_image_serial = 0
-        self.__is_map_plot = None
         self.__score_key = "score"
         self.__max_value = 0
         self.__filter_min_value = 0
         self.__best_pos_list = None
+        self.__label_im = None
         self.__heat_map_max_size = []
         self.__heatmap_clicked = False
         self.__enable_continues_image_display = True
@@ -63,11 +65,13 @@ class HeatMapWidget(QWidget):
         self._heat_map_gbox = QGroupBox('Heat map', self)
         self._heat_map_plot = TwoDimenisonalPlotWidget(self)
         self._heat_map_popup_menu = QMenu(self._heat_map_gbox)
-        self._image_info_label = QLabel("Image: #, value #", self._heat_map_gbox)
+
+        heat_map_info_widget = QWidget(self._heat_map_gbox)
+        score_type_label = QLabel("Score type: ", heat_map_info_widget)
+        self._score_type_cbox = QComboBox(heat_map_info_widget)
+        self._image_info_label = QLabel("Image: #, value #", heat_map_info_widget)
 
         self._heat_map_tools_widget = QWidget(self._heat_map_gbox)
-        score_type_label = QLabel("Score type: ", self._heat_map_tools_widget)
-        self._score_type_cbox = QComboBox(self._heat_map_tools_widget)
 
         _threshold_label = QLabel("Threshold: ", self._heat_map_tools_widget)
         self._threshold_slider = QSlider(Qt.Horizontal, 
@@ -85,33 +89,39 @@ class HeatMapWidget(QWidget):
         self._best_pos_gbox.setHidden(True)
 
         # Layout --------------------------------------------------------------
+        _heat_map_info_hlayout = QHBoxLayout(heat_map_info_widget)
+        _heat_map_info_hlayout.addWidget(score_type_label)
+        _heat_map_info_hlayout.addWidget(self._score_type_cbox)
+        _heat_map_info_hlayout.addStretch(0)
+        _heat_map_info_hlayout.addWidget(self._image_info_label)
+        _heat_map_info_hlayout.setSpacing(2)
+        _heat_map_info_hlayout.setContentsMargins(0, 0, 0, 0)
+
         _heat_map_tools_hlayout = QHBoxLayout(self._heat_map_tools_widget)
-        _heat_map_tools_hlayout.addWidget(score_type_label)
-        _heat_map_tools_hlayout.addWidget(self._score_type_cbox)
         _heat_map_tools_hlayout.addWidget(_threshold_label)
         _heat_map_tools_hlayout.addWidget(self._threshold_slider)
         _heat_map_tools_hlayout.addStretch(0)
         _heat_map_tools_hlayout.addWidget(self._relaunch_processing_button)
         _heat_map_tools_hlayout.addWidget(self._create_points_button)
         _heat_map_tools_hlayout.setSpacing(2)
-        _heat_map_tools_hlayout.setContentsMargins(2, 2, 2, 2)
+        _heat_map_tools_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _heat_map_gbox_vlayout = QVBoxLayout(self._heat_map_gbox)
         _heat_map_gbox_vlayout.addWidget(self._heat_map_plot)
-        _heat_map_gbox_vlayout.addWidget(self._image_info_label)
+        _heat_map_gbox_vlayout.addWidget(heat_map_info_widget)
         _heat_map_gbox_vlayout.addWidget(self._heat_map_tools_widget)
         _heat_map_gbox_vlayout.setSpacing(2)
-        _heat_map_gbox_vlayout.setContentsMargins(2, 4, 2, 2)
+        _heat_map_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
         
         _summary_gbox_vlayout = QVBoxLayout(self._summary_gbox)
         _summary_gbox_vlayout.addWidget(self._summary_textbrowser)
         _summary_gbox_vlayout.setSpacing(2)
-        _summary_gbox_vlayout.setContentsMargins(2, 4, 2, 2)
+        _summary_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
         _best_postition_gbox_vlayout = QVBoxLayout(self._best_pos_gbox)
         _best_postition_gbox_vlayout.addWidget(self._best_pos_table)
         _best_postition_gbox_vlayout.setSpacing(2)
-        _best_postition_gbox_vlayout.setContentsMargins(2, 4, 2, 2)
+        _best_postition_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_hlayout = QVBoxLayout(self)
         _main_hlayout.addWidget(self._heat_map_gbox)
@@ -177,10 +187,11 @@ class HeatMapWidget(QWidget):
 
         self._heat_map_plot.contextMenuEvent = self.open_heat_map_popup_menu
 
-        score_types = ["Score", "Spots num", "Int aver.", "Resolution"]
+        score_types = ["Resolution", "Score", "Spots num"]
         for score_type in score_types:
             self._score_type_cbox.addItem(score_type)
         self._score_type_cbox.setMaximumWidth(200)
+        self.__score_key = "spots_resolution"
 
         #self._threshold_slider.setTickmarks(QtGui.QSlider.Below)
         self._threshold_slider.setRange(0, 100)
@@ -227,31 +238,68 @@ class HeatMapWidget(QWidget):
     def set_associated_data_collection(self, data_collection):
         self.__associated_data_collection = data_collection
         self.__associated_grid = self.__associated_data_collection.grid
+        acq_parameters = self.__associated_data_collection.acquisitions[0].\
+                    acquisition_parameters
 
-        if self.__associated_grid is None:
-            self.__is_map_plot = False
+        if not data_collection.is_mesh():
+            #x_array = numpy.linspace(0, acq_parameters.num_images, acq_parameters.num_images, dtype="int16")
+            x_array = numpy.array([])
+            y_array = numpy.array([])
+
+            self._heat_map_plot.add_curve("spots_resolution",
+                                          y_array,
+                                          x_array,
+                                          linestyle="None",
+                                          label="Resolution",
+                                          color="m",
+                                          marker=".")
+            self._heat_map_plot.add_curve("score",
+                                          y_array,
+                                          x_array,
+                                          label="Total score",
+                                          linestyle="None",
+                                          color="b",
+                                          marker=".")
+            self._heat_map_plot.add_curve("spots_num",
+                                          y_array,
+                                          x_array,
+                                          label="Number of spots",
+                                          linestyle="None",
+                                          color="b",
+                                          marker=".")
+            self._heat_map_plot.hide_all_curves()
+            self._heat_map_plot.show_curve(self.__score_key)
+
+            self.adjust_axes()
         else:
-            self.__is_map_plot = True
+            if self.allow_adjust_size:
+                grid_size = self.__associated_grid.get_size_pix()
+
+                width = grid_size[0] * 5
+                height = grid_size[1] * 5
+                ratio = float(width) / height
+
+                if width > self.__heat_map_max_size[0]:
+                    width = self.__heat_map_max_size[0]
+                    height = width / ratio
+                if height > self.__heat_map_max_size[1]:
+                    height = self.__heat_map_max_size[1]
+                    width = height * ratio
+
+                self._heat_map_plot.setFixedWidth(width)
+                self._heat_map_plot.setFixedHeight(height)
+
             axis_range = self.__associated_grid.get_col_row_num()
-            grid_size = self.__associated_grid.get_size_pix()
-
-            width = grid_size[0] * 5
-            height = grid_size[1] * 5
-            ratio = float(width) / height
-
-            if width > self.__heat_map_max_size[0]:
-                width = self.__heat_map_max_size[0]
-                height = width / ratio
-            if height > self.__heat_map_max_size[1]:
-                height = self.__heat_map_max_size[1]
-                width = height * ratio
-
-            self._heat_map_plot.setFixedWidth(width)
-            self._heat_map_plot.setFixedHeight(height)
-
-            #axis_range = self.__associated_grid.get_col_row_num()
-            self._heat_map_plot.set_x_axis_limits((0, axis_range[0]))
             self._heat_map_plot.set_y_axis_limits((0, axis_range[1]))
+            self._heat_map_plot.set_x_axis_limits((0, axis_range[0]))
+
+            self._summary_textbrowser.append("<b>Mesh parameters</b>")
+            grid_params = self.__associated_grid.get_properties()
+
+            empty_array = numpy.zeros(acq_parameters.num_images).\
+                reshape(grid_params["steps_x"], grid_params["steps_y"])
+                                                                  
+            self._heat_map_plot.plot_result(numpy.transpose(empty_array))
 
     def main_gbox_toggled(self, toggle):
         self._heat_map_plot.setHidden(not toggle)
@@ -270,96 +318,54 @@ class HeatMapWidget(QWidget):
 
     def score_type_changed(self, score_type_index):
         if score_type_index == 0:
-            self.__score_key = "score"
-        elif score_type_index == 1:
-            self.__score_key = "spots_num"
-        elif score_type_index == 2:
-            self.__score_key = "spots_int_aver"
-        elif score_type_index == 3:
             self.__score_key = "spots_resolution"
-        elif score_type_index == 4:
-            self.__score_key = "image_num"
-        self.refresh()         
+        elif score_type_index == 1:
+            self.__score_key = "score"
+        elif score_type_index == 2:
+            self.__score_key = "spots_num"
 
-    def refresh(self):
-        self._summary_textbrowser.clear()
-        if self.__results is None:
-            return         
+        if self.__results is not None:
+            if self.__results[self.__score_key].ndim == 1:
+                self._heat_map_plot.hide_all_curves()
+                self._heat_map_plot.show_curve(self.__score_key)
+                self.adjust_axes()
+            else:
+                self._heat_map_plot.plot_result(numpy.transpose(self.__results[self.__score_key]))
 
-        #for key in self.__results.keys():
-        #    self.__result_display[key] = copy(self.__results[key])
+    def adjust_axes(self):
+        #self._summary_textbrowser.clear()
 
-        self.__filter_min_value = \
-             self.__result_display[self.__score_key].max() * \
-             self._threshold_slider.value() / 100.0
-        self.__result_display[self.__score_key][self.__result_display[self.__score_key] < \
-                                                self.__filter_min_value] = 0
-    
-        if len(self.__result_display[self.__score_key].shape) == 1:
-            x_data = numpy.arange(1, self.__result_display[self.__score_key].shape[0] + 1)
-            self._heat_map_plot.clear()
-            #self._heat_map_plot.add_curve(self.__result_display, x_data, "Dozor result")
-            self._heat_map_plot.add_curve(self.__results["score"],
-                                          x_data,
-                                          label="Total score",
-                                          linestyle="None",
-                                          color="b",
-                                          marker="s")
-            """
-            self._heat_map_plot.add_curve(self.__results["spots_num"],
-                                          x_data,
-                                          label="Number of spots",
-                                          linestyle="None",
-                                          color="b",
-                                          marker="o")
-            self._heat_map_plot.add_curve(self.__results["spots_int_aver"],
-                                          x_data,
-                                          label="Int aver",
-                                          linestyle="None",
-                                          color="g",
-                                          marker="s")
-            self._heat_map_plot.add_curve(self.__results["spots_resolution"],
-                                          x_data,
-                                          linestyle="None",
-                                          label="Resolution",
-                                          color="m",
-                                          marker="s")
-            """
-            #self._heat_map_plot.enable_selection_range()
-            #self._heat_map_plot.enable_legend()
-        else:
-            if self.__associated_grid:
-                self._summary_textbrowser.append("<b>Mesh parameters</b>")
-                grid_properties = self.__associated_grid.get_properties()
+        if self.__results:
+            if self.__results[self.__score_key].ndim == 1:
+                self._heat_map_plot.adjust_axes(self.__score_key)
 
-                self._heat_map_plot.plot_result(numpy.transpose(self.__result_display[self.__score_key]),
-                                                aspect=grid_properties["dx_mm"] / \
-                                                       grid_properties["dy_mm"])
+                labels = []
+                positions = numpy.linspace(0, self.__results[self.__score_key].max(), 5)
 
-                """ 
-                self._summary_textbrowser.append("Number of columns: %d" % \
-                     grid_properties["steps_x"])
-                self._summary_textbrowser.append("Number of rows: %d" % \
-                     grid_properties["steps_y"])
-                self._summary_textbrowser.append("Horizontal spacing: %.1f %sm" % \
-                    (grid_properties["xOffset"], u"\u00B5"))
-                self._summary_textbrowser.append("Vertical spacing: %.1f %sm" % \
-                    (grid_properties["yOffset"], u"\u00B5"))
-                self._summary_textbrowser.append("Scan range : %.1f x %.1f mm" % \
-                    (grid_properties["dx_mm"], grid_properties["dy_mm"]))
+                if self.__score_key == "spots_resolution":
+                    labels.append('inf')
+                    for item in positions[1:]:  
+                        labels.append("%.2f"%(1./item))
+                else:
+                    for item in positions:
+                        labels.append("%d"% item)
 
-                self._summary_textbrowser.append("<b>Scan results</b>")
-                self._summary_textbrowser.append("Scan lines: %d" % \
-                     grid_properties["num_lines"])
-                self._summary_textbrowser.append("Images per line: %d" % \
-                     grid_properties["num_images_per_line"])
-                """
-        #self._summary_textbrowser.append("Number of frames with diffraction spots: %d" % \
-        #     (self.__results["score"] > 0).sum())
+                self._heat_map_plot.set_yticks(positions)
+                self._heat_map_plot.set_ytick_labels(labels)
 
     def filter_min_slider_changed(self, value):
-        #self.__associated_grid.set_min_score(self._threshold_slider.value() / 100.0)
-        self.refresh()
+        self.__results_display = deepcopy(self.__results)
+
+        for key in self.__results_display.keys():
+            if key != "best_positions":
+                filter_value = self.__results_display[key].max() * value / 100.0
+                self.__results_display[key][self.__results_display[key] < filter_value] = 0
+
+        if self.__results_display[self.__score_key].ndim == 1:
+            self._heat_map_plot.update_curves(self.__results_display)
+            self.adjust_axes()
+        else:
+            self._heat_map_plot.plot_result(numpy.transpose(self.__results_display[self.__score_key]))
 
     def mouse_moved(self, pos_x, pos_y):
         if self.__enable_continues_image_display and \
@@ -375,15 +381,24 @@ class HeatMapWidget(QWidget):
         self.__heatmap_clicked = True
         self.__selected_x = pos_x
         self.__selected_y = pos_y
-        image, line, self.selected_image_serial, image_path = \
-              self.get_image_parameters_from_coord()
-        try:
-           col, row = self.get_col_row_from_image_line(line, image)
-           msg = "Image: %d, value: %.1f" %(self.selected_image_serial,
-                 self.__result_display[self.__score_key][col][row])
-        except:
-           msg = "Image: %d" % self.selected_image_serial
-        self._image_info_label.setText(msg)
+
+        if self.__associated_data_collection:
+            msg = ""
+            if self.__associated_grid: 
+                image, line, self.selected_image_serial, image_path = \
+                      self.get_image_parameters_from_coord()
+                col, row = self.get_col_row_from_image_line(line, image)
+                if self.__results:
+                    msg = "Image: %d, value: %.1f" %(self.selected_image_serial,
+                             self.__results[self.__score_key][col][row])
+                else: 
+                    msg = "Image: %d" % self.selected_image_serial
+
+                label_im = deepcopy(self.__label_im)
+                label_im[label_im != label_im[col, row]] = 0
+            else:
+                msg = "Image: %d" % int(pos_x) 
+            self._image_info_label.setText(msg)
 
     def plot_double_clicked(self, event):
         self.move_to_selected_position()
@@ -400,8 +415,16 @@ class HeatMapWidget(QWidget):
         Displays results on the widget
         """
         self.__results = results
-        self.__result_display = results
-        self.refresh()
+        #self.__results_display = results
+
+        if self.__results[self.__score_key].ndim == 1:
+            self._heat_map_plot.update_curves(results)
+            self.adjust_axes()
+        else:
+            self._heat_map_plot.plot_result(numpy.transpose(results[self.__score_key]))
+        
+        if last_results:
+            self.__label_im, nb_labels = ndimage.label(self.__results['score'] > 0)
         #self.set_best_pos()
 
     def clean_result(self):
@@ -431,9 +454,13 @@ class HeatMapWidget(QWidget):
         All images are checked and if the value is over the threshold
          then screen x and y coordinates are estimated.
         """
-        if self.__is_map_plot:
+        if self.__results[self.__score_key].ndim == 1:
+            for col in range(self.__result.shape[0]):
+                if self.__result[col] > 0:
+                    self.create_centring_point(col + 0.5)
+        else:
             #result_display = numpy.transpose(self.__result_display[self.__score_key])
-            result_display = self.__result_display[self.__score_key]
+            result_display = self.__results[self.__score_key]
             #step_x = pix_width / self.__result_display.shape[0]
             #step_y = pix_height / self.__result_display.shape[1]
             for col in range(result_display.shape[0]):
@@ -442,10 +469,6 @@ class HeatMapWidget(QWidget):
                         #MD2
                         row = result_display.shape[1] - row - 1
                         self.create_centring_point(col + 0.5, row + 0.5)
-        else:
-            for col in range(self.__result_display.shape[0]):
-                if self.__result_display[col] > 0:
-                    self.create_centring_point(col + 0.5)
         self._beamline_setup_hwobj.shape_history_hwobj.select_all_points()
   
     def display_image_clicked(self):
@@ -466,9 +489,9 @@ class HeatMapWidget(QWidget):
             try:
                 col, row = self.get_col_row_from_image_line(line, image)
                 tooltip_text += "\nTotal score: %.1f" %  \
-                                self.__result_display['score'][col][row] +\
+                                self.__results['score'][col][row] +\
                                 "\nNumber of spots: %d" % \
-                                self.__result_display['spots_num'][col][row]
+                                self.__results['spots_num'][col][row]
             except:
                 pass
         self._heat_map_plot.setToolTip(tooltip_text)
@@ -487,7 +510,7 @@ class HeatMapWidget(QWidget):
             coord_y = self.__selected_y
          
 
-        if self.__is_map_plot:
+        if self.__associated_grid:
             num_cols, num_rows = self.__associated_grid.get_col_row_num()
             if coord_x > num_cols:
                 coord_x = num_cols
@@ -512,7 +535,7 @@ class HeatMapWidget(QWidget):
         """
         col, row = self.__associated_grid.get_col_row_from_line_image(line, image)
         ## TODO check if next line needs to be removed
-        row = self.__result_display[self.__score_key].shape[1] - row - 1    
+        row = self.__results[self.__score_key].shape[1] - row - 1
         return col, row
 
     def create_centring_point(self, coord_x=None, coord_y=None):
@@ -533,7 +556,7 @@ class HeatMapWidget(QWidget):
                          acquisition_parameters.osc_range
 
         omega = None
-        if self.__is_map_plot:
+        if self.__associated_grid:
             self.__associated_grid.set_osc_range(osc_range)
             motor_pos_dict = self.__associated_grid.\
                  get_motor_pos_from_col_row(coord_x, coord_y)

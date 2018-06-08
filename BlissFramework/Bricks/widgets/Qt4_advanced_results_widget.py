@@ -28,7 +28,7 @@ from widgets.Qt4_heat_map_widget import HeatMapWidget
 
 
 class AdvancedResultsWidget(QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None, allow_adjust_size=True):
         QWidget.__init__(self, parent)
         self.setObjectName('advanced_results_widget')  
 
@@ -37,10 +37,9 @@ class AdvancedResultsWidget(QWidget):
         # Internal variables --------------------------------------------------
         self._initialized = None
         self._tree_view_item = None
-        self._half_widget_size = 2000
 
         # Graphic elements ----------------------------------------------------
-        self.heat_map_widget = HeatMapWidget(self)
+        self.heat_map_widget = HeatMapWidget(self, allow_adjust_size)
 
         # Layout --------------------------------------------------------------
         _main_hlayout = QHBoxLayout(self)

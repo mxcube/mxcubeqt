@@ -139,10 +139,10 @@
           <property name="horizontalSpacing">
            <number>2</number>
           </property>
-          <item row="3" column="0">
-           <widget class="QLabel" name="a_label">
+          <item row="0" column="4">
+           <widget class="QLabel" name="c_label">
             <property name="text">
-             <string>a:</string>
+             <string>c:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
@@ -178,26 +178,6 @@
               <width>35</width>
               <height>32767</height>
              </size>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="alpha_label">
-            <property name="text">
-             <string>α:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <widget class="QLabel" name="c_label">
-            <property name="text">
-             <string>c:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -327,6 +307,26 @@
             </property>
            </spacer>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="alpha_label">
+            <property name="text">
+             <string>α:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="a_label">
+            <property name="text">
+             <string>a:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -360,7 +360,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Run parallel processing</string>
+           <string>Run Dozor</string>
           </property>
           <property name="checked">
            <bool>false</bool>

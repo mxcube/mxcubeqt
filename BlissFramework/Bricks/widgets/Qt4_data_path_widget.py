@@ -132,14 +132,16 @@ class DataPathWidget(QWidget):
         self.pathTemplateChangedSignal.emit()
 
     def _run_number_ledit_change(self, new_value):
-        """
-        Descript. :
-        """
         if str(new_value).isdigit():
-            self.set_run_number(new_value)
+            self._data_model.run_number = int(new_value)
+            self.data_path_layout.run_number_ledit.setText(str(new_value))
 
             self.update_file_name()
             self.pathTemplateChangedSignal.emit()
+        else:
+            self.data_path_layout.run_number_ledit.setText(str(self._data_model.run_number))
+            Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
+                                               Qt4_widget_colors.LIGHT_YELLOW)
 
     def _folder_ledit_change(self, new_value):        
         """
@@ -222,12 +224,12 @@ class DataPathWidget(QWidget):
 
         self.data_path_layout.base_path_ledit.setText(base_image_dir)       
 
-    def set_run_number(self, run_number):
-        """
-        Descript. :
-        """
-        self._data_model.run_number = int(run_number)
-        self.data_path_layout.run_number_ledit.setText(str(run_number))
+    #def set_run_number(self, run_number):
+    #    """
+    #    Descript. :
+    #    """
+    #    self._data_model.run_number = int(run_number)
+    #    self.data_path_layout.run_number_ledit.setText(str(run_number))
 
     def set_prefix(self, base_prefix):
         """
