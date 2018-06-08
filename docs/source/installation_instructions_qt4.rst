@@ -48,6 +48,7 @@ Other dependencies:
 * `jsonpickle <https://pypi.python.org/pypi/jsonpickle/0.7.0>`_
 * `yaml <https://pypi.python.org/pypi/PyYAML/3.12>`_
 * `scipy stack <http://www.scipy.org/install.html>`_
+* `enum34 <https://pypi.org/project/enum34/>`_
 * `PyChooch <http://github.com/mxcube/pychooch>`_
 * `PyMca <http://sourceforge.net/projects/pymca/>`_
 
@@ -57,6 +58,7 @@ Other dependencies:
 .. code-block:: bash
 
    sudo apt-get install python-qt4 python-gevent python-louie python-jsonpickle python-yaml python-numpy python-scipy python-matplotlib python-suds pymca
+   sudo pip install enum34
 
 If Qt5 used:
 
@@ -70,7 +72,7 @@ If Qt5 used:
 .. code-block:: bash
 
    sudo yum install qt qt-demos qt-designer qt4 qt4-designer PyQt4 PyQt4-webkit numpy scipy python-pip
-   sudo pip install matplotlib PyDispatcher
+   sudo pip install matplotlib PyDispatcher enum34
 
 Some hints if problems during ``sudo pip install matplotlib``:
 
