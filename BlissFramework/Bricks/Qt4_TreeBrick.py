@@ -531,10 +531,20 @@ class Qt4_TreeBrick(BlissWidget):
     def diffractometer_ready_changed(self, status):
         #self.enable_widgets.emit(status) 
         self.diffractometer_ready.emit(self.diffractometer_hwobj.is_ready()) 
+        logging.getLogger('HWR').info('diffractometer_ready_changed %s' % status)
+        logging.getLogger('HWR').info('self.diffractometer_hwobj.get_status() %s' % self.diffractometer_hwobj.get_status())
         if status:
-            BlissWidget.set_status_info("diffractometer", "Ready", "ready")
+            try:
+                info_message = self.diffractometer_hwobj.get_status()
+            except:
+                info_message = "Ready"
+            BlissWidget.set_status_info("diffractometer", info_message, "ready")
         else:
-            BlissWidget.set_status_info("diffractometer", "Not ready", "running")
+            try:
+                info_message = self.diffractometer_hwobj.get_status()
+            except:
+                info_message = "Not ready"
+            BlissWidget.set_status_info("diffractometer", info_message, "running")
 
     def diffractometer_automatic_centring_done(self, point):
         if self.dc_tree_widget.centring_method == \
