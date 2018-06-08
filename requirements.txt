@@ -7,3 +7,4 @@ numpy
 scipy
 matplotlib
 pymca
+enum34
