@@ -179,7 +179,7 @@
             - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
               name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
             - {comment: '', defaultValue: '', hidden: false, name: mnemonicList, oldValue: '',
-              type: string, value: /experimental_methods/mxcollect /singleton_objects/cats}
+              type: string, value: /experimental_methods/diffraction_methods /singleton_objects/cats}
             type: Qt4_ProgressBarBrick
           - brick: {class: Qt4_LogBarBrick, name: log_bar_brick}
             children: []
@@ -1106,7 +1106,7 @@
                     name: hutchmenu_brick
                     properties:
                     - {comment: '', defaultValue: '', hidden: false, name: collection,
-                      oldValue: '', type: string, value: /mxcollect}
+                      oldValue: '', type: string, value: /experimental_methods/diffraction_methods}
                     - {comment: '', defaultValue: 1, hidden: false, name: enableAutoCenter,
                       oldValue: 1, type: boolean, value: 1}
                     - {comment: '', defaultValue: 1, hidden: false, name: enableAutoFocus,

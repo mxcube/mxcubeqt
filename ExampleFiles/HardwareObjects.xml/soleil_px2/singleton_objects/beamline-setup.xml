@@ -18,7 +18,7 @@
     
     <!-- Procedures and routines -->
     <object href="/mockups/energyscan-mockup" role="energyscan"/>
-    <object href="/experimental_methods/mxcollect" role="collect"/>
+    <object href="/experimental_methods/diffraction_methods" role="collect"/>
     <object href="/singleton_objects/parallel-processing" role="parallel_processing"/>
     <object href="/mockups/xrf-spectrum-mockup" role="xrf_spectrum"/>
     <object href="/mockups/detector-mockup" role="detector"/>
