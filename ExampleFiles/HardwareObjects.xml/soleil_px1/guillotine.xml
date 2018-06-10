@@ -1,7 +1,0 @@
-<device class="Guillotine">
-  <username>Guillotine</username>
-  <tangoname>i10-c-cx1/ex/guillot-ev</tangoname> 
-
-  <channel type="tango" name="state">State</channel>
-
-</device>
