@@ -1,34 +1,35 @@
-<object class="PX1MultiCollect">
+<object class="PX1Collect">
 
-   <collectname>i10-c-cx1/ex/collect</collectname>
-   <pilatusname>i10-c-cx1/dt/pilatus</pilatusname>
-   <fluomotor>i10-c-cx1/dt/dtc_sdd.1-pos</fluomotor>
-   <oscaxis>Phi</oscaxis>
+  <tangoname>i10-c-cx1/ex/collect</tangoname>
 
-   <imgtojpeg>/data/local/mxcube_v2/mxcube/bin/adxv_makejpeg</imgtojpeg>
+  <channel type="tango" name="state">State</channel>
 
-   <!-- OPTIONS are firstandlast or allframes -->
-   <jpegoption>firstandlast</jpegoption>
-   <ruche_sync_dir>/nfs/archive_spool</ruche_sync_dir>
+  <object href="/minidiff" role="diffractometer"/>
 
-   <object href="/session" role="session" />
-   <object href="/dbconnection" role="dbserver" />
-   <object href="/obx" role="safety_shutter" />
-   <object href="/fastshut" role="fast_shutter" />
-   <object href="/mxlocal" role="beamline_configuration" />
-   <object href="/minidiff" role="diffractometer" />
-   <object href="/cryotong" role="sample_changer" />
-   <object href="/soleil-energyscan" role="energy" />
-   <object href="/PS_attenuator" role="transmission" />
-   <object href="/detectordistance" role="detector_distance" />
-   <object href="/mach" role="machine_current" />
-   <object href="/resolution" role="resolution" />
-   <object href="/kappa" role="kappa" />
-   <object href="/phi" role="phi" />
-   <object href="/omega" role="omega" />
-   <object href="/flux" role="flux" />
+  <object href="/omega" role="omega"/>
+  <object href="/chi" role="kappa"/>
+  <object href="/phi" role="phi"/>
 
-   <directory_prefix>PX1</directory_prefix>
-   <close_safty_shutter>0</close_safty_shutter>
+  <object href="/mxlocal" role="beamline_configuration"/>
+  <object href="/cryotong" role="sample_changer"/>
+  <object href="/energy" role="energy"/>
+  <object href="/attenuators_pslits" role="transmission"/>
+  <object href="/pilatus" role="detector"/>
+  <object href="/beam-info" role="beam_info"/>
+  <object href="/mach" role="machine_info"/>
+  <object href="/resolution" role="resolution"/>
+  <object href="/dbconnection" role="lims_client"/> 
+  <object href="/Qt4_graphics-manager" role="graphics_manager"/> 
+  <object href="/px1environment" role="environment"/> 
+  <object href="/flux" role="flux"/>
+
+  <object href="/fastshut" role="fastshut"/> 
+  <object href="/obx" role="safshut"/> 
+  <object href="/frontend" role="frontend"/> 
+
+  <object href="/lightarm" role="lightarm"/> 
+
+  <imgtojpeg>/nfs/ruche/share-dev/px1dev/MXCuBE/tools/adxv_makejpeg.sh</imgtojpeg>
+  <chooch_cmd>/nfs/ruche/share-dev/px1dev/MXCuBE/tools/run_chooch.sh</chooch_cmd>
 
 </object>

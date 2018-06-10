@@ -1,9 +1,5 @@
-<device class="TangoDCMotor">
+<device class="SmargonAxis">
   <username>Phi</username>
-  <tangoname>i10-c-cx1/ex/phi</tangoname>
-  <threshold>0.005</threshold>
-  <motor_name>Phi</motor_name>
-  <channel type="tango" polling="500" name="position">position</channel>
-  <channel type="tango" polling="500" name="state">State</channel>
-  <interval>500</interval>
+  <motor_name>phi</motor_name>
+  <object href="/smargon" role="smargon"/>
 </device>
