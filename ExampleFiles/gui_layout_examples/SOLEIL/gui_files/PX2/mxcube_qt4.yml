@@ -390,7 +390,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: Omega}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/omega}
+                          oldValue: '', type: string, value: /diffractometer/omega}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: 1, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -454,7 +454,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: Kappa}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/kappa}
+                          oldValue: '', type: string, value: /diffractometer/kappa}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: 1, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -518,7 +518,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: Phi}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/phi}
+                          oldValue: '', type: string, value: /diffractometer/phi}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: 1, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -601,7 +601,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: OmegaX}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/alignmentx}
+                          oldValue: '', type: string, value: /diffractometer/alignmentx}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: null, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -665,7 +665,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: Horizontal, type: string, value: OmegaY}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/alignmenty}
+                          oldValue: '', type: string, value: /diffractometer/alignmenty}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: 1, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -729,7 +729,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: OmegaZ}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/alignmentz}
+                          oldValue: '', type: string, value: /diffractometer/alignmentz}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: null, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -854,9 +854,9 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: Backlight}
                         - {comment: '', defaultValue: '', hidden: false, name: light_actuator,
-                          oldValue: '', type: string, value: /goniometer/backlight}
+                          oldValue: '', type: string, value: /diffractometer/backlight}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/backlight}
+                          oldValue: '', type: string, value: /diffractometer/backlight}
                         - {comment: '', defaultValue: '', hidden: false, name: out_delta,
                           oldValue: '', type: string, value: ''}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
@@ -922,9 +922,9 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: Frontlight}
                         - {comment: '', defaultValue: '', hidden: false, name: light_actuator,
-                          oldValue: '', type: string, value: /goniometer/frontlight}
+                          oldValue: '', type: string, value: /diffractometer/frontlight}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/frontlight}
+                          oldValue: '', type: string, value: /diffractometer/frontlight}
                         - {comment: '', defaultValue: '', hidden: false, name: out_delta,
                           oldValue: '', type: string, value: ''}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
@@ -970,7 +970,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: '', type: string, value: Zoom}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/predefined-zoom}
+                          oldValue: '', type: string, value: /diffractometer/predefined-zoom}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
                           oldValue: 1, type: boolean, value: 1}
                         type: Qt4_MotorPredefPosBrick
@@ -1041,7 +1041,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: Focus, type: string, value: SampleFocus}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/centringtablefocus}
+                          oldValue: '', type: string, value: /diffractometer/centringtablefocus}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: 1, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -1105,7 +1105,7 @@
                         - {comment: '', defaultValue: '', hidden: false, name: label,
                           oldValue: Vertical, type: string, value: SampleVertical}
                         - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                          oldValue: '', type: string, value: /goniometer/centringtablevertical}
+                          oldValue: '', type: string, value: /diffractometer/centringtablevertical}
                         - {comment: '', defaultValue: 1, hidden: false, name: showLabel,
                           oldValue: 1, type: boolean, value: 1}
                         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
@@ -1283,7 +1283,7 @@
                         hidden: false, name: instanceAllowConnected, oldValue: 0,
                         type: boolean, value: 0}
                       - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                        oldValue: '', type: string, value: /goniometer/diffractometer}
+                        oldValue: '', type: string, value: /diffractometer/diffractometer}
                       type: Qt4_MDPhaseBrick
                     - brick: {class: Qt4_MDApertureBrick, name: aperture_brick}
                       children: []
@@ -1307,7 +1307,7 @@
                         hidden: false, name: instanceAllowConnected, oldValue: 0,
                         type: boolean, value: 0}
                       - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
-                        oldValue: '', type: string, value: /goniometer/aperture}
+                        oldValue: '', type: string, value: /diffractometer/aperture}
                       type: Qt4_MDApertureBrick
                     - children: []
                       connections: []

@@ -42,9 +42,9 @@
       - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: '',
         type: string, value: BackLight}
       - {comment: '', defaultValue: '', hidden: false, name: light_actuator, oldValue: '',
-        type: string, value: /goniometer/backlight}
+        type: string, value: /diffractometer/backlight}
       - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-        type: string, value: /goniometer/backlight}
+        type: string, value: /diffractometer/backlight}
       - {comment: '', defaultValue: '', hidden: false, name: out_delta, oldValue: '',
         type: string, value: ''}
       - {comment: '', defaultValue: 1, hidden: false, name: showLabel, oldValue: 0,
@@ -104,9 +104,9 @@
       - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: '',
         type: string, value: FrontLight}
       - {comment: '', defaultValue: '', hidden: false, name: light_actuator, oldValue: '',
-        type: string, value: /goniometer/frontlight}
+        type: string, value: /diffractometer/frontlight}
       - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-        type: string, value: /goniometer/frontlight}
+        type: string, value: /diffractometer/frontlight}
       - {comment: '', defaultValue: '', hidden: false, name: out_delta, oldValue: '',
         type: string, value: ''}
       - {comment: '', defaultValue: 1, hidden: false, name: showLabel, oldValue: 1,

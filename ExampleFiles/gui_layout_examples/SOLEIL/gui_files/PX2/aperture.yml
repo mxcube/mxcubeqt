@@ -21,7 +21,7 @@
         - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
           name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
         - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-          type: string, value: /goniometer/aperture}
+          type: string, value: /diffractometer/aperture}
         type: Qt4_MDApertureBrick
       connections: []
       name: vbox2
@@ -126,7 +126,7 @@
         - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: '',
           type: string, value: ApertureX}
         - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-          type: string, value: /goniometer/aperturehorizontal}
+          type: string, value: /diffractometer/aperturehorizontal}
         - {comment: '', defaultValue: 1, hidden: false, name: showLabel, oldValue: 1,
           type: boolean, value: 1}
         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons, oldValue: 1,
@@ -185,7 +185,7 @@
         - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: '',
           type: string, value: ApertureY}
         - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-          type: string, value: /goniometer/aperturevertical}
+          type: string, value: /diffractometer/aperturevertical}
         - {comment: '', defaultValue: 1, hidden: false, name: showLabel, oldValue: 1,
           type: boolean, value: 1}
         - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons, oldValue: 1,

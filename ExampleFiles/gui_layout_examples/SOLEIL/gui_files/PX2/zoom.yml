@@ -23,7 +23,7 @@
     - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: zoom,
       type: string, value: Zoom}
     - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-      type: string, value: /goniometer/predefined-zoom}
+      type: string, value: /diffractometer/predefined-zoom}
     - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons, oldValue: null,
       type: boolean, value: 1}
     type: Qt4_MotorPredefPosBrick

@@ -28,15 +28,15 @@
       - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
         name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
       - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
-        type: string, value: /singleton_objects/fastshutter}
+        type: string, value: /diffractometer/fastshutter}
       - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: out,
         type: string, value: out}
       - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: Set
           in, type: string, value: Set in}
       - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: Set
           out, type: string, value: Set out}
-      - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: /goniometer/fastshutter,
-        type: string, value: FastShutter}
+      - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: '',
+        type: string, value: Fast shutter}
       type: Qt4_DuoStateBrick
     - brick: {class: Qt4_MDPhaseBrick, name: Qt4_MDPhaseBrick0}
       children: []
@@ -44,21 +44,21 @@
       name: Qt4_MDPhaseBrick0
       properties:
       - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: null, type: integer, value: -1}
+        oldValue: -1, type: integer, value: -1}
       - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
-        oldValue: null, type: integer, value: -1}
-      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+        oldValue: -1, type: integer, value: -1}
+      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
         type: string, value: '11'}
       - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
-        name: frame, oldValue: null, type: boolean, value: 0}
-      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+        name: frame, oldValue: 0, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
         type: boolean, value: 0}
       - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
-        name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
       - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
-        name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
-      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: null,
-        type: string, value: ''}
+        name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: /diffractometer/phase,
+        type: string, value: /diffractometer/diffractometer}
       type: Qt4_MDPhaseBrick
     - brick: {class: Qt4_DuoStateBrick, name: Qt4_DuoStateBrick1}
       children: []
@@ -66,37 +66,37 @@
       name: Qt4_DuoStateBrick1
       properties:
       - {comment: '', defaultValue: 0, hidden: false, name: expertModeControlOnly,
-        oldValue: null, type: boolean, value: 0}
+        oldValue: 0, type: boolean, value: 0}
       - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: null, type: integer, value: -1}
+        oldValue: -1, type: integer, value: -1}
       - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
-        oldValue: null, type: integer, value: -1}
-      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+        oldValue: -1, type: integer, value: -1}
+      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
         type: string, value: '11'}
-      - {comment: '', defaultValue: 0, hidden: false, name: forceNoControl, oldValue: null,
+      - {comment: '', defaultValue: 0, hidden: false, name: forceNoControl, oldValue: 0,
         type: boolean, value: 0}
       - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
-        name: frame, oldValue: null, type: boolean, value: 0}
-      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+        name: frame, oldValue: 0, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: 0,
         type: boolean, value: 0}
-      - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+      - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: '',
         type: string, value: ''}
-      - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: null, type: string,
-        value: in}
+      - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: in, type: string,
+        value: open}
       - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
-        name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+        name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
       - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
-        name: instanceAllowConnected, oldValue: null, type: boolean, value: 1}
-      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: ''
-        type: string, value: /goniometer/fastshutter}
-      - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: null,
-        type: string, value: out}
-      - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: null,
-        type: string, value: Set in}
-      - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: null,
-        type: string, value: Set out}
+        name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+        type: string, value: /singleton_objects/fastshutter}
+      - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: out,
+        type: string, value: closed}
+      - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: Set
+          in, type: string, value: Open}
+      - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: Set
+          out, type: string, value: Close}
       - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: '',
-        type: string, value: FastShutter}
+        type: string, value: Fast shutter}
       type: Qt4_DuoStateBrick
     connections: []
     name: vbox0
