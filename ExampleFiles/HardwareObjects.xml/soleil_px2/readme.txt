@@ -1,5 +1,5 @@
 This directory contains configuration files for MXCuBE of Proxima2A, Synchrotron SOLEIL. To allow for better overview we organized them in several subdirectories, namely: 
-  1. microdiff - all motors of MD2
+  1. diffractometer - diffractometer motors 
   2. tango_motors - notable individual motors e.g. detector distance, experimental slits ...
   3. singleton_motors - contains virtual motors, typically comprised off multiple parts, typically coming with own HardwareObject class e.g. photon energy, transmission
   4. singleton_objects - complex objects, each coming with dedicated HardwareObject e.g. queue, detector, ISPyBConnection ...
@@ -9,7 +9,7 @@ This directory contains configuration files for MXCuBE of Proxima2A, Synchrotron
 More detailed outline of the content of the subdirectories follows.
 
 
-The goniometer directory contains configurations of all motors of goniometer of Proxima2A beamline (MD2). We split the motors into two classes: continuous and discrete. 
+The diffractometer directory contains configurations of all motors of goniometer of Proxima2A beamline (MD2). We split the motors into two classes: continuous and discrete. 
 
 The following 23 motors are continuous:
     1. AlignmentX
@@ -84,53 +84,52 @@ The detectors directory contains configurations for all detectors available on t
    56. xbpm3 (cvd)
    57. xbpm5 (psd)
    58. xbpm6 (psd)
-       calibrated_diode (125um Si PIN diode)
-   59. machine_current
+   59    calibrated_diode (125um Si PIN diode)
+   60. machine_current
        
        
 The singleton_objects directory contains configuration for the following objects:
 
-   60. sample_changer
-       cryostream
-       zoom_manager #takes care of optimal zoom, focus, lighting and sample_camera gain
-   61. safety_shutter
-   62. frontend
-   63. beamline_setup
-   64. beam_info
-       shape_history
-   65. graphics_manager
-   
-   66. personal_safety_system
-   67. ispyb_connection
-   68. ldap_connection
-   69. instance_connection
-   70. beam_info
-   71. redis_client
-   72. queue
-   74. queue_model
+   61. sample_changer
+   62. cryostream
+   63. zoom_manager #takes care of optimal zoom, focus, lighting and sample_camera gain
+   64. safety_shutter
+   65. frontend
+   66. beamline_setup
+   67. beam_info
+   68. shape_history
+   69. graphics_manager
+   70. personal_safety_system
+   71. ispyb_connection
+   72. ldap_connection
+   73. instance_connection
+   74. beam_info
+   75. redis_client
+   76. queue
+   77. queue_model
 
 The experimental_methods directory contains the following configurations
-   75. omega_scan
-   76. reference_images
-   77. inverse_scan
-   78. helical_scan
-   79. raster_scan
-   80. x-ray_centring
-   81. optical_scan
-   82. tomography
-   83. energy_scan
-   84. fluorescence_spectrum
-   85. burn_strategy
+   78. omega_scan
+   79. reference_images
+   80. inverse_scan
+   81. helical_scan
+   82. raster_scan
+   83. x-ray_centring
+   84. optical_scan
+   85. tomography
+   86. energy_scan
+   87. fluorescence_spectrum
+   88. burn_strategy
 
 The maintenance directory contains the following configurations
-   86. minikappa_calibration
-   87. slit_scan
-   88. aperture_scan
-   89. capillary_scan
-   90. beam_alignment
-   91. undulator_tuning_curves
-   92. beam_scan
-   93. detector_beamcenter_calibration
+   89. minikappa_calibration
+   90. slit_scan
+   91. aperture_scan
+   92. capillary_scan
+   93. beam_alignment
+   94. undulator_tuning_curves
+   95. beam_scan
+   96. detector_beamcenter_calibration
    
    
     
