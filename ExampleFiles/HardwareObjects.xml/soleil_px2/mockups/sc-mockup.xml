@@ -1,0 +1,17 @@
+<equipment class = "SampleChangerMockup">
+ <!-- SC3 commands and channels -->
+ <test_sample_names>
+  <!-- Sample names to show in UI and matching addresses.   -->
+  <!-- Names of the form "emulate-<name>" are used for GPhL emulation, ...  -->
+  <emulate-3n0s>1:01</emulate-3n0s>
+  <emulate-4mxt>1:02</emulate-4mxt>
+  <emulate-4k4k>1:03</emulate-4k4k>
+  <emulate-4k61>1:04</emulate-4k61>
+  <emulate-4j8p>1:05</emulate-4j8p>
+  <emulate-4jrl>1:06</emulate-4jrl>
+  <emulate-4iej>1:07</emulate-4iej>
+  <emulate-thermolysin>1:08</emulate-thermolysin>
+  <emulate-4kw2>1:09</emulate-4kw2>
+  <emulate-germanate>1:10</emulate-germanate>
+ </test_sample_names>
+</equipment>

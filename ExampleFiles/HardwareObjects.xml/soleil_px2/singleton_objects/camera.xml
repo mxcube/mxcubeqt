@@ -1,0 +1,4 @@
+<device class="PX2Video">
+   <poll_interval>50</poll_interval>
+   <interval>50</interval>
+</device>

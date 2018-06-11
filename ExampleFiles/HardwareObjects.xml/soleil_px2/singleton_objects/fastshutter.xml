@@ -1,0 +1,5 @@
+<device class="SOLEIL.TangoShutter">
+  <username>Fast shutter</username>
+  <tangoname>i11-ma-cx1/ex/md2</tangoname>
+  <channel type="tango" polling="500" name="State">FastShutterIsOpen</channel>
+</device>

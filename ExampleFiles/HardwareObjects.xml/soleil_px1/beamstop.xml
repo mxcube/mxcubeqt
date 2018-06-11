@@ -1,9 +1,2 @@
-<device class = "TangoBeamStopPX1">
-  <username>Beamstop</username>
-  <tangoname>i10-c-cx1/ex/bst.1-ev</tangoname>
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <command type="tango" name="out">Extract</command>
-  <command type="tango" name="in">Insert</command>
-  <command type="tango" tangoname="i10-c-cx1/ex/light.1-pos" name="lightout">Extract</command>  
-  <command type="tango" tangoname="i10-c-cx1/ex/light.1-pos" name="lightstate">State</command>  
+<device class ="MicrodiffInOutMockup">
 </device>

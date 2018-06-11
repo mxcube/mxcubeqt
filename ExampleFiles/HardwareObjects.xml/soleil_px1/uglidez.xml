@@ -1,11 +1,5 @@
-<device class="TangoDCMotor">
-  <username>Horziontal</username>
-  <tangoname>i10-c-cx1/ex/microglide</tangoname>
-  <motor_name>z</motor_name>
-  <channel type="tango" polling="1000" name="position">z</channel>
-  <channel type="tango" polling="1000" name="state">State</channel>
-  <command type="tango" name="Stop">Stop</command>
-  <command type="tango" name="moveRelativeXYZ">RelativeMoveInXYZ</command>
-  <command type="tango" name="moveAbsoluteXYZ">AbsoluteMoveInXYZ</command>
-  <interval>1000</interval>
+<device class="SmargonAxis">
+  <username>zOffset</username>
+  <motor_name>zOffset</motor_name>
+  <object href="/smargon" role="smargon"/>
 </device>

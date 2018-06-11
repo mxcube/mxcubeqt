@@ -17,12 +17,10 @@
       <focus_offset>0.0</focus_offset>
       <lightLevel>28</lightLevel>
       <calibrationData>
-        <pixelsPerMmY>647</pixelsPerMmY>
-        <pixelsPerMmZ>647</pixelsPerMmZ>
-<!--as of 2015-06-14        <beamPositionX>636</beamPositionX>-->
-<!--as of 2015-06-14        <beamPositionY>496</beamPositionY>-->
-        <beamPositionX>620</beamPositionX>
-        <beamPositionY>499</beamPositionY>
+        <pixelsPerMmY>658</pixelsPerMmY>
+        <pixelsPerMmZ>658</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
       </calibrationData>
     </position>
     <position>
@@ -31,12 +29,10 @@
       <focus_offset>0.0</focus_offset>
       <lightLevel>35</lightLevel>
       <calibrationData>
-        <pixelsPerMmY>1240</pixelsPerMmY>
-        <pixelsPerMmZ>1240</pixelsPerMmZ>
-<!--as of 2015-06-14        <beamPositionX>594</beamPositionX>-->
-<!--as of 2015-06-14        <beamPositionY>483</beamPositionY>-->
-        <beamPositionX>570</beamPositionX>
-        <beamPositionY>482</beamPositionY>
+        <pixelsPerMmY>1269</pixelsPerMmY>
+        <pixelsPerMmZ>1269</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
       </calibrationData>
     </position>
     <position>
@@ -45,12 +41,10 @@
       <focus_offset>0.0</focus_offset>
       <lightLevel>50</lightLevel>
       <calibrationData>
-        <pixelsPerMmY>1855</pixelsPerMmY>
-        <pixelsPerMmZ>1855</pixelsPerMmZ>
-<!--as of 2015-06-14        <beamPositionX>556</beamPositionX>-->
-<!--as of 2015-06-14        <beamPositionY>462</beamPositionY>-->
-        <beamPositionX>514</beamPositionX>
-        <beamPositionY>467</beamPositionY>
+        <pixelsPerMmY>1894</pixelsPerMmY>
+        <pixelsPerMmZ>1894</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
       </calibrationData>
     </position>
     <position>
@@ -59,12 +53,10 @@
       <focus_offset>0.0</focus_offset>
       <lightLevel>60</lightLevel>
       <calibrationData>
-        <pixelsPerMmY>2550</pixelsPerMmY>
-        <pixelsPerMmZ>2550</pixelsPerMmZ>
-<!--as of 2015-06-14        <beamPositionX>506</beamPositionX>-->
-<!--as of 2015-06-14        <beamPositionY>444</beamPositionY>-->
-        <beamPositionX>449</beamPositionX>
-        <beamPositionY>444</beamPositionY>
+        <pixelsPerMmY>2632</pixelsPerMmY>
+        <pixelsPerMmZ>2632</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
       </calibrationData>
     </position>
     <position>
@@ -73,13 +65,71 @@
       <focus_offset>0.0</focus_offset>
       <lightLevel>60</lightLevel>
       <calibrationData>
-        <pixelsPerMmY>3155</pixelsPerMmY>
-        <pixelsPerMmZ>3155</pixelsPerMmZ>
-<!--as of 2015-06-14        <beamPositionX>460</beamPositionX>-->
-<!--as of 2015-06-14        <beamPositionY>418</beamPositionY>-->
-        <beamPositionX>389</beamPositionX>
-        <beamPositionY>426</beamPositionY>
+        <pixelsPerMmY>3335</pixelsPerMmY>
+        <pixelsPerMmZ>3335</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
       </calibrationData>
     </position>
-    </positions>
+    <position>
+      <username>Zoom 6</username>
+      <offset>10000</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>66</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>4000</pixelsPerMmY>
+        <pixelsPerMmZ>4000</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 7</username>
+      <offset>10700</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>75</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>4565</pixelsPerMmY>
+        <pixelsPerMmZ>4565</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 8</username>
+      <offset>11500</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>78</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>5250</pixelsPerMmY>
+        <pixelsPerMmZ>5250</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 9</username>
+      <offset>12200</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>82</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>5940</pixelsPerMmY>
+        <pixelsPerMmZ>5940</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
+      </calibrationData>
+    </position>
+    <position>
+      <username>Zoom 10</username>
+      <offset>12800</offset>
+      <focus_offset>0.0</focus_offset>
+      <lightLevel>86</lightLevel>
+      <calibrationData>
+        <pixelsPerMmY>6715</pixelsPerMmY>
+        <pixelsPerMmZ>6715</pixelsPerMmZ>
+        <beamPositionX>680</beamPositionX>
+        <beamPositionY>512</beamPositionY>
+      </calibrationData>
+    </position>
+  </positions>
 </device>

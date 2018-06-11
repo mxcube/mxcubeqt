@@ -1,0 +1,18 @@
+<object class = "XMLRPCServer" role = "XMLRPCServer">
+    <all_interfaces> 
+        True
+    </all_interfaces>
+    <port>
+        60000
+    </port>
+    <apis>
+        <api>
+            <module>Native</module>
+            <recurse>True</recurse>
+        </api>
+    </apis>
+
+    <object href="/singleton_objects/beamline-setup" role="beamline_setup"/>
+    <object href="/singleton_objects/queue" role="queue"/>
+    <object href="/singleton_objects/queue-model" role="queue_model"/>
+</object>

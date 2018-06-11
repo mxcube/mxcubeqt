@@ -1,5 +1,4 @@
 <object class="DataAnalysis">
-  <!-- Path to script that launches edna -->
-  <edna_command>/data/local/mxcube/mxcube_v2/local/SOLEIL/edna_script.sh</edna_command>
-  <edna_default_file>/data/local/mxcube_v2/mxcube/HardwareObjects.xml/PX1/edna_defaults.xml</edna_default_file>
+  <edna_command>/users/blissadm/local/bin/edna_script_bes.py</edna_command>
+  <edna_default_file>edna_defaults.xml</edna_default_file>
 </object>

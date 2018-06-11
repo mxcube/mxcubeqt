@@ -1,5 +1,0 @@
-<device class="TangoInOut">
-    <username>Microdiff front light</username>
-    <offset>0</offset>
-    <channel type="tango" name="attributeName" tangoname="i11-ma-cx1/ex/md2" polling="1000">FrontLightIsOn</channel>
-</device>

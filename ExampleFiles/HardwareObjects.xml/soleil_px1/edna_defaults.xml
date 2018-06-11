@@ -5,23 +5,26 @@
             <value>9.900000e-01</value>
         </aimedCompleteness>
         <aimedIOverSigmaAtHighestResolution>
-            <value>3.000000e+00</value>
+            <value>1.000000e+00</value>
         </aimedIOverSigmaAtHighestResolution>
-        <aimedMultiplicity>
-            <value>4.000000e+00</value>
-        </aimedMultiplicity>
         <aimedResolution>
-            <value>3.000000e+00</value>
+            <value>0</value>
         </aimedResolution>
         <complexity>
             <value>min</value>
         </complexity>
-        <forcedSpaceGroup>
-            <value>P1</value>
-        </forcedSpaceGroup>
         <maxExposureTimePerDataCollection>
             <value>30</value>
         </maxExposureTimePerDataCollection>
+        <detectorDistanceMin>
+            <value>155</value>
+        </detectorDistanceMin>
+        <detectorDistanceMax>
+            <value>800</value>
+        </detectorDistanceMax>
+        <strategyOption>
+            <value>-low never</value>
+        </strategyOption>
     </diffractionPlan>
     <experimentalCondition>
         <beam>
@@ -36,7 +39,7 @@
                     <value>0.05</value>
                 </x>
                 <y>
-                    <value>0.05</value>
+                    <value>0.03</value>
                 </y>
             </size>
         </beam>
@@ -55,13 +58,13 @@
         </shape>
         <size>
             <x>
-                <value>1.000000e-01</value>
+                <value>0.500000e-01</value>
             </x>
             <y>
-                <value>1.000000e-01</value>
+                <value>0.500000e-01</value>
             </y>
             <z>
-                <value>1.000000e-01</value>
+                <value>0.500000e-01</value>
             </z>
         </size>
         <susceptibility>

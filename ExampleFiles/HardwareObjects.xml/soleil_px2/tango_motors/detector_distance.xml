@@ -1,0 +1,9 @@
+<device class="TangoDCMotor">
+    <username>detector_distance</username>
+    <motor_name>detector_distance</motor_name>
+    <tangoname>i11-ma-cx1/dt/dtc_ccd.1-mt_ts</tangoname>
+    <channel type="tango" polling="1000" name="position">position</channel>
+    <channel type="tango" polling="1000" name="state">State</channel>
+    <command type="tango" name="Stop">Stop</command>
+    <interval>1000</interval>
+</device>

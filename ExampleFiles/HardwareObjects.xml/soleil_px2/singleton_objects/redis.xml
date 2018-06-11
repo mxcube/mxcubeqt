@@ -1,0 +1,4 @@
+<object class="RedisClient">
+    <object href="/singleton_objects/beamline-setup" role="beamline_setup"/>
+    <object href="/singleton_objects/queue-model" role="queue_model"/>   
+</object>

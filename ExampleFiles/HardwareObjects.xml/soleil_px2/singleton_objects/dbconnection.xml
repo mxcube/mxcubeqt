@@ -1,0 +1,42 @@
+<object class="SOLEILISPyBClient">
+    <proxy>http://172.19.43.1:8080</proxy>
+
+    <ws_root>http://195.221.10.20/ispyb/ispyb-ws/ispybWS/</ws_root>
+    <ws_username>abc</ws_username>
+    <ws_password>1Spy6@Sun0</ws_password>
+
+    <ws_collection>ToolsForCollectionWebService</ws_collection>
+    <ws_shipping>ToolsForShippingWebService</ws_shipping>
+    <ws_tools>ToolsForBLSampleWebService</ws_tools>
+    
+    <object role="session" href="/singleton_objects/session"/>
+    <object role="ldapServer" href="/singleton_objects/ldapconnection"/>
+       
+    <authServerType>ldap</authServerType>
+
+    <!-- all this should be removed from here (information
+        is in session now), but we need it as long as
+        mxCuBE 1.0 is running - or we need to make sure
+        mxCuBE 1.0 works with the new xml files (ie. cherry picking
+        commits from master to 1.0 or merging)
+    -->
+    
+
+    <beamline_name>PROXIMA2A</beamline_name>
+
+    <proposals>
+        <proposal>
+            <code>ifx</code>
+            <ispyb>fx</ispyb>
+            <gui>fx</gui>
+        </proposal>
+    </proposals>
+
+    <inhouse>
+        <proposal>
+            <code>opid</code>
+            <number>291</number>
+        </proposal>
+    </inhouse>
+
+</object>

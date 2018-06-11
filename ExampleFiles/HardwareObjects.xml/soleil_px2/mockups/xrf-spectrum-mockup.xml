@@ -1,0 +1,6 @@
+<object class="XRFSpectrumMockup">
+  <object hwrid="/singleton_motors/transmission" role="transmission"/>
+  <object hwrid="/singleton_motors/photon_energy" role="energy"/>
+  <object hwrid="/singleton_objects/beaminfo" role="beam_info"/>
+  <object hwrid="/singleton_objects/dbconnection" role="dbserver"/>
+</object>

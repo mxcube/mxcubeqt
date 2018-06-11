@@ -1,0 +1,49 @@
+<object class="SOLEILMachineInfo">
+    <channel type="tango" tangoname="ans/ca/machinestatus" polling="1000" name="machCurrent">current</channel>
+    <channel type="tango" tangoname="ans/ca/machinestatus" polling="1000" name="fillingMode">fillingMode</channel>
+    <channel type="tango" tangoname="ans/ca/machinestatus" polling="1000" name="operatorMessage0">message</channel>
+    <channel type="tango" tangoname="ans/ca/machinestatus" polling="1000" name="operatorMessage1">operatorMessage</channel>
+    <channel type="tango" tangoname="ans/ca/machinestatus" polling="1000" name="operatorMessage2">operatorMessage2</channel>
+    <channel type="tango" tangoname="ans/ca/machinestatus" polling="1000" name="isBeamUsable">isBeamUsable</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/tc.1" polling="1000" name="temperatureExp">temperature</channel>
+    
+<!--     <channel type="tango" tangoname="i11-ma-cx1/ex/flux" polling="5000" name="flux">flux</channel> -->
+
+    <channel type="tango" tangoname="i11-ma-cx1/ex/cryostream800" polling="1000" name="sampleTemp">sampleTemp</channel>
+<!--     <channel type="exporter" exporter_address="172.19.10.119:9001" name="cryojetIn">cryoIsBack</channel> -->
+    <channel type="tango" tangoname="i11-ma-cx1/ex/md2" polling="1000" name="cryojetIn">cryoIsBack</channel>
+    
+    <channel type="tango" tangoname="i11-ma-cx1/ex/cats" polling="1000" name="scAutoRefill">LN2Regulating</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/cats" polling="1000" name="scOverflowAlarm">di_CryoHighLevel</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/ex/cats" polling="1000" name="scLowLevelAlarm">di_CryoLowLevel</channel>
+    
+    <defaultFlux>1e+12</defaultFlux>
+    <updateIntervalS>60</updateIntervalS>		
+    <limits>{'current':505, 'temp': 25, 'hum': 60, 'intens': 5e-8}</limits>
+    
+    <intensity>
+        <shutterOpenValue>opened</shutterOpenValue>
+        <valueOnClose>1e-9</valueOnClose>
+        <initialResolution>1</initialResolution>
+        <updateRelativeTolerance>0.1</updateRelativeTolerance>
+        <acqTimeOnCloseMs>1000</acqTimeOnCloseMs>
+        <acqTimeOnOpenMs>100</acqTimeOnOpenMs>
+        <ranges>
+            <range>
+                <CurMax>2.5e-9</CurMax>
+                <CurOffset>-7.53517e-12</CurOffset>
+                <CurIndex>2</CurIndex>
+            </range>
+            <range>
+                <CurMax>6.4e-6</CurMax>
+                <CurOffset>-1.93238e-08</CurOffset>
+                <CurIndex>1</CurIndex>
+            </range>
+            <range>
+                <CurMax>10e-2</CurMax>
+                <CurOffset>-3.42607e-05</CurOffset>
+                <CurIndex>0</CurIndex>
+            </range>
+        </ranges>
+    </intensity>	
+</object>

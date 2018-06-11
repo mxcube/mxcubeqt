@@ -1,0 +1,120 @@
+- children:
+  - children:
+    - brick: {class: Qt4_ToolsBrick, name: Qt4_ToolsBrick0}
+      children: []
+      connections: []
+      name: Qt4_ToolsBrick0
+      properties:
+      - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+        oldValue: null, type: integer, value: -1}
+      - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+        oldValue: null, type: integer, value: -1}
+      - {comment: '', defaultValue: '9', hidden: false, name: fontSize, oldValue: null,
+        type: string, value: '9'}
+      - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+        name: frame, oldValue: null, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+        name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+      - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+        name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: null,
+        type: string, value: ''}
+      type: Qt4_ToolsBrick
+    connections: []
+    name: vbox0
+    properties:
+    - choices: [none, top center, top left, top right, bottom center, bottom left,
+        bottom right, center, hcenter, vcenter, left, right]
+      comment: ''
+      defaultValue: none
+      hidden: false
+      name: alignment
+      oldValue: null
+      type: combo
+      value: none
+    - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+      type: color, value: null}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+      type: integer, value: -1}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+      type: integer, value: -1}
+    - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: frameshape
+      oldValue: null
+      type: combo
+      value: default
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: hsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null, type: string,
+      value: ''}
+    - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+      type: string, value: ''}
+    - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+      type: integer, value: 2}
+    - choices: [plain, raised, sunken, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: shadowstyle
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+      type: integer, value: 2}
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: vsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    type: vbox
+  connections: []
+  name: window0
+  properties:
+  - choices: [none, top center, top left, top right, bottom center, bottom left, bottom
+        right, center, hcenter, vcenter, left, right]
+    comment: ''
+    defaultValue: none
+    hidden: false
+    name: alignment
+    oldValue: null
+    type: combo
+    value: none
+  - {comment: '', defaultValue: '', hidden: false, name: caption, oldValue: null,
+    type: string, value: ''}
+  - {comment: '', defaultValue: 1, hidden: false, name: closeOnExit, oldValue: null,
+    type: boolean, value: 1}
+  - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
+    type: string, value: tonic}
+  - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
+    value: 0}
+  - comment: ''
+    defaultValue: &id001 {}
+    hidden: true
+    name: menudata
+    oldValue: null
+    type: undefined
+    value: *id001
+  - {comment: '', defaultValue: 1, hidden: false, name: show, oldValue: null, type: boolean,
+    value: 1}
+  - {comment: '', defaultValue: 0, hidden: false, name: statusbar, oldValue: null,
+    type: boolean, value: 0}
+  signals:
+    enableExpertMode: !!python/tuple []
+    isHidden: !!python/tuple []
+    isShown: !!python/tuple []
+    quit: !!python/tuple []
+  type: window

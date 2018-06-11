@@ -1,72 +1,38 @@
-<!-- Q: redundant? -->
-<!-- <?xml version="1.0" encoding="iso-8859-1"?> -->
-<equipment class="MiniDiffPX1">
-    <username>Goniometer</username>
+<?xml version="1.0"?>
+<equipment class="PX1MiniDiff">
+  <username>Minidiff</username>
 
-    <wagolight>/lightarm</wagolight>
-    <bstop>/beamstop</bstop>
-    <samplechanger>/cryotong</samplechanger>
-    <px1env>/px1environment</px1env>
+  <channel type="tango" tangoname="i10-c-cx1/ex/sgonaxis" polling="events" name="smargon_state">State</channel>
 
-    <command type="tango" tangoname="i10-c-cx1/ex/microglide" name="uGlideMoveCmd">AbsoluteMoveInXYZ</command>
+  <sample_centring>True</sample_centring>
 
-    <phiy_direction>-1</phiy_direction>
-    
-    <device role="camera" hwrid="/ge1350c"></device>
-    <device role="obx" hwrid="/obx"></device>
-    <device role="microglide" hwrid="/microglide"></device>
-    <device role="guillotine" hwrid="/guillotine"></device>
+  <object role="smargon" hwrid="/smargon"></object>
 
-    <motors>
-        <phi-shutter>
-            <device role="phi" hwrid="/phi"></device>
-            <device role="phiz" hwrid="/uglidez"></device>
-            <device role="omega" hwrid="/omega"></device>
-            <device role="kappa" hwrid="/kappa"></device>
-        </phi-shutter>
-        <detector>
-            <device role="detdist" hwrid="/detectordistance"></device>
-        </detector>
-        <sample>
-            <device role="zoom" hwrid="/zoom"></device>
-            <device role="light" hwrid="/light"></device>
-            <device role="kappa" hwrid="/kappa"></device>  
-            <device role="kappa_phi" hwrid="/omega"></device>  
-            <device role="sampx" hwrid="/uglidex"></device>
-            <device role="sampy" hwrid="/uglidey"></device>
-        </sample>
-    </motors>
+  <object role="zoom" hwrid="/zoom"></object>
+  <object role="phi" hwrid="/omega"></object>
+  <object role="phiy" hwrid="/uglidex"></object> 
+  <object role="phiz" hwrid="/uglidey"></object>
+  <object role="sampx" hwrid="/phiz"></object>
+  <object role="sampy" hwrid="/uglidey"></object>
+  <object role="kappa" hwrid="/chi"></object>
+  <object role="kappa_phi" hwrid="/phi"></object>
 
-    <referencePosition>
-        <phi delta="0.1">0.0</phi>
-        <phiz delta="0.01">0.0</phiz>
-        <zoom delta="0.01"></zoom>
-        <light delta="0.01"></light>
-        <focus delta="0.01">0.0</focus>
-        <phiy delta="0.01">0.0</phiy>
-        <sampx delta="0.01">0.0</sampx>
-        <sampy delta="0.01">0.0</sampy>
-    </referencePosition>
+  <object role="light" href="/light"/>
+  <object role="lightarm" href="/lightarm"/>
 
-    <referencePositionWithKappa>
-        <phi delta="0.1">0.0</phi>
-        <phiz delta="0.01">0.0</phiz>
-        <zoom delta="0.01"></zoom>
-        <light delta="0.01"></light>
-        <focus delta="0.01">0.0</focus>
-        <phiy delta="0.01">0.0</phiy>
-        <sampx delta="0.01">0.0</sampx>
-        <sampy delta="0.01">0.0</sampy>
-        <kap1 delta="0.01">0.0</kap1>
-        <kap2 delta="0.01">0.0</kap2>
-    </referencePositionWithKappa>
+  <object role="beam_info" hwrid="/beam-info"></object>
 
-    <resetPosition>
-        <phiz>0.0</phiz>
-        <focus>0.0</focus>
-        <phiy>0.0</phiy>
-        <sampx>0.0</sampx>
-        <sampy>0.0</sampy>
-    </resetPosition>
+  <object role="camera" hwrid="/ge1350c"></object>
+  <object role="samplechanger" hwrid="/cryotong"></object>
+
+  <object role="px1configuration" hwrid="/px1configuration"></object>
+  <object role="px1environment" hwrid="/px1environment"></object>
+
+
+  <!-- DO THESE VALUES MAKE ANY SENSE AT PX1?? -->
+  <zoomCentre>{"x":340,"y":250}</zoomCentre>
+  <omegaReference>{"motor_name": "phiz", "position":-0.2224, "camera_axis":"x"}</omegaReference>
+  <phaseList>["Transfer","Centring","BeamLocation", "DataCollection"]</phaseList>
+  <headType>MiniKappa</headType>
 
 </equipment>

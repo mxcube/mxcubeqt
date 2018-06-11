@@ -1,0 +1,252 @@
+- children:
+  - children:
+    - brick: {class: Qt4_DuoStateBrick, name: Qt4_DuoStateBrick0}
+      children: []
+      connections: []
+      name: Qt4_DuoStateBrick0
+      properties:
+      - {comment: '', defaultValue: 0, hidden: false, name: expertModeControlOnly,
+        oldValue: null, type: boolean, value: 0}
+      - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+        oldValue: null, type: integer, value: -1}
+      - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+        oldValue: null, type: integer, value: -1}
+      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+        type: string, value: '11'}
+      - {comment: '', defaultValue: 0, hidden: false, name: forceNoControl, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+        name: frame, oldValue: null, type: boolean, value: 0}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: in, hidden: false, name: in, oldValue: null, type: string,
+        value: in}
+      - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+        name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+      - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+        name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+        type: string, value: /diffractometer/scintillator}
+      - {comment: '', defaultValue: out, hidden: false, name: out, oldValue: null,
+        type: string, value: out}
+      - {comment: '', defaultValue: Set in, hidden: false, name: setin, oldValue: null,
+        type: string, value: Set in}
+      - {comment: '', defaultValue: Set out, hidden: false, name: setout, oldValue: null,
+        type: string, value: Set out}
+      - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: '',
+        type: string, value: Scintillator}
+      type: Qt4_DuoStateBrick
+    - brick: {class: Qt4_MotorSpinBoxBrick, name: Qt4_MotorSpinBoxBrick0}
+      children: []
+      connections: []
+      name: Qt4_MotorSpinBoxBrick0
+      properties:
+      - {comment: '', defaultValue: 2, hidden: false, name: decimals, oldValue: null,
+        type: integer, value: 2}
+      - {comment: '', defaultValue: 180 90 45 30 10, hidden: false, name: defaultSteps,
+        oldValue: null, type: string, value: 180 90 45 30 10}
+      - {comment: '', defaultValue: '', hidden: false, name: delta, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: 0, hidden: false, name: enableSliderTracking,
+        oldValue: null, type: boolean, value: 0}
+      - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+        oldValue: null, type: integer, value: -1}
+      - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+        oldValue: null, type: integer, value: -1}
+      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+        type: string, value: '11'}
+      - {comment: '', defaultValue: +##.##, formatString: '%+2.2f', formatStringLength: 5,
+        hidden: false, name: formatString, oldValue: null, type: formatString, value: +##.##}
+      - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+        name: frame, oldValue: null, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: helpDecrease, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: '', hidden: false, name: helpIncrease, oldValue: null,
+        type: string, value: ''}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 0, hidden: false, name: hideInUser, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+        type: string, value: ''}
+      - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+        name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+      - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+        name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+      - {comment: '', defaultValue: 0, hidden: false, name: invertButtons, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: '',
+        type: string, value: ScintillatorY}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+        type: string, value: /diffractometer/scintillatorvertical}
+      - {comment: '', defaultValue: 1, hidden: false, name: showLabel, oldValue: null,
+        type: boolean, value: 1}
+      - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons, oldValue: 1,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 1, hidden: false, name: showPosition, oldValue: null,
+        type: boolean, value: 1}
+      - {comment: '', defaultValue: 0, hidden: false, name: showSlider, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 1, hidden: false, name: showStep, oldValue: null,
+        type: boolean, value: 1}
+      - {comment: '', defaultValue: 0, hidden: false, name: showStepList, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 1, hidden: false, name: showStop, oldValue: null,
+        type: boolean, value: 1}
+      type: Qt4_MotorSpinBoxBrick
+    - brick: {class: Qt4_MotorSpinBoxBrick, name: Qt4_MotorSpinBoxBrick1}
+      children: []
+      connections: []
+      name: Qt4_MotorSpinBoxBrick1
+      properties:
+      - {comment: '', defaultValue: 2, hidden: false, name: decimals, oldValue: null,
+        type: integer, value: 2}
+      - {comment: '', defaultValue: 180 90 45 30 10, hidden: false, name: defaultSteps,
+        oldValue: null, type: string, value: 180 90 45 30 10}
+      - {comment: '', defaultValue: '', hidden: false, name: delta, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: 0, hidden: false, name: enableSliderTracking,
+        oldValue: null, type: boolean, value: 0}
+      - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
+        oldValue: null, type: integer, value: -1}
+      - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
+        oldValue: null, type: integer, value: -1}
+      - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: null,
+        type: string, value: '11'}
+      - {comment: '', defaultValue: +##.##, formatString: '%+2.2f', formatStringLength: 5,
+        hidden: false, name: formatString, oldValue: null, type: formatString, value: +##.##}
+      - {comment: Draw a frame around the widget, defaultValue: 0, hidden: false,
+        name: frame, oldValue: null, type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: helpDecrease, oldValue: null,
+        type: string, value: ''}
+      - {comment: '', defaultValue: '', hidden: false, name: helpIncrease, oldValue: null,
+        type: string, value: ''}
+      - {comment: Hide widget, defaultValue: 0, hidden: false, name: hide, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 0, hidden: false, name: hideInUser, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: icons, oldValue: null,
+        type: string, value: ''}
+      - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
+        name: instanceAllowAlways, oldValue: null, type: boolean, value: 0}
+      - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
+        name: instanceAllowConnected, oldValue: null, type: boolean, value: 0}
+      - {comment: '', defaultValue: 0, hidden: false, name: invertButtons, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: '',
+        type: string, value: ScintillatorX}
+      - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
+        type: string, value: /diffractometer/scintillatorhorizontal}
+      - {comment: '', defaultValue: 1, hidden: false, name: showLabel, oldValue: null,
+        type: boolean, value: 1}
+      - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons, oldValue: 1,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 1, hidden: false, name: showPosition, oldValue: null,
+        type: boolean, value: 1}
+      - {comment: '', defaultValue: 0, hidden: false, name: showSlider, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 1, hidden: false, name: showStep, oldValue: null,
+        type: boolean, value: 1}
+      - {comment: '', defaultValue: 0, hidden: false, name: showStepList, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 1, hidden: false, name: showStop, oldValue: null,
+        type: boolean, value: 1}
+      type: Qt4_MotorSpinBoxBrick
+    connections: []
+    name: vbox0
+    properties:
+    - choices: [none, top center, top left, top right, bottom center, bottom left,
+        bottom right, center, hcenter, vcenter, left, right]
+      comment: ''
+      defaultValue: none
+      hidden: false
+      name: alignment
+      oldValue: null
+      type: combo
+      value: none
+    - {comment: '', defaultValue: null, hidden: false, name: color, oldValue: null,
+      type: color, value: null}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedheight, oldValue: null,
+      type: integer, value: -1}
+    - {comment: '', defaultValue: -1, hidden: false, name: fixedwidth, oldValue: null,
+      type: integer, value: -1}
+    - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: frameshape
+      oldValue: null
+      type: combo
+      value: default
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: hsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: '', hidden: false, name: icon, oldValue: null, type: string,
+      value: ''}
+    - {comment: '', defaultValue: '', hidden: false, name: label, oldValue: null,
+      type: string, value: ''}
+    - {comment: '', defaultValue: 2, hidden: false, name: margin, oldValue: null,
+      type: integer, value: 2}
+    - choices: [plain, raised, sunken, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: shadowstyle
+      oldValue: null
+      type: combo
+      value: default
+    - {comment: '', defaultValue: 2, hidden: false, name: spacing, oldValue: null,
+      type: integer, value: 2}
+    - choices: [fixed, expanding, default]
+      comment: ''
+      defaultValue: default
+      hidden: false
+      name: vsizepolicy
+      oldValue: null
+      type: combo
+      value: default
+    type: vbox
+  connections: []
+  name: window0
+  properties:
+  - choices: [none, top center, top left, top right, bottom center, bottom left, bottom
+        right, center, hcenter, vcenter, left, right]
+    comment: ''
+    defaultValue: none
+    hidden: false
+    name: alignment
+    oldValue: null
+    type: combo
+    value: none
+  - {comment: '', defaultValue: '', hidden: false, name: caption, oldValue: null,
+    type: string, value: ''}
+  - {comment: '', defaultValue: 1, hidden: false, name: closeOnExit, oldValue: null,
+    type: boolean, value: 1}
+  - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
+    type: string, value: tonic}
+  - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
+    value: 0}
+  - comment: ''
+    defaultValue: &id001 {}
+    hidden: true
+    name: menudata
+    oldValue: null
+    type: undefined
+    value: *id001
+  - {comment: '', defaultValue: 1, hidden: false, name: show, oldValue: null, type: boolean,
+    value: 1}
+  - {comment: '', defaultValue: 0, hidden: false, name: statusbar, oldValue: null,
+    type: boolean, value: 0}
+  signals:
+    enableExpertMode: !!python/tuple []
+    isHidden: !!python/tuple []
+    isShown: !!python/tuple []
+    quit: !!python/tuple []
+  type: window
