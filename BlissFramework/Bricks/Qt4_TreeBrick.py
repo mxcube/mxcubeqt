@@ -531,8 +531,6 @@ class Qt4_TreeBrick(BlissWidget):
     def diffractometer_ready_changed(self, status):
         #self.enable_widgets.emit(status) 
         self.diffractometer_ready.emit(self.diffractometer_hwobj.is_ready()) 
-        logging.getLogger('HWR').info('diffractometer_ready_changed %s' % status)
-        logging.getLogger('HWR').info('self.diffractometer_hwobj.get_status() %s' % self.diffractometer_hwobj.get_status())
         if status:
             try:
                 info_message = self.diffractometer_hwobj.get_status()
