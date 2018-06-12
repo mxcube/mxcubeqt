@@ -68,7 +68,7 @@ class CatsStatusView(QGroupBox, BlissWidget):
 
     def setState(self, state):
        
-        logging.getLogger("HWR").debug("SC StatusView. State changed %s" % str(state))
+        logging.getLogger().debug("SC StatusView. State changed %s" % str(state))
         color = SC_STATE_COLOR.get(state, None)
 
         if color is None:
@@ -196,7 +196,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
              self.baskets[-1].set_matrices(vials)
 
     def sc_state_changed(self, state, previous_state=None):
-        logging.getLogger("HWR").debug("SC State changed %s" % str(state))
+        logging.getLogger().debug("SC State changed %s" % str(state))
         Qt4_SampleChangerBrick3.sc_state_changed(self, state, previous_state)
 
         self.state = state
@@ -220,7 +220,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
 
         poweredOn = self._poweredOn and True or False # handles init state None as False
 
-        logging.getLogger("HWR").debug("updating buttons %s / %s / %s" % (running, poweredOn, self.state))
+        logging.getLogger().debug("updating buttons %s / %s / %s" % (running, poweredOn, self.state))
 
         if not poweredOn:
             self.load_button.setEnabled(False)
@@ -228,7 +228,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
             self.abort_button.setEnabled(False)
             abort_color = Qt4_widget_colors.LIGHT_GRAY
         elif ready:
-            logging.getLogger("HWR").info("Qt4_CatsSimpleBrick update buttons (ready)")
+            logging.getLogger().info("Qt4_CatsSimpleBrick update buttons (ready)")
             self.load_button.setEnabled(True)
             if self.sample_changer_hwobj.hasLoadedSample():
                 self.unload_button.setEnabled(True)
@@ -237,7 +237,7 @@ class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
             self.abort_button.setEnabled(False)
             abort_color = Qt4_widget_colors.LIGHT_GRAY
         else:
-            logging.getLogger("HWR").info("Qt4_CatsSimpleBrick update buttons (other)")
+            logging.getLogger().info("Qt4_CatsSimpleBrick update buttons (other)")
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(True)

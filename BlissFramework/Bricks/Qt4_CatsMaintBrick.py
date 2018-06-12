@@ -150,13 +150,13 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.update_buttons()
 
     def update_state(self, state):
-        logging.getLogger("HWR").debug("CATS update state : " + str(state))
+        logging.getLogger().debug("CATS update state : " + str(state))
         if state != self.state:
             self.state  = state
             self.update_buttons()
 
     def update_status(self, status):
-        logging.getLogger("HWR").debug("CATS update status : " + str(status))
+        logging.getLogger().debug("CATS update status : " + str(status))
         if status != self.status:
             self.status  = status
 
@@ -171,7 +171,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.update_buttons()
 
     def update_powered(self, value):
-        logging.getLogger("HWR").debug("CATS update powered : " + str(value))
+        logging.getLogger().debug("CATS update powered : " + str(value))
         self.powered = value
         if value:
             light_green = str(Qt4_widget_colors.LIGHT_GREEN.name())
@@ -182,7 +182,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.update_buttons()
 
     def update_message(self, value):
-        logging.getLogger("HWR").debug("CATS update message : " + str(value))
+        logging.getLogger().debug("CATS update message : " + str(value))
         self.widget.lblMessage.setText(str(value))
 
     def update_barcode(self, value):
@@ -190,7 +190,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
             barcode = value
         else: 
             barcode = "----"
-        logging.getLogger("HWR").debug("CATS update barcode : " + str(barcode))
+        logging.getLogger().debug("CATS update barcode : " + str(barcode))
         self.widget.lblMessage.setText(str(value))
 
     def update_path_running(self, value):
