@@ -542,7 +542,9 @@ class Qt4_TreeBrick(BlissWidget):
         elif info_message is None:
             info_message = "Not ready"
             info_status = "running"
-        
+        else:
+            info_status = "ready"
+            
         BlissWidget.set_status_info("diffractometer", info_message, info_status)
         
 
