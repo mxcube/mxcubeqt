@@ -389,9 +389,6 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.main_gbox.setEnabled(True)
             if self.motor_hwobj.is_ready():
                 self.motor_hwobj.update_values()
-                self.limits_changed(self.motor_hwobj.get_limits())
-                self.position_changed(self.motor_hwobj.get_position())
-                self.state_changed(self.motor_hwobj.get_state())
         else:
             self.main_gbox.setEnabled(False)
 
