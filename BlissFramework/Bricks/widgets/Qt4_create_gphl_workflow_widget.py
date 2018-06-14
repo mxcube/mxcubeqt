@@ -192,10 +192,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf = queue_model_objects.GphlWorkflow(self._workflow_hwobj)
         wf_type = str(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
-        interleave_order = ho.get_available_workflows()[wf_type].get(
-            'interleaveOrder', ''
-        )
-        wf.set_interleave_order(interleave_order)
 
         if self.current_prefix:
             path_template.base_prefix = self.current_prefix
@@ -203,9 +199,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf.set_name(wf.path_template.get_prefix())
         wf.set_number(wf.path_template.run_number)
 
-        parameters = self._workflow_hwobj.get_available_workflows()[wf_type]
-        strategy_type = parameters.get('strategy_type')
-
+        wf_parameters = ho.get_available_workflows()[wf_type]
+        strategy_type = wf_parameters.get('strategy_type')
+        wf.set_interleave_order(wf_parameters.get('interleaveOrder', ''))
         if strategy_type == 'acquisition':
             expected_resolution = self._gphl_acq_param_widget.get_parameter_value(
                 'expected_resolution'
