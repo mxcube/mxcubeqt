@@ -1,5 +1,5 @@
 <object class="Qt4_GraphicsManager">
-    <object href="/goniometer/diffractometer" role="diffractometer"/>
+    <object href="/diffractometer/diffractometer" role="diffractometer"/>
     <object href="/singleton_objects/beaminfo_exporter" role="beam_info"/>
     <object href="/singleton_objects/camera" role="camera"/>
 

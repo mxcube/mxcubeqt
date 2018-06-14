@@ -19,15 +19,15 @@
     <command type="exporter" name="saveCentringPositions">saveCentringPositions</command>
     <command type="exporter" name="getOmegaMotorDynamicScanLimits">getOmegaMotorDynamicScanLimits</command>
 
-    <object href="/goniometer/exporter/omega" role="phi"/>
-    <object href="/goniometer/exporter/alignmentz" role="phiz"/>
-    <object href="/goniometer/exporter/alignmenty" role="phiy"/>
-    <object href="/goniometer/exporter/predefined-zoom" role="zoom"/>
-    <object href="/goniometer/exporter/centringtablefocus" role="focus"/>
-    <object href="/goniometer/exporter/centringx" role="sampx"/>
-    <object href="/goniometer/exporter/centringy" role="sampy"/>
-    <object href="/goniometer/exporter/kappa" role="kappa"/>
-    <object href="/goniometer/exporter/phi" role="kappa_phi"/>
+    <object href="/diffractometer/exporter/omega" role="phi"/>
+    <object href="/diffractometer/exporter/alignmentz" role="phiz"/>
+    <object href="/diffractometer/exporter/alignmenty" role="phiy"/>
+    <object href="/diffractometer/exporter/predefined-zoom" role="zoom"/>
+    <object href="/diffractometer/exporter/centringtablefocus" role="focus"/>
+    <object href="/diffractometer/exporter/centringx" role="sampx"/>
+    <object href="/diffractometer/exporter/centringy" role="sampy"/>
+    <object href="/diffractometer/exporter/kappa" role="kappa"/>
+    <object href="/diffractometer/exporter/phi" role="kappa_phi"/>
     <object href="/singleton_objects/camera" role="camera"/>
     <object href="/singleton_objects/beaminfo" role="beam_info"/>
     <object href="/singleton_objects/centring-math" role="centring"/>

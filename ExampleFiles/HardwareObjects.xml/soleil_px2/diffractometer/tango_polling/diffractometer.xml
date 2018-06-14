@@ -14,15 +14,15 @@
     <command type="tango" polling="1000" name="saveCentringPositions">saveCentringPositions</command>
     <command type="tango" polling="1000" name="getOmegaMotorDynamicScanLimits">getOmegaMotorDynamicScanLimits</command>
 
-    <object href="/goniometer/tango_polling/omega" role="phi"/>
-    <object href="/goniometer/tango_polling/alignmentz" role="phiz"/>
-    <object href="/goniometer/tango_polling/alignmenty" role="phiy"/>
-    <object href="/goniometer/tango_polling/predefined-zoom" role="zoom"/>
-    <object href="/goniometer/tango_polling/centringtablefocus" role="focus"/>
-    <object href="/goniometer/tango_polling/centringx" role="sampx"/>
-    <object href="/goniometer/tango_polling/centringy" role="sampy"/>
-    <object href="/goniometer/tango_polling/kappa" role="kappa"/>
-    <object href="/goniometer/tango_polling/phi" role="kappa_phi"/>
+    <object href="/diffractometer/tango_polling/omega" role="phi"/>
+    <object href="/diffractometer/tango_polling/alignmentz" role="phiz"/>
+    <object href="/diffractometer/tango_polling/alignmenty" role="phiy"/>
+    <object href="/diffractometer/tango_polling/predefined-zoom" role="zoom"/>
+    <object href="/diffractometer/tango_polling/centringtablefocus" role="focus"/>
+    <object href="/diffractometer/tango_polling/centringx" role="sampx"/>
+    <object href="/diffractometer/tango_polling/centringy" role="sampy"/>
+    <object href="/diffractometer/tango_polling/kappa" role="kappa"/>
+    <object href="/diffractometer/tango_polling/phi" role="kappa_phi"/>
     <object href="/singleton_objects/camera" role="camera"/>
     <object href="/singleton_objects/beaminfo" role="beam_info"/>
     <object href="/singleton_objects/centring-math" role="centring"/>
