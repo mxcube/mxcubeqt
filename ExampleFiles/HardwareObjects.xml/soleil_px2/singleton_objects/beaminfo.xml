@@ -5,7 +5,7 @@
     <channel type="exporter" name="beamsizey">BeamSizeVertical</channel>
     <channel type="exporter" name="positionx">BeamPositionHorizontal</channel>
     <channel type="exporter" name="positiony">BeamPositionVertical</channel>
-    <object  role="zoom"  hwrid="/goniometer/zoom"></object>
+    <object  role="zoom"  hwrid="/diffractometer/zoom"></object>
 
     <beam_divergence_hor>8</beam_divergence_hor>
     <beam_divergence_vert>3</beam_divergence_vert>

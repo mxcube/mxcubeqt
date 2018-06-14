@@ -1,9 +1,9 @@
 <equipment class="PX2Resolution">
     
-    <channel type="tango" tangoname="i11-ma-c03/op/mono1" polling="500" name="energy">energy</channel>
-    <channel type="tango" tangoname="i11-ma-c03/op/mono1" polling="500" name="energy_state">State</channel>
-    <channel type="tango" tangoname="i11-ma-cx1/dt/dtc_ccd.1-mt_ts" polling="500" name="detector_position">position</channel>
-    <channel type="tango" tangoname="i11-ma-cx1/dt/dtc_ccd.1-mt_ts" polling="500" name="detector_position_state">state</channel>
+    <channel type="tango" tangoname="i11-ma-c03/op/mono1" polling="2000" name="energy">energy</channel>
+    <channel type="tango" tangoname="i11-ma-c03/op/mono1" polling="2000" name="energy_state">State</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/dt/dtc_ccd.1-mt_ts" polling="2000" name="detector_position">position</channel>
+    <channel type="tango" tangoname="i11-ma-cx1/dt/dtc_ccd.1-mt_ts" polling="2000" name="detector_position_state">state</channel>
 
     <object href="/tango_motors/detector_distance" role="detector_distance"/>
     <object href="/singleton_motors/photon_energy" role="energy"/>

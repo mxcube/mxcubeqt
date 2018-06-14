@@ -1,5 +1,5 @@
 <equipment class="EMBLBeamInfo">
-    <device hwrid="/goniometer/exporter/aperture" role="aperture"/>
+    <device hwrid="/diffractometer/aperture" role="aperture"/>
 
     <exporter_address>172.19.10.119:9001</exporter_address>
     <channel type="exporter" name="BeamPositionHorizontal">BeamPositionHorizontal</channel>

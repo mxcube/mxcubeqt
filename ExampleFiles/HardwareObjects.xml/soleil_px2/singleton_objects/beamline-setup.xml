@@ -1,9 +1,9 @@
 <object class="BeamlineSetup">
     <!-- Objects directly associatd with hardware -->
-    <object href="/goniometer/exporter/diffractometer" role="diffractometer"/>
-    <object href="/goniometer/exporter/omega" role="omega_axis"/>
-    <object href="/goniometer/exporter/kappa" role="kappa_axis"/>
-    <object href="/goniometer/exporter/phi" role="kappa_phi_axis"/>
+    <object href="/diffractometer/diffractometer" role="diffractometer"/>
+    <object href="/diffractometer/omega" role="omega_axis"/>
+    <object href="/diffractometer/kappa" role="kappa_axis"/>
+    <object href="/diffractometer/phi" role="kappa_phi_axis"/>
     <object href="/singleton_objects/cats" role="sample_changer"/>    
     <object href="/singleton_motors/resolution" role="resolution"/>
     <object href="/singleton_motors/photon_energy" role="energy"/>
