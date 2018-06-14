@@ -5,37 +5,39 @@
   <gonioAxes>
      <axis>
         <motorname>phiy</motorname>
-        <direction>[0, 1, 0]</direction>
-	<type>translation</type>
-	<motorHO>/goniometer/alignmentz</motorHO> 
+        <direction>[1, 0, 0]</direction>
+        <type>translation</type>
+	<motorHO>/diffractometer/alignmenty</motorHO> 
      </axis>
      <!-- removing this axis (normal to Omega) will fix Omega position -->
      <axis>
         <motorname>phiz</motorname>
-        <direction>[1, 0, 0]</direction>
+        <direction>[0, -1, 0]</direction>
         <type>translation</type>
-        <motorHO>/goniometer/alignmenty</motorHO> 
+        <motorHO>/diffractometer/alignmentz</motorHO> 
      </axis>
      <axis>
         <motorname>phi</motorname>
         <!-- direction of omega at Chi==0 -->
-        <direction>[0, -1, 0]</direction>
+        <direction>[-1, 0, 0]</direction>
         <type>rotation</type>
-        <motorHO>/goniometer/omega</motorHO> 
+        <motorHO>/diffractometer/omega</motorHO> 
      </axis>
      <axis>
         <!-- direction of sampx at Chi==0 and Omega == 0 --> 
         <motorname>sampx</motorname>
-        <direction>[-0.281085,  0, 0.959683]</direction>
+        <!--direction>[-0.281085,  0, 0.959683]</direction-->
+        <direction>[0, 0, 1]</direction>
         <type>translation</type>
-        <motorHO>/goniometer/centringx</motorHO> 
+        <motorHO>/diffractometer/centringx</motorHO> 
      </axis>
 
      <axis>
         <motorname>sampy</motorname>
-        <direction>[0.959683,  0, 0.281085 ]</direction>
+        <!--direction>[0.959683,  0, 0.281085 ]</direction-->
+        <direction>[0, -1, 0]</direction>
         <type>translation</type>
-        <motorHO>/goniometer/centringy</motorHO> 
+        <motorHO>/diffractometer/centringy</motorHO> 
      </axis>
   </gonioAxes>
   <cameraAxes>
