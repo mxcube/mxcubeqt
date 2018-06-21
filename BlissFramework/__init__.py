@@ -13,11 +13,16 @@ import types
 #
 import logging
 
+# Relative location of
+STD_BRICKS_LOCATION = 'BlissFramework.Bricks'
+
 SPLASH_SCREEN = None
 def set_splash_screen(screen):
+    global SPLASH_SCREEN
     SPLASH_SCREEN = screen
 
 def get_splash_screen():
+    global SPLASH_SCREEN
     return SPLASH_SCREEN
 
 _logger = logging.getLogger()
@@ -50,7 +55,7 @@ sys.path.insert(0, blissframeworkpath)
 
 
 def getStdBricksPath():
-    stdbrickspkg = __import__('BlissFramework.Bricks', globals(), locals(), [''])
+    stdbrickspkg = __import__(STD_BRICKS_LOCATION, globals(), locals(), [''])
     return os.path.dirname(stdbrickspkg.__file__)
 
 _bricksDirs = []
