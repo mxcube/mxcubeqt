@@ -135,8 +135,8 @@ def run(gui_config_file=None):
     # get config from arguments
     logFile = opts.logFile
     log_template = opts.logTemplate
-    hwobj_directory = opts.hardwareObjectsDirs.split(os.path.pathsep)
-    custom_bricks_directory = opts.bricksDirs.split(os.path.pathsep)
+    hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
+    custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
     if opts.userFileDir:
         user_file_dir = opts.userFileDir
     else:
@@ -148,20 +148,19 @@ def run(gui_config_file=None):
         hwr_server = opts.hardwareRepositoryServer
     else:
         # try to set Hardware Repository server from environment
-        try:
-            hwr_server = os.environ.get('HARDWARE_REPOSITORY_SERVER', '')
-        except KeyError:
+        hwr_server = os.environ.get('HARDWARE_REPOSITORY_SERVER')
+        if hwr_server is None:
             hwr_server = default_hwr_server
 
     # add bricks directories and hardware objects directories from environment
     try:
-        custom_bricks_directory += \
+        custom_bricks_directories += \
            os.environ.get('CUSTOM_BRICKS_PATH', '').split(os.path.pathsep)
     except KeyError:
         pass
 
     try:
-        hwobj_directory += \
+        hwobj_directories += \
            os.environ.get('CUSTOM_HARDWARE_OBJECTS_PATH', '').split(os.path.pathsep)
     except KeyError:
         pass
@@ -173,10 +172,10 @@ def run(gui_config_file=None):
         logging.getLogger().exception(\
           "Unable to create user files directory: %s" % user_file_dir)
 
-    custom_bricks_directory = [_directory for _directory in \
-          custom_bricks_directory if _directory]
-    hwobj_directory = [_directory for _directory in \
-          hwobj_directory if _directory]
+    custom_bricks_directories = [_directory for _directory in \
+                                 custom_bricks_directories if _directory]
+    hwobj_directories = [_directory for _directory in \
+                         hwobj_directories if _directory]
 
     main_application = QApplication([])
     if app_style:
@@ -204,9 +203,11 @@ def run(gui_config_file=None):
 
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_server)
-    HardwareRepository.addHardwareObjectsDirs(hwobj_directory)
     HardwareRepository.setUserFileDirectory(user_file_dir)
-    BlissFramework.addCustomBricksDirs(custom_bricks_directory)
+    if hwobj_directories:
+        HardwareRepository.addHardwareObjectsDirs(hwobj_directories)
+    if custom_bricks_directories:
+        BlissFramework.addCustomBricksDirs(custom_bricks_directories)
 
     # set log name and log file
     if gui_config_file:
