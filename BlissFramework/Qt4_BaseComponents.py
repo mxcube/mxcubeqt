@@ -5,16 +5,16 @@
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
@@ -34,7 +34,6 @@ from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
-from BlissFramework import get_splash_screen
 
 try:
     from louie import dispatcher
@@ -50,9 +49,6 @@ _emitterCache = weakref.WeakKeyDictionary()
 
 class _QObject(QObject):
     def __init__(self, *args, **kwargs):
-        """
-        Descript. :
-        """
         QObject.__init__(self, *args)
 
         try:
@@ -71,10 +67,8 @@ def emitter(ob):
 
 
 class InstanceEventFilter(QObject):
+
     def eventFilter(self, widget, event):
-        """
-        Descript. :
-        """
         obj = widget
         while obj is not None:
             if isinstance(obj, BlissWidget):
@@ -87,7 +81,7 @@ class InstanceEventFilter(QObject):
                     elif obj.shouldFilterEvent():
                         return True
                 elif isinstance(event, QKeyEvent) \
-                or isinstance(event, QFocusEvent):
+                        or isinstance(event, QFocusEvent):
                     if obj.shouldFilterEvent():
                         return True
                 return QObject.eventFilter(self, widget, event)
@@ -97,18 +91,14 @@ class InstanceEventFilter(QObject):
                 obj = None
         return QObject.eventFilter(self, widget, event)
 
+
 class WeakMethodBound:
+
     def __init__(self, f):
-        """
-        Descript. :
-        """
         self.f = weakref.ref(f.__func__)
         self.c = weakref.ref(f.__self__)
 
     def __call__(self, *args):
-        """
-        Descript. :
-        """
         obj = self.c()
         if obj is None:
             return None
@@ -118,21 +108,15 @@ class WeakMethodBound:
 
 
 class WeakMethodFree:
+
     def __init__(self, f):
-        """Descript. : """
         self.f = weakref.ref(f)
 
     def __call__(self, *args):
-        """
-        Descript. :
-        """
         return self.f()
 
 
 def WeakMethod(f):
-    """
-    Descript. :
-    """
     try:
         f.__func__
     except AttributeError:
@@ -141,20 +125,15 @@ def WeakMethod(f):
 
 
 class SignalSlotFilter:
+
     def __init__(self, signal, slot, should_cache):
-        """
-        Descript. :
-        """
         self.signal = signal
         self.slot = WeakMethod(slot)
         self.should_cache = should_cache
 
     def __call__(self, *args):
-        """
-        Descript. :
-        """
-        if (BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE and
-            BlissWidget._instanceMirror == BlissWidget.INSTANCE_MIRROR_PREVENT):
+        if BlissWidget._instanceMode == BlissWidget.INSTANCE_MODE_SLAVE and \
+            BlissWidget._instanceMirror == BlissWidget.INSTANCE_MIRROR_PREVENT:
             if self.should_cache:
                 BlissWidget._eventsCache[self.slot] = \
                     (time.time(), self.slot, args)
@@ -195,9 +174,6 @@ class BlissWidget(Connectable.Connectable, QFrame):
 
     @staticmethod
     def setRunMode(mode):
-        """
-        Descript. :
-        """
         if mode:
             BlissWidget._runMode = True
             for widget in QApplication.allWidgets():
@@ -222,16 +198,12 @@ class BlissWidget(Connectable.Connectable, QFrame):
 
     @staticmethod
     def isRunning():
-        """
-        Descript. :
-        """
         return BlissWidget._runMode
 
     @staticmethod
     def update_menu_bar_color(enable_checkbox=None):
-        """
-        Descript. : Not a direct way how to change menubar color
-                    it is now done by changing stylesheet
+        """Not a direct way how to change menubar color
+           It is now done by changing stylesheet
         """
         color = None
         if BlissWidget._menuBar is not None:
@@ -316,6 +288,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """Updates status bar"""
         if BlissWidget._statusBar:
             BlissWidget._statusBar.parent().stop_progress_bar()
+
 
     @staticmethod
     def open_progress_dialog(msg, max_steps):
@@ -848,7 +821,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         Descript. :
         """
         self.setAcceptDrops(False)
-        self.blockSignals(False) 
+        self.blockSignals(False)
         self.setEnabled(self.__enabledState)
         #self.run_mode_pushbutton = QPushButton("Simulation", self)
 
@@ -932,7 +905,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
             #                       slot)
 
         # workaround for PyQt lapse
-        print "TODO workaround for PyQt lapse" 
+        print "TODO workaround for PyQt lapse"
         #if hasattr(sender, "connectNotify"):
         #    sender.connectNotify(QtCore.pyqtSignal(signal))
 
@@ -1017,7 +990,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """
         for child in self.children():
             child.blockSignals(block)
- 
+
     def run(self):
         """
         Descript. :
@@ -1125,13 +1098,18 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """
         Descript. :
         """
+        splash_screen = BlissFramework.get_splash_screen()
+        splash_screen.set_message(\
+            "Loading hardware object defined in %s.xml" %
+            hardware_object_name)        
+
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)
 
         hwobj = HardwareRepository.HardwareRepository().\
                    getHardwareObject(hardware_object_name)
 
-        if hwobj is not None: 
+        if hwobj is not None:
             self.connect(hwobj,
                          "progressInit",
                          self.progress_init)
@@ -1141,18 +1119,21 @@ class BlissWidget(Connectable.Connectable, QFrame):
             self.connect(hwobj,
                          'progressStop',
                          self.progress_stop)
+            self.connect(hwobj,
+                         'statusMessage',
+                         self.status_message_changed)
 
         if hwobj is None and not optional:
             logging.getLogger("GUI").error(\
-               "Unable to initialize hardware: %s.xml. " % hardware_object_name[1:] + \
-               "If the restarting of MXCuBE do not help, " + \
-               "please contact your local support.")
+               "%s: Unable to initialize hardware object defined in %s.xml" % \
+                (self.objectName(),
+                 hardware_object_name[1:]))
             self.set_background_color(Qt4_widget_colors.LIGHT_RED)
             self.__failed_to_load_hwobj = True
             self.setDisabled(True)
 
         return hwobj
-            
+
 
     def progress_init(self, progress_type, number_of_steps, use_dialog=False):
         self.__use_progress_dialog = use_dialog
@@ -1166,6 +1147,9 @@ class BlissWidget(Connectable.Connectable, QFrame):
     def progress_stop(self):
         if self.__use_progress_dialog:
             BlissWidget.close_progress_dialog()
+
+    def status_message_changed(self, info_type, message, state):
+        BlissWidget.set_status_info(info_type, message, state)
 
     def __hardwareObjectDiscarded(self, hardware_object_name):
         """
@@ -1266,8 +1250,8 @@ class BlissWidget(Connectable.Connectable, QFrame):
         Descript. :
         """
         if self.__failed_to_load_hwobj:
-            state = False       
- 
+            state = False
+
         if state:
             self.setEnabled(True)
         else:
@@ -1278,7 +1262,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         Descript. :
         """
         if self.__failed_to_load_hwobj:
-            state = True 
+            state = True
 
         if state:
             self.setDisabled(True)

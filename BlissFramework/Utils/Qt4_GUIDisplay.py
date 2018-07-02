@@ -242,7 +242,6 @@ class CustomMenuBar(QMenuBar):
         self.bricks_properties_editor.show()
 
     def property_edited(self):
-        print "Property edited"
         self.saveConfigSignal.emit()
 
     def whats_this_clicked(self):
@@ -457,7 +456,8 @@ class WindowDisplayWidget(QScrollArea):
 
             self.open_in_dialog_button = QPushButton(Qt4_Icons.load_icon("UnLock"), "")
             self.open_in_dialog_button.setFixedWidth(30)
-            self.open_in_dialog_button.setObjectName("pin")
+            #self.open_in_dialog_button.setObjectName("pin")
+            self.open_in_dialog_button.setVisible(False)
 
             self.dialog = QDialog(self.parent())
             self.dialog_layout = QVBoxLayout(self.dialog)
@@ -914,8 +914,8 @@ class WindowDisplayWidget(QScrollArea):
        
  
     def save_config_requested(self):
-        print "requested " 
-        print self.central_widget.parent().parent()
+        pass
+        #print self.central_widget.parent().parent()
 
     def view_toolbar_toggled(self, state):
         """Toggle toolbar visibility"""
@@ -940,12 +940,15 @@ class WindowDisplayWidget(QScrollArea):
         self._statusbar_state_label = QLabel(" <b>State: -</b>")
         self._statusbar_diffractometer_label = QLabel(" <b>Diffractometer: -</b>")
         self._statusbar_sc_label = QLabel(" <b>Sample changer: -</b>")
-        self._progress_bar = QProgressBar()
-        self._progress_bar.setEnabled(False)
-
-        #TODO make it via property
-        self._progress_bar.setVisible(False)
         self._statusbar_last_collect_label = QLabel(" <b>Last collect: -</b>")
+        self._progress_bar = QProgressBar()
+        #TODO make it via property
+        self._progress_bar.setEnabled(False)
+        self._progress_bar.setVisible(False)
+
+        self._file_system_status_label = QLabel("File system")
+        self._edna_status_label = QLabel("EDNA")
+        self._ispyb_status_label = QLabel("ISPyB")
 
         self._statusbar.addWidget(self._statusbar_user_label)
         self._statusbar.addWidget(self._statusbar_state_label)
@@ -953,6 +956,10 @@ class WindowDisplayWidget(QScrollArea):
         self._statusbar.addWidget(self._statusbar_sc_label)
         self._statusbar.addWidget(self._progress_bar)
         self._statusbar.addWidget(self._statusbar_last_collect_label)
+
+        self._statusbar.addPermanentWidget(self._file_system_status_label)
+        self._statusbar.addPermanentWidget(self._edna_status_label)
+        self._statusbar.addPermanentWidget(self._ispyb_status_label)
 
         self._statusbar.show()
         BlissWidget._statusBar = self._statusbar
@@ -965,6 +972,9 @@ class WindowDisplayWidget(QScrollArea):
 
         if info_message == "":
             info_message = "Ready"
+
+        msg = None
+        selected_label = None
 
         if info_type == "user":
             selected_label = self._statusbar_user_label
@@ -982,23 +992,32 @@ class WindowDisplayWidget(QScrollArea):
             selected_label = self._statusbar_last_collect_label
             msg = " <b>Last collect: </b> %s (%s)" % \
                 (info_message, time.strftime("%Y-%m-%d %H:%M:%S"))
+        elif info_type == "file_system":
+            selected_label = self._file_system_status_label
+        elif info_type == "edna":
+            selected_label = self._edna_status_label
+        elif info_type == "ispyb":
+            selected_label = self._ispyb_status_label
+         
 
-        selected_label.setText(msg)
-        if selected_label in (self._statusbar_user_label, 
+        if msg: 
+            selected_label.setText(msg)
+        if selected_label in (None, 
+                              self._statusbar_user_label,
                               self._statusbar_last_collect_label):
             return 
 
         if info_state:
             info_state = info_state.lower()
 
-        if info_state == "ready" or \
+        if info_state in ("ready", "success") or \
            info_message.lower() == "ready":
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_GREEN)
         elif info_state == "action_req":
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_ORANGE)
-        elif info_state == "error":
+        elif info_state == "error" or "alarm" in info_message.lower():
             Qt4_widget_colors.set_widget_color(selected_label,
                                                Qt4_widget_colors.LIGHT_RED)
         else:
@@ -1166,7 +1185,6 @@ class WindowDisplayWidget(QScrollArea):
                         new_item.pinned = False
                         new_item.open_in_dialog_button.setIcon(Qt4_Icons.load_icon("Lock"))
                         current_widget = new_item.currentWidget()
-                        print current_widget 
                         new_item.removeTab(new_item.currentIndex())
                         new_item.dialog_layout.addWidget(current_widget)
                         new_item.dialog.show()
