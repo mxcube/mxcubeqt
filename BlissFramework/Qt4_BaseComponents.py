@@ -34,7 +34,6 @@ from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from BlissFramework.Utils import PropertyBag
 from BlissFramework.Utils import Connectable
-#from BlissFramework import get_splash_screen
 
 try:
     from louie import dispatcher
