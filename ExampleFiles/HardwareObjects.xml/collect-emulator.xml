@@ -48,8 +48,10 @@
   <simcal_options>
     <!-- Simcal memory pool option, in Gb - should be 50-66% of available memory -->
     <memory-pool>9</memory-pool>
-    <!--&lt;!&ndash; Default is 1.0. 50 needed for the germanate test case. Try globally for now &ndash;&gt;-->
-    <hkl-scale>100</hkl-scale>
+    <!-- Default is 1.0. Too low makes for 'insufficient spots', -->
+    <!-- too high for 'insufficient indexed fraction' errors -->
+    <!-- For now all test hkli files are sdcaled to work with scale 1.0 -->
+    <hkl-scale>1.0</hkl-scale>
   </simcal_options>
 
   <!-- Both thread number variables should be less than all available threads -->
