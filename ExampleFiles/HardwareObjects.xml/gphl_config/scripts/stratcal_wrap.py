@@ -368,17 +368,35 @@ def run_stratcal_native(logfile=None, **options):
     # along the symmetry axis
     # These two values are used below to determine crystal alignments
     if  laue_group == '2/m':
-        # Index of symetry axis
+        # Index of symmetry axis
         symm_axis_index = 1
     else:
         symm_axis_index = 2
     cr_scan_axis_np = crystal_unit_np.dot(scan_axis)
     symm_projection = cr_scan_axis_np[symm_axis_index]
-    orthog_component = list(cr_scan_axis_np / math.sqrt(1 - symm_projection ** 2))
-    orthog_component[symm_axis_index] = 0
+    if symm_projection == 1:
+        # axis si along symmetry axis; Set orthogonal component (arbitrarily) to X
+        orthog_component = [1, 0, 0]
+    else:
+        orthog_component = list(cr_scan_axis_np / math.sqrt(1 - symm_projection ** 2))
+        orthog_component[symm_axis_index] = 0
 
     print ('@~@~ crystal', sg_name, laue_group, '\n', crystal_unit_np)
     print('@~@~ axis', scan_axis, cr_scan_axis_np, symm_projection, orthog_component)
+    print ('@~@~ cell lengths', [np.linalg.norm(crystal_matrix[ii])
+                                 for ii in range(3)])
+    print('@~@~ +/- angle bc',
+          angle_between(crystal_matrix[1], crystal_matrix[2])/DEG2RAD )
+    print('@~@~ +/- angle ac',
+          angle_between(crystal_matrix[0], crystal_matrix[2])/DEG2RAD )
+    print('@~@~ +/- angle ab',
+          angle_between(crystal_matrix[0], crystal_matrix[1])/DEG2RAD )
+    print('@~@~ +/- angle a-omega',
+          angle_between(crystal_matrix[0], cr_scan_axis_np)/DEG2RAD )
+    print('@~@~ +/- angle b-omega',
+          angle_between(crystal_matrix[1], cr_scan_axis_np)/DEG2RAD )
+    print('@~@~ +/- angle c-omega',
+          angle_between(crystal_matrix[2], cr_scan_axis_np)/DEG2RAD )
 
     if laue_group == '-1':
         # Triclinic, nothing doing. Pass on to default stratcal
@@ -478,7 +496,8 @@ def run_stratcal_native(logfile=None, **options):
         # CA. 1, 0.3, 0.3 (on diagonal cross of a face)
         orientation = (1, 0.3, 0.3)
         # Put in same quadrant as rotation axis
-        orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii]) for ii in range(3))
+        orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii])
+                            for ii in range(3))
         add_crystal_orientation(input_data_org, orientation)
 
     elif laue_group == 'm-3m':
@@ -486,7 +505,8 @@ def run_stratcal_native(logfile=None, **options):
         # Ca, 1.0, 0.2, 0.4
         orientation = (1, 0.2, 0.4)
         # Put in same quadrant as rotation axis
-        orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii]) for ii in range(3))
+        orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii])
+                            for ii in range(3))
         add_crystal_orientation(input_data_org, orientation)
 
     else:
@@ -665,13 +685,11 @@ def get_std_crystal_axes(crystal_data, omega_name='Z'):
         if angles:
             beta = angles[1]
         else:
-            dotproduct = sum(axes[0][kk] * axes[2][kk]
-                             for kk in range(3))
-            beta = math.acos(dotproduct/(a * c))
+            beta = angle_between(axes[0], axes[2])/DEG2RAD
         newaxes = (
             (a, 0, 0),
             (0, b, 0),
-            (c*math.cos(beta), 0, c*math.sin(beta))
+            (c*math.cos(beta*DEG2RAD), 0, c*math.sin(beta*DEG2RAD))
         )
     else:
         # triclinic
@@ -689,17 +707,17 @@ def get_std_crystal_axes(crystal_data, omega_name='Z'):
         if omega_name == 'X':
             # Rotate -90 around Z to match omega X axis
             result = (
-                newaxes[1],
-                tuple(-x for x in newaxes[0]),
-                newaxes[2]
+                (0,-newaxes[0][0],0),
+                (newaxes[1][1],0,0),
+                (0, -newaxes[2][0], newaxes[2][2])
             )
             result = (result, 'XZX')
         elif omega_name == 'Z':
             # Rotate 90 around X to match omega Z axis
             result = (
                 newaxes[0],
-                tuple(-x for x in newaxes[2]),
-                newaxes[1]
+                (0, 0, newaxes[1][1]),
+                (newaxes[2][0], -newaxes[2][2], 0)
             )
             result = (result, 'ZYZ')
         else:
@@ -710,17 +728,17 @@ def get_std_crystal_axes(crystal_data, omega_name='Z'):
         if omega_name == 'X':
             # Rotate 90 around Y to match omega X axis
             result = (
-                newaxes[2],
-                newaxes[1],
-                tuple(-x for x in newaxes[0])
+                (0,0,-newaxes[0][0]),
+                (newaxes[1][2], newaxes[1][1],0),
+                (newaxes[2][2],0,0)
             )
             result = (result, 'XYX')
         elif omega_name == 'Y':
             # Rotate -90 around X to match omega Y axis
             result = (
                 newaxes[0],
-                newaxes[2],
-            tuple(-x for x in newaxes[1]),
+                (0,newaxes[1][2],-newaxes[1][1]),
+                (0,newaxes[2][2],0)
             )
             result = (result, 'YZY')
         else:
@@ -801,9 +819,10 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
         euler_order = tt[1]
         print ('@~@~ npaxes', npaxes)
         rot_matrix = mgen.rotation_from_angles(orientation, euler_order)
-        rot_matrix = np.transpose(rot_matrix)
+        # rot_matrix = np.transpose(rot_matrix)
         print ('\n\n\n@~@~ rot_matrix', rot_matrix)
         npaxes2 = rot_matrix.dot(npaxes)
+        print ('@~@~ npaxes2', npaxes2)
         npaxes2 = np.transpose(npaxes2)
         axes = npaxes2.tolist()
         print ('@~@~ axes', axes)
@@ -820,8 +839,7 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
             print('@~@~ length', ii, length)
             for jj in range(ii):
                 print ('@~@~ angle', ii, jj,
-                       math.acos(sum(axes[ii][kk]*axes[jj][kk]
-                                 for kk in range(3))/(ll[ii]*ll[jj]))/DEG2RAD)
+                       angle_between(axes[ii], axes[jj])/DEG2RAD)
 
         for tag in ('cell_dim', 'cell_ang_deg', 'u_mat_ang_deg'):
             if tag in crystal_data:
@@ -898,3 +916,26 @@ if __name__ == '__main__':
 
 
     run_stratcal_wrap(args, **options_dict)
+
+
+# Angle utility functions (Thanks to DAvid Wolever,
+# https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python#13849249
+
+
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+def angle_between(v1, v2, ):
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::
+
+            >>> angle_between((1, 0, 0), (0, 1, 0))
+            1.5707963267948966
+            >>> angle_between((1, 0, 0), (1, 0, 0))
+            0.0
+            >>> angle_between((1, 0, 0), (-1, 0, 0))
+            3.141592653589793
+    """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
