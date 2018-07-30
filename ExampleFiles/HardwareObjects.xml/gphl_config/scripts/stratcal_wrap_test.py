@@ -47,16 +47,19 @@ def analyse_data(data):
     for crystal, orientation, fp in data:
 
         state = None
-        values = {'crystal':crystal}
-        result.append(values)
-        for ii,tag in enumerate(('euler_ang_1', 'euler_ang_2', 'euler_ang_3')):
-            values[tag] = orientation[ii]
 
+        indx = 0
         for line in open(fp).readlines():
 
             if state is None:
                 if 'Initial orientation in diffractometer system' in line:
                     state = 'init_angles'
+                    indx += 1
+                    values = {'crystal':crystal, 'indx':indx}
+                    result.append(values)
+                    for ii,tag in enumerate(('euler_ang_1', 'euler_ang_2', 'euler_ang_3')):
+                        values[tag] = orientation[ii]
+
                 elif 'pg_symop' in line:
                     header = line.strip().split()
                 elif 'Selected alignments' in line:
@@ -69,11 +72,11 @@ def analyse_data(data):
                 if not ll:
                     pass
                 elif ll[0] == '1':
-                    values['init_ang_x'] = ll[1]
+                    values['init_ang_x'] = float(ll[1])
                 elif ll[0] == '2':
-                    values['init_ang_y'] = ll[1]
+                    values['init_ang_y'] = float(ll[1])
                 elif ll[0] == '3':
-                    values['init_ang_z'] = ll[1]
+                    values['init_ang_z'] = float(ll[1])
                     state = None
 
             elif state == 'final_angles':
@@ -81,29 +84,40 @@ def analyse_data(data):
                 if not ll:
                     pass
                 elif ll[0] == '1':
-                    values['final_ang_x'] = ll[1]
+                    values['final_ang_x'] = float(ll[1])
                 elif ll[0] == '2':
-                    values['final_ang_y'] = ll[1]
+                    values['final_ang_y'] = float(ll[1])
                 elif ll[0] == '3':
-                    values['final_ang_z'] = ll[1]
+                    values['final_ang_z'] = float(ll[1])
                     state = None
 
             elif state == 'alignment':
                 line = line.strip()
                 if line:
-                    ll = line.replace(', ', ',').split()
-                    values.update(dict(zip(header, ll)))
+                    for ii, ss in enumerate(line.replace(', ', ',').split()):
+                        tag = header[ii]
+                        try:
+                            values[tag] = float(ss)
+                        except ValueError:
+                            values[tag] = ss
                     state = None
     #
     return result
 
+
+def fform(xx):
+    """Format xx to give nice output table"""
+    if isinstance(xx, float):
+        return '% 5.2f' % xx
+    else:
+        return str(xx)
 
 if __name__ == '__main__':
 
     # template input file
     fp_template = "/home/rhfogh/scratch/stratcal_test_201807/stratcal_id30b.in"
     crystal_dir = "/home/rhfogh/pycharm/MXCuBE-Qt_26r/ExampleFiles/HardwareObjects.xml/gphl_config/test_samples/"
-    test_dir = "/home/rhfogh/scratch/stratcal_test_201807/20180723_4"
+    test_dir = "/home/rhfogh/scratch/stratcal_test_201807/20180730_9"
     executable = "/public/xtal/Server-nightly-alpha-bdg-linux64/autoPROC/bin/linux64/stratcal"
 
     # 3n0s	P21	monoclinic
@@ -120,18 +134,20 @@ if __name__ == '__main__':
     #             '4iej', 'thermolysin', '4kw2','germanate', ]
     # crystals = ['3n0s', '4k4k', '4k61', '4j8p', '5y6h', '4jrl',
     #             '4kh8', '4iej', '5g0f', '4kw2', ]
-    crystals = ['4k4k']
+    crystals = ['3n0s', '4k4k']
 
     # angles are in order phi, theta, omega,
     # where phi and theta are (+/-)the polar coiordinates of the rotation axis
     # in the crystal orthonormal system, and omega is the rotation
     # around the omega axis
-    angles = [(4, 15, 22, 30, 45, 60, 105),
-              (0, 20, 45, 55, 70, 90,),
-              (0,)]
-    # angles = [(30,),
-    #           (45,),
-    #           (0, 15, 22, 30, 45, 60, 105, 130, 180)]
+    # angles1 = [(0,0,0), (0,10,0), (0, 90, 0)]
+    # angles2 = [(-45, 0, 30, 112),
+    #           (20, 40, 55, 70, 95,),
+    #           (0,)]
+    angles1 = [(0,0,0), (0,30,0), (0,45,0), (0,60,0), (0, 90, 0), (0,-30,0),
+               (-30,90,0), (30,90,0), (45,90,0), (60,90,0), (90, 90, 0),
+               ]
+    angles2 = []
 
     # Environment variables for test stup. Edit to change
     ENVS = {
@@ -146,7 +162,7 @@ if __name__ == '__main__':
 
     stratcal_options = {
         'driver':6,
-        'type-of-correction':2,
+        'type-of-correction':1,
         'main-only':None
     }
 
@@ -158,8 +174,11 @@ if __name__ == '__main__':
     offset = ()
     for crystal in crystals:
         # for orientation in orientations:
-        print ('@~@~ angles', list(itertools.product(*angles)))
-        for orientation in itertools.product(*angles):
+        angles = angles1
+        if angles2:
+            angles += list(itertools.product(*angles2))
+        print ('@~@~ angles', angles)
+        for orientation in angles:
             if offset:
                 orientation = tuple(x + offset[ii]
                                     for ii, x in enumerate(orientation))
@@ -177,13 +196,13 @@ if __name__ == '__main__':
                 data.append((crystal, orientation, fp_log))
 
     table = analyse_data(data)
-    header = ['euler_ang_1', 'euler_ang_2', 'euler_ang_3',
+    header = ['crystal', 'indx', 'euler_ang_1', 'euler_ang_2', 'euler_ang_3',
               'init_ang_x', 'init_ang_y', 'init_ang_z',
               'final_ang_x', 'final_ang_y', 'final_ang_z',
               'Phi', 'Kappa', 'Omega',
               'compl', 'redun', 'error',
               ]
+
     print ('  '.join(header))
     for datum in table:
-        print ('\t'.join(str(datum[tag]) for tag in header))
-
+        print ('\t'.join(fform(datum.get(tag, ' ')) for tag in header))
