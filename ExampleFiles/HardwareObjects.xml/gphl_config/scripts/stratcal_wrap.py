@@ -40,7 +40,8 @@ __date__ = "11/07/18"
 
 DEG2RAD = math.pi/180
 
-def run_stratcal_wrap(input, logfile=None, output=None, main_only=None, selection_mode=None,
+def run_stratcal_wrap(input, logfile=None, output=None, main_only=None,
+                      selection_mode=None, type_of_correction=None,
                       *args, **options):
     """Run stratcal wrapper, adapting options and dispatching to correct runner
 
@@ -61,6 +62,8 @@ def run_stratcal_wrap(input, logfile=None, output=None, main_only=None, selectio
         options['main-only'] = main_only
     if selection_mode is not None:
         options['selection-mode'] = selection_mode
+    if type_of_correction is not None:
+        options['type-of-correction'] = type_of_correction
 
     if options.get('driver') == 6:
         # Native data collection - determine strategy and run with driver 5
@@ -324,6 +327,17 @@ def get_laue_group(sg_name):
         sg_info = SPACEGROUP_MAP[sg_name]
     return sg_info.laue_group
 
+def stratcal_merge_output(indata_exch, outdata_exch):
+    """Merges information from indat_exch and outdata_exch
+    keeping all information from the indata,
+    replacing the stratcal_sweep_list, and asdding new IDs as needed"""
+
+    result = copy.deepcopy(indata_exch)
+
+    # TODO finish this function
+
+    result['stratcal_sweep_list'] = outdata_exch['stratcal_sweep_list']
+    return result
 
 
 def run_stratcal_native(logfile=None, **options):
@@ -346,8 +360,7 @@ def run_stratcal_native(logfile=None, **options):
     mm = []
     # transform to unit vectors
     for ll in crystal_matrix:
-        length = math.sqrt(sum(x*x for x in ll))
-        mm.append(list(x/length for x in ll))
+        mm.append(unit_vector(np.array(ll)))
     # transform to orthonormal coordinate system
     if laue_group == '-1':
         mm[2] = np.cross(mm[0], mm[1])
@@ -373,13 +386,23 @@ def run_stratcal_native(logfile=None, **options):
     else:
         symm_axis_index = 2
     cr_scan_axis_np = crystal_unit_np.dot(scan_axis)
+    cr_symm_axis = crystal_unit_np[symm_axis_index]
     symm_projection = cr_scan_axis_np[symm_axis_index]
-    if symm_projection == 1:
-        # axis si along symmetry axis; Set orthogonal component (arbitrarily) to X
+    if abs(symm_projection) == 1:
+        # axis is along symmetry axis; Set orthogonal component (arbitrarily) to X
         orthog_component = [1, 0, 0]
     else:
-        orthog_component = list(cr_scan_axis_np / math.sqrt(1 - symm_projection ** 2))
+        # orthog_component is a unit vector at right angles to symmetry axis,
+        # coplanar with the omega axis
+        orthog_component = list(cr_scan_axis_np)
         orthog_component[symm_axis_index] = 0
+        orthog_component = list(unit_vector(np.array(orthog_component)))
+
+    # Angle between the projection of the omega axis in the crystal orthogonal
+    # plane and the crystal symmetry axis
+    omega_projection_angle = angle_between((1,0,0), orthog_component)
+    if orthog_component[1] + orthog_component[2] < 0:
+        omega_projection_angle = -omega_projection_angle
 
     print ('@~@~ crystal', sg_name, laue_group, '\n', crystal_unit_np)
     print('@~@~ axis', scan_axis, cr_scan_axis_np, symm_projection, orthog_component)
@@ -392,11 +415,12 @@ def run_stratcal_native(logfile=None, **options):
     print('@~@~ +/- angle ab',
           angle_between(crystal_matrix[0], crystal_matrix[1])/DEG2RAD )
     print('@~@~ +/- angle a-omega',
-          angle_between(crystal_matrix[0], cr_scan_axis_np)/DEG2RAD )
+          angle_between(crystal_matrix[0], scan_axis)/DEG2RAD )
     print('@~@~ +/- angle b-omega',
-          angle_between(crystal_matrix[1], cr_scan_axis_np)/DEG2RAD )
+          angle_between(crystal_matrix[1], scan_axis)/DEG2RAD )
     print('@~@~ +/- angle c-omega',
-          angle_between(crystal_matrix[2], cr_scan_axis_np)/DEG2RAD )
+          angle_between(crystal_matrix[2], scan_axis)/DEG2RAD )
+    print ('@~@~ omega_projection_angle', omega_projection_angle)
 
     if laue_group == '-1':
         # Triclinic, nothing doing. Pass on to default stratcal
@@ -407,89 +431,97 @@ def run_stratcal_native(logfile=None, **options):
     elif laue_group == '2/m':
         # Monoclinic
         # Two directions, theta=54.7deg; phi +/-45 deg away from symmetry axis
-        ll = list(orthog_component)
-        ll[symm_axis_index] = math.copysign(math.tan(35.3*DEG2RAD), symm_projection)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], math.pi/4
-        ).dot(ll))
-        add_crystal_orientation(input_data_org, orientation)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], -math.pi/4
-        ).dot(ll))
-        add_crystal_orientation(input_data_org, orientation)
+        for ii in (1,-1):
+            aa = omega_projection_angle + ii * math.pi/4
+            orientation = (
+                math.cos(aa),
+                math.copysign(math.tan(35.3*DEG2RAD), symm_projection),
+                math.sin(aa)
+            )
+            orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+            add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == 'mmm':
         # Orthorhombic
         # Along a body diagonal - selecting diagonal closest to the rotation axis
         orientation = tuple(math.copysign(1,x) for x in cr_scan_axis_np)
-        add_crystal_orientation(input_data_org, orientation)
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '4/m':
         # 'C4'
         # One directions, theta=54.7deg
-        ll = list(orthog_component)
-        ll[symm_axis_index] = math.copysign(math.tan(35.3*DEG2RAD), symm_projection)
-        add_crystal_orientation(input_data_org, tuple(ll))
+        orientation = (math.cos(omega_projection_angle),
+                       math.sin(omega_projection_angle),
+                       math.copysign(math.tan(35.3*DEG2RAD), symm_projection)
+                       )
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '4/mmm':
         # 422
         # theta=67.5, 22.5 deg from the plane of a twofold axis
-        ll = [1, 0, 0]
-        ll[symm_axis_index] = math.tan(35.3*DEG2RAD)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], math.pi/8
-        ).dot(ll))
-        orientation = tuple(math.copysign(1,x) for x in orientation)
-        # NB this gives alignment in correct quadrant but not necessarily closest to axis
-        # TODO
-        add_crystal_orientation(input_data_org, orientation)
+        # As close as possible to omega axis
+        tt = divmod(abs(omega_projection_angle), math.pi/2)
+        mult = tt[0]
+        remainder = tt[1] - math.pi/4
+        aa = mult*math.pi/2 + math.copysign(math.pi/8, remainder)
+        orientation = (math.cos(aa), math.sin(aa), math.tan(math.pi/8))
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '-3':
         # 'C3'
         # Two directions ca. 30deg and 40 deg above the plane, 60deg apart
-        ll = list(orthog_component)
-        ll[symm_axis_index] = math.copysign(math.tan(math.pi/6),
-                                            symm_projection)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], math.pi/6
-        ).dot(ll))
-        add_crystal_orientation(input_data_org, orientation)
-        ll[symm_axis_index] = math.copysign(math.tan(math.pi/4.5),
-                                                symm_projection)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], -math.pi/6
-        ).dot(ll))
-        add_crystal_orientation(input_data_org, orientation)
+        for ii in (1,-1):
+            aa = omega_projection_angle + ii * math.pi/6
+            orientation = (
+                math.cos(aa),
+                math.sin(aa),
+                math.copysign(math.tan((35 + ii * 5)*DEG2RAD), symm_projection)
+            )
+            orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+            add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '-3m':
         # '32'
         # One direction, theta=60deg, phi 30 deg from a twofold axis
-        # One direction 30 deg from the plane of  a twofold axis and 30 deg above the plane
-        ll = list(orthog_component)
-        ll[symm_axis_index] = math.copysign(math.tan(math.pi/6),
-                                            symm_projection)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], math.pi/6
-        ).dot(ll))
-        add_crystal_orientation(input_data_org, orientation)
+        # As close as possible to omega axis
+        tt = divmod(abs(omega_projection_angle), math.pi*2/3)
+        mult = tt[0]
+        remainder = tt[1] - math.pi/3
+        aa = mult*math.pi*2/3 + math.copysign(math.pi/6, remainder)
+        orientation = (math.cos(aa), math.sin(aa), math.tan(math.pi/6))
+        print ('@~@~ laue -3m angle', math.degrees(aa), orientation)
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '6/m':
         # 'C6'
         # One directions, theta=60deg
-        ll = list(orthog_component)
-        ll[symm_axis_index] = math.copysign(math.tan(math.pi/6),
-                                            symm_projection)
-        add_crystal_orientation(input_data_org, tuple(ll))
+        orientation = (
+            math.cos(omega_projection_angle),
+            math.sin(omega_projection_angle),
+            math.copysign(math.tan(math.pi/6), symm_projection)
+        )
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '6/mmm':
         # '622'
         # theta=70, 15 deg from the plane of a twofold axis
-        ll = [1, 0, 0]
-        ll[symm_axis_index] = math.tan(math.pi/9)
-        orientation = tuple(mgen.rotation_around_axis(
-            crystal_unit_np[symm_axis_index], math.pi/12
-        ).dot(ll))
-        add_crystal_orientation(input_data_org, orientation)
+        # As close as possible to omega axis
+        tt = divmod(abs(omega_projection_angle), math.pi/3)
+        mult = tt[0]
+        remainder = tt[1] - math.pi/6
+        aa = mult*math.pi/3 + math.copysign(math.pi/12, remainder)
+        orientation = (
+            math.cos(aa),
+            math.sin(aa),
+            math.copysign(math.tan(math.pi/9), symm_projection)
+        )
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == 'm-3':
         # '23'
@@ -498,7 +530,8 @@ def run_stratcal_native(logfile=None, **options):
         # Put in same quadrant as rotation axis
         orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii])
                             for ii in range(3))
-        add_crystal_orientation(input_data_org, orientation)
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == 'm-3m':
         # '432'
@@ -507,14 +540,16 @@ def run_stratcal_native(logfile=None, **options):
         # Put in same quadrant as rotation axis
         orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii])
                             for ii in range(3))
-        add_crystal_orientation(input_data_org, orientation)
+        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     else:
         # sg_name must be empty string
         raise ValueError("Illegal value (empty string) for SG_NAME")
 
     # Add orient list count
-    n_orients = len(input_data_org['orient_list'])
+    orient_list = input_data_org['orient_list']
+    n_orients = len(orient_list)
     input_data_org['setup_list']['n_orients'] = n_orients
 
     # Move aside old input and save new input in input_data_org['orient_list'])ts place
@@ -526,6 +561,18 @@ def run_stratcal_native(logfile=None, **options):
     # Run stratcal
     running_process = run_stratcal(logfile=logfile, **options)
     running_process.wait()
+
+    # NBNB TODO rewrite .out file to get correct ids etc.
+    outfile = options['output']
+    stem, junk = os.path.splitext(outfile)
+    for ext in ('.out.def', '.out2.def'):
+        fp_out = stem + ext
+        fp_bak = '_wrap'.join((stem, ext))
+        out_data = f90nml.read(fp_out)
+        os.rename(fp_out, fp_bak)
+        out_data = stratcal_merge_output(input_data_exch, out_data)
+        f90nml.write(out_data, fp_out)
+
     return
 
 def stratcal_exch2org(exch_data):
@@ -574,10 +621,11 @@ def stratcal_exch2org(exch_data):
     return result
 
 
-def add_crystal_orientation(data_dict, orientation):
-    """Add an orient_list record using orientation in reciprocal-space fractional crystal coordinates"""
+def add_crystal_orientation(data_dict, orientation, orthogonal_orientation):
+    """Add an orient_list record using orientation in orthonormal crystal coordinates
+    orthogonal_orientation is the direction to align for setting starting omega"""
 
-    print('@~@~ add_crystal_orientation', orientation)
+    print('@~@~ add_crystal_orientation', orientation, orthogonal_orientation)
 
     setup_list = data_dict['setup_list']
 
@@ -588,10 +636,10 @@ def add_crystal_orientation(data_dict, orientation):
     orient_list.append(orient)
 
     # Parameters identical to default omitted, I assume they will be filled in.
-    orient['crys_vec_mode'] = [2, 1]    # orthonormal space
+    orient['crys_vec_mode'] = [2, 2]    # orthonormal space
     orient['lab_vec_mode'] = 1          # Main orientation
     orient['crys_vec_1'] = list(orientation) # Orient this
-    orient['crys_vec_2'] = [1, 0, 0]    # X axis - one vector we will never align on
+    orient['crys_vec_2'] = list(orthogonal_orientation)    # with omega here
     orient['lab_vec_1'] = [0, 0, 0]    # dummy - autoset for mode 'main'
     orient['lab_vec_2'] = [0, 0, 0]    # dummy - autoset for mode 'main'
     orient['lambda'] = setup_list['lambda_def']
@@ -602,7 +650,7 @@ def add_crystal_orientation(data_dict, orientation):
     orient['two_theta_deg'] = 0    # dummy
     orient['exposure'] = 1    # dummy
     orient['trans_xyz'] = [0, 0, 0]    # dummy
-    # # Gives problems, reads as uioncode, which FOPRTRAN cannot read
+    # # Gives problems, reads as unicode, which FOPRTRAN cannot read
     # orient['name_template'] = "data/sweep%s_????.cbf"  # dummy, not used
     orient['step_deg'] = 1              # 1 degree steps
     orient['n_frames'] = 360            # 360 of them
@@ -610,7 +658,6 @@ def add_crystal_orientation(data_dict, orientation):
 
 def run_stratcal(logfile=None, **options):
     """Call stratcal binary using command line options 'options'"""
-    print ('@~@~ run_stratcal', sorted(tt for tt in options.items()))
     envs = os.environ
     cmd_list = [envs['GPHL_STRATCAL_BINARY']]
     for tag, val in sorted(options.items()):
@@ -618,12 +665,12 @@ def run_stratcal(logfile=None, **options):
         if val not in (None, ''):
             cmd_list.append(str(val))
     print ('@~@~ running stratcal', cmd_list)
-    if isinstance(logfile, str):
+    if isinstance(logfile, (str, unicode)):
         fp_log = open(logfile, 'w')
     else:
         fp_log = logfile
         # Flush the file, to make sure stratcal output (on stderr) is not mixed
-        if fp_log:
+        if fp_log and not isinstance(fp_log, str):
             # Could be None
             fp_log.flush()
             os.fsync(fp_log.fileno())
@@ -631,7 +678,7 @@ def run_stratcal(logfile=None, **options):
         result = subprocess.Popen(cmd_list, env=envs, stdout=fp_log,
                                   stderr=fp_log)
     finally:
-        if isinstance(logfile, str):
+        if isinstance(logfile, (str, unicode)):
             fp_log.flush()
             os.fsync(fp_log.fileno())
             fp_log.close()
@@ -641,6 +688,8 @@ def run_stratcal(logfile=None, **options):
 def get_std_crystal_axes(crystal_data, omega_name='Z'):
     """get (cell_a_axis, cell_b_axis, cell_c_axis) in unrotated position
     from a read-in crystal_list dictionary (with lower case tags)
+
+    Use ONLY for testing to get predictable orientations from input angles
 
     if omega_axis is given will rotate crystal so that the main symmetry axis
     (the Y axis for monoclinic crystals, the Z axis otherwise)
@@ -677,7 +726,7 @@ def get_std_crystal_axes(crystal_data, omega_name='Z'):
         # hexagonal
         newaxes = (
             (a, 0, 0),
-            (0, math.cos(math.pi*2/3)*b, -b/2),
+            (-b/2, math.cos(math.pi/6)*b, 0),
             (0, 0, c)
         )
     elif laue_group == '2/m':
@@ -729,7 +778,7 @@ def get_std_crystal_axes(crystal_data, omega_name='Z'):
             # Rotate 90 around Y to match omega X axis
             result = (
                 (0,0,-newaxes[0][0]),
-                (newaxes[1][2], newaxes[1][1],0),
+                (0, newaxes[1][1],-newaxes[1][0]),
                 (newaxes[2][2],0,0)
             )
             result = (result, 'XYX')
@@ -819,11 +868,9 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
         euler_order = tt[1]
         print ('@~@~ npaxes', npaxes)
         rot_matrix = mgen.rotation_from_angles(orientation, euler_order)
-        # rot_matrix = np.transpose(rot_matrix)
         print ('\n\n\n@~@~ rot_matrix', rot_matrix)
-        npaxes2 = rot_matrix.dot(npaxes)
+        npaxes2 = npaxes.dot(rot_matrix)
         print ('@~@~ npaxes2', npaxes2)
-        npaxes2 = np.transpose(npaxes2)
         axes = npaxes2.tolist()
         print ('@~@~ axes', axes)
         ii = 0
@@ -864,60 +911,6 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
     return logfile
 
 
-if __name__ == '__main__':
-
-    from optparse import OptionParser
-
-    optparser = OptionParser(description=
-    """Plug-in replacement wrapper for stratcal
-    
-    The environment variable GPHL_STRATCAL_BINARY must point to the stratcal binary
-    
-    
-    """)
-    optparser.add_option(
-        "--input", dest="input", metavar="infile",
-        help="input namelist file infile"
-    )
-    optparser.add_option(
-        "--output", dest="output", metavar="outfile",
-        help="output namelist file outfile"
-    )
-    optparser.add_option(
-        "--driver", dest="driver", type='int', metavar="driver",
-        help="Stratcal driver, defaults to 1 (phasing), use 5 for alignment-only mode, 6 for native collection mode",
-    )
-    optparser.add_option(
-        "--toc", dest="driver", type='int',
-        help="""type-of-correction (if exact alignment is not possible)
-    defaults to 3 (two-sided).
-    Set to 0 (off) to get only exact alignments (and to try alternative axis alignments)"""
-                         )
-    optparser.add_option(
-        "--main-only", dest="main_only", action='store_true',
-        help="main-only - calculate only main alignment, skipping cusp alignment"
-    )
-    optparser.add_option(
-        "--selection-mode", dest="selection_mode", type='int',
-        help="""selection-mode for preferred strategy
-        Default is 2 for normal and 3 for anomalous
-        0: kappa and omega angles have smallest |values|
-        1: minimal shadow
-        2: normal completeness
-        3: anomalous completeness
-        4: smallest value of |kappa|"""
-    )
-    # NB we are using anomalous (default) both for phasing and native.
-    # Could be changed
-
-    (options, args) = optparser.parse_args()
-    options_dict = dict(tt for tt in options.__dict_.items()
-                        if tt[1] is not None)
-
-
-    run_stratcal_wrap(args, **options_dict)
-
-
 # Angle utility functions (Thanks to DAvid Wolever,
 # https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python#13849249
 
@@ -939,3 +932,60 @@ def angle_between(v1, v2, ):
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+
+if __name__ == '__main__':
+
+    from optparse import OptionParser
+
+    optparser = OptionParser(description=
+    """Plug-in replacement wrapper for stratcal
+    
+    The environment variable GPHL_STRATCAL_BINARY must point to the stratcal binary
+    
+    
+    """)
+    optparser.add_option(
+        "--input", dest="input", metavar="infile",
+        help="input namelist file infile"
+    )
+    optparser.add_option(
+        "--output", dest="output", metavar="outfile",
+        help="output namelist file outfile"
+    )
+    optparser.add_option(
+        "--driver", dest="driver", type='int', metavar="driver", default=6,
+        help="Stratcal driver, defaults to 1 (phasing), use 5 for alignment-only mode, 6 for native collection mode",
+    )
+    optparser.add_option(
+        "--toc", dest="type_of_correction", type='int', default=1,
+        help="""type-of-correction (if exact alignment is not possible)
+    0:apply selection_mode and throw error if no solution found.
+    1:correction type 'right', disregard selection mode
+    2:correction type 'left', disregard selection mode
+    3:correction type 'two-sided', disregard selection mode. Buggy as of 20180731
+    """
+                         )
+    optparser.add_option(
+        "--main-only", dest="main_only", action='store_true', default=True,
+        help="main-only - calculate only main alignment, skipping cusp alignment"
+    )
+    optparser.add_option(
+        "--selection-mode", dest="selection_mode", type='int', default=4,
+        help="""selection-mode for preferred strategy
+        Default is 2 for normal and 3 for anomalous
+        0: kappa and omega angles have smallest |values|
+        1: minimal shadow
+        2: normal completeness
+        3: anomalous completeness
+        4: smallest value of |kappa|"""
+    )
+    # NB we are using anomalous (default) both for phasing and native.
+    # Could be changed
+
+    (options, args) = optparser.parse_args()
+    options_dict = dict(tt for tt in options.__dict_.items()
+                        if tt[1] is not None)
+
+
+    run_stratcal_wrap(args, **options_dict)
