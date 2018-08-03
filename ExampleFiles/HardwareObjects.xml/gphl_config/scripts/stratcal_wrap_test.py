@@ -24,6 +24,7 @@ __date__ = "16/07/18"
 import os
 import sys
 import itertools
+import math
 
 _i = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _i not in sys.path:
@@ -47,22 +48,37 @@ def analyse_data(data):
     for crystal, orientation, fp in data:
 
         state = None
+        space_group = None
+        omega_projection_angle = None
 
         indx = 0
         for line in open(fp).readlines():
 
             if state is None:
-                if 'Initial orientation in diffractometer system' in line:
+                if '@~@~' in line:
+
+                    if  'omega_projection_angle' in line:
+                        omega_projection_angle = float(line.split()[2])
+
+                elif 'Total CPU' in line:
+                    values['time'] = float(line.split()[-1])
+
+                elif 'Space group' in line:
+                    space_group = line.split()[-1]
+
+                elif 'Initial orientation in diffractometer system' in line:
                     state = 'init_angles'
                     indx += 1
-                    values = {'crystal':crystal, 'indx':indx}
-                    result.append(values)
+                    values0 = {'crystal':crystal, 'indx':indx, 'time':'     ',
+                               'omega_projection_angle':omega_projection_angle}
                     for ii,tag in enumerate(('euler_ang_1', 'euler_ang_2', 'euler_ang_3')):
-                        values[tag] = orientation[ii]
+                        values0[tag] = orientation[ii]
 
                 elif 'pg_symop' in line:
                     header = line.strip().split()
                 elif 'Selected alignments' in line:
+                    values = values0.copy()
+                    result.append(values)
                     state = 'alignment'
                 elif 'Reflections processing' in line:
                     state = 'final_angles'
@@ -72,11 +88,11 @@ def analyse_data(data):
                 if not ll:
                     pass
                 elif ll[0] == '1':
-                    values['init_ang_x'] = float(ll[1])
+                    values0['init_ang_x'] = float(ll[1])
                 elif ll[0] == '2':
-                    values['init_ang_y'] = float(ll[1])
+                    values0['init_ang_y'] = float(ll[1])
                 elif ll[0] == '3':
-                    values['init_ang_z'] = float(ll[1])
+                    values0['init_ang_z'] = float(ll[1])
                     state = None
 
             elif state == 'final_angles':
@@ -89,6 +105,20 @@ def analyse_data(data):
                     values['final_ang_y'] = float(ll[1])
                 elif ll[0] == '3':
                     values['final_ang_z'] = float(ll[1])
+                    if space_group in ('P2', 'P21', 'C2'):
+                        theta = values['final_ang_y']
+                        sign = -1 if values['final_ang_z'] <= 90 else 1
+                    else:
+                        theta = values['final_ang_z']
+                        sign = 1 if values['final_ang_y'] <= 90  else -1
+                    angx = math.radians(values['final_ang_x'])
+                    angt = math.radians(theta)
+                    print ('@~@~ angles', values['final_ang_x'], theta)
+                    print ('@~@~', math.cos(angx)/math.sin(angt))
+                    phi = sign * math.acos(min(1.0,math.cos(angx)/math.sin(angt)))
+
+                    values ['final_theta'] = theta
+                    values ['final_phi'] = math.degrees(phi)
                     state = None
 
             elif state == 'alignment':
@@ -117,8 +147,9 @@ if __name__ == '__main__':
     # template input file
     fp_template = "/home/rhfogh/scratch/stratcal_test_201807/stratcal_id30b.in"
     crystal_dir = "/home/rhfogh/pycharm/MXCuBE-Qt_26r/ExampleFiles/HardwareObjects.xml/gphl_config/test_samples/"
-    test_dir = "/home/rhfogh/scratch/stratcal_test_201807/20180730_9"
+    test_dir = "/home/rhfogh/scratch/stratcal_test_201807/20180801_8"
     executable = "/public/xtal/Server-nightly-alpha-bdg-linux64/autoPROC/bin/linux64/stratcal"
+    # executable = "//home/claus/tmp/stratcal-rf-20180802"
 
     # 3n0s	P21	monoclinic
     # 4k4k	P21212	orthorhombic	NEW
@@ -132,22 +163,23 @@ if __name__ == '__main__':
     # 4KW2	F432	cubic	NEW
     # Further crystals: 4mxt (C2), thermolysin (P6122), germanagte (Ia-3d)
     #             '4iej', 'thermolysin', '4kw2','germanate', ]
-    # crystals = ['3n0s', '4k4k', '4k61', '4j8p', '5y6h', '4jrl',
-    #             '4kh8', '4iej', '5g0f', '4kw2', ]
-    crystals = ['3n0s', '4k4k']
+    crystals = ['3n0s', '4k4k', '4k61', '4j8p', '4jrl',
+                '5y6h', '4kh8', '4iej', '5g0f', '4kw2', ]
+    # crystals = ['4kw2']
 
     # angles are in order phi, theta, omega,
     # where phi and theta are (+/-)the polar coiordinates of the rotation axis
     # in the crystal orthonormal system, and omega is the rotation
     # around the omega axis
-    # angles1 = [(0,0,0), (0,10,0), (0, 90, 0)]
-    # angles2 = [(-45, 0, 30, 112),
-    #           (20, 40, 55, 70, 95,),
-    #           (0,)]
-    angles1 = [(0,0,0), (0,30,0), (0,45,0), (0,60,0), (0, 90, 0), (0,-30,0),
-               (-30,90,0), (30,90,0), (45,90,0), (60,90,0), (90, 90, 0),
-               ]
-    angles2 = []
+    angles1 = [(0,0,0), (0,10,0), (0, 90, 0)]
+    angles2 = [(-45, 0, 30, 112),
+              (20, 40, 55, 70, 95,),
+              (0,)]
+    # angles1 = [(0,0,0), (0,30,0), (0,45,0), (0,60,0), (0, 90, 0), (0,-30,0),
+    #            (-30,90,0), (30,90,0), (45,90,0), (60,90,0), (90, 90, 0),
+    #            ]
+    # angles1 = [(0,0,0)]
+    # angles2 = []
 
     # Environment variables for test stup. Edit to change
     ENVS = {
@@ -163,7 +195,8 @@ if __name__ == '__main__':
     stratcal_options = {
         'driver':6,
         'type-of-correction':1,
-        'main-only':None
+        'main-only':None,
+        'selection_mode':4
     }
 
     for fp in (fp_template, executable):
@@ -172,16 +205,15 @@ if __name__ == '__main__':
 
     # offset = (0.1, 0.1, 0.1)
     offset = ()
+    orientations = list(angles1)
+    if angles2:
+        orientations += list(itertools.product(*angles2))
+    if offset:
+        orientations = list(tuple(x + offset[ii] for ii, x in enumerate(tt))
+                            for tt in orientations)
+    print ('@~@~ angles', orientations)
     for crystal in crystals:
-        # for orientation in orientations:
-        angles = angles1
-        if angles2:
-            angles += list(itertools.product(*angles2))
-        print ('@~@~ angles', angles)
-        for orientation in angles:
-            if offset:
-                orientation = tuple(x + offset[ii]
-                                    for ii, x in enumerate(orientation))
+        for orientation in orientations:
             print ('@~@~ testing', crystal, orientation)
             fp_crystal = os.path.join(crystal_dir, crystal, 'crystal.nml')
             fp_log = stratcal_wrap.test_stratcal_wrap(crystal,
@@ -199,7 +231,7 @@ if __name__ == '__main__':
     header = ['crystal', 'indx', 'euler_ang_1', 'euler_ang_2', 'euler_ang_3',
               'init_ang_x', 'init_ang_y', 'init_ang_z',
               'final_ang_x', 'final_ang_y', 'final_ang_z',
-              'Phi', 'Kappa', 'Omega',
+              'final_phi', 'final_theta', 'Phi', 'Kappa', 'Omega',
               'compl', 'redun', 'error',
               ]
 
