@@ -328,15 +328,44 @@ def get_laue_group(sg_name):
     return sg_info.laue_group
 
 def stratcal_merge_output(indata_exch, outdata_exch):
-    """Merges information from indat_exch and outdata_exch
+    """Merges information from indata_exch and outdata_exch
     keeping all information from the indata,
     replacing the stratcal_sweep_list, and asdding new IDs as needed"""
 
     result = copy.deepcopy(indata_exch)
 
-    # TODO finish this function
+    loop_counts = result['loop_count_list']
 
-    result['stratcal_sweep_list'] = outdata_exch['stratcal_sweep_list']
+    # Copy settings back with their IDs
+    ll = outdata_exch['goniostat_setting_list']
+    if not isinstance(ll, list):
+        ll = [ll]
+    loop_counts['n_goniostat_settings'] = len(ll)
+    result['goniostat_setting_list'] = ll
+
+    ll = outdata_exch['centred_goniostat_setting_list']
+    if not isinstance(ll, list):
+        ll = [ll]
+    loop_counts['n_centred_goniostat_settings'] = len(ll)
+    result['centred_goniostat_setting_list'] = ll
+
+    result['stratcal_sweep_list'] = sweeps = outdata_exch['stratcal_sweep_list']
+    loop_counts['n_sweeps'] = len(sweeps)
+
+    # Transfer beam, beamstop and detector setting IDs from input
+    # NBNB This assumes that there was only one of each
+    # and it was transferred as by stratcal_exch2org
+    dd = {}
+    for tag in ('beam_setting', 'beamstop_setting', 'detector_setting'):
+        ll = indata_exch[tag + '_list']
+        if isinstance(ll, list):
+            dd[tag + '_id'] = ll[0]['id']
+        else:
+            dd[tag + '_id'] = ll['id']
+    for sweep in sweeps:
+        sweep.update(dd)
+
+    #
     return result
 
 
@@ -567,7 +596,7 @@ def run_stratcal_native(logfile=None, **options):
     stem, junk = os.path.splitext(outfile)
     for ext in ('.out.def', '.out2.def'):
         fp_out = stem + ext
-        fp_bak = '_wrap'.join((stem, ext))
+        fp_bak = '_raw'.join((stem, ext))
         out_data = f90nml.read(fp_out)
         os.rename(fp_out, fp_bak)
         out_data = stratcal_merge_output(input_data_exch, out_data)
@@ -659,7 +688,13 @@ def add_crystal_orientation(data_dict, orientation, orthogonal_orientation):
 def run_stratcal(logfile=None, **options):
     """Call stratcal binary using command line options 'options'"""
     envs = os.environ
-    cmd_list = [envs['GPHL_STRATCAL_BINARY']]
+    # NBNB this little hack is necessary as stratcal points to this file
+    # We need to get the underlying binary in some other way
+    # This is hacky, but the wrapper is a temporary expedient anyway
+    stratcal_binary = envs.get('GPHL_STRATCAL_BINARY')
+    if stratcal_binary is None:
+        stratcal_binary = os.path.join(envs['GPHL_INSTALLATION'], 'stratcal')
+    cmd_list = [stratcal_binary]
     for tag, val in sorted(options.items()):
         cmd_list.append('--' + tag)
         if val not in (None, ''):
@@ -967,7 +1002,7 @@ if __name__ == '__main__':
     """
                          )
     optparser.add_option(
-        "--main-only", dest="main_only", action='store_true', default=True,
+        "--main-only", dest="main_only", action='store_true',
         help="main-only - calculate only main alignment, skipping cusp alignment"
     )
     optparser.add_option(
@@ -984,8 +1019,9 @@ if __name__ == '__main__':
     # Could be changed
 
     (options, args) = optparser.parse_args()
-    options_dict = dict(tt for tt in options.__dict_.items()
+    options_dict = dict(tt for tt in options.__dict__.items()
                         if tt[1] is not None)
+    print ('@~@~ args, options', args, options_dict)
 
 
-    run_stratcal_wrap(args, **options_dict)
+    run_stratcal_wrap(*args, **options_dict)
