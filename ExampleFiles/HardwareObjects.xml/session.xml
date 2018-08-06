@@ -4,7 +4,8 @@
   <beamline_name>P14</beamline_name>
   <file_info>
     <file_suffix>cbf</file_suffix>
-    <precision>'05'</precision>
+    <!-- Changed to 4 to fit ESRF ID30B -->
+    <precision>'04'</precision>
     <base_directory>/tmp/mxcube_base_dir</base_directory>
     <raw_data_folder_name>RAW_DATA</raw_data_folder_name>
     <processed_data_base_directory>/tmp/mxcube_base_dir</processed_data_base_directory>
@@ -13,3 +14,4 @@
     <archive_folder>p14</archive_folder>
   </file_info>
 </object>
+
