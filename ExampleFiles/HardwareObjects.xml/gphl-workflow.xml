@@ -238,7 +238,7 @@
 
 
     <!-- Parameters for the command-line invocation of the workflow application-->
-    <!-- These are unlile;y to need changing - except for maybe wfprefix -->
+    <!-- These are unlikely to need changing - except for maybe wfprefix -->
 
     <!-- Java invocation properties - syntax is e.g. '-Dfile.encoding=UTF-8' -->
     <invocation_properties>
@@ -255,6 +255,11 @@
         <co.gphl.wf.simcal_predict.b_wilson>26.0</co.gphl.wf.simcal_predict.b_wilson>
         <co.gphl.wf.simcal_predict.cell_dim_sd_scale>1.5e-3</co.gphl.wf.simcal_predict.cell_dim_sd_scale>
         <co.gphl.wf.simcal_predict.mosaicity>0.2</co.gphl.wf.simcal_predict.mosaicity>
+        <!-- The next two disable the checks that ensure the top-level -->
+        <!-- data and proc directories exist when the Workflow is invoked -->
+        <!-- In normal MXCuBE operation they are created only when collection starts -->
+        <co.gphl.wf.blRootCheck>F</co.gphl.wf.blRootCheck>
+        <co.gphl.wf.procRootCheck>F</co.gphl.wf.procRootCheck>
         <!-- Uncomment this to disable stratcal's collision checking ->
         <co.gphl.wf.stratcal.collision_mode>2</co.gphl.wf.stratcal.collision_mode>
         -->
