@@ -58,8 +58,14 @@ def run_stratcal_wrap(input, logfile=None, output=None, main_only=None,
         output = os.path.splitext(input)[0] + '.out'
     options['output'] = output
 
-    if main_only is not None:
-        options['main-only'] = main_only
+    if main_only:
+        options['main-only'] = None
+    elif 'main-only' in options:
+        if options['main-only']:
+            options['main-only'] = None
+        else:
+            del options['main-only']
+
     if selection_mode is not None:
         options['selection-mode'] = selection_mode
     if type_of_correction is not None:
@@ -68,11 +74,12 @@ def run_stratcal_wrap(input, logfile=None, output=None, main_only=None,
     if options.get('driver') == 6:
         # Native data collection - determine strategy and run with driver 5
         options['driver'] = 5
-        run_stratcal_native(logfile=logfile, **options)
+        return run_stratcal_native(logfile=logfile, **options)
 
     else:
         running_process = run_stratcal(logfile=logfile, **options)
         running_process.wait()
+    return running_process.returncode
 
 def get_laue_group(sg_name):
     """Get Laue gropup from space-group"""
@@ -350,6 +357,8 @@ def stratcal_merge_output(indata_exch, outdata_exch):
     result['centred_goniostat_setting_list'] = ll
 
     result['stratcal_sweep_list'] = sweeps = outdata_exch['stratcal_sweep_list']
+    if not isinstance(sweeps, list):
+        sweeps = [sweeps]
     loop_counts['n_sweeps'] = len(sweeps)
 
     # Transfer beam, beamstop and detector setting IDs from input
@@ -455,7 +464,7 @@ def run_stratcal_native(logfile=None, **options):
         # Triclinic, nothing doing. Pass on to default stratcal
         running_process = run_stratcal(**options)
         running_process.wait()
-        return
+        return running_process.returncode
 
     elif laue_group == '2/m':
         # Monoclinic
@@ -602,7 +611,7 @@ def run_stratcal_native(logfile=None, **options):
         out_data = stratcal_merge_output(input_data_exch, out_data)
         f90nml.write(out_data, fp_out)
 
-    return
+    return running_process.returncode
 
 def stratcal_exch2org(exch_data):
     """Convert exchange format stratcal input data to original format"""
@@ -1002,7 +1011,7 @@ if __name__ == '__main__':
     """
                          )
     optparser.add_option(
-        "--main-only", dest="main_only", action='store_true',
+        "--main-only", dest="main_only", action='store_true', default=True,
         help="main-only - calculate only main alignment, skipping cusp alignment"
     )
     optparser.add_option(
@@ -1021,7 +1030,7 @@ if __name__ == '__main__':
     (options, args) = optparser.parse_args()
     options_dict = dict(tt for tt in options.__dict__.items()
                         if tt[1] is not None)
-    print ('@~@~ args, options', args, options_dict)
-
-
-    run_stratcal_wrap(*args, **options_dict)
+    returncode = run_stratcal_wrap(*args, **options_dict)
+    # This tells workdflow that program ran OK:
+    print (' NORMAL termination')
+    sys.exit(returncode)
