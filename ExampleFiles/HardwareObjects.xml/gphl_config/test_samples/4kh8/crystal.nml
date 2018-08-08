@@ -6,7 +6,7 @@
  CELL_ANG_DEG    = 90.000 90.000 120.000
  CELL_DIM_SD     = 0.0998742 0.0998742 0.0569932
  ! 42-48 deg gives you both main and cusp axes
- U_MAT_ANG_DEG   = 0.0 136.0 95.0
+ U_MAT_ANG_DEG   = 0.0 30.0 30.0
  U_MAT_SD_DEG    = 3*0.093
  ! highest inherent res of hkli data: 1.32
  RES_LIMIT_DEF   = 1.32

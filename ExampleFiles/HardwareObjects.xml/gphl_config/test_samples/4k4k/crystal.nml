@@ -9,7 +9,7 @@
  ! CELL_B_AXIS     = -133.164978 20.579517 38.679367
  ! CELL_C_AXIS     =  16.636515 19.748716 46.768612
  ! Get longet axis (Y) AND another  aaxis within 48 deg of omega
- U_MAT_ANG_DEG     = 46.0,  0.0,  0.0
+ U_MAT_ANG_DEG     = 0.0,  30.0,  30.0
  U_MAT_SD_DEG    = 3*0.114
  ! highest inherent res of hkli data: 1.7 (from ref above)
  ! Earlier notes said 1.033, but unknown provenance

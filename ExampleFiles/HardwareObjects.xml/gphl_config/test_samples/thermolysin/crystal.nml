@@ -11,7 +11,7 @@
  ! cell_b_axis=   -14.694   -55.647   -72.705
  ! cell_c_axis=   114.390    34.818   -49.768
  ! 42-48 deg gives you both main and cusp axes
- U_MAT_ANG_DEG   = 0.0 136.0 95.0
+ U_MAT_ANG_DEG   = 0.0 30.0 30.0
  U_MAT_SD_DEG    = 3*0.17
  ! highest inherent res of hkli data: 1.932
  ! highest to-edge resolution supported: 2.70
