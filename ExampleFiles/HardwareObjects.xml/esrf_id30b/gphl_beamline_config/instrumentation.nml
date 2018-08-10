@@ -9,12 +9,15 @@ beam_sd_deg= 0.03 0.03
 lambda_sd= 0.0002
 pol_plane_n= 0.0 1.0 0.0
 pol_frac= 0.99
+d_sensor= 0.32
+mu_sensor_def = -1.0
+mu_air_def = -1.0
 min_zeta= 0.15
 
 ! We use imgCIF coordinate system: Beam (i.e. lab Z) goes the opposite way
 ! from 0,0,1 in XDS template for Pilatus, so lab Y is also reversed.
 ! Lab X is defined by Omega, so is unaffected by beam direction.
-det_name= "PILATUS6M"
+det_name= "PILATUS"
 det_x_axis= 1.0  0.0  0.0
 det_y_axis= 0.0  1.0  0.0
 det_qx= 0.172000

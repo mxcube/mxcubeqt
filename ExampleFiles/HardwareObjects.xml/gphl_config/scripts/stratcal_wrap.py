@@ -18,6 +18,7 @@ import f90nml
 import math
 import copy
 import numpy as np
+import uuid
 import mgen
 try:
     from collections import OrderedDict
@@ -378,6 +379,97 @@ def stratcal_merge_output(indata_exch, outdata_exch):
     return result
 
 
+
+def stratcal_merge_output_2(indata_exch, outdata):
+    """Merges information from indata_exch and outdata
+    keeping all information from the indata,
+    replacing the stratcal_sweep_list, and asdding new IDs as needed
+
+    NB Variant, that gets its input from original (NOT exchange) format stratcal.out
+    Written when stratcal.out.def was NOT correct.
+
+    NBNB HACKY"""
+
+    result = copy.deepcopy(indata_exch)
+
+    sweeps = outdata['sweep_list']
+    if not isinstance(sweeps, list):
+        sweeps = [sweeps]
+    goniostat_setting_list = result['goniostat_setting_list'] = []
+    centred_setting_list = result['centring_goniostat_setting_list'] = []
+    stratcal_sweep_list = result['stratcal_sweep_list'] = []
+    goniostat_setting_map = {}
+
+    # Transfer beam, beamstop and detector setting IDs from input
+    # NBNB This assumes that there was only one of each
+    # and it was transferred as by stratcal_exch2org
+    other_settings = {}
+    for tag in ('beam_setting', 'beamstop_setting', 'detector_setting'):
+        ll = indata_exch[tag + '_list']
+        if isinstance(ll, list):
+            other_settings[tag + '_id'] = ll[0]['id']
+        else:
+            other_settings[tag + '_id'] = ll['id']
+
+    ii = 0
+    for sweep in sweeps:
+
+        sweep.update(other_settings)
+
+        # Make startcal_sweep
+        ii += 1
+        sw = f90nml.Namelist()
+        stratcal_sweep_list.append(sw)
+        sw['start_deg'] = sweep['omega_deg']
+        sw['length_deg'] = sweep['n_frames'] * sweep['step_deg']
+        sw['type'] = 'MAIN:ORIENT'
+        sw['group_no'] = ii
+
+        # Check if we have the exact same setting already
+        settings = (
+            sweep['omega_deg'],
+            sweep['kappa_deg'],
+            sweep['phi_deg']
+        ) + tuple(sweep['trans_xyz'])
+        use_id = goniostat_setting_map.get(settings)
+        has_centring = any(x for x in settings[3:])
+        if not use_id:
+
+            # Make goniostat_setting
+            goniostat_setting = f90nml.Namelist()
+            goniostat_setting['id'] = str(uuid.uuid1())
+            goniostat_setting['omega_deg'] = settings[0]
+            goniostat_setting['kappa_deg'] = settings[1]
+            goniostat_setting['phi_deg'] = settings[2]
+            goniostat_setting['spindle_deg'] = sweep['spindle_deg']
+            goniostat_setting['scan_axis_no'] = sweep['axis_no']
+            goniostat_setting['aligned_crystal_axis_order'] = 0
+            goniostat_setting_list.append(goniostat_setting)
+
+            if has_centring:
+                # Make centring_goniostat_setting
+                obj = f90nml.Namelist()
+                use_id = obj['id'] =  str(uuid.uuid1())
+                obj['goniostat_setting_id'] = goniostat_setting['id']
+                obj['trans_1'], obj['trans_2'], obj['trans_3'] = settings[3:]
+                centred_setting_list.append(obj)
+            else:
+                use_id = goniostat_setting['id']
+
+        if has_centring:
+            sw['centred_goniostat_setting_id'] = use_id
+            sw['goniostat_setting_id'] = ' '
+        else:
+            sw['goniostat_setting_id'] = use_id
+            sw['centred_goniostat_setting_id'] = ' '
+
+    loop_counts = result['loop_count_list']
+    loop_counts['n_sweeps'] = len(sweeps)
+    loop_counts['n_goniostat_settings'] = len(goniostat_setting_list)
+    loop_counts['n_centred_goniostat_settings'] = len(centred_setting_list)
+    #
+    return result
+
 def run_stratcal_native(logfile=None, **options):
     """Run stratcal for native phasing (mode 6)"""
     print('@~@~ run_stratcal_native', sorted(tt for tt in options.items()))
@@ -395,22 +487,31 @@ def run_stratcal_native(logfile=None, **options):
         crystal_data['cell_b_axis'],
         crystal_data['cell_c_axis'],
     ]
-    mm = []
-    # transform to unit vectors
-    for ll in crystal_matrix:
-        mm.append(unit_vector(np.array(ll)))
-    # transform to orthonormal coordinate system
+
+    # coordinates of reciprocal-space crystal matrix
+    # in real-space coordinate system
+    # Could also be done with metric tensor
+    mm = [
+        np.cross(crystal_matrix[1], crystal_matrix[2]),
+        np.cross(crystal_matrix[2], crystal_matrix[0]),
+        np.cross(crystal_matrix[0], crystal_matrix[1]),
+    ]
+    # Now make orthonormal coordinate system
     if laue_group == '-1':
-        mm[2] = np.cross(mm[0], mm[1])
-        mm[1] = np.cross(mm[2], mm[0])
+        mm[2] = unit_vector(np.cross(mm[0], mm[1]))
+        mm[1] = unit_vector(np.cross(mm[2], mm[0]))
+        mm[0] = unit_vector(mm[0])
     elif laue_group == '2/m':
         mm[2] = np.cross(mm[0], mm[1])
+        mm[1] = unit_vector(mm[1])
+        mm[0] = unit_vector(mm[0])
     else:
+        mm[2] = unit_vector(mm[2])
         mm[1] = np.cross(mm[2], mm[0])
+        mm[0] = unit_vector(mm[0])
     crystal_unit_np = np.array(mm)
 
-
-    # NB assumes omega scan axis
+    # scan axis in real-space coordinate system. NB assumes omega scan axis
     scan_axis = input_data_exch['stratcal_instrument_list']['omega_axis']
 
     # orthog_component is a unit vector orthogonal to the symmetry axis
@@ -422,6 +523,7 @@ def run_stratcal_native(logfile=None, **options):
         # Index of symmetry axis
         symm_axis_index = 1
     else:
+        # For triclinic there is mno symmetry axis but wemught aws well use c*
         symm_axis_index = 2
     cr_scan_axis_np = crystal_unit_np.dot(scan_axis)
     cr_symm_axis = crystal_unit_np[symm_axis_index]
@@ -438,8 +540,8 @@ def run_stratcal_native(logfile=None, **options):
 
     # Angle between the projection of the omega axis in the crystal orthogonal
     # plane and the crystal symmetry axis
-    omega_projection_angle = angle_between((1,0,0), orthog_component)
-    if orthog_component[1] + orthog_component[2] < 0:
+    omega_projection_angle = angle_between(crystal_unit_np[0], orthog_component)
+    if np.cross(crystal_unit_np[0], orthog_component)[symm_axis_index] < 0:
         omega_projection_angle = -omega_projection_angle
 
     print ('@~@~ crystal', sg_name, laue_group, '\n', crystal_unit_np)
@@ -605,11 +707,16 @@ def run_stratcal_native(logfile=None, **options):
     stem, junk = os.path.splitext(outfile)
     for ext in ('.out.def', '.out2.def'):
         fp_out = stem + ext
-        fp_bak = '_raw'.join((stem, ext))
-        out_data = f90nml.read(fp_out)
-        os.rename(fp_out, fp_bak)
-        out_data = stratcal_merge_output(input_data_exch, out_data)
-        f90nml.write(out_data, fp_out)
+        if os.path.exists(fp_out):
+            fp_bak = '_raw'.join((stem, ext))
+            # out_data = f90nml.read(fp_out)
+            # Temporary, while reading .out instead of .out.def
+            out_data = f90nml.read(fp_out[:-4])
+            out_data = stratcal_merge_output_2(input_data_exch, out_data)
+            # out_data = f90nml.read(fp_out)
+            # out_data = stratcal_merge_output(input_data_exch, out_data)
+            os.rename(fp_out, fp_bak)
+            f90nml.write(out_data, fp_out)
 
     return running_process.returncode
 

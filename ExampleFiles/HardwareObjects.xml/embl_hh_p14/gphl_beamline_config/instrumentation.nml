@@ -18,6 +18,8 @@ lambda_sd= 0.0002
 pol_plane_n= 0.0 1.0 0.0
 pol_frac= 0.99
 d_sensor= 0.45
+mu_sensor_def = -1.0
+mu_air_def = -1.0
 min_zeta= 0.15
 
 ! From CF data (see top comment)
