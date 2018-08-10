@@ -145,9 +145,9 @@ def fform(xx):
 if __name__ == '__main__':
 
     # template input file
-    fp_template = "/home/rhfogh/scratch/stratcal_test_201807/stratcal_id30b.in"
+    fp_template = "/home/rhfogh/scratch/stratcal_id30b.in"
     crystal_dir = "/home/rhfogh/pycharm/MXCuBE-Qt_26r/ExampleFiles/HardwareObjects.xml/gphl_config/test_samples/"
-    test_dir = "/home/rhfogh/scratch/stratcal_test_201807/20180801_8"
+    test_dir = "/home/rhfogh/scratch/stratcal_test_201808/20180810_1"
     executable = "/public/xtal/Server-nightly-alpha-bdg-linux64/autoPROC/bin/linux64/stratcal"
     # executable = "//home/claus/tmp/stratcal-rf-20180802"
 
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     #             '4iej', 'thermolysin', '4kw2','germanate', ]
     crystals = ['3n0s', '4k4k', '4k61', '4j8p', '4jrl',
                 '5y6h', '4kh8', '4iej', '5g0f', '4kw2', ]
-    # crystals = ['4kw2']
+    # crystals = ['3n0s']
 
     # angles are in order phi, theta, omega,
     # where phi and theta are (+/-)the polar coiordinates of the rotation axis
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     # angles1 = [(0,0,0), (0,30,0), (0,45,0), (0,60,0), (0, 90, 0), (0,-30,0),
     #            (-30,90,0), (30,90,0), (45,90,0), (60,90,0), (90, 90, 0),
     #            ]
-    # angles1 = [(0,0,0)]
+    # angles1 = [(0,60,0)]
     # angles2 = []
 
     # Environment variables for test stup. Edit to change
