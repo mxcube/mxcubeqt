@@ -12,10 +12,8 @@
  U_MAT_ANG_DEG   = 0.0 30.0 30.0
  U_MAT_SD_DEG    = 3*0.067
  ! highest inherent res of hkli data: 2.323
- ! highest to-edge resolution supported: 3.25
- ! RES_LIMIT_DEF   =  2.323
- ! to speed up jobs by reducing number of reflections
- RES_LIMIT_DEF   =  3.0
+ RES_LIMIT_DEF   =  2.323
+ ! L/R at lambda=1A ca. 2.16
  ! B factor to cause intensities to drop off (a bit).
  ! 160.0 selected (correctly?() to make reflections drop to zero by 2.4A ca.
  B_WILSON = 80.0
