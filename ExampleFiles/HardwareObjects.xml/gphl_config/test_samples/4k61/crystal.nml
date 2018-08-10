@@ -21,7 +21,7 @@
 
  ! New resolution limit suggested by Claus : 2.0
  ! highest inherent res of hkli data: 1.700
- ! highest to-edge resolution supported: 2.38
+ ! L/R at lambda=1A ca. 1.47
  RES_LIMIT_DEF = 1.7
  ! B factor to cause intensities to drop off (a bit).
  ! 10.0 is a pretty random value
