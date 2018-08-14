@@ -659,7 +659,7 @@ def run_stratcal_native(logfile=None, **options):
         # As close as possible to omega axis
         mult, remainder = nearest_modulo(omega_projection_angle, math.pi/3)
         # aa = mult*math.pi/3 + math.copysign(math.pi/6, remainder)
-        aa = mult*math.pi/3 + math.copysign(math.pi/6, remainder)
+        aa = mult*math.pi/3
 
         orientation = (math.cos(aa), math.sin(aa), math.tan(math.pi/6))
         orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
