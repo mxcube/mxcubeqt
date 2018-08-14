@@ -84,42 +84,84 @@ def analyse_data(data):
                     state = 'final_angles'
 
             elif state == 'init_angles':
+                # NB this reads the first appearance of ang_y and ang_z,
+                # but the second appearance of ang_x
+                # This should give the angles for the orthonormal
+                # reciprocal-space axes
                 ll = line.strip().split()
                 if not ll:
                     pass
                 elif ll[0] == '1':
+                    if values0.get('init_ang_x') is not None:
+                        state = None
                     values0['init_ang_x'] = float(ll[1])
                 elif ll[0] == '2':
                     values0['init_ang_y'] = float(ll[1])
                 elif ll[0] == '3':
                     values0['init_ang_z'] = float(ll[1])
-                    state = None
+
+                if state is None:
+                    # We have finished - calculate
+
+                    if space_group in ('P2', 'P21', 'C2'):
+                        theta_deg = values0['init_ang_y']
+                        phi = math.atan2(
+                            -math.cos(math.radians(values0['init_ang_z'])),
+                            math.cos(math.radians(values0['init_ang_x'])),
+                        )
+                    else:
+                        theta_deg = values0['init_ang_z']
+                        phi = math.atan2(
+                            math.cos(math.radians(values0['init_ang_y'])),
+                            math.cos(math.radians(values0['init_ang_x'])),
+                        )
+
+                    values0['init_theta'] = theta_deg
+                    values0['init_phi'] = math.degrees(phi)
 
             elif state == 'final_angles':
                 ll = line.strip().split()
                 if not ll:
                     pass
                 elif ll[0] == '1':
+                    if values.get('final_ang_x') is not None:
+                        state = None
                     values['final_ang_x'] = float(ll[1])
                 elif ll[0] == '2':
                     values['final_ang_y'] = float(ll[1])
                 elif ll[0] == '3':
                     values['final_ang_z'] = float(ll[1])
-                    if space_group in ('P2', 'P21', 'C2'):
-                        theta = values['final_ang_y']
-                        sign = -1 if values['final_ang_z'] <= 90 else 1
-                    else:
-                        theta = values['final_ang_z']
-                        sign = 1 if values['final_ang_y'] <= 90  else -1
-                    angx = math.radians(values['final_ang_x'])
-                    angt = math.radians(theta)
-                    print ('@~@~ angles', values['final_ang_x'], theta)
-                    print ('@~@~', math.cos(angx)/math.sin(angt))
-                    phi = sign * math.acos(min(1.0,math.cos(angx)/math.sin(angt)))
 
-                    values ['final_theta'] = theta
+                if state is None:
+                    # We have finished - calculate
+
+                    if space_group in ('P2', 'P21', 'C2'):
+                        theta_deg = values['final_ang_y']
+                        phi = math.atan2(
+                            -math.cos(math.radians(values['final_ang_z'])),
+                            math.cos(math.radians(values['final_ang_x'])),
+                        )
+                    else:
+                        theta_deg = values['final_ang_z']
+                        phi = math.atan2(
+                            math.cos(math.radians(values['final_ang_y'])),
+                            math.cos(math.radians(values['final_ang_x'])),
+                        )
+
+                    # if space_group in ('P2', 'P21', 'C2'):
+                    #     theta = values['final_ang_y']
+                    #     sign = -1 if values['final_ang_z'] <= 90 else 1
+                    # else:
+                    #     theta = values['final_ang_z']
+                    #     sign = 1 if values['final_ang_y'] <= 90  else -1
+                    # angx = math.radians(values['final_ang_x'])
+                    # angt = math.radians(theta)
+                    # print ('@~@~ angles', values['final_ang_x'], theta)
+                    # print ('@~@~', math.cos(angx)/math.sin(angt))
+                    # phi = sign * math.acos(min(1.0,math.cos(angx)/math.sin(angt)))
+
+                    values ['final_theta'] = theta_deg
                     values ['final_phi'] = math.degrees(phi)
-                    state = None
 
             elif state == 'alignment':
                 line = line.strip()
@@ -147,7 +189,7 @@ if __name__ == '__main__':
     # template input file
     fp_template = "/home/rhfogh/scratch/stratcal_id30b.in"
     crystal_dir = "/home/rhfogh/pycharm/MXCuBE-Qt_26r/ExampleFiles/HardwareObjects.xml/gphl_config/test_samples/"
-    test_dir = "/home/rhfogh/scratch/stratcal_test_201808/20180810_1"
+    test_dir = "/home/rhfogh/scratch/stratcal_test_201808/20180814_5"
     executable = "/public/xtal/Server-nightly-alpha-bdg-linux64/autoPROC/bin/linux64/stratcal"
     # executable = "//home/claus/tmp/stratcal-rf-20180802"
 
@@ -229,8 +271,7 @@ if __name__ == '__main__':
 
     table = analyse_data(data)
     header = ['crystal', 'indx', 'euler_ang_1', 'euler_ang_2', 'euler_ang_3',
-              'init_ang_x', 'init_ang_y', 'init_ang_z',
-              'final_ang_x', 'final_ang_y', 'final_ang_z',
+              'omega_projection_angle','init_phi', 'init_theta',
               'final_phi', 'final_theta', 'Phi', 'Kappa', 'Omega',
               'compl', 'redun', 'error',
               ]
