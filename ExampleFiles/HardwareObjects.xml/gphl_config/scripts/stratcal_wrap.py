@@ -39,8 +39,6 @@ __copyright__ = """
 __author__ = "rhfogh"
 __date__ = "11/07/18"
 
-DEG2RAD = math.pi/180
-
 def run_stratcal_wrap(input, logfile=None, output=None, main_only=None,
                       selection_mode=None, type_of_correction=None,
                       *args, **options):
@@ -472,6 +470,11 @@ def stratcal_merge_output_2(indata_exch, outdata):
 
 def run_stratcal_native(logfile=None, **options):
     """Run stratcal for native phasing (mode 6)"""
+
+    # Programmers note:
+    #Plain names are in lab coordinate system,
+    # suffux _cr are in orthobnormal crystal system.
+
     print('@~@~ run_stratcal_native', sorted(tt for tt in options.items()))
     fp_in = options.get('input')
     input_data_exch = f90nml.read(fp_in)
@@ -502,65 +505,90 @@ def run_stratcal_native(logfile=None, **options):
         mm[1] = unit_vector(np.cross(mm[2], mm[0]))
         mm[0] = unit_vector(mm[0])
     elif laue_group == '2/m':
-        mm[2] = np.cross(mm[0], mm[1])
+        mm[2] = unit_vector(np.cross(mm[0], mm[1]))
         mm[1] = unit_vector(mm[1])
         mm[0] = unit_vector(mm[0])
     else:
         mm[2] = unit_vector(mm[2])
-        mm[1] = np.cross(mm[2], mm[0])
+        mm[1] = unit_vector(np.cross(mm[2], mm[0]))
         mm[0] = unit_vector(mm[0])
     crystal_unit_np = np.array(mm)
 
+    # NB for all except triclinic crystals, the Y and Z axes of
+    # crystal_unit_np match the Y and Z axes of the real-space lattice
+    # Only the X axis does not
+
     # scan axis in real-space coordinate system. NB assumes omega scan axis
-    scan_axis = input_data_exch['stratcal_instrument_list']['omega_axis']
+    scan_axis = unit_vector(
+        input_data_exch['stratcal_instrument_list']['omega_axis']
+    )
 
     # orthog_component is a unit vector orthogonal to the symmetry axis
     # and in the same plane as the symmetry and rotation axes.
-    # symm_projection is the signed length of the rotation axis component
-    # along the symmetry axis
-    # These two values are used below to determine crystal alignments
+    # omega_projection_angle is the angle from the orthonormal X axis to the
+    # projection of the omega axis
+    scan_axis_cr = unit_vector(crystal_unit_np.dot(scan_axis))
     if  laue_group == '2/m':
         # Index of symmetry axis
         symm_axis_index = 1
+        symm_axis_cr = np.array((0,1,0))
+        xx = scan_axis_cr[0]
+        zz = scan_axis_cr[2]
+        omega_projection_angle = -math.atan2(zz, xx)
+        if zz:
+            orthog_component_cr = unit_vector((xx, 00, zz))
+        else:
+            orthog_component_cr = np.array((1,0,0))
     else:
-        # For triclinic there is mno symmetry axis but wemught aws well use c*
+        # For triclinic there is no symmetry axis but we might as well use c*
         symm_axis_index = 2
-    cr_scan_axis_np = crystal_unit_np.dot(scan_axis)
-    cr_symm_axis = crystal_unit_np[symm_axis_index]
-    symm_projection = cr_scan_axis_np[symm_axis_index]
-    if abs(symm_projection) == 1:
-        # axis is along symmetry axis; Set orthogonal component (arbitrarily) to X
-        orthog_component = [1, 0, 0]
-    else:
-        # orthog_component is a unit vector at right angles to symmetry axis,
-        # coplanar with the omega axis
-        orthog_component = list(cr_scan_axis_np)
-        orthog_component[symm_axis_index] = 0
-        orthog_component = list(unit_vector(np.array(orthog_component)))
+        symm_axis_cr = np.array((0,0,1))
+        xx = scan_axis_cr[0]
+        yy = scan_axis_cr[1]
+        omega_projection_angle = math.atan2(yy, xx)
+        if yy:
+            orthog_component_cr = unit_vector((xx, yy, 0))
+        else:
+            orthog_component_cr = np.array((1,0,0))
 
-    # Angle between the projection of the omega axis in the crystal orthogonal
-    # plane and the crystal symmetry axis
-    omega_projection_angle = angle_between(crystal_unit_np[0], orthog_component)
-    if np.cross(crystal_unit_np[0], orthog_component)[symm_axis_index] < 0:
-        omega_projection_angle = -omega_projection_angle
+    cr_symm_axis = crystal_unit_np[symm_axis_index]
+    symm_projection = symm_axis_cr.dot(scan_axis_cr)
+    print ('@~@~ scan_axis_cr', scan_axis_cr)
+    # if abs(symm_projection) == 1:
+    #     orthog_component = crystal_unit_np[0]
+    #     omega_projection_angle = 0
+    # else:
+    #     orthog_component = unit_vector(
+    #         scan_axis - cr_symm_axis.dot(scan_axis) * cr_symm_axis
+    #     )
+    #     # Angle between the projection of the omega axis in the crystal
+    #     # orthogonal plane and the crystal symmetry axis
+    #     omega_projection_angle = angle_between(crystal_unit_np[0],
+    #                                            orthog_component)
 
     print ('@~@~ crystal', sg_name, laue_group, '\n', crystal_unit_np)
-    print('@~@~ axis', scan_axis, cr_scan_axis_np, symm_projection, orthog_component)
+    print('@~@~ axis', scan_axis, scan_axis_cr, symm_projection, orthog_component_cr)
     print ('@~@~ cell lengths', [np.linalg.norm(crystal_matrix[ii])
                                  for ii in range(3)])
     print('@~@~ +/- angle bc',
-          angle_between(crystal_matrix[1], crystal_matrix[2])/DEG2RAD )
+          angle_between(crystal_matrix[1], crystal_matrix[2], deg=True),
+          angle_between(crystal_unit_np[1], crystal_unit_np[2], deg=True))
     print('@~@~ +/- angle ac',
-          angle_between(crystal_matrix[0], crystal_matrix[2])/DEG2RAD )
+          angle_between(crystal_matrix[0], crystal_matrix[2], deg=True) ,
+          angle_between(crystal_unit_np[0], crystal_unit_np[2], deg=True))
     print('@~@~ +/- angle ab',
-          angle_between(crystal_matrix[0], crystal_matrix[1])/DEG2RAD )
+          angle_between(crystal_matrix[0], crystal_matrix[1], deg=True),
+          angle_between(crystal_unit_np[0], crystal_unit_np[1], deg=True) )
     print('@~@~ +/- angle a-omega',
-          angle_between(crystal_matrix[0], scan_axis)/DEG2RAD )
+          angle_between(crystal_matrix[0], scan_axis, deg=True),
+          angle_between(crystal_unit_np[0], scan_axis_cr, deg=True))
     print('@~@~ +/- angle b-omega',
-          angle_between(crystal_matrix[1], scan_axis)/DEG2RAD )
+          angle_between(crystal_matrix[1], scan_axis, deg=True),
+          angle_between(crystal_unit_np[1], scan_axis_cr, deg=True) )
     print('@~@~ +/- angle c-omega',
-          angle_between(crystal_matrix[2], scan_axis)/DEG2RAD )
-    print ('@~@~ omega_projection_angle', omega_projection_angle)
+          angle_between(crystal_matrix[2], scan_axis, deg=True),
+          angle_between(crystal_unit_np[2], scan_axis_cr, deg=True) )
+    print ('@~@~ omega_projection_angle', math.degrees(omega_projection_angle))
 
     if laue_group == '-1':
         # Triclinic, nothing doing. Pass on to default stratcal
@@ -571,95 +599,88 @@ def run_stratcal_native(logfile=None, **options):
     elif laue_group == '2/m':
         # Monoclinic
         # Two directions, theta=54.7deg; phi +/-45 deg away from symmetry axis
+        zval = math.tan(math.radians(35.3))
+        vv = orthog_component_cr + symm_axis_cr * zval
+
         for ii in (1,-1):
-            aa = omega_projection_angle + ii * math.pi/4
-            orientation = (
-                math.cos(aa),
-                math.copysign(math.tan(35.3*DEG2RAD), symm_projection),
-                math.sin(aa)
-            )
-            orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+            rot_matrix = mgen.rotation_around_y(ii * math.pi/4)
+            # We are using post-multiplication (of row vectors)
+            # so we must transpose the rotation matrix.
+            # See mgen docs and links therein
+            rot_matrix.transpose()
+            orientation = tuple(vv.dot(rot_matrix))
+            orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
             add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == 'mmm':
         # Orthorhombic
         # Along a body diagonal - selecting diagonal closest to the rotation axis
-        orientation = tuple(math.copysign(1,x) for x in cr_scan_axis_np)
-        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        orientation = tuple(math.copysign(1,x) for x in scan_axis_cr)
+        orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '4/m':
         # 'C4'
         # One directions, theta=54.7deg
-        orientation = (math.cos(omega_projection_angle),
-                       math.sin(omega_projection_angle),
-                       math.copysign(math.tan(35.3*DEG2RAD), symm_projection)
-                       )
-        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        zval = math.tan(math.radians(35.3))
+        orientation = tuple(orthog_component_cr + zval * symm_axis_cr)
+        orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '4/mmm':
         # 422
         # theta=67.5, 22.5 deg from the plane of a twofold axis
         # As close as possible to omega axis
-        tt = divmod(abs(omega_projection_angle), math.pi/2)
-        mult = tt[0]
-        remainder = tt[1] - math.pi/4
+        mult, remainder = nearest_modulo(omega_projection_angle, math.pi/2)
         aa = mult*math.pi/2 + math.copysign(math.pi/8, remainder)
         orientation = (math.cos(aa), math.sin(aa), math.tan(math.pi/8))
-        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '-3':
         # 'C3'
         # Two directions ca. 30deg and 40 deg above the plane, 60deg apart
         for ii in (1,-1):
-            aa = omega_projection_angle + ii * math.pi/6
-            orientation = (
-                math.cos(aa),
-                math.sin(aa),
-                math.copysign(math.tan((35 + ii * 5)*DEG2RAD), symm_projection)
-            )
-            orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+            zval =math.tan(math.radians(35.3 + ii * 5))
+            vv = orthog_component_cr + zval * symm_axis_cr
+            rot_matrix = mgen.rotation_around_z(ii * math.pi/6)
+            # We are using post-multiplication (of row vectors)
+            # so we must transpose the rotation matrix.
+            # See mgen docs and links therein
+            rot_matrix.transpose()
+            orientation = tuple(vv.dot(rot_matrix))
+            orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
             add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '-3m':
         # '32'
         # One direction, theta=60deg, phi 30 deg from a twofold axis
+        # NB X* is 30 deg from a twofold axis
         # As close as possible to omega axis
-        tt = divmod(abs(omega_projection_angle), math.pi*2/3)
-        mult = tt[0]
-        remainder = tt[1] - math.pi/3
-        aa = mult*math.pi*2/3 + math.copysign(math.pi/6, remainder)
+        mult, remainder = nearest_modulo(omega_projection_angle, math.pi/3)
+        # aa = mult*math.pi/3 + math.copysign(math.pi/6, remainder)
+        aa = mult*math.pi/3 + math.copysign(math.pi/6, remainder)
+
         orientation = (math.cos(aa), math.sin(aa), math.tan(math.pi/6))
-        print ('@~@~ laue -3m angle', math.degrees(aa), orientation)
-        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '6/m':
         # 'C6'
         # One directions, theta=60deg
-        orientation = (
-            math.cos(omega_projection_angle),
-            math.sin(omega_projection_angle),
-            math.copysign(math.tan(math.pi/6), symm_projection)
-        )
-        orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
+        zval = math.tan(math.pi/6)
+        orientation = tuple(orthog_component_cr + zval * symm_axis_cr)
+        orthog_vector = tuple(np.cross(orientation, symm_axis_cr))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
     elif laue_group == '6/mmm':
         # '622'
         # theta=70, 15 deg from the plane of a twofold axis
+        # NB X* is on a twofold axis
         # As close as possible to omega axis
-        tt = divmod(abs(omega_projection_angle), math.pi/3)
-        mult = tt[0]
-        remainder = tt[1] - math.pi/6
+        mult, remainder = nearest_modulo(omega_projection_angle, math.pi/3)
         aa = mult*math.pi/3 + math.copysign(math.pi/12, remainder)
-        orientation = (
-            math.cos(aa),
-            math.sin(aa),
-            math.copysign(math.tan(math.pi/9), symm_projection)
-        )
+        orientation = (math.cos(aa), math.sin(aa), math.tan(math.pi/9))
         orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
 
@@ -668,7 +689,7 @@ def run_stratcal_native(logfile=None, **options):
         # CA. 1, 0.3, 0.3 (on diagonal cross of a face)
         orientation = (1, 0.3, 0.3)
         # Put in same quadrant as rotation axis
-        orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii])
+        orientation = tuple(math.copysign(orientation[ii], scan_axis_cr[ii])
                             for ii in range(3))
         orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
@@ -678,7 +699,7 @@ def run_stratcal_native(logfile=None, **options):
         # Ca, 1.0, 0.2, 0.4
         orientation = (1, 0.2, 0.4)
         # Put in same quadrant as rotation axis
-        orientation = tuple(math.copysign(orientation[ii], cr_scan_axis_np[ii])
+        orientation = tuple(math.copysign(orientation[ii], scan_axis_cr[ii])
                             for ii in range(3))
         orthog_vector = tuple(np.cross(orientation, cr_symm_axis))
         add_crystal_orientation(input_data_org, orientation, orthog_vector)
@@ -885,11 +906,11 @@ def get_std_crystal_axes(crystal_data, omega_name='Z'):
         if angles:
             beta = angles[1]
         else:
-            beta = angle_between(axes[0], axes[2])/DEG2RAD
+            beta = angle_between(axes[0], axes[2], deg=True)
         newaxes = (
             (a, 0, 0),
             (0, b, 0),
-            (c*math.cos(beta*DEG2RAD), 0, c*math.sin(beta*DEG2RAD))
+            (c*math.cos(math.radians(beta)), 0, -c*math.sin(math.radians(beta)))
         )
     else:
         # triclinic
@@ -972,6 +993,7 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
     fp_out = fp + '.out'
     if log_to_file:
         logfile = fp + '.log'
+        # return logfile
         fp_log = open(logfile, 'w')
         sys.stdout = sys.stderr = fp_log
     else:
@@ -981,7 +1003,7 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
 
         print ('@~@~ test_stratcal_wrap', crystal, orientation, fp_in)
 
-        orientation = tuple(x*DEG2RAD for x in orientation)
+        orientation = tuple(math.radians(x) for x in orientation)
         print ('@~@~ orientation rad', orientation)
 
         # return fp_log
@@ -1019,6 +1041,10 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
         euler_order = tt[1]
         print ('@~@~ npaxes', npaxes)
         rot_matrix = mgen.rotation_from_angles(orientation, euler_order)
+        # We are using post-multiplication (of row vectors)
+        # so we must transpose the rotation matrix.
+        # See mgen docs and links therein
+        rot_matrix.transpose()
         print ('\n\n\n@~@~ rot_matrix', rot_matrix)
         npaxes2 = npaxes.dot(rot_matrix)
         print ('@~@~ npaxes2', npaxes2)
@@ -1037,7 +1063,7 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
             print('@~@~ length', ii, length)
             for jj in range(ii):
                 print ('@~@~ angle', ii, jj,
-                       angle_between(axes[ii], axes[jj])/DEG2RAD)
+                       angle_between(axes[ii], axes[jj], deg=True))
 
         for tag in ('cell_dim', 'cell_ang_deg', 'u_mat_ang_deg'):
             if tag in crystal_data:
@@ -1068,9 +1094,11 @@ def test_stratcal_wrap(crystal, orientation, fp_template, fp_crystal,
 
 def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
+    if not isinstance(vector, np.ndarray):
+        vector = np.array(vector)
     return vector / np.linalg.norm(vector)
 
-def angle_between(v1, v2, ):
+def angle_between(v1, v2, deg=False):
     """ Returns the angle in radians between vectors 'v1' and 'v2'::
 
             >>> angle_between((1, 0, 0), (0, 1, 0))
@@ -1082,7 +1110,17 @@ def angle_between(v1, v2, ):
     """
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+    angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+    result = math.copysign(angle, np.linalg.norm(np.cross(v1_u, v2_u)))
+    if deg:
+        return math.degrees(result)
+    else:
+        return result
+
+def nearest_modulo(value, divisor):
+    half = divisor/2
+    tt = divmod(value+half, divisor)
+    return (tt[0], tt[1]-half)
 
 
 if __name__ == '__main__':
