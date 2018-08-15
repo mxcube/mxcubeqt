@@ -4,7 +4,6 @@
     - file names below are set as file_name.format(directory_locations) -->
     <directory_locations>
         <LOCAL_SCRIPTS>replaced-by-GphlWorkflow.file_paths['scripts']</LOCAL_SCRIPTS>
-        <GPHL_INSTALLATION>/users/blissadm/local/gphl/gphl_latest/exe/</GPHL_INSTALLATION>
     </directory_locations>
 
     <software_paths>
@@ -19,32 +18,34 @@
     <!-- Software paths that are passed to global phasing workflow as java properties -->
     <software_properties>
 
+        <co.gphl.wf.bin>/users/blissadm/local/gphl/gphl_latest/exe/</co.gphl.wf.bin>
         <!-- Location of executable XDS binary -->
-        <co.gphl.sdcp.xdsbin>/opt/pxsoft/bin/xds_par</co.gphl.sdcp.xdsbin>
+        <co.gphl.wf.xds.bin>/opt/pxsoft/bin/xds_par</co.gphl.wf.xds.bin>
 
         <!-- Location of GPhL .license directory -->
+        <!-- defaults to co.gphl.wf.bin-->
 	    <!-- Only needed if you do NOT use the wrapper script : -->
         <!-- <co.gphl.wf.bdg_licence_dir>/MXCuBE/gphl_java_classes</co.gphl.wf.bdg_licence_dir> -->
         <!--<co.gphl.wf.bdg_licence_dir>/MXCuBE/softwares/GPhL-ESRF-20171005/20171005</co.gphl.wf.bdg_licence_dir>-->
 
         <!-- Location of stratcal binary -->
-        <co.gphl.wf.stratcal.bin>{GPHL_INSTALLATION}/stratcal</co.gphl.wf.stratcal.bin>
+        <!-- <co.gphl.wf.stratcal.bin>{GPHL_INSTALLATION}/stratcal</co.gphl.wf.stratcal.bin> -->
         <!-- Location of stratcal-specific license directory - OPTIONAL ->
         <co.gphl.wf.stratcal.bdg_licence_dir>/MXCuBE/softwares/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
         -->
 
         <!-- Location of simcal binaries -->
-        <co.gphl.wf.simcal.bin>{GPHL_INSTALLATION}/simcal</co.gphl.wf.simcal.bin>
-        <co.gphl.wf.simcal_predict.bin>{GPHL_INSTALLATION}/simcal_predict</co.gphl.wf.simcal_predict.bin>
+        <!--<co.gphl.wf.simcal.bin>{GPHL_INSTALLATION}/simcal</co.gphl.wf.simcal.bin>-->
+        <!--<co.gphl.wf.simcal_predict.bin>{GPHL_INSTALLATION}/simcal_predict</co.gphl.wf.simcal_predict.bin>-->
         <!-- Location of simcal-specific license directory - OPTIONAL ->
         <co.gphl.wf.simcal_predict.bdg_licence_dir>/MXCuBE/softwares/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
         -->
 
         <!-- Location of transcal binary -->
-        <co.gphl.wf.transcal.bin>{GPHL_INSTALLATION}/transcal</co.gphl.wf.transcal.bin>
+        <!--<co.gphl.wf.transcal.bin>{GPHL_INSTALLATION}/transcal</co.gphl.wf.transcal.bin>-->
 
         <!-- Location of recen binary -->
-        <co.gphl.wf.recen.bin>{GPHL_INSTALLATION}/recen</co.gphl.wf.recen.bin>
+        <!--<co.gphl.wf.recen.bin>{GPHL_INSTALLATION}/recen</co.gphl.wf.recen.bin>-->
 
         <!-- Path of application that analyses diffractcal (aka rotational
         calibration) data. In practice, this will almost always be a wrapper

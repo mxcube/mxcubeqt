@@ -8,7 +8,7 @@ goniostat_axis_settings= 0.0 0.0 0.0
 id= 'dset01'
 !detector_axis_settings= 291.0
 !detector_axis_settings= 260.96
-# Matches 2.3A resolutino at 1.0A wavelength
+! Matches 2.3A resolution at 1.0A wavelength
 detector_axis_settings= 470.00
 /
 
