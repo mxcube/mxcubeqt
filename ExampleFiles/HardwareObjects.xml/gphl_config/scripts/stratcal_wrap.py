@@ -827,6 +827,7 @@ def run_stratcal(logfile=None, **options):
     envs = os.environ
     # NBNB this little hack is necessary as stratcal points to this file
     # We need to get the underlying binary in some other way
+    # NB this requires the top GPhL installation property to be set
     # This is hacky, but the wrapper is a temporary expedient anyway
     stratcal_binary = envs.get('GPHL_STRATCAL_BINARY')
     if stratcal_binary is None:

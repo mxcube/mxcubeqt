@@ -7,7 +7,7 @@
          (will be searched for in HardwareObjects config xml directories-->
     <gphl_samples_subdir>gphl_config/test_samples</gphl_samples_subdir>
     <!-- Directory for (optional) output of instrument calbration results-->
-    <!-- combined with instcfgout parameter (see below); see also <newconfig> -->
+    <!-- combined with instcfgout parameter (see below); see also <newinstr> -->
     <instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>
 
     <!-- Subdirectory under Session.get_process_directory() for GPhL persistence data-->
@@ -33,8 +33,8 @@
                 <!-- EITHER file OR grid must be set. NBNB REDO! -->
                 <file>transcal_2stage.json</file>
                 <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
-                <!-- updateconfig option, automaticallly updates entire configuration -->
+                <!--<newinstr/>-->
+                <!-- updateblconfig option, automaticallly updates entire configuration -->
                 <!--<grid>grid_axes_spec</grid>-->
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
                 <instcfgout>gphl_transcal_out.nml</instcfgout>
@@ -59,7 +59,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!--&lt;!&ndash; copy calibration result to configuration directory, replacing previous value &ndash;&gt;-->
-                <!--<newconfig/>-->
+                <!--<newinstr/>-->
             </options>
         </DiffractometerCalibration>
 
@@ -85,8 +85,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -126,8 +126,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -172,8 +172,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -223,6 +223,7 @@
         <!-- Workflow enactment prefix  OPTIONAL - if set to e.g. 'wfx', data
         for successive workflow runs will be stored in 'wfx_1, ,wfx_2, ... -->
         <wfprefix>gphl_wf_</wfprefix>
+        <samplesubdir/>
     </workflow_options>
 
 </object>

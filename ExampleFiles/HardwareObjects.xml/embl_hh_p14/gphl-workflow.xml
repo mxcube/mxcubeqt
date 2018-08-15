@@ -7,7 +7,7 @@
          (will be searched for in HardwareObjects config xml directories-->
     <gphl_config>gphl_config</gphl_config>
     <!-- Directory for (optional) output of instrument calbration results-->
-    <!-- combined with instcfgout parameter (see below); see also <newconfig> -->
+    <!-- combined with instcfgout parameter (see below); see also <newinstr> -->
     <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
 
     <!-- default image width selection  if None are given by the workflow-->
@@ -63,8 +63,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -104,8 +104,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -150,8 +150,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -182,8 +182,8 @@
                 <!-- EITHER file OR grid must be set. NBNB REDO! -->
                 <file>transcal_2stage.json</file>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newconfig/>
-                <!-- updateconfig option, automaticallly updates entire configuration -->
+                <newinstr/>
+                <!-- updateblconfig option, automaticallly updates entire configuration -->
                 <!--<grid>grid_axes_spec</grid>-->
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
                 <!--<instcfgout>gphl_transcal_out.nml</instcfgout>-->
@@ -199,8 +199,8 @@
             <options>
                 <!-- Name of strategy from library to use -->
                 <strategy>DiffractCal_ex</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
@@ -208,7 +208,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newconfig/>
+                <newinstr/>
             </options>
         </DiffractometerCalibration>
 
@@ -221,8 +221,8 @@
             <options>
                 <!-- Name of strategy from library to use -->
                 <strategy>DiffractCal</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
@@ -230,7 +230,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newconfig/>
+                <newinstr/>
             </options>
         </DiffractometerCalibration_short>
     </workflows>
@@ -271,6 +271,7 @@
         <!-- Workflow enactment prefix  OPTIONAL - if set to e.g. 'wfx', data
         for successive workflow runs will be stored in 'wfx_1, ,wfx_2, ... -->
         <wfprefix>gphl_wf_</wfprefix>
+        <samplesubdir/>
     </workflow_options>
 
 </object>
