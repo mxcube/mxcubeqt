@@ -377,7 +377,6 @@ def stratcal_merge_output(indata_exch, outdata_exch):
     return result
 
 
-
 def stratcal_merge_output_2(indata_exch, outdata):
     """Merges information from indata_exch and outdata
     keeping all information from the indata,
@@ -394,7 +393,7 @@ def stratcal_merge_output_2(indata_exch, outdata):
     if not isinstance(sweeps, list):
         sweeps = [sweeps]
     goniostat_setting_list = result['goniostat_setting_list'] = []
-    centred_setting_list = result['centring_goniostat_setting_list'] = []
+    centred_setting_list = result['centred_goniostat_setting_list'] = []
     stratcal_sweep_list = result['stratcal_sweep_list'] = []
     goniostat_setting_map = {}
 
@@ -412,7 +411,7 @@ def stratcal_merge_output_2(indata_exch, outdata):
     ii = 0
     for sweep in sweeps:
 
-        sweep.update(other_settings)
+        sw.update(other_settings)
 
         # Make startcal_sweep
         ii += 1
