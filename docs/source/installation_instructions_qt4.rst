@@ -1,25 +1,18 @@
 How to install and run Qt version
 #################################
 
-MXCuBE is organized as a subset of several git submodules.
 In this page a sequence how to get software code, install dependencies and execute software is described.
 
 Tested with:
 
-* Linux: Ubuntu 10, 12, 14 (with gnome and kde) and Centos 7 (with gnome)
+* Linux: Ubuntu 10, 12, 14, 16 (with gnome and kde) and Centos 7 (with gnome)
 * Macos.
 
 *****************
 1. Git repository
 *****************
 
-The MXCuBE is hosten in several git projects that all together can be found `here <https://github.com/mxcube/mxcube>`_
-The repository for Qt version is organized in three submodules:
-
-* `HardwareRepository <https://github.com/mxcube/HardwareRepository.git>`_
-* `HardwareObjects <https://github.com/mxcube/HardwareObjects.git>`_
-* `BlissFramework <https://github.com/mxcube/BlissFramework.git>`_
-
+The MXCuBE source code can be found `here <https://github.com/mxcube/mxcube>`_
 To get MXCuBE code execute:
 
 .. code-block:: bash
@@ -55,6 +48,8 @@ Other dependencies:
 2.1. Debian/Ubuntu
 ==================
 
+Python 2x
+
 .. code-block:: bash
 
    sudo apt-get install python-qt4 python-gevent python-louie python-jsonpickle python-yaml python-numpy python-scipy python-matplotlib python-suds pymca
@@ -65,6 +60,12 @@ If Qt5 used:
 .. code-block:: bash
 
    sudo apt-get install PyMca5
+   
+Python 3x
+
+.. code-block:: bash
+
+   sudo pip3 install PyQt5 gevent numpy scipy matplotlib jsonpickle
 
 2.2. Fedora/Centos
 ==================
@@ -151,50 +152,6 @@ To install PyMca version 4, you must:
     and cd into the unzipped directory.
 
   - python setup.py install --install-lib /path-to-miniconda/envs/mxpath/lib/python2.7/site-packages
-
-
-The final installation corresponds to the following versions:
-
-
-.. code-block::
-
-   #
-   cairo                     1.12.18                       0
-   dateutil                  2.4.1                    py27_0
-   freetype                  2.4.10                        0
-   gevent                    1.2.1                    py27_0
-   greenlet                  0.4.12                   py27_0
-   jsonpickle                0.9.4                     <pip>
-   libgfortran               1.0                           0
-   libpng                    1.5.13                        1
-   Louie                     1.1                       <pip>
-   matplotlib                1.3.1                np18py27_1
-   nose                      1.3.7                     <pip>
-   numpy                     1.8.2                    py27_1
-   openssl                   1.0.2k                        1
-   pip                       9.0.1                    py27_1
-   pixman                    0.26.2                        0
-   py2cairo                  1.10.0                   py27_2
-   pydispatcher              2.0.5                    py27_0
-   PyMca                     4.7.4                     <pip>
-   pyparsing                 2.0.1                    py27_0
-   pyqt                      4.10.4                   py27_0
-   python                    2.7.13                        0
-   pytz                      2016.10                  py27_0
-   pyyaml                    3.12                     py27_0
-   qt                        4.8.5                         0
-   readline                  6.2                           2
-   scipy                     0.14.0               np18py27_0
-   setuptools                27.2.0                   py27_0
-   sip                       4.15.5                   py27_0
-   six                       1.10.0                   py27_0
-   sqlite                    3.13.0                        0
-   tk                        8.5.18                        0
-   wheel                     0.29.0                   py27_0
-   yaml                      0.1.6                         0
-   zlib                      1.2.8                         3
-
-
 
 ***************
 3. Running code
