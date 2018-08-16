@@ -411,11 +411,11 @@ def stratcal_merge_output_2(indata_exch, outdata):
     ii = 0
     for sweep in sweeps:
 
+        sw = f90nml.Namelist()
         sw.update(other_settings)
 
         # Make startcal_sweep
         ii += 1
-        sw = f90nml.Namelist()
         stratcal_sweep_list.append(sw)
         sw['start_deg'] = sweep['omega_deg']
         sw['length_deg'] = sweep['n_frames'] * sweep['step_deg']
