@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ Elettra (Trieste, Italy), September (?) 2018
+# Next MXCuBE meeting @ Elettra (Trieste, Italy), 11-13 September 2018 (http://www.elettra.eu/Conferences/2018/MXCuBE-ISPyB/)
