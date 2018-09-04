@@ -572,6 +572,11 @@ class GUIEditorWindow(QWidget):
                                                      child["name"],
                                                      "spacer",
                                                      icon=child["type"])
+                elif self.configuration.is_icon(child):
+                    new_list_item = self.append_item(parent_item,
+                                                     child["name"],
+                                                     "icon",
+                                                     icon=child["type"])
                 elif self.configuration.is_brick(child):
                     new_list_item = self.append_item(parent_item,
                                                      child["name"],

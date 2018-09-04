@@ -591,6 +591,12 @@ class Configuration:
         """
         return isinstance(item, Qt4_BaseLayoutItems.SpacerCfg)
 
+    def is_icon(self, item):
+        """
+        :returns: True if item is a spacer
+        """
+        return isinstance(item, Qt4_BaseLayoutItems.IconCfg)
+
     def is_window(self, item):
         """
         :returns: True if item is a window
