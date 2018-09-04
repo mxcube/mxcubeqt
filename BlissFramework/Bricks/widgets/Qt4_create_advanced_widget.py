@@ -355,10 +355,15 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._acq_widget.acq_widget_layout.first_image_ledit.setText(\
                      "%d" % grid_properties["first_image_num"])
                 centred_point = grid.get_centred_position()
-                self._acq_widget.acq_widget_layout.kappa_ledit.setText(\
-                     "%.2f" % float(centred_point.kappa))
-                self._acq_widget.acq_widget_layout.kappa_phi_ledit.setText(\
-                     "%.2f" % float(centred_point.kappa_phi))
+                try:
+                    self._acq_widget.acq_widget_layout.kappa_ledit.setText(\
+                         "%.2f" % float(centred_point.kappa))
+                    self._acq_widget.acq_widget_layout.kappa_phi_ledit.setText(\
+                         "%.2f" % float(centred_point.kappa_phi))
+                except:
+                    import traceback
+                    logging.getLogger("HWR").debug("Qt4_advanced_widget. %s" % traceback.format_exc())
+
                 self._advanced_methods_widget.hor_spacing_ledit.setText(\
                      "%.2f" % (float(grid_properties["xOffset"]) * 1000))
                 self._advanced_methods_widget.ver_spacing_ledit.setText(\

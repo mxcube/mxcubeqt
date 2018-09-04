@@ -112,8 +112,20 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self.enable_compression(False)
 
         try:
-            max_transmission_value = self._beamline_setup_hwobj.\
-                 energyscan_hwobj.get_max_transmission_value()
+            max_transmission_enabled = self._beamline_setup_hwobj.energyscan_hwobj.get_max_transmission_state()
+            max_transmission_value = self._beamline_setup_hwobj.energyscan_hwobj.get_max_transmission_value()
+        except:
+            max_transmission_enabled = True
+            max_transmission_value = 100.0
+
+        if max_transmission_enabled is not None:
+            self._max_transmission_cbox.setEnabled(True) 
+            self._max_transmission_cbox.setChecked(True)
+
+        try:
+            self._beamline_setup_hwobj.energyscan_hwobj.enable_max_transmission(True)
+        except:
+            pass
 
             self._adjust_transmission_cbox.setEnabled(True) 
             self._adjust_transmission_cbox.setChecked(True)

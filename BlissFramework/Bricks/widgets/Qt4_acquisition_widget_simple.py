@@ -91,7 +91,7 @@ class AcquisitionWidgetSimple(QWidget):
         self.osc_range_validator = QDoubleValidator(\
              -10000, 10000, 4, self.acq_widget_layout.osc_range_ledit)
         self.kappa_validator = QDoubleValidator(\
-             0, 360, 4, self.acq_widget_layout.kappa_ledit)
+             -0.001, 360, 4, self.acq_widget_layout.kappa_ledit)
         self.kappa_phi_validator = QDoubleValidator(\
              0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
         self.energy_validator = QDoubleValidator(\

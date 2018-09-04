@@ -152,9 +152,12 @@ class DataModelInputBinder(object):
 
             if isinstance(widget, QLineEdit):
                 if type_fn is float and validator:
-                    value = float(getattr(self.__model, field_name))
-                    widget.setText('{:g}'.format(round(float(value), \
+                    try: 
+                        value = float(getattr(self.__model, field_name))
+                        widget.setText('{:g}'.format(round(float(value), \
                                        validator.decimals())))
+                    except TypeError:
+                        widget.setText(str(getattr(self.__model, field_name)))
                 else:
                     widget.setText(str(getattr(self.__model, field_name)))
              
