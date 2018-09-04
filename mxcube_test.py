@@ -268,7 +268,7 @@ class MXCuBE_Test_Environment(object):
         self.hwr_server = HardwareRepository.HardwareRepository(self.hwr_directory)
         self.hwr_server.connect()
 
-        hwo_path = os.path.join(self.mxcube_dir,"HardwareObjects")
+        hwo_path = os.path.join(self.mxcube_dir,"HardwareRepository/HardwareObjects")
         sc_hwo_path = os.path.join(hwo_path, "sample_changer")
         if self.institute:
             inst_hwo_path = os.path.join(hwo_path, self.institute)
