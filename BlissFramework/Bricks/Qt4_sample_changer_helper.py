@@ -19,6 +19,7 @@ SC_STATE_COLOR = { SampleChangerState.Fault: Qt4_widget_colors.LIGHT_RED,
                    SampleChangerState.Unknown: Qt4_widget_colors.LIGHT_GRAY}
 
 SC_STATE_GENERAL = { SampleChangerState.Ready: True,
+                     SampleChangerState.Disabled: True,
                      SampleChangerState.Alarm: True }
 
 SC_SAMPLE_COLOR = { "LOADED": Qt4_widget_colors.LIGHT_GREEN,
