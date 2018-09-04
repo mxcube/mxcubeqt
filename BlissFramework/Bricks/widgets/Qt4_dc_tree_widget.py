@@ -877,11 +877,12 @@ class DataCollectTree(QWidget):
                              plate_manipulator_hwobj.getLoadedSample().getCoords():
                        result = True
             elif self.beamline_setup_hwobj.sample_changer_hwobj is not None:
-                if not self.beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
-                    result = False
-                elif item.get_model().location == self.beamline_setup_hwobj.\
-                        sample_changer_hwobj.getLoadedSample().getCoords():
-                    result = True
+                result = False
+                if self.beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
+                    loaded_sample = self.beamline_setup_hwobj.sample_changer_hwobj.getLoadedSample()
+                    if loaded_sample is not None:
+                        if item.get_model().location == list(loaded_sample.getCoords()):
+                            result = True
         return result
 
     def collect_items(self, items=[], checked_items=[]):

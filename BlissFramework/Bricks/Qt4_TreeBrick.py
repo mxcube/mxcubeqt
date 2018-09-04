@@ -671,7 +671,7 @@ class Qt4_TreeBrick(BlissWidget):
                                                      lims_sample.lims_location))
                         sample_list.append(sc_sample)
                 else: # No sample with that barcode, continue with location
-                    lims_sample = location_samples.get(sc_sample.location)
+                    lims_sample = location_samples.get(tuple(sc_sample.location))
                     if lims_sample:
                         if lims_sample.lims_code:
                             log.warning("The sample has a barcode in LIMS, but " + \
@@ -781,6 +781,7 @@ class Qt4_TreeBrick(BlissWidget):
         is updated, but not exclusively, when a sample is changed.
         """
         self.dc_tree_widget.set_sample_pin_icon()
+        self.dc_tree_widget.update_basket_selection()
 
     def sample_load_state_changed(self, state, *args):
         """
