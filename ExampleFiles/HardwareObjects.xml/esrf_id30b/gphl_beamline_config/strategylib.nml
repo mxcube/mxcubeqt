@@ -8,13 +8,15 @@ goniostat_axis_settings= 0.0 0.0 0.0
 id= 'dset01'
 !detector_axis_settings= 291.0
 !detector_axis_settings= 260.96
-detector_axis_settings= 392.36
+! Matches 2.3A resolution at 1.0A wavelength
+detector_axis_settings= 470.00
 /
 
 &beam_setting_list
 id= 'bset01'
 ! Standard ESRF ID30B wavelength, matching 12.7 keV
-lambda= 0.97625196850393714
+! lambda= 0.97625196850393714
+lambda = 1.0
 /
 
 ! ################### Default characteristation strategy

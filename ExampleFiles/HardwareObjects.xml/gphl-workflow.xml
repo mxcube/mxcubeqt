@@ -2,12 +2,12 @@
 
     <!-- GPHL beamline configuration subdirectory
          (relative to HardwareObjects config xml directories-->
-    <gphl_beamline_config>embl_hh_p14/gphl_beamline_config</gphl_beamline_config>
+    <gphl_beamline_config>esrf_id30b/gphl_beamline_config</gphl_beamline_config>
     <!-- GPHL configuration subdirectory (for test_camples/, scripts/)
          (will be searched for in HardwareObjects config xml directories-->
     <gphl_config>gphl_config</gphl_config>
     <!-- Directory for (optional) output of instrument calbration results-->
-    <!-- combined with instcfgout parameter (see below); see also <newconfig> -->
+    <!-- combined with instcfgout parameter (see below); see also <newinstr> -->
     <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
 
     <!-- default image width selection  if None are given by the workflow-->
@@ -45,7 +45,7 @@
             <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
             <strategy_type>acquisition</strategy_type>
             <documentation>
-                Single wavelength data acquisition.
+                Single wavelength data acquisition, strategy for phasing
                 Includes initial characterisation and complete collection
             </documentation>
             <!-- Workflow interleave order (string);  Slowest changing first-->
@@ -63,8 +63,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -104,8 +104,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -150,8 +150,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -163,6 +163,42 @@
                 <prefix>gphl_data</prefix>
             </options>
         </ThreeWavelengthMAD>
+
+        <SingleWavelengthNative>
+            <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
+            <strategy_type>acquisition</strategy_type>
+            <documentation>
+                Single wavelength data acquisition, strategy for native data collectino
+                Includes initial characterisation and complete collection
+            </documentation>
+            <!-- Workflow interleave order (string);  Slowest changing first-->
+            <!-- 'g' (Goniostat position); 's' (Scan number); -->
+            <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <interleave_order>gs</interleave_order>
+            <!-- Default wavelengths (in A) and their roles -->
+            <beam_energies>
+                <beam_energy>
+                    <role>Acquisition</role>
+                    <!-- beamline energies in keV -->
+                    <value>12.7</value>
+                </beam_energy>
+            </beam_energies>
+            <options>
+                <!-- Name of initial strategy from library to use -->
+                <strategy>InitialCharacterisation</strategy>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
+                <!-- Pattern name for inverse-beam collections -->
+                <ibpattern>ib_interleaved</ibpattern>
+                <!-- Pattern name for non-inverse-beam collections -->
+                <pattern>interleaved</pattern>
+                <!-- NBNB replace later -->
+                <!-- Pattern name for characterisation collections -->
+                <charpattern>generic</charpattern>
+                <!-- Default prefix - will be overwritten from user input -->
+                <prefix>gphl_data</prefix>
+            </options>
+        </SingleWavelengthNative>
 
         <TranslationalCalibration>
             <application>co.gphl.wf.workflows.WFTransCal</application>
@@ -182,8 +218,8 @@
                 <!-- EITHER file OR grid must be set. NBNB REDO! -->
                 <file>transcal_2stage.json</file>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newconfig/>
-                <!-- updateconfig option, automaticallly updates entire configuration -->
+                <newinstr/>
+                <!-- updateblconfig option, automaticallly updates entire configuration -->
                 <!--<grid>grid_axes_spec</grid>-->
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
                 <!--<instcfgout>gphl_transcal_out.nml</instcfgout>-->
@@ -199,8 +235,8 @@
             <options>
                 <!-- Name of strategy from library to use -->
                 <strategy>DiffractCal_ex</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
@@ -208,7 +244,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newconfig/>
+                <newinstr/>
             </options>
         </DiffractometerCalibration>
 
@@ -221,8 +257,8 @@
             <options>
                 <!-- Name of strategy from library to use -->
                 <strategy>DiffractCal</strategy>
-                <!-- Working subdirectory for workflow-side application data-->
-                <appdir>calculations</appdir>
+                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
+                <!--<appdir>calculations</appdir>-->
                 <!-- Name for diffractometer calibration output -->
                 <calibration>diffractcal</calibration>
                 <!-- Path of file to dump persisted instrumentation configuration. OPTIONAL-->
@@ -230,7 +266,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newconfig/>
+                <newinstr/>
             </options>
         </DiffractometerCalibration_short>
     </workflows>
@@ -238,7 +274,7 @@
 
 
     <!-- Parameters for the command-line invocation of the workflow application-->
-    <!-- These are unlile;y to need changing - except for maybe wfprefix -->
+    <!-- These are unlikely to need changing - except for maybe wfprefix -->
 
     <!-- Java invocation properties - syntax is e.g. '-Dfile.encoding=UTF-8' -->
     <invocation_properties>
@@ -255,6 +291,11 @@
         <co.gphl.wf.simcal_predict.b_wilson>26.0</co.gphl.wf.simcal_predict.b_wilson>
         <co.gphl.wf.simcal_predict.cell_dim_sd_scale>1.5e-3</co.gphl.wf.simcal_predict.cell_dim_sd_scale>
         <co.gphl.wf.simcal_predict.mosaicity>0.2</co.gphl.wf.simcal_predict.mosaicity>
+        <!-- The next two disable the checks that ensure the top-level -->
+        <!-- data and proc directories exist when the Workflow is invoked -->
+        <!-- In normal MXCuBE operation they are created only when collection starts -->
+        <!--<co.gphl.wf.blRootCheck>F</co.gphl.wf.blRootCheck>-->
+        <!--<co.gphl.wf.procRootCheck>F</co.gphl.wf.procRootCheck>-->
         <!-- Uncomment this to disable stratcal's collision checking ->
         <co.gphl.wf.stratcal.collision_mode>2</co.gphl.wf.stratcal.collision_mode>
         -->
@@ -271,6 +312,7 @@
         <!-- Workflow enactment prefix  OPTIONAL - if set to e.g. 'wfx', data
         for successive workflow runs will be stored in 'wfx_1, ,wfx_2, ... -->
         <wfprefix>gphl_wf_</wfprefix>
+        <samplesubdir/>
     </workflow_options>
 
 </object>

@@ -9,10 +9,10 @@
  ! CELL_B_AXIS     =   9.312113    125.527946     45.535633
  ! CELL_C_AXIS     =  91.193390     24.308718    -85.661034
  ! 42-48 deg gives you both main and cusp axes
- U_MAT_ANG_DEG   = 0.0, 44.0, 90.0
+ U_MAT_ANG_DEG   = 0.0, 30.0, 30.0
  U_MAT_SD_DEG    = 3*0.103
  ! highest inherent res of hkli data: 2.100
- ! highest to-edge resolution supported: 2.94
+ ! L/R at lambda=1A ca. 1.92
  RES_LIMIT_DEF   =  2.1
  ! B factor to cause intensities to drop off (a bit).
  ! 10.0 is a pretty random value
