@@ -1,7 +1,5 @@
-<device class="Qt4_LimaVideo"> 
+<device class="Qt4_VimbaVideo"> 
    <type>Prosilica</type> 
-   <address>169.254.1.10</address> 
    <mirror>(True, False)</mirror> 
-   <imageType>rgb</imageType>	
    <interval>40</interval>	
 </device>

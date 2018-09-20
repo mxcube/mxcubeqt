@@ -7,10 +7,10 @@
 
   <channel type="tine" name="energyScanStart" tinename="/P13/fluorescence-scan/fls-scan" attach="event">start</channel>
   <channel type="tine" name="energyScanStatus" tinename="/P13/fluorescence-scan/fls-scan" attach="event">status</channel>	
-  <channel type="tine" name="energyScanError" tinename="/P13/fluorescence-scan/fls-scan">error</channel>
+  <channel type="tine" name="energyScanError" tinename="/P13/fluorescence-scan/fls-scan" attach="datachange">error</channel>
   <command type="tine" name="energyScanAbort" tinename="/P13/fluorescence-scan/fls-scan">abort</command>
 
-  <command type="tine" name="cmdEnableMaxTransmission" tinename="/P13/fluorescence-scan/fls-scan">attenuate-state</command>
+  <command type="tine" name="cmdAdjustTransmission" tinename="/P13/fluorescence-scan/fls-scan">attenuate-state</command>
   <command type="tine" name="cmdSetMaxTransmission" tinename="/P13/fluorescence-scan/fls-scan">max-transmission</command>
 
   <chooch_command>/opt/embl-hh/bin/runchooch.py</chooch_command>

@@ -38,8 +38,9 @@
        and used as a queue_entry. If queue entry is missing
        then queue skip exception will be raised.
   -->
-  <advancedMethods>["MeshScan", "XrayCentring", "LineScan"]</advancedMethods>
-
+  <advancedMethods>["MeshScan"]</advancedMethods>
+  <autoprocessingMethods>["EDNAproc"]</autoprocessingMethods>
+  <run_processing_parallel>True</run_processing_parallel>
 
   <!-- Is it possible to change the beam wavelentgh.
        Should perhaps be associated with the diffractometer -->
@@ -52,6 +53,7 @@
   <acquisition_limit_values>
     <!-- <exposure_time>0.040, 10000</exposure_time> -->
     <kappa>-5, 240</kappa>
+    <number_of_images>1, 99999</number_of_images>
   </acquisition_limit_values>
 
   <default_acquisition_values>
@@ -64,6 +66,7 @@
     <overlap>0</overlap>
     <number_of_images>1</number_of_images>
     <detector_mode>1</detector_mode>
+    <compression>True</compression>
   </default_acquisition_values>
   <default_helical_values>
     <exposure_time>0.010</exposure_time>

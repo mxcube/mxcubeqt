@@ -4,6 +4,6 @@
   <channel type="exporter" name="BeamstopDistance">BeamstopDistance</channel>
   <channel type="exporter" name="BeamstopPosition">BeamstopPosition</channel>
   <defaultBeamstopSize>1.5</defaultBeamstopSize>
-  <defaultBeamstopDistance>34.0</defaultBeamstopDistance>
+  <!--defaultBeamstopDistance>34.0</defaultBeamstopDistance-->
   <defaultBeamstopDirection>Y</defaultBeamstopDirection>
 </device>

@@ -35,6 +35,7 @@
        then queue skip exception will be raised.
   -->
   <advancedMethods>["MeshScan", "XrayCentering"]</advancedMethods>
+  <autoprocessingMethods>["EDNAproc", "Xia2Dials", "AutoProc"]</autoprocessingMethods>
 
   <!-- Is it possible to change the beam wavelentgh.
        Should perhaps be associated with the diffractometer -->
@@ -93,6 +94,5 @@
     <run_number>1</run_number>
     <overlap>0</overlap>
     <number_of_images>1</number_of_images>
-    <detector_mode>1</detector_mode>
   </default_advanced_values>
  </object>

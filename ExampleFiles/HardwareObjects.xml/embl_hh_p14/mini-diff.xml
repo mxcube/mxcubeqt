@@ -6,6 +6,7 @@
   <channel type="exporter" name="CurrentPhase">CurrentPhase</channel>
   <channel type="exporter" name="FastShutterIsOpen">FastShutterIsOpen</channel> 
   <channel type="exporter" name="ScintillatorPosition">ScintillatorPosition</channel>
+  <channel type="exporter" name="CapillaryPosition">CapillaryPosition</channel>
   <channel type="exporter" name="State">State</channel>
 
   <command type="exporter" name="startSetPhase">startSetPhase</command>
@@ -32,7 +33,7 @@
   <object href="/centring-math" role="centring"/>
 
   <zoom_centre>{"x":681,"y":494}</zoom_centre>
-  <omega_reference>{"motor_name": "phiz", "position":-0.0660, "camera_axis":"x", "direction": 1}</omega_reference>
+  <omega_reference>{"motor_name": "phiz", "position":-0.0720, "camera_axis":"x", "direction": 1}</omega_reference>
 
   <grid_direction>{"fast": (0,1), "slow": (1,0), "omega_ref" : 163.675}</grid_direction>
   <phase_list>("Transfer", "Centring", "DataCollection", "BeamLocation")</phase_list>

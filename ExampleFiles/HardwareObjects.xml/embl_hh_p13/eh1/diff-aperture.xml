@@ -3,4 +3,5 @@
    <channel type="exporter" name="CurrentApertureDiameterIndex">CurrentApertureDiameterIndex</channel>
    <channel type="exporter" name="ApertureDiameters">ApertureDiameters</channel>
    <channel type="exporter" name="AperturePosition">AperturePosition</channel>
+   <channel type="exporter" name="State">State</channel>
 </device>
