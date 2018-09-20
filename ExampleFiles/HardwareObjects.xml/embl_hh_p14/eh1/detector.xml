@@ -19,7 +19,7 @@
   <channel type="tine" name="chanTemperature" tinename="/P14/detector/eiger16m">temperature</channel>
   <channel type="tine" name="chanHumidity" tinename="/P14/detector/eiger16m">humidity</channel>
   <channel type="tine" name="chanStatus" tinename="/P14/detector/eiger16m">status</channel>
-  <channel type="tine" name="chanRoiMode" tinename="/P14/detector/eiger16m">detector-mode</channel>
+  <channel type="tine" name="chanRoiMode" tinename="/P14/detector/eiger16m" attach="datachange">detector-mode</channel>
   <channel type="tine" name="chanFrameRate" tinename="/P14/detector/eiger16m">frame-rate</channel>
   <channel type="tine" name="chanBeamXY" tinename="/P14/detector/eiger16m">beam-xy</channel> 
   <channel type="tine" name="chanActualFrameRate" tinename="/P14/tioga/tioga">average-speed</channel>

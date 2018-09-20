@@ -1,8 +1,9 @@
 <object class="BeamlineTools">
    <object href="/beamline-test" role="beamline_test"/>
+   <object href="/flux" role="flux"/>
    <object href="/eh1/detector" role="detector"/>
    <tools>
-     <tool>
+     <!-- <tool>
        <hwobj>beamline_test</hwobj>
        <display>Center beam</display>
        <method>center_beam_report</method>
@@ -10,12 +11,12 @@
        <confirmation>This will start automatic beam centering. Continue?</confirmation>
      </tool>
      <tool>
-       <hwobj>beamline_test</hwobj>
+       <hwobj>flux</hwobj>
        <display>Measure intensity</display>
        <method>measure_intensity</method>
        <confirmation>This will measure flux. Continue?</confirmation>
        <icon>Sun</icon>
-     </tool>
+     </tool> -->
      <tool>
        <hwobj>detector</hwobj>
        <display>Restart Eiger DAQ</display>

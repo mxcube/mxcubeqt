@@ -3,12 +3,11 @@
    <channel type="tine" name="chanStatusList" tinename="/P14/P14SC/P14Marvin">MarvinStatus</channel>
    <channel type="tine" name="chanPuckSwitches" tinename="/P14/P14SC/P14Marvin">PuckSwitches</channel>
    <channel type="tine" name="chanMountedSamplePuck" tinename="/P14/P14SC/P14Marvin">StsSmplMnted</channel>
-   <channel type="tine" name="chanProcessStepInfo" tinename="/P14/P14SC/P14Marvin">ProcessStepInfo</channel>
-   <channel type="tine" name="chanProcessStatus" tinename="/P14/P14SC/P14Marvin">ProcessStatus</channel>
-   <channel type="tine" name="chanTaskStatus" tinename="/P14/P14SC/P14Marvin">TaskStatus</channel>
-   <channel type="tine" name="chanCommandList" tinename="/P14/P14SC/P14Marvin">CommandList</channel>
-   <channel type="tine" name="chanErrors" tinename="/P14/P14SC/P14Marvin">Errors</channel>
-   <!-- <channel type="tine" name="chanVeto" tinename="/P14/P14DetTrans.CDI/VetoActive">RECV</channel> -->
+   <channel type="tine" name="chanProcessStepInfo" tinename="/P14/P14SC/P14Marvin" attach="datachange">ProcessStepInfo</channel>
+   <channel type="tine" name="chanProcessStatus" tinename="/P14/P14SC/P14Marvin" attach="datachange">ProcessStatus</channel>
+   <channel type="tine" name="chanTaskStatus" tinename="/P14/P14SC/P14Marvin" >TaskStatus</channel>
+   <channel type="tine" name="chanCommandList" tinename="/P14/P14SC/P14Marvin" attach="datachange">CommandList</channel>
+   <channel type="tine" name="chanErrors" tinename="/P14/P14SC/P14Marvin" attach="datachange">Errors</channel>
 
    <command type="tine" name="cmdMountSample" tinename="/P14/P14SC/P14Marvin" timeout="2000">MountSample</command> 
    <command type="tine" name="cmdUnmountSample" tinename="/P14/P14SC/P14Marvin" timeout="2000">DismountSample</command>
@@ -17,14 +16,11 @@
    <command type="tine" name="cmdBaseToCenter" tinename="/P14/P14SC/P14Marvin">BaseToCenter</command>
    <command type="tine" name="cmdCenterToBase" tinename="/P14/P14SC/P14Marvin">CenterToBase</command>
    <command type="tine" name="cmdDryGripper" tinename="/P14/P14SC/P14Marvin">DryGripper</command>
-
-   
    <command type="tine" name="cmdCloseGuillotine"   tinename="/P14/collection/shutter">close</command> 
 
    <object href="/eh1/beamFocusing" role="beam_focusing"/>
    <object href="/mini-diff" role="diffractometer"/>
-   <object href="/mxcollect" role="collection"/>
-   <!-- <object hwrid="/eh1/detector-distance" role="detector_distance"/>     -->
+   <object href="/eh1/detector" role="detector"/>
 
    <useUpdateTimer>False</useUpdateTimer>
    <log_filename>/opt/embl-hh/var/log/mxcube/marvin.log</log_filename>

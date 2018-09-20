@@ -1,9 +1,4 @@
-<device class="MicrodiffMotor">
+<device class="ExporterMotor">
   <exporter_address>p13md201.embl-hamburg.de:9001</exporter_address>
   <motor_name>CentringTableFocus</motor_name>
 </device> 
-
-<!-- <device class="TINEMotor">
-  <command type="tine" name="setPosition" tinename="/P13/MD/MD_0">CentringTableFocusPosition</command>
-  <channel type="tine" name="axisPosition" tinename="/P13/MD/MD_0">CentringTableFocusPosition</channel>
-</device> -->
