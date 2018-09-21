@@ -27,7 +27,7 @@ fa-icon: users
 - [Status report of MXCuBE3]() 
 - [Incorporation of Global Phasing workflows in MXCuBE]()
 - [Abstract Beamline Interface]()
-- [MXCUBE3: Installation and user experience]()
+- [MXCUBE3: Installation and user experience](doc/meetings_2018_Elettra/elettra_slides_mxcube_installation.pdf)
 
 ### MXCuBE refactoring
 

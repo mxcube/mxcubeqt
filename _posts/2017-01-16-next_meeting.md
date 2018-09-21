@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ MAXIV  (Lund, Sweeden), March 2018
+# Next MXCuBE meeting @ MAXIV  (Lund, Sweeden), March 2019
