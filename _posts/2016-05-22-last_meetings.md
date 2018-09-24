@@ -18,7 +18,7 @@ fa-icon: users
 - [MAX IV]()
 - [Soleil]()
 - [HZB]()
-- [Elettra]()
+- [Elettra](doc/meetings_2018_Elettra/elettra_slides_mxcube.pdf)
 - [GPhL]()
 - [DESY]()
 
