@@ -11,8 +11,8 @@ partners:
 * [HZB](http://www.helmholtz-berlin.de/)
 * [EMBL](http://www.embl.org/)
 * [Global Phasing Ltd.](http://www.globalphasing.com/)
-* [ALBA] (https://www.cells.es/en)
-* [DESY] (https://www.desy.de)
+* [ALBA](https://www.cells.es/en/)
+* [DESY](https://www.desy.de/)
 
 Latest information about the MXCuBE project can be found in the
 [project webpage] (http://mxcube.github.io/mxcube/).
