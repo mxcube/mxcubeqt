@@ -16,7 +16,7 @@ fa-icon: users
 - [EMBL Hamburg](doc/meetings_2018_Elettra/elettra_status_report_karpics.pdf)
 - [ALBA]()
 - [MAX IV]()
-- [Soleil]()
+- [Soleil](doc/meetings_2018_Elettra/soleil_status_elettra.pdf)
 - [HZB]()
 - [Elettra](doc/meetings_2018_Elettra/elettra_slides_mxcube.pdf)
 - [GPhL]()
