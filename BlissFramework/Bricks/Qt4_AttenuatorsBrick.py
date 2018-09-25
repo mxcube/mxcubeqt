@@ -98,13 +98,13 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
         self.instance_synchronize("transmission_ledit", "new_value_ledit")
 
-    def propertyChanged(self, property_value, old_value, new_value):
+    def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         Args.     :
         Return.   : 
         """
-        if property_value == 'mnemonic':
+        if property_name == 'mnemonic':
             if self.attenuators_hwobj is not None:
                 self.disconnect(self.attenuators_hwobj,
                                 'deviceReady',
@@ -140,7 +140,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
             else:
                 self.disconnected()
         else:
-            BlissWidget.propertyChanged(self, property_value, old_value, new_value)
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def input_field_changed(self, input_field_text):
         """

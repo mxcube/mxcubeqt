@@ -64,6 +64,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("useOscStartCbox", "boolean", False)
         self.addProperty("useCompression", "boolean", False)
+        self.addProperty("showCollectNowButton", "boolean", False)
        
         # Signals -------------------------------------------------------------
         self.defineSignal("request_tree_brick", ())
@@ -86,11 +87,11 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QSizePolicy.MinimumExpanding,
-                           QSizePolicy.MinimumExpanding)
+        #self.setSizePolicy(QSizePolicy.MinimumExpanding,
+        #                   QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
-        self.setEnabled(self.ispyb_logged_in)
+        #self.setEnabled(self.ispyb_logged_in)
 
     def set_expert_mode(self, state):
         self.task_tool_box_widget.set_expert_mode(state)
@@ -107,6 +108,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.setEnabled(True)
 
         self.request_tree_brick.emit() 
+        self.task_tool_box_widget.adjust_width(self.width())
 
     def user_group_saved(self, new_user_group):
         """
@@ -151,6 +153,10 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         Args.     :
         Return    :
         """
+
+        #TODO check this
+        logged_in = True        
+
         self.ispyb_logged_in = logged_in
         
         if self.session_hwobj is not None:
@@ -184,11 +190,12 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-
         elif property_name == 'useOscStartCbox':
             self.task_tool_box_widget.use_osc_start_cbox(new_value)
-        #elif property_name == 'useCompression':
-        #    self.task_tool_box_widget.enable_compression(new_value)
+        elif property_name == 'useCompression':
+            self.task_tool_box_widget.enable_compression(new_value)
+        elif property_name == 'showCollectNowButton':
+            self.task_tool_box_widget.collect_now_button.setVisible(new_value)
 
     def selection_changed(self, items):
         """

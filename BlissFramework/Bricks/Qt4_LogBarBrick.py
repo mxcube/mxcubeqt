@@ -35,12 +35,12 @@ class Qt4_LogBarBrick(BlissWidget):
     """
     Descript. :
     """
-    COLORS = {logging.NOTSET: 'lightgrey',
-              logging.DEBUG: 'darkgreen', 
-              logging.INFO: 'darkblue',
-              logging.WARNING: 'orange', 
-              logging.ERROR: 'red',
-              logging.CRITICAL: 'black'}
+    COLORS = {logging.NOTSET: Qt.lightGray,
+              logging.DEBUG: Qt.darkGreen, 
+              logging.INFO: Qt.darkBlue,
+              logging.WARNING: QColor(255, 185, 56), 
+              logging.ERROR: Qt.red,
+              logging.CRITICAL: Qt.red}
 
     def __init__(self, *args):
         """
@@ -70,8 +70,6 @@ class Qt4_LogBarBrick(BlissWidget):
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        #self.setSizePolicy(QSizePolicy.MinimumExpanding, 
-        #                   QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
 
@@ -92,17 +90,14 @@ class Qt4_LogBarBrick(BlissWidget):
         """Appends a new log line to the text edit
         """
         if self.isRunning() and record.name in ('user_level_log', 'GUI'):
-            msg = record.getMessage()#.replace('\n',' ').strip()
+            msg = record.getMessage()
             level = record.getLevel()
-            color = Qt4_LogBarBrick.COLORS[level]
-            date_time = "%s %s" % (record.getDate(), record.getTime())
+            self._status_bar_widget.text_edit.setTextColor(Qt4_LogBarBrick.COLORS[level])
+            self._status_bar_widget.text_edit.append(\
+                "[%s %s]  %s" % (record.getDate(), record.getTime(), msg))
 
-            self._status_bar_widget.text_edit.\
-                append("<font color=%s>[%s]" % (color, date_time) + \
-                           " "*5 + "<b>%s</b></font>" % msg)
-
-            if level == logging.WARNING or level == logging.ERROR:
-                self._status_bar_widget.toggle_background_color()
+            #if level == logging.WARNING or level == logging.ERROR:
+            #    self._status_bar_widget.toggle_background_color()
             text_document = self._status_bar_widget.text_edit.document()
             if self.max_log_lines > -1 and \
                text_document.blockCount() > self.max_log_lines:
@@ -110,3 +105,6 @@ class Qt4_LogBarBrick(BlissWidget):
                 cursor.select(QTextCursor.BlockUnderCursor)
                 cursor.removeSelectedText()
                 cursor.deleteChar()
+
+            if level == logging.ERROR:
+                self._status_bar_widget.toggle_background_color()

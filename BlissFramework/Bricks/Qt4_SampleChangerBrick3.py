@@ -25,8 +25,6 @@ from BlissFramework import Qt4_Icons
 from sample_changer import SC3
 from Qt4_sample_changer_helper import *
 
-import logging
-
 
 __credits__ = ["MXCuBE colaboration"]
 __version__ = "2.3"
@@ -84,8 +82,6 @@ class VialView(QWidget):
         return self.vial_code
 
     def set_selected(self, state):
-        logging.getLogger().debug("VialView %s, selected %s" % (self.vial_index, state))
-
         if state is True:
             Qt4_widget_colors.set_widget_color(self, \
                 Qt4_widget_colors.LIGHT_GREEN)
@@ -96,12 +92,10 @@ class VialView(QWidget):
 
     def mousePressEvent(self, event):
         """Mouse single clicked event"""
-        logging.getLogger().debug("mouse pressed on vial view")
         QWidget.mousePressEvent(self,event)
         
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
-        logging.getLogger().debug("mouse released on vial view")
         self.singleClickSignal.emit(self.vial_index)
         QWidget.mouseReleaseEvent(self,event)
 
@@ -120,7 +114,6 @@ class VialNumberView(QLabel):
 
     def mousePressEvent(self, event):
         """Mouse single clicked event"""
-        logging.getLogger().debug("mouse pressed on vial number view")
         QWidget.mousePressEvent(self,event)
         
     def mouseReleaseEvent(self, event):
@@ -176,12 +169,10 @@ class SampleBox(QWidget):
             Qt4_widget_colors.LINE_EDIT_CHANGED)
     
     def mousePressEvent(self, event):
-        logging.getLogger().debug("mouse press on sample %s" % self.vial_index) 
         QWidget.mousePressEvent(self,event)
 
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
-        logging.getLogger().debug("mouse release on sample %s" % self.vial_index) 
         self.singleClickSignal.emit(self.vial_index)
         QWidget.mouseReleaseEvent(self,event)
         
@@ -735,7 +726,8 @@ class StatusView(QWidget):
 
         enabled = SC_STATE_GENERAL.get(state, False)
         self.status_label.setEnabled(enabled)
-        if state == SampleChangerState.Fault:
+        if state in (SampleChangerState.Fault,
+                     SampleChangerState.Alarm):
             self.reset_button.setEnabled(True)
         else:
             self.reset_button.setEnabled(enabled and self.in_expert_mode)
@@ -1042,9 +1034,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                 #self.current_sample_view.hideHolderLength(self.sample_changer_hwobj.isMicrodiff())
                 #self.status.hideOperationalControl(self.sample_changer_hwobj.isMicrodiff())
                 self.sc_status_changed(self.sample_changer_hwobj.getStatus())
-                logging.getLogger().debug("Updating sc state (first)")
                 self.sc_state_changed(self.sample_changer_hwobj.getState())
-                logging.getLogger().debug("   / done" )
                 self.infoChanged()
                 self.selectionChanged()
                 #self.sample_changer_hwobjInUse(self.sampleChanger.sampleChangerInUse())
@@ -1084,7 +1074,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.current_sample_view.set_number_samples(self.vials_per_basket) 
 
         for basket_index in range(self.basket_count):
-            temp_basket = BasketView(self.sc_contents_gbox, basket_index, self.vials_per_basket, self.vials_per_row, self.basket_label)
+            temp_basket = BasketView(self.sc_contents_gbox, basket_index + 1, self.vials_per_basket, self.vials_per_row, self.basket_label)
             temp_basket.loadSampleSignal.connect(self.load_this_sample)
             temp_basket.selectSampleSignal.connect(self.user_select_this_sample)
             temp_basket.setChecked(False)
@@ -1126,7 +1116,6 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobj.changeMode(SampleChangerMode.Normal, wait=False)
 
     def loadedSampleChanged(self, sample):
-        logging.getLogger().info("Brick received new sample loaded %s" % sample)
         if sample is None:
             # get current location in SC
             sample = self.sample_changer_hwobj.getSelectedSample()
@@ -1141,7 +1130,6 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         else:
             barcode = sample.getID()
             location = sample.getCoords()
-        logging.getLogger().info("     sample location is %s" % str(location))
         
         self.current_sample_view.setLoadedMatrixCode(barcode)
         self.current_sample_view.setLoadedLocation(location)
@@ -1190,11 +1178,9 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobjStateChanged(state)
 
     def sc_status_changed(self, status):
-        logging.getLogger().debug("Status changed %s" % status) 
         self.status.setStatusMsg(status)
 
     def sc_state_changed(self, state, previous_state=None):
-        logging.getLogger().debug("State changed %s" % state) 
         self.status.setState(state)
         self.current_basket_view.setState(state)
         self.current_sample_view.setState(state)
@@ -1233,7 +1219,6 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobj.select(address, wait=False)
 
     def user_select_this_sample(self, basket_index, vial_index):
-        logging.getLogger().debug("user select sample %s %s" % (basket_index, vial_index))
         if self.single_click_selection:
             self.user_selected_sample = (basket_index, vial_index)
             self.reset_selection()

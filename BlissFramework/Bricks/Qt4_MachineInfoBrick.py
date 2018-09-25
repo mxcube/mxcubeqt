@@ -121,7 +121,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
             if self['showDiskSize']:
-                self.disc_label = QLabel("Storage disc space", self)
+                self.disc_label = QLabel("Storage disk space", self)
                 self.disc_value_label = QLabel(self)
                 self.main_vlayout.addWidget(self.disc_label)
                 self.main_vlayout.addWidget(self.disc_value_label)
@@ -153,13 +153,13 @@ class Qt4_MachineInfoBrick(BlissWidget):
            Typicaly connected to the signal comming from TreeBrick
         """
 
-        if self.disc_label:
-            dataDir = str(dataDir)
-            if not os.path.exists(dataDir):
-                dataDir = '/' + dataDir.split('/')[1]
+	_data_dir=dataDir.split("/")
+        _data_dir="/%s/%s/%s"%(_data_dir[1],_data_dir[2],_data_dir[3])
 
-            if True:
-                st = os.statvfs(dataDir)
+        if self.disc_label:
+            
+            if os.path.exists(_data_dir):
+                st = os.statvfs(_data_dir)
                 total = st.f_blocks * st.f_frsize
                 free = st.f_bavail * st.f_frsize
                 perc = st.f_bavail / float(st.f_blocks)
@@ -173,7 +173,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
                     Qt4_widget_colors.set_widget_color(self.disc_value_label,
                                                        STATES['error'])
             else:
-                txt = 'Not available'
+                txt = 'Not available: %s'%_data_dir
                 Qt4_widget_colors.set_widget_color(self.disc_value_label,
                                                    STATES['unknown'])
             self.disc_value_label.setText(txt)

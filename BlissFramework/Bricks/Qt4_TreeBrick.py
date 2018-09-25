@@ -499,7 +499,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.current_queue_entry = queue_entry 
         self.enable_widgets.emit(False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
-        BlissWidget.set_status_info("status", "Queue started", "running")
+        #BlissWidget.set_status_info("status", "Queue started", "running")
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.current_queue_entry = None
@@ -513,20 +513,15 @@ class Qt4_TreeBrick(BlissWidget):
     def queue_paused_handler(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_paused_handler(status)
-        BlissWidget.set_status_info("status", "Queue paused", "action_req")
 
     def queue_execution_finished(self, status):
         #self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_execution_completed(status)
-        if status == "Failed":
-            BlissWidget.set_status_info("status", "Queue execution failed", "error")
-        else:
-            BlissWidget.set_status_info("status", "", "ready")
 
     def queue_stop_handler(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_stop_handler(status)
-        BlissWidget.set_status_info("status", "Queue stoped")
+        #BlissWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
         self.diffractometer_ready.emit(self.diffractometer_hwobj.is_ready())
@@ -621,12 +616,15 @@ class Qt4_TreeBrick(BlissWidget):
 
         self.sample_changer_widget.sample_combo.clear()
         for sample in self.lims_samples:
-            if sample.containerSampleChangerLocation:
-                self.filtered_lims_samples.append(sample)
-                item_text = "%s-%s" %(sample.proteinAcronym, sample.sampleName)
-                #if hasattr(sample, "code"):
-                #    item_text += " (%s)" % sample.code
-                self.sample_changer_widget.sample_combo.addItem(item_text)
+            try:
+                if sample.containerSampleChangerLocation:
+                    self.filtered_lims_samples.append(sample)
+                    item_text = "%s-%s" %(sample.proteinAcronym, sample.sampleName)
+                    #if hasattr(sample, "code"):
+                    #    item_text += " (%s)" % sample.code
+                    self.sample_changer_widget.sample_combo.addItem(item_text)
+            except:
+                pass 
 
         self.sample_changer_widget.sample_label.setEnabled(True)
         self.sample_changer_widget.sample_combo.setEnabled(True)
@@ -794,6 +792,8 @@ class Qt4_TreeBrick(BlissWidget):
         Qt4_widget_colors.set_widget_color(self.sample_changer_widget.details_button,
                                            QColor(s_color))
         self.dc_tree_widget.scroll_to_item()
+        if self.diffractometer_hwobj.in_plate_mode():
+            self.dc_tree_widget.plate_navigator_widget.refresh_plate_location()
 
     def sample_selection_changed(self):
         """

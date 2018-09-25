@@ -68,7 +68,9 @@ class Qt4_CameraBrick(BlissWidget):
         self.camera_control_dialog = CameraControlDialog(self)
 
         self.popup_menu = QMenu(self)
+        self.popup_menu.menuAction().setIconVisibleInMenu(True)
         create_menu = self.popup_menu.addMenu("Create")
+        create_menu.menuAction().setIconVisibleInMenu(True)
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("VCRPlay2"),
             "Centring point with 3 clicks",
@@ -79,6 +81,7 @@ class Qt4_CameraBrick(BlissWidget):
             "Centring point on current position",
             self.create_point_current_clicked)
         temp_action.setShortcut("Ctrl+2")
+        temp_action.setIcon(Qt4_Icons.load_icon("ThumbUp"))
         create_menu.addAction(Qt4_Icons.load_icon("ThumbUp"),
                               "Centring points with one click",
                               self.create_points_one_click_clicked)
@@ -86,16 +89,20 @@ class Qt4_CameraBrick(BlissWidget):
             Qt4_Icons.load_icon("Line.png"),
             "Helical line",
             self.create_line_clicked)
+        temp_action.setShortcut("Ctrl+3")
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("Line.png"),
             "Automatic helical line",
             self.create_auto_line_clicked) 
-        temp_action.setShortcut("Ctrl+3")
         temp_action = create_menu.addAction(
             Qt4_Icons.load_icon("Grid"),
             "Grid",
             self.create_grid)
         temp_action.setShortcut("Ctrl+4")
+        temp_action = create_menu.addAction(
+            Qt4_Icons.load_icon("AutoGrid"),
+            "Auto Grid",
+            self.create_auto_grid)
 
         measure_menu = self.popup_menu.addMenu("Measure")
         self.measure_distance_action = measure_menu.addAction(\
@@ -349,6 +356,9 @@ class Qt4_CameraBrick(BlissWidget):
 
     def create_grid(self):
         self.graphics_manager_hwobj.create_grid()
+
+    def create_auto_grid(self):
+        self.graphics_manager_hwobj.create_auto_grid()
 
     def move_beam_mark_manual(self):
         self.graphics_manager_hwobj.start_move_beam_mark()

@@ -85,13 +85,13 @@ class Qt4_BeamSizeBrick(BlissWidget):
         self.main_gbox = QGroupBox('Beam size', self)
         hor_label = QLabel("Horizontal:", self.main_gbox)
         self.hor_size_ledit = QLineEdit(self.main_gbox)
-        self.hor_size_ledit.setMaximumWidth(70)
+        self.hor_size_ledit.setMaximumWidth(120)
         self.hor_size_ledit.setEnabled(False)
         self.hor_size_ledit.setAlignment(Qt.AlignRight)
 
         ver_label = QLabel("Vertical:", self.main_gbox)
         self.ver_size_ledit = QLineEdit(self.main_gbox)
-        self.ver_size_ledit.setMaximumWidth(70)
+        self.ver_size_ledit.setMaximumWidth(120)
         self.ver_size_ledit.setEnabled(False)
         self.ver_size_ledit.setAlignment(Qt.AlignRight)
 

@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import QMenu, QMessageBox
+from QtImport import QMenu, QMessageBox, QApplication
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -110,14 +110,15 @@ class Qt4_ToolsBrick(BlissWidget):
             if key == self.sender():
                 tool = self.action_dict[key]
                 if tool.get("confirmation"):
-                    print 1
-                    conf_dialog = QMessageBox(None, "Question",
-                         tool["confirmation"], QMessageBox.Ok, QMessageBox.Cancel)
-                    print 2
-                    conf_dialog.move(10, 10)
-                    conf_dialog.show() 
-                    print 3
-                    if conf_dialog == QMessageBox.Ok:
+                    conf_dialog = QMessageBox(QMessageBox.Question, "Question",
+                         str(tool["confirmation"]), QMessageBox.Ok | QMessageBox.Cancel)
+                    rec = QApplication.desktop().screenGeometry()
+                    print QApplication.desktop().pos().x()
+                    pos_x = rec.right() + rec.width() / 2 - conf_dialog.width() / 2
+                    print rec.right(), rec.width() / 2, conf_dialog.width() / 2, pos_x
+                    pos_y = rec.height() / 2
+                    conf_dialog.move(pos_x, pos_y)
+                    if conf_dialog.exec_() == QMessageBox.Ok:
                         getattr(tool["hwobj"], tool["method"])()
                 else:
                     getattr(tool["hwobj"], tool["method"])()

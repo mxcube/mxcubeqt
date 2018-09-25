@@ -43,6 +43,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.addProperty('kevFormatString', 'formatString', '##.####')
         self.addProperty('angFormatString', 'formatString', '##.####')
         self.addProperty('displayStatus', 'boolean', False)
+        self.addProperty('doBeamAlignment', 'boolean', False)
 
         # Signals ------------------------------------------------------------
 
@@ -66,6 +67,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.wavelength_ledit.setReadOnly(True)
 
         self.status_label = QLabel("Status:", self.group_box)
+        self.status_label.setEnabled(False)
         self.status_ledit = QLineEdit(self.group_box)
         self.status_ledit.setEnabled(False)
 
@@ -79,6 +81,8 @@ class Qt4_EnergyBrick(BlissWidget):
         self.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedWidth(25)
+
+        self.beam_align_cbox = QCheckBox("Center beam after energy change", self)
  
         # Layout --------------------------------------------------------------
         _new_value_widget_hlayout = QHBoxLayout(self.new_value_widget)
@@ -97,6 +101,8 @@ class Qt4_EnergyBrick(BlissWidget):
         _group_box_gridlayout.addWidget(self.status_ledit, 2, 1)
         _group_box_gridlayout.addWidget(self.set_to_label, 3, 0) 
         _group_box_gridlayout.addWidget(self.new_value_widget, 3, 1)
+        _group_box_gridlayout.addWidget(self.beam_align_cbox, 4, 0, 1, 2)
+        
         _group_box_gridlayout.setSpacing(0)
         _group_box_gridlayout.setContentsMargins(1, 1, 1, 1) 
 
@@ -112,6 +118,7 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_ledit.textChanged.connect(self.input_field_changed)
         self.units_combobox.activated.connect(self.units_changed)
         self.stop_button.clicked.connect(self.stop_clicked)
+        self.beam_align_cbox.stateChanged.connect(self.do_beam_align_changed)
 
         # Other --------------------------------------------------------------- 
         #self.group_box.setCheckable(True)
@@ -123,12 +130,6 @@ class Qt4_EnergyBrick(BlissWidget):
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. : Event triggered when user property changed in the property
-                    editor. 
-        Args.     : property_name (string), old_value, new_value
-        Return.   : None
-        """
         if property_name == 'mnemonic':
             if self.energy_hwobj is not None:
                 self.disconnect(self.energy_hwobj, 'deviceReady', self.connected)
@@ -144,7 +145,8 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.connect(self.energy_hwobj, 'energyChanged', self.energy_changed)
                 self.connect(self.energy_hwobj, 'stateChanged', self.state_changed)
                 self.connect(self.energy_hwobj, 'statusInfoChanged', self.status_info_changed)
-                self.energy_hwobj.update_values() 
+                self.energy_hwobj.update_values()
+                self.energy_hwobj.set_do_beam_alignment(self['doBeamAlignment'])
                 if self.energy_hwobj.isReady():
                     self.connected()
                 else:
@@ -160,15 +162,13 @@ class Qt4_EnergyBrick(BlissWidget):
         elif property_name == 'displayStatus':
             self.status_label.setVisible(new_value)
             self.status_ledit.setVisible(new_value)
+        elif property_name == 'doBeamAlignment':
+            self.beam_align_cbox.setEnabled(new_value)
+            self.beam_align_cbox.setChecked(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def connected(self):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         self.setEnabled(True)
         tunable_energy = self.energy_hwobj.can_move_energy()
         if tunable_energy is None:
@@ -187,19 +187,13 @@ class Qt4_EnergyBrick(BlissWidget):
              #   QtGui.QPalette.Button) 
 
     def disconnected(self):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         self.setEnabled(False)
 
+    def do_beam_align_changed(self, state):
+        if self.energy_hwobj is not None:
+            self.energy_hwobj.set_do_beam_alignment(self.beam_align_cbox.isChecked())
+
     def energy_changed(self, energy_value, wavelength_value):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         energy_value_str = self['kevFormatString'] % energy_value
         wavelength_value_str = self['angFormatString'] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
@@ -213,11 +207,6 @@ class Qt4_EnergyBrick(BlissWidget):
         self.status_ledit.setText(status_info)
 
     def current_value_changed(self):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         input_field_text = self.new_value_ledit.text()
 
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
@@ -234,11 +223,6 @@ class Qt4_EnergyBrick(BlissWidget):
                  QPalette.Base)
 
     def input_field_changed(self, input_field_text):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
            QValidator.Acceptable:
             Qt4_widget_colors.set_widget_color(\
@@ -252,19 +236,9 @@ class Qt4_EnergyBrick(BlissWidget):
                 QPalette.Base)
 
     def units_changed(self, unit):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         self.set_new_value_limits()
 
     def set_new_value_limits(self):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         if self.units_combobox.currentIndex() == 0:
             value_limits = self.energy_hwobj.get_energy_limits()
             self.group_box.setTitle("Energy")
@@ -280,9 +254,4 @@ class Qt4_EnergyBrick(BlissWidget):
         self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
    
     def stop_clicked(self):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         print("stoped clicked")

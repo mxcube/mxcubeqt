@@ -111,9 +111,9 @@ class Qt4_StateMachineBrick(BlissWidget):
                                                  self.state_changed)
                 self.state_machine_hwobj.connect("conditionChanged",
                                                  self.condition_changed)
-            self.init_state_machine()
-            self.init_state_graph()
-            self.state_machine_hwobj.update_values()
+                self.init_state_machine()
+                self.init_state_graph()
+                self.state_machine_hwobj.update_values()
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
