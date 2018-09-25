@@ -47,7 +47,7 @@ def load(icon_name):
         else:
             return icon
 
-def getIconPath(icon_name):
+def get_icon_path(icon_name):
     """
     Descript. : Return path to an icon
     """

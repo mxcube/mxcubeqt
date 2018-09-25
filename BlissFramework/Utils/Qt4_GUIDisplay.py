@@ -106,6 +106,7 @@ class CustomMenuBar(QMenuBar):
              "Information for developers", self.info_for_developers_clicked)
         self.info_for_developers_action.setEnabled(False)
         self.help_menu.addAction("User manual", self.user_manual_clicked)
+        self.help_menu.addAction("Shortcuts", self.shortcuts_clicked)
         self.help_menu.addSeparator()
         self.help_menu.addAction("Whats this", self.whats_this_clicked)
         self.help_menu.addSeparator()
@@ -253,13 +254,31 @@ class CustomMenuBar(QMenuBar):
     def about_clicked(self):
         """Display dialog with info about mxcube"""
 
-        about_msg_box = QMessageBox.about(self,
-             "About MXCuBE",
-             """<b>MXCuBE v %s </b>
-                <p>Macromolecular Xtallography Customized Beamline Environment<p>
-                Python %s - Qt %s - PyQt %s on %s"""%(__version__,
-              platform.python_version(), QT_VERSION_STR,
-              PYQT_VERSION_STR, platform.system()))
+        QMessageBox.about(\
+            self,
+            "About MXCuBE",
+            """<b>MXCuBE v %s </b>
+               <p>Macromolecular Xtallography Customized Beamline Environment<p>
+               Python %s - Qt %s - PyQt %s on %s"""%(__version__,
+            platform.python_version(), QT_VERSION_STR,
+            QT_VERSION_STR, platform.system()))
+
+    def shortcuts_clicked(self):
+        shortcuts_text = \
+           """<b>Ctrl + 1</b>   : start 3 click centering<br>
+              <b>Ctrl + 2</b>   : save new centering point<br>
+              <b>Ctrl + 3</b>   : create new helical line<br>
+              <b>Ctrl + 4</b>   : start grid drawing<br><br>
+              <b>Ctrl + a</b>   : select all centering points<br>
+              <b>Ctrl + d</b>   : deselect all graphical items<br>
+              <b>Ctrl + x</b>   : delete all graphical items<br><br>
+              <b>Ctrl + +/-</b> : zoom in/out<br><br>
+              <b>Mouse wheel +/-</b> : rotate sample
+           """
+        QMessageBox.about(\
+            self,
+            "Available shortcuts",
+            shortcuts_text)
 
     def quit_clicked(self):
         """Exit mxcube"""
@@ -1473,6 +1492,13 @@ class WindowDisplayWidget(QScrollArea):
 
     def append_windows_links(self, window_list):
         self._menubar.append_windows_links(window_list)
+
+    def set_font_size(self, font_size):
+        for widget in self.children():
+            if hasattr(widget, "font"):
+                font = widget.font()
+                font.setPointSize(font_size)
+                widget.setFont(font)
 
 class BricksPropertiesEditor(QWidget):
 

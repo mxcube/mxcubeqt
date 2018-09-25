@@ -192,9 +192,10 @@ class BlissWidget(Connectable.Connectable, QFrame):
                     widget.__stop()
                     try:
                         widget.set_expert_mode(True)
-                    except:
+                    except Exception as ex:
                         logging.getLogger().exception(\
-                           "Could not set %s to expert mode", widget.name())
+                           "Could not set %s to expert mode: %s" % \
+                           (str(widget), str(ex)))
 
     @staticmethod
     def isRunning():
@@ -1099,9 +1100,10 @@ class BlissWidget(Connectable.Connectable, QFrame):
         Descript. :
         """
         splash_screen = BlissFramework.get_splash_screen()
-        splash_screen.set_message(\
-            "Loading hardware object defined in %s.xml" %
-            hardware_object_name)        
+        if splash_screen:
+            splash_screen.set_message(\
+                "Loading hardware object defined in %s.xml" %
+                hardware_object_name)        
 
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)

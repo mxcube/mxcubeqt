@@ -49,7 +49,8 @@ GROUP_BOX_GRAY = QColor(230, 230, 230)
 QUEUE_ENTRY_COLORS = [WHITE,
                       LIGHT_GREEN,
                       LIGHT_YELLOW,
-                      LIGHT_RED]
+                      LIGHT_RED,
+                      LIGHT_GRAY]
 
 TREE_ITEM_SAMPLE = QColor(240, 240, 240)
 TREE_ITEM_COLLECTION = QColor(255, 230, 210)
