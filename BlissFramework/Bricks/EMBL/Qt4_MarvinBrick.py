@@ -61,7 +61,7 @@ class Qt4_MarvinBrick(BlissWidget):
 
         self.puck_switches_gbox = QGroupBox('Puck switches', self)
         self.puck_switches_table = QTableWidget(self.puck_switches_gbox)
-        self.central_puck_ledit = QLineEdit('Centre', self.puck_switches_gbox)
+        self.central_puck_ledit = QLineEdit('No center puck', self.puck_switches_gbox)
 
         self.control_gbox = QGroupBox('Control', self)
         self.open_lid_button = QPushButton("Open lid", self.control_gbox)
@@ -136,17 +136,17 @@ class Qt4_MarvinBrick(BlissWidget):
         self.puck_switches_table.setColumnCount(17)
         self.puck_switches_table.verticalHeader().hide()
         self.puck_switches_table.horizontalHeader().hide()
-        self.puck_switches_table.setRowHeight(0, 20)
-        self.puck_switches_table.setFixedHeight(26)
+        self.puck_switches_table.setRowHeight(0, 28)
+        self.puck_switches_table.setFixedHeight(28)
         self.puck_switches_table.setShowGrid(True)
+        self.puck_switches_table.setFixedWidth(33 * 17 + 4)
 
         for col_index in range(17):
             temp_item = QTableWidgetItem(str(col_index + 1))
             temp_item.setFlags(Qt.ItemIsEnabled)
             temp_item.setBackground(Qt4_widget_colors.WHITE)
             self.puck_switches_table.setItem(0, col_index, temp_item)
-            self.puck_switches_table.setColumnWidth(col_index, 22)
-            self.puck_switches_table.setFixedWidth(22 * 17 + 6)
+            self.puck_switches_table.setColumnWidth(col_index, 33)
 
         self.status_table.setColumnCount(3)
         self.status_table.setHorizontalHeaderLabels(["Property", "Description", "Value"])

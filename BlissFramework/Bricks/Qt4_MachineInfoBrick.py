@@ -50,8 +50,6 @@ class Qt4_MachineInfoBrick(BlissWidget):
 
         # Internal values -----------------------------------------------------
         self.graphics_initialized = None
-        self.disc_label = None
-        self.disc_value_label = None
         self.value_label_list = []
 
         # Properties (name, type, default value, comment)---------------------- 
@@ -74,10 +72,8 @@ class Qt4_MachineInfoBrick(BlissWidget):
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot('setColDir', ())
          
         # Graphic elements ----------------------------------------------------
-        self.disc_value_label = None
 
         # Layout --------------------------------------------------------------
         self.main_vlayout = QVBoxLayout(self)
@@ -120,64 +116,9 @@ class Qt4_MachineInfoBrick(BlissWidget):
                 temp_widget.init_info(item, self['maxPlotPoints'])
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
-            if self['showDiskSize']:
-                self.disc_label = QLabel("Storage disc space", self)
-                self.disc_value_label = QLabel(self)
-                self.main_vlayout.addWidget(self.disc_label)
-                self.main_vlayout.addWidget(self.disc_value_label)
         self.graphics_initialized = True
         for index, value in enumerate(values_list):
             self.value_label_list[index].update_info(value)
-
-    def sizeof_fmt(self, num):
-        """Returns disk space formated in string"""
-
-        for x in ['bytes', 'KB', 'MB', 'GB']:
-            if num < 1024.0:
-                return "%3.1f%s" % (num, x)
-            num /= 1024.0
-        return "%3.1f%s" % (num, 'TB')
-   
-    def sizeof_num(self, num):
-        """Returns disk space formated in exp value"""
-
-        for x in ['m', unichr(181), 'n']:
-            if num > 0.001:
-                num *= 1000.0 
-                return "%0.1f%s" % (num, x)
-            num *= 1000.0
-        return "%3.1f%s" % (num, ' n')
-
-    def setColDir(self, dataDir):
-        """Slot to update disk space label.
-           Typicaly connected to the signal comming from TreeBrick
-        """
-
-        if self.disc_label:
-            dataDir = str(dataDir)
-            if not os.path.exists(dataDir):
-                dataDir = '/' + dataDir.split('/')[1]
-
-            if True:
-                st = os.statvfs(dataDir)
-                total = st.f_blocks * st.f_frsize
-                free = st.f_bavail * st.f_frsize
-                perc = st.f_bavail / float(st.f_blocks)
-                txt = 'Total: %s\nFree:  %s (%s)' % (self.sizeof_fmt(total),
-                                                     self.sizeof_fmt(free),
-                                                     '{0:.0%}'.format(perc))  
-                if free / 2 ** 30 > self['diskThreshold']:
-                    Qt4_widget_colors.set_widget_color(self.disc_value_label,
-                                                   STATES['ready'])
-                else:
-                    Qt4_widget_colors.set_widget_color(self.disc_value_label,
-                                                       STATES['error'])
-            else:
-                txt = 'Not available'
-                Qt4_widget_colors.set_widget_color(self.disc_value_label,
-                                                   STATES['unknown'])
-            self.disc_value_label.setText(txt)
-
 
 class CustomInfoWidget(QWidget):
     """Custom information widget"""

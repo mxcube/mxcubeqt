@@ -52,7 +52,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.is_beam_location_phase = False
 
         # Properties ----------------------------------------------------------
-        self.addProperty('hwobj_beam_focusing', 'string', '/eh1/beamFocusing')
+        self.addProperty('hwobj_beam_focusing', 'string', '')
         self.addProperty('hwobj_beamline_test', 'string', '/beamline-test')
         self.addProperty('hwobj_diffractometer', 'string', '/mini-diff')
         self.addProperty('hwobj_motors_list', 'string', '')
@@ -121,6 +121,12 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.measure_flux_button.setToolTip("Measure flux")
         self.measure_flux_button.setIcon(Qt4_Icons.load_icon("Sun"))
 
+    def enable_widget(self, state):
+        pass
+
+    def disable_widget(self, state):
+        pass
+
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == 'hwobj_motors_list':
             hwobj_names_list = new_value.split()
@@ -178,7 +184,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
                 self.disconnect(self.beam_focusing_hwobj,
                                 'focusingModeChanged',
                                 self.focus_mode_changed)
-            self.beam_focusing_hwobj = self.getHardwareObject(new_value)
+            self.beam_focusing_hwobj = self.getHardwareObject(new_value, optional=True)
             if self.beam_focusing_hwobj is not None:
                 self.connect(self.beam_focusing_hwobj,
                              'focusingModeChanged',
@@ -238,7 +244,8 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.update_gui()
 
     def measure_flux_clicked(self):
-        conf_msg = "This will measure flux. Continue?"
+        conf_msg = "This will measure flux at 100% transmission.\n" +\
+                   "If necessary move the sample out of beam. Continue?" 
         if QMessageBox.warning(None, "Question", conf_msg,
                QMessageBox.Ok, QMessageBox.Cancel) == QMessageBox.Ok:
             self.beamline_test_hwobj.measure_intensity()

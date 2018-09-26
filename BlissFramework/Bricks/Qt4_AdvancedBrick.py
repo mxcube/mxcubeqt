@@ -107,8 +107,11 @@ class Qt4_AdvancedBrick(BlissWidget):
         self.line_parameters_widget.setEnabled(isinstance(item, Qt4_queue_item.XrayCenteringQueueItem))
         self.line_results_widget.setEnabled(isinstance(item, Qt4_queue_item.XrayCenteringQueueItem))
 
-        self.snapshot_widget.display_snapshot(\
-             data_collection.grid.get_snapshot())
+        try:
+            self.snapshot_widget.display_snapshot(\
+                 data_collection.grid.get_snapshot())
+        except:
+            pass
 
         self.tool_box.setCurrentWidget(self.results_widget)
 

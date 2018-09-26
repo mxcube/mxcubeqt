@@ -64,6 +64,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("useOscStartCbox", "boolean", False)
         self.addProperty("useCompression", "boolean", False)
+        self.addProperty("showCollectNowButton", "boolean", False)
        
         # Signals -------------------------------------------------------------
         self.defineSignal("request_tree_brick", ())
@@ -86,11 +87,11 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QSizePolicy.MinimumExpanding,
-                           QSizePolicy.MinimumExpanding)
+        #self.setSizePolicy(QSizePolicy.MinimumExpanding,
+        #                   QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
-        self.setEnabled(self.ispyb_logged_in)
+        #self.setEnabled(self.ispyb_logged_in)
 
     def set_expert_mode(self, state):
         self.task_tool_box_widget.set_expert_mode(state)
@@ -107,13 +108,9 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.setEnabled(True)
 
         self.request_tree_brick.emit() 
+        self.task_tool_box_widget.adjust_width(self.width())
 
     def user_group_saved(self, new_user_group):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
         self.session_hwobj.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
         path = self.session_hwobj.get_base_image_directory() + "/" + str(new_user_group)
@@ -130,13 +127,11 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
                     prop_id = None, start_date = None, prop_code = None, 
                     is_inhouse = None):
         """
-        Descript. : Connected to the slot set_session and is called after a
-                    request to get the current session from LIMS (ISPyB) is  
-                    made. The signal is normally emitted by the brick that 
-                    handles LIMS login, ie ProposalBrick.
-                    The session_id is '' if no session could be retrieved.
-        Args.     :
-        Return.   :
+        Connected to the slot set_session and is called after a
+        request to get the current session from LIMS (ISPyB) is  
+        made. The signal is normally emitted by the brick that 
+        handles LIMS login, ie ProposalBrick.
+        The session_id is '' if no session could be retrieved.
         """
         if session_id is '':
             self.logged_in(True)
@@ -145,12 +140,12 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
     @pyqtSlot(bool)
     def logged_in(self, logged_in):
         """
-        Descript. : Handels the signal logged_in from the brick the handles 
-                    LIMS (ISPyB) login, ie ProposalBrick. The signal is 
-                    emitted when a user was succesfully logged in.
-        Args.     :
-        Return    :
+        Handels the signal logged_in from the brick the handles 
+        LIMS (ISPyB) login, ie ProposalBrick. The signal is 
+        emitted when a user was succesfully logged in.
         """
+        logged_in = True        
+
         self.ispyb_logged_in = logged_in
         
         if self.session_hwobj is not None:
@@ -160,12 +155,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.task_tool_box_widget.ispyb_logged_in(logged_in)
     
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. : Overriding BaseComponents.BlissWidget (propertyChanged
-                    obj.) run method.
-        Args.     :
-        Return    :
-        """
         if property_name == 'beamline_setup':
             self.beamline_setup_hwobj = self.getHardwareObject(new_value)
             if self.beamline_setup_hwobj:
@@ -184,27 +173,21 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-
         elif property_name == 'useOscStartCbox':
             self.task_tool_box_widget.use_osc_start_cbox(new_value)
-        #elif property_name == 'useCompression':
-        #    self.task_tool_box_widget.enable_compression(new_value)
+        elif property_name == 'useCompression':
+            self.task_tool_box_widget.enable_compression(new_value)
+        elif property_name == 'showCollectNowButton':
+            self.task_tool_box_widget.collect_now_button.setVisible(new_value)
 
     def selection_changed(self, items):
         """
-        Descript. : Connected to the signal "selection_changed" of the 
-                    TreeBrick. Called when the selection in the tree changes.
-        Args.     :
-        Return    :
+        Connected to the signal "selection_changed" of the TreeBrick.
+        Called when the selection in the tree changes.
         """
         self.task_tool_box_widget.selection_changed(items)
 
     def point_selected(self, selected_position):
-        """
-        Descript. : slot when point selected
-        Args.     :
-        Return    :
-        """
         self.task_tool_box_widget.helical_page.\
             centred_position_selection(selected_position)
         self.task_tool_box_widget.discrete_page.\

@@ -60,6 +60,7 @@ class QueueItem(QTreeWidgetItem):
         self._previous_check_state = False
         self._font_is_bold = False
         self._star = False
+        self._base_tool_tip = ""
         self.setText(1, '')
  
     def listView(self):
@@ -215,6 +216,12 @@ class QueueItem(QTreeWidgetItem):
                 grand_children_list.append(self.child(child_index).child(grand_child_index))
         return grand_children_list
 
+    def set_strike_out(self, state):
+        font = self.font(0)
+        font.setStrikeOut(state)
+        self.setFont(0, font)
+
+
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
         #kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
@@ -296,17 +303,18 @@ class DataCollectionQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
-
     def init_processing_info(self):
         dc_model = self.get_model()
-        dc_parameters = dc_model.as_dict()
-        if dc_parameters["num_images"] > 19:
-            pass
-            # @~@~ Code below breaks - no such attribute 'processing_methods'
-            # for index, processing_method in enumerate(dc_model.processing_methods):
-            #     self.setIcon(2 + index, BALL_UNKNOWN)
+        if hasattr(dc_model, "processing_methods"):
+            dc_parameters = dc_model.as_dict()
+            if dc_parameters["num_images"] > 19:
+                for index, processing_method in enumerate(dc_model.processing_methods):
+                    self.setIcon(2 + index, BALL_UNKNOWN)
 
     def init_tool_tip(self):
+        self.update_tool_tip()
+
+    def update_tool_tip(self):
         dc_model = self.get_model()
         dc_parameters = dc_model.as_dict()
         dc_parameters_table = \
@@ -328,46 +336,32 @@ class DataCollectionQueueItem(TaskQueueItem):
                  dc_parameters["resolution"],
                  dc_parameters["transmission"])
 
-        thumb_info = ''
-        if dc_model.is_executed():
-            paths = dc_model.acquisitions[0].get_preview_image_paths()
-            first_image_path = dc_model.acquisitions[0].path_template.\
-                get_image_file_name() % dc_parameters["first_image"]
-            if len(paths) == 1:
-                thumb_info = \
-                   '''<br><table border='0.5'>
-                      <tr><td>%s</td></tr>
-                      <tr><td><img src="%s" width=200></td></tr>
-                      </table>
-                  ''' % (first_image_path, paths[0])
-            else:
-                last_image_path = dc_model.acquisitions[0].\
-                   path_template.get_image_file_name() % (dc_parameters["first_image"] + \
-                                                          dc_parameters["num_images"])
-                thumb_info = \
-                   '''<br><table border='0.5'>
-                      <tr><td>%s</td><td>%s</td></tr>
-                      <tr><td><img src="%s" width=200></td>
-                          <td><img src="%s" width=200></tr>
-                      </table>
-                  ''' % (first_image_path, last_image_path, paths[0], paths[-1])
-
-        processing_msg = ''
+        processing_table = ""
         if len(dc_model.processing_msg_list) > 0:
-            processing_msg = '<br><br><b>Processing info</b>'
+            processing_table = \
+              '''</br></br>
+                 <b>Processing info:</b>
+                 <table border='0.5'>
+              '''
             for msg in dc_model.processing_msg_list:
-                processing_msg += '<br>%s' % msg
+                if msg[2] in ("failed"):
+                    proc_msg = "<font color=#FE0000>%s: %s %s</font>" % (msg[1], msg[2], msg[3])
+                else:
+                    proc_msg = "%s: %s" % (msg[1], msg[2])
+                processing_table += "<tr><td>%s</td><td>%s</td></tr>" % (msg[0], proc_msg)
 
+            processing_table += "</table>"
+
+        
         tool_tip = '''<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
                     <html lang="en">
                     <body>
                        %s
                        %s
-                       %s
                     </body>
                     </html>''' % (dc_parameters_table,
-                                  thumb_info,
-                                  processing_msg)
+                                  processing_table)
+
         self.setToolTip(0, tool_tip)
 
 class CharacterisationQueueItem(TaskQueueItem):
@@ -424,6 +418,6 @@ MODEL_VIEW_MAPPINGS = \
      queue_model_objects.Workflow: GenericWorkflowQueueItem,
      queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
      queue_model_objects.XrayCentering: XrayCenteringQueueItem,
-     #queue_model_objects.XrayImaging: XrayImagingQueueItem,
+     queue_model_objects.XrayImaging: XrayImagingQueueItem,
      queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
 

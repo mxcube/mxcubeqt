@@ -124,7 +124,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
     def motor_state_changed(self, state):
         #TODO remove this check and use motor_states as in AbstractMotor
-        if hasattr(self.motor_hwobj, "motor_state"):
+        if hasattr(self.motor_hwobj, "motor_states"):
             s = state in (self.motor_hwobj.motor_states.READY,
                           self.motor_hwobj.motor_states.LOWLIMIT,
                           self.motor_hwobj.motor_states.HIGHLIMIT)
@@ -227,7 +227,7 @@ class Qt4_MotorPredefPosBrick(BlissWidget):
 
     def position_selected(self, index):
         if index >= 0:
-            if self.motor_hwobj.is_ready():
+            if True:
                 #TODO remove this check
                 if hasattr(self.motor_hwobj, "moveToPosition"):
                     self.motor_hwobj.moveToPosition(self.positions[index])

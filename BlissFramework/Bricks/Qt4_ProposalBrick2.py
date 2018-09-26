@@ -133,14 +133,13 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         self.login_as_user_widget = QWidget(self.main_gbox)
         self.proposal_combo = QComboBox(self.login_as_user_widget)
-        self.proposal_combo.setFixedWidth(140)
 
         self.user_group_widget = QWidget(self.main_gbox)
         #self.title_label = QtGui.QLabel(self.user_group_widget)
         #self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.user_group_label = QLabel("  Group: ", self.user_group_widget)
         self.user_group_ledit = QLineEdit(self.user_group_widget)
-        self.user_group_ledit.setFixedHeight(27)
+        self.user_group_ledit.setFixedSize(100, 27)
         self.user_group_save_button = QToolButton(self.user_group_widget)
         self.user_group_save_button.setText("Set")
         self.user_group_save_button.setFixedHeight(27)
@@ -176,7 +175,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         _main_gboxlayout.addWidget(self.login_as_proposal_widget)
         _main_gboxlayout.addWidget(self.logout_button)
         _main_gboxlayout.addWidget(self.login_as_user_widget)
-        #_main_vlayout.addSpacing(10)
+        _main_gboxlayout.addStretch()
         _main_gboxlayout.addWidget(self.user_group_widget)
         _main_gboxlayout.setSpacing(2)
         _main_gboxlayout.setContentsMargins(0, 0, 0, 0)
@@ -372,6 +371,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             logging.getLogger().warning("Using local login: the data collected won't be stored in the database")
             self.lims_hwobj.disable()
             expiration_time = 0
+            self.loggedIn.emit(False)
         else:
             msg = "Results in ISPyB will be stored under proposal %s%s - '%s'" % \
                  (proposal["code"],
@@ -383,7 +383,7 @@ class Qt4_ProposalBrick2(BlissWidget):
             if code not in codes_list:
                 codes = self["codes"] + " " + code
                 self["codes"] = codes
-                self.propertyBag.getProperty('codes').setValue(codes)
+                #self.propertyBag.getProperty('codes').setValue(codes)
 
             # Build the info for the interface
             title = str(proposal['title'])
@@ -432,6 +432,9 @@ class Qt4_ProposalBrick2(BlissWidget):
             except (TypeError, IndexError, ValueError):
                 expiration_time = 0
 
+            self.loggedIn.emit(True)
+
+        """
         is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
         win_title = "%s (%s-%s)" % (self["titlePrefix"], \
             self.lims_hwobj.translate(proposal["code"], 'gui'), \
@@ -445,7 +448,7 @@ class Qt4_ProposalBrick2(BlissWidget):
                   session["startDate"],
                   proposal["code"],
                   is_inhouse)
-        self.loggedIn.emit(True)
+        """
 
     def setCodes(self, codes):
         """
@@ -692,10 +695,12 @@ class Qt4_ProposalBrick2(BlissWidget):
             prop_ok = False
         if not prop_ok:
             self.ispybDown()
+            BlissWidget.set_status_info("ispyb", "error")
         else:
             self.select_proposal(prop)
             BlissWidget.set_status_info("user", "%s%s@%s" % \
                (proposal_code, str(proposal_number), beamline_name))
+            BlissWidget.set_status_info("ispyb", "ready")
 
     def proposal_combo_activated(self, item_index):
         self.select_proposal(self.proposals[item_index])
@@ -788,6 +793,7 @@ class Qt4_ProposalBrick2(BlissWidget):
         if len(self.proposals) == 0:
             logging.getLogger("GUI").error("No proposals for user %s found in ISPyB" % user_name)
             self.ispybDown()
+            BlissWidget.set_status_info("ispyb", "error")
         else: 
             self.proposal_combo.clear()
             proposal_tooltip = "Available proposals:"
@@ -818,6 +824,7 @@ class Qt4_ProposalBrick2(BlissWidget):
 
             BlissWidget.set_status_info("user", "%s@%s" % \
                (user_name, self.lims_hwobj.beamline_name))
+            BlissWidget.set_status_info("ispyb", "ready")
 
     def select_todays_proposal(self, proposal_list):
         """
