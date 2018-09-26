@@ -121,12 +121,6 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.measure_flux_button.setToolTip("Measure flux")
         self.measure_flux_button.setIcon(Qt4_Icons.load_icon("Sun"))
 
-    def setEnabled(self, state):
-        self.unf_hor_motor_brick.setEnabled(False)
-        self.unf_ver_motor_brick.setEnabled(False)
-        self.double_hor_motor_brick.setEnabled(False)
-        self.double_ver_motor_brick.setEnabled(False)
-
     def enable_widget(self, state):
         pass
 

@@ -620,8 +620,6 @@ class Qt4_TreeBrick(BlissWidget):
                 if sample.containerSampleChangerLocation:
                     self.filtered_lims_samples.append(sample)
                     item_text = "%s-%s" %(sample.proteinAcronym, sample.sampleName)
-                    #if hasattr(sample, "code"):
-                    #    item_text += " (%s)" % sample.code
                     self.sample_changer_widget.sample_combo.addItem(item_text)
             except:
                 pass 

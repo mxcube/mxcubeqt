@@ -153,7 +153,7 @@ class Qt4_MachineInfoBrick(BlissWidget):
            Typicaly connected to the signal comming from TreeBrick
         """
 
-	_data_dir=dataDir.split("/")
+        _data_dir=dataDir.split("/")
         _data_dir="/%s/%s/%s"%(_data_dir[1],_data_dir[2],_data_dir[3])
 
         if self.disc_label:

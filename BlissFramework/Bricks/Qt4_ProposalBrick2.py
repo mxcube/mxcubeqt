@@ -133,7 +133,6 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         self.login_as_user_widget = QWidget(self.main_gbox)
         self.proposal_combo = QComboBox(self.login_as_user_widget)
-        #elf.proposal_combo.setFixedWidth(140)
 
         self.user_group_widget = QWidget(self.main_gbox)
         #self.title_label = QtGui.QLabel(self.user_group_widget)
