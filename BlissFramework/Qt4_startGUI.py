@@ -185,6 +185,7 @@ def run(gui_config_file=None):
     if not opts.designMode and gui_config_file:
         lock_filename = os.path.join(tempfile.gettempdir(), '.%s.lock' % \
           os.path.basename(gui_config_file or "unnamed"))
+
         try:
             lockfile = open(lock_filename, "w")
         except:
@@ -192,7 +193,7 @@ def run(gui_config_file=None):
                  "Cannot create lock file (%s), exiting" % lock_filename)
             sys.exit(1)
         else:
-            os.chmod(lock_filename, 0o666)
+            os.chmod(lock_filename, 0666)
             try:
                 fcntl.lockf(lockfile.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
             except:
@@ -200,7 +201,6 @@ def run(gui_config_file=None):
                     "lock (%s), exiting " % lock_filename + \
                     "(hint: maybe the same application is already running ?)")
                 sys.exit(1)
-
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_server)
     HardwareRepository.setUserFileDirectory(user_file_dir)
@@ -309,15 +309,16 @@ def run(gui_config_file=None):
     gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 
+    palette = main_application.palette()
+    palette.setColor(QPalette.ToolTipBase, QColor(255, 241, 204))
+    palette.setColor(QPalette.ToolTipText, Qt.black)
+    main_application.setPalette(palette)
+
     main_application.setOrganizationName("MXCuBE")
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
     #app.setWindowIcon(QIcon("images/icon.png"))
     main_application.exec_()
-
-    #gevent_timer = QTimer()
-    #gevent_timer.timeout.connect(do_gevent)
-    #gevent_timer.start(0)
 
     supervisor.finalize()
 

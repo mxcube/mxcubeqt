@@ -181,6 +181,7 @@ class WindowCfg(ContainerCfg):
         self.properties.addProperty("statusbar", "boolean", False)
         self.properties.addProperty("menudata", "", {}, hidden=True)
         self.properties.addProperty("expertPwd", "string", "tonic")
+        self.properties.addProperty("fontSize", "integer", 12)
 
         self.signals.update({"isShown": (),
                              "isHidden": (),

@@ -80,16 +80,9 @@ class BlissSplashScreen(QSplashScreen):
         painter.drawText(QRect(QPoint(top_x, top_y),
                          QPoint(right_x, bot_y)),
                          Qt.AlignLeft | Qt.AlignTop,
-                         "Loading MXCuBE")
+                         "Starting MXCuBE. Please wait...")
         painter.font().setPixelSize(pxsize * 2.5)
         painter.font().setPixelSize(pxsize)
-
-        top_y = bot_y
-        bot_y += 2 + painter.fontMetrics().height()
-        painter.drawText(QRect(QPoint(top_x, top_y),
-                         QPoint(right_x, bot_y)),
-                         Qt.AlignLeft | Qt.AlignBottom,
-                         "Please wait...")
 
         top_y = bot_y
         bot_y += 2 + painter.fontMetrics().height()
@@ -292,6 +285,8 @@ class GUISupervisor(QWidget):
             display.set_caption(window["properties"]["caption"])
             display.draw_preview(window, id(display))
             display.close_on_exit = window["properties"]["closeOnExit"]
+            display.set_font_size(window["properties"]["fontSize"])
+
             if window["properties"]["show"]:
                 display._show = True
             else:
