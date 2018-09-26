@@ -113,9 +113,7 @@ class Qt4_ToolsBrick(BlissWidget):
                     conf_dialog = QMessageBox(QMessageBox.Question, "Question",
                          str(tool["confirmation"]), QMessageBox.Ok | QMessageBox.Cancel)
                     rec = QApplication.desktop().screenGeometry()
-                    print QApplication.desktop().pos().x()
                     pos_x = rec.right() + rec.width() / 2 - conf_dialog.width() / 2
-                    print rec.right(), rec.width() / 2, conf_dialog.width() / 2, pos_x
                     pos_y = rec.height() / 2
                     conf_dialog.move(pos_x, pos_y)
                     if conf_dialog.exec_() == QMessageBox.Ok:
