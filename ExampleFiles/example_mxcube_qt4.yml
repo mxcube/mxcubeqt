@@ -61,8 +61,6 @@
             connections:
             - {receiver: task_tollbox_brick, receiverWindow: mxCuBE, signal: selection_changed,
               slot: selection_changed}
-            - {receiver: mach_info_brick, receiverWindow: mxCuBE, signal: set_directory,
-              slot: setColDir}
             - {receiver: parameters_tab, receiverWindow: mxCuBE, signal: hide_sample_centring_tab,
               slot: hidePage_Sample_centring}
             - {receiver: parameters_tab, receiverWindow: mxCuBE, signal: hide_sample_tab,
@@ -155,6 +153,8 @@
               type: boolean, value: 0}
             - {comment: '', defaultValue: '', hidden: false, name: hwobj_state_machine,
               oldValue: '', type: string, value: ''}
+            - {comment: '', defaultValue: '', hidden: false, name: hwobj_unittest,
+              oldValue: null, type: string, value: ''}
             - {comment: Allow to control brick in all modes, defaultValue: 0, hidden: false,
               name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
@@ -788,8 +788,6 @@
                     connections: []
                     name: hutchmenu_brick
                     properties:
-                    - {comment: '', defaultValue: '', hidden: false, name: collection,
-                      oldValue: '', type: string, value: /mxcollect}
                     - {comment: '', defaultValue: 1, hidden: false, name: enableAutoCenter,
                       oldValue: 1, type: boolean, value: 1}
                     - {comment: '', defaultValue: 1, hidden: false, name: enableAutoFocus,
@@ -1163,6 +1161,10 @@
                   value: 0}
                 - {comment: '', defaultValue: /queue-model, hidden: false, name: queue_model,
                   oldValue: /queue-model, type: string, value: /queue-model}
+                - {comment: '', defaultValue: 0, hidden: false, name: showCollectNowButton,
+                  oldValue: null, type: boolean, value: 0}
+                - {comment: '', defaultValue: 0, hidden: false, name: useCompression,
+                  oldValue: null, type: boolean, value: 0}
                 - {comment: '', defaultValue: 0, hidden: false, name: useOscStartCbox,
                   oldValue: 0, type: boolean, value: 0}
                 type: Qt4_TaskToolBoxBrick
@@ -1459,6 +1461,8 @@
                 properties:
                 - {comment: '', defaultValue: '5', hidden: false, name: basketCount,
                   oldValue: '5', type: string, value: '5'}
+                - {comment: '', defaultValue: Basket, hidden: false, name: basketLabel,
+                  oldValue: null, type: string, value: Basket}
                 - {comment: '', defaultValue: 22, hidden: false, name: defaultHolderLength,
                   oldValue: 22, type: integer, value: 22}
                 - {comment: '', defaultValue: 1, hidden: false, name: doubleClickLoads,
@@ -2186,6 +2190,26 @@
             type: string, value: ''}
           - {comment: '', defaultValue: 1, hidden: false, name: margin, oldValue: null,
             type: integer, value: 1}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Advanced,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Characterisation,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Data_collection,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Data_collection_group,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Energy_scan,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Plate_manipulator,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Sample,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Sample_centring,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Sample_changer,
+            oldValue: null, type: boolean, value: 0}
+          - {comment: '', defaultValue: 0, hidden: false, name: newdialog_XRF_spectrum,
+            oldValue: null, type: boolean, value: 0}
           - choices: [plain, raised, sunken, default]
             comment: ''
             defaultValue: default
@@ -2506,6 +2530,12 @@
         type: string, value: ''}
       - {comment: '', defaultValue: 1, hidden: false, name: margin, oldValue: null,
         type: integer, value: 1}
+      - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Collect, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Log, oldValue: null,
+        type: boolean, value: 0}
+      - {comment: '', defaultValue: 0, hidden: false, name: newdialog_Test, oldValue: null,
+        type: boolean, value: 0}
       - choices: [plain, raised, sunken, default]
         comment: ''
         defaultValue: default
@@ -2571,6 +2601,8 @@
           type: combo
           value: keV
         - {comment: '', defaultValue: 0, hidden: false, name: displayStatus, oldValue: 0,
+          type: boolean, value: 0}
+        - {comment: '', defaultValue: 0, hidden: false, name: doBeamAlignment, oldValue: null,
           type: boolean, value: 0}
         - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
           oldValue: -1, type: integer, value: -1}
@@ -2928,7 +2960,7 @@
       name: chat_brick
       properties:
       - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: 200, type: integer, value: -1}
+        oldValue: -1, type: integer, value: -1}
       - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
         oldValue: -1, type: integer, value: -1}
       - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
@@ -2954,7 +2986,7 @@
       name: log_bar_brick
       properties:
       - {comment: Set fixed height in pixels, defaultValue: -1, hidden: false, name: fixedHeight,
-        oldValue: 200, type: integer, value: -1}
+        oldValue: -1, type: integer, value: -1}
       - {comment: Set fixed width in pixels, defaultValue: -1, hidden: false, name: fixedWidth,
         oldValue: -1, type: integer, value: -1}
       - {comment: '', defaultValue: '11', hidden: false, name: fontSize, oldValue: '11',
@@ -3047,6 +3079,8 @@
     type: boolean, value: 1}
   - {comment: '', defaultValue: '123', hidden: false, name: expertPwd, oldValue: null,
     type: string, value: '123'}
+  - {comment: '', defaultValue: 12, hidden: false, name: fontSize, oldValue: null,
+    type: integer, value: 12}
   - {comment: '', defaultValue: 1, hidden: false, name: menubar, oldValue: null, type: boolean,
     value: 1}
   - comment: ''
@@ -3075,6 +3109,8 @@
       properties:
       - {comment: '', defaultValue: '5', hidden: false, name: basketCount, oldValue: '5',
         type: string, value: '5'}
+      - {comment: '', defaultValue: Basket, hidden: false, name: basketLabel, oldValue: null,
+        type: string, value: Basket}
       - {comment: '', defaultValue: 22, hidden: false, name: defaultHolderLength,
         oldValue: 22, type: integer, value: 22}
       - {comment: '', defaultValue: 1, hidden: false, name: doubleClickLoads, oldValue: 1,
@@ -3179,6 +3215,8 @@
     type: boolean, value: 0}
   - {comment: '', defaultValue: tonic, hidden: false, name: expertPwd, oldValue: null,
     type: string, value: tonic}
+  - {comment: '', defaultValue: 12, hidden: false, name: fontSize, oldValue: null,
+    type: integer, value: 12}
   - {comment: '', defaultValue: 0, hidden: false, name: menubar, oldValue: null, type: boolean,
     value: 0}
   - comment: ''
