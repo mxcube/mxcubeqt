@@ -12,27 +12,27 @@ fa-icon: users
 
 ### Status reports
 
-- [ESRF]()
+- [ESRF](doc/meetings_2018_Elettra/ESRFStatusReport.ppsx)
 - [EMBL Hamburg](doc/meetings_2018_Elettra/elettra_status_report_karpics.pdf)
-- [ALBA]()
+- [ALBA](doc/meetings_2018_Elettra/MXCuBE-Trieste_20181011-ALBA_status_report.pdf)
 - [MAX IV]()
 - [Soleil](doc/meetings_2018_Elettra/soleil_status_elettra.pdf)
 - [HZB](doc/meetings_2018_Elettra/mxcube_meeting_bessy2_status.pdf)
 - [Elettra](doc/meetings_2018_Elettra/elettra_slides_mxcube.pdf)
-- [GPhL]()
-- [DESY]()
+- [GPhL](doc/meetings_2018_Elettra/Gerard Bricogne overall presentation for GPhL.pdf)
+- [DESY](doc/meetings_2018_Elettra/P11-Status.pdf)
 
 ### MXCuBE developement highlights
 
-- [Status report of MXCuBE3]() 
+- [Status report of MXCuBE3](doc/meetings_2018_Elettra/mxcube3-status-mxcube-ispyb-meeting-elletra-sep-2018.pdf) 
 - [Incorporation of Global Phasing workflows in MXCuBE](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_RHF.pdf)
-- [Abstract Beamline Interface]()
+- [Abstract Beamline Interface](doc/meetings_2018_Elettra/GPhL_Keller_MXCuBE-2018-09.pdf)
 - [MXCUBE3: Installation and user experience](doc/meetings_2018_Elettra/elettra_slides_mxcube_installation.pdf)
 
 ### MXCuBE refactoring
 
-- [Hardware Objects - Perpetum mobile]()
-- [MXCuBE3 UI-API ]()
+- [Hardware Objects - Perpetum mobile](doc/meetings_2018_Elettra/HOPerpetuumMobile.ppsx)
+- [MXCuBE3 UI-API ](doc/meetings_2018_Elettra/ui-api-mxcube-ispyb-meeting-elletra-sep-2018.pdf)
 - [A practical example of the proposed UI-API ](doc/meetings_2018_Elettra/MXCuBE_2018_UIexample.pdf)
 - [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
 
