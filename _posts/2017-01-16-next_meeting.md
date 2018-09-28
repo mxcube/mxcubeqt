@@ -1,8 +1,8 @@
 ---
-title: "Upcoming meeting"
+title: " Upcoming meeting "
 bg: blue
 color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ Elettra (Trieste, Italy), September (?) 2018
+# Next MXCuBE meeting @ MAXIV  (Lund, Sweeden), March 2019

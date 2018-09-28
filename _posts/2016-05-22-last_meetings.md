@@ -1,19 +1,40 @@
 ---
-title: "Last meetings"
+title: " Last meetings "
 bg: turquoise
 color: white
 fa-icon: users
 ---
 
-## Developers' Committee meetings
-The Developers' Committee started a series of monthly web meetings in Feb 2018, to plan and coordinate code reorganisation:
-- [Meeting minutes](doc/developers_meetings/index.html)
+# 13th. MXCuBE meeting @ Elettra (Trieste, Italy), 11-13 September 2018
+[more info](http://www.elettra.eu/Conferences/2018/MXCuBE-ISPyB/)
 
-___
+## Full list of presentations
 
+### Status reports
 
-___
+- [ESRF]()
+- [EMBL Hamburg](doc/meetings_2018_Elettra/elettra_status_report_karpics.pdf)
+- [ALBA]()
+- [MAX IV]()
+- [Soleil](doc/meetings_2018_Elettra/soleil_status_elettra.pdf)
+- [HZB](doc/meetings_2018_Elettra/mxcube_meeting_bessy2_status.pdf)
+- [Elettra](doc/meetings_2018_Elettra/elettra_slides_mxcube.pdf)
+- [GPhL]()
+- [DESY]()
 
+### MXCuBE developement highlights
+
+- [Status report of MXCuBE3]() 
+- [Incorporation of Global Phasing workflows in MXCuBE](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_RHF_cut.pptx)
+- [Abstract Beamline Interface]()
+- [MXCUBE3: Installation and user experience](doc/meetings_2018_Elettra/elettra_slides_mxcube_installation.pdf)
+
+### MXCuBE refactoring
+
+- [Hardware Objects - Perpetum mobile]()
+- [MXCuBE3 UI-API ]()
+- [A practical example of the proposed UI-API ](doc/meetings_2018_Elettra/MXCuBE_2018_UIexample.pptx)
+- [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
 
 # 12th. MXCuBE meeting @ Diamond (Oxfordshire, UK), January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
 
