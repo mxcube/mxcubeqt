@@ -25,7 +25,7 @@ fa-icon: users
 ### MXCuBE developement highlights
 
 - [Status report of MXCuBE3]() 
-- [Incorporation of Global Phasing workflows in MXCuBE](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_RHF_cut.pptx)
+- [Incorporation of Global Phasing workflows in MXCuBE](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_RHF.pdf)
 - [Abstract Beamline Interface]()
 - [MXCUBE3: Installation and user experience](doc/meetings_2018_Elettra/elettra_slides_mxcube_installation.pdf)
 
@@ -33,8 +33,14 @@ fa-icon: users
 
 - [Hardware Objects - Perpetum mobile]()
 - [MXCuBE3 UI-API ]()
-- [A practical example of the proposed UI-API ](doc/meetings_2018_Elettra/MXCuBE_2018_UIexample.pptx)
+- [A practical example of the proposed UI-API ](doc/meetings_2018_Elettra/MXCuBE_2018_UIexample.pdf)
 - [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
+
+### Minuters and reports
+- [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary.docx)
+- [Scientific Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
+- Steering committee meeting summary not available - please contribute
+
 
 # 12th. MXCuBE meeting @ Diamond (Oxfordshire, UK), January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
 
