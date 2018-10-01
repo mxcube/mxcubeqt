@@ -93,9 +93,6 @@ class CreateHelicalWidget(CreateTaskBase):
              connect(self.acq_parameters_changed)
         self._acq_widget.madEnergySelectedSignal.connect(\
              self.mad_energy_selected)
-        self._acq_widget.acq_widget_layout.set_max_osc_range_button.clicked.\
-             connect(self.set_max_osc_total_range_clicked)
-
         self._data_path_widget.pathTemplateChangedSignal.\
              connect(self.path_template_changed)
 
@@ -127,6 +124,8 @@ class CreateHelicalWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_helical_values")
+            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(\
+                self._beamline_setup_hwobj._get_run_processing_parallel())
 
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
@@ -313,16 +312,6 @@ class CreateHelicalWidget(CreateTaskBase):
             self._path_template.run_number += 1
 
         return data_collections
-
-    def set_max_osc_total_range_clicked(self):
-        num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
-        (lower, upper), exp_time = self._acq_widget.update_osc_total_range_limits()
-        self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
-            "%.2f" % lower)
-        self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
-            "%.2f" % abs(upper - lower))
-        self._acq_widget.acq_widget_layout.osc_range.setText(\
-            "%.2f" % (abs(lower - upper) / 2 / num_images))
 
     def lines_treewidget_selection_changed(self):
         self.enable_widgets(\

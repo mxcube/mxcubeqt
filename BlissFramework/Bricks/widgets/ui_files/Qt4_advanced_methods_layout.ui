@@ -283,7 +283,7 @@
               </property>
               <property name="maximumSize">
                <size>
-                <width>180</width>
+                <width>280</width>
                 <height>27</height>
                </size>
               </property>
@@ -302,12 +302,12 @@
               </property>
               <property name="maximumSize">
                <size>
-                <width>180</width>
+                <width>280</width>
                 <height>27</height>
                </size>
               </property>
               <property name="text">
-               <string>Vetical spacing (μm):</string>
+               <string>Vertical spacing (μm):</string>
               </property>
              </widget>
             </item>
@@ -498,14 +498,6 @@
                 <width>16777215</width>
                 <height>150</height>
                </size>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
               </property>
               <property name="rootIsDecorated">
                <bool>false</bool>

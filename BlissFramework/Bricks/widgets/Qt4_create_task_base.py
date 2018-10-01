@@ -64,7 +64,6 @@ class CreateTaskBase(QWidget):
          self._data_path_widget = None
          self._current_selected_items = []
          self._path_template = None
-         self._energy_scan_result = None
          self._session_hwobj = None
          self._beamline_setup_hwobj = None
          self._graphics_manager_hwobj = None
@@ -74,11 +73,21 @@ class CreateTaskBase(QWidget):
         if self._acq_widget:
             self._acq_widget.acq_widget_layout.energy_label.setEnabled(state)
             self._acq_widget.acq_widget_layout.energy_ledit.setEnabled(state)
+            if self._acq_widget.acq_widget_layout.findChild(QCheckBox, "mad_cbox"):
+                self._acq_widget.acq_widget_layout.mad_cbox.setEnabled(state)
+                self._acq_widget.acq_widget_layout.energies_combo.setEnabled(state)
+            if self._acq_widget.acq_widget_layout.findChild(QLabel, "first_image_label"):
+                self._acq_widget.acq_widget_layout.first_image_label.setEnabled(state)
+                self._acq_widget.acq_widget_layout.first_image_ledit.setEnabled(state)
+
+    def set_run_processing_parallel(self, state):
+        pass
 
     def enable_compression(self, state):
         if self._data_path_widget:
+            #self._data_path_widget.compression_enabled = state
             self._data_path_widget.data_path_layout.compression_cbox.setChecked(state)
-            self._data_path_widget.data_path_layout.compression_cbox.setEnabled(state)
+            self._data_path_widget.data_path_layout.compression_cbox.setVisible(state)
             self._data_path_widget.update_file_name()
 
     def init_models(self):
@@ -99,13 +108,11 @@ class CreateTaskBase(QWidget):
                 else:
                     self._acq_widget.use_kappa(True)
                     self._acq_widget.use_max_osc_range(False)
-                
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def init_data_path_model(self):
         bl_setup = self._beamline_setup_hwobj
-
         if bl_setup is not None:
             # Initialize the path_template of the widget to default
             # values read from the beamline setup
@@ -122,6 +129,7 @@ class CreateTaskBase(QWidget):
                 self._path_template.base_prefix = self.get_default_prefix()
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
+                self._path_template.compression = self._data_path_widget.compression_enabled
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
@@ -140,8 +148,8 @@ class CreateTaskBase(QWidget):
 
             bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
             bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
-            bl_setup_hwobj.transmission_hwobj.connect('attFactorChanged', self.set_transmission)
-            bl_setup_hwobj.transmission_hwobj.connect('attLimitsChanged', self.set_transmission_limits)
+            bl_setup_hwobj.transmission_hwobj.connect('valueChanged', self.set_transmission)
+            bl_setup_hwobj.transmission_hwobj.connect('limitsChanged', self.set_transmission_limits)
             bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
             bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
             bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.set_osc_start)
@@ -149,6 +157,7 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
             bl_setup_hwobj.detector_hwobj.connect('detectorRoiModeChanged', self.set_detector_roi_mode)
             bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
+            bl_setup_hwobj.beam_info_hwobj.connect('beamInfoChanged', self.set_beam_info)
 
             bl_setup_hwobj.resolution_hwobj.update_values()
             bl_setup_hwobj.detector_hwobj.update_values()
@@ -300,7 +309,6 @@ class CreateTaskBase(QWidget):
     def set_transmission_limits(self, limits):
         if limits:
             acq_widget = self.get_acquisition_widget()
-
             if acq_widget:
                 acq_widget.update_transmission_limits(limits)
 
@@ -317,6 +325,9 @@ class CreateTaskBase(QWidget):
 
             if acq_widget:
                 acq_widget.update_exp_time_limits()
+
+    def set_beam_info(self, beam_info):
+        pass
 
     def get_default_prefix(self, sample_data_node = None, generic_name = False):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
@@ -471,8 +482,14 @@ class CreateTaskBase(QWidget):
         energy = self._beamline_setup_hwobj._get_energy()
         transmission = self._beamline_setup_hwobj._get_transmission()
         resolution = self._beamline_setup_hwobj._get_resolution()
-    
-        self._acquisition_parameters.osc_start = omega            
+
+        set_omega = True   
+        if self._acq_widget:
+            if self._acq_widget.acq_widget_layout.findChild(QCheckBox, "max_osc_range_cbx"):
+                if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
+                    set_omega = False
+        if set_omega:
+            self._acquisition_parameters.osc_start = omega            
         self._acquisition_parameters.kappa = kappa
         self._acquisition_parameters.kappa_phi = kappa_phi
         self._acquisition_parameters.energy = energy
@@ -657,6 +674,8 @@ class CreateTaskBase(QWidget):
                    queue_model_enumerables.CENTRING_METHOD.XRAY:
 
                     #Xray centering
+                    dc_group = self._tree_brick.dc_tree_widget.create_task_group(sample)
+                    print dc_group
                     mesh_dc = self._create_dc_from_grid(sample)
                     mesh_dc.run_processing_parallel = "XrayCentering"
                     sc = queue_model_objects.XrayCentering(mesh_dc)
@@ -759,7 +778,7 @@ class CreateTaskBase(QWidget):
 
     def _create_dc_from_grid(self, sample, grid=None):
         if grid is None:
-            grid = self._graphics_manager_hwobj.get_auto_grid()
+            grid = self._graphics_manager_hwobj.create_auto_grid()
 
         grid.set_snapshot(self._graphics_manager_hwobj.\
                           get_scene_snapshot(grid))
@@ -839,3 +858,57 @@ class CreateTaskBase(QWidget):
                     name = self._path_template.get_prefix()
                     model.set_name(name)
                     item.setText(0, model.get_display_name())
+
+
+    def set_osc_total_range(self, num_images=None, mesh=False):
+        """Updates osc totol range. Limits are changed if a plate is used.
+           - For simple oscillation osc_range is defined by osc_start and 
+             osc_start top limit.
+           - For mesh osc_range is defined by number of images per line
+             and osc in the middle of mesh  
+        """
+        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+            set_max_range = False
+
+            if num_images is None:
+                try:
+                    num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
+                except:
+                    num_images = 0
+
+            if self._acq_widget.acq_widget_layout.findChild(QCheckBox, "max_osc_range_cbx"):
+                if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
+                    set_max_range = True
+                else:
+                    num_images = 0
+
+            exp_time = None
+            exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
+
+            scan_limits = self._beamline_setup_hwobj.diffractometer_hwobj.get_scan_limits(num_images, exp_time)
+
+            self._acq_widget.osc_total_range_validator.setTop(abs(scan_limits[1] - scan_limits[0]))
+            self._acq_widget.acq_widget_layout.osc_total_range_ledit.setToolTip(\
+                 "Oscillation range limits 0 : %0.5f\n4 digits precision." % \
+                 abs(scan_limits[1] - scan_limits[0]))
+
+            self._acq_widget.osc_start_validator.setRange(scan_limits[0], scan_limits[1], 4)
+            self._acq_widget.acq_widget_layout.osc_start_ledit.setToolTip(
+                "Oscillation start limits %0.2f : %0.2f\n" % \
+                (scan_limits[0], scan_limits[1]) +
+                "4 digits precision.")
+
+            if set_max_range:
+                if mesh:
+                    self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
+                       "%.4f" % ((scan_limits[0] + scan_limits[1])/2))
+                else:
+                    self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
+                       "%.4f" % (scan_limits[0] + 0.01))
+                self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
+                     "%.4f" % abs(scan_limits[1] - scan_limits[0] - 0.01))
+                if num_images:
+                     osc_range_per_frame = int(abs(scan_limits[1] - scan_limits[0] - 0.01) / \
+                          num_images * 1000) / 1000.
+                     self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
+                         "%.3f" % osc_range_per_frame)

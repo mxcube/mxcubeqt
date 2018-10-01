@@ -85,12 +85,8 @@ class CreateDiscreteWidget(CreateTaskBase):
              self.mad_energy_selected)
         self._processing_widget.enableProcessingSignal.connect(\
              self._run_processing_toggled)
-        self._acq_widget.acq_widget_layout.set_max_osc_range_button.clicked.\
-             connect(self.set_max_osc_total_range_clicked)
 
         # Other ---------------------------------------------------------------
-        #self._processing_widget.processing_widget.\
-        #     run_processing_parallel_cbox.setChecked(False)
 
     def init_models(self):
         """
@@ -107,7 +103,8 @@ class CreateDiscreteWidget(CreateTaskBase):
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_acquisition_values")
-            self._acquisition_parameters.compression = True
+            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(\
+                self._beamline_setup_hwobj._get_run_processing_parallel())
             
     def set_tunable_energy(self, state):
         """
