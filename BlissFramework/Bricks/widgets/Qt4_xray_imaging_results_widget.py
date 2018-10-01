@@ -106,9 +106,6 @@ class XrayImagingResultsWidget(QWidget):
         self._results_widget.play_button.setIcon(Qt4_Icons.load_icon("VCRPlay"))
         self._results_widget.stop_button.setIcon(Qt4_Icons.load_icon("Stop2"))
 
-        self._results_widget.data_path_ledit.setText("/home/karpics/Downloads/data/data00000.tif")
-        self._results_widget.ff_path_ledit.setText("/home/karpics/Downloads/flatfield/flat00000.tif")
-
     def set_xray_imaging_hwobj(self, xray_imaging_hwobj):
         self.xray_imaging_hwobj = xray_imaging_hwobj
         if self.xray_imaging_hwobj is not None:
