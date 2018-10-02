@@ -43,9 +43,9 @@ fa-icon: users
 
 
 # 12th. MXCuBE meeting
-# Organised by Global Phasing (Cambridge, UK)
-# Held at Diamond (Oxfordshire, UK)
-# January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
+## Organised by Global Phasing (Cambridge, UK)
+## Held at Diamond (Oxfordshire, UK)
+## January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
 
 ![group photo](img/2018-diamond-meeting-group.jpg)
 
