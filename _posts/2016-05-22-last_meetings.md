@@ -36,22 +36,28 @@ fa-icon: users
 - [A practical example of the proposed UI-API ](doc/meetings_2018_Elettra/MXCuBE_2018_UIexample.pdf)
 - [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
 
-### Minuters and reports
+### Minutes and reports
 - [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary.docx)
 - [Scientific Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
 - Steering committee meeting summary not available - please contribute
 
 
-# 12th. MXCuBE meeting @ Diamond (Oxfordshire, UK), January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
+# 12th. MXCuBE meeting
+# Organised by Global Phasing (Cambridge, UK)
+# Held at Diamond (Oxfordshire, UK)
+# January 31<sup>st</sup> - February 2<sup>nd</sup>, 2018
 
 ![group photo](img/2018-diamond-meeting-group.jpg)
 
 ## Background
 
-The meeting was held together with ISPyB, with the following, joint [Agenda](doc/meetings_2018_Diamond/Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 final.pdf)
+This MXCuBE meeting was held together with the ISPyB meeting, with the following, joint [Agenda](doc/meetings_2018_Diamond/Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 final.pdf)
 
-This time the meeting was 
-[organised on different lines to previous years](doc/meetings_2018_Diamond/Proposed Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 v4.pdf), to put more emphasis on [the scientific goals of the project](doc/meetings_2018_Diamond/Background and suggestions for presentations ISPyB-MXCuBE meeting Jan-Feb 2018.pdf) and on how to make them feed through into the development priorities and the coordination of activities.
+This time the meeting was organised on different lines to previous years, as proposed by Global Phasing 
+ [Proposed Agenda](doc/meetings_2018_Diamond/Proposed Agenda for ISPyB-MXCuBE meeting Jan-Feb 2018 v4.pdf),
+ to put more emphasis on the scientific goals of the project and on how to make
+ them feed through into the development priorities and the coordination of activities 
+ [Background and suggestions](doc/meetings_2018_Diamond/Background and suggestions for presentations ISPyB-MXCuBE meeting Jan-Feb 2018.pdf).
 
 
 ## Full list of presentations
@@ -89,7 +95,7 @@ This time the meeting was
 - ["Less is more": a proposal for enhancing collaboration](doc/meetings_2018_Diamond/mxcubemeeting_dls_lessismore.pdf)
 - [Licensing MXCuBE under the LGPL](doc/meetings_2018_Diamond/GPhL_Keller_MXCuBE-2018-01.pdf)
 
-### Minuters and reports
+### Minutes and reports
 - [Developers' Committee minutes](doc/meetings_2018_Diamond/MXCuBE_201801_devel_minutes.pdf)
 - [Scientific and Steering Committee minutes](doc/meetings_2018_Diamond/MXCuBE_201801_minutes.pdf)
 - [Overview of MXCuBE versions](doc/meetings_2018_Diamond/MXCuBEversions201801.pdf)
