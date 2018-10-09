@@ -37,7 +37,7 @@ fa-icon: users
 - [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
 
 ### Minutes and reports
-- [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary.docx)
+- [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary_v1.pdf)
 - [Scientific Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
 - Steering committee meeting summary not available - please contribute
 
