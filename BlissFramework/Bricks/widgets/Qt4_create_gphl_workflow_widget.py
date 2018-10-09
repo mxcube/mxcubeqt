@@ -177,6 +177,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         path_template = self._create_path_template(sample, self._path_template)
         path_template.num_files = 0
+        path_template.compression = False
 
         ho = self._workflow_hwobj
         if ho.get_state() == States.OFF:

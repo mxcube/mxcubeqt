@@ -402,10 +402,10 @@ def stratcal_merge_output_2(indata_exch, outdata):
     # and it was transferred as by stratcal_exch2org
     other_settings = {}
     for tag in ('beam_setting', 'beamstop_setting', 'detector_setting'):
-        ll = indata_exch[tag + '_list']
+        ll = indata_exch.get(tag + '_list')
         if isinstance(ll, list):
             other_settings[tag + '_id'] = ll[0]['id']
-        else:
+        elif ll:
             other_settings[tag + '_id'] = ll['id']
 
     ii = 0
@@ -773,10 +773,11 @@ def stratcal_exch2org(exch_data):
     dd = indata.pop('detector_setting_list')
     setup_list['det_coord_def'] = dd['det_coord']
 
-    for tag, val in indata.pop('beamstop_setting_list').items():
-        # Assumes a single beamstop-list
-        if tag != 'id':
-            setup_list[tag] = val
+    if 'beamstop_setting_list' in indata:
+        for tag, val in indata.pop('beamstop_setting_list').items():
+            # Assumes a single beamstop-list
+            if tag != 'id':
+                setup_list[tag] = val
 
     segment_lists = indata.pop('segment_list')
     setup_list['n_segments'] = len(segment_lists)
@@ -1130,8 +1131,8 @@ if __name__ == '__main__':
     optparser = OptionParser(description=
     """Plug-in replacement wrapper for stratcal
     
-    The environment variable GPHL_STRATCAL_BINARY must point to the stratcal binary
-    
+    The environment variable GPHL_STRATCAL_BINARY points to the stratcal binary
+    If not set, it defaults to os.path.join(envs['GPHL_INSTALLATION'], 'stratcal')
     
     """)
     optparser.add_option(

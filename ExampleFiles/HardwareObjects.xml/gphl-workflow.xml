@@ -2,7 +2,7 @@
 
     <!-- GPHL beamline configuration subdirectory
          (relative to HardwareObjects config xml directories-->
-    <gphl_beamline_config>esrf_id30b/gphl_beamline_config</gphl_beamline_config>
+    <gphl_beamline_config>embl_hh_p14/gphl_beamline_config</gphl_beamline_config>
     <!-- GPHL configuration subdirectory (for test_camples/, scripts/)
          (will be searched for in HardwareObjects config xml directories-->
     <gphl_config>gphl_config</gphl_config>

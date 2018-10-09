@@ -223,9 +223,9 @@ if __name__ == '__main__':
     # angles1 = [(0,60,0)]
     # angles2 = []
 
-    # Environment variables for test stup. Edit to change
+    # Environment variables for test setup. Edit to change
     ENVS = {
-        'OMP_STACKSIZE':'16M',
+        'OMP_STACKSIZE':'256M',
         'OMP_THREAD_LIMIT':'6',
         'OMP_NUM_THREADS':'6',
         'GPHL_STRATCAL_BINARY':executable,
