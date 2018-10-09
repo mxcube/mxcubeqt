@@ -72,10 +72,10 @@ gonio_centring_axis_names= 'phiy', 'sampy', 'sampx'
 !beamstop_param_vals=    1.0               -120.0                60.0
 
 ! Taken from http://xds.mpimf-heidelberg.mpg.de/html_doc/INPUT_templates/XDS-PILATUS.INP
-xds_DETECTOR= EIGER
-xds_MINIMUM_VALID_PIXEL_VALUE= 0
-xds_TRUSTED_REGION= 0.0 1.41
-xds_OVERLOAD= 1000000
+! xds_DETECTOR= EIGER
+! xds_MINIMUM_VALID_PIXEL_VALUE= 0
+! xds_TRUSTED_REGION= 0.0 1.41
+! xds_OVERLOAD= 1000000
 
 /
 
