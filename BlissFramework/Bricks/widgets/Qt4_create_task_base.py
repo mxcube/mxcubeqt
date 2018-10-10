@@ -68,6 +68,7 @@ class CreateTaskBase(QWidget):
          self._beamline_setup_hwobj = None
          self._graphics_manager_hwobj = None
          self._in_plate_mode = None
+         self._enable_compression = None
         
     def set_expert_mode(self, state):
         if self._acq_widget:
@@ -85,7 +86,7 @@ class CreateTaskBase(QWidget):
 
     def enable_compression(self, state):
         if self._data_path_widget:
-            #self._data_path_widget.compression_enabled = state
+            self._enable_compression = state
             self._data_path_widget.data_path_layout.compression_cbox.setChecked(state)
             self._data_path_widget.data_path_layout.compression_cbox.setVisible(state)
             self._data_path_widget.update_file_name()
@@ -129,7 +130,7 @@ class CreateTaskBase(QWidget):
                 self._path_template.base_prefix = self.get_default_prefix()
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
-                self._path_template.compression = self._data_path_widget.compression_enabled
+                self._path_template.compression = self._enable_compression
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
@@ -673,9 +674,9 @@ class CreateTaskBase(QWidget):
                 elif self._tree_brick.dc_tree_widget.centring_method == \
                    queue_model_enumerables.CENTRING_METHOD.XRAY:
 
-                    #Xray centering
-                    dc_group = self._tree_brick.dc_tree_widget.create_task_group(sample)
-                    print dc_group
+                    # Xray centering
+                    # TODO add dg_group for XrayCentering
+                    # dc_group = self._tree_brick.dc_tree_widget.create_task_group(sample)
                     mesh_dc = self._create_dc_from_grid(sample)
                     mesh_dc.run_processing_parallel = "XrayCentering"
                     sc = queue_model_objects.XrayCentering(mesh_dc)

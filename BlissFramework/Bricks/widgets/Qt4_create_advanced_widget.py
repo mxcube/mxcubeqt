@@ -171,7 +171,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def set_beamline_setup(self, bl_setup_hwobj):
         """
-        In plate mode osciallation start is in the middle of the grid
+        In plate mode oscillation start is in the middle of the grid
         """
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
