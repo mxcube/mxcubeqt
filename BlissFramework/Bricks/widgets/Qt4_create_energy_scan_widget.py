@@ -96,6 +96,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._max_transmission_ledit.textEdited.connect(\
              self.max_transmission_value_changed)
 
+        self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+
     def set_expert_mode(self, state):
         self._adjust_transmission_cbox.setEnabled(state)
         self._max_transmission_label.setEnabled(state)
@@ -109,7 +111,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         self._periodic_table_widget.set_elements(\
              self._beamline_setup_hwobj.energyscan_hwobj.getElements())
-        self.enable_compression(False)
 
         try:
             max_transmission_value = self._beamline_setup_hwobj.\

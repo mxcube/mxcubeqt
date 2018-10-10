@@ -97,6 +97,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.is_logged_in = False
         self.lims_samples = None
         self.filtered_lims_samples = None
+        self.compression_state = True
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("queue", "string", "/queue")

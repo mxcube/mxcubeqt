@@ -85,8 +85,6 @@ class CreateAdvancedWidget(CreateTaskBase):
              self.grid_osc_range_ledit_changed)
         self._acq_widget.acq_widget_layout.osc_total_range_ledit.textEdited.connect(\
              self.grid_osc_total_range_ledit_changed)
-        self._acq_widget.acq_widget_layout.set_max_osc_range_button.clicked.\
-             connect(self.set_max_osc_total_range_clicked)
 
         self._data_path_widget.pathTemplateChangedSignal.\
              connect(self.path_template_changed)
@@ -132,9 +130,10 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         self._acq_widget.acq_widget_layout.osc_total_range_label.setText(\
             "Total osc. range per line")
-        self.enable_widgets(False)
+        #self.enable_widgets(False)
 
     def enable_widgets(self, state):
+        return
         self._acq_widget.setEnabled(state)
         self._data_path_widget.setEnabled(state)
 
@@ -172,7 +171,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def set_beamline_setup(self, bl_setup_hwobj):
         """
-        In plate mode osciallation is start is in the middle of grid
+        In plate mode oscillation start is in the middle of the grid
         """
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
@@ -180,11 +179,20 @@ class CreateAdvancedWidget(CreateTaskBase):
              setText("Oscillation middle:")
 
         hor_size, ver_size = bl_setup_hwobj.beam_info_hwobj.get_beam_size()
-        self.spacing = [hor_size, ver_size] 
+        self.spacing[0] = hor_size
+        self.spacing[1] = ver_size
         self._advanced_methods_widget.hor_spacing_ledit.setText(\
              "%.1f" % (hor_size * 1000))
         self._advanced_methods_widget.ver_spacing_ledit.setText(\
              "%.1f" % (ver_size * 1000))
+
+    def set_beam_info(self, beam_info):
+        self.spacing[0] = beam_info["size_x"]
+        self.spacing[1] = beam_info["size_y"]
+        self._advanced_methods_widget.hor_spacing_ledit.setText(\
+             "%.1f" % (beam_info["size_x"] * 1000))
+        self._advanced_methods_widget.ver_spacing_ledit.setText(\
+             "%.1f" % (beam_info["size_x"] * 1000))
 
     def approve_creation(self):
         """
@@ -320,7 +328,10 @@ class CreateAdvancedWidget(CreateTaskBase):
             if not self.dc_selected:
                 grid_treewidget_item.setSelected(True)
                 self.grid_treewidget_item_selection_changed()
-                self.update_grid_osc_total_range()
+                if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
+                    self._acq_widget.update_osc_total_range_limits(grid_properties["num_images_per_line"])
+                else:
+                    self.update_grid_osc_total_range()
             
     def shape_deleted(self, shape, shape_type):
         """Removes shape from QTreeWidget and self._grid_map
@@ -505,7 +516,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._advanced_methods_widget.move_up_button.setEnabled(state)
         self._advanced_methods_widget.move_down_button.setEnabled(state)
 
-        self._acq_widget.acq_widget_layout.set_max_osc_range_button.setEnabled(\
+        self._acq_widget.acq_widget_layout.max_osc_range_cbx.setEnabled(\
              state and self._in_plate_mode)
 
         self.enable_widgets(state)
@@ -547,22 +558,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 float(self._acq_widget.acq_widget_layout.osc_range_ledit.text()) * \
                 grid_properties["num_images_per_line"]))
 
-    def set_max_osc_total_range_clicked(self, state):
-        """Sets the osc range based on grid (number of images per line
-           and osc in the middle of the grid)        
-        """
+    def set_osc_total_range(self, num_images=None, mesh=False):
         grid_properties = self.get_selected_grid_properties()
         if grid_properties:
-            exposure_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
-            (lower, upper), result_exp_time = self._acq_widget.update_osc_total_range_limits(\
-                 calc_by_speed=False,
-                 num_images=grid_properties["num_images_per_line"],
-                 exp_time=exposure_time)
-            self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
-                 "%.4f" % ((lower + upper) / 2))
-            self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
-                 "%.4f" % (abs(upper - lower) - 1e-4))
-            self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
-                 "%.4f" % (abs(lower - upper) / grid_properties["num_images_per_line"]))
-            self._acq_widget.acq_widget_layout.exp_time_ledit.setText(\
-                 "%.5f" % (result_exp_time))
+            CreateTaskBase.set_osc_total_range(self, grid_properties["num_images_per_line"], mesh=True)    

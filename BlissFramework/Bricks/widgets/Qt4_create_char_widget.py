@@ -138,6 +138,8 @@ class CreateCharWidget(CreateTaskBase):
         
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 
+        self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+
     def enable_compression(self, state):
         CreateTaskBase.enable_compression(self, False)
 
@@ -320,6 +322,7 @@ class CreateCharWidget(CreateTaskBase):
         char.run_characterisation = self._char_widget.characterisation_gbox.isChecked()
         char.wait_result = self._char_widget.wait_result_cbx.isChecked()
         char.run_diffraction_plan = self._char_widget.execute_plan_cbx.isChecked()
+        char.diff_plan_compression = self._tree_brick.compression_state
 
         tasks.append(char)
         self._path_template.run_number += 1

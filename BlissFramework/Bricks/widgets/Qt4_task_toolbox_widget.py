@@ -32,7 +32,7 @@ from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.Qt4_create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.Qt4_create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
-#from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
+from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
 
 
 class TaskToolBoxWidget(QWidget):
@@ -55,16 +55,10 @@ class TaskToolBoxWidget(QWidget):
         # Graphic elements ----------------------------------------------------
         self.method_label = QLabel("Collection method", self)
         self.method_label.setAlignment(Qt.AlignCenter)
-        #Qt4_widget_colors.set_widget_color(self.method_label,
-        #                                   Qt4_widget_colors.SKY_BLUE)
-        #font = self.method_group_box.font()
-        #font.setPointSize(10)
-        #self.method_group_box.setFont(font)
 
         self.tool_box = QToolBox(self)
         self.tool_box.setObjectName("tool_box")
-        self.tool_box.setFixedWidth(475)
-        #self.tool_box.setFont(font)
+        #self.tool_box.setFixedWidth(600)
 
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
@@ -77,9 +71,8 @@ class TaskToolBoxWidget(QWidget):
                                                                "gphl_workflow")
         else:
             self.gphl_workflow_page = None
-            logging.getLogger("GUI").info("GPhL workflow is not available")
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
-        #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
+        self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
 
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
@@ -90,7 +83,7 @@ class TaskToolBoxWidget(QWidget):
             self.tool_box.addItem(self.gphl_workflow_page,
                                   "GPhL Workflows")
         self.tool_box.addItem(self.advanced_page, "Advanced")
-        #self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
+        self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
 
         self.button_box = QWidget(self)
         self.create_task_button = QPushButton("  Add to queue", self.button_box)
@@ -120,9 +113,8 @@ class TaskToolBoxWidget(QWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QSizePolicy.Expanding,
-                           QSizePolicy.Expanding)
-
+        #self.setSizePolicy(QSizePolicy.Expanding,
+        #                   QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
         self.create_task_button.clicked.connect(self.create_task_button_click)
@@ -147,6 +139,10 @@ class TaskToolBoxWidget(QWidget):
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_expert_mode(state)
 
+    def enable_compression(self, status):
+        for i in range(0, self.tool_box.count()):
+            self.tool_box.widget(i).enable_compression(status)
+
     def set_tree_brick(self, brick):
         """Sets the tree brick of each page in the toolbox.
         """
@@ -160,10 +156,6 @@ class TaskToolBoxWidget(QWidget):
             acq_widget = self.tool_box.widget(i).get_acquisition_widget()
             if acq_widget:
                 acq_widget.use_osc_start(status)
-
-    def enable_compression(self, status):
-        for i in range(0, self.tool_box.count()):
-            self.tool_box.widget(i).enable_compression(status)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
         self._beamline_setup_hwobj = beamline_setup_hwobj
@@ -186,23 +178,22 @@ class TaskToolBoxWidget(QWidget):
                 if beamline_setup_hwobj.xrf_spectrum_hwobj is not None:
                     has_xrf_spectrum = True
 
-            if hasattr(beamline_setup_hwobj, 'xray_imaging_hwobj'):
-                if beamline_setup_hwobj.xray_imaging_hwobj is not None:
-                    has_xray_imaging = True
+        if hasattr(beamline_setup_hwobj, 'xray_imaging_hwobj'):
+            if beamline_setup_hwobj.xray_imaging_hwobj is not None:
+                has_xray_imaging = True
 
         if not has_energy_scan:
             self.tool_box.removeItem(self.tool_box.indexOf(self.energy_scan_page))
             self.energy_scan_page.hide()
-            logging.getLogger("GUI").warning("Energy scan task not available")
+            logging.getLogger("HWR").info("Energy scan task not available")
         if not has_xrf_spectrum:
             self.tool_box.removeItem(self.tool_box.indexOf(self.xrf_spectrum_page))
             self.xrf_spectrum_page.hide()
-            logging.getLogger("GUI").warning("XRF spectrum task not available")
+            logging.getLogger("HWR").info("XRF spectrum task not available")
         if not has_xray_imaging:
-            pass
-            #self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
-            #self.xray_imaging_page.hide()
-            #logging.getLogger("GUI").warning("Xray Imaging task not available")
+            self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
+            self.xray_imaging_page.hide()
+            logging.getLogger("HWR").info("Xray Imaging task not available")
 
         has_gphl_workflow = False
         if hasattr(beamline_setup_hwobj, 'gphl_workflow_hwobj'):
@@ -214,7 +205,7 @@ class TaskToolBoxWidget(QWidget):
                 beamline_setup_hwobj.gphl_workflow_hwobj
             )
         else:
-            logging.getLogger("GUI").info("GPhL workflow task not available")
+            logging.getLogger("HWR").info("GPhL workflow task not available")
 
 
     def update_data_path_model(self):
@@ -429,6 +420,7 @@ class TaskToolBoxWidget(QWidget):
             if isinstance(item, Qt4_queue_item.SampleCentringQueueItem):
                 item.setOn(False)
                 item.setText(1, "Skipped")
+                item.set_strike_out(True)
                 item.get_model().set_executed(True)
                 item.get_model().set_running(False)
                 item.get_model().set_enabled(False)
