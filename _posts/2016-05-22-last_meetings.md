@@ -39,6 +39,7 @@ fa-icon: users
 ### Minutes and reports
 - [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary_v1.pdf)
 - [Scientific Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
+- [MXCuBE-ISPyB joint dicussion - DRAFT](doc/meetings_2018_Elettra/Trieste_2018_ISPyB_MXCuBE.pdf) Autoprocessing and metrics.
 - Steering committee meeting summary not available - please contribute
 
 
