@@ -3,11 +3,11 @@
 
 ! DETECTOR and OVERLOAD are mandatory
 ! http://xds.mpimf-heidelberg.mpg.de/html_doc/INPUT_templates/XDS-EIGER.INP
- DETECTOR=EIGER
- OVERLOAD=1048500
+! DETECTOR=EIGER
+! OVERLOAD=1048500
 
- ! Resolution exclusion to exclude ice rings:
- ! Source Clemens Vonrhein (autoPROC values)
+! Resolution exclusion to exclude ice rings:
+! Source Clemens Vonrhein (autoPROC values)
  EXCLUDE_RESOLUTION_RANGE=   3.914    3.865 ! pre-defined ice-ring resolution
  EXCLUDE_RESOLUTION_RANGE=   3.679    3.634 ! pre-defined ice-ring resolution
  EXCLUDE_RESOLUTION_RANGE=   3.458    3.412 ! pre-defined ice-ring resolution
