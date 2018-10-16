@@ -218,7 +218,7 @@ class GUISupervisor(QWidget):
                         self.splash_screen.set_message("Building GUI configuration...")
                         config = Qt4_Configuration.Configuration(raw_config, load_from_dict)
                     except:
-                        logging.getLogger().exception(failed_msg)
+                        logging.getLogger("GUI").exception(failed_msg)
                         QMessageBox.warning(self, "Error", failed_msg,
                                             QMessageBox.Ok)
                     else:
@@ -238,6 +238,8 @@ class GUISupervisor(QWidget):
 
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
+
+                    self.hardware_repository.printReport()
 
                     if self.launch_in_design_mode:
                         self.framework = Qt4_GUIBuilder.GUIBuilder()
