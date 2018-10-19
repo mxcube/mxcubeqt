@@ -3,7 +3,7 @@
 !  http://confluence.globalphasing.com/display/autoPROC/2017/09/12/Test+data+from+EMBL-Hamborg+PetraIII-P14+with+Eiger16M
 ! and http://confluence.globalphasing.com/display/SDCP/Translation+calibration%3A+P14+20170403+--+take+II
 ! And gleb email dated April 10 2017.
-! Valuies are in RC cordinate system,
+! Values are in RC cordinate system,
 ! differing from Centring coordinate system by 180 deg rotation aroudn y.
 ! NBNB TODO this will require change in kappahi correction code and config!
 ! Many values are pretty random
