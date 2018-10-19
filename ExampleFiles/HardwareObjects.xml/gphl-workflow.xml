@@ -1,11 +1,11 @@
 <object class="GphlWorkflow">
 
-    <!-- GPHL beamline configuration subdirectory
-         (relative to HardwareObjects config xml directories-->
-    <gphl_beamline_config>embl_hh_p14/gphl_beamline_config</gphl_beamline_config>
-    <!-- GPHL configuration subdirectory (for test_camples/, scripts/)
-         (will be searched for in HardwareObjects config xml directories-->
-    <gphl_config>gphl_config</gphl_config>
+    <!--&lt;!&ndash; GPHL beamline configuration subdirectory-->
+         <!--(relative to HardwareObjects config xml directories&ndash;&gt;-->
+    <!--<gphl_beamline_config>embl_hh_p14/gphl_beamline_config</gphl_beamline_config>-->
+    <!--&lt;!&ndash; GPHL configuration subdirectory (for test_camples/, scripts/)-->
+         <!--(will be searched for in HardwareObjects config xml directories&ndash;&gt;-->
+    <!--<gphl_config>gphl_config</gphl_config>-->
     <!-- Directory for (optional) output of instrument calbration results-->
     <!-- combined with instcfgout parameter (see below); see also <newinstr> -->
     <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
@@ -304,6 +304,8 @@
     <!--  Workflow options common to all workflows - can be overridden for individual workflows-->
     <workflow_options>
         <!-- URL for beamline connection, as seen from the workflow application -->
+        <!--<beamline>py4j:fourier.globalphasing.com:</beamline>-->
+        <!-- Use linme below if workflow runs on the same computer as MXCuBE-->
         <beamline>py4j::</beamline>
         <!-- Location of persistence layer (workflow application data files -->
         <!-- The main data file is : -->
