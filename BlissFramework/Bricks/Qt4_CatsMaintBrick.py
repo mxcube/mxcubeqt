@@ -245,8 +245,10 @@ class Qt4_CatsMaintBrick(BlissWidget):
     def update_tool_state(self, value):
         self.tool_state = value
         if self.device is not None and not self.path_running:
-            self.widget.btOpenTool.setEnabled(not value)
-            self.widget.btCloseTool.setEnabled(value)
+            self.widget.btOpenTool.setEnabled(True)
+            self.widget.btCloseTool.setEnabled(True)
+            #self.widget.btOpenTool.setEnabled(not value)
+            #self.widget.btCloseTool.setEnabled(value)
         else:
             self.widget.btOpenTool.setEnabled(False)
             self.widget.btCloseTool.setEnabled(False)
