@@ -162,7 +162,7 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
         from PyQt4.QtCore import *
         from PyQt4.QtGui import *
         from PyQt4.uic import *
-        #from PyQt4.QtSvg import *
+        from PyQt4.QtSvg import *
         
         def getQApp():
             return qApp
