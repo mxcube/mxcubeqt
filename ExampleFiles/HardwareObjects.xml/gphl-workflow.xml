@@ -304,9 +304,9 @@
     <!--  Workflow options common to all workflows - can be overridden for individual workflows-->
     <workflow_options>
         <!-- URL for beamline connection, as seen from the workflow application -->
-        <!--<beamline>py4j:fourier.globalphasing.com:</beamline>-->
-        <!-- Use linme below if workflow runs on the same computer as MXCuBE-->
-        <beamline>py4j::</beamline>
+        <!-- The default value is 'py4j::' if teh workflow is run on the same computer -->
+        <!-- and 'py4j:%s:' % socket.gethostname() if workflow is run remotely via ssh -->
+        <beamline>py4j:fourier.globalphasing.com:</beamline>
         <!-- Location of persistence layer (workflow application data files -->
         <!-- The main data file is : -->
         <!-- Session.get_process_directory()/<gphl_subdir>/<persist.xml -->
