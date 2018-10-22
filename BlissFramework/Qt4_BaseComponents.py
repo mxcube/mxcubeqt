@@ -183,7 +183,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
                         widget.set_expert_mode(False)
                     except:
                         logging.getLogger().exception(\
-                           "Could not set %s to user mode", widget.name())
+                           "Could not set %s to user mode", widget.objectName())
 
         else:
             BlissWidget._runMode = False
@@ -194,7 +194,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
                         widget.set_expert_mode(True)
                     except:
                         logging.getLogger().exception(\
-                           "Could not set %s to expert mode", widget.name())
+                           "Could not set %s to expert mode", widget.objectName())
 
     @staticmethod
     def isRunning():
