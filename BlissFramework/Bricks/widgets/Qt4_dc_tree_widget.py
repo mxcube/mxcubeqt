@@ -881,7 +881,7 @@ class DataCollectTree(QWidget):
                 if self.beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
                     loaded_sample = self.beamline_setup_hwobj.sample_changer_hwobj.getLoadedSample()
                     if loaded_sample is not None:
-                        if item.get_model().location == list(loaded_sample.getCoords()):
+                        if list(item.get_model().location) == list(loaded_sample.getCoords()):
                             result = True
         return result
 
