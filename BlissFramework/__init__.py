@@ -1,4 +1,10 @@
 import gevent.monkey
+# this has to be done early to avoid a 
+# bug with subprocess + gevent
+#  if subprocess is imported before gevent
+#  does its patching an exception is 
+gevent.monkey.patch_all(thread=False)
+
 if not hasattr(gevent, "wait"):
   def mywait(timeout=None):
     return gevent.run(timeout)
