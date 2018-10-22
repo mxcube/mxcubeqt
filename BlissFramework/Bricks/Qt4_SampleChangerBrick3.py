@@ -900,10 +900,9 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         
         self.vials_per_basket = 10 # default is 10. it can be changed with basketCount property
 
-        self.vials_per_basket = 10 # default is 10. it can be changed with basketCount property
-
         self.single_click_selection = False
         self.user_selected_sample = (None, None)
+
 
         self.contents_widget = QWidget(self)
         self.status = self.build_status_view(self.contents_widget)
@@ -923,6 +922,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
              "Double-click loads the sample", self.sc_contents_gbox)
         self.double_click_loads_cbox.setEnabled(False)
         self.scan_baskets_view = ScanBasketsView(self.sc_contents_gbox)
+
 
         # operations widget builds simple action buttons 
         #   overwrite 'build_operations_widget()' method in derived class 
@@ -971,6 +971,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
 
         self.test_sample_changer_button.clicked.connect(self.test_sample_changer)
         self.reset_baskets_samples_button.clicked.connect(self.resetBasketsSamplesInfo)
+
         #self.status.resetSampleChangerSignal.connect(self.resetSampleChanger)
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -1029,9 +1030,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
                 #self.current_sample_view.hideHolderLength(self.sample_changer_hwobj.isMicrodiff())
                 #self.status.hideOperationalControl(self.sample_changer_hwobj.isMicrodiff())
                 self.sc_status_changed(self.sample_changer_hwobj.getStatus())
-                logging.getLogger().debug("Updating sc state (first)")
                 self.sc_state_changed(self.sample_changer_hwobj.getState())
-                logging.getLogger().debug("   / done" )
                 self.infoChanged()
                 self.selectionChanged()
                 #self.sample_changer_hwobjInUse(self.sampleChanger.sampleChangerInUse())
@@ -1207,7 +1206,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.status.setStatusMsg(status)
 
     def sc_state_changed(self, state, previous_state=None):
-        logging.getLogger().debug("State changed %s" % state) 
+        logging.getLogger().debug("SampleChangerBrick. State changed %s" % state) 
         self.status.setState(state)
         self.current_basket_view.setState(state)
         self.current_sample_view.setState(state)
@@ -1246,7 +1245,6 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobj.select(address, wait=False)
 
     def user_select_this_sample(self, basket_index, vial_index):
-        logging.getLogger("HWR").debug("user select sample %s %s" % (basket_index, vial_index))
         if self.single_click_selection:
             self.user_selected_sample = (basket_index, vial_index)
             self.reset_selection()
@@ -1263,7 +1261,6 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def load_this_sample(self, basket_index, vial_index):
         if self.double_click_loads_cbox.isChecked():
             #holder_len = self.current_sample_view.getHolderLength()
-            logging.getLogger("HWR").debug("loading sample %s %s (double_click)" % (basket_index, vial_index))
             sample_loc="%d:%02d" % (basket_index+1,vial_index)
             self.sample_changer_hwobj.load(sample_loc, wait=False)
 
