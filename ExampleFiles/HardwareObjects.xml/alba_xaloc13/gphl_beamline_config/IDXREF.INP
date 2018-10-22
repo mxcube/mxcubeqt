@@ -6,6 +6,12 @@
 ! DETECTOR=PILATUS
 ! OVERLOAD=1048500
 
+! Recommended by clemens, http://confluence.globalphasing.com/display/autoPROC/Shadows+for+Thaumatin2+data?focusedCommentId=10588412#comment-10588412
+ MINIMUM_NUMBER_OF_PIXELS_IN_A_SPOT= 4
+ SEPMIN=	4
+ CLUSTER_RADIUS= 2
+ MAXIMUM_ERROR_OF_SPOT_POSITION= 2
+
 ! Resolution exclusion to exclude ice rings:
 ! Source Clemens Vonrhein (autoPROC values)
  EXCLUDE_RESOLUTION_RANGE=   3.914    3.865 ! pre-defined ice-ring resolution
