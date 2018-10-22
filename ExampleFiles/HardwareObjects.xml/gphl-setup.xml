@@ -8,6 +8,15 @@
         <GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>
     </directory_locations>
 
+    <!-- If set, run workflow through ssh with selected options -->
+    <!-- NB The  Host option is mandatory -->
+    <ssh_options>
+        <Host>lonsdale</Host>
+        <IdentityFile>/home/rhfogh/.ssh/wf_test_id</IdentityFile>
+        <User>rhfogh</User>
+        <StrictHostKeyChecking>no</StrictHostKeyChecking>
+    </ssh_options>
+
     <software_paths>
         <!-- Location of Java binary to execute for workflow application -->
         <java_binary>{GPHL_SETUP}/jre1.8.0_144/bin/java</java_binary>
@@ -79,11 +88,10 @@
 
     <!-- Hosts and ports for py4j java-python gateway, all OPTIONAL-->
     <!-- If not set will use py4j default values, which are as given below-->
+    <!-- NB python_host is set automatically to localhost or socket.gethostname()-->
+    <!-- NB java_host is not needed as all communication is effectively one-way -->
     <!--<connection_parameters>-->
-        <!-- If empty or missing, python_address defaults to   socket.gethostname()-->
-        <!--<python_address></python_address>-->
         <!--<python_port>25334</python_port>-->
-        <!--<java_address>127.0.0.1</java_address>-->
         <!--<java_port>25333</java_port>-->
     <!--</connection_parameters>-->
 
