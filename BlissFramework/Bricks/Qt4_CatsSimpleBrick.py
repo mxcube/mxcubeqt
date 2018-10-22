@@ -41,11 +41,16 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 __category__ = "Sample changer"
 
+# Revert previous commit
 class CatsStatusView(QGroupBox):
+#class CatsStatusView(QGroupBox, BlissWidget):
 
     def __init__(self, parent, brick):
+       
+        # Revert previous commit
         QGroupBox.__init__(self, "Sample Changer State", parent)
-        
+        #BlissWidget.__init__(self, parent) 
+
         # Graphic elements ----------------------------------------------------
         #self.contents_widget = QGroupBox("Sample Changer State", self)
 
@@ -81,6 +86,9 @@ class CatsStatusView(QGroupBox):
         self._parent.set_status_info("sc", state_str)
        
     def setIcons(self, *args):
+        pass
+
+    def set_expert_mode(self, *args):
         pass
 
 class Qt4_CatsSimpleBrick(Qt4_SampleChangerBrick3):
