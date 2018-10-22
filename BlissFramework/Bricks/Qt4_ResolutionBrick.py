@@ -238,7 +238,7 @@ class Qt4_ResolutionBrick(BlissWidget):
                 self.disconnect(self.door_interlock_hwobj,
                                 'doorInterlockStateChanged',
                                 self.door_interlock_state_changed)
-            self.door_interlock_hwobj = self.getHardwareObject(new_value)
+            self.door_interlock_hwobj = self.getHardwareObject(new_value, optional=True)
             if self.door_interlock_hwobj is not None:
                 self.connect(self.door_interlock_hwobj,
                              'doorInterlockStateChanged',
