@@ -11,3 +11,5 @@ build
 CMakeLists.txt
 ChangeLog
 *OLD*
+.vscode\*
+.idea\*
