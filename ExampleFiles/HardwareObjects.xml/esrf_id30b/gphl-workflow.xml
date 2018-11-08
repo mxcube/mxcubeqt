@@ -63,8 +63,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
-                <!--<appdir>calculations</appdir>-->
+                <!-- Working subdirectory for workflow-side application data-->
+                <!-- <appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -104,8 +104,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
-                <!--<appdir>calculations</appdir>-->
+                <!-- Working subdirectory for workflow-side application data-->
+                <!-- <appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -150,8 +150,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
-                <!--<appdir>calculations</appdir>-->
+                <!-- Working subdirectory for workflow-side application data-->
+                <!-- <appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -238,7 +238,7 @@
 
 
     <!-- Parameters for the command-line invocation of the workflow application-->
-    <!-- These are unlile;y to need changing - except for maybe wfprefix -->
+    <!-- These are unlikely to need changing - except for maybe wfprefix -->
 
     <!-- Java invocation properties - syntax is e.g. '-Dfile.encoding=UTF-8' -->
     <invocation_properties>

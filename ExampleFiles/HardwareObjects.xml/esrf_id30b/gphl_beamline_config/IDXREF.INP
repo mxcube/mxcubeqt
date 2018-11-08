@@ -1,7 +1,7 @@
 ! Standard Pilatus XDS input
 ! Used for XDS processing of characterisation images only.
 
-! DETECTOR and OVERLOAD are mandatory
+! DETECTOR and OVERLOAD are mandatory, but are set in instrumentation.nml, NOT here.
 ! http://xds.mpimf-heidelberg.mpg.de/html_doc/INPUT_templates/XDS-PILATUS.INP
 ! DETECTOR=PILATUS
 ! OVERLOAD=1048500
