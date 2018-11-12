@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import logging
 
 from QtImport import *
@@ -25,6 +24,8 @@ from QtImport import *
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
+import math
+import sys
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -398,6 +399,8 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
+
+        limits = self.make_limits_bounded(limits)
         
         if limits and not None in limits:
             self.position_spinbox.blockSignals(True)
@@ -406,11 +409,15 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
             self.position_spinbox.blockSignals(False)
 
             self.position_slider.blockSignals(True)
-            self.position_slider.setMaximum(limits[1])
             self.position_slider.setMinimum(limits[0])
+            self.position_slider.setMaximum(limits[1])
             self.position_slider.blockSignals(False)
 
             self.set_tool_tip(limits=limits)
+
+    def make_limits_bounded(self, limits):
+        return (limits[0] if not math.isinf(limits[0]) else math.copysign(sys.maxint, limits[0]),
+                limits[1] if not math.isinf(limits[1]) else math.copysign(sys.maxint, limits[1]))
 
     def open_history_menu(self):
         """
@@ -751,7 +758,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         elif property_name == 'showSlider':
             self.position_slider.setVisible(new_value)
         elif property_name == 'enableSliderTracking':
-            self.position_slider.setTracking(new_value)  
+            self.position_slider.setTracking(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
