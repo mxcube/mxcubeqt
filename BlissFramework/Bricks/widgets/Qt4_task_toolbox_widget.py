@@ -196,8 +196,8 @@ class TaskToolBoxWidget(QWidget):
             logging.getLogger("HWR").info("Xray Imaging task not available")
 
         has_gphl_workflow = False
-        if hasattr(beamline_setup_hwobj, 'gphl_workflow_hwobj'):
-            if beamline_setup_hwobj.gphl_workflow_hwobj:
+        if hasattr(beamline_setup_hwobj, 'gphl_connection_hwobj'):
+            if beamline_setup_hwobj.gphl_connection_hwobj:
                 has_gphl_workflow = True
 
         if has_gphl_workflow:

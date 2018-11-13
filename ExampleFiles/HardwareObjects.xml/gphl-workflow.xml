@@ -1,11 +1,8 @@
 <object class="GphlWorkflow">
 
-    <!--&lt;!&ndash; GPHL beamline configuration subdirectory-->
-         <!--(relative to HardwareObjects config xml directories&ndash;&gt;-->
-    <!--<gphl_beamline_config>embl_hh_p14/gphl_beamline_config</gphl_beamline_config>-->
-    <!--&lt;!&ndash; GPHL configuration subdirectory (for test_camples/, scripts/)-->
-         <!--(will be searched for in HardwareObjects config xml directories&ndash;&gt;-->
-    <!--<gphl_config>gphl_config</gphl_config>-->
+    <!-- GPHL beamline configuration subdirectory
+         (relative to HardwareObjects config xml directories-->
+    <gphl_beamline_config>gphl_beamline_config</gphl_beamline_config>
     <!-- Directory for (optional) output of instrument calbration results-->
     <!-- combined with instcfgout parameter (see below); see also <newinstr> -->
     <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
@@ -63,8 +60,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
-                <!--<appdir>calculations</appdir>-->
+                <!-- Working subdirectory for workflow-side application data-->
+                <!-- <appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -104,8 +101,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
-                <!--<appdir>calculations</appdir>-->
+                <!-- Working subdirectory for workflow-side application data-->
+                <!-- <appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -150,8 +147,8 @@
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>InitialCharacterisation</strategy>
-                <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
-                <!--<appdir>calculations</appdir>-->
+                <!-- Working subdirectory for workflow-side application data-->
+                <!-- <appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
                 <ibpattern>ib_interleaved</ibpattern>
                 <!-- Pattern name for non-inverse-beam collections -->
@@ -244,7 +241,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newinstr/>
+                <!--<newinstr/>-->
             </options>
         </DiffractometerCalibration>
 
@@ -266,7 +263,7 @@
                 <!-- Pattern name for characterisation collections - used for all data here-->
                 <charpattern>multiorientation</charpattern>
                 <!-- copy calibration result to configuration directory, replacing previous value -->
-                <newinstr/>
+                <!--<newinstr/>-->
             </options>
         </DiffractometerCalibration_short>
     </workflows>
@@ -291,11 +288,6 @@
         <co.gphl.wf.simcal_predict.b_wilson>26.0</co.gphl.wf.simcal_predict.b_wilson>
         <co.gphl.wf.simcal_predict.cell_dim_sd_scale>1.5e-3</co.gphl.wf.simcal_predict.cell_dim_sd_scale>
         <co.gphl.wf.simcal_predict.mosaicity>0.2</co.gphl.wf.simcal_predict.mosaicity>
-        <!-- The next two disable the checks that ensure the top-level -->
-        <!-- data and proc directories exist when the Workflow is invoked -->
-        <!-- In normal MXCuBE operation they are created only when collection starts -->
-        <!--<co.gphl.wf.blRootCheck>F</co.gphl.wf.blRootCheck>-->
-        <!--<co.gphl.wf.procRootCheck>F</co.gphl.wf.procRootCheck>-->
         <!-- Uncomment this to disable stratcal's collision checking ->
         <co.gphl.wf.stratcal.collision_mode>2</co.gphl.wf.stratcal.collision_mode>
         -->
@@ -306,7 +298,8 @@
         <!-- URL for beamline connection, as seen from the workflow application -->
         <!-- The default value is 'py4j::' if teh workflow is run on the same computer -->
         <!-- and 'py4j:%s:' % socket.gethostname() if workflow is run remotely via ssh -->
-        <beamline>py4j:fourier.globalphasing.com:</beamline>
+        <!-- <beamline>py4j:fourier.globalphasing.com:</beamline> -->
+        <beamline>py4j::</beamline>
         <!-- Location of persistence layer (workflow application data files -->
         <!-- The main data file is : -->
         <!-- Session.get_process_directory()/<gphl_subdir>/<persist.xml -->

@@ -8,14 +8,23 @@
         <GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>
     </directory_locations>
 
+    <!-- Redirection of workflow runner (java) output for debug purposes. Optional -->
+    <!-- If set, the tem-late will be used as template % timestamp -->
+    <!-- e.g. wf_2018-11-12T18:35:02.727815.out -->
+    <gphl_logfile_template>wf_%s.out</gphl_logfile_template>
+
+
     <!-- If set, run workflow through ssh with selected options -->
     <!-- NB The  Host option is mandatory -->
-    <ssh_options>
-        <Host>lonsdale</Host>
-        <IdentityFile>/home/rhfogh/.ssh/wf_test_id</IdentityFile>
-        <User>rhfogh</User>
-        <StrictHostKeyChecking>no</StrictHostKeyChecking>
-    </ssh_options>
+    <!--<ssh_options>-->
+        <!--<Host>lonsdale</Host>-->
+        <!--<IdentityFile>/home/rhfogh/.ssh/wf_test_id</IdentityFile>-->
+        <!--<User>rhfogh</User>-->
+        <!--<StrictHostKeyChecking>no</StrictHostKeyChecking>-->
+    <!--</ssh_options>-->
+
+    <!-- NB Non-absolute file names are interpreted relative to one of the  -->
+    <!-- HardwareRepository directories on the lookup path -->
 
     <software_paths>
         <!-- Location of Java binary to execute for workflow application -->
@@ -30,14 +39,11 @@
         <gphl_java_classpath>{GPHL_SETUP}/workflow/wf17/*</gphl_java_classpath>
 
         <!-- Directory with workflow config input, e.g. instrumentation.nml -->
-        <gphl_beamline_config>{GPHL_SETUP}/gphl_beamline_config</gphl_beamline_config>
+        <gphl_beamline_config>gphl_beamline_config</gphl_beamline_config>
 
         <!-- Directory with workflow config input, e.g. instrumentation.nml -->
-        <gphl_test_samples>{GPHL_SETUP}/gphl_test_samples</gphl_test_samples>
-
-        <!-- Redirection of workflow runner (java) output for debug purposes. Optional -->
-        <!-- Path is relative to path_template.process_directory -->
-        <gphl_wf_redirected_out>gphl_java_wf_redirect.out</gphl_wf_redirected_out>
+        <!--<gphl_test_samples>{GPHL_SETUP}/gphl_test_samples</gphl_test_samples>-->
+        <gphl_test_samples>test_samples</gphl_test_samples>
 
         <!-- Location of installation used for processing queue (not reachable from BCS computer. -->
         <!-- Passed as environmental variable GPHL_PROC_INSTALLATION. Optional -->
@@ -65,7 +71,8 @@
         -->
 
         <!-- Location of simcal binaries -->
-        <co.gphl.wf.simcal.bin>{GPHL_SETUP}/scripts/simcal</co.gphl.wf.simcal.bin>
+        <!--<co.gphl.wf.simcal.bin>{GPHL_SETUP}/scripts/simcal</co.gphl.wf.simcal.bin>-->
+        <co.gphl.wf.simcal.bin>scripts/simcal</co.gphl.wf.simcal.bin>
         <!-- Location of simcal-specific license directory - OPTIONAL ->
         <co.gphl.wf.simcal_predict.bdg_licence_dir>/public/xtal/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
         -->
@@ -79,7 +86,8 @@
         <!-- Path of application that analyses diffractcal (aka rotational
         calibration) data. In practice, this will almost always be a wrapper
         script that sets up the environment properly. -->
-        <co.gphl.wf.diffractcal.bin>{GPHL_SETUP}/scripts/aP_wf_rotcal</co.gphl.wf.diffractcal.bin>
+        <!--<co.gphl.wf.diffractcal.bin>{GPHL_SETUP}/scripts/aP_wf_rotcal</co.gphl.wf.diffractcal.bin>-->
+        <co.gphl.wf.diffractcal.bin>scripts/aP_wf_rotcal</co.gphl.wf.diffractcal.bin>
 
     </software_properties>
 
