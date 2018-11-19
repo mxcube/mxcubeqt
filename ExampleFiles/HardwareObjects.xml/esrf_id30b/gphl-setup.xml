@@ -8,7 +8,7 @@
 
     <software_paths>
         <!-- Location of Java binary to execute for workflow application -->
-        <java_binary>/users/blissadm/bin/java</java_binary>
+        <java_binary>/sware/pub/java-1.8.0_91/linux_x64/bin/java</java_binary>
 
         <!-- Gphl workflow Java classpath. -->
         <!--Should point to all contents of workflow application directory-->
@@ -18,14 +18,14 @@
     <!-- Software paths that are passed to global phasing workflow as java properties -->
     <software_properties>
 
-        <co.gphl.wf.bin>/users/blissadm/local/gphl/gphl_latest/exe/</co.gphl.wf.bin>
+        <co.gphl.wf.bin>/users/blissadm/local/gphl/gphl_latest/latest/autoPROC/bin/linux64/</co.gphl.wf.bin>
         <!-- Location of executable XDS binary -->
         <co.gphl.wf.xds.bin>/opt/pxsoft/bin/xds_par</co.gphl.wf.xds.bin>
 
         <!-- Location of GPhL .license directory -->
         <!-- defaults to co.gphl.wf.bin-->
 	    <!-- Only needed if you do NOT use the wrapper script : -->
-        <!-- <co.gphl.wf.bdg_licence_dir>/MXCuBE/gphl_java_classes</co.gphl.wf.bdg_licence_dir> -->
+         <co.gphl.wf.bdg_licence_dir>/users/blissadm/local/gphl/gphl_latest/latest</co.gphl.wf.bdg_licence_dir>
         <!--<co.gphl.wf.bdg_licence_dir>/MXCuBE/softwares/GPhL-ESRF-20171005/20171005</co.gphl.wf.bdg_licence_dir>-->
 
         <!-- Location of stratcal binary -->
@@ -56,6 +56,10 @@
 
     <!-- Subdirectory under Session.get_process_directory() for GPhL persistence data-->
     <gphl_subdir>GPHL</gphl_subdir>
+
+    <!-- Redirection of workflow runner (java) output for debug purposes -->
+    <gphl_wf_redirected_out>/users/blissadm/local/gphl/gphl_java_wf_redirect.out</gphl_wf_redirected_out>
+
 
     <!-- Hosts and ports for py4j java-python gateway, all OPTIONAL-->
     <!-- If not set will use py4j default values, which are as given below-->

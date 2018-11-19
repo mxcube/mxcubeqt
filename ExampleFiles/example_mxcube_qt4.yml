@@ -1162,7 +1162,7 @@
                 - {comment: '', defaultValue: /queue-model, hidden: false, name: queue_model,
                   oldValue: /queue-model, type: string, value: /queue-model}
                 - {comment: '', defaultValue: 0, hidden: false, name: showCollectNowButton,
-                  oldValue: null, type: boolean, value: 0}
+                  oldValue: null, type: boolean, value: 1}
                 - {comment: '', defaultValue: 0, hidden: false, name: useCompression,
                   oldValue: null, type: boolean, value: 0}
                 - {comment: '', defaultValue: 0, hidden: false, name: useOscStartCbox,

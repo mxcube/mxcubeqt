@@ -1,10 +1,16 @@
 ! Standard Pilatus XDS input
 ! Used for XDS processing of characterisation images only.
 
-! DETECTOR and OVERLOAD are mandatory
+! DETECTOR and OVERLOAD are mandatory, but are set in instrumentation.nml, NOT here.
 ! http://xds.mpimf-heidelberg.mpg.de/html_doc/INPUT_templates/XDS-PILATUS.INP
 ! DETECTOR=PILATUS
 ! OVERLOAD=1048500
+
+! Recommended by clemens, http://confluence.globalphasing.com/display/autoPROC/Shadows+for+Thaumatin2+data?focusedCommentId=10588412#comment-10588412
+ MINIMUM_NUMBER_OF_PIXELS_IN_A_SPOT= 4
+ SEPMIN=	4
+ CLUSTER_RADIUS= 2
+ MAXIMUM_ERROR_OF_SPOT_POSITION= 2
 
 ! Resolution exclusion to exclude ice rings:
 ! Source Clemens Vonrhein (autoPROC values)

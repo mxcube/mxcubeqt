@@ -1,0 +1,5 @@
+<root_node>
+    <base_directory>/scratch_fs1/rhfogh/mxcube_base_dir</base_directory>
+    <processed_data_base_directory>/scratch_fs1/rhfogh/mxcube_base_dir</processed_data_base_directory>
+    <archive_base_directory>/scratch_fs1/rhfogh/mxcube_base_dir</archive_base_directory>
+</root_node>
