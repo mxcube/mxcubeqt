@@ -29,6 +29,9 @@ import logging
 import platform
 from optparse import OptionParser
 
+import gevent.monkey
+gevent.monkey.patch_all(thread=False)
+
 from QtImport import *
 
 import BlissFramework
