@@ -25,7 +25,6 @@ from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
 __category__ = "General"
 
 
@@ -52,7 +51,6 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         self.door_interlock_hwobj=None
 
         # Internal values -----------------------------------------------------
-        self.__expertMode = False
         
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QGroupBox("Door interlock", self)
@@ -61,6 +59,7 @@ class Qt4_DoorInterlockBrick(BlissWidget):
         Qt4_widget_colors.set_widget_color(self.state_label,
                                            self.STATES['unknown']) 
         self.state_label.setAlignment(Qt.AlignCenter)
+        self.state_label.setFixedHeight(24)
         self.unlock_door_button = QPushButton(\
              Qt4_Icons.load_icon("EnterHutch"),
              "Unlock", self.main_groupbox)

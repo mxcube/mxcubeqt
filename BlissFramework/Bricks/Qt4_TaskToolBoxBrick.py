@@ -64,6 +64,11 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.addProperty("queue_model", "string", "/queue-model")
         self.addProperty("useOscStartCbox", "boolean", False)
         self.addProperty("useCompression", "boolean", False)
+        self.addProperty("showDiscreetTask", "boolean", True)
+        self.addProperty("showHelicalTask", "boolean", True)
+        self.addProperty("showCharTask", "boolean", True)
+        self.addProperty("showAdvancedTask", "boolean", True)
+        self.addProperty("showStillScanTask", "boolean", False)
         self.addProperty("showCollectNowButton", "boolean", False)
        
         # Signals -------------------------------------------------------------
@@ -120,6 +125,7 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
     @pyqtSlot(BlissWidget)
     def set_tree_brick(self, brick):
         self.tree_brick = brick
+        self.tree_brick.compression_state = self['useCompression'] == 1
         self.task_tool_box_widget.set_tree_brick(brick)
     
     @pyqtSlot(int, str, str, int, str, str, bool)
@@ -179,6 +185,26 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.task_tool_box_widget.enable_compression(new_value)
         elif property_name == 'showCollectNowButton':
             self.task_tool_box_widget.collect_now_button.setVisible(new_value)
+        elif property_name == 'showDiscreetTask':
+            if not new_value:
+                self.task_tool_box_widget.hide_task(\
+                     self.task_tool_box_widget.discrete_page) 
+        elif property_name == "showHelicalTask":
+            if not new_value:
+                self.task_tool_box_widget.hide_task(\
+                     self.task_tool_box_widget.helical_page)
+        elif property_name == "showCharTask":
+            if not new_value:
+                self.task_tool_box_widget.hide_task(\
+                     self.task_tool_box_widget.char_page)
+        elif property_name == "showAdvancedTask":
+            if not new_value:
+                self.task_tool_box_widget.hide_task(\
+                     self.task_tool_box_widget.advanced_page)
+        elif property_name == "showStillScanTask":
+            if not new_value:
+                self.task_tool_box_widget.hide_task(\
+                     self.task_tool_box_widget.still_scan_page)
 
     def selection_changed(self, items):
         """

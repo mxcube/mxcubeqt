@@ -36,19 +36,17 @@ class Qt4_XrayImagingBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
-        self.addProperty("hwobj_xray_imaging", "string", "")
+        self.addProperty("hwobj_beamline_setup", "string", "/beamline-setup")
 
-        self._xray_imaging_parameters_widget = XrayImagingParametersWidget(\
-            self, 'xray_imaging_parameters_widget')
         self._xray_imaging_results_widget = XrayImagingResultsWidget(\
             self, 'xray_imaging_results_widget')
+        #self._xray_imaging_parameters_widget = XrayImagingParametersWidget(\
+        #    self, 'xray_imaging_parameters_widget')
 
-        self._xray_imaging_parameters_widget.setHidden(True)
-        
         # Layout
         _main_vlayout = QVBoxLayout(self)
-        _main_vlayout.addWidget(self._xray_imaging_parameters_widget)
         _main_vlayout.addWidget(self._xray_imaging_results_widget)
+        #_main_vlayout.addWidget(self._xray_imaging_parameters_widget)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.setSpacing(2)
         _main_vlayout.addStretch(10)
@@ -57,16 +55,10 @@ class Qt4_XrayImagingBrick(BlissWidget):
         self.defineSlot("populate_parameter_widget", ({}))
 
     def populate_parameter_widget(self, item):
-        """
-        Descript. :
-        """
-        pass
+        self._xray_imaging_results_widget.populate_widget(item)
+        #self._xray_imaging_parameters_widget.populate_widget(item)
 
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. : Overriding BaseComponents.BlissWidget (propertyChanged 
-                    object) run method.
-        """
-        if property_name == 'hwobj_xray_imaging':
-            self._xray_imaging_results_widget.set_xray_imaging_hwobj(
+        if property_name == 'hwobj_beamline_setup':
+            self._xray_imaging_results_widget.set_beamline_setup_hwobj(
                 self.getHardwareObject(new_value))

@@ -835,7 +835,8 @@ class ScanBasketsView(QWidget):
         self.buttonSelect.setIcon(Qt4_Icons.load(scan_select))
 
     def scanAllBaskets(self):
-        self.scanAllBasketsSignal.emit()
+        #self.scanAllBasketsSignal.emit()
+        pass
 
     def select_baskets_samples(self):
         self.selectBasketsSamplesSignal.emit()

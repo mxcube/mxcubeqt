@@ -244,8 +244,9 @@ class Qt4_CameraBrick(BlissWidget):
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
                 self.init_image_scale_list()
-                self.camera_control_dialog.set_camera_hwobj(\
-                     self.graphics_manager_hwobj.camera_hwobj)
+                if hasattr(self.graphics_manager_hwobj, "camera_hwobj"):
+                    self.camera_control_dialog.set_camera_hwobj(\
+                         self.graphics_manager_hwobj.camera_hwobj)
         elif property_name == 'fixedSize':
             try:
                 fixed_size = list(map(int, new_value.split()))

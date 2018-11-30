@@ -47,8 +47,8 @@ class Qt4_ParallelProcessingPreviewBrick(BlissWidget):
         self.defineSlot("populate_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.mesh_results_widget = AdvancedResultsWidget(self, allow_adjust_size=False)
-        self.line_results_widget = AdvancedResultsWidget(self, allow_adjust_size=False)
+        self.mesh_results_widget = AdvancedResultsWidget(self, allow_adjust_size=True)
+        self.line_results_widget = AdvancedResultsWidget(self, allow_adjust_size=True)
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QHBoxLayout(self)
@@ -64,21 +64,18 @@ class Qt4_ParallelProcessingPreviewBrick(BlissWidget):
 
         # Other ---------------------------------------------------------------
         self.line_results_widget.setHidden(True)
-        self.mesh_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
         self.line_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
-        self.mesh_results_widget.heat_map_widget._summary_gbox.setHidden(True)
         self.line_results_widget.heat_map_widget._summary_gbox.setHidden(True)
+        self.mesh_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
+        self.mesh_results_widget.heat_map_widget._summary_gbox.setHidden(True)
 
-        self.mesh_results_widget.heat_map_widget.setFixedWidth(1450)
-        self.line_results_widget.heat_map_widget.setFixedWidth(1450)
+        self.mesh_results_widget.heat_map_widget.setFixedWidth(1300)
+        self.line_results_widget.heat_map_widget.setFixedWidth(1300)
 
     def populate_widget(self, item):
         if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
-            self.parameters_widget.populate_widget(item, data_collection)
             self.results_widget.populate_widget(item, data_collection)   
-
-            self.line_parameters_widget.populate_widget(item, item.get_model().line_collection)
             self.line_results_widget.populate_widget(item, item.get_model().line_collection) 
         else:
             data_collection = item.get_model()
@@ -98,6 +95,5 @@ class Qt4_ParallelProcessingPreviewBrick(BlissWidget):
         """
         if property_name == 'beamline_setup':
             bl_setup = self.getHardwareObject(new_value)
-            #self.session_hwobj = bl_setup.session_hwobj
             self.mesh_results_widget.set_beamline_setup(bl_setup)
             self.line_results_widget.set_beamline_setup(bl_setup)

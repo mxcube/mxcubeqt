@@ -38,10 +38,10 @@ class Qt4_DuoStateBrick(BlissWidget):
         'disabled': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
         'noperm': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
         'error': (Qt4_widget_colors.LIGHT_RED, False, False, False, False),
-        'out': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
+        'out': (Qt4_widget_colors.LIGHT_GREEN, True, False, False, True),
         'closed': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
         'moving': (Qt4_widget_colors.LIGHT_YELLOW, False, False, None, None),
-        'in': (Qt4_widget_colors.LIGHT_GREEN, True, True, True, False),
+        'in': (Qt4_widget_colors.LIGHT_GREEN, False, True, True, False),
         'opened': (Qt4_widget_colors.LIGHT_GREEN, True, True, True, False),
         'automatic': (Qt4_widget_colors.WHITE, True, True, False, False)
     }
@@ -113,7 +113,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         bold_font = self.state_ledit.font()
         bold_font.setBold(True)
         self.state_ledit.setFont(bold_font)
-        self.state_ledit.setFixedHeight(20)
+        self.state_ledit.setFixedHeight(24)
 
         self.set_in_button.setToolTip("Changes the control state")
         self.set_out_button.setToolTip("Changes the control state")           

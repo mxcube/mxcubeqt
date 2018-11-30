@@ -58,11 +58,14 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
         self.state_label = QLabel('<b> </b>', _main_groupbox)
         self.image_tracking_cbox = QCheckBox(\
              "Enable Adxv image tracking", _main_groupbox)
+        self.filter_frames_cbox = QCheckBox(\
+             "Filter frames based on Dozor score", _main_groupbox)
         
         # Layout --------------------------------------------------------------
         _main_groupbox_vlayout = QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.state_label)
         _main_groupbox_vlayout.addWidget(self.image_tracking_cbox)
+        _main_groupbox_vlayout.addWidget(self.filter_frames_cbox)
         _main_groupbox_vlayout.setSpacing(2)
         _main_groupbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
@@ -75,10 +78,13 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
 
         # Qt signal/slot connections ------------------------------------------
         self.image_tracking_cbox.toggled.connect(\
-             self.image_tracking_cbox_changed)
+             self.image_tracking_cbox_toggled)
+        self.filter_frames_cbox.toggled.connect(\
+             self.filter_frames_cbox_toggled)
 
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(Qt.AlignCenter)
+        self.state_label.setFixedHeight(24)
         self.state_changed("unknown")
         #self.state_label.setFixedHeight(20)
         
@@ -86,8 +92,8 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
         if property_name == 'mnemonic':
             if self.image_tracking_hwobj is not None:
                 self.disconnect(self.image_tracking_hwobj,
-                                'imageTrackingEnabledChanged',
-                                self.image_tracking_enabled_changed)
+                                'imageTrackingStateChanged',
+                                self.image_tracking_state_changed)
                 self.disconnect(self.image_tracking_hwobj, 
                                 'stateChanged', 
                                 self.state_changed)
@@ -98,8 +104,8 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
                      self.image_tracking_hwobj.is_tracking_enabled() == True)
                 self.image_tracking_cbox.blockSignals(False)
                 self.connect(self.image_tracking_hwobj,
-                                'imageTrackingEnabledChanged',
-                                self.image_tracking_enabled_changed)
+                             'imageTrackingStateChanged',
+                             self.image_tracking_state_changed)
                 self.connect(self.image_tracking_hwobj, 
                              'stateChanged', 
                              self.state_changed)
@@ -111,11 +117,15 @@ class Qt4_ImageTrackingStatusBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
-    def image_tracking_cbox_changed(self, state):
+    def image_tracking_cbox_toggled(self, state):
         self.image_tracking_hwobj.set_image_tracking_state(state)
 
-    def image_tracking_enabled_changed(self, state):
-        self.image_tracking_cbox.setChecked(state) 
+    def filter_frames_cbox_toggled(self, state):
+        self.image_tracking_hwobj.set_filter_frames_state(state)
+
+    def image_tracking_state_changed(self, state_dict):
+        self.image_tracking_cbox.setChecked(state_dict["image_tracking"])
+        self.filter_frames_cbox.setChecked(state_dict["filter_frames"]) 
 
     def state_changed(self, state, state_label = None):
         color = None

@@ -58,6 +58,7 @@ class Qt4_TreeBrick(BlissWidget):
     hide_xrf_spectrum_tab = pyqtSignal(bool)
     hide_workflow_tab = pyqtSignal(bool)
     hide_advanced_tab = pyqtSignal(bool)
+    hide_xray_imaging_tab = pyqtSignal(bool)
     populate_dc_parameter_widget = pyqtSignal(object)
     populate_dc_group_widget = pyqtSignal(object)
     populate_char_parameter_widget = pyqtSignal(object)
@@ -66,6 +67,7 @@ class Qt4_TreeBrick(BlissWidget):
     populate_xrf_spectrum_widget = pyqtSignal(object)
     populate_workflow_tab = pyqtSignal(object)
     populate_advanced_widget = pyqtSignal(object)
+    populate_xray_imaging_widget = pyqtSignal(object)
  
     selection_changed = pyqtSignal(object)
     set_directory = pyqtSignal(str)
@@ -98,6 +100,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.lims_samples = None
         self.filtered_lims_samples = None
         self.compression_state = True
+        self.queue_autosave_action = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty("queue", "string", "/queue")
@@ -134,6 +137,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("hide_xrf_spectrum_tab",())
         self.defineSignal("hide_workflow_tab", ())
         self.defineSignal("hide_advanced_tab", ())
+        self.defineSignal("hide_xray_imaging_tab", ())
         self.defineSignal("populate_dc_parameter_widget", ())
         self.defineSignal("populate_dc_group_widget", ())
         self.defineSignal("populate_char_parameter_widget",())
@@ -142,6 +146,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.defineSignal("populate_xrf_spectrum_widget", ())
         self.defineSignal("populate_workflow_tab", ())
         self.defineSignal("populate_advanced_widget", ())
+        self.defineSignal("populate_xray_imaging_widget", ())
         self.defineSignal("selection_changed",())
         self.defineSignal("set_directory", ())
         self.defineSignal("set_prefix", ())
@@ -689,8 +694,8 @@ class Qt4_TreeBrick(BlissWidget):
                                             "that the positions are correct.")
                                 sample_list.append(lims_sample)
                         else:
-                            log.warning("No sample in ISPyB for location %s" % \
-                                        str(sc_sample.location))
+                            #log.warning("No sample in ISPyB for location %s" % \
+                            #            str(sc_sample.location))
                             sample_list.append(sc_sample)
             self.dc_tree_widget.populate_tree_widget(basket_list, sample_list, 
                  self.dc_tree_widget.sample_mount_method)
@@ -825,6 +830,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
 
     def show_sample_tab(self, item):
         """
@@ -843,6 +849,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
 
     def show_dcg_tab(self, item):
         """
@@ -859,6 +866,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
 
     def populate_dc_parameters_tab(self, item = None):
         """
@@ -881,6 +889,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
         self.populate_dc_parameters_tab(item)
 
     def populate_dc_group_tab(self, item = None):
@@ -904,6 +913,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
         self.populate_char_parameters_tab(item)
 
     def populate_char_parameters_tab(self, item):
@@ -927,6 +937,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
@@ -950,6 +961,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(False)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
         self.populate_xrf_spectrum_tab(item)
 
     def populate_xrf_spectrum_tab(self, item):
@@ -973,6 +985,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(False)
+        self.hide_xray_imaging_tab.emit(True)
         self.populate_advanced_tab(item)
 
     def populate_advanced_tab(self, item):
@@ -999,6 +1012,7 @@ class Qt4_TreeBrick(BlissWidget):
         self.hide_xrf_spectrum_tab.emit(False)
         self.hide_workflow_tab.emit(False)
         self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(True)
 
         running = self.queue_hwobj.is_executing() 
         self.populate_workflow_tab(item, running=running)
@@ -1008,6 +1022,27 @@ class Qt4_TreeBrick(BlissWidget):
         Descript. :
         """
         self.populate_workflow_tab.emit(item, running)
+
+    def show_xray_imaging_tab(self, item):
+        """
+        Descript. :
+        """
+        self.sample_changer_widget.details_button.setText("Show SC")
+        self.hide_dcg_tab.emit(True)
+        self.hide_dc_parameters_tab.emit(True)
+        self.hide_sample_changer_tab.emit(True)
+        self.hide_plate_manipulator_tab.emit(True)
+        self.hide_char_parameters_tab.emit(True)
+        self.hide_sample_tab.emit(True)
+        self.hide_energy_scan_tab.emit(True)
+        self.hide_xrf_spectrum_tab.emit(True)
+        self.hide_workflow_tab.emit(True)
+        self.hide_advanced_tab.emit(True)
+        self.hide_xray_imaging_tab.emit(False)
+        self.populate_xray_imaging_tab(item)
+
+    def populate_xray_imaging_tab(self, item):
+        self.populate_xray_imaging_widget.emit(item)
 
     def mount_mode_combo_changed(self, index):
         self.dc_tree_widget.filter_sample_list(index)
@@ -1074,6 +1109,8 @@ class Qt4_TreeBrick(BlissWidget):
                 self.populate_dc_group_tab(item)
             elif isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
                 self.populate_advanced_tab(item)
+            elif isinstance(item, Qt4_queue_item.XrayImagingQueueItem):
+                self.populate_xray_imaging_tab(item)
 
         self.selection_changed.emit(items)
 
@@ -1279,11 +1316,13 @@ class Qt4_TreeBrick(BlissWidget):
 
     def auto_save_queue(self):
         """Saves queue in the file"""
-        if self.queue_autosave_action.isChecked():
-            if self.redis_client_hwobj is not None:
-                self.redis_client_hwobj.save_queue()
-            #else:
-            #    self.dc_tree_widget.save_queue()
+        if self.queue_autosave_action is not None:
+            if self.queue_autosave_action.isChecked() and \
+               self.dc_tree_widget.samples_initialized:
+                if self.redis_client_hwobj is not None:
+                    self.redis_client_hwobj.save_queue()
+                #else:
+                #    self.dc_tree_widget.save_queue()
 
     def load_queue(self):
         """Loads queue from file"""
