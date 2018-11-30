@@ -25,7 +25,6 @@ sys.path.append(os.path.abspath('dummy_modules/'))
 sys.path.append(os.path.abspath('../..'))
 sys.path.append(os.path.abspath('../../BlissFramework'))
 sys.path.append(os.path.abspath('../../HardwareRepository/'))
-sys.path.append(os.path.abspath('../../HardwareObjects/'))
 
 # -- General configuration -----------------------------------------------------
 

@@ -27,11 +27,11 @@ import sys
 import os
 import logging
 import platform
-from optparse import OptionParser
 
 import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 
+from optparse import OptionParser
 from QtImport import *
 
 import BlissFramework
@@ -49,7 +49,6 @@ _logger.addHandler(_GUIhdlr)
 
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = 2.3
 
 
 def do_gevent():
@@ -128,13 +127,6 @@ def run(gui_config_file=None):
 
     (opts, args) = parser.parse_args()
 
-    if len(args) >= 1:
-        if len(args) == 1:
-            gui_config_file = os.path.abspath(args[0])
-        else:
-            parser.error('Too many arguments.')
-            sys.exit(1)
-
     # get config from arguments
     logFile = opts.logFile
     log_template = opts.logTemplate
@@ -185,25 +177,19 @@ def run(gui_config_file=None):
         main_application.setStyle(app_style)
     lockfile = None
 
-    if not opts.designMode and gui_config_file:
-        lock_filename = os.path.join(tempfile.gettempdir(), '.%s.lock' % \
-          os.path.basename(gui_config_file or "unnamed"))
-
-        try:
-            lockfile = open(lock_filename, "w")
-        except:
-            logging.getLogger().exception(\
-                 "Cannot create lock file (%s), exiting" % lock_filename)
-            sys.exit(1)
+    if len(args) >= 1:
+        if len(args) == 1:
+            gui_config_file = os.path.abspath(args[0])
         else:
-            os.chmod(lock_filename, 0666)
-            try:
-                fcntl.lockf(lockfile.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except:
-                logging.getLogger().exception("Cannot acquire " + \
-                    "lock (%s), exiting " % lock_filename + \
-                    "(hint: maybe the same application is already running ?)")
-                sys.exit(1)
+            parser.error('Too many arguments.')
+            sys.exit(1)
+
+    if len( os.popen( "ps -aef | grep 'python' -i | grep 'hardwareRepository'  | grep -v 'grep' | awk '{ print $3 }'" ).read().strip().split( '\n' )) > 1:
+        QMessageBox.warning(None, "Warning", "Another instance of MXCuBE is running.\n" + \
+                            "Please close it and start MXCuBE again.",
+                            QMessageBox.Ok)
+        sys.exit(1)
+
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_server)
     HardwareRepository.setUserFileDirectory(user_file_dir)
@@ -324,14 +310,6 @@ def run(gui_config_file=None):
     main_application.exec_()
 
     supervisor.finalize()
-
-    if lockfile is not None:
-        filename = lockfile.name
-        try:
-            lockfile.close()
-            os.unlink(filename)
-        except:
-            logging.getLogger().error("Problem removing the lock file")
 
     if log_lockfile is not None:
         filename = log_lockfile.name

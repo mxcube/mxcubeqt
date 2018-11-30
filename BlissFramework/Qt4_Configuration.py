@@ -79,8 +79,8 @@ class Configuration:
     """Configuration of a BlissWidget"""
     classes = {"hbox": Qt4_BaseLayoutItems.ContainerCfg,
                "vbox": Qt4_BaseLayoutItems.ContainerCfg,
-               "vgroupbox": Qt4_BaseLayoutItems.ContainerCfg,
-               "hgroupbox": Qt4_BaseLayoutItems.ContainerCfg,
+               "vgroupbox": Qt4_BaseLayoutItems.GroupBoxCfg,
+               "hgroupbox": Qt4_BaseLayoutItems.GroupBoxCfg,
                "hspacer": Qt4_BaseLayoutItems.SpacerCfg,
                "vspacer": Qt4_BaseLayoutItems.SpacerCfg,
                "label": Qt4_BaseLayoutItems.LabelCfg,

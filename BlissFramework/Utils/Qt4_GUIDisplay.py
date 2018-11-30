@@ -372,6 +372,28 @@ class CustomToolBar(QToolBar):
         self.setSizePolicy(QSizePolicy.MinimumExpanding,
                            QSizePolicy.Fixed)
 
+class CustomGroupBox(QGroupBox):
+
+    def __init__(self, *args, **kwargs):
+        QGroupBox.__init__(self, args[0])
+        self.setObjectName(args[1])
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
+
+        if kwargs["layout"] == "horizontal":
+            __group_box_layout = QHBoxLayout(self)
+        else:
+            __group_box_layout = QVBoxLayout(self)
+        __group_box_layout.setSpacing(0)
+        __group_box_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.toggled.connect(self.set_checked)
+
+    def set_checked(self, state):
+        for child in self.children():
+            if hasattr(child, "setVisible"):
+                child.setVisible(state == True)
+
 class WindowDisplayWidget(QScrollArea):
     """Main widget"""
 
@@ -543,49 +565,17 @@ class WindowDisplayWidget(QScrollArea):
         kwargs['layout'] = 'horizontal'
         return WindowDisplayWidget.CustomFrame(*args, **kwargs)
 
-        """
-        execution_mode = kwargs.get('execution_mode', False)
-
-        frame = QFrame(args[0])
-        frame.setObjectName(args[1])
-
-        if not execution_mode:
-            frame.setFrameStyle(QFrame.Box | QFrame.Plain)
-
-        frame_layout = QHBoxLayout(frame)
-        frame_layout.setSpacing(0)
-        frame_layout.setContentsMargins(0, 0, 0, 0)
-
-        return frame
-        """
-
     def horizontalGroupBox(*args, **kwargs):
         """Horizontal group box"""
 
-        groupbox = QGroupBox(args[0])
-        groupbox.setObjectName(args[1])
-        groupbox.setSizePolicy(QSizePolicy.Expanding,
-                               QSizePolicy.Expanding)
-
-        group_box_layout = QHBoxLayout(groupbox)
-        group_box_layout.setSpacing(0)
-        group_box_layout.setContentsMargins(0, 0, 0, 0)
-
-        return groupbox
+        kwargs['layout'] = 'horizontal'
+        return CustomGroupBox(*args, **kwargs)
 
     def verticalGroupBox(*args, **kwargs):
         """Vertical group box"""
 
-        groupbox = QGroupBox(args[0])
-        groupbox.setObjectName(args[1])
-        groupbox.setSizePolicy(QSizePolicy.Expanding,
-                               QSizePolicy.Expanding)
-
-        group_box_layout = QVBoxLayout(groupbox)
-        group_box_layout.setSpacing(0)
-        group_box_layout.setContentsMargins(0, 0, 0, 0)
-
-        return groupbox
+        kwargs['layout'] = 'vertical'
+        return CustomGroupBox(*args, **kwargs)
 
     class CustomTabWidget(QTabWidget):
         """Tab widget"""
@@ -1134,6 +1124,9 @@ class WindowDisplayWidget(QScrollArea):
 
                 if item_type.endswith("groupbox"):
                     new_item.setTitle(item_cfg["properties"]["label"])
+                    if item_cfg["properties"]["checkable"]: 
+                        new_item.setCheckable(True)
+                        new_item.set_checked(item_cfg["properties"]["setCheckable"])                     
 
                 new_item.layout().setSpacing(item_cfg["properties"]["spacing"])
                 if hasattr(new_item.layout(), "setContentsMargins"):
