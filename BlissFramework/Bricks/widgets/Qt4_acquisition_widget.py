@@ -162,7 +162,7 @@ class AcquisitionWidget(QWidget):
         self.first_img_validator = QIntValidator(\
              0, 99999, self.acq_widget_layout.first_image_ledit)
         self.num_img_validator = QIntValidator(\
-             1, 99999, self.acq_widget_layout.num_images_ledit) 
+             1, 9999999, self.acq_widget_layout.num_images_ledit) 
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
@@ -287,7 +287,7 @@ class AcquisitionWidget(QWidget):
         Updates kappa value
         """
         if not self.acq_widget_layout.kappa_ledit.hasFocus() and \
-           new_value:
+           new_value is not None:
             self.acq_widget_layout.kappa_ledit.setText(str(new_value))
             self.emit_acq_parameters_changed()
 

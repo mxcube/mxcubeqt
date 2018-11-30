@@ -384,7 +384,6 @@ class AcquisitionWidgetSimple(QWidget):
             max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
             top_limit = float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
             limits = (max(exp_time_limits[0], top_limit), exp_time_limits[1])
-
             self.update_detector_exp_time_limits(limits)
         except:
             pass

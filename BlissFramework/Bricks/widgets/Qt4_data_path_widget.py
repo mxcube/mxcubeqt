@@ -32,11 +32,11 @@ class DataPathWidget(QWidget):
 
     pathTemplateChangedSignal = pyqtSignal()
 
-    def __init__(self, parent = None, name = '', fl = 0, data_model = None, 
-                 layout = None):
+    def __init__(self, parent=None, name='', fl=0, data_model=None, layout=None):
         QWidget.__init__(self, parent, Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
+        self.parent = parent  
 
         # Hardware objects ----------------------------------------------------
 
@@ -89,8 +89,8 @@ class DataPathWidget(QWidget):
              self.data_path_layout.run_number_ledit,
              int, QIntValidator(0, 1000, self))
 
-        #self._data_model_pm.bind_value_update('compression',
-        #     self.data_path_layout.compression_cbox, bool, None)
+        self._data_model_pm.bind_value_update('compression',
+             self.data_path_layout.compression_cbox, bool, None)
 
     def _browse_clicked(self):
         """
@@ -118,6 +118,7 @@ class DataPathWidget(QWidget):
             if self.enable_macros:
                 available_chars += "%"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)
+            new_value = new_value.replace("\\", "")
 
         if len(new_value) > 50:
             logging.getLogger("GUI").\
@@ -139,7 +140,7 @@ class DataPathWidget(QWidget):
             self.update_file_name()
             self.pathTemplateChangedSignal.emit()
         else:
-            self.data_path_layout.run_number_ledit.setText(str(self._data_model.run_number))
+            #self.data_path_layout.run_number_ledit.setText(str(self._data_model.run_number))
             Qt4_widget_colors.set_widget_color(self.data_path_layout.folder_ledit,
                                                Qt4_widget_colors.LIGHT_YELLOW)
 
@@ -154,11 +155,13 @@ class DataPathWidget(QWidget):
         cursor_pos = self.data_path_layout.folder_ledit.cursorPosition()
         if len(new_value) > 0:
             available_chars = string.ascii_lowercase + string.ascii_uppercase + \
-                              string.digits + "-_/" 
+                              string.digits + "-_/"
             if self.enable_macros:
                 available_chars += "%"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)
+            new_value = new_value.replace('\\', '')
 
+        new_sub_dir = str(new_value).strip(' ')
         self.data_path_layout.folder_ledit.setText(new_value)
         self.data_path_layout.folder_ledit.setCursorPosition(cursor_pos)
 
@@ -180,6 +183,9 @@ class DataPathWidget(QWidget):
         self.pathTemplateChangedSignal.emit()
 
     def _compression_toggled(self, state):
+        if hasattr(self.parent, "_tree_brick"):
+            if self.parent._tree_brick:
+                self.parent._tree_brick.compression_state = state
         self._data_model.compression = state
         self.update_file_name()
         self.pathTemplateChangedSignal.emit()

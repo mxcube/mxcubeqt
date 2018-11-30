@@ -96,8 +96,8 @@ class DataModelInputBinder(object):
                                                    QPalette.Base)
                return False
 
-            if flt_value >= validator.bottom() and \
-               flt_value <= validator.top():
+            if flt_value >= min(validator.bottom(), validator.top()) and \
+               flt_value <= max(validator.bottom(), validator.top()):
             #if validator.validate(new_value, widget.cursorPosition())[0] \
             #        == QValidator.Acceptable:
                 if self.bindings[field_name][3]:

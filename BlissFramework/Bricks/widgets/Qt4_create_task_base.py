@@ -552,22 +552,30 @@ class CreateTaskBase(QWidget):
         Return    "
         """
         if self._acq_widget:
+            kappa = None
+            kappa_phi = None
             self._acq_widget.use_kappa(False)
-
             if position:
                 if len(self._current_selected_items) == 1:
                     item = self._current_selected_items[0]
                     cpos = position.get_centred_position()
                     if hasattr(cpos, "kappa"):
-                        self._acq_widget.update_kappa(cpos.kappa)
+                        kappa = cpos.kappa
                     if hasattr(cpos, "kappa_phi"):
-                        self._acq_widget.update_kappa_phi(cpos.kappa_phi)
+                        kappa_phi = cpos.kappa_phi
                     if isinstance(item, Qt4_queue_item.TaskQueueItem):
                         snapshot = self._graphics_manager_hwobj.get_scene_snapshot(position)
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
+                kappa = self._beamline_setup_hwobj._get_kappa_axis_position()
+                kappa_phi = self._beamline_setup_hwobj._get_kappa_phi_axis_position()
+
+            if kappa:
+                self.set_kappa(kappa)
+            if kappa_phi:
+                self.set_kappa_phi(kappa_phi)
 
     # Should be called by the object that calls create_task,
     # and add_task.

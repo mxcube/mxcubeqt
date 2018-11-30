@@ -52,7 +52,6 @@ class PeriodicTableWidget(QWidget):
         # Graphic elements ----------------------------------------------------
         if PYMCA_IMPORTED:
             self.periodic_table = CustomPeriodicTable(self)
-            self.periodic_table.setFixedSize(470, 230)
         else:
             self.periodic_elements_combo = QComboBox(self)
             self.periodic_elements_combo.setFixedWidth(100)
