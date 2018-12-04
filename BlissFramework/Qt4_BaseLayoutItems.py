@@ -329,6 +329,20 @@ class SplitterCfg(ContainerCfg):
                                         "[]",
                                         hidden=True)
 
+class GroupBoxCfg(ContainerCfg):
+    """
+    Descript. :
+    """
+
+    def __init__(self, *args):
+        """
+        Descript. :
+        """
+        ContainerCfg.__init__(self, *args)
+
+        self.properties.addProperty("checkable", "boolean", False)
+        self.properties.addProperty("checked", "boolean", False)
+
 
 class SpacerCfg(_CfgItem):
     """
