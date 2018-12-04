@@ -238,13 +238,16 @@ class Qt4_ResolutionBrick(BlissWidget):
                 self.disconnect(self.door_interlock_hwobj,
                                 'doorInterlockStateChanged',
                                 self.door_interlock_state_changed)
-            self.door_interlock_hwobj = self.getHardwareObject(new_value)
+            self.door_interlock_hwobj = self.getHardwareObject(new_value, optional=True)
             if self.door_interlock_hwobj is not None:
                 self.connect(self.door_interlock_hwobj,
                              'doorInterlockStateChanged',
                              self.door_interlock_state_changed)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def run(self):
+        self.update_gui()
 
     def input_field_changed(self, input_field_text):
         """
@@ -340,6 +343,8 @@ class Qt4_ResolutionBrick(BlissWidget):
         """
         Door interlock is optional, because not all sites might have it
         """
+        groupbox_title = ""
+
         if self.detector_distance_hwobj is None:
             detector_ready = False
         elif detector_ready is None:
@@ -355,7 +360,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             self.detector_distance_changed(curr_detector_distance)
             self.detector_distance_state_changed(self.detector_distance_hwobj.get_state())
             if self.units_combobox.currentText() == "mm":
-                self.group_box.setTitle('Detector distance')
+                groupbox_title = 'Detector distance'
                 self.new_value_validator.setRange(self.detector_distance_limits[0],
                                                   self.detector_distance_limits[1],
                                                   2)
@@ -379,15 +384,17 @@ class Qt4_ResolutionBrick(BlissWidget):
             self.resolution_value_changed(curr_resolution)
             self.resolution_state_changed(self.resolution_hwobj.getState())
             if self.units_combobox.currentText() != "mm":
-                self.group_box.setTitle('Resolution')
+                groupbox_title = 'Resolution'
                 self.new_value_validator.setRange(self.resolution_limits[0],
                                                   self.resolution_limits[1],
                                                   3)
         else:
             self.resolution_state_changed(None)
 
-        self.new_value_ledit.setEnabled(self.door_interlocked)
         self.setEnabled(self.door_interlocked)
+        if not self.door_interlocked:
+            groupbox_title += " (door is unlocked)"
+        self.group_box.setTitle(groupbox_title)
         self.create_tool_tip()
 
     def resolution_ready(self):

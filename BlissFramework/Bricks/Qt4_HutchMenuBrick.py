@@ -217,7 +217,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
             current_file_name, "Image files (%s)" % " ".join(formats)))
 
         if len(filename):
-            image_type = os.path.splitext(filename)[1].strip('.').upper()
             try:
                 self.graphics_manager_hwobj.save_scene_snapshot(filename)
                 self.file_index += 1        

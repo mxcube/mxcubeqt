@@ -113,10 +113,10 @@ class Qt4_AttenuatorsBrick(BlissWidget):
                                 'deviceNotReady',
                                 self.disconnected)
                 self.disconnect(self.attenuators_hwobj,
-                                'attStateChanged',
+                                'stateChanged',
                                 self.transmission_state_changed)
                 self.disconnect(self.attenuators_hwobj,
-                                'attFactorChanged',
+                                'valueChanged',
                                 self.transmission_value_changed)
             self.attenuators_hwobj = self.getHardwareObject(new_value)
             if self.attenuators_hwobj is not None:
@@ -127,16 +127,13 @@ class Qt4_AttenuatorsBrick(BlissWidget):
                              'deviceNotReady',
                              self.disconnected)
                 self.connect(self.attenuators_hwobj,
-                             'attStateChanged',
+                             'stateChanged',
                              self.transmission_state_changed)
                 self.connect(self.attenuators_hwobj,
-                             'attFactorChanged',
+                             'valueChanged',
                              self.transmission_value_changed)
-                if self.attenuators_hwobj.isReady():
-                    self.connected()
-                    self.attenuators_hwobj.update_values() 
-                else:
-                    self.disconnected()
+                self.connected()
+                self.attenuators_hwobj.update_values() 
             else:
                 self.disconnected()
         else:
@@ -170,7 +167,7 @@ class Qt4_AttenuatorsBrick(BlissWidget):
 
         if self.new_value_validator.validate(input_field_text, 0)[0] == \
            QValidator.Acceptable:
-            self.attenuators_hwobj.setTransmission(\
+            self.attenuators_hwobj.set_value(\
                  float(input_field_text))
             self.new_value_ledit.setText("") 
             Qt4_widget_colors.set_widget_color(\

@@ -53,6 +53,7 @@ class Qt4_CRLBrick(BlissWidget):
         self.addProperty('lenseCount', 'integer', 6)
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('formatString', 'formatString', '#.#')
+        self.addProperty('caption', 'string', '')
 
         # Signals ------------------------------------------------------------
 
@@ -139,6 +140,9 @@ class Qt4_CRLBrick(BlissWidget):
                 self.crl_value_table.setColumnWidth(col_index, 20)
                 self.crl_value.append(0)
             self.crl_value_table.setFixedWidth(20 * new_value + 6)
+        elif property_name == 'caption':
+            if new_value:
+                self.main_gbox.setTitle(new_value) 
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 

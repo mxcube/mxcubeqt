@@ -39,7 +39,6 @@ class Qt4_BeamPositionBrick(BlissWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        self.flux_hwobj = None
         self.beam_focusing_hwobj = None
         self.beamline_test_hwobj = None
         self.diffractometer_hwobj = None
@@ -60,6 +59,9 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.addProperty('defaultSteps', 'string', '')
         self.addProperty('defaultDeltas', 'string', '')
         self.addProperty('defaultDecimals', 'string', '')
+        self.addProperty('enableCenterBeam', 'boolean', True)
+        self.addProperty('enableMeasureFlux', 'boolean', True)
+        self.addProperty('compactView', 'boolean', False)
 
         # Signals -------------------------------------------------------------
 
@@ -145,7 +147,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
                     temp_motor_widget.move_right_button.setVisible(True)
                     temp_motor_widget.position_slider.setVisible(False)
                     temp_motor_widget.step_button.setVisible(False)
-                    temp_motor_widget.stop_button.setVisible(False)
+                    #temp_motor_widget.stop_button.setVisible(False)
                     
                     try:  
                         temp_motor_widget.set_line_step(default_step_list[index])
@@ -192,7 +194,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
                 mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
                 self.focus_mode_changed(mode, beam_size)
         elif property_name == "hwobj_beamline_test":
-            self.beamline_test_hwobj = self.getHardwareObject(new_value)  
+            self.beamline_test_hwobj = self.getHardwareObject(new_value, optional=True)
         elif property_name == "hwobj_diffractometer":
             if self.diffractometer_hwobj is not None:
                 self.disconnect(self.diffractometer_hwobj,
@@ -204,6 +206,15 @@ class Qt4_BeamPositionBrick(BlissWidget):
                              'minidiffPhaseChanged',
                              self.phase_changed)
             self.update_gui()
+        elif property_name == 'enableCenterBeam':
+            self.center_beam_button.setVisible(new_value)
+        elif property_name == 'enableMeasureFlux':
+            self.measure_flux_button.setVisible(new_value)
+        elif property_name == 'compactView':
+            for widget in self.motor_widget_list:
+                widget.position_spinbox.setHidden(new_value)
+                widget.position_slider.setHidden(new_value)
+                widget.step_button.setHidden(new_value)
         else:
             BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
@@ -248,4 +259,4 @@ class Qt4_BeamPositionBrick(BlissWidget):
                    "If necessary move the sample out of beam. Continue?" 
         if QMessageBox.warning(None, "Question", conf_msg,
                QMessageBox.Ok, QMessageBox.Cancel) == QMessageBox.Ok:
-            self.beamline_test_hwobj.measure_intensity()
+            self.beamline_test_hwobj.measure_flux()

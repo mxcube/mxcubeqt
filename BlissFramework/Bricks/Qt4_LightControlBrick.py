@@ -41,10 +41,6 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
         self.light_actuator_hwo = None
         self.light_saved_pos=None
 
-        self.addProperty('light_actuator', 'string', '')
-        self.addProperty('icons', 'string', '')
-        self.addProperty('out_delta', 'string', '')
-
         self.light_off_button=QPushButton(self.main_gbox)
         self.light_off_button.setIcon(Qt4_Icons.load_icon('BulbDelete'))
         self.light_off_button.setFixedSize(27, 27)
@@ -126,24 +122,7 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
             self.light_off_button.setDown(False)
 
     def propertyChanged(self,property,oldValue,newValue):
-
-        if property=='light_actuator':
-            if self.light_actuator_hwo is not None:
-                self.disconnect(self.light_actuator_hwo,'wagoStateChanged',self.lightStateChanged)
-
-            self.light_actuator_hwo=self.getHardwareObject(newValue)
-            if self.light_actuator_hwo is not None:
-                self.connect(self.light_actuator_hwo,'wagoStateChanged',self.lightStateChanged)
-                self.lightStateChanged(self.light_actuator_hwo.getState())
-
-        elif property=='icons':
-            icons_list=newValue.split()
-            try:
-                self.light_off_button.setIcon(Qt4_Icons.load_icon(icons_list[0]))
-                self.light_on_button.setIcon(Qt4_Icons.load_icon(icons_list[1]))
-            except IndexError:
-                pass
-        elif property=='mnemonic':
+        if property=='mnemonic':
             Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick.propertyChanged(self,property,oldValue,newValue)
             if self.motor_hwobj is not None:
                 if self.motor_hwobj.isReady():

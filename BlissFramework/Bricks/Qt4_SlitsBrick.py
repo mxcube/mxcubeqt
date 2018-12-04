@@ -303,11 +303,11 @@ class Qt4_SlitsBrick(BlissWidget):
                  Qt4_widget_colors.LIGHT_GREEN,
                  QPalette.Base)
 
-    def focus_mode_changed(self, hor_gab_enabled, ver_gap_enabled):
-        self.hor_pos_dspinbox.setEnabled(hor_gab_enabled)
-        self.set_hor_gap_button.setEnabled(hor_gab_enabled)
-        self.ver_pos_dspinbox.setEnabled(ver_gap_enabled)
-        self.set_ver_gap_button.setEnabled(ver_gap_enabled)
+    def focus_mode_changed(self, gap_enabled):
+        self.hor_pos_dspinbox.setEnabled(gap_enabled[0])
+        self.set_hor_gap_button.setEnabled(gap_enabled[0])
+        self.ver_pos_dspinbox.setEnabled(gap_enabled[1])
+        self.set_ver_gap_button.setEnabled(gap_enabled[1])
 
     def min_limits_changed(self, limits):
         if limits is not None:
