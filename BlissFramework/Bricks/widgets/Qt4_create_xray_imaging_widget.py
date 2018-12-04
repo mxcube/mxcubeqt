@@ -81,7 +81,28 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
-        self._acq_widget.use_kappa(False) 
+        self._acq_widget.use_kappa(False)
+        self._acq_widget.acq_widget_layout.max_osc_range_cbx.setVisible(False)
+        self._acq_widget.acq_widget_layout.first_image_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.first_image_ledit.setVisible(False)
+        self._acq_widget.acq_widget_layout.detector_roi_mode_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.detector_roi_mode_combo.setVisible(False)
+        self._acq_widget.acq_widget_layout.energies_combo.setVisible(False)
+        self._acq_widget.acq_widget_layout.mad_cbox.setVisible(False)
+        self._acq_widget.acq_widget_layout.energy_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.energy_ledit.setVisible(False)
+        self._acq_widget.acq_widget_layout.transmission_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.transmission_ledit.setVisible(False)
+        self._acq_widget.acq_widget_layout.resolution_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.resolution_ledit.setVisible(False)
+        self._acq_widget.acq_widget_layout.kappa_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.kappa_ledit.setVisible(False)
+        self._acq_widget.acq_widget_layout.kappa_phi_label.setVisible(False)
+        self._acq_widget.acq_widget_layout.kappa_phi_ledit.setVisible(False)
+        self._acq_widget.acq_widget_layout.shutterless_cbx.setVisible(False)
+
+    def enable_compression(self, state):
+        CreateTaskBase.enable_compression(self, False)
 
     def init_models(self):
         """
@@ -94,13 +115,14 @@ class CreateXrayImagingWidget(CreateTaskBase):
         if self._beamline_setup_hwobj is not None:
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_imaging_values")
+            self._path_template.suffix = 'tiff'
 
     def set_beamline_setup(self, bl_setup_hwobj):
         """
         In plate mode osciallation is start is in the middle of grid
         """
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
-        self._xray_imaging_parameters_widget.set_beamline_setup(bl_setup_hwobj)
+        #self._xray_imaging_parameters_widget.set_beamline_setup(bl_setup_hwobj)
 
     def single_item_selection(self, tree_item):
         """
@@ -119,12 +141,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
             self._path_template = data_model.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
-            self._acquisition_parameters = data_model.acquisitions[0].acquisition_parameters
+            self._acquisition_parameters = data_model.acquisition.acquisition_parameters
             self._acq_widget.update_data_model(self._acquisition_parameters,
                                                self._path_template)
 
             self._xray_imaging_parameters = data_model.xray_imaging_parameters
-            self._xray_imaging_parameters_widget.update_data_model(self._xray_imaging_parameters)
+            self._xray_imaging_parameters_widget.update_data_model(data_model)
     
 
             self.setDisabled(False)
@@ -143,15 +165,15 @@ class CreateXrayImagingWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
 
-        self._path_template.run_number += 1
+        #self._path_template.run_number += 1
 
         acq = self._create_acq(sample)
         acq.acquisition_parameters.centred_position = cpos
         dc = queue_model_objects.XrayImaging(self._xray_imaging_parameters.copy(),
-                                             [acq],
+                                             acq,
                                              sample.crystals[0])
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
-        dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
+        dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.IMAGING
 
         return [dc]

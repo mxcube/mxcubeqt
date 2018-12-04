@@ -109,10 +109,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
-        self._periodic_table_widget.set_elements(\
-             self._beamline_setup_hwobj.energyscan_hwobj.getElements())
-
         try:
+            self._periodic_table_widget.set_elements(\
+                self._beamline_setup_hwobj.energyscan_hwobj.getElements())
+
             max_transmission_value = self._beamline_setup_hwobj.\
                  energyscan_hwobj.get_max_transmission_value()
 

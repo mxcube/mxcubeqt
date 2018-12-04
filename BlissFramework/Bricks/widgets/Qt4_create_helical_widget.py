@@ -305,8 +305,9 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_requires_centring(False)
             dc.run_processing_after = self._processing_widget.processing_widget.\
                run_processing_after_cbox.isChecked()
-            dc.run_processing_parallel = self._processing_widget.processing_widget.\
-               run_processing_parallel_cbox.isChecked()
+            if self._processing_widget.processing_widget.\
+               run_processing_parallel_cbox.isChecked():
+               dc.run_processing_parallel = "LineScan"
 
             data_collections.append(dc)
             self._path_template.run_number += 1
