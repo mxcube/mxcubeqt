@@ -20,8 +20,8 @@
 from QtImport import *
 
 import os
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_widget_utils import DataModelInputBinder

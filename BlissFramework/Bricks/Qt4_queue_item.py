@@ -23,7 +23,7 @@ from QtImport import *
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 
 PIN_ICON = Qt4_Icons.load_icon("sample_axis")

@@ -19,7 +19,7 @@
 
 from QtImport import *
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget

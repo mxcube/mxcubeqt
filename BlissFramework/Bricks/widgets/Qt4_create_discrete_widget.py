@@ -22,8 +22,8 @@ import copy
 from QtImport import *
 
 import Qt4_queue_item
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 from Qt4_GraphicsLib import GraphicsItemPoint
 
 from BlissFramework.Utils import Qt4_widget_colors

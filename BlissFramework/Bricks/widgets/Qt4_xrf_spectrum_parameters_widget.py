@@ -19,7 +19,7 @@
 
 from QtImport import *
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_data_path_widget import DataPathWidget

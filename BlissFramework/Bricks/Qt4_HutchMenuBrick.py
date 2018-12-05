@@ -23,7 +23,7 @@ import traceback
 
 from QtImport import *
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 import Qt4_GraphicsManager as graphics_manager
 
 from BlissFramework import Qt4_Icons

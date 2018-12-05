@@ -24,10 +24,9 @@ from QtImport import *
 
 import Qt4_queue_item
 from Qt4_GraphicsLib import GraphicsItemPoint
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
-from queue_model_enumerables_v1 import EXPERIMENT_TYPE
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN
+from queue_model_enumerables import EXPERIMENT_TYPE, COLLECTION_ORIGIN
 from Qt4_create_task_base import CreateTaskBase
 from Qt4_data_path_widget import DataPathWidget
 from Qt4_periodic_table_widget import PeriodicTableWidget

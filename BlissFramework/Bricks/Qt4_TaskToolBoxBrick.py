@@ -23,8 +23,7 @@ import traceback
 
 from QtImport import *
 
-import Qt4_GraphicsManager as graphics_manager
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from widgets.Qt4_task_toolbox_widget import TaskToolBoxWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget

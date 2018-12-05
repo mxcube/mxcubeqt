@@ -23,7 +23,7 @@ from QtImport import *
 
 import Qt4_queue_item
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 from widgets.Qt4_heat_map_widget import HeatMapWidget
 
 

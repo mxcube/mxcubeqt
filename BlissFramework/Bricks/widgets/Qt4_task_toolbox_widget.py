@@ -22,7 +22,7 @@ import logging
 from QtImport import *
 
 import Qt4_queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from BlissFramework import Qt4_Icons
 from widgets.Qt4_create_discrete_widget import CreateDiscreteWidget
