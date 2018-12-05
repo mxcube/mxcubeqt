@@ -1,8 +1,8 @@
 import os
 import qtui
 import qt
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
 from widgets.widget_utils import DataModelInputBinder
 

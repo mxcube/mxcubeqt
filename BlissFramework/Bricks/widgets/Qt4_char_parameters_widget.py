@@ -20,19 +20,14 @@
 from QtImport import *
 
 import os
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
-from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from widgets.Qt4_reference_image_widget import ReferenceImageWidget
 from widgets.Qt4_char_type_widget import CharTypeWidget
 from widgets.Qt4_optimisation_parameters_widget_layout\
     import OptimisationParametersWidgetLayout
-from widgets.Qt4_radiation_damage_model_widget_layout\
-    import RadiationDamageModelWidgetLayout
-from widgets.Qt4_vertical_crystal_dimension_widget_layout\
-    import VerticalCrystalDimensionWidgetLayout
 
 
 class CharParametersWidget(QWidget):

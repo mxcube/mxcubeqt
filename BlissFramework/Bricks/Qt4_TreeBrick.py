@@ -29,7 +29,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from Qt4_sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from widgets.Qt4_dc_tree_widget import DataCollectTree
-from queue_model_enumerables_v1 import CENTRING_METHOD
+from queue_model_enumerables import CENTRING_METHOD
 
 
 __credits__ = ["MXCuBE colaboration"]

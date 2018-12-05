@@ -1,4 +1,4 @@
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 import qt
 
 from BlissFramework import Icons

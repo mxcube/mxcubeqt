@@ -34,13 +34,13 @@ from QtImport import *
 
 import Qt4_queue_item
 import queue_entry
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from widgets.Qt4_confirm_dialog import ConfirmDialog
 from widgets.Qt4_plate_navigator_widget import PlateNavigatorWidget
-from queue_model_enumerables_v1 import CENTRING_METHOD
+from queue_model_enumerables import CENTRING_METHOD
 
 
 __credits__ = ["MxCuBE colaboration"]

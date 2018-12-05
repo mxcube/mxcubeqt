@@ -1,8 +1,8 @@
 import qt
 import logging
 import queue_item
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 import abc
 import copy
 import ShapeHistory as shape_history

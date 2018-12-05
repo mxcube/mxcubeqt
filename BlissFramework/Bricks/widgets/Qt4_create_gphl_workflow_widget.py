@@ -1,9 +1,9 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 import Qt4_queue_item as queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
-from queue_model_enumerables_v1 import States
+from queue_model_enumerables import States
 
 from Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget

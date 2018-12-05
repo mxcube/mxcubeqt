@@ -17,16 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import copy
 
 from QtImport import *
 
 import Qt4_queue_item
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
-from widgets.Qt4_widget_utils import DataModelInputBinder
 from Qt4_create_task_base import CreateTaskBase
 from Qt4_acquisition_still_widget import AcquisitionStillWidget
 from Qt4_data_path_widget import DataPathWidget

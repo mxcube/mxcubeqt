@@ -19,15 +19,12 @@
 
 from QtImport import *
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_periodic_table_widget import PeriodicTableWidget
-#from widgets.Qt4_matplot_widget import TwoAxisPlotWidget
 from widgets.Qt4_pymca_plot_widget import PymcaPlotWidget
 from widgets.Qt4_snapshot_widget import SnapshotWidget
-
-from BlissFramework.Utils import Qt4_widget_colors
 
 
 class EnergyScanParametersWidget(QWidget):

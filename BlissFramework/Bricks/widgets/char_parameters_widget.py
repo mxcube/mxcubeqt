@@ -1,8 +1,8 @@
 import os
 import qt
 import qtui
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
 from widgets.reference_image_widget import ReferenceImageWidget
 from widgets.char_type_widget import CharTypeWidget

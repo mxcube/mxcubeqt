@@ -23,15 +23,14 @@ import copy
 from QtImport import *
 
 import Qt4_queue_item
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 from Qt4_GraphicsLib import GraphicsItemPoint
 
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from Qt4_create_task_base import CreateTaskBase
 from Qt4_data_path_widget import DataPathWidget
 from Qt4_acquisition_widget_simple import AcquisitionWidgetSimple
-from queue_model_enumerables_v1 import XTAL_SPACEGROUPS
 
 
 class CreateCharWidget(CreateTaskBase):
@@ -136,7 +135,9 @@ class CreateCharWidget(CreateTaskBase):
                               self._vertical_dimension_widget.max_vphi_ledit, float,
                               QDoubleValidator(0.0, 1000, 2, self))
         
-        self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
+        self._vertical_dimension_widget.space_group_ledit.addItems(
+            queue_model_enumerables.XTAL_SPACEGROUPS
+        )
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
@@ -153,8 +154,9 @@ class CreateCharWidget(CreateTaskBase):
         """
         Descript. :
         """
-        self._char_params.space_group = queue_model_enumerables.\
-                                        XTAL_SPACEGROUPS[index]
+        self._char_params.space_group = (
+            queue_model_enumerables.XTAL_SPACEGROUPS[index]
+        )
 
     def _set_space_group(self, space_group):
         """
@@ -163,8 +165,8 @@ class CreateCharWidget(CreateTaskBase):
         index  = 0
      
         if self._vertical_dimension_widget: 
-            if space_group in XTAL_SPACEGROUPS:
-                index = XTAL_SPACEGROUPS.index(space_group)
+            if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
+                index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
 
             self._space_group_change(index)
             self._vertical_dimension_widget.space_group_ledit.\

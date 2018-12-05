@@ -17,13 +17,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from QtImport import *
 
 import Qt4_queue_item
 
-import queue_model_objects_v1 as queue_model_objects
 from widgets.Qt4_heat_map_widget import HeatMapWidget
 
 

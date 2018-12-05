@@ -24,12 +24,11 @@ import logging
 from QtImport import *
 
 import Qt4_queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_acquisition_widget import AcquisitionWidget
-from queue_model_enumerables_v1 import EXPERIMENT_TYPE
 
 
 class CreateAdvancedWidget(CreateTaskBase):

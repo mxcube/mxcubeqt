@@ -9,7 +9,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import copy
 import logging
 
@@ -17,7 +16,7 @@ from QtImport import *
 
 import Qt4_queue_item
 from Qt4_GraphicsLib import GraphicsItemPoint
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget

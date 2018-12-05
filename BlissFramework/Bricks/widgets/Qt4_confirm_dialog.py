@@ -22,7 +22,7 @@ import os
 from QtImport import *
 
 import Qt4_queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 from BlissFramework.Utils import Qt4_widget_colors
 
 
