@@ -17,14 +17,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
-import traceback
 
 from QtImport import *
-
-import Qt4_GraphicsManager as graphics_manager
-import queue_model_objects_v1 as queue_model_objects
 
 from widgets.Qt4_task_toolbox_widget import TaskToolBoxWidget
 from BlissFramework.Qt4_BaseComponents import BlissWidget
@@ -185,26 +180,27 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
             self.task_tool_box_widget.enable_compression(new_value)
         elif property_name == 'showCollectNowButton':
             self.task_tool_box_widget.collect_now_button.setVisible(new_value)
-        elif property_name == 'showDiscreetTask':
-            if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.discrete_page) 
-        elif property_name == "showHelicalTask":
-            if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.helical_page)
-        elif property_name == "showCharTask":
-            if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.char_page)
-        elif property_name == "showAdvancedTask":
-            if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.advanced_page)
-        elif property_name == "showStillScanTask":
-            if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.still_scan_page)
+        # # NB new additino by IK, buthide_task is not defiend ANYWHERE
+        # elif property_name == 'showDiscreetTask':
+        #     if not new_value:
+        #         self.task_tool_box_widget.hide_task(\
+        #              self.task_tool_box_widget.discrete_page)
+        # elif property_name == "showHelicalTask":
+        #     if not new_value:
+        #         self.task_tool_box_widget.hide_task(\
+        #              self.task_tool_box_widget.helical_page)
+        # elif property_name == "showCharTask":
+        #     if not new_value:
+        #         self.task_tool_box_widget.hide_task(\
+        #              self.task_tool_box_widget.char_page)
+        # elif property_name == "showAdvancedTask":
+        #     if not new_value:
+        #         self.task_tool_box_widget.hide_task(\
+        #              self.task_tool_box_widget.advanced_page)
+        # elif property_name == "showStillScanTask":
+        #     if not new_value:
+        #         self.task_tool_box_widget.hide_task(\
+        #              self.task_tool_box_widget.still_scan_page)
 
     def selection_changed(self, items):
         """

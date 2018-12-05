@@ -1,7 +1,7 @@
 import qt
 import logging
 import gevent
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 import queue_item
 import queue_entry
 
@@ -9,7 +9,7 @@ from collections import namedtuple
 from BlissFramework import Icons
 from BlissFramework.Utils import widget_colors
 from widgets.confirm_dialog import ConfirmDialog
-from queue_model_enumerables_v1 import CENTRING_METHOD
+from queue_model_enumerables import CENTRING_METHOD
 
 SCFilterOptions = namedtuple('SCFilterOptions', 
                              ['SAMPLE_CHANGER', 'MOUNTED_SAMPLE', 'FREE_PIN', 'PLATE'])

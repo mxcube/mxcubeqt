@@ -21,12 +21,10 @@ import os
 
 from QtImport import *
 
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
-#from widgets.Qt4_ispyb_widget import ISPyBSampleInfoWidget
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-from BlissFramework.Utils import Qt4_widget_colors
 
 
 __credits__ = ["MXCuBE colaboration"]

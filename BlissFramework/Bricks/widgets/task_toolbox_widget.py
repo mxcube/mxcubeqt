@@ -1,7 +1,7 @@
 import logging
 import qt
 import queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from BlissFramework import Icons
 from widgets.create_helical_widget import CreateHelicalWidget
@@ -10,7 +10,7 @@ from widgets.create_char_widget import CreateCharWidget
 from widgets.create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.create_workflow_widget import CreateWorkflowWidget
-from queue_model_enumerables_v1 import EXPERIMENT_TYPE
+from queue_model_enumerables import EXPERIMENT_TYPE
 
 
 class TaskToolBoxWidget(qt.QWidget):

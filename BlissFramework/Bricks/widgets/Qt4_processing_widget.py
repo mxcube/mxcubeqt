@@ -21,8 +21,8 @@ import os
 
 from QtImport import *
 
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 from widgets.Qt4_widget_utils import DataModelInputBinder
 
 

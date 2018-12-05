@@ -49,6 +49,7 @@ _logger.addHandler(_GUIhdlr)
 
 
 __credits__ = ["MXCuBE colaboration"]
+__version__ = 2.3
 
 
 def do_gevent():

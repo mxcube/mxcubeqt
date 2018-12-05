@@ -4,7 +4,7 @@ import logging
 import copy
 import queue_item
 import ShapeHistory as shape_history
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from create_task_base import CreateTaskBase
 from widgets.widget_utils import DataModelInputBinder

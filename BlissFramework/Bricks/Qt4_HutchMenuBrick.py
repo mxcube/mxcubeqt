@@ -17,14 +17,9 @@
 #   You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
-import traceback
 
 from QtImport import *
-
-import queue_model_objects_v1 as queue_model_objects
-import Qt4_GraphicsManager as graphics_manager
 
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors

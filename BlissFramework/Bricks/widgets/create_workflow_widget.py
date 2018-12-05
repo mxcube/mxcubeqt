@@ -1,7 +1,6 @@
 import qt
-import copy
 import queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 import MxLookupScanBrick
 import itertools
 

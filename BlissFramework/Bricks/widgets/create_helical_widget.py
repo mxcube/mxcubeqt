@@ -1,7 +1,7 @@
 import logging
 import qt
 import copy
-import queue_model_objects_v1 as qmo
+import queue_model_objects as qmo
 import queue_item
 
 import ShapeHistory as shape_history
@@ -11,8 +11,7 @@ from widgets.data_path_widget import DataPathWidget
 from widgets.acquisition_widget import AcquisitionWidget
 from widgets.processing_widget import ProcessingWidget
 
-from queue_model_enumerables_v1 import EXPERIMENT_TYPE
-from queue_model_enumerables_v1 import COLLECTION_ORIGIN
+from queue_model_enumerables import EXPERIMENT_TYPE
 
 class CreateHelicalWidget(CreateTaskBase):
     def __init__(self, parent = None,name = None, fl = 0):

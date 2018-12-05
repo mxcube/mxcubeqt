@@ -2,8 +2,8 @@ import os
 import qtui
 import qt
 import copy
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 import queue_item
 import ShapeHistory as shape_history
 
@@ -11,8 +11,6 @@ from widgets.widget_utils import DataModelInputBinder
 from create_task_base import CreateTaskBase
 from widgets.data_path_widget import DataPathWidget
 from acquisition_widget_simple import AcquisitionWidgetSimple
-
-from queue_model_enumerables_v1 import XTAL_SPACEGROUPS
 
 
 class CreateCharWidget(CreateTaskBase):
@@ -126,7 +124,9 @@ class CreateCharWidget(CreateTaskBase):
                               max_vphi_ledit, float,
                               qt.QDoubleValidator(0.0, 1000, 2, self))
         
-        space_group_ledit.insertStrList(XTAL_SPACEGROUPS)
+        space_group_ledit.insertStrList(
+            queue_model_enumerables.XTAL_SPACEGROUPS
+        )
 
         prefix_ledit = self._data_path_widget.\
                        data_path_widget_layout.child('prefix_ledit')
@@ -157,13 +157,14 @@ class CreateCharWidget(CreateTaskBase):
         self._acquisition_parameters.induce_burn = state
 
     def _space_group_change(self, index):
-       self._char_params.space_group = queue_model_enumerables.\
-                                       XTAL_SPACEGROUPS[index]
+       self._char_params.space_group = (
+           queue_model_enumerables.XTAL_SPACEGROUPS[index]
+       )
     def _set_space_group(self, space_group):
         index  = 0
         
-        if space_group in XTAL_SPACEGROUPS:
-            index = XTAL_SPACEGROUPS.index(space_group)
+        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
+            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
         self._vertical_dimension_widget.\

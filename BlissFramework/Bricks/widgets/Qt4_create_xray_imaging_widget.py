@@ -27,8 +27,8 @@ from widgets.Qt4_acquisition_widget import AcquisitionWidget
 from widgets.Qt4_xray_imaging_parameters_widget import XrayImagingParametersWidget
 
 from Qt4_GraphicsLib import GraphicsItemPoint
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
 
 class CreateXrayImagingWidget(CreateTaskBase):

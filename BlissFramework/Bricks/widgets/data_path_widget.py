@@ -2,7 +2,7 @@ import qtui
 import qt
 import os
 import logging
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from widgets.widget_utils import DataModelInputBinder
 from BlissFramework.Utils import widget_colors

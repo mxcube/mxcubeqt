@@ -1,7 +1,7 @@
 import os
 import qt
 import queue_item
-import queue_model_objects_v1 as queue_model_objects
+import queue_model_objects
 
 from widgets.confirm_dialog_widget_vertical_layout \
      import ConfirmDialogWidgetVerticalLayout

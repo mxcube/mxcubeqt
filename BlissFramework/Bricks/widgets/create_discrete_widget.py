@@ -3,8 +3,8 @@ import qt
 import ShapeHistory as shape_history
 import queue_item
 
-import queue_model_objects_v1 as queue_model_objects
-import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects
+import queue_model_enumerables
 
 from widgets.data_path_widget import DataPathWidget
 from widgets.processing_widget import ProcessingWidget

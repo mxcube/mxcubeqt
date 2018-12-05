@@ -3,7 +3,7 @@
 import logging
 from collections import namedtuple
 
-import queue_model_enumerables_v1 as enumerables
+import queue_model_enumerables
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -403,10 +403,11 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             ll = self._pulldowns['space_group'] = []
             if data.crystal_system:
                 ll.append('')
-                ll.extend([x.name for x in enumerables.SPACEGROUP_DATA
+                ll.extend([x.name
+                           for x in queue_model_enumerables.SPACEGROUP_DATA
                            if x.point_group in data.point_groups])
             else:
-                ll.extend(enumerables.XTAL_SPACEGROUPS)
+                ll.extend(queue_model_enumerables.XTAL_SPACEGROUPS)
 
             widget = self._widget_data['space_group'][0]
             widget.clear()
