@@ -1,5 +1,0 @@
-<object class="EMBLFlux">
-   <object href="/singleton_motors/transmission" role="transmission"/>
-   <object href="/singleton_objects/beaminfo" role="beam_info"/>
-   <defaultFlux>1.e+12</defaultFlux>
-</object>

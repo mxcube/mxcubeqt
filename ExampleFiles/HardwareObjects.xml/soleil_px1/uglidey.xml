@@ -1,5 +1,0 @@
-<device class="SmargonAxis">
-  <username>yOffset</username>
-  <motor_name>yOffset</motor_name>
-  <object href="/smargon" role="smargon"/>
-</device>
