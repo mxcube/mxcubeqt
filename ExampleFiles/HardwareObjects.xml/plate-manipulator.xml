@@ -1,4 +1,4 @@
-<equipment class = "sample_changer.PlateManipulatorMockup">
+<equipment class = "PlateManipulatorMockup">
    <numRows>8</numRows>
    <numCols>12</numCols>
    <numDrops>3</numDrops>
