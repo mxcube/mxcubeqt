@@ -1,5 +1,0 @@
-<device class="MicrodiffMotor">
-  <username>kappa</username>
-  <exporter_address>microdiff29new:9001</exporter_address>
-  <motor_name>Kappa</motor_name>
-</device>

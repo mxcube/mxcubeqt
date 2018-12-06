@@ -1,5 +1,0 @@
-<device class="SmargonAxis">
-  <username>Chi</username>
-  <motor_name>chi</motor_name>
-  <object href="/smargon" role="smargon"/>
-</device>

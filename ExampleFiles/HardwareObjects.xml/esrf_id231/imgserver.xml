@@ -1,5 +1,0 @@
-<device class="SSRLImgServerClient">
-  <host>localhost</host>
-  <port>14005</port>
-  <channel type="spec" version="plouf:matias" name="newImage">IMGPATH</channel>
-</device>
