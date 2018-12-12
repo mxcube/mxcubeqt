@@ -162,7 +162,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        bl_setup_hwobj = HardwareRepository.HardwareRepository().getHardwareObject(
+        bl_setup_hwobj = HardwareRepository.getHardwareRepository().getHardwareObject(
             'beamline-setup'
         )
         xx = next(

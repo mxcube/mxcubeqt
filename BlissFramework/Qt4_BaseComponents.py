@@ -806,7 +806,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
 
         dispatcher.connect(self.__hardwareObjectDiscarded,
                            'hardwareObjectDiscarded',
-                           HardwareRepository.HardwareRepository())
+                           HardwareRepository.getHardwareRepository())
         self.defineSlot('enable_widget', ())
         self.defineSlot('disable_widget', ())
 
@@ -1108,7 +1108,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        hwobj = HardwareRepository.HardwareRepository().\
+        hwobj = HardwareRepository.getHardwareRepository().\
                    getHardwareObject(hardware_object_name)
 
         if hwobj is not None:
@@ -1167,7 +1167,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         """
         d = {}
         for ho_name in self.__loaded_hardware_objects:
-            info = HardwareRepository.HardwareRepository().getInfo(ho_name)
+            info = HardwareRepository.getHardwareRepository().getInfo(ho_name)
 
             if len(info) > 0:
                 d[ho_name] = info

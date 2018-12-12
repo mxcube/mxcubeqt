@@ -75,7 +75,7 @@ class MotorPositionReminder(QTableItem):
 
         
     def setMotor(self, motor_mne):
-        self.motor = HardwareRepository.HardwareRepository().getHardwareObject(motor_mne)
+        self.motor = HardwareRepository.getHardwareRepository().getHardwareObject(motor_mne)
 
         if self.motor is not None:
             self.cmdMotorPosition.setEnabled(True)
