@@ -1173,7 +1173,7 @@ class GUIBuilder(qt.QMainWindow):
                                                    "Do you want to create a startup script for the new GUI ?",
                                                    qt.QMessageBox.Yes, qt.QMessageBox.No) == qt.QMessageBox.Yes:
                             try:
-                                hwr_server = HardwareRepository.getHardwareRepository().serverAddress
+                                hwr_server = HardwareRepository.HardwareRepository().serverAddress
                             except:
                                 hwr_server = ""
                             else:
@@ -1254,7 +1254,7 @@ class GUIBuilder(qt.QMainWindow):
         terminal = os.environ["TERM"] or "xterm"
 
         try:
-            hwr_server = HardwareRepository.getHardwareRepository().serverAddress
+            hwr_server = HardwareRepository.HardwareRepository().serverAddress
         except:
             logging.getLogger().error("Sorry, could not find Hardware Repository server")
         else:
