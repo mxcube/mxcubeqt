@@ -1392,7 +1392,7 @@ class GUIBuilder(QMainWindow):
                           QMessageBox.No) == QMessageBox.Yes:
                         try:
                             hwr_server = HardwareRepository.\
-                               HardwareRepository().serverAddress
+                               getHardwareRepository().serverAddress
                         except:
                             hwr_server = ""
                         else:
@@ -1494,7 +1494,7 @@ class GUIBuilder(QMainWindow):
         terminal = os.environ["TERM"] or "xterm"
 
         try:
-            hwr_server = HardwareRepository.HardwareRepository().serverAddress
+            hwr_server = HardwareRepository.getHardwareRepository().serverAddress
         except:
             logging.getLogger().error("Sorry, could not find Hardware Repository server")
         else:

@@ -574,7 +574,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
         #
         # connect signals / slots
         #
-        dispatcher.connect(self.__hardwareObjectDiscarded, 'hardwareObjectDiscarded', HardwareRepository.HardwareRepository())
+        dispatcher.connect(self.__hardwareObjectDiscarded, 'hardwareObjectDiscarded', HardwareRepository.getHardwareRepository())
  
         self.defineSlot('enable_widget', ())
         
@@ -787,7 +787,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
         if screen is not None:
             screen.set_message("Loading hardware object: %s" % hardwareObjectName)
 
-        ho = HardwareRepository.HardwareRepository().getHardwareObject(hardwareObjectName)
+        ho = HardwareRepository.getHardwareRepository().getHardwareObject(hardwareObjectName)
     
         return ho
         
@@ -802,7 +802,7 @@ class BlissWidget(QWidget, Connectable.Connectable):
         d = {}
         
         for ho_name in self.__loadedHardwareObjects:
-            info = HardwareRepository.HardwareRepository().getInfo(ho_name)
+            info = HardwareRepository.getHardwareRepository().getInfo(ho_name)
             
             if len(info) > 0:
                 d[ho_name] = info
@@ -953,7 +953,7 @@ class ProcedureBrick(BlissWidget):
     def setMnemonic(self, mne):
         self.getProperty('mnemonic').setValue(mne)
 
-        proc = HardwareRepository.HardwareRepository().getProcedure(mne)
+        proc = HardwareRepository.getHardwareRepository().getProcedure(mne)
 
         self.__setProcedure(proc)
 
@@ -996,7 +996,7 @@ class ProcedureBrick(BlissWidget):
     def addPage(self, pageName):
         self.__pages.append(ProcedureWidgets.ProcedurePanel(self))
 
-        self.__pages[-1].setProcedure(HardwareRepository.HardwareRepository().getProcedure(self['mnemonic']))
+        self.__pages[-1].setProcedure(HardwareRepository.getHardwareRepository().getProcedure(self['mnemonic']))
         self.procedureTab.addTab(self.__pages[-1], pageName)
 
         return self.__pages[-1]
@@ -1008,7 +1008,7 @@ class ProcedureBrick(BlissWidget):
         
     def propertyChanged(self, property, oldValue, newValue):
         if property == 'mnemonic':
-            self.setMnemonic(newValue) #Procedure(HardwareRepository.HardwareRepository().getHardwareObject(newValue))
+            self.setMnemonic(newValue) #Procedure(HardwareRepository.getHardwareRepository().getHardwareObject(newValue))
         elif property == 'equipment':
             self.setEquipment(self.getHardwareObject(newValue))
 
