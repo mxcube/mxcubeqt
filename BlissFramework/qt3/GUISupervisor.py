@@ -64,7 +64,7 @@ class GUISupervisor(qt.QWidget):
         qt.QWidget.__init__(self)
 
         self.launchInDesignMode = designMode
-        self.hardwareRepository = HardwareRepository.HardwareRepository()
+        self.hardwareRepository = HardwareRepository.getHardwareRepository()
         self.showMaximized = showMaximized
         self.noBorder = noBorder
         self.windows = []

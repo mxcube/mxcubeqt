@@ -235,7 +235,7 @@ class CustomMenuBar(QMenuBar):
 
     def reload_hwr_clicked(self):
         """Reloads hardware objects"""
-        hwr = HardwareRepository.HardwareRepository()
+        hwr = HardwareRepository.getHardwareRepository()
         hwr.reloadHardwareObjects()
 
     def edit_brick_properties(self):

@@ -30,8 +30,6 @@ from QtImport import *
 from BlissFramework import Qt4_Icons
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
-
-from HardwareRepository.HardwareRepository import dispatcher
 import collections
 
 
