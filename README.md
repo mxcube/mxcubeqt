@@ -9,7 +9,7 @@ agreement has been signed for the development of MXCuBE with the following
 partners:
 * ESRF
 * [Soleil](http://www.synchrotron-soleil.fr/)
-* [Max lab](https://www.maxlab.lu.se/)
+* [Max IV](https://www.maxiv.lu.se/)
 * [HZB](http://www.helmholtz-berlin.de/)
 * [EMBL](http://www.embl.org/)
 * [Global Phasing Ltd.](http://www.globalphasing.com/)
