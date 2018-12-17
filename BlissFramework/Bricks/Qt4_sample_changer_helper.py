@@ -1,5 +1,5 @@
 from BlissFramework.Utils import Qt4_widget_colors
-from abstract.AbstractSampleChanger import SampleChangerState, SampleChangerMode, SampleChanger
+from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import SampleChangerState, SampleChangerMode, SampleChanger
 
 SC_STATE_COLOR = { SampleChangerState.Fault: Qt4_widget_colors.LIGHT_RED,
                    SampleChangerState.Ready: Qt4_widget_colors.LIGHT_GREEN,
