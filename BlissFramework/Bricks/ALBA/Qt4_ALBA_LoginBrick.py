@@ -80,9 +80,12 @@ class Qt4_ALBA_LoginBrick(Qt4_ProposalBrick2):
             self.refuseLogin(False, msg)
             return
 
-        prop = self.lims_hwobj.getProposal(proposal_code, proposal_number)
+        # We need to translate the proposal_code to acces ispyb database:
+        t_proposal_code = self.lims_hwobj.translate(proposal_code, 'ispyb')
+        logging.getLogger("HWR").debug('Translating proposal code from %s to %s' % (proposal_code, t_proposal_code))
+        prop = self.lims_hwobj.getProposal(t_proposal_code, proposal_number)
 
-        logging.getLogger("HWR").debug('   got proposal info from lims: %s' % str(prop))
+        logging.getLogger("HWR").debug('   ALBALoginBrick:got proposal info from lims: %s' % str(prop))
         # Check if everything went ok
         prop_ok = True
         try:
