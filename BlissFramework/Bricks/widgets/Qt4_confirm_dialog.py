@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import logging
 
 from QtImport import *
 
@@ -46,6 +47,13 @@ class ConfirmDialog(QDialog):
         self.checked_items = []
         self.sample_items = []
        
+        self.configuration_values = {
+          'snapshot_options_plate_mode':  [0,1],
+          'snapshot_options_default':  [0,1,2,4],
+          'default_snapshots_standard':  1,
+          'default_snapshots_characterization':  -1,
+        }
+
         # Graphic elements ---------------------------------------------------- 
         self.conf_dialog_layout = loadUi(os.path.join(\
              os.path.dirname(__file__),
@@ -69,18 +77,23 @@ class ConfirmDialog(QDialog):
         # Other --------------------------------------------------------------- 
         self.setWindowTitle('Confirm collection')
 
+    def get_config_value(self, name):
+        return self.configuration_values.get(name,None)
+
     def set_plate_mode(self, plate_mode):
         """Sets plate mode"""
         if plate_mode:
-            snapshot_count = [0, 1]
+            snapshot_list = self.get_config_value('snapshot_options_plate_mode')
             self.conf_dialog_layout.take_video_cbx.setEnabled(False)
             self.conf_dialog_layout.take_video_cbx.setChecked(False)
         else:
-            snapshot_count = [0, 1, 2, 4]
+            snapshot_list = self.get_config_value('snapshot_options_default')
+
+        snapshot_count = self.get_config_value('default_snapshots_standard')
+
         self.conf_dialog_layout.take_snapshots_combo.clear()
-        for item in snapshot_count:
-            self.conf_dialog_layout.take_snapshots_combo.addItem(str(item))        
-        self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(1)
+        self.conf_dialog_layout.take_snapshots_combo.addItems(map(str,snapshot_list))
+        self.set_default_snapshots(snapshot_count)
  
     def disable_dark_current_cbx(self):
         self.conf_dialog_layout.force_dark_cbx.setEnabled(False)
@@ -90,7 +103,7 @@ class ConfirmDialog(QDialog):
         self.conf_dialog_layout.force_dark_cbx.setEnabled(True)
         self.conf_dialog_layout.force_dark_cbx.setChecked(True)
         
-    def set_items(self, checked_items):
+    def set_items(self, checked_items, dialog_config=None):
         """Populates information about items to be collected"""
         self.sample_items = []
         self.checked_items = checked_items
@@ -148,11 +161,13 @@ class ConfirmDialog(QDialog):
                      acquisition_parameters
                 if not item_model.is_helical() and not item_model.is_mesh():
                     interleave_items += 1
+                snapshot_count = self.get_config_value('default_snapshots_standard')
+                self.set_default_snapshots(snapshot_count)
             elif isinstance(item, Qt4_queue_item.CharacterisationQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                     acquisitions[0].acquisition_parameters
-                self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(\
-                    self.conf_dialog_layout.take_snapshots_combo.count() - 1)
+                snapshot_count = self.get_config_value('default_snapshots_characterization')
+                self.set_default_snapshots(snapshot_count)
             elif isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
                 acq_parameters = item_model.reference_image_collection.\
                      acquisitions[0].acquisition_parameters
@@ -278,3 +293,21 @@ class ConfirmDialog(QDialog):
         Descript. :
         """
         self.reject()
+
+    def set_default_configuration(self,conf):
+        self.configuration_values.update(conf)
+
+    def set_default_snapshots(self,nb_snapshot):
+
+        combo = self.conf_dialog_layout.take_snapshots_combo
+        items = []
+        for idx in range(combo.count()): 
+           items.append( str(combo.itemText(idx)) ) 
+
+        try:
+           idx = items.index(str(nb_snapshot))
+        except:
+           logging.getLogger("HWR").debug(" default nb_snapshots %s not in combo list. selecting first option" % nb_snapshot) 
+           idx = 0 
+
+        combo.setCurrentIndex(idx)
