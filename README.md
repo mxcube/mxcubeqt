@@ -1,5 +1,7 @@
 # MXCuBE
 
+[![Build Status](https://travis-ci.org/mxcube/mxcube.svg?branch=master)](https://travis-ci.org/mxcube/mxcube)
+
 MXCuBE stands for Macromolecular Xtallography Customized Beamline Environment.
 The project started in 2005 at [ESRF](http://www.esrf.eu), since then it has
 been adopted by other institutes in Europe. In 2010, a collaboration
