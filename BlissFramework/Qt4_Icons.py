@@ -65,7 +65,7 @@ def get_icon_path(icon_name):
         return filename
         
 def load_icon(icon_name):
-    return QtIcon.QIcon(load(icon_name))
+    return QtImport.QIcon(load(icon_name))
 
 def load_pixmap(icon_name):
     return load(icon_name)

@@ -22,7 +22,7 @@ from QtImport import *
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
-from sample_changer import SC3
+from HardwareRepository.HardwareObjects import SC3
 from Qt4_sample_changer_helper import *
 
 
