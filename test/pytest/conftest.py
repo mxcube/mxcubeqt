@@ -17,16 +17,3 @@ print ("Config path: %s" % HWR_XML_FILES)
 @pytest.fixture(scope="session")
 def mxcube_root():
     return MXCUBE_ROOT
-"""
-from HardwareRepository.HardwareRepository import getHardwareRepository
-
-@pytest.fixture(scope="session")
-def hwr():
-    hwr = getHardwareRepository(HWR_XML_FILES)
-    hwr.connect()
-    return hwr
-
-@pytest.fixture(scope="session")
-def blsetup(hwr):
-    return hwr.getHardwareObject("beamline-setup")
-"""
