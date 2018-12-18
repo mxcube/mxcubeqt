@@ -2,7 +2,7 @@ PyDispatcher
 gevent
 suds
 simplejson
-simpleyaml
+pyyaml
 numpy
 scipy
 matplotlib
