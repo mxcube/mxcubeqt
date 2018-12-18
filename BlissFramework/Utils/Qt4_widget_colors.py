@@ -17,48 +17,48 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import Qt, QColor, QPalette
+import QtImport
 
 from random import randint
 import numpy as np
 
 #Basic core colors
-WHITE = QColor(Qt.white )
-GRAY =  QColor(Qt.gray )
-LIGHT_GRAY = QColor(Qt.lightGray )
-DARK_GRAY = QColor(Qt.darkGray )
-GREEN = QColor(Qt.green )
-DARK_GREEN = QColor(Qt.darkGreen)
-RED = QColor(Qt.red )
+WHITE = QtImport.QColor(QtImport.Qt.white )
+GRAY =  QtImport.QColor(QtImport.Qt.gray )
+LIGHT_GRAY = QtImport.QColor(QtImport.Qt.lightGray )
+DARK_GRAY = QtImport.QColor(QtImport.Qt.darkGray )
+GREEN = QtImport.QColor(QtImport.Qt.green )
+DARK_GREEN = QtImport.QColor(QtImport.Qt.darkGreen)
+RED = QtImport.QColor(QtImport.Qt.red )
 
-LIGHT_GREEN = QColor(204,255,204)
-LIGHT_RED = QColor(255,204,204)
-LIGHT_YELLOW = QColor(254, 254, 121)
-LIGHT_BLUE = QColor(72, 191, 255)
-LIGHT_2_GRAY = QColor(240, 240, 240)
-LIGHT_ORANGE = QColor(255, 185, 56)
-SKY_BLUE = QColor(190, 225 ,255)
-PLUM = QColor(142, 69, 133, 70)
+LIGHT_GREEN = QtImport.QColor(204,255,204)
+LIGHT_RED = QtImport.QColor(255,204,204)
+LIGHT_YELLOW = QtImport.QColor(254, 254, 121)
+LIGHT_BLUE = QtImport.QColor(72, 191, 255)
+LIGHT_2_GRAY = QtImport.QColor(240, 240, 240)
+LIGHT_ORANGE = QtImport.QColor(255, 185, 56)
+SKY_BLUE = QtImport.QColor(190, 225 ,255)
+PLUM = QtImport.QColor(142, 69, 133, 70)
 
-LINE_EDIT_ORIGINAL = QColor(0, 0, 12)
-LINE_EDIT_ACTIVE = QColor(204,255,204)
+LINE_EDIT_ORIGINAL = QtImport.QColor(0, 0, 12)
+LINE_EDIT_ACTIVE = QtImport.QColor(204,255,204)
 LINE_EDIT_CHANGED = LIGHT_ORANGE
-LINE_EDIT_ERROR = QColor(255,204,204)
+LINE_EDIT_ERROR = QtImport.QColor(255,204,204)
 
-BUTTON_ORIGINAL = QColor(242, 241, 240)
-GROUP_BOX_GRAY = QColor(230, 230, 230)
+BUTTON_ORIGINAL = QtImport.QColor(242, 241, 240)
+GROUP_BOX_GRAY = QtImport.QColor(230, 230, 230)
 QUEUE_ENTRY_COLORS = [WHITE,
                       LIGHT_GREEN,
                       LIGHT_YELLOW,
                       LIGHT_RED,
                       LIGHT_GRAY]
 
-TREE_ITEM_SAMPLE = QColor(240, 240, 240)
-TREE_ITEM_COLLECTION = QColor(255, 230, 210)
+TREE_ITEM_SAMPLE = QtImport.QColor(240, 240, 240)
+TREE_ITEM_COLLECTION = QtImport.QColor(255, 230, 210)
 
-TASK_GROUP = [QColor("#B0DBFF"),
-              QColor("#E57935"),
-              QColor("#B1FF52")]
+TASK_GROUP = [QtImport.QColor("#B0DBFF"),
+              QtImport.QColor("#E57935"),
+              QtImport.QColor("#B1FF52")]
 
 
 def set_widget_color(widget, color, color_role=None):
@@ -66,14 +66,14 @@ def set_widget_color(widget, color, color_role=None):
     Descript. :
     """
     if color_role is None:
-        color_role = QPalette.Window
+        color_role = QtImport.QPalette.Window
     widget_palette = widget.palette()
     widget_palette.setColor(color_role, color)
     widget.setAutoFillBackground(True) 
     widget.setPalette(widget_palette)
 
 def get_random_color(alpha=255):
-    return QColor(randint(0, 255),
+    return QtImport.QColor(randint(0, 255),
                   randint(0, 255),
                   randint(0, 255),
                   alpha)
