@@ -17,6 +17,6 @@ def test_mxcube_qt(mxcube_root):
     print("GUI file: %s" % gui_file)
     Qt4_startGUI.run(gui_file)
 
-    for widget in QtImport.getQApp().allWidgets():
-        if hasattr(widget, "test_pytest"):
-            widget.test_pytest()
+    #for widget in QtImport.getQApp().allWidgets():
+    #    if hasattr(widget, "test_pytest"):
+    #        widget.test_pytest()
