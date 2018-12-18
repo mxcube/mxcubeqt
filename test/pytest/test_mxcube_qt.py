@@ -3,8 +3,6 @@ import os
 import pytest
 
 def test_mxcube_qt(mxcube_root):
-    sys.path.insert(0, mxcube_root + "/BlissFramework")
-    print sys.path
     gui_file = os.path.join(mxcube_root,
                             "ExampleFiles/example_mxcube_qt4.yml")
     hr_server = os.path.join(mxcube_root,
