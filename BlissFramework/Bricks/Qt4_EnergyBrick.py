@@ -168,6 +168,14 @@ class Qt4_EnergyBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
+    def test(self):
+        QTest.keyClicks(self.new_value_ledit, "15")
+        QTest.keyPress(self.new_value_ledit, Qt.Key_Enter)
+ 
+        #if not str(self.energy_ledit.text()).startswith("15"):
+        #    raise ValueError("EnergyBrick: Setting energy to 15 keV failed")
+        assert str(self.energy_ledit.text()).startswith("15"), "EnergyBrick: Setting energy to 15 keV failed"
+
     def connected(self):
         self.setEnabled(True)
         tunable_energy = self.energy_hwobj.can_move_energy()

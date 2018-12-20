@@ -36,8 +36,7 @@ from QtImport import *
 
 import BlissFramework
 from BlissFramework import Qt4_GUISupervisor
-from BlissFramework.Utils import Qt4_ErrorHandler
-from BlissFramework.Utils import Qt4_GUILogHandler
+from BlissFramework.Utils import Qt4_ErrorHandler, Qt4_GUILogHandler, Qt4_GUITest
 
 #from BlissFramework.Utils import terminal_server
 
@@ -51,6 +50,7 @@ _logger.addHandler(_GUIhdlr)
 __credits__ = ["MXCuBE colaboration"]
 __version__ = 2.3
 
+test_ready_event = gevent.event.Event()
 
 def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)
@@ -73,8 +73,8 @@ class MyCustomEvent(QEvent):
 
         QEvent.__init__(self, event_type)
         self.data = data
-
-def run(gui_config_file=None):
+    
+def run(gui_config_file=None, test_mode=False):
     """Main run method"""
 
     default_hwr_server = 'localhost:hwr'
@@ -292,6 +292,10 @@ def run(gui_config_file=None):
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))
 
+    #if test_mode:
+    if True:
+        gevent.spawn_later(10, Qt4_GUITest.run_test)
+
     # redirect errors to logger
     Qt4_ErrorHandler.enableStdErrRedirection()
 
@@ -319,7 +323,6 @@ def run(gui_config_file=None):
             os.unlink(filename)
         except:
             logging.getLogger().exception("Problem removing the log lock file")
-
 
 if __name__ == '__main__':
     run()

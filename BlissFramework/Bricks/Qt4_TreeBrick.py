@@ -410,6 +410,21 @@ class Qt4_TreeBrick(BlissWidget):
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
+    def test_select_sample(self):
+        item_iterator = QTreeWidgetItemIterator(\
+             self.dc_tree_widget.sample_tree_widget)
+        item = item_iterator.value()
+        while item:
+              if isinstance(item, Qt4_queue_item.SampleQueueItem):
+                  self.dc_tree_widget.sample_tree_widget.setCurrentItem(item)
+                  #self.dc_tree_widget.mount_sample_task()
+                  break
+              item_iterator += 1
+              item = item_iterator.value()    
+
+    def test_collect_queue(self):
+        QTest.mouseClick(self.dc_tree_widget.collect_button, Qt.LeftButton)
+
     @pyqtSlot(int, str, str, int, str, str, bool)
     def set_session(self, session_id, t_prop_code = None, prop_number = None,
                     prop_id = None, start_date = None, prop_code = None,

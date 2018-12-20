@@ -110,6 +110,10 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         self.request_tree_brick.emit() 
         self.task_tool_box_widget.adjust_width(self.width())
 
+    def test_collect_now(self):
+        self.task_tool_box_widget.current_page_changed(0)
+        QTest.mouseClick(self.task_tool_box_widget.collect_now_button, Qt.LeftButton)
+
     def user_group_saved(self, new_user_group):
         self.session_hwobj.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
