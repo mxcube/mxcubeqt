@@ -28,10 +28,9 @@ from HardwareRepository.BaseHardwareObjects import HardwareObject
 
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.2."
 
 cwd = os.getcwd()
-hwr_server = cwd +  "/ExampleFiles/HardwareObjects.xml"
+hwr_server = cwd +  "/HardwareRepository/configuration/xml-qt"
 
 print "==============================================================="
 print "MXCuBE home directory: %s" % cwd
@@ -39,7 +38,6 @@ print "Hardware repository: %s" % hwr_server
 HardwareRepository.setHardwareRepositoryServer(hwr_server)
 hardware_repository = HardwareRepository.HardwareRepository()
 hardware_repository.connect()
-HardwareRepository.addHardwareObjectsDirs([cwd + "/HardwareObjects"])
 unittest_hwobj = hardware_repository.getHardwareObject("unittest")
 if unittest_hwobj is not None:
     print "UnitTest hardware object loaded"

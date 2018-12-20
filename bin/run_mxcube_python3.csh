@@ -1,3 +1,3 @@
 #!/bin/csh -f
 
-/home/mxuser/mxcube/mxcube-2/bin/mxcube_python3 --hardwareRepository=/home/mxuser/mxcube/mxcube-2/ExampleFiles/HardwareObjects.xml --hardwareObjectsDirs=/home/mxuser/mxcube/mxcube-2/HardwareObjects/sample_changer $argv
+python3 /home/USER/mxcube2/bin/mxcube --hardwareRepository=/home/USER/mxcube2/HardwareRepository/configuration/xml-qt $argv

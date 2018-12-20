@@ -292,8 +292,7 @@ def run(gui_config_file=None, test_mode=False):
     main_application.postEvent(supervisor,
         MyCustomEvent(Qt4_GUISupervisor.LOAD_GUI_EVENT, gui_config_file))
 
-    #if test_mode:
-    if True:
+    if test_mode:
         gevent.spawn_later(10, Qt4_GUITest.run_test)
 
     # redirect errors to logger
