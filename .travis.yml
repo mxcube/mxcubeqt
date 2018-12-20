@@ -25,5 +25,4 @@ install:
   - cd ..
   - sudo apt-get install python-qt4
 script:
-#  - python -m pytest
-  - python -m pytest test/pytest/
+  - python -m pytest
