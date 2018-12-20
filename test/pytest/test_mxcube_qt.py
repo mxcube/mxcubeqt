@@ -10,13 +10,8 @@ def test_mxcube_qt(mxcube_root):
     hr_server = os.path.join(mxcube_root,
                              "HardwareRepository/configuration/xml-qt")
     os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
-    from BlissFramework import Qt4_startGUI
+    from BlissFramework import Qt4_startTestGUI
  
     print("GUI file: %s" % gui_file)
 
-    print(dir(QtImport))
-    Qt4_startGUI.run(gui_file, test_mode=True)
-     
-    #for widget in QtImport.getQApp().allWidgets():
-    #    if hasattr(widget, "test_pytest"):
-    #        widget.test_pytest()
+    Qt4_startTestGUI.run_test(gui_file)
