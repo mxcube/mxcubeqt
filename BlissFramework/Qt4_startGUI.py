@@ -180,7 +180,8 @@ def run(gui_config_file=None, test_mode=False):
 
     if len(args) >= 1:
         if len(args) == 1:
-            gui_config_file = os.path.abspath(args[0])
+            if gui_config_file is None: 
+                gui_config_file = os.path.abspath(args[0])
         else:
             parser.error('Too many arguments.')
             sys.exit(1)
