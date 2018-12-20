@@ -28,9 +28,6 @@ import os
 import logging
 import platform
 
-import gevent.monkey
-gevent.monkey.patch_all(thread=False)
-
 from optparse import OptionParser
 from QtImport import *
 
