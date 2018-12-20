@@ -1,10 +1,11 @@
-PyDispatcher
-gevent
 suds
-simplejson
-pyyaml
+gevent
+enum34
+jsonpickle
+simpleyaml
+PyDispatcher
 numpy
 scipy
 matplotlib
+Pillow
 pymca
-enum34
