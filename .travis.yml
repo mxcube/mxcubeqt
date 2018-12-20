@@ -8,7 +8,7 @@ install:
 #  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry pip install -r requirements_2.txt; fi
 #  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_3.txt; fi
   - pip install -r requirements.txt 
-
+  - pip install ruamel.yaml
 #  - cd ..
 #  - curl -L -O http://sourceforge.net/projects/pyqt/files/sip/sip-4.14.1/sip-4.14.1.tar.gz
 #  - tar -xf sip-4.14.1.tar.gz
@@ -24,8 +24,8 @@ install:
 #  - make -j 2
 #  - sudo make install
 #  - cd ..
-  - sudo apt-get install python-qt4
-  - sudo apt-get install libyaml-dev
-  - sudo apt-get install python-yaml
+  - apt-get install python-qt4
+  - apt-get install libyaml-dev
+  - apt-get install python-yaml
 script:
   - python -m pytest
