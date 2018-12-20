@@ -24,6 +24,6 @@ install:
 #  - make -j 2
 #  - sudo make install
 #  - cd ..
-  - sudo apt-get install python-qt4, python-yaml
+  - sudo apt-get install python-qt4 python-yaml
 script:
   - python -m pytest
