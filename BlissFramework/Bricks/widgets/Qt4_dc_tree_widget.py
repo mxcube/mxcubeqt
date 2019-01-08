@@ -884,7 +884,7 @@ class DataCollectTree(QWidget):
                     result = True
         return result
 
-    def collect_items(self, items=[], checked_items=[]):
+    def collect_items(self, items=[], checked_items=[], wait=False):
         """Starts data collection
            - deselects all shapes
            - checks data collection parameters via beamline setup
@@ -932,7 +932,7 @@ class DataCollectTree(QWidget):
         self.run_cb()
         QApplication.setOverrideCursor(QCursor(Qt.BusyCursor))
         try:
-            self.queue_hwobj.execute()
+            self.queue_hwobj.execute(wait)
         except (Exception, e):
             raise e
         self.parent().set_condition_state("confirmation_window_accepted",

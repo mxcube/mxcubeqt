@@ -414,6 +414,9 @@ class TaskToolBoxWidget(QWidget):
             self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
 
     def collect_now_button_click(self):
+        self.collect_now_task()
+
+    def collect_now_task(self, wait=False):
         self.create_task_button_click()
         collect_items = []
         for item in self.tree_brick.dc_tree_widget.get_collect_items():
@@ -427,7 +430,7 @@ class TaskToolBoxWidget(QWidget):
             else:
                 collect_items.append(item)
         if self.tree_brick.dc_tree_widget.enable_collect_condition:
-            self.tree_brick.dc_tree_widget.collect_items(collect_items)
+            self.tree_brick.dc_tree_widget.collect_items(collect_items, wait=wait)
         else:
             logging.getLogger("GUI").warning("Collections are disabled")
 

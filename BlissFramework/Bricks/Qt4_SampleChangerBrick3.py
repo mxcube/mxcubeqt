@@ -22,7 +22,7 @@ from QtImport import *
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework import Qt4_Icons
-from sample_changer import SC3
+from HardwareRepository.HardwareObjects.abstract import AbstractSampleChanger
 from Qt4_sample_changer_helper import *
 
 
@@ -470,7 +470,7 @@ class CurrentBasketView(CurrentView):
         self.scan_basket_button.setIcon(Qt4_Icons.load_icon(scan_one_icon))
 
     def scanBasket(self):
-        self.scanBasketSignal.emitt()
+        self.scanBasketSignal.emit()
 
 class CurrentSampleView(CurrentView):
 
@@ -1210,13 +1210,13 @@ class Qt4_SampleChangerBrick3(BlissWidget):
             self.status.setMinidiffStatus(self.sample_changer_hwobj.minidiffCanMove())
 
     def changeBasket(self, basket_number):
-        address = SC3.Basket.getBasketAddress(basket_number)
+        address = AbstractSampleChanger.Basket.getBasketAddress(basket_number)
         self.sample_changer_hwobj.select(address, wait=False)
 
     def changeSample(self, sample_number):
         basket_index = self.sample_changer_hwobj.getSelectedComponent().getIndex()
         basket_number = basket_index + 1
-        address = SC3.Pin.getSampleAddress(basket_number, sample_number)
+        address = AbstractSampleChanger.Pin.getSampleAddress(basket_number, sample_number)
         self.sample_changer_hwobj.select(address, wait=False)
 
     def user_select_this_sample(self, basket_index, vial_index):
@@ -1273,7 +1273,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def scanAllBaskets(self):
         baskets_to_scan = []
         for index, basket_checkbox in enumerate(self.baskets):
-            baskets_to_scan.append(SC3.Basket.getBasketAddress(index + 1) \
+            baskets_to_scan.append(AbstractSampleChanger.Basket.getBasketAddress(index + 1) \
               if basket_checkbox.isChecked() else None)
         self.sample_changer_hwobj.scan(filter(None, baskets_to_scan),
              recursive=True, wait=False)
