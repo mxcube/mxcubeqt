@@ -217,18 +217,17 @@ class DataPathWidget(QWidget):
         """
         Descript. :
         """
-        base_image_dir = self._base_image_dir
-        dir_parts = directory.split(base_image_dir) 
-
-        if len(dir_parts) > 1:
-            sub_dir = dir_parts[1]
-            self._data_model.directory = directory
+        self._data_model.directory = str(directory)
+ 
+        if len(directory.split("/")) != len(self._base_image_dir.split("/")):
+            dir_parts = directory.split("/")
+            sub_dir = os.path.join(*dir_parts[len(self._base_image_dir.split("/")):])
             self.data_path_layout.folder_ledit.setText(sub_dir)
-        else:
-            self.data_path_layout.folder_ledit.setText('')
-            self._data_model.directory = base_image_dir
+        #else:
+        #    self.data_path_layout.folder_ledit.setText('')
+        #    self._data_model.directory = base_image_dir
 
-        self.data_path_layout.base_path_ledit.setText(base_image_dir)       
+        self.data_path_layout.base_path_ledit.setText(self._base_image_dir)
 
     #def set_run_number(self, run_number):
     #    """
