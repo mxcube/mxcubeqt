@@ -223,9 +223,9 @@ class DataPathWidget(QWidget):
             dir_parts = directory.split("/")
             sub_dir = os.path.join(*dir_parts[len(self._base_image_dir.split("/")):])
             self.data_path_layout.folder_ledit.setText(sub_dir)
-        #else:
-        #    self.data_path_layout.folder_ledit.setText('')
-        #    self._data_model.directory = base_image_dir
+        else:
+            self.data_path_layout.folder_ledit.setText('')
+            self._data_model.directory = self._base_image_dir
 
         self.data_path_layout.base_path_ledit.setText(self._base_image_dir)
 
