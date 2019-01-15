@@ -39,7 +39,7 @@ from HardwareRepository import HardwareRepository
 LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
 
 
-class BlissSplashScreen(QtImport.QSplashScreen):
+class SplashScreen(QtImport.QSplashScreen):
     """Splash screen when mxcube is loading"""
 
     def __init__(self, pixmap):
@@ -117,7 +117,7 @@ class GUISupervisor(QtImport.QWidget):
         self.show_maximized = show_maximized
         self.no_border = no_border
         self.windows = []
-        self.splash_screen = BlissSplashScreen(Icons.load_pixmap("splash"))
+        self.splash_screen = SplashScreen(Icons.load_pixmap("splash"))
 
         set_splash_screen(self.splash_screen)
         self.splash_screen.show()
